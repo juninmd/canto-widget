@@ -7,6 +7,13 @@ sincronizado com o Google Drive sem que o Google consiga ler nada.
 
 Abas: **tarefas · notas · clipboard · reuniões · agenda · sync**.
 
+![Widget ancorado no canto inferior direito](docs/prints/01-canto-inferior-direito.png)
+
+| Tarefas do dia | Cards pesquisáveis |
+|---|---|
+| ![Checklist do dia](docs/prints/04-tarefas-do-dia.png) | ![Notas em cards](docs/prints/08-cards-salvos.png) |
+| ![Busca nos cards](docs/prints/09-busca-cluster.png) | ![Todas as abas](docs/prints/20-abas-completas.png) |
+
 Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em Rust.
 
 ## Modelo de segurança
@@ -25,6 +32,10 @@ Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em R
 | CSP | sem origens remotas; toda a rede sai pelo processo Rust, nunca pela webview |
 
 Perder a senha mestra significa perder os dados: não há recuperação, nem local nem no Drive.
+
+| Cofre trancado | Senha errada |
+|---|---|
+| ![Cofre trancado](docs/prints/13-cofre-trancado.png) | ![Senha incorreta](docs/prints/14-senha-errada.png) |
 
 ## Rodando
 
@@ -50,6 +61,8 @@ cd src-tauri && cargo test
    e passa a exibir o e-mail da conta conectada.
 6. **sincronizar agora** faz pull + merge + push.
 
+![Aba de sync com a conta conectada](docs/prints/10-aba-sync.png)
+
 O mesmo cofre em outra máquina: crie o cofre local **com a mesma senha mestra**, configure o Drive
 e sincronize — o merge traz o conteúdo remoto.
 
@@ -71,10 +84,25 @@ Last-write-wins por item (`updated_at` em ms) com lápides para remoções:
   toca um aviso sonoro e abre um overlay com título, horário, local e o botão **entrar no Meet**
   quando o evento tem link.
 
+| Clipboard local | Últimas transcrições |
+|---|---|
+| ![Histórico da área de transferência](docs/prints/21-clipboard.png) | ![Lista de transcrições](docs/prints/22-transcricoes.png) |
+| ![Agenda do dia](docs/prints/24-agenda.png) | ![Alerta de reunião começando](docs/prints/26-popup-alerta.png) |
+
 ## Aparência e atalho
 
 - Skins: **padrão**, **Hueco Mundo** (Bleach) e **Drácula**, trocáveis pelos pontos no cabeçalho.
 - Atalho global **Ctrl+Alt+Espaço** (`Cmd+Alt+Espaço` no macOS) mostra/esconde o widget.
+
+| padrão | Hueco Mundo | Drácula |
+|---|---|---|
+| ![Skin padrão](docs/prints/30-skin-padrao.png) | ![Skin Hueco Mundo](docs/prints/31-skin-hueco-mundo.png) | ![Skin Drácula](docs/prints/32-skin-dracula.png) |
+
+Atalho global escondendo e trazendo o widget de volta:
+
+| Ctrl+Alt+Espaço | Ctrl+Alt+Espaço de novo |
+|---|---|
+| ![Widget escondido](docs/prints/33-atalho-escondeu.png) | ![Widget de volta](docs/prints/34-atalho-voltou.png) |
 
 ## Janela
 
