@@ -7,8 +7,6 @@ sincronizado com o Google Drive sem que o Google consiga ler nada.
 
 Abas: **tarefas · notas · clipboard · reuniões · agenda · sync**.
 
-![Widget ancorado no canto inferior direito](docs/prints/01-canto-inferior-direito.png)
-
 | Tarefas do dia | Cards pesquisáveis |
 |---|---|
 | ![Checklist do dia](docs/prints/04-tarefas-do-dia.png) | ![Notas em cards](docs/prints/08-cards-salvos.png) |
