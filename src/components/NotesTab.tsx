@@ -41,9 +41,21 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
     }
   }
 
+  function cancelar() {
+    setDraft(EMPTY);
+    setEditing(false);
+  }
+
   if (editing) {
     return (
-      <form onSubmit={save} className="flex h-full flex-col gap-2">
+      <form
+        onSubmit={save}
+        onKeyDown={(e) => {
+          if (e.key === "Escape") cancelar();
+          if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) void save(e);
+        }}
+        className="flex h-full flex-col gap-2"
+      >
         <input
           autoFocus
           value={draft.title}
@@ -64,15 +76,17 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
           className="rounded-lg border border-edge bg-ink px-3 py-1.5 text-xs text-muted outline-none focus:border-accent"
         />
         <div className="flex gap-2">
-          <button type="submit" className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent">
+          <button
+            type="submit"
+            title="Ctrl+Enter"
+            className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent"
+          >
             salvar
           </button>
           <button
             type="button"
-            onClick={() => {
-              setDraft(EMPTY);
-              setEditing(false);
-            }}
+            onClick={cancelar}
+            title="Esc"
             className="rounded-lg bg-edge px-3 py-1.5 text-sm text-fg"
           >
             cancelar

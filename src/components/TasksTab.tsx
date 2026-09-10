@@ -1,9 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, errText, type Task } from "../lib/api";
 
 export default function TasksTab({ today, onError }: { today: string; onError: (m: string) => void }) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
+  const [editando, setEditando] = useState<{ id: string; title: string } | null>(null);
+  // Encerrar a edicao desmonta o input ainda focado, e o webview dispara um
+  // blur nele com a closure do render anterior. Sem esta trava, Esc salvaria o
+  // texto descartado e Enter gravaria o cofre duas vezes.
+  const edicaoEncerrada = useRef(false);
 
   async function reload() {
     try {
@@ -37,6 +42,15 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
     } catch (e) {
       onError(errText(e));
     }
+  }
+
+  async function renomear() {
+    if (edicaoEncerrada.current || !editando) return;
+    edicaoEncerrada.current = true;
+    const alvo = editando;
+    setEditando(null);
+    if (!alvo.title.trim() || alvo.title === tasks.find((t) => t.id === alvo.id)?.title) return;
+    await run(() => api.taskRename(alvo.id, alvo.title));
   }
 
   const done = tasks.filter((t) => t.done).length;
@@ -77,12 +91,33 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
               onChange={() => run(() => api.taskToggle(t.id))}
               className="size-4 accent-[var(--color-accent)]"
             />
-            <span
-              className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
-              title={t.title}
-            >
-              {t.title}
-            </span>
+            {editando?.id === t.id ? (
+              <input
+                autoFocus
+                value={editando.title}
+                onChange={(e) => setEditando({ id: t.id, title: e.target.value })}
+                onBlur={() => void renomear()}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") void renomear();
+                  if (e.key === "Escape") {
+                    edicaoEncerrada.current = true;
+                    setEditando(null);
+                  }
+                }}
+                className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
+              />
+            ) : (
+              <span
+                className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
+                title={`${t.title}\n(clique duas vezes para renomear)`}
+                onDoubleClick={() => {
+                  edicaoEncerrada.current = false;
+                  setEditando({ id: t.id, title: t.title });
+                }}
+              >
+                {t.title}
+              </span>
+            )}
             <button
               type="button"
               onClick={() => run(() => api.itemDelete(t.id))}

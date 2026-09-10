@@ -5,6 +5,15 @@ use crate::error::{AppError, Result};
 use crate::model::{now_ms, Note, Task};
 use crate::vault::AppState;
 
+/// Titulo de tarefa sempre chega aparado e nunca vazio, no cadastro e no rename.
+fn titulo_de_tarefa(bruto: &str) -> Result<String> {
+    let limpo = bruto.trim();
+    if limpo.is_empty() {
+        return Err(AppError::Config("a tarefa precisa de um titulo".into()));
+    }
+    Ok(limpo.to_string())
+}
+
 pub fn new_id() -> String {
     format!("{:x}{:x}", now_ms(), rand::thread_rng().gen::<u32>())
 }
@@ -49,10 +58,7 @@ pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task
 
 #[tauri::command]
 pub fn task_add(state: State<'_, AppState>, title: String, day: String) -> Result<Task> {
-    let title = title.trim().to_string();
-    if title.is_empty() {
-        return Err(AppError::Config("a tarefa precisa de um titulo".into()));
-    }
+    let title = titulo_de_tarefa(&title)?;
     let now = now_ms();
     let task = Task {
         id: new_id(),
@@ -79,12 +85,21 @@ pub fn task_toggle(state: State<'_, AppState>, id: String) -> Result<()> {
 
 #[tauri::command]
 pub fn task_rename(state: State<'_, AppState>, id: String, title: String) -> Result<()> {
+    let title = titulo_de_tarefa(&title)?;
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
             t.title = title;
             t.updated_at = now_ms();
         }
     })
+}
+
+/// Marca atividade deliberada do usuario para adiar o auto-lock.
+#[tauri::command]
+pub fn vault_touch(state: State<'_, AppState>) {
+    if state.is_unlocked() {
+        state.touch();
+    }
 }
 
 /// Traz para `day` as tarefas em aberto de dias anteriores, sem duplicar nada.
@@ -165,4 +180,30 @@ pub fn note_save(
 #[tauri::command]
 pub fn item_delete(state: State<'_, AppState>, id: String) -> Result<()> {
     state.mutate(|d| d.tombstone(&id, now_ms()))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn titulo_valido_chega_aparado() {
+        assert_eq!(titulo_de_tarefa("  comprar leite  ").unwrap(), "comprar leite");
+    }
+
+    #[test]
+    fn titulo_vazio_ou_so_espaco_e_recusado() {
+        for bruto in ["", "   ", "\t\n", "\u{00a0}"] {
+            assert!(
+                matches!(titulo_de_tarefa(bruto), Err(AppError::Config(_))),
+                "aceitou {bruto:?} como titulo"
+            );
+        }
+    }
+
+    #[test]
+    fn ids_gerados_em_sequencia_nao_se_repetem() {
+        let ids: std::collections::HashSet<String> = (0..500).map(|_| new_id()).collect();
+        assert_eq!(ids.len(), 500);
+    }
 }

@@ -115,7 +115,54 @@ pub fn write_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<()> {
         std::fs::create_dir_all(parent)?;
     }
     let tmp = path.with_extension("tmp");
-    std::fs::write(&tmp, serde_json::to_vec_pretty(value)?)?;
+    let bytes = serde_json::to_vec_pretty(value)?;
+    {
+        use std::io::Write;
+        let mut f = std::fs::File::create(&tmp)?;
+        f.write_all(&bytes)?;
+        // Sem descarregar no disco antes do rename, uma queda de energia pode
+        // deixar o nome novo apontando para conteudo vazio: cofre perdido.
+        f.sync_all()?;
+    }
     std::fs::rename(&tmp, path)?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tmpdir(nome: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("canto-store-{nome}-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&d);
+        d
+    }
+
+    #[test]
+    fn grava_e_le_de_volta_sem_deixar_temporario() {
+        let dir = tmpdir("roundtrip");
+        let alvo = vault_path(&dir);
+        write_json_atomic(&alvo, &KdfParams::default()).unwrap();
+        let lido: KdfParams = read_json(&alvo).unwrap().unwrap();
+        assert_eq!(lido.m_kib, KdfParams::default().m_kib);
+        assert!(!alvo.with_extension("tmp").exists(), "temporario ficou para tras");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn regravar_substitui_o_conteudo_anterior() {
+        let dir = tmpdir("overwrite");
+        let alvo = settings_path(&dir);
+        write_json_atomic(&alvo, &KdfParams { t: 1, ..Default::default() }).unwrap();
+        write_json_atomic(&alvo, &KdfParams { t: 9, ..Default::default() }).unwrap();
+        let lido: KdfParams = read_json(&alvo).unwrap().unwrap();
+        assert_eq!(lido.t, 9);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn arquivo_ausente_devolve_none() {
+        let ausente = tmpdir("vazio").join("nada.json");
+        assert!(read_json::<KdfParams>(&ausente).unwrap().is_none());
+    }
 }

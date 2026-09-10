@@ -27,6 +27,8 @@ Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em R
 | Transcrições | leitura restrita à pasta configurada, extensões `txt/md/vtt/srt`, nome de arquivo validado contra travessia de caminho |
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |
 | Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`) |
+| Auto-lock | 15 min sem uso deliberado do cofre e o widget se tranca sozinho, avisando na tela. Polling de fundo (clipboard, agenda) não conta como uso |
+| Gravação | escrita em arquivo temporário com `fsync` antes do `rename`: queda de energia não deixa envelope pela metade |
 | CSP | sem origens remotas; toda a rede sai pelo processo Rust, nunca pela webview |
 
 Perder a senha mestra significa perder os dados: não há recuperação, nem local nem no Drive.
@@ -43,10 +45,16 @@ bun run tauri dev      # desenvolvimento
 bun run tauri build    # instalador da plataforma atual
 ```
 
-Testes do núcleo (cripto, merge de sync, callback OAuth):
+Testes do núcleo (cripto, merge de sync, callback OAuth, auto-lock, gravação atômica):
 
 ```bash
 cd src-tauri && cargo test
+```
+
+Testes da interface (relógio do dia, disparo do aviso de reunião):
+
+```bash
+bun test
 ```
 
 ## Conectando o Google Drive
@@ -80,7 +88,8 @@ Last-write-wins por item (`updated_at` em ms) com lápides para remoções:
   limpando numeração/timestamps de `vtt`/`srt` para virar texto corrido pesquisável.
 - **agenda** — eventos do dia do Google Calendar. Um minuto antes do início, o widget aparece,
   toca um aviso sonoro e abre um overlay com título, horário, local e o botão **entrar no Meet**
-  quando o evento tem link.
+  quando o evento tem link. O relógio do aviso vive no App, não na aba: dispara com você em
+  qualquer aba ou com o widget escondido. `Esc` fecha o overlay.
 
 | Clipboard local | Últimas transcrições |
 |---|---|
@@ -91,6 +100,9 @@ Last-write-wins por item (`updated_at` em ms) com lápides para remoções:
 
 - Skins: **padrão**, **Hueco Mundo** (Bleach) e **Drácula**, trocáveis pelos pontos no cabeçalho.
 - Atalho global **Ctrl+Alt+Espaço** (`Cmd+Alt+Espaço` no macOS) mostra/esconde o widget.
+- **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
+- **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.
+- A lista de tarefas vira sozinha à meia-noite, sem precisar reabrir o widget.
 
 | padrão | Hueco Mundo | Drácula |
 |---|---|---|
