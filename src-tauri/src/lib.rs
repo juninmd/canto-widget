@@ -32,6 +32,7 @@ pub fn run() {
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir));
             cmd_extras::watch_clipboard(app.handle().clone());
+            watch_idle(app.handle().clone());
             build_tray(app.handle())?;
 
             if let Some(win) = app.get_webview_window("main") {
@@ -46,6 +47,7 @@ pub fn run() {
             commands::vault_create,
             commands::vault_unlock,
             commands::vault_lock,
+            commands::vault_touch,
             commands::tasks_for_day,
             commands::task_add,
             commands::task_toggle,
@@ -83,6 +85,23 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o Canto");
+}
+
+/// Um widget de canto fica aberto o dia inteiro; sem isto o cofre destrancado
+/// e o vigia do clipboard sobrevivem a qualquer tempo longe da maquina.
+const AUTO_LOCK_MS: i64 = 15 * 60 * 1000;
+pub const EVENTO_AUTO_LOCK: &str = "canto://auto-lock";
+
+fn watch_idle(app: tauri::AppHandle) {
+    std::thread::spawn(move || loop {
+        std::thread::sleep(std::time::Duration::from_secs(20));
+        let Some(state) = app.try_state::<AppState>() else {
+            continue;
+        };
+        if state.lock_if_idle(AUTO_LOCK_MS) {
+            let _ = tauri::Emitter::emit(&app, EVENTO_AUTO_LOCK, AUTO_LOCK_MS / 60_000);
+        }
+    });
 }
 
 /// Atalho global de mostrar/esconder. Ctrl+Alt+Espaco (Cmd+Alt+Espaco no macOS).
