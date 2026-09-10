@@ -19,6 +19,7 @@ Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em R
 | Item | Decisão |
 |---|---|
 | Derivação de chave | Argon2id (19 MiB, t=2, p=1), salt aleatório de 16 bytes por cofre |
+| Senha mestra | mínimo de 4 caracteres (`MIN_SENHA`). O envelope fica em disco e sobe para o Drive, então a senha é atacável **offline**: nenhum limite de tentativas protege, e o Argon2id encarece cada palpite, não o total deles. Senha curta é uma escolha consciente de conveniência sobre resistência |
 | Cifra | AES-256-GCM, nonce novo a cada gravação, AAD fixando o domínio (`canto.vault.v1`) |
 | Chave | só existe em RAM enquanto o cofre está destrancado; zeroizada ao trancar/sair |
 | Sync | o Drive recebe **apenas o envelope cifrado**; a fusão acontece local, em claro, na RAM |

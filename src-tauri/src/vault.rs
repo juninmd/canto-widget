@@ -8,6 +8,11 @@ use crate::error::{AppError, Result};
 use crate::model::{now_ms, VaultData};
 use crate::store::{self, SealedBlob, DRIVE_AAD, VAULT_AAD};
 
+/// Piso da senha mestra. Curto por escolha do dono do cofre: o envelope fica em
+/// disco e sobe para o Drive, entao a senha e atacavel offline e nenhum limite
+/// de tentativas protege. O Argon2id encarece cada palpite, nao o total deles.
+pub const MIN_SENHA: usize = 4;
+
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct DriveConfig {
     #[serde(default)]
@@ -83,8 +88,10 @@ impl AppState {
         if self.vault_exists() {
             return Err(AppError::AlreadyExists);
         }
-        if password.chars().count() < 8 {
-            return Err(AppError::Config("a senha mestra precisa de ao menos 8 caracteres".into()));
+        if password.chars().count() < MIN_SENHA {
+            return Err(AppError::Config(format!(
+                "a senha mestra precisa de ao menos {MIN_SENHA} caracteres"
+            )));
         }
         let salt = store::new_salt();
         let key = VaultKey::derive(password, &salt)?;
@@ -227,8 +234,25 @@ mod tests {
     #[test]
     fn senha_curta_nao_cria_cofre() {
         let st = estado("curta");
-        assert!(st.create("1234567").is_err());
+        assert!(st.create("abc").is_err(), "aceitou senha abaixo do piso");
         assert!(!st.vault_exists());
+        let _ = std::fs::remove_dir_all(&st.dir);
+    }
+
+    #[test]
+    fn senha_no_piso_exato_e_aceita() {
+        let st = estado("piso");
+        let senha: String = "a".repeat(MIN_SENHA);
+        st.create(&senha).unwrap();
+        assert!(st.is_unlocked());
+        let _ = std::fs::remove_dir_all(&st.dir);
+    }
+
+    #[test]
+    fn o_piso_conta_caracteres_e_nao_bytes() {
+        let st = estado("unicode");
+        // 4 caracteres, 16 bytes em UTF-8: precisa passar.
+        assert!(st.create("🔐🔐🔐🔐").is_ok());
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
