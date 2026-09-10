@@ -46,6 +46,7 @@ export const api = {
   create: (password: string) => invoke<void>("vault_create", { password }),
   unlock: (password: string) => invoke<void>("vault_unlock", { password }),
   lock: () => invoke<void>("vault_lock"),
+  touch: () => invoke<void>("vault_touch"),
 
   tasksForDay: (day: string) => invoke<Task[]>("tasks_for_day", { day }),
   taskAdd: (title: string, day: string) => invoke<Task>("task_add", { title, day }),

@@ -61,21 +61,33 @@ pub fn clip_clear(state: State<'_, AppState>) -> Result<()> {
 }
 
 /// Vigia o clipboard do sistema enquanto o cofre estiver destrancado.
+/// So decifra o historico quando o texto realmente mudou: sem isso o widget
+/// pagaria uma leitura + AES-GCM do arquivo inteiro 50 vezes por minuto.
 pub fn watch_clipboard(app: tauri::AppHandle) {
-    std::thread::spawn(move || loop {
-        std::thread::sleep(std::time::Duration::from_millis(1200));
-        let Some(state) = app.try_state::<AppState>() else {
-            continue;
-        };
-        if !state.is_unlocked() {
-            continue;
-        }
-        let Ok(texto) = app.clipboard().read_text() else {
-            continue;
-        };
-        let Ok(mut hist) = state.clip_load() else { continue };
-        if hist.push(&texto, new_id()) {
-            let _ = state.clip_save(&hist);
+    std::thread::spawn(move || {
+        let mut ultimo = String::new();
+        loop {
+            std::thread::sleep(std::time::Duration::from_millis(1200));
+            let Some(state) = app.try_state::<AppState>() else {
+                continue;
+            };
+            if !state.is_unlocked() {
+                // Cofre trancado no meio do caminho: esquece o ultimo visto para
+                // nao perder a proxima copia por parecer repetida.
+                ultimo.clear();
+                continue;
+            }
+            let Ok(texto) = app.clipboard().read_text() else {
+                continue;
+            };
+            if texto == ultimo {
+                continue;
+            }
+            ultimo = texto.clone();
+            let Ok(mut hist) = state.clip_load() else { continue };
+            if hist.push(&texto, new_id()) {
+                let _ = state.clip_save(&hist);
+            }
         }
     });
 }

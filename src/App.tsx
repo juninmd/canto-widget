@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
-import { api, errText, todayLocal, type AgendaItem, type VaultStatus } from "./lib/api";
+import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
+import { useAgenda } from "./lib/useAgenda";
+import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
 import NotesTab from "./components/NotesTab";
@@ -20,6 +22,8 @@ export default function App() {
   const [tab, setTab] = useState<Tab>("tarefas");
   const [error, setError] = useState("");
   const [alerta, setAlerta] = useState<AgendaItem | null>(null);
+  const today = useToday();
+  const agenda = useAgenda(status?.unlocked === true);
 
   const refresh = useCallback(async () => {
     try {
@@ -32,6 +36,35 @@ export default function App() {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // O Rust tranca o cofre sozinho depois de um tempo parado; a UI precisa saber.
+  useEffect(() => {
+    const parar = listen<number>("canto://auto-lock", (e) => {
+      setError(`cofre trancado sozinho apos ${e.payload} min sem uso`);
+      void refresh();
+    });
+    return () => {
+      void parar.then((f) => f());
+    };
+  }, [refresh]);
+
+  // Uso deliberado adia o auto-lock. Estrangulado: um aviso por janela basta.
+  useEffect(() => {
+    if (!status?.unlocked) return;
+    let proximo = 0;
+    const marcar = () => {
+      const agora = Date.now();
+      if (agora < proximo) return;
+      proximo = agora + 30_000;
+      void api.touch().catch(() => {});
+    };
+    window.addEventListener("pointerdown", marcar);
+    window.addEventListener("keydown", marcar);
+    return () => {
+      window.removeEventListener("pointerdown", marcar);
+      window.removeEventListener("keydown", marcar);
+    };
+  }, [status?.unlocked]);
 
   // O Rust avisa quando uma reuniao esta comecando; o overlay assume a tela.
   useEffect(() => {
@@ -110,11 +143,11 @@ export default function App() {
             ))}
           </nav>
           <main className="min-h-0 flex-1 p-3">
-            {tab === "tarefas" && <TasksTab today={todayLocal()} onError={setError} />}
+            {tab === "tarefas" && <TasksTab today={today} onError={setError} />}
             {tab === "notas" && <NotesTab onError={setError} />}
             {tab === "clipboard" && <ClipboardTab onError={setError} />}
             {tab === "reunioes" && <TranscriptsTab onError={setError} />}
-            {tab === "agenda" && <AgendaTab onError={setError} />}
+            {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "sync" && <SyncTab onError={setError} />}
           </main>
         </>

@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem } from "../lib/api";
-import { hora, janelaDoDia, minutosAte, paraAlertar } from "../lib/agenda";
-
-const INTERVALO_MS = 30_000;
+import { hora, minutosAte } from "../lib/agenda";
+import type { Agenda } from "../lib/useAgenda";
 
 /// Evento sintetico para o usuario conferir o pop-up e o som sem esperar uma reuniao.
 function eventoDeTeste(): AgendaItem {
@@ -19,39 +17,14 @@ function eventoDeTeste(): AgendaItem {
   };
 }
 
-export default function AgendaTab({ onError }: { onError: (m: string) => void }) {
-  const [itens, setItens] = useState<AgendaItem[]>([]);
-  const [carregando, setCarregando] = useState(false);
-  const alertados = useRef(new Set<string>());
-
-  const reload = useCallback(async () => {
-    setCarregando(true);
-    try {
-      const { timeMin, timeMax } = janelaDoDia();
-      setItens(await api.agendaToday(timeMin, timeMax));
-    } catch (e) {
-      onError(errText(e));
-    } finally {
-      setCarregando(false);
-    }
-  }, [onError]);
-
-  useEffect(() => {
-    void reload();
-    const t = setInterval(() => void reload(), 5 * 60_000);
-    return () => clearInterval(t);
-  }, [reload]);
-
-  // Vigia o relógio: quando um evento está começando, chama o pop-up.
-  useEffect(() => {
-    const t = setInterval(() => {
-      for (const evento of paraAlertar(itens, alertados.current)) {
-        alertados.current.add(evento.id);
-        void api.alertaAbrir(evento).catch((e) => onError(errText(e)));
-      }
-    }, INTERVALO_MS);
-    return () => clearInterval(t);
-  }, [itens, onError]);
+export default function AgendaTab({
+  agenda,
+  onError,
+}: {
+  agenda: Agenda;
+  onError: (m: string) => void;
+}) {
+  const { itens, carregando, erro, recarregar } = agenda;
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -66,7 +39,11 @@ export default function AgendaTab({ onError }: { onError: (m: string) => void })
           >
             testar aviso
           </button>
-          <button type="button" onClick={() => void reload()} className="underline decoration-dotted hover:text-muted">
+          <button
+            type="button"
+            onClick={() => void recarregar()}
+            className="underline decoration-dotted hover:text-muted"
+          >
             {carregando ? "..." : "atualizar"}
           </button>
         </span>
@@ -109,7 +86,7 @@ export default function AgendaTab({ onError }: { onError: (m: string) => void })
         })}
         {itens.length === 0 && !carregando && (
           <li className="px-2 py-6 text-center text-xs text-faint">
-            nada hoje — ou entre com o Google na aba sync
+            {erro || "nada hoje — ou entre com o Google na aba sync"}
           </li>
         )}
       </ul>

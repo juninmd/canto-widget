@@ -1,15 +1,38 @@
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hora } from "../lib/agenda";
 import { tocarAlerta } from "../lib/som";
 
 export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFechar: () => void }) {
+  const principal = useRef<HTMLButtonElement>(null);
+
+  const fechar = useCallback(() => {
+    void api.alertaFechar();
+    onFechar();
+  }, [onFechar]);
+
   useEffect(() => {
     void tocarAlerta();
+    // O overlay cobre o widget inteiro: quem chega por teclado precisa do foco
+    // na acao principal e de uma saida por Esc.
+    principal.current?.focus();
   }, [evento.id]);
 
+  useEffect(() => {
+    const aoTeclar = (e: KeyboardEvent) => {
+      if (e.key === "Escape") fechar();
+    };
+    window.addEventListener("keydown", aoTeclar);
+    return () => window.removeEventListener("keydown", aoTeclar);
+  }, [fechar]);
+
   return (
-    <div className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl">
+    <div
+      role="alertdialog"
+      aria-modal="true"
+      aria-label={`reuniao comecando: ${evento.titulo}`}
+      className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl"
+    >
       <div className="min-h-0">
         <p className="text-[11px] uppercase tracking-widest text-accent">começando agora</p>
         <h1 className="mt-1 line-clamp-2 text-lg font-semibold">{evento.titulo}</h1>
@@ -25,11 +48,11 @@ export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFec
       <div className="flex gap-2">
         {evento.meet && (
           <button
+            ref={principal}
             type="button"
             onClick={() => {
               void api.abrirLink(evento.meet);
-              void api.alertaFechar();
-              onFechar();
+              fechar();
             }}
             className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent"
           >
@@ -38,6 +61,7 @@ export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFec
         )}
         {!evento.meet && evento.link && (
           <button
+            ref={principal}
             type="button"
             onClick={() => void api.abrirLink(evento.link)}
             className="flex-1 rounded-lg bg-edge px-3 py-2 text-sm text-fg"
@@ -47,10 +71,8 @@ export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFec
         )}
         <button
           type="button"
-          onClick={() => {
-            void api.alertaFechar();
-            onFechar();
-          }}
+          onClick={fechar}
+          title="Esc"
           className="rounded-lg bg-edge px-3 py-2 text-sm text-muted"
         >
           fechar
