@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type Note } from "../lib/api";
+import { useDesfazer } from "../lib/useDesfazer";
 
 const EMPTY = { id: undefined as string | undefined, title: "", body: "", tags: "" };
 
@@ -12,6 +13,17 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
   async function reload(q = query) {
     try {
       setNotes(await api.notesSearch(q));
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
+  const desfazivel = useDesfazer(onError, () => reload());
+
+  async function excluir(n: Note) {
+    try {
+      desfazivel(await api.itemDelete(n.id), `card "${n.title}" excluído`);
+      await reload();
     } catch (e) {
       onError(errText(e));
     }
@@ -135,7 +147,7 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
               </button>
               <button
                 type="button"
-                onClick={() => void api.itemDelete(n.id).then(() => reload())}
+                onClick={() => void excluir(n)}
                 className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
                 aria-label={`excluir ${n.title}`}
               >

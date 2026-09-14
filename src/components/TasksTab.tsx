@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type Task } from "../lib/api";
+import { useDesfazer } from "../lib/useDesfazer";
 
 export default function TasksTab({ today, onError }: { today: string; onError: (m: string) => void }) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -34,6 +35,8 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
       onError(errText(e));
     }
   }
+
+  const desfazivel = useDesfazer(onError, reload);
 
   async function run(fn: () => Promise<unknown>) {
     try {
@@ -121,7 +124,7 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
             )}
             <button
               type="button"
-              onClick={() => run(() => api.itemDelete(t.id))}
+              onClick={() => run(async () => desfazivel(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`))}
               // Visivel tambem no foco: so no hover, o teclado nunca acha o botao.
               className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
               aria-label={`excluir ${t.title}`}
