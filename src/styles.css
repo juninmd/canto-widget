@@ -56,6 +56,77 @@
   --color-danger: var(--color-danger);
 }
 
+/*
+ * Movimento. Duracoes da NN/g (feedback ~100ms, entrada 200ms, saida 50ms mais curta),
+ * ease-out para entrar e ease-in para sair, e so transform/opacity para ficar no
+ * compositor (web.dev). Toda classe animada entra via `motion-safe:`; quem pede menos
+ * movimento recebe no maximo um fade de opacidade (WCAG 2.3.3, MDN).
+ */
+@theme {
+  --ease-entrar: cubic-bezier(0.2, 0, 0, 1);
+  --ease-sair: cubic-bezier(0.4, 0, 1, 1);
+  /* Entrada com fill backwards: ao terminar nao sobra transform criando stacking context. */
+
+  --animate-entrar: canto-entrar 200ms var(--ease-entrar) backwards;
+  --animate-aba: canto-entrar-curto 150ms var(--ease-entrar) backwards;
+  --animate-surgir: canto-surgir 250ms var(--ease-entrar) backwards;
+  --animate-sair: canto-sair 150ms var(--ease-sair) forwards;
+  --animate-baixar: canto-baixar 150ms var(--ease-sair) forwards;
+  --animate-marcar: canto-marcar 150ms var(--ease-entrar);
+  --animate-fade: canto-fade 100ms linear backwards;
+
+  @keyframes canto-entrar {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes canto-entrar-curto {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+  }
+  @keyframes canto-surgir {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+  @keyframes canto-sair {
+    to {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+  }
+  @keyframes canto-baixar {
+    to {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @keyframes canto-marcar {
+    50% {
+      transform: scale(1.15);
+    }
+  }
+  @keyframes canto-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* Botao afunda ao pressionar: confirma o clique antes da resposta do cofre chegar. */
+@media (prefers-reduced-motion: no-preference) {
+  button {
+    transition: transform 100ms var(--ease-entrar);
+  }
+  button:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+}
+
 html,
 body,
 #root {

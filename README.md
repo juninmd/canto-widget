@@ -28,6 +28,7 @@ Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em R
 | Transcrições | leitura restrita à pasta configurada, extensões `txt/md/vtt/srt`, nome de arquivo validado contra travessia de caminho |
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |
 | Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`, nome mantido por compatibilidade) |
+| Desfazer | remoções recentes ficam só em RAM (últimas 20) e somem ao trancar; a webview só conhece uma chave opaca, nunca reenvia o conteúdo |
 | Auto-lock | 15 min sem uso deliberado do cofre e o widget se tranca sozinho, avisando na tela. Polling de fundo (clipboard, agenda) não conta como uso |
 | Gravação | escrita em arquivo temporário com `fsync` antes do `rename`: queda de energia não deixa envelope pela metade |
 | CSP | sem origens remotas; toda a rede sai pelo processo Rust, nunca pela webview |
@@ -120,6 +121,9 @@ Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
   `Home`/`End` vão às pontas. Todo controle mostra anel de foco, e o excluir aparece também no foco.
 - **Senha** — "mostrar senha" na tela do cofre; ao criar, o mínimo de 4 caracteres fica visível.
 - **Agenda** — cada evento diz em texto se é **agora**, **em 1h35** ou **encerrado**, sem depender só da cor.
+- **Desfazer** — excluir tarefa, card ou item do clipboard (e limpar o histórico) não pede confirmação:
+  um aviso no rodapé oferece **desfazer** por 6 s, com o prazo pausado enquanto o mouse ou o foco
+  estão nele. Erros ficam até serem fechados; erro de pasta de transcrições aparece na própria aba.
 
 ### Acessibilidade das skins
 
@@ -133,6 +137,18 @@ Critérios aplicados, com o antes/depois em [`docs/prints/ux`](docs/prints/ux):
 | Foco visível | WCAG 2.2 — 2.4.7 | `:focus-visible` global na cor de destaque |
 | Abas por teclado | WAI-ARIA APG — Tabs | `TabBar` com `tablist`/`tab`/`tabpanel` e setas |
 | Divulgação progressiva | NN/g | credenciais OAuth recolhidas quando a conta já está conectada |
+
+### Movimento
+
+Animações só onde mostram causa e efeito: item criado, item excluído, aviso chegando, troca de aba e cofre abrindo. Quadros de 0 a 200 ms, antes e depois, em [`docs/prints/ux-animacoes`](docs/prints/ux-animacoes).
+
+| Regra | Fonte | Como ficou |
+|---|---|---|
+| Entrar em 150–250 ms, sair mais rápido | NN/g — Animation Duration; Card, Moran & Newell (ciclo perceptivo ~100 ms) | tokens `--animate-*` em `styles.css`: aba 150, item 200, cofre 250, saída 150 |
+| Desacelerar ao entrar, acelerar ao sair | Dragicevic et al., CHI 2011; Heer & Robertson, 2007 | `--ease-entrar` / `--ease-sair` |
+| Só `transform` e `opacity` | web.dev — High-performance animations | nenhuma animação de layout; auditado com `document.getAnimations()` |
+| Animar só o que muda | Tversky, Morrison & Bétrancourt, 2002 | lista não reanima a cada recarga, só itens que surgiram depois dela (`useNovos`) |
+| Respeitar "reduzir movimento" | WCAG 2.2 — 2.3.3; `prefers-reduced-motion` | sem deslocamento: fade de 100 ms, e exclusões somem na hora |
 
 | padrão | Hueco Mundo | Drácula |
 |---|---|---|

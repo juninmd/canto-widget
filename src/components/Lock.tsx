@@ -29,7 +29,10 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
   }
 
   return (
-    <form onSubmit={submit} className="flex h-full flex-col justify-center gap-3 px-6">
+    <form
+      onSubmit={submit}
+      className="flex h-full flex-col justify-center gap-3 px-6 motion-safe:animate-surgir motion-reduce:animate-fade"
+    >
       <div>
         <h2 className="text-sm font-semibold text-fg">
           {exists ? "Cofre trancado" : "Criar cofre"}
