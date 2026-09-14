@@ -4,11 +4,6 @@ use std::time::Duration;
 use crate::error::{AppError, Result};
 use crate::oauth::{Pkce, SCOPE, TOKEN_URL};
 
-const FILE_NAME: &str = "vault.enc";
-const API: &str = "https://www.googleapis.com/drive/v3/files";
-const UPLOAD_API: &str = "https://www.googleapis.com/upload/drive/v3/files";
-const BOUNDARY: &str = "canto-widget-boundary";
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct DriveTokens {
     pub refresh_token: String,
@@ -31,17 +26,6 @@ struct TokenResponse {
 struct UserInfo {
     #[serde(default)]
     email: String,
-}
-
-#[derive(Deserialize)]
-struct FileList {
-    #[serde(default)]
-    files: Vec<FileMeta>,
-}
-
-#[derive(Deserialize)]
-pub struct FileMeta {
-    pub id: String,
 }
 
 fn client() -> Result<reqwest::blocking::Client> {
@@ -153,67 +137,4 @@ pub fn account_email(token: &str) -> Result<String> {
         .map_err(|e| AppError::Drive(e.to_string()))?;
     let info: UserInfo = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
     Ok(info.email)
-}
-
-pub fn find_vault(token: &str) -> Result<Option<FileMeta>> {
-    let res = client()?
-        .get(API)
-        .bearer_auth(token)
-        .query(&[
-            ("spaces", "appDataFolder"),
-            ("q", &format!("name = '{FILE_NAME}' and trashed = false")),
-            ("fields", "files(id)"),
-            ("pageSize", "1"),
-        ])
-        .send()
-        .map_err(|e| AppError::Drive(e.to_string()))?
-        .error_for_status()
-        .map_err(|e| AppError::Drive(e.to_string()))?;
-    let list: FileList = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
-    Ok(list.files.into_iter().next())
-}
-
-pub fn download(token: &str, file_id: &str) -> Result<Vec<u8>> {
-    let res = client()?
-        .get(format!("{API}/{file_id}"))
-        .bearer_auth(token)
-        .query(&[("alt", "media")])
-        .send()
-        .map_err(|e| AppError::Drive(e.to_string()))?
-        .error_for_status()
-        .map_err(|e| AppError::Drive(e.to_string()))?;
-    Ok(res.bytes().map_err(|e| AppError::Drive(e.to_string()))?.to_vec())
-}
-
-/// Sobe o envelope ja cifrado. O Google recebe apenas bytes opacos.
-pub fn upload(token: &str, file_id: Option<&str>, body: &[u8]) -> Result<String> {
-    let metadata = match file_id {
-        Some(_) => serde_json::json!({ "name": FILE_NAME }),
-        None => serde_json::json!({ "name": FILE_NAME, "parents": ["appDataFolder"] }),
-    };
-    let mut payload = Vec::new();
-    payload.extend_from_slice(
-        format!("--{BOUNDARY}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{metadata}\r\n").as_bytes(),
-    );
-    payload.extend_from_slice(
-        format!("--{BOUNDARY}\r\nContent-Type: application/octet-stream\r\n\r\n").as_bytes(),
-    );
-    payload.extend_from_slice(body);
-    payload.extend_from_slice(format!("\r\n--{BOUNDARY}--\r\n").as_bytes());
-
-    let http = client()?;
-    let req = match file_id {
-        Some(id) => http.patch(format!("{UPLOAD_API}/{id}?uploadType=multipart")),
-        None => http.post(format!("{UPLOAD_API}?uploadType=multipart")),
-    };
-    let res = req
-        .bearer_auth(token)
-        .header("Content-Type", format!("multipart/related; boundary={BOUNDARY}"))
-        .body(payload)
-        .send()
-        .map_err(|e| AppError::Drive(e.to_string()))?
-        .error_for_status()
-        .map_err(|e| AppError::Drive(e.to_string()))?;
-    let meta: FileMeta = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
-    Ok(meta.id)
 }

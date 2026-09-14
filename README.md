@@ -2,10 +2,10 @@
 
 Widget de desktop (Windows, macOS e Linux) que vive no **canto inferior direito** da tela:
 checklist do dia, cards de notas pesquisáveis, histórico de área de transferência,
-transcrições das últimas reuniões e a agenda do dia — tudo cifrado em disco e
-sincronizado com o Google Drive sem que o Google consiga ler nada.
+transcrições das últimas reuniões e a agenda do dia — tudo cifrado em disco, com backup
+em arquivo `.canto` cifrado e início junto com o sistema.
 
-Abas: **tarefas · notas · clipboard · reuniões · agenda · sync**.
+Abas: **tarefas · notas · clipboard · reuniões · agenda · ajustes**.
 
 | Tarefas do dia | Cards pesquisáveis |
 |---|---|
@@ -19,20 +19,20 @@ Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em R
 | Item | Decisão |
 |---|---|
 | Derivação de chave | Argon2id (19 MiB, t=2, p=1), salt aleatório de 16 bytes por cofre |
-| Senha mestra | mínimo de 4 caracteres (`MIN_SENHA`). O envelope fica em disco e sobe para o Drive, então a senha é atacável **offline**: nenhum limite de tentativas protege, e o Argon2id encarece cada palpite, não o total deles. Senha curta é uma escolha consciente de conveniência sobre resistência |
+| Senha mestra | mínimo de 4 caracteres (`MIN_SENHA`). O envelope fica em disco e sai da máquina em todo backup exportado, então a senha é atacável **offline**: nenhum limite de tentativas protege, e o Argon2id encarece cada palpite, não o total deles. Senha curta é uma escolha consciente de conveniência sobre resistência |
 | Cifra | AES-256-GCM, nonce novo a cada gravação, AAD fixando o domínio (`canto.vault.v1`) |
 | Chave | só existe em RAM enquanto o cofre está destrancado; zeroizada ao trancar/sair |
-| Sync | o Drive recebe **apenas o envelope cifrado**; a fusão acontece local, em claro, na RAM |
-| Escopo OAuth | `drive.appdata` (pasta privada do app), `calendar.events.readonly` (só leitura da agenda) e `openid email` (mostrar de quem é a conta). O widget não enxerga o resto do seu Drive |
-| Clipboard | histórico fica **só na máquina** (`clipboard.json`, cifrado), fora do `vault.json` — nunca sobe para o Drive |
+| Backup | o `.canto` exportado é o próprio envelope cifrado; a fusão do import acontece local, em claro, na RAM. O caminho vem do diálogo nativo aberto pelo Rust, nunca da webview |
+| Escopo OAuth | opcional, só para a agenda: `calendar.events.readonly` e `openid email` (mostrar de quem é a conta). Nenhum escopo de Drive |
+| Clipboard | histórico fica **só na máquina** (`clipboard.json`, cifrado), fora do `vault.json` — nunca entra no backup |
 | Transcrições | leitura restrita à pasta configurada, extensões `txt/md/vtt/srt`, nome de arquivo validado contra travessia de caminho |
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |
-| Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`) |
+| Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`, nome mantido por compatibilidade) |
 | Auto-lock | 15 min sem uso deliberado do cofre e o widget se tranca sozinho, avisando na tela. Polling de fundo (clipboard, agenda) não conta como uso |
 | Gravação | escrita em arquivo temporário com `fsync` antes do `rename`: queda de energia não deixa envelope pela metade |
 | CSP | sem origens remotas; toda a rede sai pelo processo Rust, nunca pela webview |
 
-Perder a senha mestra significa perder os dados: não há recuperação, nem local nem no Drive.
+Perder a senha mestra significa perder os dados: não há recuperação, nem local nem pelos backups.
 
 | Cofre trancado | Senha errada |
 |---|---|
@@ -46,40 +46,52 @@ bun run tauri dev      # desenvolvimento
 bun run tauri build    # instalador da plataforma atual
 ```
 
-Testes do núcleo (cripto, merge de sync, callback OAuth, auto-lock, gravação atômica):
+Testes do núcleo (cripto, merge, backup/import, callback OAuth, auto-lock, gravação atômica):
 
 ```bash
 cd src-tauri && cargo test
 ```
 
-Testes da interface (relógio do dia, disparo do aviso de reunião):
+Testes da interface (relógio do dia, aviso de reunião, backup):
 
 ```bash
 bun test
 ```
 
-## Conectando o Google Drive
+## Backup e outra máquina
 
-1. No Google Cloud Console: **APIs e serviços → Credenciais → Criar credencial → ID do cliente OAuth → App para computador**.
-2. Habilite a **Google Drive API** no mesmo projeto.
-3. Habilite também a **Google Calendar API** se quiser a aba de agenda.
-4. Na aba **sync** do widget, cole o *Client ID* (e o *client secret*, que o Google emite para apps desktop) e salve.
-5. **conectar conta** abre o navegador; ao autorizar, o widget captura o code na porta loopback
-   e passa a exibir o e-mail da conta conectada.
-6. **sincronizar agora** faz pull + merge + push.
+Aba **ajustes → Backup**:
 
-![Aba de sync com a conta conectada](docs/prints/10-aba-sync.png)
+- **exportar** abre o diálogo de salvar e grava `canto-AAAA-MM-DD.canto` — o envelope já cifrado
+  com a senha mestra. Pode ir para pendrive, e-mail ou qualquer nuvem: sem a senha é ilegível.
+- **importar** abre o diálogo, decifra com a senha da sessão e **mescla** no cofre atual
+  (last-write-wins por item, com lápides). Reimportar o mesmo arquivo não muda nada. Antes de
+  mesclar, o estado anterior é guardado em `backups/`.
+- Backup criado com outra senha mestra é recusado sem tocar no cofre local.
 
-O mesmo cofre em outra máquina: crie o cofre local **com a mesma senha mestra**, configure o Drive
-e sincronize — o merge traz o conteúdo remoto.
+Levar para outra máquina: crie o cofre lá **com a mesma senha mestra** e importe o `.canto`.
 
-## Sincronização
+Além disso, o widget grava sozinho **uma cópia por dia** (data UTC) em `backups/`, mantendo as
+últimas 10 somando as de antes de importar. Não precisa do cofre destrancado.
 
-Last-write-wins por item (`updated_at` em ms) com lápides para remoções:
+Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 
 - item editado nos dois lados → vence a edição mais recente;
 - item apagado em A e editado em B → vence quem tem o carimbo mais novo;
-- merge é idempotente e comutativo nos casos acima (coberto por `tests/merge.rs`).
+- merge é idempotente e comutativo nos casos acima.
+
+## Agenda do Google (opcional)
+
+1. No Google Cloud Console: **APIs e serviços → Credenciais → Criar credencial → ID do cliente OAuth → App para computador**.
+2. Habilite a **Google Calendar API** no mesmo projeto.
+3. Na aba **ajustes**, cole o *Client ID* (e o *client secret*, que o Google emite para apps desktop) e salve.
+4. **entrar com o Google** abre o navegador; ao autorizar, o widget captura o code na porta loopback
+   e passa a exibir o e-mail da conta conectada.
+
+Quem conectou numa versão anterior (com sync no Drive): a agenda continua funcionando, mas o token
+ainda carrega o escopo `drive.appdata`. **desconectar conta** e entrar de novo para ficar só com a
+agenda. O `vault.enc` antigo (cifrado) segue na pasta oculta do app no Drive até ser apagado em
+Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 
 ## Abas locais
 
@@ -104,6 +116,23 @@ Last-write-wins por item (`updated_at` em ms) com lápides para remoções:
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.
 - A lista de tarefas vira sozinha à meia-noite, sem precisar reabrir o widget.
+- **Teclado** — as abas seguem o padrão do WAI-ARIA: `Tab` entra na barra, `←`/`→` trocam de aba,
+  `Home`/`End` vão às pontas. Todo controle mostra anel de foco, e o excluir aparece também no foco.
+- **Senha** — "mostrar senha" na tela do cofre; ao criar, o mínimo de 4 caracteres fica visível.
+- **Agenda** — cada evento diz em texto se é **agora**, **em 1h35** ou **encerrado**, sem depender só da cor.
+
+### Acessibilidade das skins
+
+Critérios aplicados, com o antes/depois em [`docs/prints/ux`](docs/prints/ux):
+
+| Regra | Fonte | Como ficou |
+|---|---|---|
+| Texto ≥ 4.5:1 | WCAG 2.2 — 1.4.3 | token `faint` clareado nas 3 skins; `on-accent` branco no Hueco Mundo |
+| Borda de campo ≥ 3:1 | WCAG 2.2 — 1.4.11 | token `line` só para bordas de input |
+| Alvo ≥ 24×24 px | WCAG 2.2 — 2.5.8 | skins, esconder, trancar, links e excluir com área de 24 px |
+| Foco visível | WCAG 2.2 — 2.4.7 | `:focus-visible` global na cor de destaque |
+| Abas por teclado | WAI-ARIA APG — Tabs | `TabBar` com `tablist`/`tab`/`tabpanel` e setas |
+| Divulgação progressiva | NN/g | credenciais OAuth recolhidas quando a conta já está conectada |
 
 | padrão | Hueco Mundo | Drácula |
 |---|---|---|
@@ -121,11 +150,27 @@ Atalho global escondendo e trazendo o widget de volta:
 - Sem decoração, sempre no topo, fora da barra de tarefas; arraste pelo cabeçalho.
 - Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, trancar cofre, sair.
 
+## Iniciar junto com o computador
+
+Ligado por padrão na primeira execução do app instalado e controlável na aba **ajustes** ("abrir o Canto ao ligar o
+computador"). A partir daí a escolha do usuário manda: o padrão não volta a ligar o que ele
+desligou. Quando o sistema abre a app no boot, ela sobe com `--autostart` e fica **apenas na
+bandeja**, sem pular na tela; o cofre continua trancado até a senha ser digitada.
+Builds de debug (`tauri dev`) não registram nada no boot.
+
+Só roda **uma instância**: abrir o Canto de novo com ele na bandeja apenas traz o widget para a
+frente.
+
+No Windows a entrada vive em `HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run` (valor
+`Canto`); no macOS/Linux, no launcher de sessão do usuário.
+
 ## Onde ficam os arquivos
 
 `app_data_dir` da plataforma (ex.: `%APPDATA%\com.junin.canto` no Windows):
 
 - `vault.json` — envelope cifrado com tarefas e notas;
-- `drive.json` — credenciais OAuth, cifradas com a mesma chave;
+- `backups/*.canto` — cópias diárias e de antes de importar, cifradas (últimas 10);
+- `drive.json` — credenciais OAuth da agenda, cifradas com a mesma chave;
 - `clipboard.json` — histórico da área de transferência, cifrado e nunca sincronizado;
-- `settings.json` — preferências não sensíveis (pasta de transcrições, skin).
+- `settings.json` — preferências não sensíveis (pasta de transcrições, skin);
+- `autostart.json` — marca que a escolha de iniciar com o sistema já foi feita.

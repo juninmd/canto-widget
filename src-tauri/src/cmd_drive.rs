@@ -67,11 +67,6 @@ pub fn drive_connect(state: State<'_, AppState>) -> Result<String> {
     Ok(quem)
 }
 
-#[tauri::command(async)]
-pub fn drive_sync(state: State<'_, AppState>) -> Result<i64> {
-    state.sync()
-}
-
 fn open_in_browser(url: &str) -> Result<()> {
     tauri_plugin_opener::open_url(url, None::<&str>)
         .map_err(|e| AppError::Drive(format!("nao consegui abrir o navegador: {e}")))
