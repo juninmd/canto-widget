@@ -3,13 +3,13 @@ use std::sync::Mutex;
 use zeroize::Zeroizing;
 
 use crate::crypto::VaultKey;
-use crate::drive::{self, DriveTokens};
+use crate::drive::DriveTokens;
 use crate::error::{AppError, Result};
 use crate::model::{now_ms, VaultData};
 use crate::store::{self, SealedBlob, DRIVE_AAD, VAULT_AAD};
 
 /// Piso da senha mestra. Curto por escolha do dono do cofre: o envelope fica em
-/// disco e sobe para o Drive, entao a senha e atacavel offline e nenhum limite
+/// disco e sai da maquina em backups exportados, entao a senha e atacavel offline e nenhum limite
 /// de tentativas protege. O Argon2id encarece cada palpite, nao o total deles.
 pub const MIN_SENHA: usize = 4;
 
@@ -27,7 +27,7 @@ pub struct DriveConfig {
 
 pub struct Session {
     key: VaultKey,
-    /// Necessaria para derivar a chave do envelope remoto, que tem salt proprio.
+    /// Necessaria para derivar a chave de um backup importado, que tem salt proprio.
     password: Zeroizing<String>,
     salt: Vec<u8>,
     pub data: VaultData,
@@ -172,46 +172,17 @@ impl AppState {
         store::write_json_atomic(&store::drive_path(&self.dir), &blob)
     }
 
-    /// Puxa o envelope remoto, funde e devolve o novo estado ja cifrado para subir.
-    /// O Drive so ve bytes opacos: a fusao acontece inteira em memoria local.
-    pub fn sync(&self) -> Result<i64> {
-        let mut cfg = self.drive_config()?;
-        let tokens = cfg.tokens.as_mut().ok_or_else(|| {
-            AppError::Config("conecte a conta do Google antes de sincronizar".into())
-        })?;
-        let token = drive::fresh_access_token(tokens, &cfg.client_id, &cfg.client_secret)?;
-        let remote = drive::find_vault(&token)?;
-
-        if let Some(meta) = &remote {
-            let bytes = drive::download(&token, &meta.id)?;
-            let blob: SealedBlob = serde_json::from_slice(&bytes)
-                .map_err(|e| AppError::Drive(format!("envelope remoto ilegivel: {e}")))?;
-            let remote_data = self.open_remote(&blob)?;
-            self.mutate(|local| {
-                let merged = std::mem::take(local).merge(remote_data);
-                *local = merged;
-            })?;
-        }
-
-        let payload = std::fs::read(store::vault_path(&self.dir))?;
-        let id = drive::upload(&token, remote.as_ref().map(|m| m.id.as_str()), &payload)?;
-        cfg.tokens.as_mut().unwrap().access_token = token;
-        self.save_drive_config(&cfg)?;
-        let _ = id;
-        Ok(now_ms())
-    }
-
-    fn open_remote(&self, blob: &SealedBlob) -> Result<VaultData> {
+    /// Abre um envelope de fora (backup importado) com a senha da sessao. O salt
+    /// e o do envelope: um backup feito em outra maquina tem salt proprio.
+    pub fn abrir_envelope(&self, blob: &SealedBlob) -> Result<VaultData> {
         let guard = self.session.lock().unwrap();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
-        let remote_salt = blob.salt_bytes()?;
-        let key = if remote_salt == session.salt {
-            VaultKey::derive(&session.password, &session.salt)?
-        } else {
-            VaultKey::derive(&session.password, &remote_salt)?
-        };
-        let plain = blob.open(&key, VAULT_AAD).map_err(|_| {
-            AppError::Drive("o cofre no Drive foi criado com outra senha mestra".into())
+        let key = VaultKey::derive(&session.password, &blob.salt_bytes()?)?;
+        let plain = blob.open(&key, VAULT_AAD).map_err(|e| match e {
+            AppError::WrongPassword => {
+                AppError::Config("o backup foi criado com outra senha mestra".into())
+            }
+            outro => outro,
         })?;
         Ok(serde_json::from_slice(&plain)?)
     }

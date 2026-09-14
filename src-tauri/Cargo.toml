@@ -1,7 +1,7 @@
 [package]
 name = "canto-widget"
 version = "0.1.0"
-description = "Widget de tarefas e notas criptografadas, sincronizado com o Google Drive"
+description = "Widget de tarefas e notas criptografadas, com backup cifrado local"
 edition = "2021"
 rust-version = "1.82"
 
@@ -24,11 +24,14 @@ rand = "0.8"
 base64 = "0.22"
 zeroize = { version = "1", features = ["derive"] }
 sha2 = "0.10"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "multipart", "blocking"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
 url = "2"
 time = "0.3"
 tauri-plugin-global-shortcut = "2.3.2"
 tauri-plugin-clipboard-manager = "2.3.3"
+tauri-plugin-autostart = "2"
+tauri-plugin-dialog = "2.7.3"
+tauri-plugin-single-instance = "2.4.4"
 
 [features]
 default = []

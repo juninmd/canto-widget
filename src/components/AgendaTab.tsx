@@ -86,7 +86,7 @@ export default function AgendaTab({
         })}
         {itens.length === 0 && !carregando && (
           <li className="px-2 py-6 text-center text-xs text-faint">
-            {erro || "nada hoje — ou entre com o Google na aba sync"}
+            {erro || "nada hoje — ou entre com o Google na aba ajustes"}
           </li>
         )}
       </ul>

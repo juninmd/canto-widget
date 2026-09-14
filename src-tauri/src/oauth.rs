@@ -9,7 +9,7 @@ use crate::error::{AppError, Result};
 
 /// Escopo minimo para o que o widget faz: pasta privada do app, leitura da agenda
 /// e identidade (so para exibir a conta). O resto do Drive continua inacessivel.
-pub const SCOPE: &str = "https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/calendar.events.readonly openid email";
+pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly openid email";
 pub const AUTH_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
 pub const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 const WAIT_TIMEOUT: Duration = Duration::from_secs(180);
