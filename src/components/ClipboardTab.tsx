@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type ClipItem } from "../lib/api";
+import { useDesfazer } from "../lib/useDesfazer";
 
 export default function ClipboardTab({ onError }: { onError: (m: string) => void }) {
   const [query, setQuery] = useState("");
@@ -24,6 +25,8 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
+  const desfazivel = useDesfazer(onError, () => reload());
+
   async function run(fn: () => Promise<unknown>) {
     try {
       await fn();
@@ -47,7 +50,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
         />
         <button
           type="button"
-          onClick={() => run(api.clipClear)}
+          onClick={() => run(async () => desfazivel(await api.clipClear(), "histórico limpo (fixados mantidos)"))}
           title="limpar tudo, menos os fixados"
           className="rounded-lg bg-edge px-3 text-xs text-fg"
         >
@@ -80,7 +83,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
                 </button>
                 <button
                   type="button"
-                  onClick={() => run(() => api.clipDelete(i.id))}
+                  onClick={() => run(async () => desfazivel(await api.clipDelete(i.id), "item excluído do histórico"))}
                   className="min-h-6 px-1 hover:text-danger"
                 >
                   excluir

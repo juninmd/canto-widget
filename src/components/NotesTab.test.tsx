@@ -14,9 +14,14 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { default: NotesTab } = await import("./NotesTab");
+const { ToastProvider } = await import("../lib/toast");
 
 async function abrirEditor() {
-  render(<NotesTab onError={() => {}} />);
+  render(
+    <ToastProvider>
+      <NotesTab onError={() => {}} />
+    </ToastProvider>,
+  );
   // A busca da lista e debounced em 150 ms; deixa ela assentar dentro do act
   // para o editor abrir sem update pendente.
   await act(async () => {

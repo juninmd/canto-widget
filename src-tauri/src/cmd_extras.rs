@@ -4,6 +4,7 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 
 use crate::calendar::{self, AgendaItem};
 use crate::clipboard::ClipItem;
+use crate::lixeira::Removido;
 use crate::commands::new_id;
 use crate::drive;
 use crate::error::{AppError, Result};
@@ -47,17 +48,28 @@ pub fn clip_pin(state: State<'_, AppState>, id: String) -> Result<()> {
 }
 
 #[tauri::command]
-pub fn clip_delete(state: State<'_, AppState>, id: String) -> Result<()> {
+pub fn clip_delete(state: State<'_, AppState>, id: String) -> Result<Option<String>> {
     let mut hist = state.clip_load()?;
-    hist.items.retain(|i| i.id != id);
-    state.clip_save(&hist)
+    let (fora, dentro) = std::mem::take(&mut hist.items).into_iter().partition(|i| i.id == id);
+    hist.items = dentro;
+    state.clip_save(&hist)?;
+    Ok(guardar_clips(&state, fora))
 }
 
 #[tauri::command]
-pub fn clip_clear(state: State<'_, AppState>) -> Result<()> {
+pub fn clip_clear(state: State<'_, AppState>) -> Result<Option<String>> {
     let mut hist = state.clip_load()?;
-    hist.items.retain(|i| i.pinned);
-    state.clip_save(&hist)
+    let (fixados, fora) = std::mem::take(&mut hist.items).into_iter().partition(|i| i.pinned);
+    hist.items = fixados;
+    state.clip_save(&hist)?;
+    Ok(guardar_clips(&state, fora))
+}
+
+fn guardar_clips(state: &AppState, itens: Vec<ClipItem>) -> Option<String> {
+    if itens.is_empty() {
+        return None;
+    }
+    state.guardar_na_lixeira(Removido::Clips(itens))
 }
 
 /// Vigia o clipboard do sistema enquanto o cofre estiver destrancado.

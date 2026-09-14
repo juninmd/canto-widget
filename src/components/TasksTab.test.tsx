@@ -18,14 +18,21 @@ mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     chamadas.push({ cmd, args });
     if (cmd === "tasks_for_day") return Promise.resolve([tarefa]);
+    if (cmd === "item_delete") return Promise.resolve("chave-1");
+    if (cmd === "lixeira_desfazer") return Promise.resolve(true);
     return Promise.resolve(null);
   },
 }));
 
 const { default: TasksTab } = await import("./TasksTab");
+const { ToastProvider } = await import("../lib/toast");
 
 async function abrirEdicao() {
-  render(<TasksTab today="2026-09-09" onError={() => {}} />);
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
   await act(async () => {
     await Promise.resolve();
   });
@@ -92,4 +99,23 @@ test("renomear volta a funcionar depois de um Esc", async () => {
     id: "t1",
     title: "comprar cha",
   });
+});
+
+test("excluir oferece desfazer com a chave devolvida pelo cofre", async () => {
+  await abrirEdicao();
+  fireEvent.keyDown(screen.getByDisplayValue("comprar leite"), { key: "Escape" });
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("excluir comprar leite"));
+  });
+  const aviso = await screen.findByText('tarefa "comprar leite" excluída');
+  expect(aviso).toBeTruthy();
+
+  chamadas.length = 0;
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "desfazer" }));
+  });
+
+  expect(chamadas).toContainEqual({ cmd: "lixeira_desfazer", args: { chave: "chave-1" } });
+  expect(chamadas.some((c) => c.cmd === "tasks_for_day"), "lista nao recarregou apos desfazer").toBe(true);
+  expect(screen.queryByText('tarefa "comprar leite" excluída')).toBeNull();
 });
