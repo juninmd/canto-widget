@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type Task } from "../lib/api";
 import { useDesfazer } from "../lib/useDesfazer";
+import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
 
 export default function TasksTab({ today, onError }: { today: string; onError: (m: string) => void }) {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -11,9 +12,14 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
   // texto descartado e Enter gravaria o cofre duas vezes.
   const edicaoEncerrada = useRef(false);
 
+  const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
+  const [marcando, setMarcando] = useState("");
+  const { saindo, sair } = useSaida();
+
   async function reload() {
     try {
       setTasks(await api.tasksForDay(today));
+      setCarregadoPara(today);
     } catch (e) {
       onError(errText(e));
     }
@@ -37,6 +43,10 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
   }
 
   const desfazivel = useDesfazer(onError, reload);
+  const novo = useNovos(
+    tasks.map((t) => t.id),
+    carregadoPara,
+  );
 
   async function run(fn: () => Promise<unknown>) {
     try {
@@ -88,12 +98,21 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
         {tasks.map((t) => (
-          <li key={t.id} className="group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50">
+          <li
+            key={t.id}
+            className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${novo(t.id) ? ENTRAR : ""} ${
+              saindo.has(t.id) ? SAIR : ""
+            }`}
+          >
             <input
               type="checkbox"
               checked={t.done}
-              onChange={() => run(() => api.taskToggle(t.id))}
-              className="size-4 accent-[var(--color-accent)]"
+              onChange={() => {
+                setMarcando(t.id);
+                void run(() => api.taskToggle(t.id));
+              }}
+              onAnimationEnd={() => setMarcando("")}
+              className={`size-4 accent-[var(--color-accent)] ${marcando === t.id ? "motion-safe:animate-marcar" : ""}`}
             />
             {editando?.id === t.id ? (
               <input
@@ -124,7 +143,11 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
             )}
             <button
               type="button"
-              onClick={() => run(async () => desfazivel(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`))}
+              onClick={() =>
+                void sair(t.id, () =>
+                  run(async () => desfazivel(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
+                )
+              }
               // Visivel tambem no foco: so no hover, o teclado nunca acha o botao.
               className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
               aria-label={`excluir ${t.title}`}
