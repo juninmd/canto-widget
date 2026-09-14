@@ -7,13 +7,22 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
   const [query, setQuery] = useState("");
   const [itens, setItens] = useState<TranscriptMeta[]>([]);
   const [aberta, setAberta] = useState<{ nome: string; texto: string } | null>(null);
+  // Erro da pasta fica na aba, junto da pasta: e contexto, nao um aviso solto (NN/g).
+  const [erroPasta, setErroPasta] = useState("");
 
   async function reload(q = query) {
     try {
       setDir(await api.transcriptsDir());
-      setItens(await api.transcriptsList(q));
     } catch (e) {
       onError(errText(e));
+      return;
+    }
+    try {
+      setItens(await api.transcriptsList(q));
+      setErroPasta("");
+    } catch (e) {
+      setItens([]);
+      setErroPasta(errText(e));
     }
   }
 
@@ -107,7 +116,19 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
             </button>
           </li>
         ))}
-        {itens.length === 0 && (
+        {itens.length === 0 && erroPasta && (
+          <li role="alert" className="flex flex-col items-center gap-2 px-2 py-6 text-center text-xs text-danger">
+            <span className="break-all">{erroPasta}</span>
+            <button
+              type="button"
+              onClick={() => setEditandoDir(true)}
+              className="min-h-7 rounded-lg bg-edge px-3 text-fg"
+            >
+              escolher outra pasta
+            </button>
+          </li>
+        )}
+        {itens.length === 0 && !erroPasta && (
           <li className="px-2 py-6 text-center text-xs text-faint">
             {query ? "nenhuma transcrição bate com a busca" : "nenhuma transcrição nesta pasta"}
           </li>
