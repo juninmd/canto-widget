@@ -27,6 +27,7 @@ export function todayLocal(d = new Date()): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 export type DriveStatus = { configured: boolean; connected: boolean; email: string };
+export type ResumoImport = { tarefas: number; notas: number };
 
 export type ClipItem = { id: string; text: string; copied_at: number; pinned: boolean };
 export type TranscriptMeta = { name: string; modified_at: number; size: number; preview: string };
@@ -59,12 +60,18 @@ export const api = {
     invoke<Note>("note_save", { id: note.id ?? null, ...note }),
   itemDelete: (id: string) => invoke<void>("item_delete", { id }),
 
+  autostartStatus: () => invoke<boolean>("autostart_status"),
+  autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),
+
+  /** `null` quando o usuario cancela o dialogo. */
+  backupExportar: () => invoke<string | null>("backup_exportar"),
+  backupImportar: () => invoke<ResumoImport | null>("backup_importar"),
+
   driveStatus: () => invoke<DriveStatus>("drive_status"),
   driveConfigure: (clientId: string, clientSecret: string) =>
     invoke<void>("drive_configure", { clientId, clientSecret }),
   driveConnect: () => invoke<string>("drive_connect"),
   driveDisconnect: () => invoke<void>("drive_disconnect"),
-  driveSync: () => invoke<number>("drive_sync"),
 
   clipList: (query: string) => invoke<ClipItem[]>("clip_list", { query }),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),

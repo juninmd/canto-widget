@@ -25,7 +25,7 @@ async function abrirEditor() {
   await act(async () => {
     fireEvent.click(screen.getByText("+"));
   });
-  return screen.getByPlaceholderText("titulo");
+  return screen.getByPlaceholderText("título");
 }
 
 beforeEach(() => {
@@ -70,5 +70,5 @@ test("Esc cancela o editor e descarta o rascunho", async () => {
   await act(async () => {
     fireEvent.click(screen.getByText("+"));
   });
-  expect((screen.getByPlaceholderText("titulo") as HTMLInputElement).value).toBe("");
+  expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("");
 });

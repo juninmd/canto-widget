@@ -111,21 +111,32 @@ pub fn read_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<Option<T>>
 /// Grava em arquivo temporario e renomeia: uma queda no meio da escrita nao
 /// deixa o cofre truncado (perda total, ja que sem o tag GCM nada abre).
 pub fn write_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<()> {
+    write_bytes_atomic(path, &serde_json::to_vec_pretty(value)?)
+}
+
+pub fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> Result<()> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    let tmp = path.with_extension("tmp");
-    let bytes = serde_json::to_vec_pretty(value)?;
+    let tmp = tmp_path(path);
     {
         use std::io::Write;
         let mut f = std::fs::File::create(&tmp)?;
-        f.write_all(&bytes)?;
+        f.write_all(bytes)?;
         // Sem descarregar no disco antes do rename, uma queda de energia pode
         // deixar o nome novo apontando para conteudo vazio: cofre perdido.
         f.sync_all()?;
     }
     std::fs::rename(&tmp, path)?;
     Ok(())
+}
+
+/// Sufixo em vez de trocar a extensao: exportando `x.canto` numa pasta do
+/// usuario, `x.tmp` poderia ser um arquivo dele e seria sobrescrito.
+fn tmp_path(path: &Path) -> PathBuf {
+    let mut nome = path.file_name().unwrap_or_default().to_os_string();
+    nome.push(".tmp");
+    path.with_file_name(nome)
 }
 
 #[cfg(test)]
@@ -145,7 +156,7 @@ mod tests {
         write_json_atomic(&alvo, &KdfParams::default()).unwrap();
         let lido: KdfParams = read_json(&alvo).unwrap().unwrap();
         assert_eq!(lido.m_kib, KdfParams::default().m_kib);
-        assert!(!alvo.with_extension("tmp").exists(), "temporario ficou para tras");
+        assert!(!tmp_path(&alvo).exists(), "temporario ficou para tras");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
@@ -157,6 +168,16 @@ mod tests {
         write_json_atomic(&alvo, &KdfParams { t: 9, ..Default::default() }).unwrap();
         let lido: KdfParams = read_json(&alvo).unwrap().unwrap();
         assert_eq!(lido.t, 9);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn temporario_nao_pisa_em_arquivo_vizinho_do_usuario() {
+        let dir = tmpdir("vizinho");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("backup.tmp"), b"do usuario").unwrap();
+        write_bytes_atomic(&dir.join("backup.canto"), b"envelope").unwrap();
+        assert_eq!(std::fs::read(dir.join("backup.tmp")).unwrap(), b"do usuario");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

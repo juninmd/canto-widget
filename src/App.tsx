@@ -7,15 +7,13 @@ import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
 import NotesTab from "./components/NotesTab";
-import SyncTab from "./components/SyncTab";
+import AjustesTab from "./components/AjustesTab";
 import SkinPicker from "./components/SkinPicker";
 import ClipboardTab from "./components/ClipboardTab";
 import TranscriptsTab from "./components/TranscriptsTab";
 import AgendaTab from "./components/AgendaTab";
+import TabBar, { painelId, type Tab } from "./components/TabBar";
 import Alerta from "./components/Alerta";
-
-type Tab = "tarefas" | "notas" | "clipboard" | "reunioes" | "agenda" | "sync";
-const TABS: Tab[] = ["tarefas", "notas", "clipboard", "reunioes", "agenda", "sync"];
 
 export default function App() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
@@ -96,14 +94,14 @@ export default function App() {
         </div>
         <div className="flex items-center gap-2 text-[11px] text-muted">
           {status?.unlocked && (
-            <button type="button" onClick={lock} className="hover:text-fg">
+            <button type="button" onClick={lock} className="min-h-6 rounded px-1.5 hover:text-fg">
               trancar
             </button>
           )}
           <button
             type="button"
             onClick={() => void getCurrentWindow().hide()}
-            className="hover:text-fg"
+            className="grid size-6 place-items-center rounded hover:text-fg"
             title="esconder (Ctrl+Alt+Espaço para voltar)"
             aria-label="esconder widget"
           >
@@ -128,27 +126,19 @@ export default function App() {
         <Lock exists={status.exists} onOpen={refresh} />
       ) : (
         <>
-          <nav className="flex shrink-0 gap-1 overflow-x-auto px-3 pt-2 text-xs">
-            {TABS.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTab(t)}
-                className={`shrink-0 rounded-lg px-2.5 py-1 capitalize ${
-                  tab === t ? "bg-edge text-fg" : "text-muted hover:text-fg"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </nav>
-          <main className="min-h-0 flex-1 p-3">
+          <TabBar atual={tab} onChange={setTab} />
+          <main
+            id={painelId(tab)}
+            role="tabpanel"
+            aria-labelledby={`aba-${tab}`}
+            className="min-h-0 flex-1 p-3"
+          >
             {tab === "tarefas" && <TasksTab today={today} onError={setError} />}
             {tab === "notas" && <NotesTab onError={setError} />}
             {tab === "clipboard" && <ClipboardTab onError={setError} />}
             {tab === "reunioes" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
-            {tab === "sync" && <SyncTab onError={setError} />}
+            {tab === "ajustes" && <AjustesTab onError={setError} />}
           </main>
         </>
       )}

@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { janelaDoDia, minutosAte, paraAlertar } from "./agenda";
+import { janelaDoDia, minutosAte, paraAlertar, situacao } from "./agenda";
 import type { AgendaItem } from "./api";
 
 const base: AgendaItem = {
@@ -56,5 +56,27 @@ describe("agenda", () => {
 
   test("data invalida nao derruba o calculo", () => {
     expect(minutosAte({ ...base, inicio: "nao-e-data" }, agora)).toBe(Number.POSITIVE_INFINITY);
+  });
+});
+
+describe("situacao", () => {
+  const agora = new Date("2026-09-14T10:00:00Z");
+  const evento = (inicio: string, fim: string) => ({ ...base, inicio, fim });
+
+  test("reuniao em andamento diz agora em texto, nao so na cor", () => {
+    expect(situacao(evento("2026-09-14T09:50:00Z", "2026-09-14T10:30:00Z"), agora)).toEqual({ rotulo: "agora", agora: true });
+  });
+
+  test("reuniao que ja terminou nao aparece como agora", () => {
+    expect(situacao(evento("2026-09-14T09:00:00Z", "2026-09-14T09:30:00Z"), agora).rotulo).toBe("encerrado");
+  });
+
+  test("proxima reuniao mostra quanto falta em minutos e horas", () => {
+    expect(situacao(evento("2026-09-14T10:07:30Z", "2026-09-14T11:00:00Z"), agora).rotulo).toBe("em 8 min");
+    expect(situacao(evento("2026-09-14T11:35:00Z", "2026-09-14T12:00:00Z"), agora).rotulo).toBe("em 1h35");
+  });
+
+  test("evento de dia inteiro nao ganha contagem", () => {
+    expect(situacao({ ...base, dia_inteiro: true, inicio: "2026-09-14" }, agora).rotulo).toBe("");
   });
 });
