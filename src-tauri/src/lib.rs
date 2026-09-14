@@ -1,5 +1,8 @@
+pub mod autostart;
+pub mod backup;
 pub mod calendar;
 pub mod clipboard;
+pub mod cmd_backup;
 pub mod cmd_drive;
 pub mod cmd_extras;
 pub mod commands;
@@ -24,21 +27,42 @@ use crate::vault::AppState;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Primeiro plugin por exigencia dele: com o autostart, abrir o app de novo
+        // criaria outra bandeja e outro vigia gravando o mesmo clipboard.json.
+        .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
+            let _ = window::mostrar(app);
+        }))
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(
+            tauri_plugin_autostart::Builder::new()
+                .args([autostart::ARG_AUTOSTART])
+                .build(),
+        )
         .setup(|app| {
             register_toggle_shortcut(app.handle())?;
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
-            app.manage(AppState::new(dir));
+            app.manage(AppState::new(dir.clone()));
             cmd_extras::watch_clipboard(app.handle().clone());
             watch_idle(app.handle().clone());
+            watch_backup(dir);
             build_tray(app.handle())?;
+            // Build de debug depende do vite no ar: registra-lo no boot abriria um widget quebrado.
+            #[cfg(not(debug_assertions))]
+            if let Err(e) = autostart::ensure_default(app.handle()) {
+                // Registro do SO indisponivel nao pode impedir o widget de abrir.
+                eprintln!("autostart indisponivel: {e}");
+            }
 
             if let Some(win) = app.get_webview_window("main") {
                 window::anchor_bottom_right(&win)?;
-                win.show()?;
-                win.set_focus()?;
+                // Subida no boot fica so na bandeja: nada pula na tela do usuario.
+                if !autostart::iniciado_pelo_sistema() {
+                    win.show()?;
+                    win.set_focus()?;
+                }
             }
             Ok(())
         })
@@ -60,7 +84,6 @@ pub fn run() {
             cmd_drive::drive_configure,
             cmd_drive::drive_disconnect,
             cmd_drive::drive_connect,
-            cmd_drive::drive_sync,
             cmd_extras::clip_list,
             cmd_extras::clip_copy,
             cmd_extras::clip_pin,
@@ -75,6 +98,10 @@ pub fn run() {
             cmd_extras::alerta_payload,
             cmd_extras::alerta_fechar,
             cmd_extras::abrir_link,
+            autostart::autostart_status,
+            autostart::autostart_set,
+            cmd_backup::backup_exportar,
+            cmd_backup::backup_importar,
         ])
         .on_window_event(|win, event| {
             // Fechar esconde o widget; sair de verdade so pela bandeja.
@@ -101,6 +128,16 @@ fn watch_idle(app: tauri::AppHandle) {
         if state.lock_if_idle(AUTO_LOCK_MS) {
             let _ = tauri::Emitter::emit(&app, EVENTO_AUTO_LOCK, AUTO_LOCK_MS / 60_000);
         }
+    });
+}
+
+/// Copia diaria do envelope cifrado; nao precisa do cofre destrancado.
+fn watch_backup(dir: std::path::PathBuf) {
+    std::thread::spawn(move || loop {
+        if let Err(e) = backup::diario(&dir, &backup::hoje_utc()) {
+            eprintln!("backup diario falhou: {e}");
+        }
+        std::thread::sleep(std::time::Duration::from_secs(30 * 60));
     });
 }
 

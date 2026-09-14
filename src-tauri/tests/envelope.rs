@@ -37,7 +37,7 @@ fn url_de_autorizacao_usa_pkce_s256_e_escopo_minimo() {
     assert!(url.contains("code_challenge_method=S256"));
     assert!(url.contains(&format!("code_challenge={}", pkce.challenge)));
     assert!(url.contains(&format!("state={}", pkce.state)));
-    assert!(url.contains("scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fdrive.appdata"));
+    assert!(url.contains("scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.readonly"));
     // identidade minima para exibir a conta, nada alem disso
     assert!(url.contains("openid") && url.contains("email"));
     assert!(url.contains("redirect_uri=http%3A%2F%2F127.0.0.1%3A5731"));
@@ -47,8 +47,9 @@ fn url_de_autorizacao_usa_pkce_s256_e_escopo_minimo() {
 }
 
 #[test]
-fn escopo_pedido_nao_alcanca_o_drive_inteiro() {
+fn login_google_serve_so_a_agenda_e_nao_toca_no_drive() {
+    // O backup agora e arquivo local: pedir qualquer escopo de Drive seria acesso sem uso.
     let url = authorize_url("id", "http://127.0.0.1:1", &Pkce::new());
-    assert!(!url.contains("auth%2Fdrive&") && !url.contains("auth%2Fdrive+") && !url.contains("drive.file"));
-    assert!(url.contains("drive.appdata"));
+    assert!(!url.contains("auth%2Fdrive"), "{url}");
+    assert!(!url.contains("calendar+") && !url.contains("calendar&"), "agenda deve ser so leitura: {url}");
 }

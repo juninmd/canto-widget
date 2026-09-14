@@ -7,15 +7,15 @@ import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
 import NotesTab from "./components/NotesTab";
-import SyncTab from "./components/SyncTab";
+import AjustesTab from "./components/AjustesTab";
 import SkinPicker from "./components/SkinPicker";
 import ClipboardTab from "./components/ClipboardTab";
 import TranscriptsTab from "./components/TranscriptsTab";
 import AgendaTab from "./components/AgendaTab";
 import Alerta from "./components/Alerta";
 
-type Tab = "tarefas" | "notas" | "clipboard" | "reunioes" | "agenda" | "sync";
-const TABS: Tab[] = ["tarefas", "notas", "clipboard", "reunioes", "agenda", "sync"];
+type Tab = "tarefas" | "notas" | "clipboard" | "reunioes" | "agenda" | "ajustes";
+const TABS: Tab[] = ["tarefas", "notas", "clipboard", "reunioes", "agenda", "ajustes"];
 
 export default function App() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
@@ -148,7 +148,7 @@ export default function App() {
             {tab === "clipboard" && <ClipboardTab onError={setError} />}
             {tab === "reunioes" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
-            {tab === "sync" && <SyncTab onError={setError} />}
+            {tab === "ajustes" && <AjustesTab onError={setError} />}
           </main>
         </>
       )}

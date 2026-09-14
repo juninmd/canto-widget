@@ -36,7 +36,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
   return (
     <div className="flex h-full flex-col gap-2">
       <p className="text-[11px] text-faint">
-        Histórico local e cifrado — <span className="text-muted">nunca vai para o Drive</span>.
+        Histórico local e cifrado — <span className="text-muted">nunca entra no backup</span>.
       </p>
       <div className="flex gap-2">
         <input

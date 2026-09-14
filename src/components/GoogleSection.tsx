@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, errText, type DriveStatus } from "../lib/api";
 
-export default function SyncTab({ onError }: { onError: (m: string) => void }) {
+export default function GoogleSection({ onError }: { onError: (m: string) => void }) {
   const [status, setStatus] = useState<DriveStatus>({ configured: false, connected: false, email: "" });
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
@@ -27,22 +27,20 @@ export default function SyncTab({ onError }: { onError: (m: string) => void }) {
     try {
       await fn();
       if (msg) setInfo(msg);
-      await reload();
     } catch (e) {
       onError(errText(e));
     } finally {
+      await reload();
       setBusy("");
     }
   }
 
   return (
-    <div className="flex h-full flex-col gap-2 overflow-y-auto pr-1 text-sm">
-      <p className="text-[11px] text-faint">
-        Atalho global: <span className="text-muted">Ctrl+Alt+Espaço</span> mostra ou esconde o widget.
-      </p>
+    <section className="flex flex-col gap-2">
+      <h2 className="text-xs font-semibold text-fg">Agenda do Google</h2>
       <p className="text-xs text-muted">
-        O Drive guarda apenas o envelope ja cifrado, na pasta privada do app
-        (<code className="text-muted">appDataFolder</code>). A senha mestra nunca sai daqui.
+        Opcional. A conta serve só para ler os eventos do dia (somente leitura); nenhum dado do cofre
+        vai para o Google.
       </p>
 
       <label className="text-[11px] text-muted">Client ID OAuth (app desktop)</label>
@@ -70,7 +68,7 @@ export default function SyncTab({ onError }: { onError: (m: string) => void }) {
         salvar credenciais
       </button>
 
-      <div className="mt-2 flex items-center gap-2 text-xs">
+      <div className="mt-1 flex items-center gap-2 text-xs">
         <span className={`size-2 rounded-full ${status.connected ? "bg-accent" : "bg-faint"}`} />
         <span className="truncate text-muted">
           {status.connected
@@ -81,24 +79,14 @@ export default function SyncTab({ onError }: { onError: (m: string) => void }) {
         </span>
       </div>
 
-      <div className="flex gap-2">
-        <button
-          type="button"
-          disabled={busy !== "" || !status.configured}
-          onClick={() => run("conn", async () => setInfo(`entrou como ${await api.driveConnect()}`), "")}
-          className="flex-1 rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
-        >
-          {busy === "conn" ? "aguardando navegador..." : status.connected ? "trocar de conta" : "entrar com o Google"}
-        </button>
-        <button
-          type="button"
-          disabled={busy !== "" || !status.connected}
-          onClick={() => run("sync", api.driveSync, "sincronizado com o Drive")}
-          className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent disabled:opacity-40"
-        >
-          {busy === "sync" ? "sincronizando..." : "sincronizar agora"}
-        </button>
-      </div>
+      <button
+        type="button"
+        disabled={busy !== "" || !status.configured}
+        onClick={() => run("conn", async () => setInfo(`entrou como ${await api.driveConnect()}`), "")}
+        className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
+      >
+        {busy === "conn" ? "aguardando navegador..." : status.connected ? "trocar de conta" : "entrar com o Google"}
+      </button>
       {status.connected && (
         <button
           type="button"
@@ -110,6 +98,6 @@ export default function SyncTab({ onError }: { onError: (m: string) => void }) {
         </button>
       )}
       {info && <p className="text-[11px] text-accent">{info}</p>}
-    </div>
+    </section>
   );
 }

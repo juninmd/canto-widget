@@ -28,11 +28,19 @@ pub fn toggle(app: &tauri::AppHandle) -> tauri::Result<()> {
     };
     if win.is_visible()? {
         win.hide()?;
-    } else {
-        anchor_bottom_right(&win)?;
-        win.show()?;
-        win.set_focus()?;
+        return Ok(());
     }
+    mostrar(app)
+}
+
+/// Traz o widget para a frente, ancorado no canto do monitor atual.
+pub fn mostrar(app: &tauri::AppHandle) -> tauri::Result<()> {
+    let Some(win) = app.get_webview_window("main") else {
+        return Ok(());
+    };
+    anchor_bottom_right(&win)?;
+    win.show()?;
+    win.set_focus()?;
     Ok(())
 }
 

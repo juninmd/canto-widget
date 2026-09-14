@@ -16,7 +16,7 @@ pub enum AppError {
     Io(String),
     #[error("formato invalido: {0}")]
     Format(String),
-    #[error("google drive: {0}")]
+    #[error("google: {0}")]
     Drive(String),
     #[error("{0}")]
     Config(String),
