@@ -138,6 +138,18 @@ Critérios aplicados, com o antes/depois em [`docs/prints/ux`](docs/prints/ux):
 | Abas por teclado | WAI-ARIA APG — Tabs | `TabBar` com `tablist`/`tab`/`tabpanel` e setas |
 | Divulgação progressiva | NN/g | credenciais OAuth recolhidas quando a conta já está conectada |
 
+### Movimento
+
+Animações só onde mostram causa e efeito: item criado, item excluído, aviso chegando, troca de aba e cofre abrindo. Quadros de 0 a 200 ms, antes e depois, em [`docs/prints/ux-animacoes`](docs/prints/ux-animacoes).
+
+| Regra | Fonte | Como ficou |
+|---|---|---|
+| Entrar em 150–250 ms, sair mais rápido | NN/g — Animation Duration; Card, Moran & Newell (ciclo perceptivo ~100 ms) | tokens `--animate-*` em `styles.css`: aba 150, item 200, cofre 250, saída 150 |
+| Desacelerar ao entrar, acelerar ao sair | Dragicevic et al., CHI 2011; Heer & Robertson, 2007 | `--ease-entrar` / `--ease-sair` |
+| Só `transform` e `opacity` | web.dev — High-performance animations | nenhuma animação de layout; auditado com `document.getAnimations()` |
+| Animar só o que muda | Tversky, Morrison & Bétrancourt, 2002 | lista não reanima a cada recarga, só itens que surgiram depois dela (`useNovos`) |
+| Respeitar "reduzir movimento" | WCAG 2.2 — 2.3.3; `prefers-reduced-motion` | sem deslocamento: fade de 100 ms, e exclusões somem na hora |
+
 | padrão | Hueco Mundo | Drácula |
 |---|---|---|
 | ![Skin padrão](docs/prints/30-skin-padrao.png) | ![Skin Hueco Mundo](docs/prints/31-skin-hueco-mundo.png) | ![Skin Drácula](docs/prints/32-skin-dracula.png) |

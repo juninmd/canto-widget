@@ -129,9 +129,10 @@ function Canto() {
           <TabBar atual={tab} onChange={setTab} />
           <main
             id={painelId(tab)}
+            key={tab}
             role="tabpanel"
             aria-labelledby={`aba-${tab}`}
-            className="min-h-0 flex-1 p-3"
+            className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
           >
             {tab === "tarefas" && <TasksTab today={today} onError={setError} />}
             {tab === "notas" && <NotesTab onError={setError} />}

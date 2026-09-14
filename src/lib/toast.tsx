@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { duracaoSaida } from "./movimento";
 
 export type Aviso = {
   texto: string;
@@ -56,15 +57,24 @@ export function ToastProvider({ children, duracaoMs = DURACAO_INFO_MS }: { child
 /** `duracaoMs` nulo: erro fica até ser fechado, para dar tempo de ler (NN/g). */
 function Toast({ aviso, fechar, duracaoMs }: { aviso: AvisoAtivo; fechar: (id: number) => void; duracaoMs: number | null }) {
   const [pausado, setPausado] = useState(false);
+  const [saindo, setSaindo] = useState(false);
   const { id } = aviso;
+
+  // Sai animando e so entao desmonta; com menos movimento pedido, some na hora.
+  const encerrar = useCallback(() => {
+    const ms = duracaoSaida();
+    if (!ms) return fechar(id);
+    setSaindo(true);
+    setTimeout(() => fechar(id), ms);
+  }, [fechar, id]);
 
   // Pausa com mouse ou foco em cima: prazo ajustável (WCAG 2.2.1).
   useEffect(() => {
     if (duracaoMs === null || pausado) return;
     // Dependencias estaveis: um aviso novo chegando nao reinicia o prazo dos outros.
-    const t = setTimeout(() => fechar(id), duracaoMs);
+    const t = setTimeout(encerrar, duracaoMs);
     return () => clearTimeout(t);
-  }, [duracaoMs, pausado, fechar, id]);
+  }, [duracaoMs, pausado, encerrar]);
 
   const erro = aviso.tipo === "erro";
   return (
@@ -75,7 +85,7 @@ function Toast({ aviso, fechar, duracaoMs }: { aviso: AvisoAtivo; fechar: (id: n
       onBlur={() => setPausado(false)}
       className={`pointer-events-auto flex items-center gap-2 rounded-lg border bg-ink px-3 py-1.5 text-xs text-fg shadow-lg ${
         erro ? "border-danger" : "border-line"
-      }`}
+      } ${saindo ? "pointer-events-none motion-safe:animate-baixar" : "motion-safe:animate-entrar motion-reduce:animate-fade"}`}
     >
       <span className={`min-w-0 flex-1 break-words ${erro ? "text-danger" : ""}`}>{aviso.texto}</span>
       {aviso.acao && (
@@ -83,7 +93,7 @@ function Toast({ aviso, fechar, duracaoMs }: { aviso: AvisoAtivo; fechar: (id: n
           type="button"
           onClick={() => {
             aviso.acao!.executar();
-            fechar(id);
+            encerrar();
           }}
           className="min-h-6 shrink-0 rounded px-2 font-semibold text-accent hover:bg-edge"
         >
@@ -92,7 +102,7 @@ function Toast({ aviso, fechar, duracaoMs }: { aviso: AvisoAtivo; fechar: (id: n
       )}
       <button
         type="button"
-        onClick={() => fechar(id)}
+        onClick={encerrar}
         aria-label="fechar aviso"
         className="grid size-6 shrink-0 place-items-center rounded text-muted hover:text-fg"
       >

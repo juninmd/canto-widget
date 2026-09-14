@@ -1,15 +1,20 @@
 import { useEffect, useState } from "react";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useDesfazer } from "../lib/useDesfazer";
+import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
 
 export default function ClipboardTab({ onError }: { onError: (m: string) => void }) {
   const [query, setQuery] = useState("");
   const [itens, setItens] = useState<ClipItem[]>([]);
   const [copiado, setCopiado] = useState("");
 
+  const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
+  const { saindo, sair } = useSaida();
+
   async function reload(q = query) {
     try {
       setItens(await api.clipList(q));
+      setCarregadoPara(q);
     } catch (e) {
       onError(errText(e));
     }
@@ -26,6 +31,11 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
   }, [query]);
 
   const desfazivel = useDesfazer(onError, () => reload());
+  // O vigia do clipboard traz itens novos a cada 2.5s: eles entram deslizando no topo.
+  const novo = useNovos(
+    itens.map((i) => i.id),
+    carregadoPara,
+  );
 
   async function run(fn: () => Promise<unknown>) {
     try {
@@ -60,7 +70,10 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
         {itens.map((i) => (
-          <li key={i.id} className="group rounded-lg border border-edge bg-ink/60 p-2">
+          <li
+            key={i.id}
+            className={`group rounded-lg border border-edge bg-ink/60 p-2 ${novo(i.id) ? ENTRAR : ""} ${saindo.has(i.id) ? SAIR : ""}`}
+          >
             <button
               type="button"
               className="w-full text-left"
@@ -83,7 +96,11 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
                 </button>
                 <button
                   type="button"
-                  onClick={() => run(async () => desfazivel(await api.clipDelete(i.id), "item excluído do histórico"))}
+                  onClick={() =>
+                    void sair(i.id, () =>
+                      run(async () => desfazivel(await api.clipDelete(i.id), "item excluído do histórico")),
+                    )
+                  }
                   className="min-h-6 px-1 hover:text-danger"
                 >
                   excluir
