@@ -14,11 +14,21 @@ import TranscriptsTab from "./components/TranscriptsTab";
 import AgendaTab from "./components/AgendaTab";
 import TabBar, { painelId, type Tab } from "./components/TabBar";
 import Alerta from "./components/Alerta";
+import { ToastProvider, useToast } from "./lib/toast";
 
 export default function App() {
+  return (
+    <ToastProvider>
+      <Canto />
+    </ToastProvider>
+  );
+}
+
+function Canto() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
   const [tab, setTab] = useState<Tab>("tarefas");
-  const [error, setError] = useState("");
+  const avisar = useToast();
+  const setError = useCallback((texto: string) => avisar({ texto, tipo: "erro" }), [avisar]);
   const [alerta, setAlerta] = useState<AgendaItem | null>(null);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
@@ -29,7 +39,7 @@ export default function App() {
     } catch (e) {
       setError(errText(e));
     }
-  }, []);
+  }, [setError]);
 
   useEffect(() => {
     void refresh();
@@ -38,13 +48,13 @@ export default function App() {
   // O Rust tranca o cofre sozinho depois de um tempo parado; a UI precisa saber.
   useEffect(() => {
     const parar = listen<number>("canto://auto-lock", (e) => {
-      setError(`cofre trancado sozinho apos ${e.payload} min sem uso`);
+      avisar({ texto: `cofre trancado sozinho após ${e.payload} min sem uso` });
       void refresh();
     });
     return () => {
       void parar.then((f) => f());
     };
-  }, [refresh]);
+  }, [refresh, avisar]);
 
   // Uso deliberado adia o auto-lock. Estrangulado: um aviso por janela basta.
   useEffect(() => {
@@ -109,16 +119,6 @@ export default function App() {
           </button>
         </div>
       </header>
-
-      {error && (
-        <button
-          type="button"
-          onClick={() => setError("")}
-          className="border-b border-edge bg-ink px-3 py-1.5 text-left text-[11px] text-danger"
-        >
-          {error}
-        </button>
-      )}
 
       {!status ? (
         <div className="flex-1" />
