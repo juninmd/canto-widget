@@ -31,7 +31,7 @@ export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFec
       role="alertdialog"
       aria-modal="true"
       aria-label={`reuniao comecando: ${evento.titulo}`}
-      className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl"
+      className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
     >
       <div className="min-h-0">
         <p className="text-[11px] uppercase tracking-widest text-accent">começando agora</p>

@@ -178,8 +178,10 @@ pub fn note_save(
 }
 
 #[tauri::command]
-pub fn item_delete(state: State<'_, AppState>, id: String) -> Result<()> {
-    state.mutate(|d| d.tombstone(&id, now_ms()))
+/// Devolve a chave para desfazer, ou `None` se o id nao existia.
+pub fn item_delete(state: State<'_, AppState>, id: String) -> Result<Option<String>> {
+    let removido = state.mutate(|d| d.remover(&id, now_ms()))?;
+    Ok(removido.and_then(|r| state.guardar_na_lixeira(r)))
 }
 
 #[cfg(test)]

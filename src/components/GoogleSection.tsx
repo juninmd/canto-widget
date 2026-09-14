@@ -48,7 +48,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
         <summary className="min-h-6 cursor-pointer text-[11px] text-muted hover:text-fg">
           credenciais OAuth {status.configured ? "(salvas)" : ""}
         </summary>
-        <div className="mt-2 flex flex-col gap-2">
+        <div className="mt-2 flex flex-col gap-2 motion-safe:animate-aba">
           <label htmlFor="google-client-id" className="text-[11px] text-muted">Client ID OAuth (app desktop)</label>
           <input
             id="google-client-id"

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, errText, type Note } from "../lib/api";
+import { useDesfazer } from "../lib/useDesfazer";
+import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
 
 const EMPTY = { id: undefined as string | undefined, title: "", body: "", tags: "" };
 
@@ -9,9 +11,28 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
   const [draft, setDraft] = useState(EMPTY);
   const [editing, setEditing] = useState(false);
 
+  const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
+  const { saindo, sair } = useSaida();
+
   async function reload(q = query) {
     try {
       setNotes(await api.notesSearch(q));
+      setCarregadoPara(q);
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
+  const desfazivel = useDesfazer(onError, () => reload());
+  const novo = useNovos(
+    notes.map((n) => n.id),
+    carregadoPara,
+  );
+
+  async function excluir(n: Note) {
+    try {
+      desfazivel(await api.itemDelete(n.id), `card "${n.title}" excluído`);
+      await reload();
     } catch (e) {
       onError(errText(e));
     }
@@ -120,7 +141,10 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
 
       <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
         {notes.map((n) => (
-          <li key={n.id} className="group rounded-lg border border-edge bg-ink/60 p-2">
+          <li
+            key={n.id}
+            className={`group rounded-lg border border-edge bg-ink/60 p-2 ${novo(n.id) ? ENTRAR : ""} ${saindo.has(n.id) ? SAIR : ""}`}
+          >
             <div className="flex items-start justify-between gap-2">
               <button
                 type="button"
@@ -135,7 +159,7 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
               </button>
               <button
                 type="button"
-                onClick={() => void api.itemDelete(n.id).then(() => reload())}
+                onClick={() => void sair(n.id, () => excluir(n))}
                 className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
                 aria-label={`excluir ${n.title}`}
               >
