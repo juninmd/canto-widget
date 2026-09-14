@@ -47,6 +47,7 @@ pub struct AppState {
     pub session: Mutex<Option<Session>>,
     /// Ultimo evento que disparou o pop-up, lido pela janela de alerta.
     pub alerta: Mutex<Option<crate::calendar::AgendaItem>>,
+    pub lixeira: crate::lixeira::Lixeira,
     /// Instante do ultimo uso deliberado do cofre, base do auto-lock.
     /// Pollings de fundo (clipboard, agenda) de proposito nao mexem aqui.
     last_active: Mutex<i64>,
@@ -58,6 +59,7 @@ impl AppState {
             dir,
             session: Mutex::new(None),
             alerta: Mutex::new(None),
+            lixeira: Default::default(),
             last_active: Mutex::new(now_ms()),
         }
     }
@@ -126,6 +128,7 @@ impl AppState {
 
     pub fn lock(&self) {
         *self.session.lock().unwrap() = None;
+        self.lixeira.esvaziar();
     }
 
     pub fn is_unlocked(&self) -> bool {

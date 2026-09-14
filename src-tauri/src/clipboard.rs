@@ -46,6 +46,12 @@ impl ClipHistory {
                 pinned: false,
             },
         );
+        self.podar();
+        true
+    }
+
+    /// Fixados nao contam para o limite.
+    pub(crate) fn podar(&mut self) {
         let mut kept = 0;
         self.items.retain(|i| {
             if i.pinned {
@@ -54,7 +60,6 @@ impl ClipHistory {
             kept += 1;
             kept <= MAX_ITENS
         });
-        true
     }
 }
 

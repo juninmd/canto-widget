@@ -9,6 +9,7 @@ pub mod commands;
 pub mod crypto;
 pub mod drive;
 pub mod error;
+pub mod lixeira;
 pub mod meet;
 pub mod model;
 pub mod oauth;
@@ -102,6 +103,7 @@ pub fn run() {
             autostart::autostart_set,
             cmd_backup::backup_exportar,
             cmd_backup::backup_importar,
+            lixeira::lixeira_desfazer,
         ])
         .on_window_event(|win, event| {
             // Fechar esconde o widget; sair de verdade so pela bandeja.

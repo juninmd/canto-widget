@@ -58,7 +58,9 @@ export const api = {
   notesSearch: (query: string) => invoke<Note[]>("notes_search", { query }),
   noteSave: (note: { id?: string; title: string; body: string; tags: string[] }) =>
     invoke<Note>("note_save", { id: note.id ?? null, ...note }),
-  itemDelete: (id: string) => invoke<void>("item_delete", { id }),
+  /** Devolve a chave de `lixeiraDesfazer`, ou `null` se nada foi removido. */
+  itemDelete: (id: string) => invoke<string | null>("item_delete", { id }),
+  lixeiraDesfazer: (chave: string) => invoke<boolean>("lixeira_desfazer", { chave }),
 
   autostartStatus: () => invoke<boolean>("autostart_status"),
   autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),
@@ -76,8 +78,8 @@ export const api = {
   clipList: (query: string) => invoke<ClipItem[]>("clip_list", { query }),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
   clipPin: (id: string) => invoke<void>("clip_pin", { id }),
-  clipDelete: (id: string) => invoke<void>("clip_delete", { id }),
-  clipClear: () => invoke<void>("clip_clear"),
+  clipDelete: (id: string) => invoke<string | null>("clip_delete", { id }),
+  clipClear: () => invoke<string | null>("clip_clear"),
 
   transcriptsDir: () => invoke<string>("transcripts_dir"),
   transcriptsSetDir: (dir: string) => invoke<void>("transcripts_set_dir", { dir }),
