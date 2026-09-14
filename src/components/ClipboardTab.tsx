@@ -43,7 +43,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="buscar no que você copiou"
-          className="flex-1 rounded-lg border border-edge bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
         <button
           type="button"
@@ -72,16 +72,16 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
             >
               <p className="line-clamp-3 whitespace-pre-wrap break-all text-xs text-fg">{i.text}</p>
             </button>
-            <div className="mt-1 flex items-center justify-between text-[10px] text-faint">
+            <div className="mt-1 flex items-center justify-between text-[11px] text-faint">
               <span>{copiado === i.id ? "copiado!" : new Date(i.copied_at).toLocaleTimeString()}</span>
-              <span className="flex gap-2">
-                <button type="button" onClick={() => run(() => api.clipPin(i.id))} className="hover:text-fg">
+              <span className="flex gap-3">
+                <button type="button" onClick={() => run(() => api.clipPin(i.id))} className="min-h-6 px-1 hover:text-fg">
                   {i.pinned ? "fixado" : "fixar"}
                 </button>
                 <button
                   type="button"
                   onClick={() => run(() => api.clipDelete(i.id))}
-                  className="hidden hover:text-danger group-hover:inline"
+                  className="min-h-6 px-1 hover:text-danger"
                 >
                   excluir
                 </button>

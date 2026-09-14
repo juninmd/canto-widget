@@ -36,16 +36,16 @@ export default function AjustesTab({ onError }: { onError: (m: string) => void }
   return (
     <div className="flex h-full flex-col gap-4 overflow-y-auto pr-1 text-sm">
       <section className="flex flex-col gap-2">
-        <p className="text-[11px] text-faint">
+        <p className="text-xs text-muted">
           Atalho global: <span className="text-muted">Ctrl+Alt+Espaço</span> mostra ou esconde o widget.
         </p>
-        <label className="flex items-center gap-2 text-[11px] text-muted">
+        <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
           <input
             type="checkbox"
             checked={autostart}
             disabled={busy}
             onChange={(e) => void alternar(e.target.checked)}
-            className="accent-accent"
+            className="size-4 accent-[var(--color-accent)]"
           />
           abrir o Canto ao ligar o computador (direto na bandeja)
         </label>

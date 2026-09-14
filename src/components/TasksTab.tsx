@@ -62,23 +62,24 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="nova tarefa de hoje"
-          className="flex-1 rounded-lg border border-edge bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
-        <button type="submit" className="rounded-lg bg-edge px-3 text-sm text-fg">
+        <button type="submit" aria-label="adicionar tarefa" className="rounded-lg bg-edge px-3 text-sm text-fg">
           +
         </button>
       </form>
 
       <div className="flex items-center justify-between text-[11px] text-muted">
         <span>
-          {done}/{tasks.length} concluidas
+          {done}/{tasks.length} concluídas
         </span>
         <button
           type="button"
           onClick={() => run(() => api.carryOver(today))}
-          className="underline decoration-dotted hover:text-fg"
+          title="traz para hoje as tarefas não concluídas dos dias anteriores"
+          className="min-h-6 underline decoration-dotted hover:text-fg"
         >
-          puxar pendencias
+          puxar pendências
         </button>
       </div>
 
@@ -121,15 +122,16 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
             <button
               type="button"
               onClick={() => run(() => api.itemDelete(t.id))}
-              className="hidden text-xs text-faint hover:text-danger group-hover:block"
+              // Visivel tambem no foco: so no hover, o teclado nunca acha o botao.
+              className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
               aria-label={`excluir ${t.title}`}
             >
-              x
+              ×
             </button>
           </li>
         ))}
         {tasks.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda</li>
+          <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda — escreva acima e tecle Enter</li>
         )}
       </ul>
     </div>

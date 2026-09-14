@@ -60,20 +60,20 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
           autoFocus
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-          placeholder="titulo"
-          className="rounded-lg border border-edge bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+          placeholder="título"
+          className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
         <textarea
           value={draft.body}
           onChange={(e) => setDraft({ ...draft, body: e.target.value })}
-          placeholder="conteudo do card"
-          className="flex-1 resize-none rounded-lg border border-edge bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+          placeholder="conteúdo do card"
+          className="flex-1 resize-none rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
         />
         <input
           value={draft.tags}
           onChange={(e) => setDraft({ ...draft, tags: e.target.value })}
-          placeholder="tags separadas por virgula"
-          className="rounded-lg border border-edge bg-ink px-3 py-1.5 text-xs text-muted outline-none focus:border-accent"
+          placeholder="tags separadas por vírgula"
+          className="rounded-lg border border-line bg-ink px-3 py-1.5 text-xs text-muted outline-none focus:border-accent"
         />
         <div className="flex gap-2">
           <button
@@ -102,8 +102,8 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="buscar em titulos, corpo e tags"
-          className="flex-1 rounded-lg border border-edge bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+          placeholder="buscar em títulos, corpo e tags"
+          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
         <button
           type="button"
@@ -111,6 +111,7 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
             setDraft(EMPTY);
             setEditing(true);
           }}
+          aria-label="novo card"
           className="rounded-lg bg-edge px-3 text-sm text-fg"
         >
           +
@@ -135,16 +136,16 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
               <button
                 type="button"
                 onClick={() => void api.itemDelete(n.id).then(() => reload())}
-                className="hidden text-xs text-faint hover:text-danger group-hover:block"
+                className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
                 aria-label={`excluir ${n.title}`}
               >
-                x
+                ×
               </button>
             </div>
             {n.tags.length > 0 && (
               <div className="mt-1 flex flex-wrap gap-1">
                 {n.tags.map((t) => (
-                  <span key={t} className="rounded bg-edge px-1.5 py-0.5 text-[10px] text-muted">
+                  <span key={t} className="rounded bg-edge px-1.5 py-0.5 text-[11px] text-muted">
                     #{t}
                   </span>
                 ))}
@@ -154,7 +155,7 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
         ))}
         {notes.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">
-            {query ? "nenhum card encontrado" : "nenhum card salvo ainda"}
+            {query ? "nenhum card encontrado" : "nenhum card salvo ainda — toque em + para criar"}
           </li>
         )}
       </ul>
