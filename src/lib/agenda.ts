@@ -39,3 +39,16 @@ export function paraAlertar(
     return m <= antecedencia && m > -2;
   });
 }
+
+/** Rótulo de leitura rápida: a cor sozinha não pode ser o único sinal de "agora" (WCAG 1.4.1). */
+export function situacao(item: AgendaItem, agora = new Date()): { rotulo: string; agora: boolean } {
+  const faltam = minutosAte(item, agora);
+  if (!Number.isFinite(faltam)) return { rotulo: "", agora: false };
+  const fim = new Date(item.fim).getTime();
+  const acabou = Number.isNaN(fim) ? faltam <= -60 : fim <= agora.getTime();
+  if (acabou) return { rotulo: "encerrado", agora: false };
+  if (faltam <= 0) return { rotulo: "agora", agora: true };
+  const min = Math.ceil(faltam);
+  const h = Math.floor(min / 60);
+  return { rotulo: h ? `em ${h}h${String(min % 60).padStart(2, "0")}` : `em ${min} min`, agora: false };
+}

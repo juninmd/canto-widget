@@ -116,6 +116,23 @@ Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.
 - A lista de tarefas vira sozinha à meia-noite, sem precisar reabrir o widget.
+- **Teclado** — as abas seguem o padrão do WAI-ARIA: `Tab` entra na barra, `←`/`→` trocam de aba,
+  `Home`/`End` vão às pontas. Todo controle mostra anel de foco, e o excluir aparece também no foco.
+- **Senha** — "mostrar senha" na tela do cofre; ao criar, o mínimo de 4 caracteres fica visível.
+- **Agenda** — cada evento diz em texto se é **agora**, **em 1h35** ou **encerrado**, sem depender só da cor.
+
+### Acessibilidade das skins
+
+Critérios aplicados, com o antes/depois em [`docs/prints/ux`](docs/prints/ux):
+
+| Regra | Fonte | Como ficou |
+|---|---|---|
+| Texto ≥ 4.5:1 | WCAG 2.2 — 1.4.3 | token `faint` clareado nas 3 skins; `on-accent` branco no Hueco Mundo |
+| Borda de campo ≥ 3:1 | WCAG 2.2 — 1.4.11 | token `line` só para bordas de input |
+| Alvo ≥ 24×24 px | WCAG 2.2 — 2.5.8 | skins, esconder, trancar, links e excluir com área de 24 px |
+| Foco visível | WCAG 2.2 — 2.4.7 | `:focus-visible` global na cor de destaque |
+| Abas por teclado | WAI-ARIA APG — Tabs | `TabBar` com `tablist`/`tab`/`tabpanel` e setas |
+| Divulgação progressiva | NN/g | credenciais OAuth recolhidas quando a conta já está conectada |
 
 | padrão | Hueco Mundo | Drácula |
 |---|---|---|

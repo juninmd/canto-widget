@@ -11,7 +11,7 @@ export default function SkinPicker() {
   }, []);
 
   return (
-    <div className="flex items-center gap-1" role="radiogroup" aria-label="skin do widget">
+    <div className="flex items-center" role="radiogroup" aria-label="skin do widget">
       {SKINS.map((s) => (
         <button
           key={s.id}
@@ -19,15 +19,21 @@ export default function SkinPicker() {
           role="radio"
           aria-checked={skin === s.id}
           title={s.nome}
+          aria-label={s.nome}
           onClick={() => {
             setSkin(s.id);
             applySkin(s.id);
           }}
-          className={`size-3 rounded-full border transition ${
-            skin === s.id ? "border-fg scale-110" : "border-edge opacity-60 hover:opacity-100"
-          }`}
-          style={{ backgroundColor: s.amostra }}
-        />
+          // Area de clique de 24px (WCAG 2.5.8) com a bolinha visual de 12px.
+          className="group/skin grid size-6 place-items-center rounded-full"
+        >
+          <span
+            className={`size-3 rounded-full border transition ${
+              skin === s.id ? "border-fg scale-110" : "border-edge opacity-60 group-hover/skin:opacity-100"
+            }`}
+            style={{ backgroundColor: s.amostra }}
+          />
+        </button>
       ))}
     </div>
   );
