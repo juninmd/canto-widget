@@ -19,10 +19,18 @@ pub struct DriveConfig {
     pub client_id: String,
     #[serde(default)]
     pub client_secret: String,
+    /// Salvo pelo usuario em Ajustes. Credencial antiga, de antes do cliente embutido, nao conta.
+    #[serde(default)]
+    pub cliente_proprio: bool,
     #[serde(default)]
     pub tokens: Option<DriveTokens>,
     #[serde(default)]
     pub email: String,
+    #[serde(default)]
+    pub nome: String,
+    /// Foto da conta como `data:` URL; vazia quando nao veio ou nao passou na checagem.
+    #[serde(default)]
+    pub avatar: String,
 }
 
 pub struct Session {
@@ -126,6 +134,13 @@ impl AppState {
         Ok(())
     }
 
+    /// Copia da senha da sessao, para cifra-la com a biometria. Nunca sai do processo.
+    pub(crate) fn senha_da_sessao(&self) -> Result<Zeroizing<String>> {
+        let guard = self.session.lock().unwrap();
+        let session = guard.as_ref().ok_or(AppError::Locked)?;
+        Ok(session.password.clone())
+    }
+
     pub fn lock(&self) {
         *self.session.lock().unwrap() = None;
         self.lixeira.esvaziar();
@@ -149,6 +164,29 @@ impl AppState {
         let out = f(&mut session.data);
         self.persist(session)?;
         Ok(out)
+    }
+
+    /// Para vigias de fundo: nao conta como uso (auto-lock segue correndo) e so grava
+    /// em disco quando a closure diz que mudou algo.
+    pub fn em_fundo<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
+        let mut guard = self.session.lock().unwrap();
+        let session = guard.as_mut().ok_or(AppError::Locked)?;
+        let (out, mudou) = f(&mut session.data);
+        if mudou {
+            self.persist(session)?;
+        }
+        Ok(out)
+    }
+
+    /// Mutacao do usuario que talvez nao mude nada: grava so se `f` devolver `true`.
+    pub fn mutate_se(&self, f: impl FnOnce(&mut VaultData) -> bool) -> Result<()> {
+        self.touch();
+        let mut guard = self.session.lock().unwrap();
+        let session = guard.as_mut().ok_or(AppError::Locked)?;
+        if f(&mut session.data) {
+            self.persist(session)?;
+        }
+        Ok(())
     }
 
     pub fn read<T>(&self, f: impl FnOnce(&VaultData) -> T) -> Result<T> {
@@ -260,6 +298,21 @@ mod tests {
         *st.last_active.lock().unwrap() = now_ms() - 61_000;
         st.read(|d| d.tasks.len()).unwrap();
         assert!(!st.lock_if_idle(60_000), "leitura do usuario nao adiou o timer");
+        let _ = std::fs::remove_dir_all(&st.dir);
+    }
+
+    #[test]
+    fn vigia_de_lembretes_nao_adia_o_auto_lock_nem_grava_sem_mudanca() {
+        let st = estado("em-fundo");
+        st.create("senha-mestra").unwrap();
+        let antes = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
+        *st.last_active.lock().unwrap() = now_ms() - 61_000;
+        std::thread::sleep(std::time::Duration::from_millis(20));
+        st.em_fundo(|d| (d.tasks.len(), false)).unwrap();
+        let depois = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
+        assert_eq!(antes, depois, "regravou o cofre sem nada mudar");
+        assert!(st.lock_if_idle(60_000), "o vigia de fundo segurou o cofre aberto");
+        assert!(matches!(st.em_fundo(|_| ((), true)), Err(AppError::Locked)));
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
