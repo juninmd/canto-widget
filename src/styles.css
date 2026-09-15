@@ -30,6 +30,19 @@
 }
 
 /* Drácula: paleta oficial dracula-theme.com */
+:root[data-skin="claro"] {
+  color-scheme: light;
+  --color-ink: #f1f5f9;
+  --color-panel: #ffffff;
+  --color-edge: #e2e8f0;
+  --color-accent: #15803d;
+  --color-on-accent: #ffffff;
+  --color-fg: #0f172a;
+  --color-muted: #475569;
+  --color-faint: #556173;
+  --color-line: #7b8595;
+  --color-danger: #be123c;
+}
 :root[data-skin="dracula"] {
   --color-ink: #21222c;
   --color-panel: #282a36;

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api, errText, type Note } from "../lib/api";
 import { useDesfazer } from "../lib/useDesfazer";
 import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
+import NotaCard from "./NotaCard";
 
 const EMPTY = { id: undefined as string | undefined, title: "", body: "", tags: "" };
 
@@ -11,6 +12,7 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
   const [draft, setDraft] = useState(EMPTY);
   const [editing, setEditing] = useState(false);
 
+  const [anuncio, setAnuncio] = useState("");
   const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
   const { saindo, sair } = useSaida();
 
@@ -33,6 +35,17 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
     try {
       desfazivel(await api.itemDelete(n.id), `card "${n.title}" excluído`);
       await reload();
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
+  async function fixar(n: Note) {
+    try {
+      const fixada = await api.notePin(n.id);
+      await reload();
+      // Sem aviso a nota "pula" para o topo ou some do lugar sem explicacao.
+      setAnuncio(fixada ? `"${n.title}" fixada no topo` : `"${n.title}" desafixada`);
     } catch (e) {
       onError(errText(e));
     }
@@ -121,9 +134,12 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
     <div className="flex h-full flex-col gap-2">
       <div className="flex gap-2">
         <input
+          type="search"
           value={query}
+          data-atalho="busca"
+          aria-label="buscar notas"
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="buscar em títulos, corpo e tags"
+          placeholder="buscar em títulos, corpo e #tag"
           className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
         <button
@@ -133,49 +149,30 @@ export default function NotesTab({ onError }: { onError: (m: string) => void }) 
             setEditing(true);
           }}
           aria-label="novo card"
+          data-atalho="novo"
           className="rounded-lg bg-edge px-3 text-sm text-fg"
         >
           +
         </button>
       </div>
 
+      <p role="status" className="sr-only">
+        {anuncio}
+      </p>
       <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
         {notes.map((n) => (
-          <li
+          <NotaCard
             key={n.id}
-            className={`group rounded-lg border border-edge bg-ink/60 p-2 ${novo(n.id) ? ENTRAR : ""} ${saindo.has(n.id) ? SAIR : ""}`}
-          >
-            <div className="flex items-start justify-between gap-2">
-              <button
-                type="button"
-                className="flex-1 text-left"
-                onClick={() => {
-                  setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", ") });
-                  setEditing(true);
-                }}
-              >
-                <p className="truncate text-sm font-medium text-fg">{n.title}</p>
-                <p className="mt-0.5 line-clamp-2 text-xs text-muted">{n.body}</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => void sair(n.id, () => excluir(n))}
-                className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-                aria-label={`excluir ${n.title}`}
-              >
-                ×
-              </button>
-            </div>
-            {n.tags.length > 0 && (
-              <div className="mt-1 flex flex-wrap gap-1">
-                {n.tags.map((t) => (
-                  <span key={t} className="rounded bg-edge px-1.5 py-0.5 text-[11px] text-muted">
-                    #{t}
-                  </span>
-                ))}
-              </div>
-            )}
-          </li>
+            nota={n}
+            classe={`${novo(n.id) ? ENTRAR : ""} ${saindo.has(n.id) ? SAIR : ""}`}
+            onAbrir={() => {
+              setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", ") });
+              setEditing(true);
+            }}
+            onFixar={() => void fixar(n)}
+            onExcluir={() => void sair(n.id, () => excluir(n))}
+            onTag={(t) => setQuery(`#${t}`)}
+          />
         ))}
         {notes.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">

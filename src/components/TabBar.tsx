@@ -40,7 +40,7 @@ export default function TabBar({ atual, onChange }: { atual: Tab; onChange: (t: 
       onKeyDown={aoTeclar}
       className="flex shrink-0 gap-1 overflow-x-auto px-3 pt-2 text-xs"
     >
-      {TABS.map((t) => (
+      {TABS.map((t, i) => (
         <button
           key={t.id}
           ref={(el) => {
@@ -54,6 +54,7 @@ export default function TabBar({ atual, onChange }: { atual: Tab; onChange: (t: 
           aria-controls={atual === t.id ? painelId(t.id) : undefined}
           tabIndex={atual === t.id ? 0 : -1}
           onClick={() => onChange(t.id)}
+          title={`Alt+${i + 1}`}
           className={`min-h-7 shrink-0 rounded-lg px-2.5 ${
             atual === t.id ? "bg-edge font-semibold text-fg" : "text-muted hover:text-fg"
           }`}

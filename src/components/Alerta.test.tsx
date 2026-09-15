@@ -4,10 +4,12 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { AgendaItem } from "../lib/api";
 
 const chamadas: string[] = [];
+const argumentos: Record<string, unknown>[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
-  invoke: (cmd: string) => {
+  invoke: (cmd: string, args?: Record<string, unknown>) => {
     chamadas.push(cmd);
+    argumentos.push(args ?? {});
     return Promise.resolve(null);
   },
 }));
@@ -27,6 +29,7 @@ const evento: AgendaItem = {
 
 beforeEach(() => {
   chamadas.length = 0;
+  argumentos.length = 0;
 });
 
 afterEach(cleanup);
@@ -60,6 +63,7 @@ test("o listener de Esc sai junto com o alerta", async () => {
     unmount();
   });
   chamadas.length = 0;
+  argumentos.length = 0;
 
   await act(async () => {
     fireEvent.keyDown(window, { key: "Escape" });
@@ -78,4 +82,23 @@ test("nao abre o Meet sozinho, so no clique", async () => {
     fireEvent.click(screen.getByText("entrar no Meet"));
   });
   expect(chamadas).toContain("abrir_link");
+});
+
+test("lembrete de tarefa conclui a tarefa certa direto do aviso", async () => {
+  const { comoEvento } = await import("../lib/lembretes");
+  const lembrete = comoEvento({ id: "t9", title: "tomar remédio", done: false, day: "2026-09-14", created_at: 1, updated_at: 1, hora: "08:30" });
+  let fechou = false;
+  await act(async () => {
+    render(<Alerta evento={lembrete} onFechar={() => { fechou = true; }} />);
+  });
+  expect(screen.getByText("lembrete de tarefa")).toBeTruthy();
+  expect(screen.queryByText("entrar no Meet")).toBeNull();
+  const concluir = screen.getByRole("button", { name: "concluir tarefa" });
+  expect(document.activeElement).toBe(concluir);
+  await act(async () => {
+    fireEvent.click(concluir);
+  });
+  expect(argumentos[chamadas.indexOf("task_concluir")]).toEqual({ id: "t9" });
+  expect(chamadas).toContain("alerta_fechar");
+  expect(fechou).toBe(true);
 });

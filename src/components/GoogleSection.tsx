@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type DriveStatus } from "../lib/api";
+import ContaGoogle from "./ContaGoogle";
 
 export default function GoogleSection({ onError }: { onError: (m: string) => void }) {
   const [status, setStatus] = useState<DriveStatus>({ configured: false, connected: false, email: "" });
@@ -44,9 +45,10 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
       </p>
 
       {/* Credenciais sao passo unico: com a conta conectada, ficam recolhidas (divulgacao progressiva). */}
-      <details open={!status.connected}>
+      {/* Build com cliente embutido: credencial propria vira opcao avancada, recolhida. */}
+      <details open={!status.connected && !status.embutido}>
         <summary className="min-h-6 cursor-pointer text-[11px] text-muted hover:text-fg">
-          credenciais OAuth {status.configured ? "(salvas)" : ""}
+          {status.embutido ? "usar credenciais OAuth próprias (avançado)" : `credenciais OAuth ${status.configured ? "(salvas)" : ""}`}
         </summary>
         <div className="mt-2 flex flex-col gap-2 motion-safe:animate-aba">
           <label htmlFor="google-client-id" className="text-[11px] text-muted">Client ID OAuth (app desktop)</label>
@@ -78,35 +80,30 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
         </div>
       </details>
 
-      <div className="mt-1 flex items-center gap-2 text-xs">
-        <span className={`size-2 rounded-full ${status.connected ? "bg-accent" : "bg-faint"}`} />
-        <span className="truncate text-muted">
-          {status.connected
-            ? status.email || "conta conectada"
-            : status.configured
-              ? "credenciais salvas"
-              : "não configurado"}
-        </span>
-      </div>
+      {status.connected ? (
+        <ContaGoogle
+          status={status}
+          ocupado={busy !== ""}
+          saindo={busy === "out"}
+          onSair={() => void run("out", api.driveDisconnect, "você saiu da conta Google")}
+        />
+      ) : (
+        <div className="mt-1 flex items-center gap-2 text-xs">
+          <span className="size-2 rounded-full bg-faint" />
+          <span className="truncate text-muted">
+            {status.embutido ? "pronto para entrar" : status.configured ? "credenciais salvas" : "não configurado"}
+          </span>
+        </div>
+      )}
 
       <button
         type="button"
         disabled={busy !== "" || !status.configured}
-        onClick={() => run("conn", async () => setInfo(`entrou como ${await api.driveConnect()}`), "")}
+        onClick={() => run("conn", async () => setInfo(`entrou como ${(await api.driveConnect()) || "conta Google"}`), "")}
         className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
       >
         {busy === "conn" ? "aguardando navegador..." : status.connected ? "trocar de conta" : "entrar com o Google"}
       </button>
-      {status.connected && (
-        <button
-          type="button"
-          disabled={busy !== ""}
-          onClick={() => run("out", api.driveDisconnect, "conta desconectada")}
-          className="min-h-6 self-start text-left text-[11px] text-faint underline decoration-dotted hover:text-danger"
-        >
-          desconectar conta
-        </button>
-      )}
       {info && <p className="text-[11px] text-accent">{info}</p>}
     </section>
   );

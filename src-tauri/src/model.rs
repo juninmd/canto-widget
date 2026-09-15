@@ -10,7 +10,16 @@ pub trait Versioned {
     fn updated_at(&self) -> i64;
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+/// Regra de repeticao de uma tarefa. `dia` da semanal: 0 = domingo ... 6 = sabado.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(tag = "tipo", rename_all = "snake_case")]
+pub enum Repetir {
+    Diaria,
+    DiasUteis,
+    Semanal { dia: u8 },
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Task {
     pub id: String,
     pub title: String,
@@ -19,9 +28,17 @@ pub struct Task {
     pub day: String,
     pub created_at: i64,
     pub updated_at: i64,
+    /// Horario do lembrete, "HH:MM" local. Campos novos com default: cofres antigos abrem igual.
+    #[serde(default)]
+    pub hora: Option<String>,
+    #[serde(default)]
+    pub repetir: Option<Repetir>,
+    /// Id da primeira tarefa da serie; instancias recebem o id `<serie>-<dia>`.
+    #[serde(default)]
+    pub serie: Option<String>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Note {
     pub id: String,
     pub title: String,
@@ -30,6 +47,8 @@ pub struct Note {
     pub tags: Vec<String>,
     pub created_at: i64,
     pub updated_at: i64,
+    #[serde(default)]
+    pub fixada: bool,
 }
 
 impl Versioned for Task {
