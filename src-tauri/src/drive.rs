@@ -22,12 +22,6 @@ struct TokenResponse {
     expires_in: i64,
 }
 
-#[derive(Deserialize)]
-struct UserInfo {
-    #[serde(default)]
-    email: String,
-}
-
 fn client() -> Result<reqwest::blocking::Client> {
     reqwest::blocking::Client::builder()
         .timeout(Duration::from_secs(30))
@@ -124,17 +118,4 @@ pub fn fresh_access_token(
     tokens.access_token = res.access_token.clone();
     tokens.expires_at = crate::model::now_ms() + res.expires_in * 1000;
     Ok(res.access_token)
-}
-
-/// Identidade da conta conectada, so para exibir no widget.
-pub fn account_email(token: &str) -> Result<String> {
-    let res = client()?
-        .get("https://openidconnect.googleapis.com/v1/userinfo")
-        .bearer_auth(token)
-        .send()
-        .map_err(|e| AppError::Drive(e.to_string()))?
-        .error_for_status()
-        .map_err(|e| AppError::Drive(e.to_string()))?;
-    let info: UserInfo = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
-    Ok(info.email)
 }

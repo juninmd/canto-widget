@@ -146,19 +146,19 @@ pub fn transcript_read(state: State<'_, AppState>, name: String) -> Result<Strin
 
 // ---------- agenda do dia ----------
 
-#[tauri::command(async)]
-pub fn agenda_today(
-    state: State<'_, AppState>,
-    time_min: String,
-    time_max: String,
-) -> Result<Vec<AgendaItem>> {
+#[tauri::command]
+pub async fn agenda_today(app: tauri::AppHandle, time_min: String, time_max: String) -> Result<Vec<AgendaItem>> {
+    crate::bloqueante::rodar(move || agenda(&app.state::<AppState>(), &time_min, &time_max)).await
+}
+
+fn agenda(state: &AppState, time_min: &str, time_max: &str) -> Result<Vec<AgendaItem>> {
     let mut cfg = state.drive_config()?;
     let tokens = cfg
         .tokens
         .as_mut()
         .ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
     let token = drive::fresh_access_token(tokens, &cfg.client_id, &cfg.client_secret)?;
-    let eventos = calendar::eventos(&token, &time_min, &time_max)?;
+    let eventos = calendar::eventos(&token, time_min, time_max)?;
     state.save_drive_config(&cfg)?;
     Ok(eventos)
 }

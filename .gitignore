@@ -4,3 +4,6 @@ shots/
 src-tauri/target/
 src-tauri/gen/schemas/
 *.tmp
+# Cliente OAuth do Google Cloud: repo publico, nunca versionar.
+src-tauri/google-oauth.json
+client_secret_*.json
