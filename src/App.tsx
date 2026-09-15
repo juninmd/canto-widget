@@ -3,6 +3,9 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
 import { useAgenda } from "./lib/useAgenda";
+import { useLembretes } from "./lib/useLembretes";
+import { focarAtalho, useAtalhos } from "./lib/atalhos";
+import AtalhosAjuda from "./components/AtalhosAjuda";
 import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
@@ -32,6 +35,18 @@ function Canto() {
   const [alerta, setAlerta] = useState<AgendaItem | null>(null);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
+  useLembretes(status?.unlocked === true, today);
+  const [ajuda, setAjuda] = useState(false);
+  // Concluir pelo aviso muda a tarefa por fora da aba: a lista precisa reler.
+  const [versaoTarefas, setVersaoTarefas] = useState(0);
+
+  useAtalhos(status?.unlocked === true && !alerta, (acao) => {
+    if (acao.tipo === "ajuda") return setAjuda((v) => !v);
+    if (ajuda) return;
+    if (acao.tipo === "aba") return setTab(acao.aba);
+    if (acao.tipo === "trancar") return void lock();
+    focarAtalho(acao.alvo);
+  });
 
   const refresh = useCallback(async () => {
     try {
@@ -85,13 +100,15 @@ function Canto() {
   }, []);
 
   async function lock() {
+    setAjuda(false);
     await api.lock();
     await refresh();
   }
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden rounded-2xl border border-edge bg-panel/95 text-fg shadow-2xl backdrop-blur">
-      {alerta && <Alerta evento={alerta} onFechar={() => setAlerta(null)} />}
+      {alerta && <Alerta evento={alerta} onFechar={() => setAlerta(null)} onConcluida={() => setVersaoTarefas((v) => v + 1)} />}
+      {ajuda && status?.unlocked && <AtalhosAjuda onFechar={() => setAjuda(false)} />}
       <header
         data-tauri-drag-region
         className="flex items-center justify-between border-b border-edge px-3 py-2"
@@ -104,9 +121,20 @@ function Canto() {
         </div>
         <div className="flex items-center gap-2 text-[11px] text-muted">
           {status?.unlocked && (
-            <button type="button" onClick={lock} className="min-h-6 rounded px-1.5 hover:text-fg">
-              trancar
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => setAjuda(true)}
+                aria-label="atalhos de teclado"
+                title="atalhos de teclado (?)"
+                className="grid size-6 place-items-center rounded hover:text-fg"
+              >
+                ?
+              </button>
+              <button type="button" onClick={lock} title="trancar (Alt+L)" className="min-h-6 rounded px-1.5 hover:text-fg">
+                trancar
+              </button>
+            </>
           )}
           <button
             type="button"
@@ -134,7 +162,7 @@ function Canto() {
             aria-labelledby={`aba-${tab}`}
             className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
           >
-            {tab === "tarefas" && <TasksTab today={today} onError={setError} />}
+            {tab === "tarefas" && <TasksTab today={today} versao={versaoTarefas} agenda={agenda.itens} onError={setError} />}
             {tab === "notas" && <NotesTab onError={setError} />}
             {tab === "clipboard" && <ClipboardTab onError={setError} />}
             {tab === "reunioes" && <TranscriptsTab onError={setError} />}
