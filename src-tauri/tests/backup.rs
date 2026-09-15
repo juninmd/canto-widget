@@ -21,6 +21,7 @@ fn com_tarefa(st: &AppState, id: &str) {
             day: "2026-09-14".into(),
             created_at: 1,
             updated_at: now_ms(),
+            ..Default::default()
         })
     })
     .unwrap();
@@ -35,6 +36,7 @@ fn com_nota(st: &AppState, id: &str) {
             tags: vec![],
             created_at: 1,
             updated_at: now_ms(),
+            ..Default::default()
         })
     })
     .unwrap();
