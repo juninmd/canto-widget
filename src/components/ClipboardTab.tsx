@@ -54,6 +54,8 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
       <div className="flex gap-2">
         <input
           value={query}
+          data-atalho="busca"
+          aria-label="buscar no clipboard"
           onChange={(e) => setQuery(e.target.value)}
           placeholder="buscar no que você copiou"
           className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"

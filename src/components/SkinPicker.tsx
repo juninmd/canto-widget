@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { applySkin, loadSkin, SKINS, type SkinId } from "../lib/theme";
+import { applySkin, loadSkin, seguirSistema, SKINS, type SkinId } from "../lib/theme";
 
 export default function SkinPicker() {
   const [skin, setSkin] = useState<SkinId>("padrao");
@@ -9,6 +9,11 @@ export default function SkinPicker() {
     setSkin(inicial);
     applySkin(inicial);
   }, []);
+
+  useEffect(() => {
+    if (skin !== "sistema") return;
+    return seguirSistema(() => applySkin("sistema"));
+  }, [skin]);
 
   return (
     <div className="flex items-center" role="radiogroup" aria-label="skin do widget">
@@ -31,7 +36,7 @@ export default function SkinPicker() {
             className={`size-3 rounded-full border transition ${
               skin === s.id ? "border-fg scale-110" : "border-edge opacity-60 group-hover/skin:opacity-100"
             }`}
-            style={{ backgroundColor: s.amostra }}
+            style={{ background: s.amostra }}
           />
         </button>
       ))}

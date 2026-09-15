@@ -87,6 +87,7 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
 
       <input
         value={query}
+        data-atalho="busca"
         onChange={(e) => setQuery(e.target.value)}
         placeholder="buscar no que foi dito nas reuniões"
         className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
