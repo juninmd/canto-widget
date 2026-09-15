@@ -9,7 +9,13 @@ use crate::error::{AppError, Result};
 
 /// Escopo minimo para o que o widget faz: pasta privada do app, leitura da agenda
 /// e identidade (so para exibir a conta). O resto do Drive continua inacessivel.
-pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly openid email";
+pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly openid email profile";
+/// Cliente OAuth embutido na build (ver build.rs). Client secret de app desktop nao e
+/// confidencial para o Google; a protecao do fluxo e o PKCE + state.
+pub fn cliente_embutido() -> Option<(&'static str, &'static str)> {
+    Some((option_env!("CANTO_GOOGLE_CLIENT_ID")?, option_env!("CANTO_GOOGLE_CLIENT_SECRET").unwrap_or("")))
+}
+
 pub const AUTH_URL: &str = "https://accounts.google.com/o/oauth2/v2/auth";
 pub const TOKEN_URL: &str = "https://oauth2.googleapis.com/token";
 const WAIT_TIMEOUT: Duration = Duration::from_secs(180);
