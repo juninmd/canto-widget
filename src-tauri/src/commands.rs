@@ -2,7 +2,7 @@ use rand::Rng;
 use tauri::State;
 
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Note, Task};
+use crate::model::{now_ms, Task};
 use crate::vault::AppState;
 
 /// Titulo de tarefa sempre chega aparado e nunca vazio, no cadastro e no rename.
@@ -49,6 +49,7 @@ pub fn vault_lock(state: State<'_, AppState>) {
 
 #[tauri::command]
 pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task>> {
+    state.mutate_se(|d| crate::rotina::materializar(d, &day, now_ms()) > 0)?;
     state.read(|d| {
         let mut list: Vec<Task> = d.tasks.iter().filter(|t| t.day == day).cloned().collect();
         list.sort_by_key(|t| (t.done, t.created_at));
@@ -67,6 +68,7 @@ pub fn task_add(state: State<'_, AppState>, title: String, day: String) -> Resul
         day,
         created_at: now,
         updated_at: now,
+        ..Default::default()
     };
     let created = task.clone();
     state.mutate(|d| d.tasks.push(task))?;
@@ -81,6 +83,24 @@ pub fn task_toggle(state: State<'_, AppState>, id: String) -> Result<()> {
             t.updated_at = now_ms();
         }
     })
+}
+
+/// Idempotente, ao contrario do toggle: o "concluir" do lembrete nao pode reabrir
+/// uma tarefa que o usuario ja marcou pela lista.
+#[tauri::command]
+pub fn task_concluir(state: State<'_, AppState>, id: String) -> Result<()> {
+    state.mutate_se(|d| concluir(d, &id, now_ms()))
+}
+
+pub fn concluir(d: &mut crate::model::VaultData, id: &str, agora: i64) -> bool {
+    match d.tasks.iter_mut().find(|t| t.id == id && !t.done) {
+        Some(t) => {
+            t.done = true;
+            t.updated_at = agora;
+            true
+        }
+        None => false,
+    }
 }
 
 #[tauri::command]
@@ -109,71 +129,14 @@ pub fn tasks_carry_over(state: State<'_, AppState>, day: String) -> Result<usize
         let now = now_ms();
         let mut moved = 0;
         for t in d.tasks.iter_mut() {
-            if !t.done && t.day < day {
+            // Serie recorrente ganha instancia propria no dia; arrastar duplicaria a tarefa.
+            if !t.done && t.day < day && t.serie.is_none() {
                 t.day = day.clone();
                 t.updated_at = now;
                 moved += 1;
             }
         }
         moved
-    })
-}
-
-#[tauri::command]
-pub fn notes_search(state: State<'_, AppState>, query: String) -> Result<Vec<Note>> {
-    let q = query.trim().to_lowercase();
-    state.read(|d| {
-        let mut list: Vec<Note> = d
-            .notes
-            .iter()
-            .filter(|n| q.is_empty() || note_matches(n, &q))
-            .cloned()
-            .collect();
-        list.sort_by(|a, b| b.updated_at.cmp(&a.updated_at));
-        list
-    })
-}
-
-pub fn note_matches(n: &Note, needle_lower: &str) -> bool {
-    n.title.to_lowercase().contains(needle_lower)
-        || n.body.to_lowercase().contains(needle_lower)
-        || n.tags.iter().any(|t| t.to_lowercase().contains(needle_lower))
-}
-
-#[tauri::command]
-pub fn note_save(
-    state: State<'_, AppState>,
-    id: Option<String>,
-    title: String,
-    body: String,
-    tags: Vec<String>,
-) -> Result<Note> {
-    let now = now_ms();
-    let tags: Vec<String> = tags
-        .into_iter()
-        .map(|t| t.trim().to_lowercase())
-        .filter(|t| !t.is_empty())
-        .collect();
-    state.mutate(move |d| match id.and_then(|id| d.notes.iter_mut().find(|n| n.id == id)) {
-        Some(n) => {
-            n.title = title;
-            n.body = body;
-            n.tags = tags;
-            n.updated_at = now;
-            n.clone()
-        }
-        None => {
-            let note = Note {
-                id: new_id(),
-                title,
-                body,
-                tags,
-                created_at: now,
-                updated_at: now,
-            };
-            d.notes.push(note.clone());
-            note
-        }
     })
 }
 
