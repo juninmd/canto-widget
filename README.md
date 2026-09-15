@@ -23,12 +23,14 @@ Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em R
 | Cifra | AES-256-GCM, nonce novo a cada gravação, AAD fixando o domínio (`canto.vault.v1`) |
 | Chave | só existe em RAM enquanto o cofre está destrancado; zeroizada ao trancar/sair |
 | Backup | o `.canto` exportado é o próprio envelope cifrado; a fusão do import acontece local, em claro, na RAM. O caminho vem do diálogo nativo aberto pelo Rust, nunca da webview |
-| Escopo OAuth | opcional, só para a agenda: `calendar.events.readonly` e `openid email` (mostrar de quem é a conta). Nenhum escopo de Drive |
+| Escopo OAuth | opcional, só para a agenda: `calendar.events.readonly` e `openid email profile` (nome, e-mail e foto da conta; a foto só é baixada de `*.googleusercontent.com` e fica no cofre). Nenhum escopo de Drive |
 | Clipboard | histórico fica **só na máquina** (`clipboard.json`, cifrado), fora do `vault.json` — nunca entra no backup |
 | Transcrições | leitura restrita à pasta configurada, extensões `txt/md/vtt/srt`, nome de arquivo validado contra travessia de caminho |
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |
 | Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`, nome mantido por compatibilidade) |
 | Desfazer | remoções recentes ficam só em RAM (últimas 20) e somem ao trancar; a webview só conhece uma chave opaca, nunca reenvia o conteúdo |
+| Windows Hello | opcional. A senha mestra é cifrada (AES-256-GCM) com uma chave derivada da assinatura RSA de um desafio aleatório, feita por um par de chaves do Windows Hello preso ao TPM e liberado só por rosto, digital ou PIN. `biometria.json` não serve sem esse chip e esse gesto, e nunca entra em backup. A ativação assina, grava e reabre na hora (o Windows pede o gesto duas vezes): hardware com assinatura instável é recusado ali, não descoberto na tela de bloqueio. Cofre recriado com outra senha desliga a biometria sozinho. macOS/Linux: indisponível por enquanto |
+| Lembretes | o vigia de lembretes de tarefa roda em fundo e não adia o auto-lock nem regrava o cofre à toa |
 | Auto-lock | 15 min sem uso deliberado do cofre e o widget se tranca sozinho, avisando na tela. Polling de fundo (clipboard, agenda) não conta como uso |
 | Gravação | escrita em arquivo temporário com `fsync` antes do `rename`: queda de energia não deixa envelope pela metade |
 | CSP | sem origens remotas; toda a rede sai pelo processo Rust, nunca pela webview |
@@ -83,14 +85,19 @@ Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 
 ## Agenda do Google (opcional)
 
+**Build com cliente embutido:** baixe o JSON do cliente "App para computador" do Google Cloud e salve como
+`src-tauri/google-oauth.json` (fica fora do git). A build embute o Client ID, e em **ajustes** basta
+**entrar com o Google**. Sem o arquivo, o app pede as credenciais como abaixo.
+
 1. No Google Cloud Console: **APIs e serviços → Credenciais → Criar credencial → ID do cliente OAuth → App para computador**.
 2. Habilite a **Google Calendar API** no mesmo projeto.
 3. Na aba **ajustes**, cole o *Client ID* (e o *client secret*, que o Google emite para apps desktop) e salve.
 4. **entrar com o Google** abre o navegador; ao autorizar, o widget captura o code na porta loopback
-   e passa a exibir o e-mail da conta conectada.
+   e mostra um cartão com foto, nome e e-mail da conta. **sair** revoga o token no Google e apaga a
+   conta do cofre; as credenciais do cliente continuam salvas.
 
 Quem conectou numa versão anterior (com sync no Drive): a agenda continua funcionando, mas o token
-ainda carrega o escopo `drive.appdata`. **desconectar conta** e entrar de novo para ficar só com a
+ainda carrega o escopo `drive.appdata`. **sair** e entrar de novo para ficar só com a
 agenda. O `vault.enc` antigo (cifrado) segue na pasta oculta do app no Drive até ser apagado em
 Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 
@@ -110,9 +117,29 @@ Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 | ![Histórico da área de transferência](docs/prints/21-clipboard.png) | ![Lista de transcrições](docs/prints/22-transcricoes.png) |
 | ![Agenda do dia](docs/prints/24-agenda.png) | ![Alerta de reunião começando](docs/prints/26-popup-alerta.png) |
 
+## Tarefas, notas e resumo
+
+- **Horário e lembrete** — o ⏰ da tarefa define um horário: na hora, o widget aparece com
+  **lembrete de tarefa** e o botão **concluir tarefa**. Funciona em qualquer aba ou com o widget escondido.
+- **Recorrência** — todo dia, dias úteis ou toda semana no mesmo dia. A tarefa do dia é criada
+  quando o dia chega, com id determinístico (`<série>-<dia>`): duas máquinas geram a mesma e o merge
+  não duplica. Excluir o dia de hoje não apaga a série; "não repete" encerra. "Puxar pendências"
+  ignora tarefas recorrentes, que já ganham a sua própria.
+- **Notas fixadas** — o alfinete leva o card para o topo; clicar numa `#tag` filtra só por ela.
+- **Resumo do dia** — texto com o que foi concluído, o que ficou pendente e as reuniões, pronto
+  para copiar.
+
+| Horário e repetição | Resumo do dia | Lembrete |
+|---|---|---|
+| ![Detalhes da tarefa](docs/prints/produtividade/1-tarefa-horario-repeticao.png) | ![Resumo do dia](docs/prints/produtividade/2-resumo-do-dia.png) | ![Lembrete de tarefa](docs/prints/produtividade/8-lembrete-tarefa.png) |
+| ![Nota fixada](docs/prints/produtividade/3-notas-fixada.png) | ![Filtro por tag](docs/prints/produtividade/4-notas-filtro-tag.png) | ![Windows Hello](docs/prints/produtividade/5-trancado-windows-hello.png) |
+
 ## Aparência e atalho
 
-- Skins: **padrão**, **Hueco Mundo** (Bleach) e **Drácula**, trocáveis pelos pontos no cabeçalho.
+- Skins: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Claro** e **Sistema**, que segue o tema
+  claro/escuro do sistema operacional e troca sozinha quando ele muda. A clara passa AA em todo texto.
+- **Atalhos** — `Alt+1`…`Alt+6` trocam de aba, `N` cria tarefa ou card, `/` busca, `Alt+L` tranca e
+  `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
 - Atalho global **Ctrl+Alt+Espaço** (`Cmd+Alt+Espaço` no macOS) mostra/esconde o widget.
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.
@@ -163,7 +190,9 @@ Atalho global escondendo e trazendo o widget de volta:
 ## Janela
 
 - Ancorada na **work area** do monitor atual (fora da barra de tarefas/dock), margem de 16 px.
-- Sem decoração, sempre no topo, fora da barra de tarefas; arraste pelo cabeçalho.
+- Sem decoração e fora da barra de tarefas; arraste pelo cabeçalho e redimensione pelas bordas.
+- Posição e tamanho ficam em `janela.json`. Se o monitor sumir ou a janela não couber mais, ela volta ao canto.
+  Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
 - Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, trancar cofre, sair.
 
 ## Iniciar junto com o computador
@@ -189,4 +218,6 @@ No Windows a entrada vive em `HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 - `drive.json` — credenciais OAuth da agenda, cifradas com a mesma chave;
 - `clipboard.json` — histórico da área de transferência, cifrado e nunca sincronizado;
 - `settings.json` — preferências não sensíveis (pasta de transcrições, skin);
+- `janela.json` — posição, tamanho e "sempre no topo";
+- `biometria.json` — senha mestra cifrada pela chave do Windows Hello (só se ativado);
 - `autostart.json` — marca que a escolha de iniciar com o sistema já foi feita.

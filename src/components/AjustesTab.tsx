@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { api, errText } from "../lib/api";
 import BackupSection from "./BackupSection";
 import GoogleSection from "./GoogleSection";
+import JanelaSection from "./JanelaSection";
+import SegurancaSection from "./SegurancaSection";
 
 export default function AjustesTab({ onError }: { onError: (m: string) => void }) {
   const [autostart, setAutostart] = useState(false);
@@ -37,7 +39,8 @@ export default function AjustesTab({ onError }: { onError: (m: string) => void }
     <div className="flex h-full flex-col gap-4 overflow-y-auto pr-1 text-sm">
       <section className="flex flex-col gap-2">
         <p className="text-xs text-muted">
-          Atalho global: <span className="text-muted">Ctrl+Alt+Espaço</span> mostra ou esconde o widget.
+          Atalho global: <span className="text-muted">Ctrl+Alt+Espaço</span> mostra ou esconde o widget. Tecle{" "}
+          <kbd className="rounded border border-line px-1 text-[11px]">?</kbd> para ver todos os atalhos.
         </p>
         <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
           <input
@@ -50,6 +53,8 @@ export default function AjustesTab({ onError }: { onError: (m: string) => void }
           abrir o Canto ao ligar o computador (direto na bandeja)
         </label>
       </section>
+      <SegurancaSection onError={onError} />
+      <JanelaSection onError={onError} />
       <BackupSection onError={onError} />
       <GoogleSection onError={onError} />
     </div>

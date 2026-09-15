@@ -119,3 +119,48 @@ test("excluir oferece desfazer com a chave devolvida pelo cofre", async () => {
   expect(chamadas.some((c) => c.cmd === "tasks_for_day"), "lista nao recarregou apos desfazer").toBe(true);
   expect(screen.queryByText('tarefa "comprar leite" excluída')).toBeNull();
 });
+
+async function montar() {
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await Promise.resolve();
+  });
+}
+
+test("horario e repeticao gravam na hora; semanal usa o dia da semana da tarefa", async () => {
+  await montar();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("horário do lembrete de comprar leite"), { target: { value: "14:30" } });
+  });
+  expect(chamadas.find((c) => c.cmd === "task_set_detalhes")?.args).toEqual({ id: "t1", hora: "14:30", repetir: null });
+
+  chamadas.length = 0;
+  const repetir = screen.getByLabelText("repetir comprar leite") as HTMLSelectElement;
+  // 2026-09-09 e quarta-feira: a opcao semanal precisa dizer isso e mandar dia 3.
+  expect(repetir.textContent).toContain("toda quarta");
+  await act(async () => {
+    fireEvent.change(repetir, { target: { value: "semanal" } });
+  });
+  expect(chamadas.find((c) => c.cmd === "task_set_detalhes")?.args?.repetir).toEqual({ tipo: "semanal", dia: 3 });
+});
+
+test("resumo do dia mostra o texto e volta com Esc", async () => {
+  await montar();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "resumo do dia" }));
+  });
+  const resumo = screen.getByRole("region", { name: "resumo do dia" });
+  expect(resumo.textContent).toContain("Pendente (1)");
+  expect(resumo.textContent).toContain("comprar leite");
+  await act(async () => {
+    fireEvent.keyDown(screen.getByRole("button", { name: "copiar resumo" }), { key: "Escape" });
+  });
+  expect(screen.queryByRole("region", { name: "resumo do dia" })).toBeNull();
+});

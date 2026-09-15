@@ -1,18 +1,27 @@
 pub mod autostart;
 pub mod backup;
+pub mod biometria;
+pub mod bloqueante;
 pub mod calendar;
 pub mod clipboard;
+pub mod cmd_biometria;
+pub mod cmd_notas;
 pub mod cmd_backup;
 pub mod cmd_drive;
 pub mod cmd_extras;
 pub mod commands;
+pub mod conta;
 pub mod crypto;
 pub mod drive;
 pub mod error;
+#[cfg(windows)]
+pub mod hello;
+pub mod janela;
 pub mod lixeira;
 pub mod meet;
 pub mod model;
 pub mod oauth;
+pub mod rotina;
 pub mod store;
 pub mod transcripts;
 pub mod vault;
@@ -46,6 +55,8 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
+            app.manage(janela::Janela::carregar(&dir));
+            watch_janela(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
             watch_idle(app.handle().clone());
             watch_backup(dir);
@@ -58,7 +69,8 @@ pub fn run() {
             }
 
             if let Some(win) = app.get_webview_window("main") {
-                window::anchor_bottom_right(&win)?;
+                win.set_always_on_top(app.state::<janela::Janela>().cfg().sempre_no_topo)?;
+                janela::posicionar(&win)?;
                 // Subida no boot fica so na bandeja: nada pula na tela do usuario.
                 if !autostart::iniciado_pelo_sistema() {
                     win.show()?;
@@ -77,9 +89,13 @@ pub fn run() {
             commands::task_add,
             commands::task_toggle,
             commands::task_rename,
+            commands::task_concluir,
             commands::tasks_carry_over,
-            commands::notes_search,
-            commands::note_save,
+            cmd_notas::notes_search,
+            cmd_notas::note_save,
+            cmd_notas::note_pin,
+            rotina::task_set_detalhes,
+            rotina::tasks_lembretes,
             commands::item_delete,
             cmd_drive::drive_status,
             cmd_drive::drive_configure,
@@ -104,13 +120,24 @@ pub fn run() {
             cmd_backup::backup_exportar,
             cmd_backup::backup_importar,
             lixeira::lixeira_desfazer,
+            cmd_biometria::biometria_status,
+            cmd_biometria::biometria_ativar,
+            cmd_biometria::biometria_desbloquear,
+            cmd_biometria::biometria_desativar,
+            janela::janela_config,
+            janela::janela_sempre_no_topo,
+            janela::janela_restaurar,
         ])
-        .on_window_event(|win, event| {
+        .on_window_event(|win, event| match event {
             // Fechar esconde o widget; sair de verdade so pela bandeja.
-            if let tauri::WindowEvent::CloseRequested { api, .. } = event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
                 let _ = win.hide();
             }
+            tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {
+                janela::registrar(win);
+            }
+            _ => {}
         })
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o Canto");
@@ -129,6 +156,16 @@ fn watch_idle(app: tauri::AppHandle) {
         };
         if state.lock_if_idle(AUTO_LOCK_MS) {
             let _ = tauri::Emitter::emit(&app, EVENTO_AUTO_LOCK, AUTO_LOCK_MS / 60_000);
+        }
+    });
+}
+
+/// Posicao e tamanho vao para o disco no maximo a cada 2 s, nao a cada pixel arrastado.
+fn watch_janela(app: tauri::AppHandle, dir: std::path::PathBuf) {
+    std::thread::spawn(move || loop {
+        std::thread::sleep(std::time::Duration::from_secs(2));
+        if let Err(e) = app.state::<janela::Janela>().gravar_se_sujo(&dir) {
+            eprintln!("posicao da janela nao gravou: {e}");
         }
     });
 }
@@ -202,7 +239,12 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
                     state.lock();
                 }
             }
-            "quit" => app.exit(0),
+            "quit" => {
+                if let Ok(dir) = app.path().app_data_dir() {
+                    let _ = app.state::<janela::Janela>().gravar_se_sujo(&dir);
+                }
+                app.exit(0)
+            }
             _ => {}
         })
         .on_tray_icon_event(|tray, event| {

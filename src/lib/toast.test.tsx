@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from "bun:test";
+import { afterEach, expect, jest, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ToastProvider, useToast, type Aviso } from "./toast";
@@ -45,14 +45,20 @@ test("mouse em cima pausa o prazo para dar tempo de clicar em desfazer", async (
   expect(screen.getByRole("button", { name: "desfazer" })).toBeTruthy();
 });
 
-test("aviso novo nao reinicia o prazo dos que ja estavam na tela", async () => {
-  montar(60);
-  act(() => avisar({ texto: "primeiro" }));
-  await esperar(40);
-  act(() => avisar({ texto: "segundo" }));
-  await esperar(35);
-  expect(screen.queryByText("primeiro")).toBeNull();
-  expect(screen.getByText("segundo")).toBeTruthy();
+// Relogio falso: com folga de 15 ms em tempo real, a granularidade do timer no Windows derrubava o teste.
+test("aviso novo nao reinicia o prazo dos que ja estavam na tela", () => {
+  jest.useFakeTimers();
+  try {
+    montar(60);
+    act(() => avisar({ texto: "primeiro" }));
+    act(() => jest.advanceTimersByTime(40));
+    act(() => avisar({ texto: "segundo" }));
+    act(() => jest.advanceTimersByTime(35));
+    expect(screen.queryByText("primeiro")).toBeNull();
+    expect(screen.getByText("segundo")).toBeTruthy();
+  } finally {
+    jest.useRealTimers();
+  }
 });
 
 test("no maximo tres avisos empilhados, sai o mais antigo", () => {

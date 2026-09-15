@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { api, errText, type Task } from "../lib/api";
+import { Fragment, useEffect, useRef, useState } from "react";
+import { api, errText, type AgendaItem, type Task } from "../lib/api";
+import ResumoDia from "./ResumoDia";
+import TarefaDetalhes, { SeloDetalhes } from "./TarefaDetalhes";
 import { useDesfazer } from "../lib/useDesfazer";
 import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
 
-export default function TasksTab({ today, onError }: { today: string; onError: (m: string) => void }) {
+type Props = { today: string; versao?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
+
+export default function TasksTab({ today, versao, agenda = [], onError }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
   const [editando, setEditando] = useState<{ id: string; title: string } | null>(null);
@@ -15,6 +19,8 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
   const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
   const [marcando, setMarcando] = useState("");
   const { saindo, sair } = useSaida();
+  const [detalhes, setDetalhes] = useState("");
+  const [resumo, setResumo] = useState(false);
 
   async function reload() {
     try {
@@ -28,7 +34,7 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
   useEffect(() => {
     void reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [today]);
+  }, [today, versao]);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -68,11 +74,16 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
 
   const done = tasks.filter((t) => t.done).length;
 
+  if (resumo) {
+    return <ResumoDia dia={today} tarefas={tasks} agenda={agenda} onFechar={() => setResumo(false)} onError={onError} />;
+  }
+
   return (
     <div className="flex h-full flex-col gap-2">
       <form onSubmit={add} className="flex gap-2">
         <input
           value={title}
+          data-atalho="novo"
           onChange={(e) => setTitle(e.target.value)}
           placeholder="nova tarefa de hoje"
           className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
@@ -86,75 +97,96 @@ export default function TasksTab({ today, onError }: { today: string; onError: (
         <span>
           {done}/{tasks.length} concluídas
         </span>
-        <button
-          type="button"
-          onClick={() => run(() => api.carryOver(today))}
-          title="traz para hoje as tarefas não concluídas dos dias anteriores"
-          className="min-h-6 underline decoration-dotted hover:text-fg"
-        >
-          puxar pendências
-        </button>
+        <span className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setResumo(true)}
+            title="texto com o que foi feito, o que ficou e as reuniões, pronto para copiar"
+            className="min-h-6 underline decoration-dotted hover:text-fg"
+          >
+            resumo do dia
+          </button>
+          <button
+            type="button"
+            onClick={() => run(() => api.carryOver(today))}
+            title="traz para hoje as tarefas não concluídas dos dias anteriores"
+            className="min-h-6 underline decoration-dotted hover:text-fg"
+          >
+            puxar pendências
+          </button>
+        </span>
       </div>
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
         {tasks.map((t) => (
-          <li
-            key={t.id}
-            className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${novo(t.id) ? ENTRAR : ""} ${
-              saindo.has(t.id) ? SAIR : ""
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={t.done}
-              onChange={() => {
-                setMarcando(t.id);
-                void run(() => api.taskToggle(t.id));
-              }}
-              onAnimationEnd={() => setMarcando("")}
-              className={`size-4 accent-[var(--color-accent)] ${marcando === t.id ? "motion-safe:animate-marcar" : ""}`}
-            />
-            {editando?.id === t.id ? (
-              <input
-                autoFocus
-                value={editando.title}
-                onChange={(e) => setEditando({ id: t.id, title: e.target.value })}
-                onBlur={() => void renomear()}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") void renomear();
-                  if (e.key === "Escape") {
-                    edicaoEncerrada.current = true;
-                    setEditando(null);
-                  }
-                }}
-                className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
-              />
-            ) : (
-              <span
-                className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
-                title={`${t.title}\n(clique duas vezes para renomear)`}
-                onDoubleClick={() => {
-                  edicaoEncerrada.current = false;
-                  setEditando({ id: t.id, title: t.title });
-                }}
-              >
-                {t.title}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={() =>
-                void sair(t.id, () =>
-                  run(async () => desfazivel(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
-                )
-              }
-              // Visivel tambem no foco: so no hover, o teclado nunca acha o botao.
-              className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-              aria-label={`excluir ${t.title}`}
+          <Fragment key={t.id}>
+            <li
+              className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${novo(t.id) ? ENTRAR : ""} ${
+                saindo.has(t.id) ? SAIR : ""
+              }`}
             >
-              ×
-            </button>
-          </li>
+              <input
+                type="checkbox"
+                checked={t.done}
+                onChange={() => {
+                  setMarcando(t.id);
+                  void run(() => api.taskToggle(t.id));
+                }}
+                onAnimationEnd={() => setMarcando("")}
+                className={`size-4 accent-[var(--color-accent)] ${marcando === t.id ? "motion-safe:animate-marcar" : ""}`}
+              />
+              {editando?.id === t.id ? (
+                <input
+                  autoFocus
+                  value={editando.title}
+                  onChange={(e) => setEditando({ id: t.id, title: e.target.value })}
+                  onBlur={() => void renomear()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") void renomear();
+                    if (e.key === "Escape") {
+                      edicaoEncerrada.current = true;
+                      setEditando(null);
+                    }
+                  }}
+                  className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
+                />
+              ) : (
+                <span
+                  className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
+                  title={`${t.title}\n(clique duas vezes para renomear)`}
+                  onDoubleClick={() => {
+                    edicaoEncerrada.current = false;
+                    setEditando({ id: t.id, title: t.title });
+                  }}
+                >
+                  {t.title}
+                </span>
+              )}
+              <SeloDetalhes tarefa={t} aberto={detalhes === t.id} onAlternar={() => setDetalhes(detalhes === t.id ? "" : t.id)} />
+              <button
+                type="button"
+                onClick={() =>
+                  void sair(t.id, () =>
+                    run(async () => desfazivel(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
+                  )
+                }
+                // Visivel tambem no foco: so no hover, o teclado nunca acha o botao.
+                className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
+                aria-label={`excluir ${t.title}`}
+              >
+                ×
+              </button>
+            </li>
+            {detalhes === t.id && (
+              <li>
+                <TarefaDetalhes
+                  tarefa={t}
+                  onMudar={(hora, repetir) => void run(() => api.taskSetDetalhes(t.id, hora, repetir))}
+                  onFechar={() => setDetalhes("")}
+                />
+              </li>
+            )}
+          </Fragment>
         ))}
         {tasks.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda — escreva acima e tecle Enter</li>

@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useRef } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hora } from "../lib/agenda";
+import { PREFIXO_TAREFA } from "../lib/lembretes";
 import { tocarAlerta } from "../lib/som";
 
-export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFechar: () => void }) {
+type Props = { evento: AgendaItem; onFechar: () => void; onConcluida?: () => void };
+
+export default function Alerta({ evento, onFechar, onConcluida }: Props) {
   const principal = useRef<HTMLButtonElement>(null);
+  const tarefa = evento.id.startsWith(PREFIXO_TAREFA) ? evento.id.slice(PREFIXO_TAREFA.length) : null;
 
   const fechar = useCallback(() => {
     void api.alertaFechar();
@@ -30,11 +34,13 @@ export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFec
     <div
       role="alertdialog"
       aria-modal="true"
-      aria-label={`reuniao comecando: ${evento.titulo}`}
+      aria-label={`${tarefa ? "lembrete de tarefa" : "reuniao comecando"}: ${evento.titulo}`}
       className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
     >
       <div className="min-h-0">
-        <p className="text-[11px] uppercase tracking-widest text-accent">começando agora</p>
+        <p className="text-[11px] uppercase tracking-widest text-accent">
+          {tarefa ? "lembrete de tarefa" : "começando agora"}
+        </p>
         <h1 className="mt-1 line-clamp-2 text-lg font-semibold">{evento.titulo}</h1>
         <p className="mt-1 text-sm text-muted">{hora(evento)}</p>
         {evento.local && <p className="mt-1 line-clamp-2 text-xs text-faint">{evento.local}</p>}
@@ -46,6 +52,16 @@ export default function Alerta({ evento, onFechar }: { evento: AgendaItem; onFec
       </div>
 
       <div className="flex gap-2">
+        {tarefa && (
+          <button
+            ref={principal}
+            type="button"
+            onClick={() => void api.taskConcluir(tarefa).then(onConcluida).finally(fechar)}
+            className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent"
+          >
+            concluir tarefa
+          </button>
+        )}
         {evento.meet && (
           <button
             ref={principal}

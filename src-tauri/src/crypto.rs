@@ -35,6 +35,11 @@ impl VaultKey {
         Ok(key)
     }
 
+    /// Chave ja derivada por outro caminho (ex.: assinatura do Windows Hello).
+    pub(crate) fn from_bytes(bytes: [u8; 32]) -> Self {
+        VaultKey(bytes)
+    }
+
     fn cipher(&self) -> Aes256Gcm {
         Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(&self.0))
     }

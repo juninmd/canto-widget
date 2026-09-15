@@ -9,6 +9,7 @@ fn task(id: &str, title: &str, updated_at: i64) -> Task {
         day: "2026-09-08".into(),
         created_at: 1,
         updated_at,
+        ..Default::default()
     }
 }
 
@@ -20,6 +21,7 @@ fn note(id: &str, body: &str, updated_at: i64) -> Note {
         tags: vec![],
         created_at: 1,
         updated_at,
+        ..Default::default()
     }
 }
 

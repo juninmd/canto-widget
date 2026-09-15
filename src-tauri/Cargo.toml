@@ -11,6 +11,7 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
+serde_json = "1"
 
 [dependencies]
 tauri = { version = "2", features = ["tray-icon"] }
@@ -35,3 +36,14 @@ tauri-plugin-single-instance = "2.4.4"
 
 [features]
 default = []
+
+[target.'cfg(windows)'.dependencies]
+# Mesma versao que o tauri ja traz: nenhuma crate nova no lockfile, so features.
+windows = { version = "0.61", features = [
+  "Foundation",
+  "Security_Credentials",
+  "Security_Cryptography",
+  "Storage_Streams",
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+] }
