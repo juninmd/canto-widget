@@ -7,8 +7,16 @@ const MARGIN: f64 = 16.0;
 /// Ancora a janela no canto inferior direito do monitor onde ela esta,
 /// respeitando a area util (fora da barra de tarefas / dock).
 pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
+    if let Some((x, y)) = posicao_ancorada(win)? {
+        win.set_position(LogicalPosition::new(x, y))?;
+    }
+    Ok(())
+}
+
+/// Onde a janela fica quando ancorada no canto do monitor atual, em pixels logicos.
+pub fn posicao_ancorada(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
     let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
-        return Ok(());
+        return Ok(None);
     };
     let scale = monitor.scale_factor();
     let size = win.outer_size()?.to_logical::<f64>(scale);
@@ -18,8 +26,7 @@ pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
 
     let x = origin.x + bounds.width - size.width - MARGIN;
     let y = origin.y + bounds.height - size.height - MARGIN;
-    win.set_position(LogicalPosition::new(x, y))?;
-    Ok(())
+    Ok(Some((x, y)))
 }
 
 pub fn toggle(app: &tauri::AppHandle) -> tauri::Result<()> {
@@ -38,7 +45,7 @@ pub fn mostrar(app: &tauri::AppHandle) -> tauri::Result<()> {
     let Some(win) = app.get_webview_window("main") else {
         return Ok(());
     };
-    anchor_bottom_right(&win)?;
+    crate::janela::posicionar(&win)?;
     win.show()?;
     win.set_focus()?;
     Ok(())
@@ -54,7 +61,7 @@ pub fn abrir_alerta(app: &tauri::AppHandle, evento: AgendaItem) -> tauri::Result
         *state.alerta.lock().unwrap() = Some(evento);
     }
     if let Some(win) = app.get_webview_window("main") {
-        anchor_bottom_right(&win)?;
+        crate::janela::posicionar(&win)?;
         win.show()?;
         win.set_focus()?;
     }
