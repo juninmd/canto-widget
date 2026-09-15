@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { api, errText } from "../lib/api";
+import { useEffect, useState } from "react";
+import { api, errText, type StatusBiometria } from "../lib/api";
 
 export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () => void }) {
   const [password, setPassword] = useState("");
@@ -7,6 +7,28 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [mostrar, setMostrar] = useState(false);
+  const [bio, setBio] = useState<StatusBiometria | null>(null);
+
+  useEffect(() => {
+    if (!exists) return;
+    void api
+      .biometriaStatus()
+      .then((s) => setBio(s?.disponivel && s.ativa ? s : null))
+      .catch(() => setBio(null));
+  }, [exists]);
+
+  async function comBiometria() {
+    setError("");
+    setBusy(true);
+    try {
+      await api.biometriaDesbloquear();
+      onOpen();
+    } catch (e) {
+      setError(errText(e));
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -76,6 +98,16 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
         <p role="alert" className="text-xs text-danger">
           {error}
         </p>
+      )}
+      {bio && (
+        <button
+          type="button"
+          onClick={() => void comBiometria()}
+          disabled={busy}
+          className="rounded-lg border border-accent px-3 py-2 text-sm font-semibold text-fg disabled:opacity-40"
+        >
+          Destrancar com {bio.nome}
+        </button>
       )}
       <button
         type="submit"
