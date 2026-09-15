@@ -4,11 +4,13 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 type Chamada = { cmd: string; args?: Record<string, unknown> };
 const chamadas: Chamada[] = [];
+let notas: unknown[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     chamadas.push({ cmd, args });
-    if (cmd === "notes_search") return Promise.resolve([]);
+    if (cmd === "notes_search") return Promise.resolve(notas);
+    if (cmd === "note_pin") return Promise.resolve(true);
     return Promise.resolve(null);
   },
 }));
@@ -35,6 +37,7 @@ async function abrirEditor() {
 
 beforeEach(() => {
   chamadas.length = 0;
+  notas = [];
 });
 
 afterEach(cleanup);
@@ -76,4 +79,45 @@ test("Esc cancela o editor e descarta o rascunho", async () => {
     fireEvent.click(screen.getByText("+"));
   });
   expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("");
+});
+
+async function listaCom(nota: Record<string, unknown>) {
+  notas = [{ id: "n1", title: "wifi", body: "senha", tags: ["casa"], created_at: 1, updated_at: 1, fixada: false, ...nota }];
+  render(
+    <ToastProvider>
+      <NotesTab onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await new Promise((pronto) => setTimeout(pronto, 250));
+  });
+}
+
+test("clicar na tag filtra pela tag exata", async () => {
+  await listaCom({});
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "#casa" }));
+    await new Promise((pronto) => setTimeout(pronto, 250));
+  });
+  expect((screen.getByLabelText("buscar notas") as HTMLInputElement).value).toBe("#casa");
+  expect(chamadas.some((c) => c.cmd === "notes_search" && c.args?.query === "#casa")).toBe(true);
+});
+
+test("fixar pede ao cofre, recarrega e avisa o leitor de tela", async () => {
+  await listaCom({});
+  const antes = chamadas.filter((c) => c.cmd === "notes_search").length;
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("fixar wifi no topo"));
+    await Promise.resolve();
+  });
+  expect(chamadas.find((c) => c.cmd === "note_pin")?.args).toEqual({ id: "n1" });
+  expect(chamadas.filter((c) => c.cmd === "notes_search").length).toBeGreaterThan(antes);
+  expect(screen.getByText(/fixada no topo/).getAttribute("role")).toBe("status");
+});
+
+test("nota fixada mostra o alfinete sem depender do hover", async () => {
+  await listaCom({ fixada: true });
+  const alfinete = screen.getByLabelText("desafixar wifi");
+  expect(alfinete.getAttribute("aria-pressed")).toBe("true");
+  expect(alfinete.className).not.toContain("opacity-0");
 });
