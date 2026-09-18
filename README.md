@@ -9,8 +9,8 @@ Abas: **tarefas · notas · clipboard · reuniões · agenda · ajustes**.
 
 | Tarefas do dia | Cards pesquisáveis |
 |---|---|
-| ![Checklist do dia](docs/prints/04-tarefas-do-dia.png) | ![Notas em cards](docs/prints/08-cards-salvos.png) |
-| ![Busca nos cards](docs/prints/09-busca-cluster.png) | ![Todas as abas](docs/prints/20-abas-completas.png) |
+| ![Checklist do dia](docs/prints/04-tarefas-do-dia.png) | ![Notas em cards](docs/prints/produtividade/3-notas-fixada.png) |
+| ![Todas as abas](docs/prints/20-abas-completas.png) | ![Filtro por tag nos cards](docs/prints/produtividade/4-notas-filtro-tag.png) |
 
 Stack: **Tauri v2 + React 19 + TypeScript + Tailwind v4**, núcleo de cofre em Rust.
 
@@ -112,9 +112,8 @@ Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
   quando o evento tem link. O relógio do aviso vive no App, não na aba: dispara com você em
   qualquer aba ou com o widget escondido. `Esc` fecha o overlay.
 
-| Clipboard local | Últimas transcrições |
+| Agenda do dia | Alerta de reunião |
 |---|---|
-| ![Histórico da área de transferência](docs/prints/21-clipboard.png) | ![Lista de transcrições](docs/prints/22-transcricoes.png) |
 | ![Agenda do dia](docs/prints/24-agenda.png) | ![Alerta de reunião começando](docs/prints/26-popup-alerta.png) |
 
 ## Tarefas, notas e resumo
