@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { dayWindow, minutesUntil, shouldAlert, status } from "./agenda";
+import { dayWindow, hour, minutesUntil, shouldAlert, status } from "./agenda";
 import type { AgendaItem } from "./api";
 
 const base: AgendaItem = {
@@ -79,4 +79,17 @@ describe("status", () => {
   test("an all-day event gets no countdown", () => {
     expect(status({ ...base, all_day: true, start: "2026-09-14" }, now).label).toBe("");
   });
+});
+
+test("meeting time stays in 24h pt-BR even on a system set to English", () => {
+  const original = Date.prototype.toLocaleTimeString;
+  Date.prototype.toLocaleTimeString = function (locales?: Intl.LocalesArgument, options?: Intl.DateTimeFormatOptions) {
+    const explicit = typeof locales === "string" || (Array.isArray(locales) && locales.length > 0);
+    return original.call(this, explicit ? locales : "en-US", options);
+  };
+  try {
+    expect(hour({ ...base, start: new Date(2026, 8, 14, 9, 30).toISOString() })).toBe("09:30");
+  } finally {
+    Date.prototype.toLocaleTimeString = original;
+  }
 });

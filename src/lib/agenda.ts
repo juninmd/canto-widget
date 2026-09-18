@@ -12,7 +12,7 @@ export function hour(item: AgendaItem): string {
   const d = new Date(item.start);
   return Number.isNaN(d.getTime())
     ? item.start
-    : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
 /** Minutes until the event starts (negative if it has already started). */

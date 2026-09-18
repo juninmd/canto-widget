@@ -110,7 +110,7 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
               <div className="flex items-baseline justify-between gap-2">
                 <p className="truncate text-sm font-medium text-fg">{t.name}</p>
                 <span className="shrink-0 text-[11px] text-faint">
-                  {new Date(t.modified_at).toLocaleDateString()}
+                  {new Date(t.modified_at).toLocaleDateString("pt-BR")}
                 </span>
               </div>
               <p className="mt-0.5 line-clamp-3 text-xs text-muted">{t.preview}</p>
