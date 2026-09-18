@@ -58,6 +58,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Optional public GitHub App Client ID (device flow); without it only personal tokens work.
           CANTO_GITHUB_CLIENT_ID: ${{ vars.CANTO_GITHUB_CLIENT_ID }}
+          # Signs the update bundles; the app only installs what this key signed (pubkey in tauri.conf.json).
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           # Code signing is NOT configured, so SmartScreen and Gatekeeper will warn. To enable it, add
           # these secrets and uncomment: APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY,
           # APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID (macOS); an Authenticode certificate on Windows.
@@ -69,4 +72,7 @@ jobs:
           releaseBody: Instaladores para Windows, macOS e Linux. Veja o CHANGELOG.md para o que mudou.
           releaseDraft: true
           prerelease: false
-          args: ${{ matrix.args }}
+          # latest.json is what installed apps poll; it only resolves once the draft is published.
+          uploadUpdaterJson: true
+          updaterJsonPreferNsis: true
+          args: ${{ matrix.args }} --config src-tauri/tauri.updater.conf.json

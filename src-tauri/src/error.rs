@@ -20,6 +20,9 @@ pub enum AppError {
     Drive(String),
     #[error("github: {0}")]
     Github(String),
+    /// Shown after "Não foi possível verificar:" or "A atualização não foi instalada:", so no prefix of its own.
+    #[error("{0}")]
+    Update(String),
     #[error("{0}")]
     Config(String),
 }

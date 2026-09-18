@@ -110,6 +110,21 @@ Atalho global escondendo e trazendo o widget de volta:
   Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
 - Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, trancar cofre, sair.
 
+## Atualizações
+
+**Ajustes → Atualizações** mostra a **versão instalada** e a **última publicada** (com a data), verificadas ao abrir
+a aba ou em **verificar agora**. Havendo versão nova, aparecem as notas do release e o botão **atualizar para X e
+reiniciar**: o Canto baixa mostrando o progresso, confere a assinatura, instala e abre de novo com o cofre trancado.
+Em fundo, o app verifica 5 s depois de abrir e a cada 6 h, e avisa uma vez por versão nova com um atalho para
+Ajustes. Sem internet, o aviso de fundo fica quieto; a seção mostra o erro quando você pede para verificar.
+
+No Windows, o instalador roda em modo passivo (só a barra de progresso) e usa o mesmo formato da instalação
+original, `.exe` ou `.msi`. No macOS e no Linux, o app se reinicia sozinho depois de instalar.
+
+| Versão nova disponível | Depois de atualizar |
+|---|---|
+| ![Seção Atualizações com versão nova](prints/app/15-atualizacao-disponivel.png) | ![Seção Atualizações em dia](prints/app/16-atualizado.png) |
+
 ## Iniciar junto com o computador
 
 Ligado por padrão na primeira execução do app instalado e controlável na aba **ajustes** ("abrir o Canto ao ligar o

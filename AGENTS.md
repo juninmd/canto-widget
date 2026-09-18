@@ -71,6 +71,10 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - Commands that read or write the vault are `#[tauri::command(async)]`: a sync command runs on the main thread and
   each persist re-seals the whole vault (~120 ms at 22 MB), freezing the window. Lists sent to the webview are paged
   or bounded (`notes_search` takes `limit` and returns `{total, items}`).
+- **Updater signing**: `plugins.updater.pubkey` in `tauri.conf.json` must match the private key in the
+  `TAURI_SIGNING_PRIVATE_KEY` secret. Changing the pubkey without shipping it first under the old key leaves every
+  installed app unable to update. Signed bundles only come from `--config src-tauri/tauri.updater.conf.json`
+  (release workflow), so local `tauri build` does not need the key. Never commit a private key.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
 

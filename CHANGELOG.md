@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/). Ainda não houve release p
 
 ### Adicionado
 
+- **Atualização automática**: Ajustes → Atualizações mostra a versão instalada e a última publicada, com notas e
+  data; o app avisa quando sai versão nova e atualiza com um clique, conferindo a assinatura antes de instalar.
 - **Pronto para cofres grandes**: gravar o cofre não trava mais a janela, a aba de notas carrega 50 cards por vez
   com **mostrar mais** e um card aceita até 100 mil caracteres. Um teste de carga (30 mil tarefas, 5 mil notas,
   1.000 transcrições) mede cada etapa contra um teto; números em `docs/benchmark.md`.

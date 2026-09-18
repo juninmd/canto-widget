@@ -5,6 +5,7 @@ import GoogleSection from "./GoogleSection";
 import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
+import UpdateSection from "./UpdateSection";
 
 export default function SettingsTab({ onError }: { onError: (m: string) => void }) {
   const [autostart, setAutostart] = useState(false);
@@ -59,6 +60,7 @@ export default function SettingsTab({ onError }: { onError: (m: string) => void 
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />
       <GoogleSection onError={onError} />
+      <UpdateSection />
     </div>
   );
 }

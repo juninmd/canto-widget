@@ -30,6 +30,7 @@ pub mod snooze;
 pub mod store;
 pub mod transcripts;
 pub mod trash;
+pub mod updater;
 pub mod vault;
 pub mod window;
 pub mod window_state;
@@ -52,6 +53,7 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_autostart::Builder::new()
                 .args([autostart::ARG_AUTOSTART])
@@ -63,6 +65,7 @@ pub fn run() {
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
             app.manage(cmd_github::GithubState::default());
+            app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
             watch_window_state(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
@@ -126,6 +129,8 @@ pub fn run() {
             snooze::alert_snooze,
             cmd_extras::open_link,
             autostart::autostart_status,
+            updater::update_check,
+            updater::update_install,
             autostart::autostart_set,
             cmd_backup::backup_export,
             cmd_backup::backup_import,

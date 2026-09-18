@@ -65,6 +65,10 @@ export type GithubList = { total: number; items: GithubItem[] };
 export type GithubLists = { assigned: GithubList; my_prs: GithubList; review_requested: GithubList; my_issues: GithubList };
 export type GithubStatus = { connected: boolean; login: string; source: string; device_flow: boolean };
 export type DeviceCode = { user_code: string; url: string; expires_in_s: number };
+/** `latest` is the newest published version, even when it is not newer than `current`. */
+export type UpdateInfo = { current: string; latest: string; available: boolean; notes: string; date: string | null };
+export type UpdateProgress = { downloaded: number; total: number | null };
+export const UPDATE_PROGRESS_EVENT = "canto://update-progress";
 
 // `preview` is the first 500 characters; copying fetches the stored text in Rust.
 export type ClipItem = { id: string; preview: string; chars: number; kept: number; truncated: boolean; copied_at: number; pinned: boolean };
@@ -161,6 +165,10 @@ export const api = {
   githubDeviceCancel: () => invoke<void>("github_device_cancel"),
   githubDisconnect: () => invoke<void>("github_disconnect"),
   githubLists: () => invoke<GithubLists>("github_lists"),
+
+  updateCheck: () => invoke<UpdateInfo>("update_check"),
+  /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */
+  updateInstall: () => invoke<void>("update_install"),
 };
 
 export function errText(e: unknown): string {

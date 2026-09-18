@@ -4,6 +4,7 @@ import { listen } from "@tauri-apps/api/event";
 import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
 import { useAgenda } from "./lib/useAgenda";
 import { useReminders } from "./lib/useReminders";
+import { useUpdateNotice } from "./lib/useUpdateNotice";
 import { useFullscreen } from "./lib/useFullscreen";
 import { focusShortcut, useShortcuts } from "./lib/shortcuts";
 import ShortcutsHelp from "./components/ShortcutsHelp";
@@ -31,12 +32,14 @@ export default function App() {
 function Canto() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
   const [tab, setTab] = useState<Tab>("tasks");
+  const openSettings = useCallback(() => setTab("settings"), []);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
   const [alert, setAlert] = useState<AgendaItem | null>(null);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
   useReminders(status?.unlocked === true, today);
+  useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const fullscreen = useFullscreen();
   const toggleFullscreen = () => void fullscreen.toggle().catch((e) => setError(errText(e)));
