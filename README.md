@@ -66,6 +66,7 @@ lembrete já sai marcado. **Resumo do dia** pronto para colar e **puxar pendênc
 
 Os eventos do dia vêm do Google Calendar (somente leitura). Um minuto antes, o widget salta na tela com **entrar
 no Meet**, toca um som e manda notificação do sistema, esteja você em qualquer aba ou com ele escondido.
+Clique no evento para ver quem organizou, a pauta, os convidados e os anexos, como as anotações do Gemini.
 
 </td>
 <td width="36%"><img src="docs/prints/app/07-aviso-reuniao.png" alt="Aviso de reunião com entrar no Meet e adiar"></td>
@@ -99,6 +100,7 @@ nada: ele guarda o começo e avisa. No Windows, ignora o que gerenciadores de se
 ### 🐙 Seu GitHub numa olhada
 
 **Revisão pedida a mim**, atribuídos a mim, PRs e issues que eu abri, com ícone de PR ou issue e quem abriu.
+Filtre por texto, `repo:` ou `label:`, só PRs ou só issues, e role com **mostrar mais**.
 Entra com token pessoal só leitura ou pelo navegador (device flow).
 
 </td>
@@ -116,7 +118,8 @@ Troca de senha mestra, Windows Hello, backup `.canto`, início com o sistema e a
 </tr>
 </table>
 
-Também tem 🎙️ **Reuniões**: transcrições `.vtt`, `.srt`, `.txt` e `.md` de uma pasta local, limpas e pesquisáveis.
+Também tem 🎙️ **Reuniões**: as anotações e transcrições do Gemini das últimas duas semanas, mais transcrições
+`.vtt`, `.srt`, `.txt` e `.md` de uma pasta local, limpas e pesquisáveis.
 
 ⌨️ **Tudo por teclado:** `Alt+1`…`Alt+7` trocam de aba, `N` cria, `/` busca, `F11` tela cheia, `Alt+L` tranca e `?` lista os atalhos.
 
@@ -214,7 +217,7 @@ Achou uma falha? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Desenvolvimento
 
-Pré-requisitos: [Bun](https://bun.sh) ≥ 1.2, Rust estável ≥ 1.82 e as
+Pré-requisitos: [Bun](https://bun.sh) ≥ 1.2, Rust estável ≥ 1.85 e as
 [dependências do Tauri v2](https://v2.tauri.app/start/prerequisites/) do seu sistema.
 
 ```bash

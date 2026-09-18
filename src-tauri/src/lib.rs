@@ -4,26 +4,32 @@ pub mod backup;
 pub mod biometric;
 pub mod blocking;
 pub mod calendar;
+pub mod calendar_event;
 pub mod clip_os;
 pub mod clipboard;
 pub mod cmd_biometric;
 pub mod cmd_backup;
 pub mod cmd_drive;
 pub mod cmd_extras;
+pub mod cmd_gemini;
 pub mod cmd_github;
 pub mod cmd_notes;
 pub mod commands;
 pub mod crypto;
 pub mod drive;
 pub mod error;
+pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
+pub mod github_query;
 #[cfg(windows)]
 pub mod hello;
 pub mod meet;
 pub mod model;
+pub mod net;
 pub mod notification;
 pub mod oauth;
+pub mod plain_text;
 pub mod password;
 pub mod routine;
 pub mod snooze;
@@ -123,6 +129,7 @@ pub fn run() {
             cmd_extras::transcripts_list,
             cmd_extras::transcript_read,
             cmd_extras::agenda_today,
+            cmd_gemini::gemini_docs,
             cmd_extras::alert_open,
             cmd_extras::alert_payload,
             cmd_extras::alert_close,
@@ -149,6 +156,7 @@ pub fn run() {
             cmd_github::github_device_cancel,
             cmd_github::github_disconnect,
             cmd_github::github_lists,
+            cmd_github::github_section,
         ])
         .on_window_event(|win, event| match event {
             // Closing hides the widget; quitting for real only from the tray.

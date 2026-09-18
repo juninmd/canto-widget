@@ -1,4 +1,3 @@
-use rand::Rng;
 use tauri::State;
 
 use crate::error::{AppError, Result};
@@ -15,7 +14,7 @@ fn task_title(raw: &str) -> Result<String> {
 }
 
 pub fn new_id() -> String {
-    format!("{:x}{:x}", now_ms(), rand::thread_rng().gen::<u32>())
+    format!("{:x}{:x}", now_ms(), rand::random::<u32>())
 }
 
 #[derive(serde::Serialize)]

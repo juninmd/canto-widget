@@ -62,6 +62,9 @@ export type GithubItem = {
 };
 /** `total` is GitHub's count; `items` only carries the first page (up to 30). */
 export type GithubList = { total: number; items: GithubItem[] };
+export type GithubSection = "review_requested" | "assigned" | "my_prs" | "my_issues";
+export type GithubKind = "all" | "pr" | "issue";
+export type GithubFilter = { text: string; kind: GithubKind };
 export type GithubLists = { assigned: GithubList; my_prs: GithubList; review_requested: GithubList; my_issues: GithubList };
 export type GithubStatus = { connected: boolean; login: string; source: string; device_flow: boolean };
 export type DeviceCode = { user_code: string; url: string; expires_in_s: number };
@@ -82,7 +85,15 @@ export type AgendaItem = {
   location: string;
   meet: string;
   link: string;
+  // Only Google Calendar events carry these; task reminders leave them out.
+  organizer?: string;
+  creator?: string;
+  description?: string;
+  guests?: number;
+  attachments?: Attachment[];
 };
+export type Attachment = { title: string; url: string; mime: string };
+export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 
 export const api = {
   status: () => invoke<VaultStatus>("vault_status"),
@@ -150,6 +161,7 @@ export const api = {
 
   agendaToday: (timeMin: string, timeMax: string) =>
     invoke<AgendaItem[]>("agenda_today", { timeMin, timeMax }),
+  geminiDocs: (timeMin: string, timeMax: string) => invoke<GeminiDoc[]>("gemini_docs", { timeMin, timeMax }),
   alertOpen: (event: AgendaItem) => invoke<void>("alert_open", { event }),
   alertPayload: () => invoke<AgendaItem | null>("alert_payload"),
   alertClose: () => invoke<void>("alert_close"),
@@ -164,7 +176,9 @@ export const api = {
   githubDeviceFinish: () => invoke<string>("github_device_finish"),
   githubDeviceCancel: () => invoke<void>("github_device_cancel"),
   githubDisconnect: () => invoke<void>("github_disconnect"),
-  githubLists: () => invoke<GithubLists>("github_lists"),
+  githubLists: (filter: GithubFilter) => invoke<GithubLists>("github_lists", { filter }),
+  githubSection: (section: GithubSection, page: number, filter: GithubFilter) =>
+    invoke<GithubList>("github_section", { section, page, filter }),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

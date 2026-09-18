@@ -11,11 +11,17 @@
   foi copiado e quanto ficou; copiar de volta devolve esse trecho. O histórico inteiro tem um teto de 1 milhão de
   caracteres fora os fixados, e no Windows o Canto só lê o clipboard quando ele muda.
 - **reuniões** — lista as transcrições da pasta configurada (padrão `~/Documents/Transcricoes`),
-  limpando numeração/timestamps de `vtt`/`srt` para virar texto corrido pesquisável.
+  limpando numeração/timestamps de `vtt`/`srt` para virar texto corrido pesquisável. Acima dos arquivos, a seção
+  **Do Gemini** lista as anotações e transcrições que o Gemini anexou às reuniões dos últimos 14 dias (exige a
+  conta Google conectada); clicar abre o documento no navegador, e a busca da aba filtra pelo nome da reunião.
 - **agenda** — eventos do dia do Google Calendar. Um minuto antes do início, o widget aparece,
   toca um aviso sonoro, manda uma notificação do sistema e abre um overlay com título, horário, local e o botão **entrar no Meet**
   quando o evento tem link. O relógio do aviso vive no App, não na aba: dispara com você em
   qualquer aba ou com o widget escondido. `Esc` fecha o overlay.
+  Clicar num evento abre os detalhes: quem organizou, quem criou (quando é outra pessoa), quantos convidados,
+  a descrição em texto puro, os anexos e **abrir no Calendar**. O overlay do aviso traz as mesmas informações.
+  As **anotações do Gemini** ("Take notes for me" no Meet) viram um Google Doc anexado ao evento depois da
+  chamada e aparecem ali como anexo; clicar abre o documento no navegador.
 
 | Agenda do dia | Alerta de reunião |
 |---|---|

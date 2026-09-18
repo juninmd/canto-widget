@@ -14,7 +14,7 @@ mod tests {
     fn blocking_http_client_does_not_crash_the_async_command() {
         let task = tauri::async_runtime::spawn(async {
             super::run(|| {
-                drop(reqwest::blocking::Client::new());
+                drop(crate::net::client_builder().build().unwrap());
                 Ok(7)
             })
             .await

@@ -3,7 +3,7 @@
 ## Pré-requisitos
 
 - [Bun](https://bun.sh) 1.2 ou mais novo
-- Rust estável (`rustup`), versão mínima 1.82
+- Rust estável (`rustup`), versão mínima 1.85
 - Dependências do Tauri v2 para o seu sistema: <https://v2.tauri.app/start/prerequisites/>
   (no Linux: `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`)
 

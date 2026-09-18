@@ -55,16 +55,8 @@ fn assigned_merges_issues_and_prs_newest_to_oldest() {
 }
 
 #[test]
-fn merge_respects_the_one_page_cap() {
+fn merge_keeps_both_full_pages_so_show_more_never_skips_items() {
     let many = |pr| (0..PER_PAGE as u64).map(|n| raw(n, "https://github.com/o/r/issues/1", "2026-09-01T00:00:00Z", pr)).collect();
-    let merged = merge(convert(search_response(30, many(false))), convert(search_response(30, many(true))));
-    assert_eq!(merged.items.len(), PER_PAGE);
-}
-
-#[test]
-fn every_query_carries_an_explicit_type_and_only_open_items() {
-    for q in [ASSIGNED_ISSUES, ASSIGNED_PRS, MY_PRS, REVIEW_REQUESTED, MY_ISSUES] {
-        assert!(q.contains("is:open"), "{q}");
-        assert!(q.contains("is:issue") ^ q.contains("is:pr"), "{q}");
-    }
+    let merged = merge(convert(search_response(90, many(false))), convert(search_response(90, many(true))));
+    assert_eq!((merged.items.len(), merged.total), (2 * PER_PAGE, 180));
 }

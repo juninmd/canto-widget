@@ -1,5 +1,5 @@
 use base64::{engine::general_purpose::URL_SAFE_NO_PAD as B64U, Engine};
-use rand::RngCore;
+use rand::{rngs::SysRng, TryRng};
 use sha2::{Digest, Sha256};
 use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
@@ -33,18 +33,22 @@ impl Default for Pkce {
 impl Pkce {
     pub fn new() -> Self {
         let verifier = random_b64(64);
-        let challenge = B64U.encode(Sha256::digest(verifier.as_bytes()));
         Self {
+            challenge: challenge(&verifier),
             verifier,
-            challenge,
             state: random_b64(24),
         }
     }
 }
 
+/// S256 method of RFC 7636: base64url(SHA-256(verifier)) without padding.
+fn challenge(verifier: &str) -> String {
+    B64U.encode(Sha256::digest(verifier.as_bytes()))
+}
+
 fn random_b64(bytes: usize) -> String {
     let mut buf = vec![0u8; bytes];
-    rand::rngs::OsRng.fill_bytes(&mut buf);
+    SysRng.try_fill_bytes(&mut buf).expect("o sistema nao forneceu aleatoriedade");
     B64U.encode(buf)
 }
 
@@ -142,6 +146,12 @@ mod tests {
     fn propagates_googles_error() {
         let line = "GET /?error=access_denied&state=abc HTTP/1.1";
         assert!(parse_callback(line, "abc").is_err());
+    }
+
+    #[test]
+    fn pkce_challenge_matches_the_rfc_7636_example() {
+        let verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk";
+        assert_eq!(challenge(verifier), "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM");
     }
 
     #[test]

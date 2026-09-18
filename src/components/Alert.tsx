@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { api, type AgendaItem } from "../lib/api";
-import { hour } from "../lib/agenda";
+import { hour, people } from "../lib/agenda";
 import { TASK_PREFIX } from "../lib/reminders";
 import { playAlert } from "../lib/sound";
 
@@ -39,13 +39,26 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
       aria-label={`${task ? "lembrete de tarefa" : "reuniao comecando"}: ${event.title}`}
       className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
     >
-      <div className="min-h-0">
+      <div className="min-h-0 overflow-y-auto">
         <p className="text-[11px] uppercase tracking-widest text-accent">
           {task ? "lembrete de tarefa" : "começando agora"}
         </p>
         <h1 className="mt-1 line-clamp-2 text-lg font-semibold">{event.title}</h1>
         <p className="mt-1 text-sm text-muted">{hour(event)}</p>
         {event.location && <p className="mt-1 line-clamp-2 text-xs text-faint">{event.location}</p>}
+        {people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
+        {event.description && <p className="mt-2 line-clamp-4 whitespace-pre-line text-xs text-faint">{event.description}</p>}
+        {(event.attachments ?? []).slice(0, 3).map((a) => (
+          <button
+            key={a.url}
+            type="button"
+            onClick={() => void api.openLink(a.url)}
+            title={a.url}
+            className="mt-1.5 block w-full truncate rounded bg-edge px-2 py-1 text-left text-xs text-fg"
+          >
+            📄 {a.title}
+          </button>
+        ))}
         {event.meet && (
           <p className="mt-2 truncate text-xs text-muted" title={event.meet}>
             {event.meet}

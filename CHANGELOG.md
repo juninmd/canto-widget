@@ -5,6 +5,24 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Detalhes do evento na agenda**: clicar num evento mostra quem organizou, quem criou, quantos convidados,
+  a descrição e os anexos, como as anotações do Gemini, com **abrir no Calendar**. O aviso de reunião traz o
+  mesmo.
+- **Filtros e paginação na aba GitHub**: busca por texto ou qualificador (`repo:`, `label:`), botões
+  **tudo · PRs · issues** e **mostrar mais** em cada lista.
+- **Anotações e transcrições do Gemini na aba Reuniões**: os documentos que o Gemini anexa às reuniões dos
+  últimos 14 dias aparecem acima dos arquivos da pasta e abrem no navegador.
+- **Carregamento visível**: agenda, GitHub e transcrições mostram cartões de espera em vez de uma área vazia.
+
+### Alterado
+
+- Dependências nas versões mais recentes: React 19.3, Vite 8 (Rolldown), TypeScript 7 (compilador nativo),
+  `aes-gcm` 0.11, `argon2` 0.6, `sha2` 0.11, `rand` 0.10 e `reqwest` 0.13. Cofres gravados pela 0.1.0 continuam
+  abrindo (há um teste com um cofre real dessa versão), e o app deixou de carregar duas cópias do cliente HTTP.
+  Compilar exige Rust 1.85.
+
 ## [0.1.0] - 2026-09-18
 
 Primeiro release público.

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, errText, type TranscriptMeta } from "../lib/api";
+import GeminiDocs from "./GeminiDocs";
+import Skeleton from "./Skeleton";
 
 export default function TranscriptsTab({ onError }: { onError: (m: string) => void }) {
   const [dir, setDir] = useState("");
@@ -9,12 +11,14 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
   const [open, setOpen] = useState<{ name: string; text: string } | null>(null);
   // Folder error stays in the tab, next to the folder: it's context, not a loose alert (NN/g).
   const [folderError, setFolderError] = useState("");
+  const [loaded, setLoaded] = useState(false);
 
   async function reload(q = query) {
     try {
       setDir(await api.transcriptsDir());
     } catch (e) {
       onError(errText(e));
+      setLoaded(true);
       return;
     }
     try {
@@ -23,6 +27,8 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
     } catch (e) {
       setItems([]);
       setFolderError(errText(e));
+    } finally {
+      setLoaded(true);
     }
   }
 
@@ -93,48 +99,57 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
         className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
       />
 
-      <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
-        {items.map((t) => (
-          <li key={t.name}>
-            <button
-              type="button"
-              onClick={async () => {
-                try {
-                  setOpen({ name: t.name, text: await api.transcriptRead(t.name) });
-                } catch (e) {
-                  onError(errText(e));
-                }
-              }}
-              className="w-full rounded-lg border border-edge bg-ink/60 p-2 text-left"
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="truncate text-sm font-medium text-fg">{t.name}</p>
-                <span className="shrink-0 text-[11px] text-faint">
-                  {new Date(t.modified_at).toLocaleDateString("pt-BR")}
-                </span>
-              </div>
-              <p className="mt-0.5 line-clamp-3 text-xs text-muted">{t.preview}</p>
-            </button>
-          </li>
-        ))}
-        {items.length === 0 && folderError && (
-          <li role="alert" className="flex flex-col items-center gap-2 px-2 py-6 text-center text-xs text-danger">
-            <span className="break-all">{folderError}</span>
-            <button
-              type="button"
-              onClick={() => setEditingDir(true)}
-              className="min-h-7 rounded-lg bg-edge px-3 text-fg"
-            >
-              escolher outra pasta
-            </button>
-          </li>
-        )}
-        {items.length === 0 && !folderError && (
-          <li className="px-2 py-6 text-center text-xs text-faint">
-            {query ? "nenhuma transcrição bate com a busca" : "nenhuma transcrição nesta pasta"}
-          </li>
-        )}
-      </ul>
+      <div className="flex-1 overflow-y-auto pr-1">
+        <GeminiDocs query={query} />
+        <h3 className="mb-1 text-xs font-semibold text-fg">Arquivos da pasta</h3>
+        <ul className="space-y-2">
+          {items.map((t) => (
+            <li key={t.name}>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    setOpen({ name: t.name, text: await api.transcriptRead(t.name) });
+                  } catch (e) {
+                    onError(errText(e));
+                  }
+                }}
+                className="w-full rounded-lg border border-edge bg-ink/60 p-2 text-left"
+              >
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="truncate text-sm font-medium text-fg">{t.name}</p>
+                  <span className="shrink-0 text-[11px] text-faint">
+                    {new Date(t.modified_at).toLocaleDateString("pt-BR")}
+                  </span>
+                </div>
+                <p className="mt-0.5 line-clamp-3 text-xs text-muted">{t.preview}</p>
+              </button>
+            </li>
+          ))}
+          {items.length === 0 && folderError && (
+            <li role="alert" className="flex flex-col items-center gap-2 px-2 py-6 text-center text-xs text-danger">
+              <span className="break-all">{folderError}</span>
+              <button
+                type="button"
+                onClick={() => setEditingDir(true)}
+                className="min-h-7 rounded-lg bg-edge px-3 text-fg"
+              >
+                escolher outra pasta
+              </button>
+            </li>
+          )}
+          {!loaded && (
+            <li>
+              <Skeleton label="lendo as transcrições" />
+            </li>
+          )}
+          {loaded && items.length === 0 && !folderError && (
+            <li className="px-2 py-6 text-center text-xs text-faint">
+              {query ? "nenhuma transcrição bate com a busca" : "nenhuma transcrição nesta pasta"}
+            </li>
+          )}
+        </ul>
+      </div>
     </div>
   );
 }

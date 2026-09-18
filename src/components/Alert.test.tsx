@@ -116,3 +116,23 @@ test("snoozing hands the alert back to Rust for 10 minutes and hides the overlay
   expect(calls).not.toContain("alert_close");
   expect(closed).toBe(true);
 });
+
+test("the meeting alert brings who organized, the agenda and the attached notes", async () => {
+  const detailed: AgendaItem = {
+    ...event,
+    organizer: "Ana Souza",
+    guests: 4,
+    description: "Pauta:\nRoadmap do trimestre",
+    attachments: [{ title: "Anotações do Gemini", url: "https://docs.google.com/document/d/abc", mime: "" }],
+  };
+  await act(async () => {
+    render(<Alert event={detailed} onClose={() => {}} />);
+  });
+  expect(screen.getByText("organizado por Ana Souza · 4 convidados")).toBeTruthy();
+  expect(screen.getByText(/Roadmap do trimestre/)).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "📄 Anotações do Gemini" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://docs.google.com/document/d/abc" });
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "entrar no Meet" }));
+});
