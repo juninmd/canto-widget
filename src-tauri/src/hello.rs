@@ -1,20 +1,20 @@
-//! Windows Hello via KeyCredentialManager: um par RSA no TPM, liberado por rosto, digital ou PIN.
+//! Windows Hello via KeyCredentialManager: an RSA pair in the TPM, unlocked by face, fingerprint or PIN.
 use windows::core::{Array, HSTRING};
 use windows::Security::Credentials::{KeyCredentialCreationOption, KeyCredentialManager, KeyCredentialStatus};
 use windows::Security::Cryptography::CryptographicBuffer;
 
 use crate::error::{AppError, Result};
 
-pub const NOME: &str = "Windows Hello";
-const CREDENCIAL: &str = "com.junin.canto.cofre";
+pub const NAME: &str = "Windows Hello";
+const CREDENTIAL: &str = "com.junin.canto.cofre";
 
 pub struct Hello(&'static str);
 
-fn falha(e: windows::core::Error) -> AppError {
-    AppError::Crypto(format!("{NOME}: {}", e.message()))
+fn failure(e: windows::core::Error) -> AppError {
+    AppError::Crypto(format!("{NAME}: {}", e.message()))
 }
 
-fn conferir(status: KeyCredentialStatus) -> Result<()> {
+fn check(status: KeyCredentialStatus) -> Result<()> {
     let msg = match status {
         KeyCredentialStatus::Success => return Ok(()),
         KeyCredentialStatus::UserCanceled | KeyCredentialStatus::UserPrefersPassword => "cancelado; use a senha mestra",
@@ -22,18 +22,18 @@ fn conferir(status: KeyCredentialStatus) -> Result<()> {
         KeyCredentialStatus::SecurityDeviceLocked => "dispositivo bloqueado por tentativas; use a senha mestra",
         _ => "falhou; use a senha mestra",
     };
-    Err(AppError::Config(format!("{NOME}: {msg}")))
+    Err(AppError::Config(format!("{NAME}: {msg}")))
 }
 
-/// O dialogo do Hello abre sem foco quando chamado de um app de bandeja; traz para frente.
-fn focar_dialogo() {
+/// The Hello dialog opens without focus when called from a tray app; bring it to front.
+fn focus_dialog() {
     use windows::Win32::UI::WindowsAndMessaging::{FindWindowW, SetForegroundWindow};
     std::thread::spawn(|| {
         for _ in 0..30 {
             std::thread::sleep(std::time::Duration::from_millis(100));
-            // SAFETY: nomes de classe estaticos; FindWindowW so le as strings.
+            // SAFETY: static class names; FindWindowW only reads the strings.
             if let Ok(hwnd) = unsafe { FindWindowW(&HSTRING::from("Credential Dialog Xaml Host"), None) } {
-                // SAFETY: hwnd vem do proprio FindWindowW acima.
+                // SAFETY: hwnd comes from the FindWindowW call above.
                 let _ = unsafe { SetForegroundWindow(hwnd) };
                 return;
             }
@@ -41,67 +41,66 @@ fn focar_dialogo() {
     });
 }
 
-pub fn disponivel() -> bool {
+pub fn available() -> bool {
     KeyCredentialManager::IsSupportedAsync().and_then(|op| op.get()).unwrap_or(false)
 }
 
-/// Cria (ou substitui) o par de chaves; o Windows pede o gesto do usuario aqui.
-pub fn criar() -> Result<Hello> {
-    criar_com(CREDENCIAL)
+/// Creates (or replaces) the key pair; Windows prompts for the user gesture here.
+pub fn create() -> Result<Hello> {
+    create_with(CREDENTIAL)
 }
 
-/// Credencial padrao do cofre, para desbloquear.
-pub const COFRE: Hello = Hello(CREDENCIAL);
+/// Default vault credential, for unlocking.
+pub const VAULT: Hello = Hello(CREDENTIAL);
 
-fn criar_com(nome: &'static str) -> Result<Hello> {
-    focar_dialogo();
-    let r = KeyCredentialManager::RequestCreateAsync(&HSTRING::from(nome), KeyCredentialCreationOption::ReplaceExisting)
+fn create_with(name: &'static str) -> Result<Hello> {
+    focus_dialog();
+    let r = KeyCredentialManager::RequestCreateAsync(&HSTRING::from(name), KeyCredentialCreationOption::ReplaceExisting)
         .and_then(|op| op.get())
-        .map_err(falha)?;
-    conferir(r.Status().map_err(falha)?)?;
-    Ok(Hello(nome))
+        .map_err(failure)?;
+    check(r.Status().map_err(failure)?)?;
+    Ok(Hello(name))
 }
 
-pub fn apagar() {
-    let _ = KeyCredentialManager::DeleteAsync(&HSTRING::from(CREDENCIAL)).and_then(|op| op.get());
+pub fn delete() {
+    let _ = KeyCredentialManager::DeleteAsync(&HSTRING::from(CREDENTIAL)).and_then(|op| op.get());
 }
 
-impl crate::biometria::Assinante for Hello {
-    fn assinar(&self, desafio: &[u8]) -> Result<Vec<u8>> {
-        let aberta = KeyCredentialManager::OpenAsync(&HSTRING::from(self.0))
+impl crate::biometric::Signer for Hello {
+    fn sign(&self, challenge: &[u8]) -> Result<Vec<u8>> {
+        let opened = KeyCredentialManager::OpenAsync(&HSTRING::from(self.0))
             .and_then(|op| op.get())
-            .map_err(falha)?;
-        conferir(aberta.Status().map_err(falha)?)?;
-        let credencial = aberta.Credential().map_err(falha)?;
-        focar_dialogo();
-        let dados = CryptographicBuffer::CreateFromByteArray(desafio).map_err(falha)?;
-        let assinado = credencial.RequestSignAsync(&dados).and_then(|op| op.get()).map_err(falha)?;
-        conferir(assinado.Status().map_err(falha)?)?;
+            .map_err(failure)?;
+        check(opened.Status().map_err(failure)?)?;
+        let credential = opened.Credential().map_err(failure)?;
+        focus_dialog();
+        let data = CryptographicBuffer::CreateFromByteArray(challenge).map_err(failure)?;
+        let signed = credential.RequestSignAsync(&data).and_then(|op| op.get()).map_err(failure)?;
+        check(signed.Status().map_err(failure)?)?;
         let mut bytes = Array::<u8>::new();
-        CryptographicBuffer::CopyToByteArray(&assinado.Result().map_err(falha)?, &mut bytes).map_err(falha)?;
+        CryptographicBuffer::CopyToByteArray(&signed.Result().map_err(failure)?, &mut bytes).map_err(failure)?;
         Ok(bytes.to_vec())
     }
 }
 
 #[cfg(test)]
 mod tests {
-    /// Consulta real ao sistema, sem prompt: `cargo test -- --ignored hello`.
+    /// Real system query, no prompt: `cargo test -- --ignored hello`.
     #[test]
     #[ignore]
-    fn consulta_disponibilidade_sem_abrir_prompt() {
-        println!("windows hello disponivel = {}", super::disponivel());
+    fn queries_availability_without_opening_a_prompt() {
+        println!("windows hello disponivel = {}", super::available());
     }
 
-    /// Manual, pede o gesto 3 vezes: prova que a assinatura e deterministica,
-    /// premissa da chave do cofre. Usa credencial propria e apaga no fim.
+    /// Manual, prompts for the gesture 3 times to prove signing is deterministic (the vault key's assumption); uses its own credential and deletes it at the end.
     #[test]
     #[ignore]
-    fn assinatura_do_hello_e_deterministica() {
-        use crate::biometria::Assinante;
-        const TESTE: &str = "com.junin.canto.teste-determinismo";
-        let h = super::criar_com(TESTE).unwrap();
-        let (a, b) = (h.assinar(b"desafio fixo").unwrap(), h.assinar(b"desafio fixo").unwrap());
-        let _ = windows::Security::Credentials::KeyCredentialManager::DeleteAsync(&windows::core::HSTRING::from(TESTE)).and_then(|op| op.get());
-        assert_eq!(a, b, "assinatura mudou entre chamadas: a chave do cofre nao se reconstruiria");
+    fn hello_signature_is_deterministic() {
+        use crate::biometric::Signer;
+        const TEST_CREDENTIAL: &str = "com.junin.canto.teste-determinismo";
+        let h = super::create_with(TEST_CREDENTIAL).unwrap();
+        let (a, b) = (h.sign(b"desafio fixo").unwrap(), h.sign(b"desafio fixo").unwrap());
+        let _ = windows::Security::Credentials::KeyCredentialManager::DeleteAsync(&windows::core::HSTRING::from(TEST_CREDENTIAL)).and_then(|op| op.get());
+        assert_eq!(a, b, "signature changed between calls: the vault key would not be reconstructible");
     }
 }

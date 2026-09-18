@@ -14,7 +14,8 @@ tauri-build = { version = "2", features = [] }
 serde_json = "1"
 
 [dependencies]
-tauri = { version = "2", features = ["tray-icon"] }
+# macos-private-api: sem ela o macOS ignora `transparent` e pinta o fundo da janela.
+tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
@@ -33,17 +34,27 @@ tauri-plugin-clipboard-manager = "2.3.3"
 tauri-plugin-autostart = "2"
 tauri-plugin-dialog = "2.7.3"
 tauri-plugin-single-instance = "2.4.4"
+tauri-plugin-notification = "2"
 
 [features]
 default = []
 
 [target.'cfg(windows)'.dependencies]
-# Mesma versao que o tauri ja traz: nenhuma crate nova no lockfile, so features.
+# Same version tauri already pulls in: features only, no new crate in the lockfile.
 windows = { version = "0.61", features = [
   "Foundation",
   "Security_Credentials",
   "Security_Cryptography",
   "Storage_Streams",
   "Win32_Foundation",
+  "Win32_System_DataExchange",
   "Win32_UI_WindowsAndMessaging",
 ] }
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

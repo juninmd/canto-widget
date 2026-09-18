@@ -7,23 +7,21 @@ use crate::error::{AppError, Result};
 use crate::store;
 use crate::vault::AppState;
 
-/// Argumento entregue ao Windows/launcher: a app precisa saber que nao foi o
-/// usuario que a abriu, para subir so na bandeja em vez de pular na tela.
+/// Lets the app know the user didn't open it, so it comes up quietly in the tray instead of popping up.
 pub const ARG_AUTOSTART: &str = "--autostart";
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 struct AutostartPrefs {
-    /// Marca que existe escolha explicita do usuario. Gravada *antes* de mexer
-    /// no SO: se a gravacao falhar, nada muda; se a mudanca falhar, o proximo
-    /// boot ainda assim nao volta a ligar o que ele mandou desligar.
-    decidido: bool,
+    // Written before touching the OS, so a failed change never re-enables what the user turned off.
+    #[serde(alias = "decidido")]
+    decided: bool,
 }
 
 fn prefs_path(dir: &Path) -> PathBuf {
     dir.join("autostart.json")
 }
 
-/// Primeira execucao liga o autostart; depois disso a escolha do usuario manda.
+/// First run enables autostart; after that the user's choice rules.
 pub fn ensure_default(app: &tauri::AppHandle) -> Result<()> {
     let dir = app
         .try_state::<AppState>()
@@ -32,17 +30,16 @@ pub fn ensure_default(app: &tauri::AppHandle) -> Result<()> {
         .clone();
     let path = prefs_path(&dir);
     let prefs: AutostartPrefs = store::read_json(&path)?.unwrap_or_default();
-    if prefs.decidido {
+    if prefs.decided {
         return Ok(());
     }
-    // Marca so depois de ligar de verdade: sem escolha do usuario registrada,
-    // repetir o padrao no proximo boot nao atropela ninguem.
+    // Marks only after actually enabling, so the default isn't repeated over a recorded user choice on the next boot.
     set(app, true)?;
-    marcar_decidido(&dir)
+    mark_decided(&dir)
 }
 
-fn marcar_decidido(dir: &Path) -> Result<()> {
-    store::write_json_atomic(&prefs_path(dir), &AutostartPrefs { decidido: true })
+fn mark_decided(dir: &Path) -> Result<()> {
+    store::write_json_atomic(&prefs_path(dir), &AutostartPrefs { decided: true })
 }
 
 fn set(app: &tauri::AppHandle, enabled: bool) -> Result<()> {
@@ -64,16 +61,15 @@ pub fn autostart_status(app: tauri::AppHandle) -> Result<bool> {
 
 #[tauri::command]
 pub fn autostart_set(app: tauri::AppHandle, enabled: bool) -> Result<()> {
-    // Escolha do usuario e registrada antes da mudanca: uma falha ao gravar o
-    // marcador aborta o toggle em vez de deixar o padrao reverte-lo no boot.
+    // Recorded before the change so a failure writing the marker aborts the toggle instead of letting the default revert it on boot.
     if let Some(state) = app.try_state::<AppState>() {
-        marcar_decidido(&state.dir)?;
+        mark_decided(&state.dir)?;
     }
     set(&app, enabled)
 }
 
-/// Aberto pelo sistema no boot: fica quieto na bandeja.
-pub fn iniciado_pelo_sistema() -> bool {
+/// Opened by the system on boot: stays quiet in the tray.
+pub fn started_by_system() -> bool {
     std::env::args().any(|a| a == ARG_AUTOSTART)
 }
 
@@ -81,30 +77,39 @@ pub fn iniciado_pelo_sistema() -> bool {
 mod tests {
     use super::*;
 
-    fn tmpdir(nome: &str) -> PathBuf {
-        let d = std::env::temp_dir().join(format!("canto-autostart-{nome}-{}", std::process::id()));
+    fn tmpdir(name: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("canto-autostart-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         d
     }
 
-    fn decidido(dir: &Path) -> bool {
+    fn decided(dir: &Path) -> bool {
         store::read_json::<AutostartPrefs>(&prefs_path(dir))
             .unwrap()
             .unwrap_or_default()
-            .decidido
+            .decided
     }
 
     #[test]
-    fn primeira_execucao_ainda_nao_decidiu() {
-        let dir = tmpdir("virgem");
-        assert!(!decidido(&dir), "sem arquivo o padrao tem de poder ligar");
+    fn first_run_has_not_decided_yet() {
+        let dir = tmpdir("fresh");
+        assert!(!decided(&dir), "without the file the default must be allowed to turn on");
     }
 
     #[test]
-    fn escolha_do_usuario_sobrevive_ao_proximo_boot() {
-        let dir = tmpdir("decidido");
-        marcar_decidido(&dir).unwrap();
-        assert!(decidido(&dir), "o padrao voltaria a ligar o que foi desligado");
+    fn user_choice_survives_the_next_boot() {
+        let dir = tmpdir("decided");
+        mark_decided(&dir).unwrap();
+        assert!(decided(&dir), "the default would re-enable what was turned off");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn legacy_marker_still_counts_as_decided() {
+        let dir = tmpdir("legacy");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(prefs_path(&dir), br#"{"decidido":true}"#).unwrap();
+        assert!(decided(&dir), "upgrading would re-enable autostart the user turned off");
         let _ = std::fs::remove_dir_all(&dir);
     }
 }

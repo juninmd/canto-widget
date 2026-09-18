@@ -14,18 +14,18 @@ const { default: TranscriptsTab } = await import("./TranscriptsTab");
 
 afterEach(cleanup);
 
-const assentar = () => act(() => new Promise((r) => setTimeout(r, 200)));
+const settle = () => act(() => new Promise((r) => setTimeout(r, 200)));
 
-test("pasta invalida aparece na aba com saida, sem aviso global a cada busca", async () => {
-  const globais: string[] = [];
-  render(<TranscriptsTab onError={(m) => globais.push(m)} />);
-  await assentar();
+test("an invalid folder shows in the tab with an escape hatch, no global alert per search", async () => {
+  const globalErrors: string[] = [];
+  render(<TranscriptsTab onError={(m) => globalErrors.push(m)} />);
+  await settle();
   fireEvent.change(screen.getByPlaceholderText("buscar no que foi dito nas reuniões"), { target: { value: "daily" } });
-  await assentar();
+  await settle();
 
   expect(screen.getByRole("alert").textContent).toContain("pasta de transcrições não encontrada");
   expect(screen.queryByText("nenhuma transcrição nesta pasta")).toBeNull();
-  expect(globais).toEqual([]);
+  expect(globalErrors).toEqual([]);
 
   fireEvent.click(screen.getByRole("button", { name: "escolher outra pasta" }));
   expect(screen.getByDisplayValue("C:/nao/existe")).toBeTruthy();

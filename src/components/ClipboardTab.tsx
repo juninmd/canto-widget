@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 import { api, errText, type ClipItem } from "../lib/api";
-import { useDesfazer } from "../lib/useDesfazer";
-import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
+import { useUndo } from "../lib/useUndo";
+import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import ClipCard from "./ClipCard";
 
 export default function ClipboardTab({ onError }: { onError: (m: string) => void }) {
   const [query, setQuery] = useState("");
-  const [itens, setItens] = useState<ClipItem[]>([]);
-  const [copiado, setCopiado] = useState("");
+  const [items, setItems] = useState<ClipItem[]>([]);
+  const [copied, setCopied] = useState("");
 
-  const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
-  const { saindo, sair } = useSaida();
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const { leaving, leave } = useExit();
 
   async function reload(q = query) {
     try {
-      setItens(await api.clipList(q));
-      setCarregadoPara(q);
+      setItems(await api.clipList(q));
+      setLoadedFor(q);
     } catch (e) {
       onError(errText(e));
     }
@@ -30,11 +31,11 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  const desfazivel = useDesfazer(onError, () => reload());
-  // O vigia do clipboard traz itens novos a cada 2.5s: eles entram deslizando no topo.
-  const novo = useNovos(
-    itens.map((i) => i.id),
-    carregadoPara,
+  const undoable = useUndo(onError, () => reload());
+  // The clipboard watcher brings in new items every 2.5s: they slide in at the top.
+  const isNew = useNewIds(
+    items.map((i) => i.id),
+    loadedFor,
   );
 
   async function run(fn: () => Promise<unknown>) {
@@ -54,7 +55,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
       <div className="flex gap-2">
         <input
           value={query}
-          data-atalho="busca"
+          data-shortcut="search"
           aria-label="buscar no clipboard"
           onChange={(e) => setQuery(e.target.value)}
           placeholder="buscar no que você copiou"
@@ -62,7 +63,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
         />
         <button
           type="button"
-          onClick={() => run(async () => desfazivel(await api.clipClear(), "histórico limpo (fixados mantidos)"))}
+          onClick={() => run(async () => undoable(await api.clipClear(), "histórico limpo (fixados mantidos)"))}
           title="limpar tudo, menos os fixados"
           className="rounded-lg bg-edge px-3 text-xs text-fg"
         >
@@ -70,48 +71,27 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
         </button>
       </div>
 
-      <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
-        {itens.map((i) => (
-          <li
+      <ul className="flex-1 space-y-1.5 overflow-y-auto pr-1">
+        {items.map((i) => (
+          <ClipCard
             key={i.id}
-            className={`group rounded-lg border border-edge bg-ink/60 p-2 ${novo(i.id) ? ENTRAR : ""} ${saindo.has(i.id) ? SAIR : ""}`}
-          >
-            <button
-              type="button"
-              className="w-full text-left"
-              title="clique para copiar de novo"
-              onClick={() =>
-                run(async () => {
-                  await api.clipCopy(i.id);
-                  setCopiado(i.id);
-                  setTimeout(() => setCopiado(""), 1200);
-                })
-              }
-            >
-              <p className="line-clamp-3 whitespace-pre-wrap break-all text-xs text-fg">{i.text}</p>
-            </button>
-            <div className="mt-1 flex items-center justify-between text-[11px] text-faint">
-              <span>{copiado === i.id ? "copiado!" : new Date(i.copied_at).toLocaleTimeString()}</span>
-              <span className="flex gap-3">
-                <button type="button" onClick={() => run(() => api.clipPin(i.id))} className="min-h-6 px-1 hover:text-fg">
-                  {i.pinned ? "fixado" : "fixar"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() =>
-                    void sair(i.id, () =>
-                      run(async () => desfazivel(await api.clipDelete(i.id), "item excluído do histórico")),
-                    )
-                  }
-                  className="min-h-6 px-1 hover:text-danger"
-                >
-                  excluir
-                </button>
-              </span>
-            </div>
-          </li>
+            item={i}
+            copied={copied === i.id}
+            className={`${isNew(i.id) ? ENTER_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
+            onCopy={() =>
+              run(async () => {
+                await api.clipCopy(i.id);
+                setCopied(i.id);
+                setTimeout(() => setCopied(""), 1200);
+              })
+            }
+            onPin={() => run(() => api.clipPin(i.id))}
+            onDelete={() =>
+              void leave(i.id, () => run(async () => undoable(await api.clipDelete(i.id), "item excluído do histórico")))
+            }
+          />
         ))}
-        {itens.length === 0 && (
+        {items.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">
             {query ? "nada encontrado" : "copie algo e aparecerá aqui"}
           </li>

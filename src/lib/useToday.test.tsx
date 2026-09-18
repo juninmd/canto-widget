@@ -3,10 +3,10 @@ import { act } from "react";
 import { cleanup, render } from "@testing-library/react";
 import { useToday } from "./useToday";
 
-let momento = new Date();
+let moment = new Date();
 
-function Sonda() {
-  return <span data-testid="dia">{useToday(() => momento)}</span>;
+function Probe() {
+  return <span data-testid="dia">{useToday(() => moment)}</span>;
 }
 
 afterEach(() => {
@@ -14,25 +14,25 @@ afterEach(() => {
   cleanup();
 });
 
-test("vira o dia sem precisar remontar o widget", async () => {
-  momento = new Date(2026, 8, 9, 23, 59, 30);
+test("rolls over the day without remounting the widget", async () => {
+  moment = new Date(2026, 8, 9, 23, 59, 30);
   jest.useFakeTimers();
-  const { getByTestId } = render(<Sonda />);
+  const { getByTestId } = render(<Probe />);
   expect(getByTestId("dia").textContent).toBe("2026-09-09");
 
-  momento = new Date(2026, 8, 10, 0, 0, 5);
+  moment = new Date(2026, 8, 10, 0, 0, 5);
   await act(async () => {
     jest.advanceTimersByTime(30_000);
   });
   expect(getByTestId("dia").textContent).toBe("2026-09-10");
 });
 
-test("nao rerenderiza a toa dentro do mesmo dia", async () => {
-  momento = new Date(2026, 8, 9, 10, 0, 0);
+test("does not re-render needlessly within the same day", async () => {
+  moment = new Date(2026, 8, 9, 10, 0, 0);
   jest.useFakeTimers();
-  const { getByTestId } = render(<Sonda />);
+  const { getByTestId } = render(<Probe />);
 
-  momento = new Date(2026, 8, 9, 10, 30, 0);
+  moment = new Date(2026, 8, 9, 10, 30, 0);
   await act(async () => {
     jest.advanceTimersByTime(30 * 60_000);
   });

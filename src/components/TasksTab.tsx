@@ -1,31 +1,32 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Task } from "../lib/api";
-import ResumoDia from "./ResumoDia";
-import TarefaDetalhes, { SeloDetalhes } from "./TarefaDetalhes";
-import { useDesfazer } from "../lib/useDesfazer";
-import { ENTRAR, SAIR, useNovos, useSaida } from "../lib/movimento";
+import { parseQuickTask } from "../lib/quickAdd";
+import DaySummary from "./DaySummary";
+import TaskDetails, { TaskBadge } from "./TaskDetails";
+import { useUndo } from "../lib/useUndo";
+import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 
-type Props = { today: string; versao?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
+type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
-export default function TasksTab({ today, versao, agenda = [], onError }: Props) {
+export default function TasksTab({ today, version, agenda = [], onError }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [title, setTitle] = useState("");
-  const [editando, setEditando] = useState<{ id: string; title: string } | null>(null);
-  // Encerrar a edicao desmonta o input ainda focado, e o webview dispara um
-  // blur nele com a closure do render anterior. Sem esta trava, Esc salvaria o
-  // texto descartado e Enter gravaria o cofre duas vezes.
-  const edicaoEncerrada = useRef(false);
+  const [editing, setEditing] = useState<{ id: string; title: string } | null>(null);
+  // Ending the edit unmounts the still-focused input, and the webview fires a
+  // blur on it with the previous render's closure. Without this guard, Esc would save
+  // the discarded text and Enter would write to the vault twice.
+  const editEnded = useRef(false);
 
-  const [carregadoPara, setCarregadoPara] = useState<string | null>(null);
-  const [marcando, setMarcando] = useState("");
-  const { saindo, sair } = useSaida();
-  const [detalhes, setDetalhes] = useState("");
-  const [resumo, setResumo] = useState(false);
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const [checking, setChecking] = useState("");
+  const { leaving, leave } = useExit();
+  const [details, setDetails] = useState("");
+  const [summary, setSummary] = useState(false);
 
   async function reload() {
     try {
       setTasks(await api.tasksForDay(today));
-      setCarregadoPara(today);
+      setLoadedFor(today);
     } catch (e) {
       onError(errText(e));
     }
@@ -34,13 +35,15 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
   useEffect(() => {
     void reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [today, versao]);
+  }, [today, version]);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
     try {
-      await api.taskAdd(title, today);
+      const quick = parseQuickTask(title);
+      const created = await api.taskAdd(quick.title, today);
+      if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
       setTitle("");
       await reload();
     } catch (e) {
@@ -48,10 +51,10 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
     }
   }
 
-  const desfazivel = useDesfazer(onError, reload);
-  const novo = useNovos(
+  const undoable = useUndo(onError, reload);
+  const isNew = useNewIds(
     tasks.map((t) => t.id),
-    carregadoPara,
+    loadedFor,
   );
 
   async function run(fn: () => Promise<unknown>) {
@@ -63,19 +66,19 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
     }
   }
 
-  async function renomear() {
-    if (edicaoEncerrada.current || !editando) return;
-    edicaoEncerrada.current = true;
-    const alvo = editando;
-    setEditando(null);
-    if (!alvo.title.trim() || alvo.title === tasks.find((t) => t.id === alvo.id)?.title) return;
-    await run(() => api.taskRename(alvo.id, alvo.title));
+  async function rename() {
+    if (editEnded.current || !editing) return;
+    editEnded.current = true;
+    const target = editing;
+    setEditing(null);
+    if (!target.title.trim() || target.title === tasks.find((t) => t.id === target.id)?.title) return;
+    await run(() => api.taskRename(target.id, target.title));
   }
 
   const done = tasks.filter((t) => t.done).length;
 
-  if (resumo) {
-    return <ResumoDia dia={today} tarefas={tasks} agenda={agenda} onFechar={() => setResumo(false)} onError={onError} />;
+  if (summary) {
+    return <DaySummary day={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />;
   }
 
   return (
@@ -83,9 +86,9 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
       <form onSubmit={add} className="flex gap-2">
         <input
           value={title}
-          data-atalho="novo"
+          data-shortcut="new"
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="nova tarefa de hoje"
+          placeholder="nova tarefa (ex.: Daily às 9h30)"
           className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
         <button type="submit" aria-label="adicionar tarefa" className="rounded-lg bg-edge px-3 text-sm text-fg">
@@ -100,7 +103,7 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
         <span className="flex gap-3">
           <button
             type="button"
-            onClick={() => setResumo(true)}
+            onClick={() => setSummary(true)}
             title="texto com o que foi feito, o que ficou e as reuniões, pronto para copiar"
             className="min-h-6 underline decoration-dotted hover:text-fg"
           >
@@ -121,31 +124,31 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
         {tasks.map((t) => (
           <Fragment key={t.id}>
             <li
-              className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${novo(t.id) ? ENTRAR : ""} ${
-                saindo.has(t.id) ? SAIR : ""
+              className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew(t.id) ? ENTER_CLASS : ""} ${
+                leaving.has(t.id) ? EXIT_CLASS : ""
               }`}
             >
               <input
                 type="checkbox"
                 checked={t.done}
                 onChange={() => {
-                  setMarcando(t.id);
+                  setChecking(t.id);
                   void run(() => api.taskToggle(t.id));
                 }}
-                onAnimationEnd={() => setMarcando("")}
-                className={`size-4 accent-[var(--color-accent)] ${marcando === t.id ? "motion-safe:animate-marcar" : ""}`}
+                onAnimationEnd={() => setChecking("")}
+                className={`size-4 accent-[var(--color-accent)] ${checking === t.id ? "motion-safe:animate-marcar" : ""}`}
               />
-              {editando?.id === t.id ? (
+              {editing?.id === t.id ? (
                 <input
                   autoFocus
-                  value={editando.title}
-                  onChange={(e) => setEditando({ id: t.id, title: e.target.value })}
-                  onBlur={() => void renomear()}
+                  value={editing.title}
+                  onChange={(e) => setEditing({ id: t.id, title: e.target.value })}
+                  onBlur={() => void rename()}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") void renomear();
+                    if (e.key === "Enter") void rename();
                     if (e.key === "Escape") {
-                      edicaoEncerrada.current = true;
-                      setEditando(null);
+                      editEnded.current = true;
+                      setEditing(null);
                     }
                   }}
                   className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
@@ -155,34 +158,34 @@ export default function TasksTab({ today, versao, agenda = [], onError }: Props)
                   className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
                   title={`${t.title}\n(clique duas vezes para renomear)`}
                   onDoubleClick={() => {
-                    edicaoEncerrada.current = false;
-                    setEditando({ id: t.id, title: t.title });
+                    editEnded.current = false;
+                    setEditing({ id: t.id, title: t.title });
                   }}
                 >
                   {t.title}
                 </span>
               )}
-              <SeloDetalhes tarefa={t} aberto={detalhes === t.id} onAlternar={() => setDetalhes(detalhes === t.id ? "" : t.id)} />
+              <TaskBadge task={t} open={details === t.id} onToggle={() => setDetails(details === t.id ? "" : t.id)} />
               <button
                 type="button"
                 onClick={() =>
-                  void sair(t.id, () =>
-                    run(async () => desfazivel(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
+                  void leave(t.id, () =>
+                    run(async () => undoable(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
                   )
                 }
-                // Visivel tambem no foco: so no hover, o teclado nunca acha o botao.
+                // Also visible on focus: hover-only would leave the keyboard user unable to find it.
                 className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
                 aria-label={`excluir ${t.title}`}
               >
                 ×
               </button>
             </li>
-            {detalhes === t.id && (
+            {details === t.id && (
               <li>
-                <TarefaDetalhes
-                  tarefa={t}
-                  onMudar={(hora, repetir) => void run(() => api.taskSetDetalhes(t.id, hora, repetir))}
-                  onFechar={() => setDetalhes("")}
+                <TaskDetails
+                  task={t}
+                  onChange={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
+                  onClose={() => setDetails("")}
                 />
               </li>
             )}

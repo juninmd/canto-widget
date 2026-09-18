@@ -1,108 +1,108 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { duracaoSaida } from "./movimento";
+import { exitDuration } from "./motion";
 
-export type Aviso = {
-  texto: string;
-  tipo?: "info" | "erro";
-  acao?: { rotulo: string; executar: () => void };
+export type Toast = {
+  message: string;
+  type?: "info" | "erro";
+  action?: { label: string; run: () => void };
 };
 
-type AvisoAtivo = Aviso & { id: number };
+type ActiveToast = Toast & { id: number };
 
-const MAX_VISIVEIS = 3;
-export const DURACAO_INFO_MS = 6000;
+const MAX_VISIBLE = 3;
+export const INFO_DURATION_MS = 6000;
 
-const Contexto = createContext<((a: Aviso) => void) | null>(null);
+const ToastContext = createContext<((a: Toast) => void) | null>(null);
 
-export function useToast(): (a: Aviso) => void {
-  const avisar = useContext(Contexto);
-  if (!avisar) throw new Error("useToast fora do ToastProvider");
-  return avisar;
+export function useToast(): (a: Toast) => void {
+  const notify = useContext(ToastContext);
+  if (!notify) throw new Error("useToast outside ToastProvider");
+  return notify;
 }
 
-export function ToastProvider({ children, duracaoMs = DURACAO_INFO_MS }: { children: ReactNode; duracaoMs?: number }) {
-  const [avisos, setAvisos] = useState<AvisoAtivo[]>([]);
-  const proximoId = useRef(1);
+export function ToastProvider({ children, durationMs = INFO_DURATION_MS }: { children: ReactNode; durationMs?: number }) {
+  const [toasts, setToasts] = useState<ActiveToast[]>([]);
+  const nextId = useRef(1);
 
-  const fechar = useCallback((id: number) => setAvisos((l) => l.filter((a) => a.id !== id)), []);
+  const close = useCallback((id: number) => setToasts((l) => l.filter((a) => a.id !== id)), []);
 
-  const avisar = useCallback((a: Aviso) => {
-    setAvisos((l) => {
-      // Polling que falha sempre igual (clipboard a cada 2.5s) nao pode empilhar o mesmo aviso.
-      if (!a.acao && l.some((x) => !x.acao && x.texto === a.texto && x.tipo === a.tipo)) return l;
-      return [...l, { ...a, id: proximoId.current++ }].slice(-MAX_VISIVEIS);
+  const notify = useCallback((a: Toast) => {
+    setToasts((l) => {
+      // Polling that fails the same way every time (clipboard every 2.5s) can't stack the same toast.
+      if (!a.action && l.some((x) => !x.action && x.message === a.message && x.type === a.type)) return l;
+      return [...l, { ...a, id: nextId.current++ }].slice(-MAX_VISIBLE);
     });
   }, []);
 
   return (
-    <Contexto.Provider value={avisar}>
+    <ToastContext.Provider value={notify}>
       {children}
       <div className="pointer-events-none absolute inset-x-3 bottom-3 z-40 flex flex-col gap-2">
-        {/* Regioes separadas: erro interrompe o leitor de tela, o resto espera a vez. */}
+        {/* Separate regions: an error interrupts the screen reader, the rest wait their turn. */}
         <div role="alert" className="flex flex-col gap-2">
-          {avisos.filter((a) => a.tipo === "erro").map((a) => (
-            <Toast key={a.id} aviso={a} fechar={fechar} duracaoMs={null} />
+          {toasts.filter((a) => a.type === "erro").map((a) => (
+            <ToastItem key={a.id} toast={a} close={close} durationMs={null} />
           ))}
         </div>
         <div role="status" className="flex flex-col gap-2">
-          {avisos.filter((a) => a.tipo !== "erro").map((a) => (
-            <Toast key={a.id} aviso={a} fechar={fechar} duracaoMs={duracaoMs} />
+          {toasts.filter((a) => a.type !== "erro").map((a) => (
+            <ToastItem key={a.id} toast={a} close={close} durationMs={durationMs} />
           ))}
         </div>
       </div>
-    </Contexto.Provider>
+    </ToastContext.Provider>
   );
 }
 
-/** `duracaoMs` nulo: erro fica até ser fechado, para dar tempo de ler (NN/g). */
-function Toast({ aviso, fechar, duracaoMs }: { aviso: AvisoAtivo; fechar: (id: number) => void; duracaoMs: number | null }) {
-  const [pausado, setPausado] = useState(false);
-  const [saindo, setSaindo] = useState(false);
-  const { id } = aviso;
+/** `durationMs` null: an error stays until dismissed, to give time to read it (NN/g). */
+function ToastItem({ toast, close, durationMs }: { toast: ActiveToast; close: (id: number) => void; durationMs: number | null }) {
+  const [paused, setPaused] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const { id } = toast;
 
-  // Sai animando e so entao desmonta; com menos movimento pedido, some na hora.
-  const encerrar = useCallback(() => {
-    const ms = duracaoSaida();
-    if (!ms) return fechar(id);
-    setSaindo(true);
-    setTimeout(() => fechar(id), ms);
-  }, [fechar, id]);
+  // Leaves with an exit animation before unmounting; with reduced motion requested, it vanishes at once.
+  const dismiss = useCallback(() => {
+    const ms = exitDuration();
+    if (!ms) return close(id);
+    setLeaving(true);
+    setTimeout(() => close(id), ms);
+  }, [close, id]);
 
-  // Pausa com mouse ou foco em cima: prazo ajustável (WCAG 2.2.1).
+  // Pauses on hover or focus: an adjustable deadline (WCAG 2.2.1).
   useEffect(() => {
-    if (duracaoMs === null || pausado) return;
-    // Dependencias estaveis: um aviso novo chegando nao reinicia o prazo dos outros.
-    const t = setTimeout(encerrar, duracaoMs);
+    if (durationMs === null || paused) return;
+    // Stable dependencies: a new toast arriving doesn't reset the others' deadline.
+    const t = setTimeout(dismiss, durationMs);
     return () => clearTimeout(t);
-  }, [duracaoMs, pausado, encerrar]);
+  }, [durationMs, paused, dismiss]);
 
-  const erro = aviso.tipo === "erro";
+  const isError = toast.type === "erro";
   return (
     <div
-      onMouseEnter={() => setPausado(true)}
-      onMouseLeave={() => setPausado(false)}
-      onFocus={() => setPausado(true)}
-      onBlur={() => setPausado(false)}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
       className={`pointer-events-auto flex items-center gap-2 rounded-lg border bg-ink px-3 py-1.5 text-xs text-fg shadow-lg ${
-        erro ? "border-danger" : "border-line"
-      } ${saindo ? "pointer-events-none motion-safe:animate-baixar" : "motion-safe:animate-entrar motion-reduce:animate-fade"}`}
+        isError ? "border-danger" : "border-line"
+      } ${leaving ? "pointer-events-none motion-safe:animate-baixar" : "motion-safe:animate-entrar motion-reduce:animate-fade"}`}
     >
-      <span className={`min-w-0 flex-1 break-words ${erro ? "text-danger" : ""}`}>{aviso.texto}</span>
-      {aviso.acao && (
+      <span className={`min-w-0 flex-1 break-words ${isError ? "text-danger" : ""}`}>{toast.message}</span>
+      {toast.action && (
         <button
           type="button"
           onClick={() => {
-            aviso.acao!.executar();
-            encerrar();
+            toast.action!.run();
+            dismiss();
           }}
           className="min-h-6 shrink-0 rounded px-2 font-semibold text-accent hover:bg-edge"
         >
-          {aviso.acao.rotulo}
+          {toast.action.label}
         </button>
       )}
       <button
         type="button"
-        onClick={encerrar}
+        onClick={dismiss}
         aria-label="fechar aviso"
         className="grid size-6 shrink-0 place-items-center rounded text-muted hover:text-fg"
       >

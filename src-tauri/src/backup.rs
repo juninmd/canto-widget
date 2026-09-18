@@ -6,61 +6,59 @@ use crate::model::now_ms;
 use crate::store::{self, SealedBlob};
 use crate::vault::AppState;
 
-pub const EXTENSAO: &str = "canto";
-/// Cofre de tarefas e notas em texto fica na casa dos KB; o teto so impede
-/// que um arquivo errado escolhido no dialogo seja lido inteiro para a RAM.
+pub const EXTENSION: &str = "canto";
+/// A tasks-and-notes vault runs a few KB; the cap only stops a wrong file picked in the dialog from being read whole into RAM.
 const MAX_BYTES: u64 = 32 * 1024 * 1024;
-/// Copias diarias e de antes de importar, somadas.
-pub const MANTER: usize = 10;
+/// Daily and pre-import copies combined.
+pub const KEEP: usize = 10;
 
 #[derive(Debug, Serialize, PartialEq)]
-pub struct ResumoImport {
-    pub tarefas: usize,
-    pub notas: usize,
+pub struct ImportSummary {
+    pub tasks: usize,
+    pub notes: usize,
 }
 
 pub fn backups_dir(dir: &Path) -> PathBuf {
     dir.join("backups")
 }
 
-/// O envelope em disco ja e cifrado e reflete cada mutacao: exportar e copiar.
-pub fn exportar(dir: &Path, destino: &Path) -> Result<()> {
-    let bytes = ler_envelope_local(dir)?.ok_or(AppError::NotFound)?;
-    store::write_bytes_atomic(destino, &bytes)
+/// The on-disk envelope is already encrypted and reflects every mutation: exporting is copying.
+pub fn export(dir: &Path, destination: &Path) -> Result<()> {
+    let bytes = read_local_envelope(dir)?.ok_or(AppError::NotFound)?;
+    store::write_bytes_atomic(destination, &bytes)
 }
 
-/// Funde o backup no cofre destrancado (last-write-wins, com lapides). Reimportar
-/// o mesmo arquivo nao muda nada; o estado anterior fica guardado em `backups/`.
-pub fn importar(state: &AppState, origem: &Path) -> Result<ResumoImport> {
-    let tamanho = std::fs::metadata(origem)?.len();
-    if tamanho > MAX_BYTES {
+/// Last-write-wins with tombstones, so reimporting the same file changes nothing; the prior state is kept in `backups/`.
+pub fn import(state: &AppState, source: &Path) -> Result<ImportSummary> {
+    let size = std::fs::metadata(source)?.len();
+    if size > MAX_BYTES {
         return Err(AppError::Config("arquivo grande demais para ser um backup do Canto".into()));
     }
-    let blob: SealedBlob = serde_json::from_slice(&std::fs::read(origem)?)
+    let blob: SealedBlob = serde_json::from_slice(&std::fs::read(source)?)
         .map_err(|_| AppError::Format("o arquivo nao e um backup do Canto".into()))?;
-    let vindo = state.abrir_envelope(&blob)?;
-    // So depois de abrir: senha errada nao deixa copia inutil para tras.
-    guardar(&state.dir, &format!("{}T{}-import", hoje_utc(), now_ms()))?;
+    let incoming = state.open_envelope(&blob)?;
+    // Only after opening: a wrong password leaves no useless copy behind.
+    save(&state.dir, &format!("{}T{}-import", today_utc(), now_ms()))?;
     state.mutate(|local| {
-        *local = std::mem::take(local).merge(vindo);
-        ResumoImport { tarefas: local.tasks.len(), notas: local.notes.len() }
+        *local = std::mem::take(local).merge(incoming);
+        ImportSummary { tasks: local.tasks.len(), notes: local.notes.len() }
     })
 }
 
-/// Uma copia por dia (UTC), sem precisar da chave. Devolve `true` se gravou.
-pub fn diario(dir: &Path, dia: &str) -> Result<bool> {
-    if backups_dir(dir).join(format!("{dia}.{EXTENSAO}")).exists() {
+/// One copy per day (UTC), without needing the key. Returns `true` if it wrote.
+pub fn daily(dir: &Path, day: &str) -> Result<bool> {
+    if backups_dir(dir).join(format!("{day}.{EXTENSION}")).exists() {
         return Ok(false);
     }
-    guardar(dir, dia)
+    save(dir, day)
 }
 
-pub fn hoje_utc() -> String {
+pub fn today_utc() -> String {
     let d = time::OffsetDateTime::now_utc().date();
     format!("{:04}-{:02}-{:02}", d.year(), u8::from(d.month()), d.day())
 }
 
-fn ler_envelope_local(dir: &Path) -> Result<Option<Vec<u8>>> {
+fn read_local_envelope(dir: &Path) -> Result<Option<Vec<u8>>> {
     match std::fs::read(store::vault_path(dir)) {
         Ok(b) => Ok(Some(b)),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
@@ -68,26 +66,26 @@ fn ler_envelope_local(dir: &Path) -> Result<Option<Vec<u8>>> {
     }
 }
 
-fn guardar(dir: &Path, nome: &str) -> Result<bool> {
-    let Some(bytes) = ler_envelope_local(dir)? else {
+fn save(dir: &Path, name: &str) -> Result<bool> {
+    let Some(bytes) = read_local_envelope(dir)? else {
         return Ok(false);
     };
-    let pasta = backups_dir(dir);
-    store::write_bytes_atomic(&pasta.join(format!("{nome}.{EXTENSAO}")), &bytes)?;
-    podar(&pasta, MANTER)?;
+    let folder = backups_dir(dir);
+    store::write_bytes_atomic(&folder.join(format!("{name}.{EXTENSION}")), &bytes)?;
+    prune(&folder, KEEP)?;
     Ok(true)
 }
 
-/// Nomes comecam pela data ISO: a ordem alfabetica e a cronologica.
-fn podar(pasta: &Path, manter: usize) -> Result<()> {
-    let mut nomes: Vec<PathBuf> = std::fs::read_dir(pasta)?
+/// Names start with the ISO date: alphabetical order is chronological order.
+fn prune(folder: &Path, keep: usize) -> Result<()> {
+    let mut names: Vec<PathBuf> = std::fs::read_dir(folder)?
         .filter_map(|e| e.ok().map(|e| e.path()))
-        .filter(|p| p.extension().is_some_and(|x| x == EXTENSAO))
+        .filter(|p| p.extension().is_some_and(|x| x == EXTENSION))
         .collect();
-    nomes.sort();
-    let excesso = nomes.len().saturating_sub(manter);
-    for velho in &nomes[..excesso] {
-        std::fs::remove_file(velho)?;
+    names.sort();
+    let excess = names.len().saturating_sub(keep);
+    for old in &names[..excess] {
+        std::fs::remove_file(old)?;
     }
     Ok(())
 }

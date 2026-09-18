@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type DriveStatus } from "../lib/api";
-import ContaGoogle from "./ContaGoogle";
+import GoogleAccount from "./GoogleAccount";
 
 export default function GoogleSection({ onError }: { onError: (m: string) => void }) {
   const [status, setStatus] = useState<DriveStatus>({ configured: false, connected: false, email: "" });
@@ -44,11 +44,11 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
         vai para o Google.
       </p>
 
-      {/* Credenciais sao passo unico: com a conta conectada, ficam recolhidas (divulgacao progressiva). */}
-      {/* Build com cliente embutido: credencial propria vira opcao avancada, recolhida. */}
-      <details open={!status.connected && !status.embutido}>
+      {/* Credentials are a one-time step: once the account is connected, they collapse (progressive disclosure). */}
+      {/* Build with an embedded client: a custom credential becomes a collapsed, advanced option. */}
+      <details open={!status.connected && !status.embedded}>
         <summary className="min-h-6 cursor-pointer text-[11px] text-muted hover:text-fg">
-          {status.embutido ? "usar credenciais OAuth próprias (avançado)" : `credenciais OAuth ${status.configured ? "(salvas)" : ""}`}
+          {status.embedded ? "usar credenciais OAuth próprias (avançado)" : `credenciais OAuth ${status.configured ? "(salvas)" : ""}`}
         </summary>
         <div className="mt-2 flex flex-col gap-2 motion-safe:animate-aba">
           <label htmlFor="google-client-id" className="text-[11px] text-muted">Client ID OAuth (app desktop)</label>
@@ -81,17 +81,17 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
       </details>
 
       {status.connected ? (
-        <ContaGoogle
+        <GoogleAccount
           status={status}
-          ocupado={busy !== ""}
-          saindo={busy === "out"}
-          onSair={() => void run("out", api.driveDisconnect, "você saiu da conta Google")}
+          busy={busy !== ""}
+          signingOut={busy === "out"}
+          onSignOut={() => void run("out", api.driveDisconnect, "você saiu da conta Google")}
         />
       ) : (
         <div className="mt-1 flex items-center gap-2 text-xs">
           <span className="size-2 rounded-full bg-faint" />
           <span className="truncate text-muted">
-            {status.embutido ? "pronto para entrar" : status.configured ? "credenciais salvas" : "não configurado"}
+            {status.embedded ? "pronto para entrar" : status.configured ? "credenciais salvas" : "não configurado"}
           </span>
         </div>
       )}

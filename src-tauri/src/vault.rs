@@ -8,10 +8,8 @@ use crate::error::{AppError, Result};
 use crate::model::{now_ms, VaultData};
 use crate::store::{self, SealedBlob, DRIVE_AAD, VAULT_AAD};
 
-/// Piso da senha mestra. Curto por escolha do dono do cofre: o envelope fica em
-/// disco e sai da maquina em backups exportados, entao a senha e atacavel offline e nenhum limite
-/// de tentativas protege. O Argon2id encarece cada palpite, nao o total deles.
-pub const MIN_SENHA: usize = 4;
+/// Kept short deliberately: the envelope leaves the machine in backups and is attackable offline with no attempt limit, so only Argon2id cost protects it.
+pub const MIN_PASSWORD_LEN: usize = 4;
 
 #[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
 pub struct DriveConfig {
@@ -19,25 +17,25 @@ pub struct DriveConfig {
     pub client_id: String,
     #[serde(default)]
     pub client_secret: String,
-    /// Salvo pelo usuario em Ajustes. Credencial antiga, de antes do cliente embutido, nao conta.
-    #[serde(default)]
-    pub cliente_proprio: bool,
+    /// Saved by the user in Settings. A pre-embedded-client credential doesn't count.
+    #[serde(default, alias = "cliente_proprio")]
+    pub owned_client: bool,
     #[serde(default)]
     pub tokens: Option<DriveTokens>,
     #[serde(default)]
     pub email: String,
-    #[serde(default)]
-    pub nome: String,
-    /// Foto da conta como `data:` URL; vazia quando nao veio ou nao passou na checagem.
+    #[serde(default, alias = "nome")]
+    pub name: String,
+    /// Account photo as a `data:` URL; empty when absent or it failed validation.
     #[serde(default)]
     pub avatar: String,
 }
 
 pub struct Session {
-    key: VaultKey,
-    /// Necessaria para derivar a chave de um backup importado, que tem salt proprio.
-    password: Zeroizing<String>,
-    salt: Vec<u8>,
+    pub(crate) key: VaultKey,
+    /// Needed to derive the key for an imported backup, which has its own salt.
+    pub(crate) password: Zeroizing<String>,
+    pub(crate) salt: Vec<u8>,
     pub data: VaultData,
 }
 
@@ -53,11 +51,10 @@ impl Session {
 pub struct AppState {
     pub dir: PathBuf,
     pub session: Mutex<Option<Session>>,
-    /// Ultimo evento que disparou o pop-up, lido pela janela de alerta.
-    pub alerta: Mutex<Option<crate::calendar::AgendaItem>>,
-    pub lixeira: crate::lixeira::Lixeira,
-    /// Instante do ultimo uso deliberado do cofre, base do auto-lock.
-    /// Pollings de fundo (clipboard, agenda) de proposito nao mexem aqui.
+    /// Last event that triggered the pop-up, read by the alert window.
+    pub alert: Mutex<Option<crate::calendar::AgendaItem>>,
+    pub trash: crate::trash::Trash,
+    /// Auto-lock baseline; background polls (clipboard, agenda) deliberately don't touch this.
     last_active: Mutex<i64>,
 }
 
@@ -66,8 +63,8 @@ impl AppState {
         Self {
             dir,
             session: Mutex::new(None),
-            alerta: Mutex::new(None),
-            lixeira: Default::default(),
+            alert: Mutex::new(None),
+            trash: Default::default(),
             last_active: Mutex::new(now_ms()),
         }
     }
@@ -80,10 +77,9 @@ impl AppState {
         now_ms() - *self.last_active.lock().unwrap()
     }
 
-    /// Tranca o cofre se ficou parado alem do limite. Devolve `true` so na
-    /// transicao, para o watchdog avisar a UI uma vez por vez.
-    pub fn lock_if_idle(&self, limite_ms: i64) -> bool {
-        if !self.is_unlocked() || self.idle_ms() < limite_ms {
+    /// Returns `true` only on the lock transition, so the watchdog notifies the UI once per lock.
+    pub fn lock_if_idle(&self, limit_ms: i64) -> bool {
+        if !self.is_unlocked() || self.idle_ms() < limit_ms {
             return false;
         }
         self.lock();
@@ -98,9 +94,9 @@ impl AppState {
         if self.vault_exists() {
             return Err(AppError::AlreadyExists);
         }
-        if password.chars().count() < MIN_SENHA {
+        if password.chars().count() < MIN_PASSWORD_LEN {
             return Err(AppError::Config(format!(
-                "a senha mestra precisa de ao menos {MIN_SENHA} caracteres"
+                "a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres"
             )));
         }
         let salt = store::new_salt();
@@ -124,6 +120,7 @@ impl AppState {
         let key = VaultKey::derive(password, &salt)?;
         let plain = blob.open(&key, VAULT_AAD)?;
         let data: VaultData = serde_json::from_slice(&plain)?;
+        crate::password::finish_interrupted(&self.dir, &salt)?;
         *self.session.lock().unwrap() = Some(Session {
             key,
             password: Zeroizing::new(password.to_string()),
@@ -134,8 +131,8 @@ impl AppState {
         Ok(())
     }
 
-    /// Copia da senha da sessao, para cifra-la com a biometria. Nunca sai do processo.
-    pub(crate) fn senha_da_sessao(&self) -> Result<Zeroizing<String>> {
+    /// Copy of the session password, to encrypt it with biometrics. Never leaves the process.
+    pub(crate) fn session_password(&self) -> Result<Zeroizing<String>> {
         let guard = self.session.lock().unwrap();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         Ok(session.password.clone())
@@ -143,7 +140,7 @@ impl AppState {
 
     pub fn lock(&self) {
         *self.session.lock().unwrap() = None;
-        self.lixeira.esvaziar();
+        self.trash.clear();
     }
 
     pub fn is_unlocked(&self) -> bool {
@@ -156,7 +153,7 @@ impl AppState {
         store::write_json_atomic(&store::vault_path(&self.dir), &blob)
     }
 
-    /// Aplica uma mutacao no cofre destrancado e grava em disco no mesmo passo.
+    /// Applies a mutation to the unlocked vault and persists it in the same step.
     pub fn mutate<T>(&self, f: impl FnOnce(&mut VaultData) -> T) -> Result<T> {
         self.touch();
         let mut guard = self.session.lock().unwrap();
@@ -166,20 +163,19 @@ impl AppState {
         Ok(out)
     }
 
-    /// Para vigias de fundo: nao conta como uso (auto-lock segue correndo) e so grava
-    /// em disco quando a closure diz que mudou algo.
-    pub fn em_fundo<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
+    /// For background watchers: doesn't count as use and only persists when the closure says something changed.
+    pub fn in_background<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
         let mut guard = self.session.lock().unwrap();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
-        let (out, mudou) = f(&mut session.data);
-        if mudou {
+        let (out, changed) = f(&mut session.data);
+        if changed {
             self.persist(session)?;
         }
         Ok(out)
     }
 
-    /// Mutacao do usuario que talvez nao mude nada: grava so se `f` devolver `true`.
-    pub fn mutate_se(&self, f: impl FnOnce(&mut VaultData) -> bool) -> Result<()> {
+    /// User mutation that might change nothing: persists only if `f` returns `true`.
+    pub fn mutate_if(&self, f: impl FnOnce(&mut VaultData) -> bool) -> Result<()> {
         self.touch();
         let mut guard = self.session.lock().unwrap();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
@@ -213,9 +209,8 @@ impl AppState {
         store::write_json_atomic(&store::drive_path(&self.dir), &blob)
     }
 
-    /// Abre um envelope de fora (backup importado) com a senha da sessao. O salt
-    /// e o do envelope: um backup feito em outra maquina tem salt proprio.
-    pub fn abrir_envelope(&self, blob: &SealedBlob) -> Result<VaultData> {
+    /// Uses the envelope's own salt, not the session's: a backup made on another machine has its own salt.
+    pub fn open_envelope(&self, blob: &SealedBlob) -> Result<VaultData> {
         let guard = self.session.lock().unwrap();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let key = VaultKey::derive(&session.password, &blob.salt_bytes()?)?;
@@ -223,7 +218,7 @@ impl AppState {
             AppError::WrongPassword => {
                 AppError::Config("o backup foi criado com outra senha mestra".into())
             }
-            outro => outro,
+            other => other,
         })?;
         Ok(serde_json::from_slice(&plain)?)
     }
@@ -233,9 +228,9 @@ impl AppState {
 mod tests {
     use super::*;
 
-    fn estado(nome: &str) -> AppState {
+    fn state(name: &str) -> AppState {
         let dir = std::env::temp_dir().join(format!(
-            "canto-vault-{nome}-{}-{}",
+            "canto-vault-{name}-{}-{}",
             std::process::id(),
             now_ms()
         ));
@@ -244,33 +239,33 @@ mod tests {
     }
 
     #[test]
-    fn senha_curta_nao_cria_cofre() {
-        let st = estado("curta");
-        assert!(st.create("abc").is_err(), "aceitou senha abaixo do piso");
+    fn short_password_does_not_create_vault() {
+        let st = state("curta");
+        assert!(st.create("abc").is_err(), "accepted a password below the floor");
         assert!(!st.vault_exists());
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
     #[test]
-    fn senha_no_piso_exato_e_aceita() {
-        let st = estado("piso");
-        let senha: String = "a".repeat(MIN_SENHA);
-        st.create(&senha).unwrap();
+    fn password_at_exact_floor_is_accepted() {
+        let st = state("piso");
+        let password: String = "a".repeat(MIN_PASSWORD_LEN);
+        st.create(&password).unwrap();
         assert!(st.is_unlocked());
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
     #[test]
-    fn o_piso_conta_caracteres_e_nao_bytes() {
-        let st = estado("unicode");
-        // 4 caracteres, 16 bytes em UTF-8: precisa passar.
+    fn floor_counts_chars_not_bytes() {
+        let st = state("unicode");
+        // 4 chars, 16 bytes in UTF-8: must pass.
         assert!(st.create("🔐🔐🔐🔐").is_ok());
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
     #[test]
-    fn cofre_criado_abre_com_a_mesma_senha_e_recusa_outra() {
-        let st = estado("abre");
+    fn created_vault_unlocks_with_same_password_and_rejects_another() {
+        let st = state("abre");
         st.create("senha-mestra").unwrap();
         st.lock();
         assert!(matches!(st.unlock("outra-senha"), Err(AppError::WrongPassword)));
@@ -280,51 +275,60 @@ mod tests {
     }
 
     #[test]
-    fn auto_lock_dispara_uma_vez_depois_do_limite() {
-        let st = estado("idle");
+    fn auto_lock_fires_once_past_the_limit() {
+        let st = state("idle");
         st.create("senha-mestra").unwrap();
-        assert!(!st.lock_if_idle(60_000), "trancou com o cofre recem-usado");
+        assert!(!st.lock_if_idle(60_000), "locked a just-used vault");
         *st.last_active.lock().unwrap() = now_ms() - 61_000;
-        assert!(st.lock_if_idle(60_000), "nao trancou apos o limite");
+        assert!(st.lock_if_idle(60_000), "did not lock past the limit");
         assert!(!st.is_unlocked());
-        assert!(!st.lock_if_idle(60_000), "avisou duas vezes pela mesma trancada");
+        assert!(!st.lock_if_idle(60_000), "reported the same lock twice");
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
     #[test]
-    fn uso_do_cofre_adia_o_auto_lock() {
-        let st = estado("adia");
+    fn using_the_vault_postpones_auto_lock() {
+        let st = state("adia");
         st.create("senha-mestra").unwrap();
         *st.last_active.lock().unwrap() = now_ms() - 61_000;
         st.read(|d| d.tasks.len()).unwrap();
-        assert!(!st.lock_if_idle(60_000), "leitura do usuario nao adiou o timer");
+        assert!(!st.lock_if_idle(60_000), "user read did not postpone the timer");
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
     #[test]
-    fn vigia_de_lembretes_nao_adia_o_auto_lock_nem_grava_sem_mudanca() {
-        let st = estado("em-fundo");
+    fn reminder_watcher_does_not_postpone_auto_lock_nor_persist_without_change() {
+        let st = state("em-fundo");
         st.create("senha-mestra").unwrap();
-        let antes = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
+        let before = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
         *st.last_active.lock().unwrap() = now_ms() - 61_000;
         std::thread::sleep(std::time::Duration::from_millis(20));
-        st.em_fundo(|d| (d.tasks.len(), false)).unwrap();
-        let depois = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
-        assert_eq!(antes, depois, "regravou o cofre sem nada mudar");
-        assert!(st.lock_if_idle(60_000), "o vigia de fundo segurou o cofre aberto");
-        assert!(matches!(st.em_fundo(|_| ((), true)), Err(AppError::Locked)));
+        st.in_background(|d| (d.tasks.len(), false)).unwrap();
+        let after = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
+        assert_eq!(before, after, "rewrote the vault with nothing changed");
+        assert!(st.lock_if_idle(60_000), "the background watcher held the vault open");
+        assert!(matches!(st.in_background(|_| ((), true)), Err(AppError::Locked)));
         let _ = std::fs::remove_dir_all(&st.dir);
     }
 
     #[test]
-    fn clipboard_de_fundo_nao_adia_o_auto_lock() {
-        let st = estado("fundo");
+    fn background_clipboard_does_not_postpone_auto_lock() {
+        let st = state("fundo");
         st.create("senha-mestra").unwrap();
         *st.last_active.lock().unwrap() = now_ms() - 61_000;
-        // Polling de fundo: le e grava o historico sem passar por read/mutate.
-        let hist = st.clip_load().unwrap();
-        st.clip_save(&hist).unwrap();
-        assert!(st.lock_if_idle(60_000), "o vigia do clipboard segurou o cofre aberto");
+        // Background poll: reads and writes history without going through read/mutate.
+        let history = st.clip_load().unwrap();
+        st.clip_save(&history).unwrap();
+        assert!(st.lock_if_idle(60_000), "the clipboard watcher held the vault open");
         let _ = std::fs::remove_dir_all(&st.dir);
+    }
+
+    #[test]
+    fn drive_config_deserializes_legacy_portuguese_keys() {
+        let legacy = r#"{"client_id":"id","client_secret":"secret","cliente_proprio":true,"nome":"Ana","email":"a@b.com"}"#;
+        let cfg: DriveConfig = serde_json::from_str(legacy).unwrap();
+        assert!(cfg.owned_client);
+        assert_eq!(cfg.name, "Ana");
+        assert_eq!(cfg.email, "a@b.com");
     }
 }

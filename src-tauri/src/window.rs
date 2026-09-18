@@ -4,17 +4,15 @@ use crate::calendar::AgendaItem;
 
 const MARGIN: f64 = 16.0;
 
-/// Ancora a janela no canto inferior direito do monitor onde ela esta,
-/// respeitando a area util (fora da barra de tarefas / dock).
 pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
-    if let Some((x, y)) = posicao_ancorada(win)? {
+    if let Some((x, y)) = anchored_position(win)? {
         win.set_position(LogicalPosition::new(x, y))?;
     }
     Ok(())
 }
 
-/// Onde a janela fica quando ancorada no canto do monitor atual, em pixels logicos.
-pub fn posicao_ancorada(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
+/// Where the window sits when anchored to the current monitor's corner, in logical pixels.
+pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
     let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
         return Ok(None);
     };
@@ -37,41 +35,39 @@ pub fn toggle(app: &tauri::AppHandle) -> tauri::Result<()> {
         win.hide()?;
         return Ok(());
     }
-    mostrar(app)
+    show(app)
 }
 
-/// Traz o widget para a frente, ancorado no canto do monitor atual.
-pub fn mostrar(app: &tauri::AppHandle) -> tauri::Result<()> {
+pub fn show(app: &tauri::AppHandle) -> tauri::Result<()> {
     let Some(win) = app.get_webview_window("main") else {
         return Ok(());
     };
-    crate::janela::posicionar(&win)?;
+    crate::window_state::place(&win)?;
     win.show()?;
     win.set_focus()?;
     Ok(())
 }
 
-pub const EVENTO_ALERTA: &str = "canto://alerta";
+pub const ALERT_EVENT: &str = "canto://alert";
 
-/// Aviso de reuniao: guarda o evento, traz o widget para a frente e avisa a UI.
-/// Um overlay na propria janela evita depender de criar webview em runtime,
-/// que se comporta de forma diferente em cada plataforma.
-pub fn abrir_alerta(app: &tauri::AppHandle, evento: AgendaItem) -> tauri::Result<()> {
+/// An overlay on the window itself avoids depending on creating a webview at runtime, which behaves differently on each platform.
+pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()> {
+    crate::notification::send(app, &event);
     if let Some(state) = app.try_state::<crate::vault::AppState>() {
-        *state.alerta.lock().unwrap() = Some(evento);
+        *state.alert.lock().unwrap() = Some(event);
     }
     if let Some(win) = app.get_webview_window("main") {
-        crate::janela::posicionar(&win)?;
+        crate::window_state::place(&win)?;
         win.show()?;
         win.set_focus()?;
     }
-    app.emit(EVENTO_ALERTA, ())?;
+    app.emit(ALERT_EVENT, ())?;
     Ok(())
 }
 
-pub fn fechar_alerta(app: &tauri::AppHandle) -> tauri::Result<()> {
+pub fn close_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
     if let Some(state) = app.try_state::<crate::vault::AppState>() {
-        *state.alerta.lock().unwrap() = None;
+        *state.alert.lock().unwrap() = None;
     }
     Ok(())
 }

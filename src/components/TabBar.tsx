@@ -1,44 +1,45 @@
 import { useRef } from "react";
 
-export type Tab = "tarefas" | "notas" | "clipboard" | "reunioes" | "agenda" | "ajustes";
+export type Tab = "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "settings";
 
-export const TABS: { id: Tab; rotulo: string }[] = [
-  { id: "tarefas", rotulo: "Tarefas" },
-  { id: "notas", rotulo: "Notas" },
-  { id: "clipboard", rotulo: "Clipboard" },
-  { id: "reunioes", rotulo: "Reuniões" },
-  { id: "agenda", rotulo: "Agenda" },
-  { id: "ajustes", rotulo: "Ajustes" },
+export const TABS: { id: Tab; label: string }[] = [
+  { id: "tasks", label: "Tarefas" },
+  { id: "notes", label: "Notas" },
+  { id: "clipboard", label: "Clipboard" },
+  { id: "meetings", label: "Reuniões" },
+  { id: "agenda", label: "Agenda" },
+  { id: "github", label: "GitHub" },
+  { id: "settings", label: "Ajustes" },
 ];
 
-export const painelId = (t: Tab) => `painel-${t}`;
-const abaId = (t: Tab) => `aba-${t}`;
+export const panelId = (t: Tab) => `panel-${t}`;
+const tabId = (t: Tab) => `aba-${t}`;
 
-/** Padrão de abas do WAI-ARIA APG: uma parada de Tab, setas/Home/End trocam de aba. */
-export default function TabBar({ atual, onChange }: { atual: Tab; onChange: (t: Tab) => void }) {
+/** WAI-ARIA APG tabs pattern: one Tab stop, arrows/Home/End switch tabs. */
+export default function TabBar({ current, onChange }: { current: Tab; onChange: (t: Tab) => void }) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
-  function aoTeclar(e: React.KeyboardEvent) {
-    const i = TABS.findIndex((t) => t.id === atual);
-    const destino = {
+  function onKeyDown(e: React.KeyboardEvent) {
+    const i = TABS.findIndex((t) => t.id === current);
+    const target = {
       ArrowRight: (i + 1) % TABS.length,
       ArrowLeft: (i - 1 + TABS.length) % TABS.length,
       Home: 0,
       End: TABS.length - 1,
     }[e.key];
-    if (destino === undefined) return;
+    if (target === undefined) return;
     e.preventDefault();
-    const alvo = TABS[destino].id;
-    onChange(alvo);
-    refs.current[alvo]?.focus();
+    const next = TABS[target].id;
+    onChange(next);
+    refs.current[next]?.focus();
   }
 
   return (
     <nav
       role="tablist"
       aria-label="seções do widget"
-      onKeyDown={aoTeclar}
-      className="flex shrink-0 gap-1 overflow-x-auto px-3 pt-2 text-xs"
+      onKeyDown={onKeyDown}
+      className="flex shrink-0 gap-0.5 overflow-x-auto px-3 pt-2 text-xs"
     >
       {TABS.map((t, i) => (
         <button
@@ -46,20 +47,20 @@ export default function TabBar({ atual, onChange }: { atual: Tab; onChange: (t: 
           ref={(el) => {
             refs.current[t.id] = el;
           }}
-          id={abaId(t.id)}
+          id={tabId(t.id)}
           type="button"
           role="tab"
-          aria-selected={atual === t.id}
-          // So o painel ativo existe no DOM; apontar para os outros seria referencia quebrada.
-          aria-controls={atual === t.id ? painelId(t.id) : undefined}
-          tabIndex={atual === t.id ? 0 : -1}
+          aria-selected={current === t.id}
+          // Only the active panel exists in the DOM; pointing at the others would be a broken reference.
+          aria-controls={current === t.id ? panelId(t.id) : undefined}
+          tabIndex={current === t.id ? 0 : -1}
           onClick={() => onChange(t.id)}
           title={`Alt+${i + 1}`}
-          className={`min-h-7 shrink-0 rounded-lg px-2.5 ${
-            atual === t.id ? "bg-edge font-semibold text-fg" : "text-muted hover:text-fg"
+          className={`min-h-7 shrink-0 rounded-lg px-1.5 ${
+            current === t.id ? "bg-edge font-semibold text-fg" : "text-muted hover:text-fg"
           }`}
         >
-          {t.rotulo}
+          {t.label}
         </button>
       ))}
     </nav>

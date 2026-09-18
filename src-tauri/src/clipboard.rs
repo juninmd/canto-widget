@@ -6,9 +6,11 @@ use crate::store::{self, SealedBlob};
 use crate::vault::AppState;
 
 pub const CLIP_AAD: &[u8] = b"canto.clip.v1";
-/// Historico local, nunca sincronizado: fica so nesta maquina, sempre cifrado.
-const MAX_ITENS: usize = 100;
-const MAX_CHARS: usize = 8_000;
+const MAX_ITEMS: usize = 100;
+pub const MAX_CHARS: usize = 32_000;
+// Unpinned total kept on disk: every copy re-seals the whole history, so it must stay small.
+const BUDGET_CHARS: usize = 1_000_000;
+pub const PREVIEW_CHARS: usize = 500;
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct ClipHistory {
@@ -23,42 +25,67 @@ pub struct ClipItem {
     pub copied_at: i64,
     #[serde(default)]
     pub pinned: bool,
+    // Size of what was really copied; 0 in items saved before the cap existed.
+    #[serde(default)]
+    pub chars: usize,
+}
+
+#[derive(Debug, Serialize)]
+pub struct ClipView {
+    pub id: String,
+    pub preview: String,
+    pub chars: usize,
+    pub kept: usize,
+    pub truncated: bool,
+    pub copied_at: i64,
+    pub pinned: bool,
+}
+
+impl From<&ClipItem> for ClipView {
+    fn from(i: &ClipItem) -> Self {
+        let stored = i.text.chars().count();
+        ClipView {
+            id: i.id.clone(),
+            preview: i.text.chars().take(PREVIEW_CHARS).collect(),
+            chars: i.chars.max(stored),
+            kept: stored,
+            truncated: i.chars > stored,
+            copied_at: i.copied_at,
+            pinned: i.pinned,
+        }
+    }
 }
 
 impl ClipHistory {
-    /// Insere o texto no topo; repetido sobe em vez de duplicar.
     pub fn push(&mut self, text: &str, id: String) -> bool {
         let text = text.trim();
         if text.is_empty() {
             return false;
         }
+        let chars = text.chars().count();
         let text: String = text.chars().take(MAX_CHARS).collect();
-        if self.items.first().is_some_and(|i| i.text == text) {
+        if self.items.first().is_some_and(|i| i.text == text && i.chars.max(chars) == chars) {
             return false;
         }
+        let pinned = self.items.iter().any(|i| i.text == text && i.pinned);
         self.items.retain(|i| i.text != text);
-        self.items.insert(
-            0,
-            ClipItem {
-                id,
-                text,
-                copied_at: now_ms(),
-                pinned: false,
-            },
-        );
-        self.podar();
+        self.items.insert(0, ClipItem { id, text, copied_at: now_ms(), pinned, chars });
+        self.prune();
         true
     }
 
-    /// Fixados nao contam para o limite.
-    pub(crate) fn podar(&mut self) {
-        let mut kept = 0;
+    pub(crate) fn prune(&mut self) {
+        let (mut kept, mut used) = (0, 0);
+        let mut first = true;
         self.items.retain(|i| {
             if i.pinned {
                 return true;
             }
             kept += 1;
-            kept <= MAX_ITENS
+            used += i.text.chars().count();
+            let keep = first || (kept <= MAX_ITEMS && used <= BUDGET_CHARS);
+            first = false;
+            keep
         });
     }
 }
@@ -73,7 +100,7 @@ impl AppState {
             None => Ok(ClipHistory::default()),
             Some(blob) => match blob.open(session.key(), CLIP_AAD) {
                 Ok(plain) => Ok(serde_json::from_slice(&plain)?),
-                // Historico e descartavel: um envelope ilegivel nao trava o widget.
+                // History is disposable: an unreadable envelope must not lock up the widget.
                 Err(_) => Ok(ClipHistory::default()),
             },
         }
@@ -91,65 +118,5 @@ impl AppState {
 }
 
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn hist(textos: &[&str]) -> ClipHistory {
-        let mut h = ClipHistory::default();
-        for (i, t) in textos.iter().enumerate() {
-            h.push(t, format!("id{i}"));
-        }
-        h
-    }
-
-    #[test]
-    fn mais_recente_fica_no_topo() {
-        let h = hist(&["um", "dois"]);
-        assert_eq!(h.items[0].text, "dois");
-        assert_eq!(h.items.len(), 2);
-    }
-
-    #[test]
-    fn repetido_sobe_sem_duplicar() {
-        let mut h = hist(&["um", "dois"]);
-        assert!(h.push("um", "novo".into()));
-        assert_eq!(h.items.len(), 2);
-        assert_eq!(h.items[0].text, "um");
-    }
-
-    #[test]
-    fn ignora_vazio_e_o_mesmo_texto_seguido() {
-        let mut h = hist(&["um"]);
-        assert!(!h.push("   ", "x".into()));
-        assert!(!h.push("um", "y".into()));
-        assert_eq!(h.items.len(), 1);
-    }
-
-    #[test]
-    fn respeita_o_teto_de_itens() {
-        let mut h = ClipHistory::default();
-        for i in 0..(MAX_ITENS + 20) {
-            h.push(&format!("item {i}"), format!("id{i}"));
-        }
-        assert_eq!(h.items.len(), MAX_ITENS);
-        assert_eq!(h.items[0].text, format!("item {}", MAX_ITENS + 19));
-    }
-
-    #[test]
-    fn fixados_sobrevivem_ao_teto() {
-        let mut h = ClipHistory::default();
-        h.push("guardar isto", "fixo".into());
-        h.items[0].pinned = true;
-        for i in 0..(MAX_ITENS + 10) {
-            h.push(&format!("ruido {i}"), format!("id{i}"));
-        }
-        assert!(h.items.iter().any(|i| i.text == "guardar isto"));
-    }
-
-    #[test]
-    fn texto_gigante_e_truncado() {
-        let mut h = ClipHistory::default();
-        h.push(&"a".repeat(MAX_CHARS * 2), "big".into());
-        assert_eq!(h.items[0].text.chars().count(), MAX_CHARS);
-    }
-}
+#[path = "clipboard_tests.rs"]
+mod tests;

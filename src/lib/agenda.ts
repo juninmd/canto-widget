@@ -1,54 +1,54 @@
 import type { AgendaItem } from "./api";
 
-/** Janela do dia local em RFC3339, do zero-hora ao fim do dia. */
-export function janelaDoDia(agora = new Date()): { timeMin: string; timeMax: string } {
-  const inicio = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 0, 0, 0);
-  const fim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 23, 59, 59);
-  return { timeMin: inicio.toISOString(), timeMax: fim.toISOString() };
+/** Day window in RFC3339, from midnight to the end of the day. */
+export function dayWindow(now = new Date()): { timeMin: string; timeMax: string } {
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+  return { timeMin: start.toISOString(), timeMax: end.toISOString() };
 }
 
-export function hora(item: AgendaItem): string {
-  if (item.dia_inteiro) return "dia inteiro";
-  const d = new Date(item.inicio);
+export function hour(item: AgendaItem): string {
+  if (item.all_day) return "dia inteiro";
+  const d = new Date(item.start);
   return Number.isNaN(d.getTime())
-    ? item.inicio
-    : d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    ? item.start
+    : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Minutos que faltam para o evento começar (negativo se já começou). */
-export function minutosAte(item: AgendaItem, agora = new Date()): number {
-  if (item.dia_inteiro) return Number.POSITIVE_INFINITY;
-  const inicio = new Date(item.inicio).getTime();
-  if (Number.isNaN(inicio)) return Number.POSITIVE_INFINITY;
-  return (inicio - agora.getTime()) / 60000;
+/** Minutes until the event starts (negative if it has already started). */
+export function minutesUntil(item: AgendaItem, now = new Date()): number {
+  if (item.all_day) return Number.POSITIVE_INFINITY;
+  const start = new Date(item.start).getTime();
+  if (Number.isNaN(start)) return Number.POSITIVE_INFINITY;
+  return (start - now.getTime()) / 60000;
 }
 
 /**
- * Eventos que merecem o pop-up agora: começam dentro de `antecedencia` minutos,
- * ainda não começaram há mais de 2 min, e nunca foram alertados nesta sessão.
+ * Events that deserve the pop-up now: start within `leadTime` minutes,
+ * haven't started more than 2 min ago, and were never alerted this session.
  */
-export function paraAlertar(
-  itens: AgendaItem[],
-  jaAlertados: Set<string>,
-  agora = new Date(),
-  antecedencia = 1,
+export function shouldAlert(
+  items: AgendaItem[],
+  alreadyAlerted: Set<string>,
+  now = new Date(),
+  leadTime = 1,
 ): AgendaItem[] {
-  return itens.filter((i) => {
-    if (jaAlertados.has(i.id)) return false;
-    const m = minutosAte(i, agora);
-    return m <= antecedencia && m > -2;
+  return items.filter((i) => {
+    if (alreadyAlerted.has(i.id)) return false;
+    const m = minutesUntil(i, now);
+    return m <= leadTime && m > -2;
   });
 }
 
-/** Rótulo de leitura rápida: a cor sozinha não pode ser o único sinal de "agora" (WCAG 1.4.1). */
-export function situacao(item: AgendaItem, agora = new Date()): { rotulo: string; agora: boolean } {
-  const faltam = minutosAte(item, agora);
-  if (!Number.isFinite(faltam)) return { rotulo: "", agora: false };
-  const fim = new Date(item.fim).getTime();
-  const acabou = Number.isNaN(fim) ? faltam <= -60 : fim <= agora.getTime();
-  if (acabou) return { rotulo: "encerrado", agora: false };
-  if (faltam <= 0) return { rotulo: "agora", agora: true };
-  const min = Math.ceil(faltam);
+/** Quick-read label: color alone can't be the only signal for "now" (WCAG 1.4.1). */
+export function status(item: AgendaItem, now = new Date()): { label: string; now: boolean } {
+  const remaining = minutesUntil(item, now);
+  if (!Number.isFinite(remaining)) return { label: "", now: false };
+  const end = new Date(item.end).getTime();
+  const ended = Number.isNaN(end) ? remaining <= -60 : end <= now.getTime();
+  if (ended) return { label: "encerrado", now: false };
+  if (remaining <= 0) return { label: "agora", now: true };
+  const min = Math.ceil(remaining);
   const h = Math.floor(min / 60);
-  return { rotulo: h ? `em ${h}h${String(min % 60).padStart(2, "0")}` : `em ${min} min`, agora: false };
+  return { label: h ? `em ${h}h${String(min % 60).padStart(2, "0")}` : `em ${min} min`, now: false };
 }

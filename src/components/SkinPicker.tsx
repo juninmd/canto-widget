@@ -1,45 +1,35 @@
-import { useEffect, useState } from "react";
-import { applySkin, loadSkin, seguirSistema, SKINS, type SkinId } from "../lib/theme";
+import { useState } from "react";
+import { applySkin, loadSkin, SKINS, type SkinId } from "../lib/theme";
 
+/** Lives in Settings: name visible next to the swatch, instead of loose dots in the header. */
 export default function SkinPicker() {
-  const [skin, setSkin] = useState<SkinId>("padrao");
-
-  useEffect(() => {
-    const inicial = loadSkin();
-    setSkin(inicial);
-    applySkin(inicial);
-  }, []);
-
-  useEffect(() => {
-    if (skin !== "sistema") return;
-    return seguirSistema(() => applySkin("sistema"));
-  }, [skin]);
+  const [skin, setSkin] = useState<SkinId>(loadSkin);
 
   return (
-    <div className="flex items-center" role="radiogroup" aria-label="skin do widget">
-      {SKINS.map((s) => (
-        <button
-          key={s.id}
-          type="button"
-          role="radio"
-          aria-checked={skin === s.id}
-          title={s.nome}
-          aria-label={s.nome}
-          onClick={() => {
-            setSkin(s.id);
-            applySkin(s.id);
-          }}
-          // Area de clique de 24px (WCAG 2.5.8) com a bolinha visual de 12px.
-          className="group/skin grid size-6 place-items-center rounded-full"
-        >
-          <span
-            className={`size-3 rounded-full border transition ${
-              skin === s.id ? "border-fg scale-110" : "border-edge opacity-60 group-hover/skin:opacity-100"
+    <section className="flex flex-col gap-2">
+      <h3 id="appearance-title" className="text-xs font-semibold text-fg">
+        Aparência
+      </h3>
+      <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-labelledby="appearance-title">
+        {SKINS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            role="radio"
+            aria-checked={skin === s.id}
+            onClick={() => {
+              setSkin(s.id);
+              applySkin(s.id);
+            }}
+            className={`flex min-h-7 items-center gap-2 rounded-lg border px-2.5 text-xs ${
+              skin === s.id ? "border-accent text-fg" : "border-edge text-muted hover:text-fg"
             }`}
-            style={{ background: s.amostra }}
-          />
-        </button>
-      ))}
-    </div>
+          >
+            <span className="size-3 shrink-0 rounded-full border border-edge" style={{ background: s.sample }} />
+            {s.name}
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
