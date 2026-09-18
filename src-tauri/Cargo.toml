@@ -3,7 +3,7 @@ name = "canto-widget"
 version = "0.1.0"
 description = "Widget de tarefas e notas criptografadas, com backup cifrado local"
 edition = "2021"
-rust-version = "1.82"
+rust-version = "1.85"
 
 [lib]
 name = "canto_widget_lib"
@@ -20,13 +20,15 @@ tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 thiserror = "2"
-aes-gcm = "0.10"
-argon2 = "0.5"
-rand = "0.8"
-base64 = "0.22"
+aes-gcm = { version = "0.11", features = ["zeroize"] }
+argon2 = "0.6"
+rand = "0.10"
+base64 = "0.23"
 zeroize = { version = "1", features = ["derive"] }
-sha2 = "0.10"
-reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+sha2 = "0.11"
+# Same TLS setup as tauri-plugin-updater: rustls with ring, so one HTTP stack and no aws-lc build.
+reqwest = { version = "0.13", default-features = false, features = ["json", "blocking", "query", "form", "rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring"] }
 url = "2"
 time = "0.3"
 tauri-plugin-global-shortcut = "2.3.2"

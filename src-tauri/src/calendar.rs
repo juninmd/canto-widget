@@ -38,7 +38,7 @@ pub struct Attachment {
 }
 
 pub fn events(token: &str, time_min: &str, time_max: &str, max_results: u32) -> Result<Vec<AgendaItem>> {
-    let res = reqwest::blocking::Client::builder()
+    let res = crate::net::client_builder()
         .timeout(std::time::Duration::from_secs(30))
         .build()
         .map_err(|e| AppError::Drive(e.to_string()))?

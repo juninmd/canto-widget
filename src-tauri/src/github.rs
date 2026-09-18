@@ -105,7 +105,7 @@ pub(crate) fn client() -> Result<reqwest::blocking::Client> {
     let mut h = HeaderMap::new();
     h.insert(ACCEPT, HeaderValue::from_static("application/vnd.github+json"));
     h.insert("X-GitHub-Api-Version", HeaderValue::from_static("2022-11-28"));
-    reqwest::blocking::Client::builder()
+    crate::net::client_builder()
         .user_agent("canto-widget")
         .default_headers(h)
         .timeout(Duration::from_secs(20))

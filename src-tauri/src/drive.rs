@@ -23,7 +23,7 @@ struct TokenResponse {
 }
 
 fn client() -> Result<reqwest::blocking::Client> {
-    reqwest::blocking::Client::builder()
+    crate::net::client_builder()
         .timeout(Duration::from_secs(30))
         .build()
         .map_err(|e| AppError::Drive(e.to_string()))

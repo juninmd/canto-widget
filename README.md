@@ -217,7 +217,7 @@ Achou uma falha? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Desenvolvimento
 
-Pré-requisitos: [Bun](https://bun.sh) ≥ 1.2, Rust estável ≥ 1.82 e as
+Pré-requisitos: [Bun](https://bun.sh) ≥ 1.2, Rust estável ≥ 1.85 e as
 [dependências do Tauri v2](https://v2.tauri.app/start/prerequisites/) do seu sistema.
 
 ```bash

@@ -1,7 +1,7 @@
-use aes_gcm::aead::{Aead, AeadCore, KeyInit, OsRng};
+use aes_gcm::aead::{Aead, Generate, KeyInit};
 use aes_gcm::{Aes256Gcm, Key, Nonce};
 use argon2::{Algorithm, Argon2, Params, Version};
-use rand::RngCore;
+use rand::{rngs::SysRng, TryRng};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::error::{AppError, Result};
@@ -39,12 +39,16 @@ impl VaultKey {
         VaultKey(bytes)
     }
 
+    /// The `zeroize` feature wipes the cipher's key schedule on drop; the temporary key copy is wiped here.
     fn cipher(&self) -> Aes256Gcm {
-        Aes256Gcm::new(Key::<Aes256Gcm>::from_slice(&self.0))
+        let mut key = Key::<Aes256Gcm>::from(self.0);
+        let cipher = Aes256Gcm::new(&key);
+        key.zeroize();
+        cipher
     }
 
     pub fn encrypt(&self, plaintext: &[u8], aad: &[u8]) -> Result<(Vec<u8>, Vec<u8>)> {
-        let nonce = Aes256Gcm::generate_nonce(&mut OsRng);
+        let nonce = Nonce::generate();
         let ciphertext = self
             .cipher()
             .encrypt(
@@ -59,12 +63,10 @@ impl VaultKey {
     }
 
     pub fn decrypt(&self, nonce: &[u8], ciphertext: &[u8], aad: &[u8]) -> Result<Vec<u8>> {
-        if nonce.len() != NONCE_LEN {
-            return Err(AppError::Crypto("nonce com tamanho invalido".into()));
-        }
+        let nonce = Nonce::try_from(nonce).map_err(|_| AppError::Crypto("nonce com tamanho invalido".into()))?;
         self.cipher()
             .decrypt(
-                Nonce::from_slice(nonce),
+                &nonce,
                 aes_gcm::aead::Payload {
                     msg: ciphertext,
                     aad,
@@ -76,7 +78,8 @@ impl VaultKey {
 
 pub fn random_salt() -> [u8; SALT_LEN] {
     let mut salt = [0u8; SALT_LEN];
-    OsRng.fill_bytes(&mut salt);
+    // Same failure mode as rand 0.8's OsRng, which panicked too: no OS entropy means no safe salt.
+    SysRng.try_fill_bytes(&mut salt).expect("o sistema nao forneceu aleatoriedade");
     salt
 }
 
@@ -85,6 +88,12 @@ mod tests {
     use super::*;
 
     const AAD: &[u8] = b"canto.v1";
+
+    #[test]
+    fn the_cipher_wipes_its_key_schedule_on_drop() {
+        fn wiped_on_drop<T: zeroize::ZeroizeOnDrop>() {}
+        wiped_on_drop::<Aes256Gcm>();
+    }
 
     #[test]
     fn roundtrip_recovers_the_original_text() {

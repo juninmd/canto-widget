@@ -8,8 +8,8 @@ local vault. Public repository: treat everything you write, commit or screenshot
 
 | Layer | Tech |
 |---|---|
-| Shell | Tauri 2.11, Rust 2021 (MSRV 1.82), `src-tauri/` |
-| UI | React 19 + TypeScript + Vite 7 + Tailwind v4, `src/` |
+| Shell | Tauri 2.11, Rust 2021 (MSRV 1.85), `src-tauri/` |
+| UI | React 19 + TypeScript 7 + Vite 8 + Tailwind v4, `src/` |
 | Package manager | **bun** (`bun.lock`); never npm/yarn/pnpm |
 | UI tests | `bun test` (happy-dom, preload `src/test-setup.ts`) |
 

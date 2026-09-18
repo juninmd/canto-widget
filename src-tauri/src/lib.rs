@@ -26,6 +26,7 @@ pub mod github_query;
 pub mod hello;
 pub mod meet;
 pub mod model;
+pub mod net;
 pub mod notification;
 pub mod oauth;
 pub mod plain_text;

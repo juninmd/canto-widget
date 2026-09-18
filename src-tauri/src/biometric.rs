@@ -50,7 +50,7 @@ fn derive_key(signature: &[u8]) -> VaultKey {
 
 pub fn enable(dir: &Path, password: &str, signer: &dyn Signer) -> Result<()> {
     let mut challenge = [0u8; 32];
-    rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut challenge);
+    rand::fill(&mut challenge);
     let signature = Zeroizing::new(signer.sign(&challenge)?);
     let (nonce, ciphertext) = derive_key(&signature).encrypt(password.as_bytes(), AAD)?;
     let env = Envelope {
@@ -163,7 +163,7 @@ mod tests {
     impl Signer for Unstable {
         fn sign(&self, challenge: &[u8]) -> Result<Vec<u8>> {
             let mut salt = [0u8; 16];
-            rand::RngCore::fill_bytes(&mut rand::thread_rng(), &mut salt);
+            rand::fill(&mut salt);
             Ok(Sha256::new().chain_update(salt).chain_update(challenge).finalize().to_vec())
         }
     }
