@@ -1,9 +1,13 @@
 # Changelog
 
 Mudanças visíveis para quem usa o Canto. Formato [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/),
-versões em [SemVer](https://semver.org/lang/pt-BR/). Ainda não houve release público: tudo abaixo entra no primeiro.
+versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
+
+## [0.1.0] - 2026-09-18
+
+Primeiro release público.
 
 ### Adicionado
 
