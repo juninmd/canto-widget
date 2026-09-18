@@ -52,3 +52,13 @@ export function status(item: AgendaItem, now = new Date()): { label: string; now
   const h = Math.floor(min / 60);
   return { label: h ? `em ${h}h${String(min % 60).padStart(2, "0")}` : `em ${min} min`, now: false };
 }
+
+/** "organizado por Ana · criado por Bruno · 5 convidados"; the creator only shows when it isn't the organizer. */
+export function people(item: AgendaItem): string {
+  const parts: string[] = [];
+  if (item.organizer) parts.push(`organizado por ${item.organizer}`);
+  if (item.creator && item.creator !== item.organizer) parts.push(`criado por ${item.creator}`);
+  const guests = item.guests ?? 0;
+  if (guests > 0) parts.push(guests === 1 ? "1 convidado" : `${guests} convidados`);
+  return parts.join(" · ");
+}

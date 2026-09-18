@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
 use crate::error::{AppError, Result};
+use crate::github_query::{self as query, queries, GithubFilter, Section};
 
 const API: &str = "https://api.github.com";
 const PER_PAGE: usize = 30;
@@ -21,7 +22,7 @@ pub struct GithubItem {
 
 #[derive(Debug, Default, Serialize, PartialEq)]
 pub struct GithubList {
-    /// Total on GitHub; `items` only carries the first page.
+    /// Total on GitHub; `items` only carries the requested page.
     pub total: u64,
     pub items: Vec<GithubItem>,
 }
@@ -66,21 +67,22 @@ pub struct GithubUser {
     pub login: String,
 }
 
-/// The search requires an explicit `is:issue` or `is:pr`; that's why "assigned" is two queries.
-const ASSIGNED_ISSUES: &str = "is:open is:issue archived:false assignee:@me";
-const ASSIGNED_PRS: &str = "is:open is:pr archived:false assignee:@me";
-const MY_PRS: &str = "is:open is:pr archived:false author:@me";
-const REVIEW_REQUESTED: &str = "is:open is:pr archived:false review-requested:@me";
-const MY_ISSUES: &str = "is:open is:issue archived:false author:@me";
-
-pub fn lists(token: &str) -> Result<GithubLists> {
-    let (issues, prs) = (search(token, ASSIGNED_ISSUES)?, search(token, ASSIGNED_PRS)?);
+pub fn lists(token: &str, filter: &GithubFilter) -> Result<GithubLists> {
     Ok(GithubLists {
-        assigned: merge(issues, prs),
-        my_prs: search(token, MY_PRS)?,
-        review_requested: search(token, REVIEW_REQUESTED)?,
-        my_issues: search(token, MY_ISSUES)?,
+        assigned: section(token, Section::Assigned, 1, filter)?,
+        my_prs: section(token, Section::MyPrs, 1, filter)?,
+        review_requested: section(token, Section::ReviewRequested, 1, filter)?,
+        my_issues: section(token, Section::MyIssues, 1, filter)?,
     })
+}
+
+/// One page of a section; "assigned" pages issues and PRs side by side, so a page may bring up to 60.
+pub fn section(token: &str, section: Section, page: u32, filter: &GithubFilter) -> Result<GithubList> {
+    let mut out = GithubList::default();
+    for q in queries(section, filter) {
+        out = merge(out, search(token, &q, query::page(page))?);
+    }
+    Ok(out)
 }
 
 pub fn user(token: &str) -> Result<String> {
@@ -88,10 +90,10 @@ pub fn user(token: &str) -> Result<String> {
     Ok(response::<GithubUser>(res)?.login)
 }
 
-fn search(token: &str, query: &str) -> Result<GithubList> {
+fn search(token: &str, query: &str, page: u32) -> Result<GithubList> {
     let url = url::Url::parse_with_params(
         &format!("{API}/search/issues"),
-        [("q", query), ("sort", "updated"), ("order", "desc"), ("per_page", &PER_PAGE.to_string())],
+        [("q", query), ("sort", "updated"), ("order", "desc"), ("per_page", &PER_PAGE.to_string()), ("page", &page.to_string())],
     )
     .map_err(|e| AppError::Github(e.to_string()))?;
     let res = client()?.get(url).bearer_auth(token).send().map_err(network)?;
@@ -152,11 +154,11 @@ fn item(b: RawItem) -> Option<GithubItem> {
 }
 
 /// The queries don't overlap (one is `is:issue`, the other `is:pr`): just concatenate.
+/// No cap: dropping the tail of a page would make "show more" skip those items for good.
 fn merge(a: GithubList, b: GithubList) -> GithubList {
     let mut items: Vec<GithubItem> = a.items.into_iter().chain(b.items).collect();
     // RFC 3339 in UTC sorts as text.
     items.sort_by(|x, y| y.updated_at.cmp(&x.updated_at));
-    items.truncate(PER_PAGE);
     GithubList { total: a.total + b.total, items }
 }
 

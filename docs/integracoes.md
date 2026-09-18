@@ -20,11 +20,26 @@ ainda carrega o escopo `drive.appdata`. **sair** e entrar de novo para ficar só
 agenda. O `vault.enc` antigo (cifrado) segue na pasta oculta do app no Drive até ser apagado em
 Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 
+### Anotações e transcrições do Gemini
+
+O Canto não gera transcrições. Quando alguém liga **Take notes for me** (anotações do Gemini) ou a transcrição
+no Meet, o Gemini salva um Google Doc no Drive do organizador e o anexa ao evento. A aba **reuniões** lista esses
+documentos (anexos cujo título cita Gemini ou transcrição) das reuniões dos últimos 14 dias, e a aba **agenda**
+os mostra nos detalhes do evento; clicar abre o documento no navegador. Mostrar o texto dentro do widget exigiria o escopo `drive.readonly`, que o Google classifica como
+restrito e que obrigaria uma auditoria de segurança paga para um app público; por isso o Canto fica só com
+`calendar.events.readonly`. Para pesquisar o texto no Canto, exporte o documento (`.txt` ou `.md`) para a
+pasta da aba **reuniões**.
+
 ## GitHub (opcional)
 
 A aba **github** lista o que está aberto e é seu: **revisão pedida a mim**, **atribuídos a mim** (issues e PRs),
-**PRs que eu abri** e **issues que eu abri**, cada lista com o total no GitHub e até 30 itens, do mais recente
-para o mais antigo. Clicar abre no navegador. **atualizar** refaz as 5 buscas (a API de busca permite 30 por minuto).
+**PRs que eu abri** e **issues que eu abri**, cada lista com o total no GitHub e 30 itens por vez, do mais recente
+para o mais antigo; **mostrar mais** traz a próxima página daquela lista, até o limite de 1.000 resultados da busca.
+Clicar abre no navegador. **atualizar** refaz as 5 buscas (a API de busca permite 30 por minuto).
+
+O campo **filtrar** entra na busca do GitHub quando você aperta `Enter`, e aceita texto livre e qualificadores
+como `repo:dono/nome`, `label:bug` ou `org:acme`. Os botões **tudo · PRs · issues** escondem as listas que não
+têm aquele tipo e não gastam busca com elas.
 
 Duas formas de conectar:
 

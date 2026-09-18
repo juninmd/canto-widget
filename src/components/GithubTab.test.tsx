@@ -99,3 +99,71 @@ test("the card names who opened it only when it isn't me, and marks PR vs issue"
   expect(screen.getByRole("img", { name: "PR rascunho" })).toBeTruthy();
   expect(screen.getByRole("img", { name: "issue" })).toBeTruthy();
 });
+
+const connected = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: false });
+const lists = (over = {}) => ({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty, ...over });
+
+test("while GitHub answers, the tab shows a busy skeleton instead of a blank area", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => new Promise(() => {});
+  await mount();
+  expect(screen.getByRole("status", { name: "carregando issues e PRs" }).getAttribute("aria-busy")).toBe("true");
+});
+
+test("show more fetches the next page of that section only and skips repeats", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 3, items: [item] } }));
+  const next = { ...item, url: "https://github.com/octo/canto/pull/43", number: 43, title: "Segundo PR" };
+  responses.github_section = () => Promise.resolve({ total: 3, items: [item, next] });
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByText("mostrar mais (2 restantes)"));
+  });
+  expect(calls.find((c) => c.cmd === "github_section")?.args).toEqual({ section: "my_prs", page: 2, filter: { text: "", kind: "all" } });
+  expect(screen.getAllByText("Revisar o cofre")).toHaveLength(1);
+  expect(screen.getByText("Segundo PR")).toBeTruthy();
+  expect(screen.getByText("mostrar mais (1 restantes)")).toBeTruthy();
+});
+
+test("the filter goes to the search and the issues chip hides PR-only sections", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists());
+  await mount();
+  fireEvent.change(screen.getByLabelText("Filtrar issues e PRs"), { target: { value: " repo:acme/atlas " } });
+  await act(async () => {
+    fireEvent.click(screen.getByText("issues"));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  expect(calls.filter((c) => c.cmd === "github_lists").at(-1)?.args).toEqual({ filter: { text: "repo:acme/atlas", kind: "issue" } });
+  expect(screen.queryByRole("region", { name: "Revisão pedida a mim" })).toBeNull();
+  expect(screen.getByRole("region", { name: "Issues que eu abri" })).toBeTruthy();
+  expect(screen.getAllByText("nada com esse filtro").length).toBeGreaterThan(0);
+});
+
+test("a slow answer for an old filter never replaces the current list", async () => {
+  responses.github_status = connected;
+  let releaseOld: (v: unknown) => void = () => {};
+  responses.github_lists = () => new Promise((r) => (releaseOld = r));
+  await mount();
+  responses.github_lists = () => Promise.resolve(lists({ my_issues: { total: 1, items: [{ ...item, title: "Atual" }] } }));
+  await act(async () => {
+    fireEvent.click(screen.getByText("issues"));
+  });
+  await act(async () => releaseOld(lists({ my_issues: { total: 1, items: [{ ...item, title: "Velho" }] } })));
+  expect(screen.getByText("Atual")).toBeTruthy();
+  expect(screen.queryByText("Velho")).toBeNull();
+});
+
+test("a failed filter change keeps the previous filter as the applied one", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 3, items: [item] } }));
+  await mount();
+  responses.github_lists = () => Promise.reject("github: limite de requisicoes atingido");
+  await act(async () => {
+    fireEvent.click(screen.getByText("issues"));
+  });
+  expect(screen.getByRole("alert").textContent).toContain("limite");
+  expect(screen.getByRole("button", { name: "tudo" }).getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByRole("button", { name: "issues" }).getAttribute("aria-pressed")).toBe("false");
+  expect(screen.getByText("Revisar o cofre")).toBeTruthy();
+});

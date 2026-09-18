@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { dayWindow, hour, minutesUntil, shouldAlert, status } from "./agenda";
+import { dayWindow, hour, minutesUntil, people, shouldAlert, status } from "./agenda";
 import type { AgendaItem } from "./api";
 
 const base: AgendaItem = {
@@ -92,4 +92,20 @@ test("meeting time stays in 24h pt-BR even on a system set to English", () => {
   } finally {
     Date.prototype.toLocaleTimeString = original;
   }
+});
+
+describe("people", () => {
+  test("names organizer, a different creator and the guest count in one line", () => {
+    expect(people({ ...base, organizer: "Ana Souza", creator: "Bruno Lima", guests: 5 })).toBe(
+      "organizado por Ana Souza · criado por Bruno Lima · 5 convidados",
+    );
+  });
+
+  test("the creator is not repeated when it is the organizer, and one guest is singular", () => {
+    expect(people({ ...base, organizer: "você", creator: "você", guests: 1 })).toBe("organizado por você · 1 convidado");
+  });
+
+  test("a task reminder has no people line", () => {
+    expect(people(base)).toBe("");
+  });
 });

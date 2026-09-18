@@ -2,9 +2,11 @@ import { afterEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
+let dir: () => Promise<string> = () => Promise.resolve("C:/nao/existe");
+
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
-    if (cmd === "transcripts_dir") return Promise.resolve("C:/nao/existe");
+    if (cmd === "transcripts_dir") return dir();
     if (cmd === "transcripts_list") return Promise.reject("pasta de transcrições não encontrada");
     return Promise.resolve(null);
   },
@@ -29,4 +31,15 @@ test("an invalid folder shows in the tab with an escape hatch, no global alert p
 
   fireEvent.click(screen.getByRole("button", { name: "escolher outra pasta" }));
   expect(screen.getByDisplayValue("C:/nao/existe")).toBeTruthy();
+});
+
+test("reading the folder shows a skeleton, and a failure never leaves it spinning", async () => {
+  dir = () => Promise.reject("cofre trancado");
+  const globalErrors: string[] = [];
+  render(<TranscriptsTab onError={(m) => globalErrors.push(m)} />);
+  expect(screen.getByRole("status", { name: "lendo as transcrições" })).toBeTruthy();
+  await settle();
+  expect(screen.queryByRole("status", { name: "lendo as transcrições" })).toBeNull();
+  expect(globalErrors).toEqual(["cofre trancado"]);
+  dir = () => Promise.resolve("C:/nao/existe");
 });

@@ -39,6 +39,7 @@ mod tests {
             location: location.into(),
             meet: String::new(),
             link: String::new(),
+            ..Default::default()
         }
     }
 

@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { api, errText, type AgendaItem } from "../lib/api";
-import { hour, status } from "../lib/agenda";
+import AgendaCard from "./AgendaCard";
+import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
 
 /// Synthetic event so the user can check the pop-up and sound without waiting for a meeting.
@@ -14,6 +16,9 @@ function testEvent(): AgendaItem {
     location: "Sala virtual",
     meet: "https://meet.google.com/abc-defg-hij",
     link: "",
+    organizer: "você",
+    guests: 3,
+    description: "Evento de exemplo para conferir o aviso, o som e os detalhes da reunião.",
   };
 }
 
@@ -25,6 +30,7 @@ export default function AgendaTab({
   onError: (m: string) => void;
 }) {
   const { items, loading, error, reload } = agenda;
+  const [open, setOpen] = useState<string | null>(null);
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -50,35 +56,14 @@ export default function AgendaTab({
       </div>
 
       <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
-        {items.map((e) => {
-          const { label, now } = status(e);
-          return (
-            <li
-              key={e.id}
-              className={`rounded-lg border p-2 ${now ? "border-accent bg-accent/10" : "border-edge bg-ink/60"}`}
-            >
-              <div className="flex items-baseline justify-between gap-2">
-                <p className="truncate text-sm font-medium text-fg">{e.title}</p>
-                <span className="shrink-0 text-[11px] text-muted">{hour(e)}</span>
-              </div>
-              {label && (
-                <p className={`text-[11px] font-semibold ${now ? "text-fg" : "text-muted"}`}>{label}</p>
-              )}
-              {e.location && <p className="truncate text-[11px] text-faint">{e.location}</p>}
-              {e.meet && (
-                <button
-                  type="button"
-                  onClick={() => void api.openLink(e.meet)}
-                  className={`mt-1.5 min-h-7 rounded px-2.5 text-xs font-semibold ${
-                    now ? "bg-accent text-on-accent" : "bg-edge text-fg"
-                  }`}
-                >
-                  entrar no Meet
-                </button>
-              )}
-            </li>
-          );
-        })}
+        {items.map((e) => (
+          <AgendaCard key={e.id} event={e} open={open === e.id} onToggle={() => setOpen(open === e.id ? null : e.id)} />
+        ))}
+        {items.length === 0 && loading && !error && (
+          <li>
+            <Skeleton label="carregando a agenda" />
+          </li>
+        )}
         {items.length === 0 && !loading && (
           <li className="px-2 py-6 text-center text-xs text-faint">
             {error || "nenhum evento hoje. Para ver sua agenda, entre com o Google em Ajustes."}

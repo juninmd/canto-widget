@@ -7,7 +7,8 @@ use zeroize::Zeroizing;
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
-use crate::github::{self, GithubLists};
+use crate::github::{self, GithubList, GithubLists};
+use crate::github_query::{GithubFilter, Section};
 use crate::github_auth::{self as auth, embedded_client_id, PollResult, Tokens};
 use crate::model::now_ms;
 use crate::store::{self, SealedBlob, GITHUB_AAD};
@@ -178,14 +179,19 @@ pub fn github_disconnect(state: State<'_, AppState>) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn github_lists(app: tauri::AppHandle) -> Result<GithubLists> {
-    run(move || {
-        let state = app.state::<AppState>();
-        state.touch();
-        let token = valid_token(&state, &app.state::<GithubState>(), now_ms())?;
-        github::lists(&token)
-    })
-    .await
+pub async fn github_lists(app: tauri::AppHandle, filter: Option<GithubFilter>) -> Result<GithubLists> {
+    run(move || github::lists(&token(&app)?, &filter.unwrap_or_default())).await
+}
+
+#[tauri::command]
+pub async fn github_section(app: tauri::AppHandle, section: Section, page: u32, filter: Option<GithubFilter>) -> Result<GithubList> {
+    run(move || github::section(&token(&app)?, section, page, &filter.unwrap_or_default())).await
+}
+
+fn token(app: &tauri::AppHandle) -> Result<Zeroizing<String>> {
+    let state = app.state::<AppState>();
+    state.touch();
+    valid_token(&state, &app.state::<GithubState>(), now_ms())
 }
 
 #[cfg(test)]
