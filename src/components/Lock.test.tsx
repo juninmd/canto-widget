@@ -2,12 +2,12 @@ import { afterEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-let biometria: unknown = null;
-const chamadas: string[] = [];
+let biometrics: unknown = null;
+const calls: string[] = [];
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
-    chamadas.push(cmd);
-    return Promise.resolve(cmd === "biometria_status" ? biometria : null);
+    calls.push(cmd);
+    return Promise.resolve(cmd === "biometric_status" ? biometrics : null);
   },
 }));
 
@@ -15,24 +15,24 @@ const { default: Lock } = await import("./Lock");
 
 afterEach(() => {
   cleanup();
-  biometria = null;
-  chamadas.length = 0;
+  biometrics = null;
+  calls.length = 0;
 });
 
-test("senha fica oculta ate o usuario pedir para ver", () => {
+test("password stays hidden until the user asks to see it", () => {
   render(<Lock exists onOpen={() => {}} />);
-  const campo = screen.getByLabelText("senha mestra") as HTMLInputElement;
-  expect(campo.type).toBe("password");
+  const field = screen.getByLabelText("senha mestra") as HTMLInputElement;
+  expect(field.type).toBe("password");
   fireEvent.click(screen.getByLabelText("mostrar senha"));
-  expect(campo.type).toBe("text");
+  expect(field.type).toBe("text");
 });
 
-test("criar cofre mostra o requisito da senha fora do placeholder", () => {
+test("creating a vault shows the password requirement outside the placeholder", () => {
   render(<Lock exists={false} onOpen={() => {}} />);
   expect(screen.getByText("mínimo de 4 caracteres")).toBeTruthy();
 });
 
-test("senhas diferentes explicam como corrigir", () => {
+test("mismatched passwords explain how to fix it", () => {
   render(<Lock exists={false} onOpen={() => {}} />);
   fireEvent.change(screen.getByLabelText("senha mestra"), { target: { value: "1234" } });
   fireEvent.change(screen.getByLabelText("repita a senha"), { target: { value: "4321" } });
@@ -40,21 +40,21 @@ test("senhas diferentes explicam como corrigir", () => {
   expect(screen.getByRole("alert").textContent).toContain("mesma senha");
 });
 
-test("com Windows Hello ativo, um botao destranca sem digitar a senha", async () => {
-  biometria = { disponivel: true, ativa: true, nome: "Windows Hello" };
-  let abriu = false;
+test("with Windows Hello enabled, a button unlocks without typing the password", async () => {
+  biometrics = { available: true, enabled: true, name: "Windows Hello" };
+  let opened = false;
   await act(async () => {
-    render(<Lock exists onOpen={() => { abriu = true; }} />);
+    render(<Lock exists onOpen={() => { opened = true; }} />);
   });
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "Destrancar com Windows Hello" }));
   });
-  expect(chamadas).toContain("biometria_desbloquear");
-  expect(abriu).toBe(true);
+  expect(calls).toContain("biometric_unlock");
+  expect(opened).toBe(true);
 });
 
-test("biometria disponivel mas nao ativada nao oferece o botao", async () => {
-  biometria = { disponivel: true, ativa: false, nome: "Windows Hello" };
+test("biometrics available but not enabled doesn't offer the button", async () => {
+  biometrics = { available: true, enabled: false, name: "Windows Hello" };
   await act(async () => {
     render(<Lock exists onOpen={() => {}} />);
   });

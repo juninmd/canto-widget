@@ -11,6 +11,7 @@
   },
   "app": {
     "withGlobalTauri": false,
+    "macOSPrivateApi": true,
     "windows": [
       {
         "label": "main",
@@ -36,6 +37,14 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "publisher": "Antonio Carlos",
+    "copyright": "Copyright (c) 2026 Antonio Carlos. Licença MIT.",
+    "license": "MIT",
+    "licenseFile": "../LICENSE",
+    "homepage": "https://github.com/juninmd/canto-widget",
+    "category": "Productivity",
+    "shortDescription": "Tarefas, notas e agenda cifradas no canto da tela",
+    "longDescription": "Widget de desktop com checklist do dia, notas pesquisáveis, clipboard local, transcrições de reuniões, agenda do Google e issues e PRs do GitHub. Tudo cifrado em disco com a senha mestra.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -7,10 +7,10 @@ use crate::error::{AppError, Result};
 
 pub const VAULT_AAD: &[u8] = b"canto.vault.v1";
 pub const DRIVE_AAD: &[u8] = b"canto.drive.v1";
+pub const GITHUB_AAD: &[u8] = b"canto.github.v1";
 const FORMAT_VERSION: u32 = 1;
 
-/// Envelope gravado em disco e enviado ao Drive. Nada aqui e legivel sem a senha:
-/// o salt e o nonce sao publicos por design, a chave nunca sai da memoria.
+/// Written to disk and sent to Drive; salt and nonce are public by design, the key never leaves memory.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SealedBlob {
     pub version: u32,
@@ -18,7 +18,7 @@ pub struct SealedBlob {
     pub salt: String,
     pub nonce: String,
     pub ciphertext: String,
-    /// Instante logico do conteudo, usado para decidir a direcao do sync.
+    /// Logical content timestamp, used to decide sync direction.
     pub updated_at: i64,
 }
 
@@ -96,6 +96,10 @@ pub fn clip_path(dir: &Path) -> PathBuf {
     dir.join("clipboard.json")
 }
 
+pub fn github_path(dir: &Path) -> PathBuf {
+    dir.join("github.json")
+}
+
 pub fn settings_path(dir: &Path) -> PathBuf {
     dir.join("settings.json")
 }
@@ -108,8 +112,7 @@ pub fn read_json<T: for<'de> Deserialize<'de>>(path: &Path) -> Result<Option<T>>
     }
 }
 
-/// Grava em arquivo temporario e renomeia: uma queda no meio da escrita nao
-/// deixa o cofre truncado (perda total, ja que sem o tag GCM nada abre).
+/// Writes to a temp file and renames so a crash mid-write can't truncate the vault (total loss without the GCM tag).
 pub fn write_json_atomic<T: Serialize>(path: &Path, value: &T) -> Result<()> {
     write_bytes_atomic(path, &serde_json::to_vec_pretty(value)?)
 }
@@ -123,56 +126,54 @@ pub fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> Result<()> {
         use std::io::Write;
         let mut f = std::fs::File::create(&tmp)?;
         f.write_all(bytes)?;
-        // Sem descarregar no disco antes do rename, uma queda de energia pode
-        // deixar o nome novo apontando para conteudo vazio: cofre perdido.
+        // Without flushing before the rename, a power loss could leave the new name pointing at empty content.
         f.sync_all()?;
     }
     std::fs::rename(&tmp, path)?;
     Ok(())
 }
 
-/// Sufixo em vez de trocar a extensao: exportando `x.canto` numa pasta do
-/// usuario, `x.tmp` poderia ser um arquivo dele e seria sobrescrito.
+/// Suffix instead of swapping the extension: exporting `x.canto`, `x.tmp` could be a user's own file and get overwritten.
 fn tmp_path(path: &Path) -> PathBuf {
-    let mut nome = path.file_name().unwrap_or_default().to_os_string();
-    nome.push(".tmp");
-    path.with_file_name(nome)
+    let mut name = path.file_name().unwrap_or_default().to_os_string();
+    name.push(".tmp");
+    path.with_file_name(name)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    fn tmpdir(nome: &str) -> PathBuf {
-        let d = std::env::temp_dir().join(format!("canto-store-{nome}-{}", std::process::id()));
+    fn tmpdir(name: &str) -> PathBuf {
+        let d = std::env::temp_dir().join(format!("canto-store-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         d
     }
 
     #[test]
-    fn grava_e_le_de_volta_sem_deixar_temporario() {
+    fn writes_and_reads_back_without_leaving_a_temp_file() {
         let dir = tmpdir("roundtrip");
-        let alvo = vault_path(&dir);
-        write_json_atomic(&alvo, &KdfParams::default()).unwrap();
-        let lido: KdfParams = read_json(&alvo).unwrap().unwrap();
-        assert_eq!(lido.m_kib, KdfParams::default().m_kib);
-        assert!(!tmp_path(&alvo).exists(), "temporario ficou para tras");
+        let target = vault_path(&dir);
+        write_json_atomic(&target, &KdfParams::default()).unwrap();
+        let read: KdfParams = read_json(&target).unwrap().unwrap();
+        assert_eq!(read.m_kib, KdfParams::default().m_kib);
+        assert!(!tmp_path(&target).exists(), "temp file was left behind");
         let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
-    fn regravar_substitui_o_conteudo_anterior() {
+    fn rewriting_replaces_the_previous_content() {
         let dir = tmpdir("overwrite");
-        let alvo = settings_path(&dir);
-        write_json_atomic(&alvo, &KdfParams { t: 1, ..Default::default() }).unwrap();
-        write_json_atomic(&alvo, &KdfParams { t: 9, ..Default::default() }).unwrap();
-        let lido: KdfParams = read_json(&alvo).unwrap().unwrap();
-        assert_eq!(lido.t, 9);
+        let target = settings_path(&dir);
+        write_json_atomic(&target, &KdfParams { t: 1, ..Default::default() }).unwrap();
+        write_json_atomic(&target, &KdfParams { t: 9, ..Default::default() }).unwrap();
+        let read: KdfParams = read_json(&target).unwrap().unwrap();
+        assert_eq!(read.t, 9);
         let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
-    fn temporario_nao_pisa_em_arquivo_vizinho_do_usuario() {
+    fn temp_file_does_not_clobber_a_neighboring_user_file() {
         let dir = tmpdir("vizinho");
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join("backup.tmp"), b"do usuario").unwrap();
@@ -182,8 +183,8 @@ mod tests {
     }
 
     #[test]
-    fn arquivo_ausente_devolve_none() {
-        let ausente = tmpdir("vazio").join("nada.json");
-        assert!(read_json::<KdfParams>(&ausente).unwrap().is_none());
+    fn missing_file_returns_none() {
+        let missing = tmpdir("vazio").join("nada.json");
+        assert!(read_json::<KdfParams>(&missing).unwrap().is_none());
     }
 }

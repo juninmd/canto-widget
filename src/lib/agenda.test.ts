@@ -1,82 +1,82 @@
 import { describe, expect, test } from "bun:test";
-import { janelaDoDia, minutosAte, paraAlertar, situacao } from "./agenda";
+import { dayWindow, minutesUntil, shouldAlert, status } from "./agenda";
 import type { AgendaItem } from "./api";
 
 const base: AgendaItem = {
   id: "e1",
-  titulo: "Daily",
-  inicio: "",
-  fim: "",
-  dia_inteiro: false,
-  local: "",
+  title: "Daily",
+  start: "",
+  end: "",
+  all_day: false,
+  location: "",
   meet: "",
   link: "",
 };
 
-const emMinutos = (m: number, agora: Date, id = "e1"): AgendaItem => ({
+const inMinutes = (m: number, now: Date, id = "e1"): AgendaItem => ({
   ...base,
   id,
-  inicio: new Date(agora.getTime() + m * 60_000).toISOString(),
+  start: new Date(now.getTime() + m * 60_000).toISOString(),
 });
 
 describe("agenda", () => {
-  const agora = new Date("2026-09-09T09:00:00");
+  const now = new Date("2026-09-09T09:00:00");
 
-  test("janela do dia cobre do zero-hora ao fim do dia local", () => {
-    const { timeMin, timeMax } = janelaDoDia(agora);
+  test("day window covers from midnight to the end of the day locally", () => {
+    const { timeMin, timeMax } = dayWindow(now);
     expect(new Date(timeMin).getHours()).toBe(0);
     expect(new Date(timeMax).getHours()).toBe(23);
     expect(new Date(timeMin).getDate()).toBe(9);
   });
 
-  test("alerta dispara para evento que comeca em ate 1 minuto", () => {
-    const itens = [emMinutos(0.5, agora)];
-    expect(paraAlertar(itens, new Set(), agora).map((i) => i.id)).toEqual(["e1"]);
+  test("alert fires for an event starting within 1 minute", () => {
+    const items = [inMinutes(0.5, now)];
+    expect(shouldAlert(items, new Set(), now).map((i) => i.id)).toEqual(["e1"]);
   });
 
-  test("nao alerta evento distante", () => {
-    expect(paraAlertar([emMinutos(30, agora)], new Set(), agora)).toHaveLength(0);
+  test("does not alert a distant event", () => {
+    expect(shouldAlert([inMinutes(30, now)], new Set(), now)).toHaveLength(0);
   });
 
-  test("nao repete alerta ja disparado", () => {
-    const itens = [emMinutos(0.2, agora)];
-    expect(paraAlertar(itens, new Set(["e1"]), agora)).toHaveLength(0);
+  test("does not repeat an already fired alert", () => {
+    const items = [inMinutes(0.2, now)];
+    expect(shouldAlert(items, new Set(["e1"]), now)).toHaveLength(0);
   });
 
-  test("para de alertar evento que comecou ha mais de 2 minutos", () => {
-    expect(paraAlertar([emMinutos(-5, agora)], new Set(), agora)).toHaveLength(0);
-    expect(paraAlertar([emMinutos(-1, agora)], new Set(), agora)).toHaveLength(1);
+  test("stops alerting an event that started more than 2 minutes ago", () => {
+    expect(shouldAlert([inMinutes(-5, now)], new Set(), now)).toHaveLength(0);
+    expect(shouldAlert([inMinutes(-1, now)], new Set(), now)).toHaveLength(1);
   });
 
-  test("evento de dia inteiro nunca vira pop-up", () => {
-    const feriado: AgendaItem = { ...base, id: "f", dia_inteiro: true, inicio: "2026-09-09" };
-    expect(paraAlertar([feriado], new Set(), agora)).toHaveLength(0);
-    expect(minutosAte(feriado, agora)).toBe(Number.POSITIVE_INFINITY);
+  test("an all-day event never becomes a pop-up", () => {
+    const holiday: AgendaItem = { ...base, id: "f", all_day: true, start: "2026-09-09" };
+    expect(shouldAlert([holiday], new Set(), now)).toHaveLength(0);
+    expect(minutesUntil(holiday, now)).toBe(Number.POSITIVE_INFINITY);
   });
 
-  test("data invalida nao derruba o calculo", () => {
-    expect(minutosAte({ ...base, inicio: "nao-e-data" }, agora)).toBe(Number.POSITIVE_INFINITY);
+  test("an invalid date does not break the calculation", () => {
+    expect(minutesUntil({ ...base, start: "nao-e-data" }, now)).toBe(Number.POSITIVE_INFINITY);
   });
 });
 
-describe("situacao", () => {
-  const agora = new Date("2026-09-14T10:00:00Z");
-  const evento = (inicio: string, fim: string) => ({ ...base, inicio, fim });
+describe("status", () => {
+  const now = new Date("2026-09-14T10:00:00Z");
+  const event = (start: string, end: string) => ({ ...base, start, end });
 
-  test("reuniao em andamento diz agora em texto, nao so na cor", () => {
-    expect(situacao(evento("2026-09-14T09:50:00Z", "2026-09-14T10:30:00Z"), agora)).toEqual({ rotulo: "agora", agora: true });
+  test("an ongoing meeting says 'now' in text, not only via color", () => {
+    expect(status(event("2026-09-14T09:50:00Z", "2026-09-14T10:30:00Z"), now)).toEqual({ label: "agora", now: true });
   });
 
-  test("reuniao que ja terminou nao aparece como agora", () => {
-    expect(situacao(evento("2026-09-14T09:00:00Z", "2026-09-14T09:30:00Z"), agora).rotulo).toBe("encerrado");
+  test("a meeting that already ended does not show as now", () => {
+    expect(status(event("2026-09-14T09:00:00Z", "2026-09-14T09:30:00Z"), now).label).toBe("encerrado");
   });
 
-  test("proxima reuniao mostra quanto falta em minutos e horas", () => {
-    expect(situacao(evento("2026-09-14T10:07:30Z", "2026-09-14T11:00:00Z"), agora).rotulo).toBe("em 8 min");
-    expect(situacao(evento("2026-09-14T11:35:00Z", "2026-09-14T12:00:00Z"), agora).rotulo).toBe("em 1h35");
+  test("the next meeting shows how long is left in minutes and hours", () => {
+    expect(status(event("2026-09-14T10:07:30Z", "2026-09-14T11:00:00Z"), now).label).toBe("em 8 min");
+    expect(status(event("2026-09-14T11:35:00Z", "2026-09-14T12:00:00Z"), now).label).toBe("em 1h35");
   });
 
-  test("evento de dia inteiro nao ganha contagem", () => {
-    expect(situacao({ ...base, dia_inteiro: true, inicio: "2026-09-14" }, agora).rotulo).toBe("");
+  test("an all-day event gets no countdown", () => {
+    expect(status({ ...base, all_day: true, start: "2026-09-14" }, now).label).toBe("");
   });
 });

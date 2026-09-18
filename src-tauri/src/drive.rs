@@ -97,7 +97,7 @@ pub fn exchange_code(
     })
 }
 
-/// Renova o access token quando faltam menos de 60s de validade.
+/// Renews the access token when less than 60s of validity remain.
 pub fn fresh_access_token(
     tokens: &mut DriveTokens,
     client_id: &str,

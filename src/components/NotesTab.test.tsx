@@ -2,14 +2,17 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-type Chamada = { cmd: string; args?: Record<string, unknown> };
-const chamadas: Chamada[] = [];
-let notas: unknown[] = [];
+type Call = { cmd: string; args?: Record<string, unknown> };
+const calls: Call[] = [];
+let notes: unknown[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
-    chamadas.push({ cmd, args });
-    if (cmd === "notes_search") return Promise.resolve(notas);
+    calls.push({ cmd, args });
+    if (cmd === "notes_search") {
+      const limit = (args?.limit as number) ?? notes.length;
+      return Promise.resolve({ total: notes.length, items: notes.slice(0, limit) });
+    }
     if (cmd === "note_pin") return Promise.resolve(true);
     return Promise.resolve(null);
   },
@@ -18,16 +21,15 @@ mock.module("@tauri-apps/api/core", () => ({
 const { default: NotesTab } = await import("./NotesTab");
 const { ToastProvider } = await import("../lib/toast");
 
-async function abrirEditor() {
+async function openEditor() {
   render(
     <ToastProvider>
       <NotesTab onError={() => {}} />
     </ToastProvider>,
   );
-  // A busca da lista e debounced em 150 ms; deixa ela assentar dentro do act
-  // para o editor abrir sem update pendente.
+  // The list search is debounced 150ms; let it settle inside act so the editor opens with no pending update.
   await act(async () => {
-    await new Promise((pronto) => setTimeout(pronto, 250));
+    await new Promise((ready) => setTimeout(ready, 250));
   });
   await act(async () => {
     fireEvent.click(screen.getByText("+"));
@@ -36,88 +38,107 @@ async function abrirEditor() {
 }
 
 beforeEach(() => {
-  chamadas.length = 0;
-  notas = [];
+  calls.length = 0;
+  notes = [];
 });
 
 afterEach(cleanup);
 
-test("Ctrl+Enter salva o card sem passar pelo botao", async () => {
-  const titulo = await abrirEditor();
+test("Ctrl+Enter saves the card without going through the button", async () => {
+  const title = await openEditor();
   await act(async () => {
-    fireEvent.change(titulo, { target: { value: "ideia solta" } });
-    fireEvent.keyDown(titulo, { key: "Enter", ctrlKey: true });
+    fireEvent.change(title, { target: { value: "ideia solta" } });
+    fireEvent.keyDown(title, { key: "Enter", ctrlKey: true });
     await Promise.resolve();
   });
 
-  const salvo = chamadas.find((c) => c.cmd === "note_save");
-  expect(salvo?.args?.title).toBe("ideia solta");
+  const saved = calls.find((c) => c.cmd === "note_save");
+  expect(saved?.args?.title).toBe("ideia solta");
 });
 
-test("Enter sozinho nao salva", async () => {
-  const titulo = await abrirEditor();
+test("Enter alone does not save", async () => {
+  const title = await openEditor();
   await act(async () => {
-    fireEvent.change(titulo, { target: { value: "ideia solta" } });
-    fireEvent.keyDown(titulo, { key: "Enter" });
+    fireEvent.change(title, { target: { value: "ideia solta" } });
+    fireEvent.keyDown(title, { key: "Enter" });
     await Promise.resolve();
   });
 
-  expect(chamadas.some((c) => c.cmd === "note_save")).toBe(false);
+  expect(calls.some((c) => c.cmd === "note_save")).toBe(false);
 });
 
-test("Esc cancela o editor e descarta o rascunho", async () => {
-  const titulo = await abrirEditor();
+test("Esc cancels the editor and discards the draft", async () => {
+  const title = await openEditor();
   await act(async () => {
-    fireEvent.change(titulo, { target: { value: "nao quero isto" } });
-    fireEvent.keyDown(titulo, { key: "Escape" });
+    fireEvent.change(title, { target: { value: "nao quero isto" } });
+    fireEvent.keyDown(title, { key: "Escape" });
     await Promise.resolve();
   });
 
-  expect(chamadas.some((c) => c.cmd === "note_save")).toBe(false);
-  // Voltou para a lista, e reabrir o editor traz campo limpo.
+  expect(calls.some((c) => c.cmd === "note_save")).toBe(false);
+  // Back to the list, and reopening the editor brings a clean field.
   await act(async () => {
     fireEvent.click(screen.getByText("+"));
   });
   expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("");
 });
 
-async function listaCom(nota: Record<string, unknown>) {
-  notas = [{ id: "n1", title: "wifi", body: "senha", tags: ["casa"], created_at: 1, updated_at: 1, fixada: false, ...nota }];
+async function listWith(note: Record<string, unknown>) {
+  notes = [{ id: "n1", title: "wifi", body: "senha", tags: ["casa"], created_at: 1, updated_at: 1, fixada: false, ...note }];
   render(
     <ToastProvider>
       <NotesTab onError={() => {}} />
     </ToastProvider>,
   );
   await act(async () => {
-    await new Promise((pronto) => setTimeout(pronto, 250));
+    await new Promise((ready) => setTimeout(ready, 250));
   });
 }
 
-test("clicar na tag filtra pela tag exata", async () => {
-  await listaCom({});
+test("clicking the tag filters by the exact tag", async () => {
+  await listWith({});
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "#casa" }));
-    await new Promise((pronto) => setTimeout(pronto, 250));
+    await new Promise((ready) => setTimeout(ready, 250));
   });
   expect((screen.getByLabelText("buscar notas") as HTMLInputElement).value).toBe("#casa");
-  expect(chamadas.some((c) => c.cmd === "notes_search" && c.args?.query === "#casa")).toBe(true);
+  expect(calls.some((c) => c.cmd === "notes_search" && c.args?.query === "#casa")).toBe(true);
 });
 
-test("fixar pede ao cofre, recarrega e avisa o leitor de tela", async () => {
-  await listaCom({});
-  const antes = chamadas.filter((c) => c.cmd === "notes_search").length;
+test("pinning asks the vault, reloads, and announces it to the screen reader", async () => {
+  await listWith({});
+  const before = calls.filter((c) => c.cmd === "notes_search").length;
   await act(async () => {
     fireEvent.click(screen.getByLabelText("fixar wifi no topo"));
     await Promise.resolve();
   });
-  expect(chamadas.find((c) => c.cmd === "note_pin")?.args).toEqual({ id: "n1" });
-  expect(chamadas.filter((c) => c.cmd === "notes_search").length).toBeGreaterThan(antes);
+  expect(calls.find((c) => c.cmd === "note_pin")?.args).toEqual({ id: "n1" });
+  expect(calls.filter((c) => c.cmd === "notes_search").length).toBeGreaterThan(before);
   expect(screen.getByText(/fixada no topo/).getAttribute("role")).toBe("status");
 });
 
-test("nota fixada mostra o alfinete sem depender do hover", async () => {
-  await listaCom({ fixada: true });
-  const alfinete = screen.getByLabelText("desafixar wifi");
-  expect(alfinete.getAttribute("aria-pressed")).toBe("true");
-  expect(alfinete.className).not.toContain("opacity-0");
+test("a pinned note shows the pin without depending on hover", async () => {
+  await listWith({ fixada: true });
+  const pin = screen.getByLabelText("desafixar wifi");
+  expect(pin.getAttribute("aria-pressed")).toBe("true");
+  expect(pin.className).not.toContain("opacity-0");
+});
+
+test("a large vault renders one page and loads the rest on demand", async () => {
+  notes = Array.from({ length: 120 }, (_, i) => ({ id: `n${i}`, title: `nota ${i}`, body: "", tags: [], created_at: i, updated_at: i }));
+  render(
+    <ToastProvider>
+      <NotesTab onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await new Promise((ready) => setTimeout(ready, 250));
+  });
+  expect(screen.getAllByText(/^nota \d+$/).length).toBe(50);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "mostrar mais (70 restantes)" }));
+    await Promise.resolve();
+  });
+  expect(screen.getAllByText(/^nota \d+$/).length).toBe(100);
+  expect(calls.at(-1)?.args).toEqual({ query: "", limit: 100 });
 });

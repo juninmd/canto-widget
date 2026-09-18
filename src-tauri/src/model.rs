@@ -10,13 +10,19 @@ pub trait Versioned {
     fn updated_at(&self) -> i64;
 }
 
-/// Regra de repeticao de uma tarefa. `dia` da semanal: 0 = domingo ... 6 = sabado.
+/// Task repeat rule. `weekday` for `Weekly`: 0 = Sunday ... 6 = Saturday.
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(tag = "tipo", rename_all = "snake_case")]
-pub enum Repetir {
-    Diaria,
-    DiasUteis,
-    Semanal { dia: u8 },
+pub enum Repeat {
+    #[serde(rename = "diaria")]
+    Daily,
+    #[serde(rename = "dias_uteis")]
+    Weekdays,
+    #[serde(rename = "semanal")]
+    Weekly {
+        #[serde(rename = "dia")]
+        weekday: u8,
+    },
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -24,18 +30,18 @@ pub struct Task {
     pub id: String,
     pub title: String,
     pub done: bool,
-    /// Dia ao qual a tarefa pertence, no formato YYYY-MM-DD (hora local).
+    /// Day the task belongs to, "YYYY-MM-DD" local time.
     pub day: String,
     pub created_at: i64,
     pub updated_at: i64,
-    /// Horario do lembrete, "HH:MM" local. Campos novos com default: cofres antigos abrem igual.
-    #[serde(default)]
-    pub hora: Option<String>,
-    #[serde(default)]
-    pub repetir: Option<Repetir>,
-    /// Id da primeira tarefa da serie; instancias recebem o id `<serie>-<dia>`.
-    #[serde(default)]
-    pub serie: Option<String>,
+    /// Reminder time, "HH:MM" local. `default` so older vaults still deserialize.
+    #[serde(default, rename = "hora")]
+    pub reminder_time: Option<String>,
+    #[serde(default, rename = "repetir")]
+    pub repeat: Option<Repeat>,
+    /// Id of the first task in the series; instances get id `<series>-<day>`.
+    #[serde(default, rename = "serie")]
+    pub series: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -47,8 +53,8 @@ pub struct Note {
     pub tags: Vec<String>,
     pub created_at: i64,
     pub updated_at: i64,
-    #[serde(default)]
-    pub fixada: bool,
+    #[serde(default, rename = "fixada")]
+    pub pinned: bool,
 }
 
 impl Versioned for Task {
@@ -75,8 +81,7 @@ pub struct VaultData {
     pub tasks: Vec<Task>,
     #[serde(default)]
     pub notes: Vec<Note>,
-    /// Lapides: id -> instante da remocao. Sem elas, um item apagado localmente
-    /// volta a existir no proximo sync vindo de outra maquina.
+    /// Tombstones (id -> deletion timestamp); without these, a locally deleted item would reappear on sync from another machine.
     #[serde(default)]
     pub deleted: HashMap<String, i64>,
 }
@@ -88,7 +93,7 @@ impl VaultData {
         self.deleted.insert(id.to_string(), at);
     }
 
-    /// Merge last-write-wins por item; remocao vence se for mais recente que a edicao.
+    /// Last-write-wins merge per item; a deletion wins if newer than the edit.
     pub fn merge(self, other: VaultData) -> VaultData {
         let mut deleted = self.deleted;
         for (id, at) in other.deleted {

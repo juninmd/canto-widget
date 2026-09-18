@@ -18,6 +18,8 @@ pub enum AppError {
     Format(String),
     #[error("google: {0}")]
     Drive(String),
+    #[error("github: {0}")]
+    Github(String),
     #[error("{0}")]
     Config(String),
 }

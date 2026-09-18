@@ -1,31 +1,38 @@
+pub mod account;
 pub mod autostart;
 pub mod backup;
-pub mod biometria;
-pub mod bloqueante;
+pub mod biometric;
+pub mod blocking;
 pub mod calendar;
+pub mod clip_os;
 pub mod clipboard;
-pub mod cmd_biometria;
-pub mod cmd_notas;
+pub mod cmd_biometric;
 pub mod cmd_backup;
 pub mod cmd_drive;
 pub mod cmd_extras;
+pub mod cmd_github;
+pub mod cmd_notes;
 pub mod commands;
-pub mod conta;
 pub mod crypto;
 pub mod drive;
 pub mod error;
+pub mod github;
+pub mod github_auth;
 #[cfg(windows)]
 pub mod hello;
-pub mod janela;
-pub mod lixeira;
 pub mod meet;
 pub mod model;
+pub mod notification;
 pub mod oauth;
-pub mod rotina;
+pub mod password;
+pub mod routine;
+pub mod snooze;
 pub mod store;
 pub mod transcripts;
+pub mod trash;
 pub mod vault;
 pub mod window;
+pub mod window_state;
 
 use tauri::menu::{Menu, MenuItem};
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
@@ -37,12 +44,12 @@ use crate::vault::AppState;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        // Primeiro plugin por exigencia dele: com o autostart, abrir o app de novo
-        // criaria outra bandeja e outro vigia gravando o mesmo clipboard.json.
+        // Must be first: with autostart, reopening the app would create another tray and clipboard.json watcher.
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
-            let _ = window::mostrar(app);
+            let _ = window::show(app);
         }))
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(
@@ -55,24 +62,25 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
-            app.manage(janela::Janela::carregar(&dir));
-            watch_janela(app.handle().clone(), dir.clone());
+            app.manage(cmd_github::GithubState::default());
+            app.manage(window_state::WindowState::load(&dir));
+            watch_window_state(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
             watch_idle(app.handle().clone());
             watch_backup(dir);
             build_tray(app.handle())?;
-            // Build de debug depende do vite no ar: registra-lo no boot abriria um widget quebrado.
+            // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
-                // Registro do SO indisponivel nao pode impedir o widget de abrir.
+                // The OS registration being unavailable must not stop the widget from opening.
                 eprintln!("autostart indisponivel: {e}");
             }
 
             if let Some(win) = app.get_webview_window("main") {
-                win.set_always_on_top(app.state::<janela::Janela>().cfg().sempre_no_topo)?;
-                janela::posicionar(&win)?;
-                // Subida no boot fica so na bandeja: nada pula na tela do usuario.
-                if !autostart::iniciado_pelo_sistema() {
+                win.set_always_on_top(app.state::<window_state::WindowState>().cfg().always_on_top)?;
+                window_state::place(&win)?;
+                // Boot startup stays in the tray only: nothing pops up on the user's screen.
+                if !autostart::started_by_system() {
                     win.show()?;
                     win.set_focus()?;
                 }
@@ -85,17 +93,18 @@ pub fn run() {
             commands::vault_unlock,
             commands::vault_lock,
             commands::vault_touch,
+            password::vault_change_password,
             commands::tasks_for_day,
             commands::task_add,
             commands::task_toggle,
             commands::task_rename,
-            commands::task_concluir,
+            commands::task_complete,
             commands::tasks_carry_over,
-            cmd_notas::notes_search,
-            cmd_notas::note_save,
-            cmd_notas::note_pin,
-            rotina::task_set_detalhes,
-            rotina::tasks_lembretes,
+            cmd_notes::notes_search,
+            cmd_notes::note_save,
+            cmd_notes::note_pin,
+            routine::task_set_schedule,
+            routine::tasks_reminders,
             commands::item_delete,
             cmd_drive::drive_status,
             cmd_drive::drive_configure,
@@ -111,31 +120,39 @@ pub fn run() {
             cmd_extras::transcripts_list,
             cmd_extras::transcript_read,
             cmd_extras::agenda_today,
-            cmd_extras::alerta_abrir,
-            cmd_extras::alerta_payload,
-            cmd_extras::alerta_fechar,
-            cmd_extras::abrir_link,
+            cmd_extras::alert_open,
+            cmd_extras::alert_payload,
+            cmd_extras::alert_close,
+            snooze::alert_snooze,
+            cmd_extras::open_link,
             autostart::autostart_status,
             autostart::autostart_set,
-            cmd_backup::backup_exportar,
-            cmd_backup::backup_importar,
-            lixeira::lixeira_desfazer,
-            cmd_biometria::biometria_status,
-            cmd_biometria::biometria_ativar,
-            cmd_biometria::biometria_desbloquear,
-            cmd_biometria::biometria_desativar,
-            janela::janela_config,
-            janela::janela_sempre_no_topo,
-            janela::janela_restaurar,
+            cmd_backup::backup_export,
+            cmd_backup::backup_import,
+            trash::trash_undo,
+            cmd_biometric::biometric_status,
+            cmd_biometric::biometric_enable,
+            cmd_biometric::biometric_unlock,
+            cmd_biometric::biometric_disable,
+            window_state::window_config,
+            window_state::window_set_always_on_top,
+            window_state::window_reset,
+            cmd_github::github_status,
+            cmd_github::github_save_token,
+            cmd_github::github_device_start,
+            cmd_github::github_device_finish,
+            cmd_github::github_device_cancel,
+            cmd_github::github_disconnect,
+            cmd_github::github_lists,
         ])
         .on_window_event(|win, event| match event {
-            // Fechar esconde o widget; sair de verdade so pela bandeja.
+            // Closing hides the widget; quitting for real only from the tray.
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
                 let _ = win.hide();
             }
             tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {
-                janela::registrar(win);
+                window_state::record(win);
             }
             _ => {}
         })
@@ -143,10 +160,9 @@ pub fn run() {
         .expect("erro ao iniciar o Canto");
 }
 
-/// Um widget de canto fica aberto o dia inteiro; sem isto o cofre destrancado
-/// e o vigia do clipboard sobrevivem a qualquer tempo longe da maquina.
+/// Without this, an unlocked vault would survive any amount of time away from the machine.
 const AUTO_LOCK_MS: i64 = 15 * 60 * 1000;
-pub const EVENTO_AUTO_LOCK: &str = "canto://auto-lock";
+pub const AUTO_LOCK_EVENT: &str = "canto://auto-lock";
 
 fn watch_idle(app: tauri::AppHandle) {
     std::thread::spawn(move || loop {
@@ -155,32 +171,32 @@ fn watch_idle(app: tauri::AppHandle) {
             continue;
         };
         if state.lock_if_idle(AUTO_LOCK_MS) {
-            let _ = tauri::Emitter::emit(&app, EVENTO_AUTO_LOCK, AUTO_LOCK_MS / 60_000);
+            let _ = tauri::Emitter::emit(&app, AUTO_LOCK_EVENT, AUTO_LOCK_MS / 60_000);
         }
     });
 }
 
-/// Posicao e tamanho vao para o disco no maximo a cada 2 s, nao a cada pixel arrastado.
-fn watch_janela(app: tauri::AppHandle, dir: std::path::PathBuf) {
+/// Position and size hit disk at most every 2s, not on every dragged pixel.
+fn watch_window_state(app: tauri::AppHandle, dir: std::path::PathBuf) {
     std::thread::spawn(move || loop {
         std::thread::sleep(std::time::Duration::from_secs(2));
-        if let Err(e) = app.state::<janela::Janela>().gravar_se_sujo(&dir) {
+        if let Err(e) = app.state::<window_state::WindowState>().save_if_dirty(&dir) {
             eprintln!("posicao da janela nao gravou: {e}");
         }
     });
 }
 
-/// Copia diaria do envelope cifrado; nao precisa do cofre destrancado.
+/// Daily copy of the encrypted envelope; doesn't need the vault unlocked.
 fn watch_backup(dir: std::path::PathBuf) {
     std::thread::spawn(move || loop {
-        if let Err(e) = backup::diario(&dir, &backup::hoje_utc()) {
+        if let Err(e) = backup::daily(&dir, &backup::today_utc()) {
             eprintln!("backup diario falhou: {e}");
         }
         std::thread::sleep(std::time::Duration::from_secs(30 * 60));
     });
 }
 
-/// Atalho global de mostrar/esconder. Ctrl+Alt+Espaco (Cmd+Alt+Espaco no macOS).
+/// Global show/hide shortcut. Ctrl+Alt+Space (Cmd+Alt+Space on macOS).
 fn toggle_shortcut() -> Shortcut {
     #[cfg(target_os = "macos")]
     let mods = Modifiers::SUPER | Modifiers::ALT;
@@ -206,7 +222,7 @@ fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
             })
             .build(),
     )?;
-    // Atalho ja tomado por outro app nao derruba o widget: a bandeja continua servindo.
+    // A shortcut already taken by another app must not bring down the widget: the tray still works.
     if let Err(e) = app.global_shortcut().register(toggle_shortcut()) {
         eprintln!("atalho global indisponivel ({TOGGLE_SHORTCUT_LABEL}): {e}");
     }
@@ -241,7 +257,7 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
             }
             "quit" => {
                 if let Ok(dir) = app.path().app_data_dir() {
-                    let _ = app.state::<janela::Janela>().gravar_se_sujo(&dir);
+                    let _ = app.state::<window_state::WindowState>().save_if_dirty(&dir);
                 }
                 app.exit(0)
             }

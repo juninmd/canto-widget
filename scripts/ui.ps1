@@ -1,4 +1,4 @@
-# Helpers de homologação visual: captura de tela e input sintético no widget.
+# Visual smoke helpers: screen capture and synthetic input on the widget.
 Add-Type -AssemblyName System.Drawing, System.Windows.Forms
 Add-Type @"
 using System;
@@ -15,7 +15,7 @@ public class Win {
 
 function Get-CantoWindow {
   $p = Get-Process canto-widget -ErrorAction SilentlyContinue | Where-Object { $_.MainWindowHandle -ne 0 } | Select-Object -First 1
-  if (-not $p) { throw "processo canto-widget sem janela visivel" }
+  if (-not $p) { throw "canto-widget process has no visible window" }
   $r = New-Object RECT
   [void][Win]::GetWindowRect($p.MainWindowHandle, [ref]$r)
   [pscustomobject]@{ Handle = $p.MainWindowHandle; X = $r.Left; Y = $r.Top; W = $r.Right - $r.Left; H = $r.Bottom - $r.Top }
@@ -34,7 +34,7 @@ function Save-Screen([string]$Path, [switch]$WindowOnly) {
   "$Path ($w x $h)"
 }
 
-# Clique em coordenada relativa (0..1) da janela do widget.
+# Clicks at a coordinate relative (0..1) to the widget window.
 function Click-Widget([double]$fx, [double]$fy) {
   $w = Get-CantoWindow
   [void][Win]::SetForegroundWindow($w.Handle)

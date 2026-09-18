@@ -5,13 +5,13 @@ use crate::error::{AppError, Result};
 use crate::model::{now_ms, Task};
 use crate::vault::AppState;
 
-/// Titulo de tarefa sempre chega aparado e nunca vazio, no cadastro e no rename.
-fn titulo_de_tarefa(bruto: &str) -> Result<String> {
-    let limpo = bruto.trim();
-    if limpo.is_empty() {
+/// Task title always arrives trimmed and never empty, on create and on rename.
+fn task_title(raw: &str) -> Result<String> {
+    let clean = raw.trim();
+    if clean.is_empty() {
         return Err(AppError::Config("a tarefa precisa de um titulo".into()));
     }
-    Ok(limpo.to_string())
+    Ok(clean.to_string())
 }
 
 pub fn new_id() -> String {
@@ -32,12 +32,12 @@ pub fn vault_status(state: State<'_, AppState>) -> Status {
     }
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn vault_create(state: State<'_, AppState>, password: String) -> Result<()> {
     state.create(&password)
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn vault_unlock(state: State<'_, AppState>, password: String) -> Result<()> {
     state.unlock(&password)
 }
@@ -47,9 +47,9 @@ pub fn vault_lock(state: State<'_, AppState>) {
     state.lock();
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task>> {
-    state.mutate_se(|d| crate::rotina::materializar(d, &day, now_ms()) > 0)?;
+    state.mutate_if(|d| crate::routine::materialize(d, &day, now_ms()) > 0)?;
     state.read(|d| {
         let mut list: Vec<Task> = d.tasks.iter().filter(|t| t.day == day).cloned().collect();
         list.sort_by_key(|t| (t.done, t.created_at));
@@ -57,9 +57,9 @@ pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task
     })
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn task_add(state: State<'_, AppState>, title: String, day: String) -> Result<Task> {
-    let title = titulo_de_tarefa(&title)?;
+    let title = task_title(&title)?;
     let now = now_ms();
     let task = Task {
         id: new_id(),
@@ -75,7 +75,7 @@ pub fn task_add(state: State<'_, AppState>, title: String, day: String) -> Resul
     Ok(created)
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn task_toggle(state: State<'_, AppState>, id: String) -> Result<()> {
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
@@ -85,27 +85,26 @@ pub fn task_toggle(state: State<'_, AppState>, id: String) -> Result<()> {
     })
 }
 
-/// Idempotente, ao contrario do toggle: o "concluir" do lembrete nao pode reabrir
-/// uma tarefa que o usuario ja marcou pela lista.
-#[tauri::command]
-pub fn task_concluir(state: State<'_, AppState>, id: String) -> Result<()> {
-    state.mutate_se(|d| concluir(d, &id, now_ms()))
+/// Idempotent, unlike toggle: a reminder's "complete" must not reopen a task already marked from the list.
+#[tauri::command(async)]
+pub fn task_complete(state: State<'_, AppState>, id: String) -> Result<()> {
+    state.mutate_if(|d| complete(d, &id, now_ms()))
 }
 
-pub fn concluir(d: &mut crate::model::VaultData, id: &str, agora: i64) -> bool {
+pub fn complete(d: &mut crate::model::VaultData, id: &str, now: i64) -> bool {
     match d.tasks.iter_mut().find(|t| t.id == id && !t.done) {
         Some(t) => {
             t.done = true;
-            t.updated_at = agora;
+            t.updated_at = now;
             true
         }
         None => false,
     }
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn task_rename(state: State<'_, AppState>, id: String, title: String) -> Result<()> {
-    let title = titulo_de_tarefa(&title)?;
+    let title = task_title(&title)?;
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
             t.title = title;
@@ -114,7 +113,7 @@ pub fn task_rename(state: State<'_, AppState>, id: String, title: String) -> Res
     })
 }
 
-/// Marca atividade deliberada do usuario para adiar o auto-lock.
+/// Marks deliberate user activity to postpone auto-lock.
 #[tauri::command]
 pub fn vault_touch(state: State<'_, AppState>) {
     if state.is_unlocked() {
@@ -122,15 +121,15 @@ pub fn vault_touch(state: State<'_, AppState>) {
     }
 }
 
-/// Traz para `day` as tarefas em aberto de dias anteriores, sem duplicar nada.
-#[tauri::command]
+/// Brings to `day` the open tasks from earlier days, without duplicating anything.
+#[tauri::command(async)]
 pub fn tasks_carry_over(state: State<'_, AppState>, day: String) -> Result<usize> {
     state.mutate(|d| {
         let now = now_ms();
         let mut moved = 0;
         for t in d.tasks.iter_mut() {
-            // Serie recorrente ganha instancia propria no dia; arrastar duplicaria a tarefa.
-            if !t.done && t.day < day && t.serie.is_none() {
+            // A recurring series gets its own instance for the day; carrying it over would duplicate the task.
+            if !t.done && t.day < day && t.series.is_none() {
                 t.day = day.clone();
                 t.updated_at = now;
                 moved += 1;
@@ -140,11 +139,10 @@ pub fn tasks_carry_over(state: State<'_, AppState>, day: String) -> Result<usize
     })
 }
 
-#[tauri::command]
-/// Devolve a chave para desfazer, ou `None` se o id nao existia.
+#[tauri::command(async)]
 pub fn item_delete(state: State<'_, AppState>, id: String) -> Result<Option<String>> {
-    let removido = state.mutate(|d| d.remover(&id, now_ms()))?;
-    Ok(removido.and_then(|r| state.guardar_na_lixeira(r)))
+    let removed = state.mutate(|d| d.remove(&id, now_ms()))?;
+    Ok(removed.and_then(|r| state.store_in_trash(r)))
 }
 
 #[cfg(test)]
@@ -152,22 +150,22 @@ mod tests {
     use super::*;
 
     #[test]
-    fn titulo_valido_chega_aparado() {
-        assert_eq!(titulo_de_tarefa("  comprar leite  ").unwrap(), "comprar leite");
+    fn valid_title_comes_back_trimmed() {
+        assert_eq!(task_title("  comprar leite  ").unwrap(), "comprar leite");
     }
 
     #[test]
-    fn titulo_vazio_ou_so_espaco_e_recusado() {
-        for bruto in ["", "   ", "\t\n", "\u{00a0}"] {
+    fn empty_or_whitespace_only_title_is_rejected() {
+        for raw in ["", "   ", "\t\n", "\u{00a0}"] {
             assert!(
-                matches!(titulo_de_tarefa(bruto), Err(AppError::Config(_))),
-                "aceitou {bruto:?} como titulo"
+                matches!(task_title(raw), Err(AppError::Config(_))),
+                "aceitou {raw:?} como titulo"
             );
         }
     }
 
     #[test]
-    fn ids_gerados_em_sequencia_nao_se_repetem() {
+    fn ids_generated_in_sequence_do_not_repeat() {
         let ids: std::collections::HashSet<String> = (0..500).map(|_| new_id()).collect();
         assert_eq!(ids.len(), 500);
     }

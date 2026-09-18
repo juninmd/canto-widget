@@ -1,0 +1,34 @@
+name: Bug
+description: Algo não funciona como deveria
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Não cole dados do seu cofre, tokens nem prints com informação pessoal.
+  - type: input
+    id: versao
+    attributes:
+      label: Versão do Canto
+      placeholder: v0.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: sistema
+    attributes:
+      label: Sistema operacional
+      options: [Windows, macOS, Linux]
+    validations:
+      required: true
+  - type: textarea
+    id: passos
+    attributes:
+      label: Passos para reproduzir
+      placeholder: "1. Abra a aba ...\n2. Clique em ...\n3. ..."
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: O que esperava e o que aconteceu
+    validations:
+      required: true

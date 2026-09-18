@@ -7,6 +7,8 @@ const ARQUIVO_OAUTH: &str = "google-oauth.json";
 
 fn main() {
     println!("cargo:rerun-if-changed={ARQUIVO_OAUTH}");
+    // Client ID publico do GitHub App (device flow), lido por option_env! em github_auth.rs.
+    println!("cargo:rerun-if-env-changed=CANTO_GITHUB_CLIENT_ID");
     if let Some((id, secret)) = ler_cliente(Path::new(ARQUIVO_OAUTH)) {
         println!("cargo:rustc-env=CANTO_GOOGLE_CLIENT_ID={id}");
         println!("cargo:rustc-env=CANTO_GOOGLE_CLIENT_SECRET={secret}");

@@ -7,12 +7,10 @@ use std::time::{Duration, Instant};
 
 use crate::error::{AppError, Result};
 
-/// Escopo minimo para o que o widget faz: pasta privada do app, leitura da agenda
-/// e identidade (so para exibir a conta). O resto do Drive continua inacessivel.
+/// Minimum scope: app-private folder, read-only calendar and identity; the rest of Drive stays inaccessible.
 pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly openid email profile";
-/// Cliente OAuth embutido na build (ver build.rs). Client secret de app desktop nao e
-/// confidencial para o Google; a protecao do fluxo e o PKCE + state.
-pub fn cliente_embutido() -> Option<(&'static str, &'static str)> {
+/// A desktop app's client secret isn't confidential to Google; the flow is protected by PKCE + state.
+pub fn embedded_client() -> Option<(&'static str, &'static str)> {
     Some((option_env!("CANTO_GOOGLE_CLIENT_ID")?, option_env!("CANTO_GOOGLE_CLIENT_SECRET").unwrap_or("")))
 }
 
@@ -24,6 +22,12 @@ pub struct Pkce {
     pub verifier: String,
     pub challenge: String,
     pub state: String,
+}
+
+impl Default for Pkce {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Pkce {
@@ -60,9 +64,7 @@ impl Loopback {
         })
     }
 
-    /// Espera o redirect do Google e devolve o authorization code.
-    /// O `state` e conferido aqui: sem isso, qualquer pagina local poderia
-    /// injetar um code de outra conta nesta porta.
+    /// `state` is checked here: without that, any local page could inject a code from another account on this port.
     pub fn wait_for_code(&self, expected_state: &str) -> Result<String> {
         let deadline = Instant::now() + WAIT_TIMEOUT;
         loop {
@@ -125,25 +127,25 @@ mod tests {
     use super::*;
 
     #[test]
-    fn extrai_code_quando_state_confere() {
+    fn extracts_code_when_state_matches() {
         let line = "GET /?state=abc&code=xyz HTTP/1.1";
         assert_eq!(parse_callback(line, "abc").unwrap(), "xyz");
     }
 
     #[test]
-    fn rejeita_state_divergente() {
+    fn rejects_mismatched_state() {
         let line = "GET /?state=intruso&code=xyz HTTP/1.1";
         assert!(parse_callback(line, "abc").is_err());
     }
 
     #[test]
-    fn propaga_erro_do_google() {
+    fn propagates_googles_error() {
         let line = "GET /?error=access_denied&state=abc HTTP/1.1";
         assert!(parse_callback(line, "abc").is_err());
     }
 
     #[test]
-    fn pkce_challenge_e_o_sha256_do_verifier() {
+    fn pkce_challenge_is_the_sha256_of_the_verifier() {
         let p = Pkce::new();
         assert_eq!(p.challenge, B64U.encode(Sha256::digest(p.verifier.as_bytes())));
         assert!(p.verifier.len() >= 43 && p.verifier.len() <= 128);

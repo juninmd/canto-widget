@@ -4,22 +4,22 @@ import { todayLocal } from "./api";
 const TICK_MS = 30_000;
 
 /**
- * O widget fica aberto a noite inteira. Sem este relógio, `todayLocal()` é
- * calculado uma vez na montagem e a aba de tarefas continua na véspera até
- * alguém mexer em alguma coisa.
+ * The widget stays open all night. Without this clock, `todayLocal()` is
+ * computed once on mount and the tasks tab stays on yesterday until
+ * something else triggers a re-render.
  */
-export function useToday(agora: () => Date = () => new Date()): string {
-  const [dia, setDia] = useState(() => todayLocal(agora()));
-  const relogio = useRef(agora);
-  relogio.current = agora;
+export function useToday(now: () => Date = () => new Date()): string {
+  const [day, setDay] = useState(() => todayLocal(now()));
+  const clock = useRef(now);
+  clock.current = now;
   useEffect(() => {
     const t = setInterval(() => {
-      setDia((atual) => {
-        const hoje = todayLocal(relogio.current());
-        return hoje === atual ? atual : hoje;
+      setDay((current) => {
+        const today = todayLocal(clock.current());
+        return today === current ? current : today;
       });
     }, TICK_MS);
     return () => clearInterval(t);
   }, []);
-  return dia;
+  return day;
 }

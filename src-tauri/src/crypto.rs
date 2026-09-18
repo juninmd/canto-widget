@@ -8,7 +8,7 @@ use crate::error::{AppError, Result};
 
 pub const SALT_LEN: usize = 16;
 pub const NONCE_LEN: usize = 12;
-/// Argon2id: 19 MiB, 2 passes, 1 lane (perfil "interactive" recomendado pela RFC 9106).
+/// Argon2id: 19 MiB, 2 passes, 1 lane (the "interactive" profile RFC 9106 recommends).
 const KDF_MEM_KIB: u32 = 19 * 1024;
 const KDF_TIME: u32 = 2;
 const KDF_LANES: u32 = 1;
@@ -17,8 +17,7 @@ const KDF_LANES: u32 = 1;
 pub struct VaultKey([u8; 32]);
 
 impl VaultKey {
-    /// Deriva a chave do cofre a partir da senha mestra. Custo fixo por design:
-    /// mudar estes parametros invalida cofres existentes.
+    /// Fixed cost by design: changing these parameters invalidates existing vaults.
     pub fn derive(password: &str, salt: &[u8]) -> Result<Self> {
         if salt.len() != SALT_LEN {
             return Err(AppError::Crypto("salt com tamanho invalido".into()));
@@ -35,7 +34,7 @@ impl VaultKey {
         Ok(key)
     }
 
-    /// Chave ja derivada por outro caminho (ex.: assinatura do Windows Hello).
+    /// Key already derived by another path (e.g. a Windows Hello signature).
     pub(crate) fn from_bytes(bytes: [u8; 32]) -> Self {
         VaultKey(bytes)
     }
@@ -88,7 +87,7 @@ mod tests {
     const AAD: &[u8] = b"canto.v1";
 
     #[test]
-    fn roundtrip_recupera_o_texto_original() {
+    fn roundtrip_recovers_the_original_text() {
         let salt = random_salt();
         let key = VaultKey::derive("senha-mestra", &salt).unwrap();
         let (nonce, ct) = key.encrypt(b"tarefa secreta", AAD).unwrap();
@@ -97,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn senha_errada_nao_decifra() {
+    fn wrong_password_does_not_decrypt() {
         let salt = random_salt();
         let (nonce, ct) = VaultKey::derive("certa", &salt)
             .unwrap()
@@ -110,7 +109,7 @@ mod tests {
     }
 
     #[test]
-    fn ciphertext_adulterado_e_rejeitado() {
+    fn tampered_ciphertext_is_rejected() {
         let salt = random_salt();
         let key = VaultKey::derive("senha", &salt).unwrap();
         let (nonce, mut ct) = key.encrypt(b"saldo: 10", AAD).unwrap();
@@ -119,7 +118,7 @@ mod tests {
     }
 
     #[test]
-    fn aad_diferente_e_rejeitado() {
+    fn different_aad_is_rejected() {
         let salt = random_salt();
         let key = VaultKey::derive("senha", &salt).unwrap();
         let (nonce, ct) = key.encrypt(b"dado", AAD).unwrap();
@@ -127,7 +126,7 @@ mod tests {
     }
 
     #[test]
-    fn salts_distintos_geram_chaves_distintas() {
+    fn distinct_salts_generate_distinct_keys() {
         let (a, b) = (random_salt(), random_salt());
         assert_ne!(a, b);
         let ka = VaultKey::derive("mesma-senha", &a).unwrap();
@@ -136,7 +135,7 @@ mod tests {
     }
 
     #[test]
-    fn nonce_nunca_se_repete_entre_gravacoes() {
+    fn nonce_never_repeats_across_writes() {
         let key = VaultKey::derive("senha", &random_salt()).unwrap();
         let (n1, _) = key.encrypt(b"x", AAD).unwrap();
         let (n2, _) = key.encrypt(b"x", AAD).unwrap();

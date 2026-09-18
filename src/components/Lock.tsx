@@ -1,27 +1,27 @@
 import { useEffect, useState } from "react";
-import { api, errText, type StatusBiometria } from "../lib/api";
+import { api, errText, type BiometricStatus } from "../lib/api";
 
 export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () => void }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [mostrar, setMostrar] = useState(false);
-  const [bio, setBio] = useState<StatusBiometria | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [bio, setBio] = useState<BiometricStatus | null>(null);
 
   useEffect(() => {
     if (!exists) return;
     void api
-      .biometriaStatus()
-      .then((s) => setBio(s?.disponivel && s.ativa ? s : null))
+      .biometricStatus()
+      .then((s) => setBio(s?.available && s.enabled ? s : null))
       .catch(() => setBio(null));
   }, [exists]);
 
-  async function comBiometria() {
+  async function withBiometrics() {
     setError("");
     setBusy(true);
     try {
-      await api.biometriaDesbloquear();
+      await api.biometricUnlock();
       onOpen();
     } catch (e) {
       setError(errText(e));
@@ -67,7 +67,7 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
       </div>
       <input
         autoFocus
-        type={mostrar ? "text" : "password"}
+        type={showPassword ? "text" : "password"}
         aria-label="senha mestra"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
@@ -76,7 +76,7 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
       />
       {!exists && (
         <input
-          type={mostrar ? "text" : "password"}
+          type={showPassword ? "text" : "password"}
           aria-label="repita a senha"
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
@@ -87,8 +87,8 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
       <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
         <input
           type="checkbox"
-          checked={mostrar}
-          onChange={(e) => setMostrar(e.target.checked)}
+          checked={showPassword}
+          onChange={(e) => setShowPassword(e.target.checked)}
           className="size-4 accent-[var(--color-accent)]"
         />
         mostrar senha
@@ -102,11 +102,11 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
       {bio && (
         <button
           type="button"
-          onClick={() => void comBiometria()}
+          onClick={() => void withBiometrics()}
           disabled={busy}
           className="rounded-lg border border-accent px-3 py-2 text-sm font-semibold text-fg disabled:opacity-40"
         >
-          Destrancar com {bio.nome}
+          Destrancar com {bio.name}
         </button>
       )}
       <button

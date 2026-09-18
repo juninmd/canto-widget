@@ -5,7 +5,7 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
   const [busy, setBusy] = useState("");
   const [info, setInfo] = useState("");
 
-  // `fn` devolve "" quando o usuario cancela o dialogo: cancelar nao e erro nem sucesso.
+  // `fn` returns "" when the user cancels the dialog: cancelling is neither error nor success.
   async function run(label: string, fn: () => Promise<string>) {
     setBusy(label);
     setInfo("");
@@ -18,14 +18,14 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
     }
   }
 
-  const exportar = async () => {
-    const onde = await api.backupExportar();
-    return onde ? `backup salvo em ${onde}` : "";
+  const doExport = async () => {
+    const where = await api.backupExport();
+    return where ? `backup salvo em ${where}` : "";
   };
 
-  const importar = async () => {
-    const r = await api.backupImportar();
-    return r ? `backup mesclado: o cofre tem ${r.tarefas} tarefas e ${r.notas} notas` : "";
+  const doImport = async () => {
+    const r = await api.backupImport();
+    return r ? `backup mesclado: o cofre tem ${r.tasks} tarefas e ${r.notes} notas` : "";
   };
 
   return (
@@ -39,7 +39,7 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
         <button
           type="button"
           disabled={busy !== ""}
-          onClick={() => run("exp", exportar)}
+          onClick={() => run("exp", doExport)}
           className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent disabled:opacity-40"
         >
           {busy === "exp" ? "exportando..." : "exportar"}
@@ -47,7 +47,7 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
         <button
           type="button"
           disabled={busy !== ""}
-          onClick={() => run("imp", importar)}
+          onClick={() => run("imp", doImport)}
           className="flex-1 rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
         >
           {busy === "imp" ? "importando..." : "importar"}

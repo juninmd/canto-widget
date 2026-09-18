@@ -5,15 +5,15 @@ use crate::meet::meet_link;
 
 const API: &str = "https://www.googleapis.com/calendar/v3/calendars/primary/events";
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct AgendaItem {
     pub id: String,
-    pub titulo: String,
-    /// RFC3339 quando ha horario; YYYY-MM-DD quando e evento de dia inteiro.
-    pub inicio: String,
-    pub fim: String,
-    pub dia_inteiro: bool,
-    pub local: String,
+    pub title: String,
+    /// RFC3339 when there's a time; YYYY-MM-DD for an all-day event.
+    pub start: String,
+    pub end: String,
+    pub all_day: bool,
+    pub location: String,
     pub meet: String,
     pub link: String,
 }
@@ -82,8 +82,8 @@ impl RawEvent {
             date_time: None,
             date: None,
         });
-        let dia_inteiro = start.date_time.is_none();
-        let entradas: Vec<&str> = self
+        let all_day = start.date_time.is_none();
+        let entries: Vec<&str> = self
             .conference_data
             .as_ref()
             .map(|c| {
@@ -94,25 +94,25 @@ impl RawEvent {
                     .collect()
             })
             .unwrap_or_default();
-        let local = self.location.unwrap_or_default();
-        let descricao = self.description.unwrap_or_default();
-        let textos: Vec<&str> = vec![descricao.as_str(), local.as_str()];
-        let meet = meet_link(self.hangout_link.as_deref(), &entradas, &textos);
-        drop(textos);
+        let location = self.location.unwrap_or_default();
+        let description = self.description.unwrap_or_default();
+        let texts: Vec<&str> = vec![description.as_str(), location.as_str()];
+        let meet = meet_link(self.hangout_link.as_deref(), &entries, &texts);
+        drop(texts);
         Some(AgendaItem {
             id: self.id,
-            titulo: self.summary.unwrap_or_else(|| "(sem titulo)".into()),
-            inicio: start.date_time.or(start.date).unwrap_or_default(),
-            fim: end.date_time.or(end.date).unwrap_or_default(),
-            dia_inteiro,
-            local,
+            title: self.summary.unwrap_or_else(|| "(sem titulo)".into()),
+            start: start.date_time.or(start.date).unwrap_or_default(),
+            end: end.date_time.or(end.date).unwrap_or_default(),
+            all_day,
+            location,
             meet,
             link: self.html_link.unwrap_or_default(),
         })
     }
 }
 
-pub fn eventos(token: &str, time_min: &str, time_max: &str) -> Result<Vec<AgendaItem>> {
+pub fn events(token: &str, time_min: &str, time_max: &str) -> Result<Vec<AgendaItem>> {
     let res = reqwest::blocking::Client::builder()
         .timeout(std::time::Duration::from_secs(30))
         .build()
@@ -135,8 +135,8 @@ pub fn eventos(token: &str, time_min: &str, time_max: &str) -> Result<Vec<Agenda
             res.text().unwrap_or_default()
         )));
     }
-    let lista: EventList = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
-    Ok(lista.items.into_iter().filter_map(RawEvent::into_item).collect())
+    let list: EventList = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
+    Ok(list.items.into_iter().filter_map(RawEvent::into_item).collect())
 }
 
 #[cfg(test)]
@@ -144,32 +144,32 @@ mod tests {
     use super::*;
 
     #[test]
-    fn desserializa_evento_do_google_com_camelcase() {
+    fn deserializes_a_google_event_with_camelcase() {
         let json = r#"{"items":[{"id":"e1","summary":"Daily","status":"confirmed",
             "hangoutLink":"https://meet.google.com/aaa-bbbb-ccc",
             "htmlLink":"https://calendar.google.com/x",
             "start":{"dateTime":"2026-09-09T09:00:00-03:00"},
             "end":{"dateTime":"2026-09-09T09:15:00-03:00"}}]}"#;
-        let lista: EventList = serde_json::from_str(json).unwrap();
-        let item = lista.items.into_iter().next().unwrap().into_item().unwrap();
-        assert_eq!(item.titulo, "Daily");
+        let list: EventList = serde_json::from_str(json).unwrap();
+        let item = list.items.into_iter().next().unwrap().into_item().unwrap();
+        assert_eq!(item.title, "Daily");
         assert_eq!(item.meet, "https://meet.google.com/aaa-bbbb-ccc");
-        assert!(!item.dia_inteiro);
+        assert!(!item.all_day);
     }
 
     #[test]
-    fn evento_cancelado_some_da_agenda() {
+    fn canceled_event_is_dropped_from_the_agenda() {
         let json = r#"{"items":[{"id":"e1","status":"cancelled","start":{"date":"2026-09-09"}}]}"#;
-        let lista: EventList = serde_json::from_str(json).unwrap();
-        assert!(lista.items.into_iter().next().unwrap().into_item().is_none());
+        let list: EventList = serde_json::from_str(json).unwrap();
+        assert!(list.items.into_iter().next().unwrap().into_item().is_none());
     }
 
     #[test]
-    fn evento_de_dia_inteiro_e_marcado() {
+    fn all_day_event_is_flagged() {
         let json = r#"{"items":[{"id":"e2","summary":"Feriado","start":{"date":"2026-09-07"},"end":{"date":"2026-09-08"}}]}"#;
-        let lista: EventList = serde_json::from_str(json).unwrap();
-        let item = lista.items.into_iter().next().unwrap().into_item().unwrap();
-        assert!(item.dia_inteiro);
-        assert_eq!(item.inicio, "2026-09-07");
+        let list: EventList = serde_json::from_str(json).unwrap();
+        let item = list.items.into_iter().next().unwrap().into_item().unwrap();
+        assert!(item.all_day);
+        assert_eq!(item.start, "2026-09-07");
     }
 }

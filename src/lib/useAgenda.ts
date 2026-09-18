@@ -1,66 +1,66 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem } from "./api";
-import { janelaDoDia, paraAlertar } from "./agenda";
+import { dayWindow, shouldAlert } from "./agenda";
 
-const RECARGA_MS = 5 * 60_000;
-const VIGIA_MS = 30_000;
+const RELOAD_MS = 5 * 60_000;
+const WATCH_MS = 30_000;
 
 export type Agenda = {
-  itens: AgendaItem[];
-  carregando: boolean;
-  erro: string;
-  recarregar: () => Promise<void>;
+  items: AgendaItem[];
+  loading: boolean;
+  error: string;
+  reload: () => Promise<void>;
 };
 
 /**
- * Mora no App, nunca na aba: o aviso de reunião precisa disparar com o usuário
- * em tarefas, em notas ou com o widget escondido na bandeja. Enquanto isto
- * vivia dentro do AgendaTab, sair da aba desligava o relógio e zerava a lista
- * de já avisados — nenhum pop-up, ou o mesmo pop-up duas vezes.
+ * Lives in App, never in the tab: the meeting alert needs to fire with the user
+ * on tasks, on notes, or with the widget hidden in the tray. While this
+ * lived inside AgendaTab, leaving the tab turned off the clock and cleared the
+ * list of those already alerted — no pop-up, or the same pop-up twice.
  */
-export function useAgenda(ativo: boolean): Agenda {
-  const [itens, setItens] = useState<AgendaItem[]>([]);
-  const [carregando, setCarregando] = useState(false);
-  const [erro, setErro] = useState("");
-  const alertados = useRef(new Set<string>());
+export function useAgenda(active: boolean): Agenda {
+  const [items, setItems] = useState<AgendaItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const alerted = useRef(new Set<string>());
 
-  const recarregar = useCallback(async () => {
-    setCarregando(true);
+  const reload = useCallback(async () => {
+    setLoading(true);
     try {
-      const { timeMin, timeMax } = janelaDoDia();
-      setItens(await api.agendaToday(timeMin, timeMax));
-      setErro("");
+      const { timeMin, timeMax } = dayWindow();
+      setItems(await api.agendaToday(timeMin, timeMax));
+      setError("");
     } catch (e) {
-      // Fica na aba: sem conta do Google, o polling de 5 em 5 min não pode
-      // tomar a faixa de erro global do widget.
-      setErro(errText(e));
+      // Stays in the tab: without a Google account, the 5-minute polling can't
+      // take over the widget's global error strip.
+      setError(errText(e));
     } finally {
-      setCarregando(false);
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (!ativo) {
-      setItens([]);
-      setErro("");
-      alertados.current.clear();
+    if (!active) {
+      setItems([]);
+      setError("");
+      alerted.current.clear();
       return;
     }
-    void recarregar();
-    const t = setInterval(() => void recarregar(), RECARGA_MS);
+    void reload();
+    const t = setInterval(() => void reload(), RELOAD_MS);
     return () => clearInterval(t);
-  }, [ativo, recarregar]);
+  }, [active, reload]);
 
   useEffect(() => {
-    if (!ativo) return;
+    if (!active) return;
     const t = setInterval(() => {
-      for (const evento of paraAlertar(itens, alertados.current)) {
-        alertados.current.add(evento.id);
-        void api.alertaAbrir(evento).catch(() => {});
+      for (const event of shouldAlert(items, alerted.current)) {
+        alerted.current.add(event.id);
+        void api.alertOpen(event).catch(() => {});
       }
-    }, VIGIA_MS);
+    }, WATCH_MS);
     return () => clearInterval(t);
-  }, [ativo, itens]);
+  }, [active, items]);
 
-  return { itens, carregando, erro, recarregar };
+  return { items, loading, error, reload };
 }
