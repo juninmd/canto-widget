@@ -140,6 +140,13 @@ Atalho global escondendo e trazendo o widget de volta:
 |---|---|
 | ![Widget escondido](prints/33-atalho-escondeu.png) | ![Widget de volta](prints/34-atalho-voltou.png) |
 
+## Segurança
+
+- **Auto-trava** — em **Ajustes → Segurança**, escolha destrancar por 5, 15 (padrão), 30 ou 60 min sem uso;
+  passado esse tempo o cofre tranca sozinho e a chave sai da memória. Não há opção de desligar a auto-trava.
+- **Destravar com Windows Hello** (quando o computador tem o suporte), em **Ajustes → Segurança**. A senha
+  mestra continua sendo o único jeito de abrir um backup em outra máquina.
+
 ## Janela
 
 - Ancorada na **work area** do monitor atual (fora da barra de tarefas/dock), margem de 16 px.

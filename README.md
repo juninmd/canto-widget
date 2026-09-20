@@ -195,7 +195,7 @@ Baixe o instalador da sua plataforma em **[Releases](https://github.com/juninmd/
 | Camada | Proteção |
 |---|---|
 | Cofre | Argon2id (19 MiB, t=2) → AES-256-GCM, nonce novo a cada gravação, gravação atômica com `fsync` |
-| Chave | só em RAM, zerada ao trancar; auto-lock após 15 min sem uso |
+| Chave | só em RAM, zerada ao trancar; auto-lock configurável (5 a 60 min sem uso, 15 min por padrão) |
 | Rede | só o processo Rust fala com a rede; a webview não tem origem remota (CSP) e nunca vê tokens |
 | Google | opcional, só `calendar.events.readonly` + perfil, OAuth com PKCE e loopback |
 | GitHub | opcional, token cifrado; itens só abrem se o link for `https://github.com/` |

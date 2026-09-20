@@ -152,6 +152,9 @@ export const api = {
   autostartStatus: () => invoke<boolean>("autostart_status"),
   autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),
 
+  autolockGet: () => invoke<number>("autolock_get"),
+  autolockSet: (minutes: number) => invoke<void>("autolock_set", { minutes }),
+
   /** `null` when the user cancels the dialog. */
   backupExport: () => invoke<string | null>("backup_export"),
   backupImport: () => invoke<ImportSummary | null>("backup_import"),

@@ -48,6 +48,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   commit; GitLab: pipeline da MR) e mostra passou/falhou/rodando/sem CI.
 - **Tempo aguardando revisão**: na lista "revisão pedida a mim", cada PR/MR mostra há quantos dias foi aberto,
   em vermelho a partir de 3 dias.
+- **Auto-trava configurável**: em Ajustes → Segurança, escolha 5, 15 (padrão), 30 ou 60 minutos sem uso antes
+  do cofre trancar sozinho.
 
 ### Alterado
 

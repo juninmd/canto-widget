@@ -1,4 +1,5 @@
 pub mod account;
+pub mod autolock;
 pub mod autostart;
 pub mod backup;
 pub mod badge;
@@ -164,6 +165,8 @@ pub fn run() {
             updater::update_check,
             updater::update_install,
             autostart::autostart_set,
+            autolock::autolock_get,
+            autolock::autolock_set,
             cmd_backup::backup_export,
             cmd_backup::backup_import,
             trash::trash_undo,
@@ -207,18 +210,18 @@ pub fn run() {
         .expect("erro ao iniciar o Canto");
 }
 
-/// Without this, an unlocked vault would survive any amount of time away from the machine.
-const AUTO_LOCK_MS: i64 = 15 * 60 * 1000;
 pub const AUTO_LOCK_EVENT: &str = "canto://auto-lock";
 
+/// Without this, an unlocked vault would survive any amount of time away from the machine.
 fn watch_idle(app: tauri::AppHandle) {
     std::thread::spawn(move || loop {
         std::thread::sleep(std::time::Duration::from_secs(20));
         let Some(state) = app.try_state::<AppState>() else {
             continue;
         };
-        if state.lock_if_idle(AUTO_LOCK_MS) {
-            let _ = tauri::Emitter::emit(&app, AUTO_LOCK_EVENT, AUTO_LOCK_MS / 60_000);
+        let limit_ms = autolock::minutes(&state.dir) * 60_000;
+        if state.lock_if_idle(limit_ms) {
+            let _ = tauri::Emitter::emit(&app, AUTO_LOCK_EVENT, limit_ms / 60_000);
         }
     });
 }
