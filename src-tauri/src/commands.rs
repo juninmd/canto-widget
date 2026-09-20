@@ -38,7 +38,15 @@ pub fn vault_create(state: State<'_, AppState>, password: String) -> Result<()> 
 
 #[tauri::command(async)]
 pub fn vault_unlock(state: State<'_, AppState>, password: String) -> Result<()> {
-    state.unlock(&password)
+    state.unlock(&password)?;
+    crate::unlock_log::record(&state.dir, "password", now_ms());
+    Ok(())
+}
+
+/// Read here, not through `state` at rest: the log survives across sessions without needing the vault open.
+#[tauri::command]
+pub fn unlock_history(state: State<'_, AppState>) -> Vec<crate::unlock_log::UnlockEntry> {
+    crate::unlock_log::history(&state.dir)
 }
 
 #[tauri::command]

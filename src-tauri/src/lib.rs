@@ -52,6 +52,7 @@ pub mod task_order;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
+pub mod unlock_log;
 pub mod updater;
 pub mod vault;
 pub mod window;
@@ -118,6 +119,7 @@ pub fn run() {
             commands::vault_create,
             commands::vault_unlock,
             commands::vault_lock,
+            commands::unlock_history,
             commands::vault_touch,
             password::vault_change_password,
             commands::tasks_for_day,

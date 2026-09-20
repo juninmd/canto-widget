@@ -146,6 +146,8 @@ Atalho global escondendo e trazendo o widget de volta:
   passado esse tempo o cofre tranca sozinho e a chave sai da memória. Não há opção de desligar a auto-trava.
 - **Destravar com Windows Hello** (quando o computador tem o suporte), em **Ajustes → Segurança**. A senha
   mestra continua sendo o único jeito de abrir um backup em outra máquina.
+- **Últimos desbloqueios** — em **Ajustes → Segurança**, a lista "últimos desbloqueios" mostra quando (e por
+  senha ou Windows Hello) o cofre foi destrancado nas últimas 20 vezes, para notar um acesso que você não fez.
 
 ## Janela
 

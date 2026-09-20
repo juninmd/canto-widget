@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
-import { api, errText, type BiometricStatus } from "../lib/api";
+import { api, errText, type BiometricStatus, type UnlockEntry } from "../lib/api";
 import { AUTOLOCK_OPTIONS } from "../lib/autolock";
+import { timeAgo } from "../lib/time";
 import { useToast } from "../lib/toast";
 import ChangePassword from "./ChangePassword";
 
-/** Master password change, auto-lock timeout and, where the system offers it, biometric unlock. */
+const METHOD_LABEL: Record<UnlockEntry["method"], string> = { password: "senha", windows_hello: "Windows Hello" };
+
+/** Master password change, auto-lock timeout, unlock history and, where the system offers it, biometric unlock. */
 export default function SecuritySection({ onError }: { onError: (m: string) => void }) {
   const [bio, setBio] = useState<BiometricStatus | null>(null);
   const [autolock, setAutolock] = useState<number | null>(null);
+  const [history, setHistory] = useState<UnlockEntry[]>([]);
   const [busy, setBusy] = useState(false);
   const notify = useToast();
 
@@ -20,6 +24,10 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
   useEffect(() => {
     void reload();
     api.autolockGet().then(setAutolock).catch(() => setAutolock(null));
+    api
+      .unlockHistory()
+      .then((h) => setHistory(h ?? []))
+      .catch(() => setHistory([]));
   }, []);
 
   async function changeAutolock(minutes: number) {
@@ -83,6 +91,21 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
             único jeito de abrir um backup em outra máquina.
           </p>
         </>
+      )}
+      {history.length > 0 && (
+        <details className="text-xs text-muted">
+          <summary className="cursor-pointer">últimos desbloqueios</summary>
+          <ul className="mt-1 flex flex-col gap-0.5 text-[11px] text-faint">
+            {[...history]
+              .reverse()
+              .slice(0, 10)
+              .map((e, i) => (
+                <li key={`${e.at}-${i}`} title={new Date(e.at).toLocaleString("pt-BR")}>
+                  {METHOD_LABEL[e.method] ?? e.method} — {timeAgo(e.at)}
+                </li>
+              ))}
+          </ul>
+        </details>
       )}
     </section>
   );

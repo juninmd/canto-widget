@@ -2,6 +2,7 @@ use tauri::{Manager, State};
 
 use crate::biometric;
 use crate::error::{AppError, Result};
+use crate::model::now_ms;
 use crate::vault::AppState;
 
 #[derive(serde::Serialize)]
@@ -69,12 +70,16 @@ pub fn biometric_enable(app: tauri::AppHandle, state: State<'_, AppState>) -> Re
 pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
     let password = without_always_on_top(&app, || biometric::open(&state.dir, &VAULT))?;
     match state.unlock(&password) {
+        Ok(()) => {
+            crate::unlock_log::record(&state.dir, "windows_hello", now_ms());
+            Ok(())
+        }
         // Vault recreated with another password: the stored copy is now useless.
         Err(AppError::WrongPassword) => {
             let _ = biometric::disable(&state.dir);
             Err(AppError::Config(format!("a senha mestra mudou; ative o {NAME} de novo em Ajustes")))
         }
-        other => other,
+        Err(e) => Err(e),
     }
 }
 

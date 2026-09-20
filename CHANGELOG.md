@@ -50,6 +50,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   em vermelho a partir de 3 dias.
 - **Auto-trava configurável**: em Ajustes → Segurança, escolha 5, 15 (padrão), 30 ou 60 minutos sem uso antes
   do cofre trancar sozinho.
+- **Registro local dos últimos desbloqueios** (até 20), com data/hora e se foi por senha ou Windows Hello, em
+  Ajustes → Segurança.
 
 ### Alterado
 

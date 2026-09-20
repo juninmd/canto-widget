@@ -47,6 +47,7 @@ export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
+export type UnlockEntry = { at: number; method: "password" | "windows_hello" };
 export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean };
 
 /// User's local day as YYYY-MM-DD. Lives in the frontend because the Rust
@@ -154,6 +155,7 @@ export const api = {
 
   autolockGet: () => invoke<number>("autolock_get"),
   autolockSet: (minutes: number) => invoke<void>("autolock_set", { minutes }),
+  unlockHistory: () => invoke<UnlockEntry[]>("unlock_history"),
 
   /** `null` when the user cancels the dialog. */
   backupExport: () => invoke<string | null>("backup_export"),
