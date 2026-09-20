@@ -91,6 +91,9 @@
 
 - Skins, escolhidas em **ajustes → Aparência**: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Claro** e **Sistema**, que segue o tema
   claro/escuro do sistema operacional e troca sozinha quando ele muda. A clara passa AA em todo texto.
+- **Tamanho da interface**, em **Ajustes → Tamanho da interface**: **compacta**, **padrão** ou **confortável** —
+  escala texto e espaçamento juntos, como um zoom do widget inteiro. A janela pode ser redimensionada pelas
+  bordas se o conteúdo não couber na densidade escolhida.
 - **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca na aba
   atual, `Ctrl+K` abre a busca global, `Alt+L` tranca e `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
 - **Busca global** (`Ctrl+K`) busca ao mesmo tempo nas tarefas de hoje, nas notas e no clipboard; escolher um resultado

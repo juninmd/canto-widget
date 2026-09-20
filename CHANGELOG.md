@@ -61,6 +61,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Busca global entre abas** (`Ctrl+K`): busca ao mesmo tempo em tarefas de hoje, notas e clipboard; escolher
   um resultado troca de aba com o texto já buscado. Tarefas de outros dias ficam fora da busca — o app ainda
   não navega entre dias.
+- **Tamanho da interface** (Ajustes → Aparência): compacta, padrão ou confortável, escalando texto e espaçamento
+  juntos.
 
 ### Alterado
 
