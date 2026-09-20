@@ -8,6 +8,7 @@ export type * from "./forgeTypes";
 export type Repeat = { tipo: "diaria" } | { tipo: "dias_uteis" } | { tipo: "semanal"; dia: number };
 
 export type Subtask = { id: string; title: string; done: boolean };
+export type Priority = "low" | "medium" | "high";
 
 export type Task = {
   id: string;
@@ -22,6 +23,7 @@ export type Task = {
   serie?: string | null;
   pr_url?: string | null;
   subtasks?: Subtask[];
+  priority?: Priority | null;
 };
 
 export type Note = {
@@ -111,6 +113,7 @@ export const api = {
   subtaskAdd: (id: string, title: string) => invoke<Subtask>("subtask_add", { id, title }),
   subtaskToggle: (id: string, subtaskId: string) => invoke<void>("subtask_toggle", { id, subtaskId }),
   subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
+  taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
   tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
 

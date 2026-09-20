@@ -47,6 +47,16 @@ pub struct Task {
     pub pr_url: Option<String>,
     #[serde(default)]
     pub subtasks: Vec<Subtask>,
+    #[serde(default)]
+    pub priority: Option<Priority>,
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Priority {
+    Low,
+    Medium,
+    High,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]

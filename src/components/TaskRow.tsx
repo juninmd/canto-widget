@@ -1,4 +1,4 @@
-import type { Repeat, Task } from "../lib/api";
+import type { Priority, Repeat, Task } from "../lib/api";
 import TaskDetails, { TaskBadge } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
 import { ENTER_CLASS, EXIT_CLASS } from "../lib/motion";
@@ -22,6 +22,7 @@ type Props = {
   onToggleDetails: () => void;
   onSchedule: (time: string | null, repeat: Repeat | null) => void;
   onLinkPr: (url: string | null) => void;
+  onPriority: (priority: Priority | null) => void;
   onSubtasksChange: () => void;
   onError: (m: string) => void;
 };
@@ -44,6 +45,7 @@ export default function TaskRow({
   onToggleDetails,
   onSchedule,
   onLinkPr,
+  onPriority,
   onSubtasksChange,
   onError,
 }: Props) {
@@ -95,7 +97,7 @@ export default function TaskRow({
       </li>
       {detailsOpen && (
         <li className="flex flex-col gap-1">
-          <TaskDetails task={t} onChange={onSchedule} onLinkPr={onLinkPr} onClose={onToggleDetails} />
+          <TaskDetails task={t} onChange={onSchedule} onLinkPr={onLinkPr} onPriority={onPriority} onClose={onToggleDetails} />
           <TaskSubtasks taskId={t.id} subtasks={t.subtasks ?? []} onError={onError} onChange={onSubtasksChange} />
         </li>
       )}

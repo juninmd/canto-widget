@@ -35,6 +35,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Antecedência do lembrete de tarefa**, em Ajustes → Lembretes (na hora, 5, 10, 15 ou 30 min antes).
 - **Vincular tarefa a um PR/MR**: link no ⏰ da tarefa, com ícone na linha para abrir direto.
 - **Subtarefas**: checklist dentro do ⏰ da tarefa, com contagem `feitas/total` na linha.
+- **Prioridade da tarefa** (alta/média/baixa) com bolinha na linha e filtro acima da lista.
 
 ### Alterado
 

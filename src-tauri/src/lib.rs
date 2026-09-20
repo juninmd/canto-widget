@@ -42,6 +42,7 @@ pub mod oauth;
 pub mod paste_plain;
 pub mod plain_text;
 pub mod password;
+pub mod priority;
 pub mod routine;
 pub mod snooze;
 pub mod store;
@@ -127,6 +128,7 @@ pub fn run() {
             subtask::subtask_add,
             subtask::subtask_toggle,
             subtask::subtask_remove,
+            priority::task_set_priority,
             cmd_notes::notes_search,
             cmd_notes::note_save,
             cmd_notes::note_pin,

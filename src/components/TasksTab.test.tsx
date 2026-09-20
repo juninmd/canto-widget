@@ -14,13 +14,16 @@ const baseTask = {
   updated_at: 1,
 };
 type Subtask = { id: string; title: string; done: boolean };
-let task: typeof baseTask & { pr_url?: string | null; subtasks?: Subtask[] } = { ...baseTask };
+type Priority = "low" | "medium" | "high";
+type MockTask = typeof baseTask & { pr_url?: string | null; subtasks?: Subtask[]; priority?: Priority | null };
+let task: MockTask = { ...baseTask };
+let extraTask: MockTask | null = null;
 let nextSubtaskId = 0;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
-    if (cmd === "tasks_for_day") return Promise.resolve([task]);
+    if (cmd === "tasks_for_day") return Promise.resolve(extraTask ? [task, extraTask] : [task]);
     if (cmd === "task_add") return Promise.resolve({ ...task, id: "t2", title: args?.title });
     if (cmd === "item_delete") return Promise.resolve("chave-1");
     if (cmd === "trash_undo") return Promise.resolve(true);
@@ -42,6 +45,10 @@ mock.module("@tauri-apps/api/core", () => ({
     }
     if (cmd === "subtask_remove") {
       task = { ...task, subtasks: (task.subtasks ?? []).filter((s) => s.id !== args?.subtaskId) };
+      return Promise.resolve(null);
+    }
+    if (cmd === "task_set_priority") {
+      task = { ...task, priority: args?.priority as Priority | null };
       return Promise.resolve(null);
     }
     return Promise.resolve(null);
@@ -70,6 +77,7 @@ async function openEditing() {
 beforeEach(() => {
   calls.length = 0;
   task = { ...baseTask };
+  extraTask = null;
   nextSubtaskId = 0;
 });
 
@@ -194,6 +202,32 @@ test("a PR link is saved on Enter and opens from the badge chip", async () => {
     fireEvent.click(screen.getByLabelText("abrir PR/MR de comprar leite"));
   });
   expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://github.com/o/r/pull/1" });
+});
+
+test("setting a priority saves it and shows a dot with its label", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  const select = screen.getByLabelText("prioridade de comprar leite");
+  await act(async () => {
+    fireEvent.change(select, { target: { value: "high" } });
+  });
+  expect(calls.find((c) => c.cmd === "task_set_priority")?.args).toEqual({ id: "t1", priority: "high" });
+  expect(screen.getByTitle("prioridade alta")).toBeTruthy();
+});
+
+test("filtering by priority hides tasks that don't match", async () => {
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", priority: "low" };
+  await mount();
+  expect(screen.getByText("pagar conta")).toBeTruthy();
+
+  const filter = screen.getByLabelText("filtrar por prioridade");
+  await act(async () => {
+    fireEvent.change(filter, { target: { value: "low" } });
+  });
+  expect(screen.queryByText("comprar leite")).toBeNull();
+  expect(screen.getByText("pagar conta")).toBeTruthy();
 });
 
 test("clearing the PR field sends null", async () => {

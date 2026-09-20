@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { api, errText, type AgendaItem, type Task } from "../lib/api";
+import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
+import { PRIORITY_LABEL } from "../lib/priority";
 import DaySummary from "./DaySummary";
 import TaskRow from "./TaskRow";
 import { useUndo } from "../lib/useUndo";
@@ -22,6 +23,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const { leaving, leave } = useExit();
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
 
   async function reload() {
     try {
@@ -82,6 +84,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   }
 
   const done = tasks.filter((t) => t.done).length;
+  const visible = priorityFilter ? tasks.filter((t) => t.priority === priorityFilter) : tasks;
 
   if (summary) {
     return <DaySummary day={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />;
@@ -123,11 +126,24 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           >
             puxar pendências
           </button>
+          <select
+            aria-label="filtrar por prioridade"
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value as Priority | "")}
+            className="rounded border border-line bg-ink px-1 py-0.5 text-[11px] text-muted outline-none focus:border-accent"
+          >
+            <option value="">todas as prioridades</option>
+            {(["high", "medium", "low"] as Priority[]).map((p) => (
+              <option key={p} value={p}>
+                {PRIORITY_LABEL[p]}
+              </option>
+            ))}
+          </select>
         </span>
       </div>
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
-        {tasks.map((t) => (
+        {visible.map((t) => (
           <TaskRow
             key={t.id}
             task={t}
@@ -157,12 +173,16 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             onToggleDetails={() => setDetails(details === t.id ? "" : t.id)}
             onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
             onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
+            onPriority={(priority) => void run(() => api.taskSetPriority(t.id, priority))}
             onSubtasksChange={reload}
             onError={onError}
           />
         ))}
         {tasks.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda — escreva acima e tecle Enter</li>
+        )}
+        {tasks.length > 0 && visible.length === 0 && (
+          <li className="px-2 py-6 text-center text-xs text-faint">nenhuma tarefa com essa prioridade</li>
         )}
       </ul>
     </div>

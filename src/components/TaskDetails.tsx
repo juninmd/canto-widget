@@ -1,25 +1,29 @@
 import { useState } from "react";
 import { api } from "../lib/api";
-import type { Repeat, Task } from "../lib/api";
+import type { Priority, Repeat, Task } from "../lib/api";
 import { dayOfWeek, REPEAT_LABEL } from "../lib/reminders";
+import { PRIORITY_DOT, PRIORITY_LABEL } from "../lib/priority";
 import { ClockIcon, PullIcon } from "./Icons";
 
 const WEEK = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+const PRIORITIES: Priority[] = ["high", "medium", "low"];
 
 function repeatValue(r: Repeat | null | undefined): string {
   return r?.tipo ?? "";
 }
 
-/** A task's time, repeat rule and linked PR/MR. Every change saves immediately: there's no "save" to forget. */
+/** A task's time, repeat rule, priority and linked PR/MR. Every change saves immediately: there's no "save" to forget. */
 export default function TaskDetails({
   task,
   onChange,
   onLinkPr,
+  onPriority,
   onClose,
 }: {
   task: Task;
   onChange: (time: string | null, repeat: Repeat | null) => void;
   onLinkPr: (url: string | null) => void;
+  onPriority: (priority: Priority | null) => void;
   onClose: () => void;
 }) {
   const [prUrl, setPrUrl] = useState(task.pr_url ?? "");
@@ -59,6 +63,19 @@ export default function TaskDetails({
           </option>
         ))}
       </select>
+      <select
+        aria-label={`prioridade de ${task.title}`}
+        value={task.priority ?? ""}
+        onChange={(e) => onPriority((e.target.value || null) as Priority | null)}
+        className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+      >
+        <option value="">sem prioridade</option>
+        {PRIORITIES.map((p) => (
+          <option key={p} value={p}>
+            {PRIORITY_LABEL[p]}
+          </option>
+        ))}
+      </select>
       <label className="flex flex-1 items-center gap-1">
         PR/MR
         <input
@@ -83,6 +100,7 @@ export default function TaskDetails({
 export function TaskBadge({ task: t, open, onToggle }: { task: Task; open: boolean; onToggle: () => void }) {
   return (
     <>
+      {t.priority && <span className={`size-2 shrink-0 rounded-full ${PRIORITY_DOT[t.priority]}`} title={`prioridade ${PRIORITY_LABEL[t.priority]}`} />}
       {(t.hora || t.repetir) && (
         <span className="shrink-0 text-[11px] text-muted" title={t.repetir ? REPEAT_LABEL[t.repetir.tipo] : undefined}>
           {t.hora}
