@@ -38,6 +38,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Prioridade da tarefa** (alta/média/baixa) com bolinha na linha e filtro acima da lista.
 - **Arrastar para reordenar** as tarefas do dia pela alça (⠿) que aparece ao passar o mouse.
 - **Recorrência mensal e por dias específicos da semana** para tarefas, além de todo dia/dias úteis/semanal.
+- **Visualizar markdown na nota**: alternar entre escrever e visualizar renderiza negrito, itálico, código,
+  listas e links (só `http(s)://` abrem no navegador).
+- **Destaque do termo buscado** dentro do título e do corpo dos cards de notas encontrados.
+- **Vincular nota a uma tarefa ou evento** da agenda: a nota ganha um selo que leva direto para a aba
+  correspondente.
 
 ### Alterado
 

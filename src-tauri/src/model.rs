@@ -94,6 +94,17 @@ pub struct Note {
     pub updated_at: i64,
     #[serde(default, rename = "fixada")]
     pub pinned: bool,
+    /// Optional reference to a task or an agenda event; `label` is a title snapshot for display,
+    /// since the linked item can be renamed or (for an event) never seen again by this vault.
+    #[serde(default)]
+    pub link: Option<NoteLink>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum NoteLink {
+    Task { id: String, label: String },
+    Event { id: String, label: String },
 }
 
 impl Versioned for Task {

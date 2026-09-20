@@ -187,7 +187,15 @@ function Canto() {
             className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
           >
             {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
-            {tab === "notes" && <NotesTab onError={setError} />}
+            {tab === "notes" && (
+              <NotesTab
+                today={today}
+                agenda={agenda.items}
+                onOpenTasks={() => setTab("tasks")}
+                onOpenAgenda={() => setTab("agenda")}
+                onError={setError}
+              />
+            )}
             {tab === "clipboard" && <ClipboardTab onError={setError} />}
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}

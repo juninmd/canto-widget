@@ -30,6 +30,8 @@ export type Task = {
   extended_repeat?: ExtendedRepeat | null;
 };
 
+export type NoteLink = { kind: "task"; id: string; label: string } | { kind: "event"; id: string; label: string };
+
 export type Note = {
   id: string;
   title: string;
@@ -38,6 +40,7 @@ export type Note = {
   created_at: number;
   updated_at: number;
   fixada?: boolean;
+  link?: NoteLink | null;
 };
 
 export type NotesPage = { total: number; items: Note[] };
@@ -125,8 +128,8 @@ export const api = {
   tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
 
   notesSearch: (query: string, limit: number) => invoke<NotesPage>("notes_search", { query, limit }),
-  noteSave: (note: { id?: string; title: string; body: string; tags: string[] }) =>
-    invoke<Note>("note_save", { id: note.id ?? null, ...note }),
+  noteSave: (note: { id?: string; title: string; body: string; tags: string[]; link?: NoteLink | null }) =>
+    invoke<Note>("note_save", { id: note.id ?? null, link: note.link ?? null, ...note }),
   /** Returns whether the note ended up pinned. */
   notePin: (id: string) => invoke<boolean>("note_pin", { id }),
   /** Returns the key for `trashUndo`, or `null` if nothing was removed. */

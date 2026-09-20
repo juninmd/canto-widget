@@ -156,8 +156,9 @@ fn old_vault_without_the_new_fields_opens_the_same() {
 }
 
 mod notes {
-    use canto_widget_lib::cmd_notes::{note_matches, sort};
-    use canto_widget_lib::model::Note;
+    use canto_widget_lib::cmd_notes::{note_matches, sort, validate_link};
+    use canto_widget_lib::error::AppError;
+    use canto_widget_lib::model::{Note, NoteLink};
 
     fn note(id: &str, tags: &[&str], pinned: bool, updated_at: i64) -> Note {
         Note {
@@ -186,6 +187,19 @@ mod notes {
         assert!(!note_matches(&trab, "#trabalho"));
         assert!(!note_matches(&work, "#trab"), "#tag turned into a substring search");
         assert!(note_matches(&work, "trab"), "free search stopped matching a tag substring");
+    }
+
+    #[test]
+    fn a_link_needs_both_a_real_id_and_a_label() {
+        assert!(validate_link(&NoteLink::Task { id: "t1".into(), label: "comprar leite".into() }).is_ok());
+        assert!(matches!(
+            validate_link(&NoteLink::Task { id: "  ".into(), label: "comprar leite".into() }),
+            Err(AppError::Config(_))
+        ));
+        assert!(matches!(
+            validate_link(&NoteLink::Event { id: "e1".into(), label: " ".into() }),
+            Err(AppError::Config(_))
+        ));
     }
 }
 

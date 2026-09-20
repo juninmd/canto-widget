@@ -57,6 +57,11 @@
 - **Notas fixadas** — o alfinete leva o card para o topo; clicar numa `#tag` filtra só por ela.
 - **Muitas notas** — a aba mostra 50 cards por vez (fixados primeiro) e **mostrar mais** traz os próximos; a busca
   procura em todos. Um card aceita até 100 mil caracteres e o título, 300.
+- **Visualizar markdown** — no editor de uma nota, alterne entre **escrever** e **visualizar** para ver
+  `**negrito**`, `*itálico*`, `` `código` ``, listas e links renderizados. Só links `http(s)://` abrem no navegador.
+- **Busca destacada** — o termo buscado aparece marcado dentro do título e do corpo dos cards encontrados.
+- **Vincular nota a tarefa ou evento** — no editor, "vincular a uma tarefa ou evento" mostra as tarefas do
+  dia e os eventos da agenda; a nota ganha um selo que leva direto para a aba correspondente.
 - **Resumo do dia** — texto com o que foi concluído, o que ficou pendente, as reuniões e os **PRs/MRs que você
   abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
   não responder, o resumo diz qual e traz o resto.

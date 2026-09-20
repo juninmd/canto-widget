@@ -3,7 +3,7 @@ use tauri::State;
 
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Note};
+use crate::model::{now_ms, Note, NoteLink};
 use crate::vault::AppState;
 
 pub const PAGE_DEFAULT: usize = 50;
@@ -63,6 +63,14 @@ pub fn note_matches(n: &Note, needle_lower: &str) -> bool {
         || n.tags.iter().any(|t| t.to_lowercase().contains(needle_lower))
 }
 
+pub fn validate_link(link: &NoteLink) -> Result<()> {
+    let (NoteLink::Task { id, label } | NoteLink::Event { id, label }) = link;
+    if id.trim().is_empty() || label.trim().is_empty() {
+        return Err(AppError::Config("vinculo invalido".into()));
+    }
+    Ok(())
+}
+
 #[tauri::command(async)]
 pub fn note_save(
     state: State<'_, AppState>,
@@ -70,6 +78,7 @@ pub fn note_save(
     title: String,
     body: String,
     tags: Vec<String>,
+    link: Option<NoteLink>,
 ) -> Result<Note> {
     let before = state.read(|d| {
         d.notes
@@ -78,6 +87,9 @@ pub fn note_save(
             .map_or((0, 0), |n| (n.title.chars().count(), n.body.chars().count()))
     })?;
     check_size(&title, &body, before)?;
+    if let Some(l) = &link {
+        validate_link(l)?;
+    }
     let now = now_ms();
     let tags: Vec<String> = tags
         .into_iter()
@@ -89,19 +101,12 @@ pub fn note_save(
             n.title = title;
             n.body = body;
             n.tags = tags;
+            n.link = link;
             n.updated_at = now;
             n.clone()
         }
         None => {
-            let note = Note {
-                id: new_id(),
-                title,
-                body,
-                tags,
-                created_at: now,
-                updated_at: now,
-                ..Default::default()
-            };
+            let note = Note { id: new_id(), title, body, tags, created_at: now, updated_at: now, link, ..Default::default() };
             d.notes.push(note.clone());
             note
         }
