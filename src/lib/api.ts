@@ -47,7 +47,7 @@ export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
-export type UnlockEntry = { at: number; method: "password" | "windows_hello" };
+export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
 export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean };
 
 /// User's local day as YYYY-MM-DD. Lives in the frontend because the Rust

@@ -37,6 +37,13 @@ pub fn enabled(dir: &Path) -> bool {
     path(dir).exists()
 }
 
+/// For a backend that doesn't use the envelope below (macOS's Keychain stores the password itself):
+/// just the presence marker `enabled`/`disable` already check for.
+#[cfg(target_os = "macos")]
+pub fn mark(dir: &Path) -> Result<()> {
+    store::write_json_atomic(&path(dir), &serde_json::json!({ "versao": VERSION }))
+}
+
 /// Requires a deterministic signature (RSA PKCS#1 v1.5, like Windows Hello's) so the key can be reconstructed.
 fn derive_key(signature: &[u8]) -> VaultKey {
     let mut h = Sha256::new();

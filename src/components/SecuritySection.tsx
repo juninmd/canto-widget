@@ -5,7 +5,11 @@ import { timeAgo } from "../lib/time";
 import { useToast } from "../lib/toast";
 import ChangePassword from "./ChangePassword";
 
-const METHOD_LABEL: Record<UnlockEntry["method"], string> = { password: "senha", windows_hello: "Windows Hello" };
+const METHOD_LABEL: Record<UnlockEntry["method"], string> = {
+  password: "senha",
+  windows_hello: "Windows Hello",
+  touch_id: "Touch ID",
+};
 
 /** Master password change, auto-lock timeout, unlock history and, where the system offers it, biometric unlock. */
 export default function SecuritySection({ onError }: { onError: (m: string) => void }) {

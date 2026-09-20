@@ -34,6 +34,8 @@ pub mod gitlab;
 pub mod gitlab_query;
 #[cfg(windows)]
 pub mod hello;
+#[cfg(target_os = "macos")]
+pub mod hello_mac;
 pub mod meet;
 pub mod model;
 pub mod net;

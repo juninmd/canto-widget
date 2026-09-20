@@ -146,8 +146,12 @@ Atalho global escondendo e trazendo o widget de volta:
   passado esse tempo o cofre tranca sozinho e a chave sai da memória. Não há opção de desligar a auto-trava.
 - **Destravar com Windows Hello** (quando o computador tem o suporte), em **Ajustes → Segurança**. A senha
   mestra continua sendo o único jeito de abrir um backup em outra máquina.
+- **Destravar com Touch ID no macOS** — mesmo lugar, mesma ideia: a senha mestra fica guardada no Chaveiro do
+  sistema, protegida por biometria; o macOS mostra o prompt do Touch ID sozinho ao ler o item. Melhor esforço:
+  sem um Mac para compilar e testar, só a CI de macOS confirma que funciona de fato.
 - **Últimos desbloqueios** — em **Ajustes → Segurança**, a lista "últimos desbloqueios" mostra quando (e por
-  senha ou Windows Hello) o cofre foi destrancado nas últimas 20 vezes, para notar um acesso que você não fez.
+  senha, Windows Hello ou Touch ID) o cofre foi destrancado nas últimas 20 vezes, para notar um acesso que você
+  não fez.
 - **Modo privacidade** — o ícone de olho no topo (ou `Alt+P`) borra o texto dos cards de clipboard e notas na
   hora, sem apagar nada; os botões continuam funcionando. Útil antes de compartilhar a tela. Não persiste entre
   aberturas do app: cada abertura começa sem o modo ativo.

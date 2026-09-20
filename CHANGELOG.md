@@ -54,6 +54,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   Ajustes → Segurança.
 - **Modo privacidade**: `Alt+P` ou o ícone de olho no topo borra o texto do clipboard e das notas na tela sem
   apagar nada, para compartilhar a tela sem se preocupar.
+- **Destravar com Touch ID no macOS**: mesmo fluxo do Windows Hello, senha mestra guardada no Chaveiro do
+  sistema protegida por biometria. Melhor esforço — implementado e revisado contra a documentação do
+  `security-framework`, mas não compilado nem testado nesta máquina (sem Mac disponível); precisa da CI de
+  macOS para confirmar.
 
 ### Alterado
 
