@@ -45,6 +45,7 @@ pub mod password;
 pub mod routine;
 pub mod snooze;
 pub mod store;
+pub mod subtask;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
@@ -123,6 +124,9 @@ pub fn run() {
             commands::task_complete,
             commands::task_link_pr,
             commands::tasks_carry_over,
+            subtask::subtask_add,
+            subtask::subtask_toggle,
+            subtask::subtask_remove,
             cmd_notes::notes_search,
             cmd_notes::note_save,
             cmd_notes::note_pin,

@@ -34,6 +34,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Abas visíveis** em Ajustes: esconda as abas que você não usa; `Alt+1`… seguem as que ficaram.
 - **Antecedência do lembrete de tarefa**, em Ajustes → Lembretes (na hora, 5, 10, 15 ou 30 min antes).
 - **Vincular tarefa a um PR/MR**: link no ⏰ da tarefa, com ícone na linha para abrir direto.
+- **Subtarefas**: checklist dentro do ⏰ da tarefa, com contagem `feitas/total` na linha.
 
 ### Alterado
 

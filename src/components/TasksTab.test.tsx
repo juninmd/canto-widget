@@ -13,7 +13,9 @@ const baseTask = {
   created_at: 1,
   updated_at: 1,
 };
-let task: typeof baseTask & { pr_url?: string | null } = { ...baseTask };
+type Subtask = { id: string; title: string; done: boolean };
+let task: typeof baseTask & { pr_url?: string | null; subtasks?: Subtask[] } = { ...baseTask };
+let nextSubtaskId = 0;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
@@ -24,6 +26,22 @@ mock.module("@tauri-apps/api/core", () => ({
     if (cmd === "trash_undo") return Promise.resolve(true);
     if (cmd === "task_link_pr") {
       task = { ...task, pr_url: args?.url as string | null };
+      return Promise.resolve(null);
+    }
+    if (cmd === "subtask_add") {
+      const sub = { id: `s${nextSubtaskId++}`, title: args?.title as string, done: false };
+      task = { ...task, subtasks: [...(task.subtasks ?? []), sub] };
+      return Promise.resolve(sub);
+    }
+    if (cmd === "subtask_toggle") {
+      task = {
+        ...task,
+        subtasks: (task.subtasks ?? []).map((s) => (s.id === args?.subtaskId ? { ...s, done: !s.done } : s)),
+      };
+      return Promise.resolve(null);
+    }
+    if (cmd === "subtask_remove") {
+      task = { ...task, subtasks: (task.subtasks ?? []).filter((s) => s.id !== args?.subtaskId) };
       return Promise.resolve(null);
     }
     return Promise.resolve(null);
@@ -52,6 +70,7 @@ async function openEditing() {
 beforeEach(() => {
   calls.length = 0;
   task = { ...baseTask };
+  nextSubtaskId = 0;
 });
 
 afterEach(cleanup);
@@ -192,6 +211,33 @@ test("clearing the PR field sends null", async () => {
     fireEvent.blur(field);
   });
   expect(calls.filter((c) => c.cmd === "task_link_pr").at(-1)?.args).toEqual({ id: "t1", url: null });
+});
+
+test("a subtask is added, toggled and removed from the checklist", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  const field = screen.getByLabelText("nova subtarefa");
+  await act(async () => {
+    fireEvent.change(field, { target: { value: "levar sacola" } });
+    fireEvent.submit(field.closest("form")!);
+  });
+  expect(calls.find((c) => c.cmd === "subtask_add")?.args).toEqual({ id: "t1", title: "levar sacola" });
+  expect(screen.getByText("0/1 subtarefas")).toBeTruthy();
+
+  const checkbox = screen.getByLabelText("levar sacola") as HTMLInputElement;
+  await act(async () => {
+    fireEvent.click(checkbox);
+  });
+  expect(calls.find((c) => c.cmd === "subtask_toggle")?.args).toEqual({ id: "t1", subtaskId: "s0" });
+  expect(screen.getByText("1/1 subtarefas")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("excluir subtarefa levar sacola"));
+  });
+  expect(calls.find((c) => c.cmd === "subtask_remove")?.args).toEqual({ id: "t1", subtaskId: "s0" });
+  expect(screen.queryByText("levar sacola")).toBeNull();
 });
 
 test("day summary shows the text and returns with Esc", async () => {

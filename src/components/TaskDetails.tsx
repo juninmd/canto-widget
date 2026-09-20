@@ -89,6 +89,11 @@ export function TaskBadge({ task: t, open, onToggle }: { task: Task; open: boole
           {t.repetir && <span aria-label={`repete ${REPEAT_LABEL[t.repetir.tipo]}`}> ↻</span>}
         </span>
       )}
+      {t.subtasks && t.subtasks.length > 0 && (
+        <span className="shrink-0 text-[11px] text-muted" title="subtarefas">
+          {t.subtasks.filter((s) => s.done).length}/{t.subtasks.length}
+        </span>
+      )}
       {t.pr_url && (
         <button
           type="button"

@@ -1,10 +1,10 @@
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
 import DaySummary from "./DaySummary";
-import TaskDetails, { TaskBadge } from "./TaskDetails";
+import TaskRow from "./TaskRow";
 import { useUndo } from "../lib/useUndo";
-import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import { useNewIds, useExit } from "../lib/motion";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -128,75 +128,38 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
         {tasks.map((t) => (
-          <Fragment key={t.id}>
-            <li
-              className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew(t.id) ? ENTER_CLASS : ""} ${
-                leaving.has(t.id) ? EXIT_CLASS : ""
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={t.done}
-                onChange={() => {
-                  setChecking(t.id);
-                  void run(() => api.taskToggle(t.id));
-                }}
-                onAnimationEnd={() => setChecking("")}
-                className={`size-4 accent-[var(--color-accent)] ${checking === t.id ? "motion-safe:animate-marcar" : ""}`}
-              />
-              {editing?.id === t.id ? (
-                <input
-                  autoFocus
-                  value={editing.title}
-                  onChange={(e) => setEditing({ id: t.id, title: e.target.value })}
-                  onBlur={() => void rename()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void rename();
-                    if (e.key === "Escape") {
-                      editEnded.current = true;
-                      setEditing(null);
-                    }
-                  }}
-                  className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
-                />
-              ) : (
-                <span
-                  className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
-                  title={`${t.title}\n(clique duas vezes para renomear)`}
-                  onDoubleClick={() => {
-                    editEnded.current = false;
-                    setEditing({ id: t.id, title: t.title });
-                  }}
-                >
-                  {t.title}
-                </span>
-              )}
-              <TaskBadge task={t} open={details === t.id} onToggle={() => setDetails(details === t.id ? "" : t.id)} />
-              <button
-                type="button"
-                onClick={() =>
-                  void leave(t.id, () =>
-                    run(async () => undoable(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
-                  )
-                }
-                // Also visible on focus: hover-only would leave the keyboard user unable to find it.
-                className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-                aria-label={`excluir ${t.title}`}
-              >
-                ×
-              </button>
-            </li>
-            {details === t.id && (
-              <li>
-                <TaskDetails
-                  task={t}
-                  onChange={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
-                  onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
-                  onClose={() => setDetails("")}
-                />
-              </li>
-            )}
-          </Fragment>
+          <TaskRow
+            key={t.id}
+            task={t}
+            isNew={isNew(t.id)}
+            isLeaving={leaving.has(t.id)}
+            checking={checking === t.id}
+            editing={editing}
+            detailsOpen={details === t.id}
+            onToggleDone={() => {
+              setChecking(t.id);
+              void run(() => api.taskToggle(t.id));
+            }}
+            onCheckAnimationEnd={() => setChecking("")}
+            onStartEdit={() => {
+              editEnded.current = false;
+              setEditing({ id: t.id, title: t.title });
+            }}
+            onEditChange={(value) => setEditing({ id: t.id, title: value })}
+            onEditCommit={() => void rename()}
+            onEditCancel={() => {
+              editEnded.current = true;
+              setEditing(null);
+            }}
+            onDelete={() =>
+              void leave(t.id, () => run(async () => undoable(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)))
+            }
+            onToggleDetails={() => setDetails(details === t.id ? "" : t.id)}
+            onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
+            onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
+            onSubtasksChange={reload}
+            onError={onError}
+          />
         ))}
         {tasks.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda — escreva acima e tecle Enter</li>

@@ -45,6 +45,15 @@ pub struct Task {
     /// Linked PR/MR, http(s) only. New field: no legacy vault has it, so plain default is enough.
     #[serde(default)]
     pub pr_url: Option<String>,
+    #[serde(default)]
+    pub subtasks: Vec<Subtask>,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct Subtask {
+    pub id: String,
+    pub title: String,
+    pub done: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
