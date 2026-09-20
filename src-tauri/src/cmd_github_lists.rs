@@ -46,6 +46,22 @@ pub(crate) fn opened_since(app: &tauri::AppHandle, since: &str) -> Option<Result
     Some(fetch())
 }
 
+/// `None` when GitHub isn't connected: the badge simply doesn't count it.
+pub(crate) fn review_requested(app: &tauri::AppHandle) -> Option<Result<u64>> {
+    match app.state::<AppState>().github_config() {
+        Ok(None) => return None,
+        Err(e) => return Some(Err(e)),
+        Ok(Some(_)) => {}
+    }
+    let fetch = || {
+        let token = token(app)?;
+        let f = ForgeFilter::default();
+        let cache = &app.state::<AppState>().forges;
+        Ok(cache.get(FORGE, &cache_key(Section::ReviewRequested, 1, &f), false, now_ms(), || github::section(&token, Section::ReviewRequested, 1, &f))?.total)
+    };
+    Some(fetch())
+}
+
 fn token(app: &tauri::AppHandle) -> Result<Zeroizing<String>> {
     let state = app.state::<AppState>();
     state.touch();

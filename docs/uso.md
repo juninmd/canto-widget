@@ -117,7 +117,12 @@ Atalho global escondendo e trazendo o widget de volta:
   sobrescritos: ao sair, o widget volta ao que era.
 - Posição e tamanho ficam em `janela.json`. Se o monitor sumir ou a janela não couber mais, ela volta ao canto.
   Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
-- Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, trancar cofre, sair.
+- Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, **entrar na próxima reunião com Meet** (atualiza
+  sozinho a cada ~90 s enquanto o cofre está destrancado), trancar cofre, sair. O atalho global
+  **Ctrl+Alt+M** (`Cmd+Alt+M` no macOS) faz a mesma coisa sem abrir o menu; sem reunião em breve, não faz nada.
+- **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você.
+  No macOS aparece o número exato no Dock; no Windows e Linux, um ponto vermelho (a API do sistema não dá
+  para desenhar números sem depender de uma fonte).
 
 ## Atualizações
 

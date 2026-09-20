@@ -118,6 +118,17 @@ pub(crate) fn opened_since(state: &AppState, since: &str) -> Option<Result<Forge
     Some(state.forges.get(FORGE, &format!("opened|{since}"), false, now_ms(), || gitlab::mrs_opened_since(&acc, since)))
 }
 
+/// `None` when GitLab isn't connected: the badge simply doesn't count it.
+pub(crate) fn review_requested(state: &AppState) -> Option<Result<u64>> {
+    let acc = match state.gitlab_config() {
+        Ok(None) => return None,
+        Ok(Some(c)) => to_account(&c),
+        Err(e) => return Some(Err(e)),
+    };
+    let f = ForgeFilter::default();
+    Some(state.forges.get(FORGE, &cache_key(Section::ReviewRequested, 1, &f), false, now_ms(), || gitlab::section(&acc, Section::ReviewRequested, 1, &f)).map(|l| l.total))
+}
+
 fn account(app: &tauri::AppHandle) -> Result<Account> {
     let state = app.state::<AppState>();
     state.touch();

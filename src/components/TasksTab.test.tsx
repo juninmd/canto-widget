@@ -195,3 +195,15 @@ test("a task without a time gets no reminder", async () => {
   expect(calls.find((c) => c.cmd === "task_add")?.args?.title).toBe("Estudar 2h de Rust");
   expect(calls.some((c) => c.cmd === "task_set_schedule")).toBe(false);
 });
+
+test("the open task pushes its count to the tray badge", async () => {
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await Promise.resolve();
+  });
+  expect(calls.filter((c) => c.cmd === "badge_set_tasks").at(-1)?.args).toEqual({ count: 1 });
+});

@@ -1,6 +1,7 @@
 pub mod account;
 pub mod autostart;
 pub mod backup;
+pub mod badge;
 pub mod biometric;
 pub mod blocking;
 pub mod calendar;
@@ -35,6 +36,7 @@ pub mod hello;
 pub mod meet;
 pub mod model;
 pub mod net;
+pub mod next_meeting;
 pub mod notification;
 pub mod oauth;
 pub mod plain_text;
@@ -44,6 +46,7 @@ pub mod snooze;
 pub mod store;
 pub mod transcripts;
 pub mod trash;
+pub mod tray_live;
 pub mod updater;
 pub mod vault;
 pub mod window;
@@ -86,6 +89,7 @@ pub fn run() {
             watch_idle(app.handle().clone());
             watch_backup(dir);
             build_tray(app.handle())?;
+            tray_live::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -171,6 +175,7 @@ pub fn run() {
             cmd_gitlab::gitlab_lists,
             cmd_gitlab::gitlab_section,
             cmd_forges::forges_opened_since,
+            tray_live::badge_set_tasks,
         ])
         .on_window_event(|win, event| match event {
             // Closing hides the widget; quitting for real only from the tray.
@@ -238,13 +243,30 @@ pub const TOGGLE_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") {
     "Ctrl+Alt+Espaco"
 };
 
+/// Global "join the next meeting" shortcut. Ctrl+Alt+M (Cmd+Alt+M on macOS); does nothing without
+/// a cached next meeting (see `tray_live::join_next_meeting`).
+fn join_shortcut() -> Shortcut {
+    #[cfg(target_os = "macos")]
+    let mods = Modifiers::SUPER | Modifiers::ALT;
+    #[cfg(not(target_os = "macos"))]
+    let mods = Modifiers::CONTROL | Modifiers::ALT;
+    Shortcut::new(Some(mods), Code::KeyM)
+}
+
+pub const JOIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Cmd+Alt+M" } else { "Ctrl+Alt+M" };
+
 fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let wanted = toggle_shortcut();
+    let (toggle, join) = (toggle_shortcut(), join_shortcut());
     app.plugin(
         tauri_plugin_global_shortcut::Builder::new()
             .with_handler(move |app, shortcut, event| {
-                if event.state == ShortcutState::Pressed && shortcut == &wanted {
+                if event.state != ShortcutState::Pressed {
+                    return;
+                }
+                if shortcut == &toggle {
                     let _ = window::toggle(app);
+                } else if shortcut == &join {
+                    tray_live::join_next_meeting(app);
                 }
             })
             .build(),
@@ -252,6 +274,9 @@ fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
     // A shortcut already taken by another app must not bring down the widget: the tray still works.
     if let Err(e) = app.global_shortcut().register(toggle_shortcut()) {
         eprintln!("atalho global indisponivel ({TOGGLE_SHORTCUT_LABEL}): {e}");
+    }
+    if let Err(e) = app.global_shortcut().register(join_shortcut()) {
+        eprintln!("atalho de entrar na reuniao indisponivel ({JOIN_SHORTCUT_LABEL}): {e}");
     }
     Ok(())
 }
@@ -264,9 +289,11 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
         true,
         None::<&str>,
     )?;
+    let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, "Sem reunião com Meet em breve", false, None::<&str>)?;
     let lock = MenuItem::with_id(app, "lock", "Trancar cofre", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Sair", true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &lock, &quit])?;
+    let menu = Menu::with_items(app, &[&toggle, &join, &lock, &quit])?;
+    app.manage(tray_live::JoinMenuItem(join));
 
     TrayIconBuilder::with_id("canto-tray")
         .icon(app.default_window_icon().cloned().unwrap())
@@ -277,6 +304,7 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
             "toggle" => {
                 let _ = window::toggle(app);
             }
+            tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
             "lock" => {
                 if let Some(state) = app.try_state::<AppState>() {
                     state.lock();

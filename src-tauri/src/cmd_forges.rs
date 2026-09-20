@@ -36,6 +36,17 @@ pub async fn forges_opened_since(app: tauri::AppHandle, since_ms: i64) -> Result
     .await
 }
 
+/// Sum of "revisão pedida a mim" across every connected forge; a forge that fails or isn't
+/// connected just doesn't add to the total (used by the tray badge, not shown to the user directly).
+pub(crate) fn review_requested_total(app: &tauri::AppHandle) -> u64 {
+    let state = app.state::<AppState>();
+    [crate::cmd_github_lists::review_requested(app), crate::cmd_gitlab::review_requested(&state)]
+        .into_iter()
+        .flatten()
+        .filter_map(Result::ok)
+        .sum()
+}
+
 fn combine(results: impl Iterator<Item = Result<ForgeList>>) -> Opened {
     let mut out = Opened::default();
     for r in results {

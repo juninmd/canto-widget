@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Entrar na próxima reunião pela bandeja**: item de menu que mostra a próxima reunião com Meet e entra nela
+  direto, sem abrir o widget; atalho global **Ctrl+Alt+M** (`Cmd+Alt+M` no macOS) faz o mesmo.
+- **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você
+  (GitHub + GitLab); número exato no Dock do macOS, ponto vermelho no Windows/Linux.
 - **Detalhes do evento na agenda**: clicar num evento mostra quem organizou, quem criou, quantos convidados,
   a descrição e os anexos, como as anotações do Gemini, com **abrir no Calendar**. O aviso de reunião traz o
   mesmo.

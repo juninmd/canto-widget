@@ -177,6 +177,8 @@ export const api = {
     invoke<ForgeList>("gitlab_section", { section, page, filter }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
+  /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
+  badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

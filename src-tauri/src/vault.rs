@@ -56,6 +56,10 @@ pub struct AppState {
     pub trash: crate::trash::Trash,
     /// GitHub/GitLab lists; dropped on lock like the rest of the plaintext.
     pub forges: crate::forge_cache::ForgeCache,
+    /// Soonest upcoming event with a Meet link, refreshed by `tray_live::watch`; read by the tray and the join shortcut.
+    pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
+    /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.
+    pub badge_tasks: Mutex<u32>,
     /// Auto-lock baseline; background polls (clipboard, agenda) deliberately don't touch this.
     last_active: Mutex<i64>,
 }
@@ -68,6 +72,8 @@ impl AppState {
             alert: Mutex::new(None),
             trash: Default::default(),
             forges: Default::default(),
+            next_meeting: Mutex::new(None),
+            badge_tasks: Mutex::new(0),
             last_active: Mutex::new(now_ms()),
         }
     }
@@ -145,6 +151,8 @@ impl AppState {
         *self.session.lock().unwrap() = None;
         self.trash.clear();
         self.forges.clear();
+        *self.next_meeting.lock().unwrap() = None;
+        *self.badge_tasks.lock().unwrap() = 0;
     }
 
     pub fn is_unlocked(&self) -> bool {

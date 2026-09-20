@@ -37,6 +37,12 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [today, version]);
 
+  // Only this tab knows "today" correctly; the tray badge just reflects whatever it last pushed.
+  useEffect(() => {
+    if (loadedFor !== today) return;
+    void api.badgeSetTasks(tasks.filter((t) => !t.done).length).catch(() => {});
+  }, [tasks, loadedFor, today]);
+
   async function add(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
