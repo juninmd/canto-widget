@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-export type Tab = "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "settings";
+export type Tab = "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "gitlab" | "settings";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: "Tarefas" },
@@ -9,6 +9,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "meetings", label: "Reuniões" },
   { id: "agenda", label: "Agenda" },
   { id: "github", label: "GitHub" },
+  { id: "gitlab", label: "GitLab" },
   { id: "settings", label: "Ajustes" },
 ];
 
@@ -16,20 +17,22 @@ export const panelId = (t: Tab) => `panel-${t}`;
 const tabId = (t: Tab) => `aba-${t}`;
 
 /** WAI-ARIA APG tabs pattern: one Tab stop, arrows/Home/End switch tabs. */
-export default function TabBar({ current, onChange }: { current: Tab; onChange: (t: Tab) => void }) {
+type Props = { current: Tab; onChange: (t: Tab) => void; tabs?: typeof TABS };
+
+export default function TabBar({ current, onChange, tabs = TABS }: Props) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   function onKeyDown(e: React.KeyboardEvent) {
-    const i = TABS.findIndex((t) => t.id === current);
+    const i = tabs.findIndex((t) => t.id === current);
     const target = {
-      ArrowRight: (i + 1) % TABS.length,
-      ArrowLeft: (i - 1 + TABS.length) % TABS.length,
+      ArrowRight: (i + 1) % tabs.length,
+      ArrowLeft: (i - 1 + tabs.length) % tabs.length,
       Home: 0,
-      End: TABS.length - 1,
+      End: tabs.length - 1,
     }[e.key];
     if (target === undefined) return;
     e.preventDefault();
-    const next = TABS[target].id;
+    const next = tabs[target].id;
     onChange(next);
     refs.current[next]?.focus();
   }
@@ -41,7 +44,7 @@ export default function TabBar({ current, onChange }: { current: Tab; onChange: 
       onKeyDown={onKeyDown}
       className="flex shrink-0 gap-0.5 overflow-x-auto px-3 pt-2 text-xs"
     >
-      {TABS.map((t, i) => (
+      {tabs.map((t, i) => (
         <button
           key={t.id}
           ref={(el) => {

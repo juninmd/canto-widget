@@ -1,8 +1,7 @@
 import { useEffect, useRef } from "react";
-import { TABS, type Tab } from "../components/TabBar";
-
+/** `index` is 1-based and counts only the visible tabs, so Alt+N matches what the bar shows. */
 export type Action =
-  | { type: "tab"; tab: Tab }
+  | { type: "tab"; index: number }
   | { type: "lock" }
   | { type: "focus"; target: "search" | "new" }
   | { type: "help" }
@@ -15,7 +14,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
   {
     title: "Navegar",
     items: [
-      { keys: ["Alt", `1–${TABS.length}`], description: `trocar de aba (${TABS.map((t) => t.label).join(", ")})` },
+      { keys: ["Alt", "1–9"], description: "trocar de aba, na ordem da barra" },
       { keys: ["/"], description: "buscar na aba atual" },
       { keys: ["Esc"], description: "fechar ajuda, detalhes ou edição" },
       { keys: ["?"], description: "abrir ou fechar esta ajuda" },
@@ -45,7 +44,7 @@ export function interpret(e: Key, typing: boolean): Action | null {
   if (e.key === "F11" && !e.altKey && !e.ctrlKey && !e.metaKey) return { type: "fullscreen" };
   if (e.altKey && !e.ctrlKey && !e.metaKey) {
     const n = /^Digit([1-9])$/.exec(e.code);
-    if (n && TABS[Number(n[1]) - 1]) return { type: "tab", tab: TABS[Number(n[1]) - 1].id };
+    if (n) return { type: "tab", index: Number(n[1]) };
     if (e.code === "KeyL") return { type: "lock" };
     return null;
   }

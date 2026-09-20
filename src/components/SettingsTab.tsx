@@ -6,8 +6,12 @@ import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
 import UpdateSection from "./UpdateSection";
+import TabsSection from "./TabsSection";
+import type { Tab } from "./TabBar";
 
-export default function SettingsTab({ onError }: { onError: (m: string) => void }) {
+type Props = { onError: (m: string) => void; hiddenTabs: Tab[]; onHiddenTabs: (hidden: Tab[]) => void };
+
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs }: Props) {
   const [autostart, setAutostart] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -56,6 +60,7 @@ export default function SettingsTab({ onError }: { onError: (m: string) => void 
         </label>
       </section>
       <SkinPicker />
+      <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
       <SecuritySection onError={onError} />
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />

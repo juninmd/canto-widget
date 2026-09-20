@@ -11,10 +11,9 @@ const key = (key: string, extra: Partial<{ code: string; altKey: boolean; ctrlKe
 });
 
 test("Alt+number switches tabs by the physical code, even inside a field", () => {
-  expect(interpret(key("1", { code: "Digit1", altKey: true }), true)).toEqual({ type: "tab", tab: "tasks" });
-  expect(interpret(key("¹", { code: "Digit6", altKey: true }), false)).toEqual({ type: "tab", tab: "github" });
-  expect(interpret(key("7", { code: "Digit7", altKey: true }), false)).toEqual({ type: "tab", tab: "settings" });
-  expect(interpret(key("8", { code: "Digit8", altKey: true }), false)).toBeNull();
+  expect(interpret(key("1", { code: "Digit1", altKey: true }), true)).toEqual({ type: "tab", index: 1 });
+  expect(interpret(key("¹", { code: "Digit6", altKey: true }), false)).toEqual({ type: "tab", index: 6 });
+  expect(interpret(key("0", { code: "Digit0", altKey: true }), false)).toBeNull();
 });
 
 test("a bare key doesn't steal typing", () => {

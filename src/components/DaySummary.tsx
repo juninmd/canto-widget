@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react";
-import type { AgendaItem, Task } from "../lib/api";
-import { daySummary } from "../lib/summary";
+import { useEffect, useMemo, useState } from "react";
+import { api, errText, type AgendaItem, type ForgeOpened, type Task } from "../lib/api";
+import { dayStart, daySummary } from "../lib/summary";
 
 export default function DaySummary({
   day,
@@ -15,7 +15,20 @@ export default function DaySummary({
   onClose: () => void;
   onError: (m: string) => void;
 }) {
-  const text = useMemo(() => daySummary(day, tasks, agenda), [day, tasks, agenda]);
+  const [opened, setOpened] = useState<ForgeOpened | null>(null);
+  const text = useMemo(() => daySummary(day, tasks, agenda, opened?.items), [day, tasks, agenda, opened]);
+
+  // Served from Rust's forge cache; a forge that isn't connected simply adds nothing.
+  useEffect(() => {
+    let live = true;
+    api
+      .forgesOpenedSince(dayStart(day))
+      .then((o) => live && setOpened(o))
+      .catch((e) => live && setOpened({ items: [], errors: [errText(e)] }));
+    return () => {
+      live = false;
+    };
+  }, [day]);
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -37,6 +50,16 @@ export default function DaySummary({
       <pre className="min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap rounded-lg border border-edge bg-ink/60 p-2 font-sans text-xs text-fg select-text">
         {text}
       </pre>
+      {!opened && (
+        <p role="status" className="text-[11px] text-faint">
+          consultando PRs/MRs abertos hoje…
+        </p>
+      )}
+      {opened?.errors.map((e) => (
+        <p key={e} className="text-[11px] text-faint">
+          PRs/MRs fora do resumo: {e}
+        </p>
+      ))}
       <div className="flex gap-2">
         <button
           type="button"

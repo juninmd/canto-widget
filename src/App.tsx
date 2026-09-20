@@ -17,6 +17,8 @@ import ClipboardTab from "./components/ClipboardTab";
 import TranscriptsTab from "./components/TranscriptsTab";
 import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
+import GitlabTab from "./components/GitlabTab";
+import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
 import { ToastProvider, useToast } from "./lib/toast";
@@ -31,7 +33,9 @@ export default function App() {
 
 function Canto() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
-  const [tab, setTab] = useState<Tab>("tasks");
+  const [hiddenTabs, setHiddenTabs] = useHiddenTabs();
+  const tabs = visibleTabs(hiddenTabs);
+  const [tab, setTab] = useState<Tab>(() => tabs[0].id);
   const openSettings = useCallback(() => setTab("settings"), []);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
@@ -50,7 +54,7 @@ function Canto() {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
     if (helpOpen) return;
-    if (action.type === "tab") return setTab(action.tab);
+    if (action.type === "tab") return tabs[action.index - 1] && setTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
     focusShortcut(action.target);
   });
@@ -172,7 +176,7 @@ function Canto() {
         <Lock exists={status.exists} onOpen={refresh} />
       ) : (
         <>
-          <TabBar current={tab} onChange={setTab} />
+          <TabBar current={tab} onChange={setTab} tabs={tabs} />
           <main
             id={panelId(tab)}
             key={tab}
@@ -186,7 +190,8 @@ function Canto() {
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}
-            {tab === "settings" && <SettingsTab onError={setError} />}
+            {tab === "gitlab" && <GitlabTab onError={setError} />}
+            {tab === "settings" && <SettingsTab onError={setError} hiddenTabs={hiddenTabs} onHiddenTabs={setHiddenTabs} />}
           </main>
         </>
       )}
