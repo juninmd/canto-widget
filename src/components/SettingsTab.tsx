@@ -7,11 +7,19 @@ import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
 import UpdateSection from "./UpdateSection";
 import TabsSection from "./TabsSection";
+import RemindersSection from "./RemindersSection";
 import type { Tab } from "./TabBar";
+import type { LeadMinutes } from "../lib/reminderLead";
 
-type Props = { onError: (m: string) => void; hiddenTabs: Tab[]; onHiddenTabs: (hidden: Tab[]) => void };
+type Props = {
+  onError: (m: string) => void;
+  hiddenTabs: Tab[];
+  onHiddenTabs: (hidden: Tab[]) => void;
+  reminderLead: LeadMinutes;
+  onReminderLead: (lead: LeadMinutes) => void;
+};
 
-export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs }: Props) {
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminderLead, onReminderLead }: Props) {
   const [autostart, setAutostart] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -61,6 +69,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs }: Props
       </section>
       <SkinPicker />
       <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
+      <RemindersSection lead={reminderLead} onChange={onReminderLead} />
       <SecuritySection onError={onError} />
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />

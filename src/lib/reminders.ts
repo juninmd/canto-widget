@@ -13,11 +13,11 @@ function start(day: string, time: string): Date {
 /** Key includes day and time: rescheduling the task produces a new reminder. */
 export const reminderKey = (t: Task) => `${t.id}@${t.day}T${t.hora}`;
 
-/** Open tasks whose time arrived less than 2 min ago and haven't reminded yet. */
-export function dueReminders(tasks: Task[], alreadyNotified: Set<string>, now = new Date()): Task[] {
+/** Open tasks whose time (minus `leadMinutes`, default 0) arrived less than 2 min ago and haven't reminded yet. */
+export function dueReminders(tasks: Task[], alreadyNotified: Set<string>, now = new Date(), leadMinutes = 0): Task[] {
   return tasks.filter((t) => {
     if (t.done || !t.hora || alreadyNotified.has(reminderKey(t))) return false;
-    const elapsed = (now.getTime() - start(t.day, t.hora).getTime()) / 60_000;
+    const elapsed = (now.getTime() - start(t.day, t.hora).getTime()) / 60_000 + leadMinutes;
     return elapsed >= 0 && elapsed < TOLERANCE_MIN;
   });
 }

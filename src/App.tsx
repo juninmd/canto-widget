@@ -19,6 +19,7 @@ import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
 import GitlabTab from "./components/GitlabTab";
 import { useHiddenTabs, visibleTabs } from "./lib/tabs";
+import { useReminderLead } from "./lib/reminderLead";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
 import { ToastProvider, useToast } from "./lib/toast";
@@ -42,7 +43,8 @@ function Canto() {
   const [alert, setAlert] = useState<AgendaItem | null>(null);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
-  useReminders(status?.unlocked === true, today);
+  const [reminderLead, setReminderLead] = useReminderLead();
+  useReminders(status?.unlocked === true, today, reminderLead);
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const fullscreen = useFullscreen();
@@ -191,7 +193,15 @@ function Canto() {
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}
             {tab === "gitlab" && <GitlabTab onError={setError} />}
-            {tab === "settings" && <SettingsTab onError={setError} hiddenTabs={hiddenTabs} onHiddenTabs={setHiddenTabs} />}
+            {tab === "settings" && (
+              <SettingsTab
+                onError={setError}
+                hiddenTabs={hiddenTabs}
+                onHiddenTabs={setHiddenTabs}
+                reminderLead={reminderLead}
+                onReminderLead={setReminderLead}
+              />
+            )}
           </main>
         </>
       )}
