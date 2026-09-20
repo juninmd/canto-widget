@@ -91,8 +91,11 @@
 
 - Skins, escolhidas em **ajustes → Aparência**: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Claro** e **Sistema**, que segue o tema
   claro/escuro do sistema operacional e troca sozinha quando ele muda. A clara passa AA em todo texto.
-- **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca, `Alt+L` tranca e
-  `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
+- **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca na aba
+  atual, `Ctrl+K` abre a busca global, `Alt+L` tranca e `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
+- **Busca global** (`Ctrl+K`) busca ao mesmo tempo nas tarefas de hoje, nas notas e no clipboard; escolher um resultado
+  troca de aba e já leva o texto buscado para o campo de busca daquela aba. Tarefas de outros dias ficam de fora: hoje
+  o app não tem como navegar até outro dia, então um resultado assim não teria para onde ir.
 - Atalho global **Ctrl+Alt+Espaço** (`Cmd+Alt+Espaço` no macOS) mostra/esconde o widget.
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.

@@ -58,6 +58,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   sistema protegida por biometria. Melhor esforço — implementado e revisado contra a documentação do
   `security-framework`, mas não compilado nem testado nesta máquina (sem Mac disponível); precisa da CI de
   macOS para confirmar.
+- **Busca global entre abas** (`Ctrl+K`): busca ao mesmo tempo em tarefas de hoje, notas e clipboard; escolher
+  um resultado troca de aba com o texto já buscado. Tarefas de outros dias ficam fora da busca — o app ainda
+  não navega entre dias.
 
 ### Alterado
 

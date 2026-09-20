@@ -40,3 +40,9 @@ test("F11 toggles fullscreen even while typing, but not with a modifier", () => 
   expect(interpret(key("F11", { code: "F11" }), true)).toEqual({ type: "fullscreen" });
   expect(interpret(key("F11", { code: "F11", ctrlKey: true }), false)).toBeNull();
 });
+
+test("Ctrl+K opens the global search even while typing, but not with Alt or Meta added", () => {
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true }), true)).toEqual({ type: "globalSearch" });
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, altKey: true }), false)).toBeNull();
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, metaKey: true }), false)).toBeNull();
+});

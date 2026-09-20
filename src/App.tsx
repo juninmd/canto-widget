@@ -8,6 +8,7 @@ import { useUpdateNotice } from "./lib/useUpdateNotice";
 import { useFullscreen } from "./lib/useFullscreen";
 import { focusShortcut, useShortcuts } from "./lib/shortcuts";
 import ShortcutsHelp from "./components/ShortcutsHelp";
+import GlobalSearch from "./components/GlobalSearch";
 import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
@@ -39,7 +40,13 @@ function Canto() {
   const [hiddenTabs, setHiddenTabs] = useHiddenTabs();
   const tabs = visibleTabs(hiddenTabs);
   const [tab, setTab] = useState<Tab>(() => tabs[0].id);
-  const openSettings = useCallback(() => setTab("settings"), []);
+  // Cleared on every manual tab switch so a stale jump doesn't re-seed a tab's search later.
+  const [jumpQuery, setJumpQuery] = useState("");
+  const changeTab = useCallback((id: Tab) => {
+    setJumpQuery("");
+    setTab(id);
+  }, []);
+  const openSettings = useCallback(() => changeTab("settings"), [changeTab]);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
   const [alert, setAlert] = useState<AgendaItem | null>(null);
@@ -50,6 +57,7 @@ function Canto() {
   useReminders(status?.unlocked === true, today, reminderLead);
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const fullscreen = useFullscreen();
   const toggleFullscreen = () => void fullscreen.toggle().catch((e) => setError(errText(e)));
   // Completing from the toast changes the task outside the tab: the list needs to reread.
@@ -59,8 +67,9 @@ function Canto() {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
     if (action.type === "privacy") return togglePrivacy();
-    if (helpOpen) return;
-    if (action.type === "tab") return tabs[action.index - 1] && setTab(tabs[action.index - 1].id);
+    if (action.type === "globalSearch") return setSearchOpen((v) => !v);
+    if (helpOpen || searchOpen) return;
+    if (action.type === "tab") return tabs[action.index - 1] && changeTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
     focusShortcut(action.target);
   });
@@ -118,6 +127,7 @@ function Canto() {
 
   async function lock() {
     setHelpOpen(false);
+    setSearchOpen(false);
     await api.lock();
     await refresh();
   }
@@ -130,6 +140,19 @@ function Canto() {
     >
       {alert && <Alert event={alert} onClose={() => setAlert(null)} onCompleted={() => setTasksVersion((v) => v + 1)} />}
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
+      {searchOpen && status?.unlocked && (
+        <GlobalSearch
+          today={today}
+          privacy={privacy}
+          onError={setError}
+          onClose={() => setSearchOpen(false)}
+          onNavigate={(target, q) => {
+            setJumpQuery(q);
+            setTab(target);
+            setSearchOpen(false);
+          }}
+        />
+      )}
       <header
         data-tauri-drag-region
         className="flex items-center justify-between border-b border-edge px-3 py-2"
@@ -192,7 +215,7 @@ function Canto() {
         <Lock exists={status.exists} onOpen={refresh} />
       ) : (
         <>
-          <TabBar current={tab} onChange={setTab} tabs={tabs} />
+          <TabBar current={tab} onChange={changeTab} tabs={tabs} />
           <main
             id={panelId(tab)}
             key={tab}
@@ -206,12 +229,13 @@ function Canto() {
                 today={today}
                 agenda={agenda.items}
                 privacy={privacy}
-                onOpenTasks={() => setTab("tasks")}
-                onOpenAgenda={() => setTab("agenda")}
+                initialQuery={jumpQuery}
+                onOpenTasks={() => changeTab("tasks")}
+                onOpenAgenda={() => changeTab("agenda")}
                 onError={setError}
               />
             )}
-            {tab === "clipboard" && <ClipboardTab privacy={privacy} onError={setError} />}
+            {tab === "clipboard" && <ClipboardTab privacy={privacy} initialQuery={jumpQuery} onError={setError} />}
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}

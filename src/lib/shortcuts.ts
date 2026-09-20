@@ -6,7 +6,8 @@ export type Action =
   | { type: "focus"; target: "search" | "new" }
   | { type: "help" }
   | { type: "fullscreen" }
-  | { type: "privacy" };
+  | { type: "privacy" }
+  | { type: "globalSearch" };
 
 export type Shortcut = { keys: string[]; description: string };
 
@@ -17,7 +18,8 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
     items: [
       { keys: ["Alt", "1–9"], description: "trocar de aba, na ordem da barra" },
       { keys: ["/"], description: "buscar na aba atual" },
-      { keys: ["Esc"], description: "fechar ajuda, detalhes ou edição" },
+      { keys: ["Ctrl", "K"], description: "busca global em tarefas de hoje, notas e clipboard" },
+      { keys: ["Esc"], description: "fechar ajuda, detalhes, edição ou a busca global" },
       { keys: ["?"], description: "abrir ou fechar esta ajuda" },
     ],
   },
@@ -44,6 +46,8 @@ type Key = { key: string; code: string; altKey: boolean; ctrlKey: boolean; metaK
 export function interpret(e: Key, typing: boolean): Action | null {
   // Function key doesn't produce text: it counts even with focus in a field.
   if (e.key === "F11" && !e.altKey && !e.ctrlKey && !e.metaKey) return { type: "fullscreen" };
+  // Like a browser's address-bar shortcut: opens the search even while typing elsewhere.
+  if (e.ctrlKey && !e.altKey && !e.metaKey && e.code === "KeyK") return { type: "globalSearch" };
   if (e.altKey && !e.ctrlKey && !e.metaKey) {
     const n = /^Digit([1-9])$/.exec(e.code);
     if (n) return { type: "tab", index: Number(n[1]) };

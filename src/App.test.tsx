@@ -20,11 +20,16 @@ mock.module("@tauri-apps/api/core", () => ({
       case "alert_payload":
         return Promise.resolve({ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" });
       case "notes_search":
-        return Promise.resolve({ total: 0, items: [] });
+        return Promise.resolve(
+          args?.query === "reuniao"
+            ? { total: 1, items: [{ id: "n1", title: "ata reuniao", body: "", tags: [], created_at: 1, updated_at: 1 }] }
+            : { total: 0, items: [] },
+        );
       case "tasks_for_day":
-      case "clip_list":
       case "transcripts_list":
         return Promise.resolve([]);
+      case "clip_list":
+        return Promise.resolve({ items: [], max_pinned: 100 });
       case "drive_status":
         return Promise.resolve({ configured: false, connected: false, email: "" });
       default:
@@ -206,6 +211,32 @@ test("completing from the task alert updates the open list", async () => {
   await settle();
   expect(calls.some((c) => c.cmd === "task_complete")).toBe(true);
   expect(reads(), "the tab would keep showing the task as open").toBeGreaterThan(before);
+});
+
+test("Ctrl+K opens the global search; picking a note result jumps to Notes with the query seeded", async () => {
+  render(<App />);
+  await settle();
+
+  await act(async () => {
+    fireEvent.keyDown(document.body, { key: "k", code: "KeyK", ctrlKey: true });
+  });
+  const dialog = screen.getByRole("dialog", { name: "busca global" });
+
+  await act(async () => {
+    fireEvent.change(screen.getByPlaceholderText("buscar em tarefas de hoje, notas e clipboard"), {
+      target: { value: "reuniao" },
+    });
+    jest.advanceTimersByTime(150);
+    await Promise.resolve();
+  });
+  await settle();
+
+  fireEvent.click(screen.getByRole("button", { name: "notas →" }));
+  await settle();
+
+  expect(dialog.isConnected, "the overlay should have closed").toBe(false);
+  expect(screen.getByRole("tab", { name: "Notas" }).getAttribute("aria-selected")).toBe("true");
+  expect((screen.getByLabelText("buscar notas") as HTMLInputElement).value).toBe("reuniao");
 });
 
 test("F11 enters and exits fullscreen, and the top button reflects the state", async () => {

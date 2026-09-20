@@ -7,10 +7,10 @@ import ClipCard from "./ClipCard";
 
 const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
 
-type Props = { privacy: boolean; onError: (m: string) => void };
+type Props = { privacy: boolean; initialQuery?: string; onError: (m: string) => void };
 
-export default function ClipboardTab({ privacy, onError }: Props) {
-  const [query, setQuery] = useState("");
+export default function ClipboardTab({ privacy, initialQuery, onError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [kindFilter, setKindFilter] = useState<ClipKind | "all">("all");
   const [items, setItems] = useState<ClipItem[]>([]);
   const [maxPinned, setMaxPinned] = useState(100);

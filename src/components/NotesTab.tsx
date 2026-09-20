@@ -12,13 +12,15 @@ type Props = {
   today: string;
   agenda?: AgendaItem[];
   privacy: boolean;
+  /** Seeds the search field once, e.g. arriving from the global search overlay. */
+  initialQuery?: string;
   onOpenTasks: () => void;
   onOpenAgenda: () => void;
   onError: (m: string) => void;
 };
 
-export default function NotesTab({ today, agenda = [], privacy, onOpenTasks, onOpenAgenda, onError }: Props) {
-  const [query, setQuery] = useState("");
+export default function NotesTab({ today, agenda = [], privacy, initialQuery, onOpenTasks, onOpenAgenda, onError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);
