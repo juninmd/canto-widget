@@ -3,6 +3,7 @@ import { act } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 
 let opened: () => Promise<unknown> = () => Promise.resolve({ items: [], errors: [] });
+let geminiDocs: () => Promise<unknown> = () => Promise.resolve([]);
 let args: unknown = null;
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -11,6 +12,7 @@ mock.module("@tauri-apps/api/core", () => ({
       args = a;
       return opened();
     }
+    if (cmd === "gemini_docs") return geminiDocs();
     return Promise.resolve(null);
   },
 }));
@@ -19,8 +21,8 @@ const { default: DaySummary } = await import("./DaySummary");
 
 afterEach(cleanup);
 
-async function mount() {
-  render(<DaySummary day="2026-09-18" tasks={[]} agenda={[]} onClose={() => {}} onError={() => {}} />);
+async function mount(agenda: unknown[] = []) {
+  render(<DaySummary day="2026-09-18" tasks={[]} agenda={agenda as never} onClose={() => {}} onError={() => {}} />);
   for (let i = 0; i < 3; i++) await act(async () => {});
 }
 
@@ -44,4 +46,18 @@ test("while the forges answer, the summary says it's still looking", async () =>
   opened = () => new Promise(() => {});
   await mount();
   expect(screen.getByRole("status").textContent).toContain("consultando");
+});
+
+test("a meeting's Gemini notes reach the summary text", async () => {
+  const meeting = { id: "r", title: "Daily", start: new Date(2026, 8, 18, 9, 0).toISOString(), end: "", all_day: false, location: "", meet: "", link: "" };
+  geminiDocs = () => Promise.resolve([{ meeting: "Daily", start: meeting.start, title: "Notas", url: "https://docs.google.com/z" }]);
+  await mount([meeting]);
+  expect(screen.getByRole("region", { name: "resumo do dia" }).textContent).toContain("anotações do Gemini: https://docs.google.com/z");
+});
+
+test("Gemini notes unavailable (no Google account) leaves the rest of the summary intact", async () => {
+  const meeting = { id: "r", title: "Daily", start: new Date(2026, 8, 18, 9, 0).toISOString(), end: "", all_day: false, location: "", meet: "", link: "" };
+  geminiDocs = () => Promise.reject(new Error("sem conta"));
+  await mount([meeting]);
+  expect(screen.getByRole("region", { name: "resumo do dia" }).textContent).toContain("09:00 Daily");
 });

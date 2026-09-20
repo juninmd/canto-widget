@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import type { AgendaItem, ForgeItem, Task } from "./api";
+import type { AgendaItem, ForgeItem, GeminiDoc, Task } from "./api";
 import { dayStart, daySummary } from "./summary";
 
 const t = (title: string, done: boolean, hora: string | null = null): Task => ({ id: title, title, done, day: "2026-09-14", created_at: 1, updated_at: 1, hora });
@@ -10,6 +10,14 @@ test("separates done, pending and meetings with a count", () => {
   expect(text).toContain("Concluído (1)\n- enviar NF");
   expect(text).toContain("Pendente (1)\n- ligar banco (15:00)");
   expect(text).toMatch(/Reuniões \(1\)\n- 09:30 Daily/);
+});
+
+test("a meeting with Gemini notes carries the link in the summary line", () => {
+  const doc: GeminiDoc = { meeting: "Daily", start: meeting.start, title: "Notas da Daily", url: "https://docs.google.com/x" };
+  const other: GeminiDoc = { meeting: "Outra reunião", start: new Date(2026, 8, 14, 11, 0).toISOString(), title: "Y", url: "https://docs.google.com/y" };
+  const text = daySummary("2026-09-14", [], [meeting], [], [doc, other]);
+  expect(text).toContain("09:30 Daily — anotações do Gemini: https://docs.google.com/x");
+  expect(text).not.toContain("docs.google.com/y");
 });
 
 test("PRs and MRs opened today are listed with the forge's own reference", () => {

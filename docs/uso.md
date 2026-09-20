@@ -70,7 +70,8 @@ nunca mostra de novo.
   o corpo e as tags num arquivo `.md`.
 - **Resumo do dia** — texto com o que foi concluído, o que ficou pendente, as reuniões e os **PRs/MRs que você
   abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
-  não responder, o resumo diz qual e traz o resto.
+  não responder, o resumo diz qual e traz o resto. Uma reunião com anotações do Gemini leva o link delas na
+  mesma linha.
 - **Abas visíveis** — em **Ajustes → Abas visíveis**, desmarque as abas que você não usa. Os dados continuam no
   cofre, e `Alt+1`, `Alt+2`… seguem a ordem das abas que ficaram. Ajustes nunca some.
 

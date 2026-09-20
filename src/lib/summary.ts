@@ -1,4 +1,4 @@
-import type { AgendaItem, ForgeItem, Task } from "./api";
+import type { AgendaItem, ForgeItem, GeminiDoc, Task } from "./api";
 import { hour } from "./agenda";
 
 /** Local midnight of a `YYYY-MM-DD` day, in ms. */
@@ -11,8 +11,20 @@ function longDate(day: string): string {
   return new Date(dayStart(day)).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" });
 }
 
+/** Same event the Calendar attachment came from: title and start match exactly. */
+function geminiLink(e: AgendaItem, docs: GeminiDoc[]): string {
+  const doc = docs.find((d) => d.meeting === e.title && d.start === e.start);
+  return doc ? ` — anotações do Gemini: ${doc.url}` : "";
+}
+
 /** Plain text, ready to paste into chat or email: no markdown that could break at the destination. */
-export function daySummary(day: string, tasks: Task[], agenda: AgendaItem[], opened: ForgeItem[] = []): string {
+export function daySummary(
+  day: string,
+  tasks: Task[],
+  agenda: AgendaItem[],
+  opened: ForgeItem[] = [],
+  geminiDocs: GeminiDoc[] = [],
+): string {
   const done = tasks.filter((t) => t.done);
   const open = tasks.filter((t) => !t.done);
   const lines = [`Resumo de ${longDate(day)}`, ""];
@@ -22,7 +34,7 @@ export function daySummary(day: string, tasks: Task[], agenda: AgendaItem[], ope
   };
   section("Concluído", done.map((t) => t.title));
   section("Pendente", open.map((t) => (t.hora ? `${t.title} (${t.hora})` : t.title)));
-  section("Reuniões", agenda.map((e) => `${hour(e)} ${e.title}`));
+  section("Reuniões", agenda.map((e) => `${hour(e)} ${e.title}${geminiLink(e, geminiDocs)}`));
   section("PRs/MRs abertos", opened.map((i) => `${i.reference} ${i.title}${i.draft ? " (rascunho)" : ""}`));
   if (lines.length === 2) lines.push("Nada registrado hoje.");
   return lines.join("\n").trimEnd();

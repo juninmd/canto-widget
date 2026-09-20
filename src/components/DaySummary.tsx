@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { api, errText, type AgendaItem, type ForgeOpened, type Task } from "../lib/api";
+import { api, errText, type AgendaItem, type ForgeOpened, type GeminiDoc, type Task } from "../lib/api";
 import { dayStart, daySummary } from "../lib/summary";
 
 export default function DaySummary({
@@ -16,7 +16,11 @@ export default function DaySummary({
   onError: (m: string) => void;
 }) {
   const [opened, setOpened] = useState<ForgeOpened | null>(null);
-  const text = useMemo(() => daySummary(day, tasks, agenda, opened?.items), [day, tasks, agenda, opened]);
+  const [geminiDocs, setGeminiDocs] = useState<GeminiDoc[]>([]);
+  const text = useMemo(
+    () => daySummary(day, tasks, agenda, opened?.items, geminiDocs),
+    [day, tasks, agenda, opened, geminiDocs],
+  );
 
   // Served from Rust's forge cache; a forge that isn't connected simply adds nothing.
   useEffect(() => {
@@ -25,6 +29,20 @@ export default function DaySummary({
       .forgesOpenedSince(dayStart(day))
       .then((o) => live && setOpened(o))
       .catch((e) => live && setOpened({ items: [], errors: [errText(e)] }));
+    return () => {
+      live = false;
+    };
+  }, [day]);
+
+  // Best-effort: no Google account connected, or nothing from Gemini today, just means no links.
+  useEffect(() => {
+    let live = true;
+    const start = new Date(dayStart(day));
+    const end = new Date(dayStart(day) + 24 * 60 * 60 * 1000);
+    api
+      .geminiDocs(start.toISOString(), end.toISOString())
+      .then((d) => live && setGeminiDocs(d ?? []))
+      .catch(() => live && setGeminiDocs([]));
     return () => {
       live = false;
     };

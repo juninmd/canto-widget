@@ -68,6 +68,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Pasta sincronizada com merge automático** (Ajustes → Pasta sincronizada): aponte para uma pasta do
   Dropbox/OneDrive/Syncthing e o Canto cuida do resto — exporta a cada alteração e mescla o que chegar de
   outra máquina ao destrancar e a cada ~5 min, sem precisar de exportar/importar manual.
+- **Anotações do Gemini no resumo do dia**: quando uma reunião tem anotações do Gemini anexadas, o resumo
+  leva o link delas na mesma linha da reunião.
 
 ### Alterado
 
