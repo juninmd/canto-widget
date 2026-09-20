@@ -75,6 +75,18 @@
 | ![Detalhes da tarefa](prints/produtividade/1-tarefa-horario-repeticao.png) | ![Resumo do dia](prints/produtividade/2-resumo-do-dia.png) | ![Lembrete de tarefa](prints/produtividade/8-lembrete-tarefa.png) |
 | ![Nota fixada](prints/produtividade/3-notas-fixada.png) | ![Filtro por tag](prints/produtividade/4-notas-filtro-tag.png) | ![Windows Hello](prints/produtividade/5-trancado-windows-hello.png) |
 
+## GitHub e GitLab
+
+- **Abas github e gitlab** — issues e PRs/MRs abertos, em quatro listas: revisão pedida a mim, atribuídos a
+  mim, PRs/MRs que eu abri e issues que eu abri. Filtro por texto (ou qualificador do GitHub, como `repo:` e
+  `label:`), tipo, ordenação e **mostrar mais** em cada lista. As listas ficam 5 min guardadas em memória
+  para poupar a cota da API; **atualizar** força uma busca nova.
+- **Status do CI** — em cada PR/MR, o botão **ver CI** busca sob demanda a combinação dos checks (GitHub) ou
+  o pipeline (GitLab) do último commit e mostra passou/falhou/rodando/sem CI. Só busca quando você clica,
+  nunca ao abrir a lista.
+- **Tempo aguardando revisão** — na lista "revisão pedida a mim", cada PR/MR mostra há quanto tempo foi aberto;
+  passados 3 dias o texto fica em vermelho.
+
 ## Aparência e atalho
 
 - Skins, escolhidas em **ajustes → Aparência**: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Claro** e **Sistema**, que segue o tema

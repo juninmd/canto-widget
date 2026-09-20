@@ -199,6 +199,28 @@ test("a slow answer for an old filter never replaces the current list", async ()
   expect(screen.queryByText("Velho")).toBeNull();
 });
 
+test("a PR waiting for review shows since when it was opened, in red once stale", async () => {
+  responses.github_status = connected;
+  const fourDaysAgo = new Date(Date.now() - 4 * 86_400_000).toISOString();
+  responses.github_lists = () => Promise.resolve(lists({ review_requested: { total: 1, items: [{ ...item, created_at: fourDaysAgo }] } }));
+  await mount();
+  const badge = screen.getByText(/aguardando há 4 d/);
+  expect(badge.className).toContain("text-danger");
+});
+
+test("ver CI asks the vault for the PR's combined status and shows the result, on click only", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [item] } }));
+  responses.github_pr_checks = () => Promise.resolve("success");
+  await mount();
+  expect(calls.some((c) => c.cmd === "github_pr_checks")).toBe(false);
+  await act(async () => {
+    fireEvent.click(screen.getByText("ver CI"));
+  });
+  expect(calls.find((c) => c.cmd === "github_pr_checks")?.args).toEqual({ repo: item.repo, number: item.number });
+  expect(screen.getByText("✓ CI passou")).toBeTruthy();
+});
+
 test("a failed filter change keeps the previous filter as the applied one", async () => {
   responses.github_status = connected;
   responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 3, items: [item] } }));

@@ -3,7 +3,7 @@ use serde::Deserialize;
 use std::time::Duration;
 
 use crate::error::{AppError, Result};
-use crate::forge::{merge, ForgeItem, ForgeList};
+use crate::forge::{checks_from_github, merge, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{self as filter, ForgeFilter, Section, Sort, PER_PAGE};
 use crate::github_query::{opened_since, queries};
@@ -66,6 +66,30 @@ pub fn prs_opened_since(token: &str, since: &str) -> Result<(ForgeList, Option<Q
 pub fn user(token: &str) -> Result<String> {
     let res = client()?.get(format!("{API}/user")).bearer_auth(token).send().map_err(network)?;
     Ok(response::<GithubUser>(res)?.login)
+}
+
+#[derive(Deserialize)]
+struct PullDetail {
+    head: PullHead,
+}
+
+#[derive(Deserialize)]
+struct PullHead {
+    sha: String,
+}
+
+#[derive(Deserialize)]
+struct CombinedStatus {
+    #[serde(default)]
+    state: String,
+}
+
+/// Two calls (head sha, then its combined status): only on an explicit click, never per row of a list.
+pub fn pr_checks(token: &str, repo: &str, number: u64) -> Result<ChecksStatus> {
+    let pr: PullDetail = response(client()?.get(format!("{API}/repos/{repo}/pulls/{number}")).bearer_auth(token).send().map_err(network)?)?;
+    let status: CombinedStatus =
+        response(client()?.get(format!("{API}/repos/{repo}/commits/{}/status", pr.head.sha)).bearer_auth(token).send().map_err(network)?)?;
+    Ok(checks_from_github(&status.state))
 }
 
 fn search(token: &str, query: &str, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {

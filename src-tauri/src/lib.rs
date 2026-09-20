@@ -182,11 +182,13 @@ pub fn run() {
             cmd_github::github_disconnect,
             cmd_github_lists::github_lists,
             cmd_github_lists::github_section,
+            cmd_github_lists::github_pr_checks,
             cmd_gitlab::gitlab_status,
             cmd_gitlab::gitlab_connect,
             cmd_gitlab::gitlab_disconnect,
             cmd_gitlab::gitlab_lists,
             cmd_gitlab::gitlab_section,
+            cmd_gitlab::gitlab_mr_checks,
             cmd_forges::forges_opened_since,
             tray_live::badge_set_tasks,
         ])

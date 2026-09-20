@@ -5,7 +5,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
-use crate::forge::{ForgeList, ForgeLists};
+use crate::forge::{ChecksStatus, ForgeList, ForgeLists};
 use crate::forge_filter::{cache_key, ForgeFilter, Section};
 use crate::gitlab::{self, Account};
 use crate::gitlab_query;
@@ -106,6 +106,12 @@ pub async fn gitlab_section(app: tauri::AppHandle, section: Section, page: u32, 
         cache.get(FORGE, &cache_key(section, page, &f), false, now_ms(), || gitlab::section(&acc, section, page, &f))
     })
     .await
+}
+
+/// One click on one MR row, not a list: a single call, never cached.
+#[tauri::command]
+pub async fn gitlab_mr_checks(app: tauri::AppHandle, project: String, iid: u64) -> Result<ChecksStatus> {
+    run(move || gitlab::mr_checks(&account(&app)?, &project, iid)).await
 }
 
 /// `None` when GitLab isn't connected: the day summary just leaves it out.

@@ -1,9 +1,13 @@
-import { api, type ForgeItem, type ForgeList } from "../lib/api";
-import { timeAgo } from "../lib/time";
+import { useState } from "react";
+import { api, type ChecksStatus, type ForgeItem, type ForgeList, type ForgeSection as ForgeSectionKey } from "../lib/api";
+import type { Forge } from "../lib/forge";
+import { daysSince, timeAgo } from "../lib/time";
 import { IssueIcon, PullIcon } from "./Icons";
 
 type Props = {
   title: string;
+  section: ForgeSectionKey;
+  forge: Forge;
   list: ForgeList;
   login: string;
   filtered: boolean;
@@ -11,7 +15,7 @@ type Props = {
   onMore: () => void;
 };
 
-export default function ForgeSection({ title, list, login, filtered, loadingMore, onMore }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore }: Props) {
   const rest = list.total - list.items.length;
   return (
     <section aria-label={title}>
@@ -23,7 +27,7 @@ export default function ForgeSection({ title, list, login, filtered, loadingMore
       ) : (
         <ul className="space-y-1.5">
           {list.items.map((it) => (
-            <Row key={it.url} item={it} login={login} />
+            <Row key={it.url} item={it} login={login} forge={forge} waiting={section === "review_requested"} />
           ))}
         </ul>
       )}
@@ -41,8 +45,20 @@ export default function ForgeSection({ title, list, login, filtered, loadingMore
   );
 }
 
-function Row({ item, login }: { item: ForgeItem; login: string }) {
+function Row({ item, login, forge, waiting }: { item: ForgeItem; login: string; forge: Forge; waiting: boolean }) {
   const kind = item.is_pr ? (item.draft ? "PR rascunho" : "PR") : "issue";
+  const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
+  const wait = waiting && item.is_pr ? daysSince(item.created_at) : null;
+
+  async function loadChecks() {
+    setChecks("loading");
+    try {
+      setChecks(forge === "github" ? await api.githubPrChecks(item.repo, item.number) : await api.gitlabMrChecks(item.repo, item.number));
+    } catch {
+      setChecks("none");
+    }
+  }
+
   return (
     <li>
       <button
@@ -60,10 +76,36 @@ function Row({ item, login }: { item: ForgeItem; login: string }) {
             <span className="truncate">{item.reference}</span>
             {item.draft && <span className="shrink-0 text-faint">rascunho</span>}
             {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
+            {wait !== null && (
+              <span className={`shrink-0 ${wait >= 3 ? "text-danger" : "text-faint"}`}>aguardando há {wait <= 0 ? "menos de 1 d" : `${wait} d`}</span>
+            )}
             <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>
           </span>
         </span>
       </button>
+      {item.is_pr && (
+        <div className="mt-1 flex items-center gap-2 pl-7 text-[11px]">
+          {checks === null ? (
+            <button type="button" onClick={() => void loadChecks()} className="text-muted underline decoration-dotted hover:text-fg">
+              ver CI
+            </button>
+          ) : (
+            <ChecksBadge status={checks} />
+          )}
+        </div>
+      )}
     </li>
   );
+}
+
+function ChecksBadge({ status }: { status: ChecksStatus | "loading" }) {
+  const map: Record<ChecksStatus | "loading", { label: string; className: string }> = {
+    loading: { label: "verificando…", className: "text-faint" },
+    success: { label: "✓ CI passou", className: "text-accent" },
+    failure: { label: "✗ CI falhou", className: "text-danger" },
+    running: { label: "● CI rodando", className: "text-muted" },
+    none: { label: "sem CI", className: "text-faint" },
+  };
+  const { label, className } = map[status];
+  return <span className={className}>{label}</span>;
 }

@@ -53,6 +53,8 @@ export default function ForgeBoard({ forge, login, host, lists: gh, onDisconnect
             <ForgeSection
               key={key}
               title={title}
+              section={key}
+              forge={forge}
               list={lists[key]}
               login={login}
               filtered={isFiltered(gh.filter)}

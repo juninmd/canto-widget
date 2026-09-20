@@ -31,6 +31,35 @@ pub struct ForgeList {
     pub limited_until: Option<i64>,
 }
 
+/// Combined CI/pipeline status of a PR/MR's head commit, fetched on demand (one click, not per list row).
+#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ChecksStatus {
+    Success,
+    Failure,
+    Running,
+    /// No checks configured, or the forge reported a state this app doesn't track (cancelled, skipped, ...).
+    None,
+}
+
+pub fn checks_from_github(state: &str) -> ChecksStatus {
+    match state {
+        "success" => ChecksStatus::Success,
+        "failure" | "error" => ChecksStatus::Failure,
+        "pending" => ChecksStatus::Running,
+        _ => ChecksStatus::None,
+    }
+}
+
+pub fn checks_from_gitlab(status: Option<&str>) -> ChecksStatus {
+    match status {
+        Some("success") => ChecksStatus::Success,
+        Some("failed") => ChecksStatus::Failure,
+        Some("running" | "pending" | "created" | "waiting_for_resource" | "scheduled") => ChecksStatus::Running,
+        _ => ChecksStatus::None,
+    }
+}
+
 #[derive(Debug, Default, Serialize)]
 pub struct ForgeLists {
     pub assigned: ForgeList,
@@ -122,5 +151,22 @@ mod tests {
         let (a, b) = pages();
         let merged = merge(a, b, &ForgeFilter::default());
         assert_eq!((merged.total, merged.items.len()), (9, 2));
+    }
+
+    #[test]
+    fn github_combined_status_maps_to_the_three_states_the_ui_shows() {
+        assert_eq!(checks_from_github("success"), ChecksStatus::Success);
+        assert_eq!(checks_from_github("failure"), ChecksStatus::Failure);
+        assert_eq!(checks_from_github("pending"), ChecksStatus::Running);
+        assert_eq!(checks_from_github("whatever-github-adds-later"), ChecksStatus::None);
+    }
+
+    #[test]
+    fn gitlab_pipeline_status_maps_to_the_three_states_the_ui_shows() {
+        assert_eq!(checks_from_gitlab(Some("success")), ChecksStatus::Success);
+        assert_eq!(checks_from_gitlab(Some("failed")), ChecksStatus::Failure);
+        assert_eq!(checks_from_gitlab(Some("running")), ChecksStatus::Running);
+        assert_eq!(checks_from_gitlab(Some("canceled")), ChecksStatus::None);
+        assert_eq!(checks_from_gitlab(None), ChecksStatus::None, "an MR with no pipeline configured");
     }
 }

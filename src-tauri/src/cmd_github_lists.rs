@@ -5,7 +5,7 @@ use zeroize::Zeroizing;
 use crate::blocking::run;
 use crate::cmd_github::{valid_token, GithubState, FORGE};
 use crate::error::Result;
-use crate::forge::{ForgeList, ForgeLists};
+use crate::forge::{ChecksStatus, ForgeList, ForgeLists};
 use crate::forge_filter::{cache_key, ForgeFilter, Section};
 use crate::github;
 use crate::model::now_ms;
@@ -30,6 +30,12 @@ pub async fn github_section(app: tauri::AppHandle, section: Section, page: u32, 
         cache.get(FORGE, &cache_key(section, page, &f), false, now_ms(), || github::section(&token, section, page, &f))
     })
     .await
+}
+
+/// One click on one PR row, not a list: two calls (head sha, then its combined status), never cached.
+#[tauri::command]
+pub async fn github_pr_checks(app: tauri::AppHandle, repo: String, number: u64) -> Result<ChecksStatus> {
+    run(move || github::pr_checks(&token(&app)?, &repo, number)).await
 }
 
 /// `None` when GitHub isn't connected: the day summary just leaves it out.

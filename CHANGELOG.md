@@ -44,6 +44,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Vincular nota a uma tarefa ou evento** da agenda: a nota ganha um selo que leva direto para a aba
   correspondente.
 - **Exportar nota como .md**: ícone de download no card, com diálogo nativo de salvar.
+- **Status do CI/pipeline no card do PR/MR**: botão "ver CI" busca sob demanda (GitHub: checks combinados do
+  commit; GitLab: pipeline da MR) e mostra passou/falhou/rodando/sem CI.
+- **Tempo aguardando revisão**: na lista "revisão pedida a mim", cada PR/MR mostra há quantos dias foi aberto,
+  em vermelho a partir de 3 dias.
 
 ### Alterado
 

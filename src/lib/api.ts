@@ -94,6 +94,8 @@ export type AgendaItem = {
   attachments?: Attachment[];
 };
 export type Attachment = { title: string; url: string; mime: string };
+/** Combined CI/pipeline status of a PR/MR's head commit. */
+export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 
 export const api = {
@@ -193,6 +195,8 @@ export const api = {
   githubLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("github_lists", { filter, force }),
   githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("github_section", { section, page, filter }),
+  /** One call per click, not per list row: never fetched for a whole page at once. */
+  githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
 
   gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
   /** Validates address and token against the instance; returns the username. */
@@ -201,6 +205,8 @@ export const api = {
   gitlabLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("gitlab_lists", { filter, force }),
   gitlabSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("gitlab_section", { section, page, filter }),
+  /** One call per click, not per list row: never fetched for a whole page at once. */
+  gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
   /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */

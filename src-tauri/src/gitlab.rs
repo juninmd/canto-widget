@@ -4,7 +4,7 @@ use std::time::Duration;
 use zeroize::Zeroizing;
 
 use crate::error::{AppError, Result};
-use crate::forge::{merge, ForgeItem, ForgeList};
+use crate::forge::{checks_from_gitlab, merge, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{ForgeFilter, Section, PER_PAGE};
 use crate::gitlab_query::{opened_since, requests, Request};
@@ -69,6 +69,26 @@ pub fn section(acc: &Account, section: Section, page: u32, f: &ForgeFilter) -> R
 
 pub fn mrs_opened_since(acc: &Account, since: &str) -> Result<(ForgeList, Option<Quota>)> {
     fetch(acc, &opened_since(since))
+}
+
+#[derive(Deserialize)]
+struct MrDetail {
+    #[serde(default)]
+    head_pipeline: Option<HeadPipeline>,
+}
+
+#[derive(Deserialize)]
+struct HeadPipeline {
+    status: String,
+}
+
+/// One call: unlike GitHub, GitLab already embeds the head pipeline in the MR detail.
+pub fn mr_checks(acc: &Account, project: &str, iid: u64) -> Result<ChecksStatus> {
+    let encoded = project.replace('/', "%2F");
+    let url = format!("{}/api/v4/projects/{encoded}/merge_requests/{iid}", acc.base);
+    let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
+    let detail: MrDetail = response(res)?;
+    Ok(checks_from_gitlab(detail.head_pipeline.as_ref().map(|p| p.status.as_str())))
 }
 
 fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
