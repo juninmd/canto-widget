@@ -1,6 +1,6 @@
 use canto_widget_lib::error::AppError;
-use canto_widget_lib::model::{Repeat, Task, VaultData};
-use canto_widget_lib::routine::{set_schedule, weekday_of, instance_id, materialize, validate_time};
+use canto_widget_lib::model::{ExtendedRepeat, Repeat, Task, VaultData};
+use canto_widget_lib::routine::{instance_id, materialize, set_extended_repeat, set_schedule, weekday_of, validate_time};
 
 fn task(id: &str, day: &str) -> Task {
     Task { id: id.into(), title: "tomar remedio".into(), day: day.into(), created_at: 1, updated_at: 1, ..Default::default() }
@@ -96,6 +96,54 @@ fn a_time_outside_the_format_is_rejected_before_the_vault() {
     let mut t = task("x", "2026-09-14");
     assert!(set_schedule(&mut t, None, Some(Repeat::Weekly { weekday: 7 }), 1).is_err());
     assert!(t.repeat.is_none() && t.series.is_none(), "state changed despite the error");
+}
+
+fn with_extended_series(day: &str, r: ExtendedRepeat) -> VaultData {
+    let mut t = task("s1", day);
+    set_extended_repeat(&mut t, Some(r), 2).unwrap();
+    VaultData { tasks: vec![t], ..Default::default() }
+}
+
+#[test]
+fn monthly_fires_only_on_the_chosen_day_of_month() {
+    let mut d = with_extended_series("2026-09-05", ExtendedRepeat::Monthly { day: 5 });
+    assert_eq!(materialize(&mut d, "2026-09-06", 10), 0);
+    assert_eq!(materialize(&mut d, "2026-10-05", 10), 1);
+}
+
+#[test]
+fn a_day_of_month_a_shorter_month_lacks_simply_does_not_fire_that_month() {
+    let mut d = with_extended_series("2026-01-31", ExtendedRepeat::Monthly { day: 31 });
+    assert_eq!(materialize(&mut d, "2026-02-28", 10), 0, "February has no 31st");
+    assert_eq!(materialize(&mut d, "2026-03-31", 10), 1);
+}
+
+#[test]
+fn specific_days_fires_on_any_of_the_chosen_weekdays() {
+    // Monday (1) and Wednesday (3), starting Monday 2026-09-14.
+    let mut d = with_extended_series("2026-09-14", ExtendedRepeat::SpecificDays { days: vec![1, 3] });
+    assert_eq!(materialize(&mut d, "2026-09-15", 10), 0, "tuesday is not chosen");
+    assert_eq!(materialize(&mut d, "2026-09-16", 10), 1, "wednesday is chosen");
+}
+
+#[test]
+fn setting_one_recurrence_kind_clears_the_other() {
+    let mut t = task("x", "2026-09-14");
+    set_schedule(&mut t, None, Some(Repeat::Daily), 1).unwrap();
+    set_extended_repeat(&mut t, Some(ExtendedRepeat::Monthly { day: 1 }), 2).unwrap();
+    assert!(t.repeat.is_none(), "legacy repeat survived setting the extended kind");
+
+    set_schedule(&mut t, None, Some(Repeat::Weekdays), 3).unwrap();
+    assert!(t.extended_repeat.is_none(), "extended repeat survived setting the legacy kind");
+}
+
+#[test]
+fn extended_repeat_rejects_an_out_of_range_day_or_weekday() {
+    let mut t = task("x", "2026-09-14");
+    assert!(set_extended_repeat(&mut t, Some(ExtendedRepeat::Monthly { day: 32 }), 1).is_err());
+    assert!(set_extended_repeat(&mut t, Some(ExtendedRepeat::SpecificDays { days: vec![] }), 1).is_err());
+    assert!(set_extended_repeat(&mut t, Some(ExtendedRepeat::SpecificDays { days: vec![7] }), 1).is_err());
+    assert!(t.extended_repeat.is_none(), "state changed despite the error");
 }
 
 #[test]

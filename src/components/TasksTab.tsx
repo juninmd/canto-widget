@@ -163,6 +163,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             }
             onToggleDetails={() => setDetails(details === t.id ? "" : t.id)}
             onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
+            onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(t.id, repeat))}
             onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
             onPriority={(priority) => void run(() => api.taskSetPriority(t.id, priority))}
             onSubtasksChange={reload}

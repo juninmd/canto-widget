@@ -49,7 +49,8 @@
   tarefa já com o lembrete. "14h" sozinho não conta: "Estudar 2h de Rust" é duração, não horário.
 - **Adiar** — o aviso de reunião ou de tarefa tem **adiar 10 min**: ele some e volta depois. Tarefa concluída
   ou apagada nesse meio-tempo não volta a tocar.
-- **Recorrência** — todo dia, dias úteis ou toda semana no mesmo dia. A tarefa do dia é criada
+- **Recorrência** — todo dia, dias úteis, toda semana no mesmo dia, todo mês (no mesmo dia do mês; um mês
+  sem esse dia simplesmente não gera tarefa) ou em dias específicos da semana. A tarefa do dia é criada
   quando o dia chega, com id determinístico (`<série>-<dia>`): duas máquinas geram a mesma e o merge
   não duplica. Excluir o dia de hoje não apaga a série; "não repete" encerra. "Puxar pendências"
   ignora tarefas recorrentes, que já ganham a sua própria.

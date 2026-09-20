@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Repeat, Task, VaultData};
+use crate::model::{now_ms, ExtendedRepeat, Repeat, Task, VaultData};
 use crate::vault::AppState;
 
 /// Valid "YYYY-MM-DD", or `None`. The day comes from the webview: don't trust the format.
@@ -39,6 +39,15 @@ impl Repeat {
     }
 }
 
+impl ExtendedRepeat {
+    pub fn applies_on(&self, day: &str) -> bool {
+        match self {
+            ExtendedRepeat::Monthly { day: target } => civil(day).is_some_and(|(_, _, d)| d == *target as u32),
+            ExtendedRepeat::SpecificDays { days } => weekday_of(day).is_some_and(|s| days.contains(&s)),
+        }
+    }
+}
+
 pub fn instance_id(series: &str, day: &str) -> String {
     format!("{series}-{day}")
 }
@@ -61,7 +70,9 @@ pub fn materialize(d: &mut VaultData, day: &str, now: i64) -> usize {
     let new_tasks: Vec<Task> = latest
         .into_iter()
         .filter(|(series, _)| !has_today.contains(series))
-        .filter(|(_, t)| t.repeat.is_some_and(|r| r.applies_on(day)))
+        .filter(|(_, t)| {
+            t.repeat.is_some_and(|r| r.applies_on(day)) || t.extended_repeat.as_ref().is_some_and(|r| r.applies_on(day))
+        })
         .map(|(series, t)| Task {
             id: instance_id(series, day),
             day: day.to_string(),
@@ -98,11 +109,48 @@ pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, 
     }
     t.reminder_time = time.filter(|h| !h.is_empty()).map(|h| validate_time(&h)).transpose()?;
     t.repeat = repeat;
+    // The two recurrence kinds are mutually exclusive: picking one clears the other.
+    if repeat.is_some() {
+        t.extended_repeat = None;
+    }
     if repeat.is_some() && t.series.is_none() {
         t.series = Some(t.id.clone());
     }
     t.updated_at = now;
     Ok(())
+}
+
+fn validate_extended(repeat: &ExtendedRepeat) -> Result<()> {
+    match repeat {
+        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => Err(AppError::Config("dia do mes invalido".into())),
+        ExtendedRepeat::SpecificDays { days } if days.is_empty() || days.iter().any(|d| *d > 6) => {
+            Err(AppError::Config("dias da semana invalidos".into()))
+        }
+        _ => Ok(()),
+    }
+}
+
+pub fn set_extended_repeat(t: &mut Task, repeat: Option<ExtendedRepeat>, now: i64) -> Result<()> {
+    if let Some(r) = &repeat {
+        validate_extended(r)?;
+    }
+    t.extended_repeat = repeat;
+    if t.extended_repeat.is_some() {
+        t.repeat = None;
+        if t.series.is_none() {
+            t.series = Some(t.id.clone());
+        }
+    }
+    t.updated_at = now;
+    Ok(())
+}
+
+#[tauri::command(async)]
+pub fn task_set_extended_repeat(state: State<'_, AppState>, id: String, repeat: Option<ExtendedRepeat>) -> Result<()> {
+    state.mutate(|d| match d.tasks.iter_mut().find(|t| t.id == id) {
+        Some(t) => set_extended_repeat(t, repeat, now_ms()),
+        None => Err(AppError::NotFound),
+    })?
 }
 
 #[tauri::command(async)]

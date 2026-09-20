@@ -37,6 +37,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Subtarefas**: checklist dentro do ⏰ da tarefa, com contagem `feitas/total` na linha.
 - **Prioridade da tarefa** (alta/média/baixa) com bolinha na linha e filtro acima da lista.
 - **Arrastar para reordenar** as tarefas do dia pela alça (⠿) que aparece ao passar o mouse.
+- **Recorrência mensal e por dias específicos da semana** para tarefas, além de todo dia/dias úteis/semanal.
 
 ### Alterado
 

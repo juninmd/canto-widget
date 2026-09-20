@@ -15,7 +15,13 @@ const baseTask = {
 };
 type Subtask = { id: string; title: string; done: boolean };
 type Priority = "low" | "medium" | "high";
-type MockTask = typeof baseTask & { pr_url?: string | null; subtasks?: Subtask[]; priority?: Priority | null };
+type ExtendedRepeat = { tipo: "monthly"; day: number } | { tipo: "specific_days"; days: number[] };
+type MockTask = typeof baseTask & {
+  pr_url?: string | null;
+  subtasks?: Subtask[];
+  priority?: Priority | null;
+  extended_repeat?: ExtendedRepeat | null;
+};
 let task: MockTask = { ...baseTask };
 let extraTask: MockTask | null = null;
 let nextSubtaskId = 0;
@@ -49,6 +55,10 @@ mock.module("@tauri-apps/api/core", () => ({
     }
     if (cmd === "task_set_priority") {
       task = { ...task, priority: args?.priority as Priority | null };
+      return Promise.resolve(null);
+    }
+    if (cmd === "task_set_extended_repeat") {
+      task = { ...task, extended_repeat: args?.repeat as ExtendedRepeat | null };
       return Promise.resolve(null);
     }
     return Promise.resolve(null);
@@ -183,6 +193,84 @@ test("time and repeat save immediately; weekly uses the task's day of week", asy
     fireEvent.change(repeat, { target: { value: "semanal" } });
   });
   expect(calls.find((c) => c.cmd === "task_set_schedule")?.args?.repeat).toEqual({ tipo: "semanal", dia: 3 });
+});
+
+test("monthly recurrence defaults to the task's day of month and can be edited", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  const repeat = screen.getByLabelText("repetir comprar leite");
+  await act(async () => {
+    fireEvent.change(repeat, { target: { value: "mensal" } });
+  });
+  // 2026-09-09: day of month is 9.
+  expect(calls.find((c) => c.cmd === "task_set_extended_repeat")?.args).toEqual({
+    id: "t1",
+    repeat: { tipo: "monthly", day: 9 },
+  });
+
+  calls.length = 0;
+  const dayInput = screen.getByLabelText("dia do mês de comprar leite");
+  await act(async () => {
+    fireEvent.change(dayInput, { target: { value: "31" } });
+  });
+  expect(calls.find((c) => c.cmd === "task_set_extended_repeat")?.args).toEqual({
+    id: "t1",
+    repeat: { tipo: "monthly", day: 31 },
+  });
+});
+
+test("specific weekdays start with today's weekday and toggle, keeping at least one", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("repetir comprar leite"), { target: { value: "dias_especificos" } });
+  });
+  // 2026-09-09 is a Wednesday (3).
+  expect(calls.find((c) => c.cmd === "task_set_extended_repeat")?.args).toEqual({
+    id: "t1",
+    repeat: { tipo: "specific_days", days: [3] },
+  });
+
+  calls.length = 0;
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("sexta"));
+  });
+  expect(calls.find((c) => c.cmd === "task_set_extended_repeat")?.args).toEqual({
+    id: "t1",
+    repeat: { tipo: "specific_days", days: [3, 5] },
+  });
+
+  // Removing back down to one day is fine, but the last remaining day can't be toggled off.
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("quarta"));
+  });
+  expect((screen.getByLabelText("sexta") as HTMLButtonElement).disabled).toBe(true);
+});
+
+test("picking a legacy repeat option clears any extended repeat, and 'não repete' clears both", async () => {
+  task = { ...task, extended_repeat: { tipo: "monthly", day: 9 } };
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  const repeat = screen.getByLabelText("repetir comprar leite") as HTMLSelectElement;
+  expect(repeat.value).toBe("mensal");
+
+  await act(async () => {
+    fireEvent.change(repeat, { target: { value: "diaria" } });
+  });
+  expect(calls.find((c) => c.cmd === "task_set_schedule")?.args?.repeat).toEqual({ tipo: "diaria" });
+
+  calls.length = 0;
+  await act(async () => {
+    fireEvent.change(repeat, { target: { value: "" } });
+  });
+  expect(calls.find((c) => c.cmd === "task_set_schedule")?.args?.repeat).toBeNull();
+  expect(calls.find((c) => c.cmd === "task_set_extended_repeat")?.args?.repeat).toBeNull();
 });
 
 test("a PR link is saved on Enter and opens from the badge chip", async () => {

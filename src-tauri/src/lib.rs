@@ -135,6 +135,7 @@ pub fn run() {
             cmd_notes::note_save,
             cmd_notes::note_pin,
             routine::task_set_schedule,
+            routine::task_set_extended_repeat,
             routine::tasks_reminders,
             commands::item_delete,
             cmd_drive::drive_status,

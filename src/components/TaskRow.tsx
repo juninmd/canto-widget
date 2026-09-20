@@ -1,4 +1,4 @@
-import type { Priority, Repeat, Task } from "../lib/api";
+import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import TaskDetails, { TaskBadge } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
 import { GripIcon } from "./Icons";
@@ -23,6 +23,7 @@ type Props = {
   onDelete: () => void;
   onToggleDetails: () => void;
   onSchedule: (time: string | null, repeat: Repeat | null) => void;
+  onExtendedRepeat: (repeat: ExtendedRepeat | null) => void;
   onLinkPr: (url: string | null) => void;
   onPriority: (priority: Priority | null) => void;
   onSubtasksChange: () => void;
@@ -50,6 +51,7 @@ export default function TaskRow({
   onDelete,
   onToggleDetails,
   onSchedule,
+  onExtendedRepeat,
   onLinkPr,
   onPriority,
   onSubtasksChange,
@@ -118,7 +120,14 @@ export default function TaskRow({
       </li>
       {detailsOpen && (
         <li className="flex flex-col gap-1">
-          <TaskDetails task={t} onChange={onSchedule} onLinkPr={onLinkPr} onPriority={onPriority} onClose={onToggleDetails} />
+          <TaskDetails
+            task={t}
+            onChange={onSchedule}
+            onExtendedRepeat={onExtendedRepeat}
+            onLinkPr={onLinkPr}
+            onPriority={onPriority}
+            onClose={onToggleDetails}
+          />
           <TaskSubtasks taskId={t.id} subtasks={t.subtasks ?? []} onError={onError} onChange={onSubtasksChange} />
         </li>
       )}

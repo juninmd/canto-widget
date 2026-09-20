@@ -9,6 +9,8 @@ export type Repeat = { tipo: "diaria" } | { tipo: "dias_uteis" } | { tipo: "sema
 
 export type Subtask = { id: string; title: string; done: boolean };
 export type Priority = "low" | "medium" | "high";
+/** `day`: 1-31, matched exactly. `days`: 0 = Sunday ... 6 = Saturday, same as `Repeat`'s `dia`. */
+export type ExtendedRepeat = { tipo: "monthly"; day: number } | { tipo: "specific_days"; days: number[] };
 
 export type Task = {
   id: string;
@@ -24,6 +26,8 @@ export type Task = {
   pr_url?: string | null;
   subtasks?: Subtask[];
   priority?: Priority | null;
+  /** Mutually exclusive with `repetir`: monthly or specific-weekdays recurrence. */
+  extended_repeat?: ExtendedRepeat | null;
 };
 
 export type Note = {
@@ -115,6 +119,8 @@ export const api = {
   subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
   taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
   tasksReorder: (day: string, ids: string[]) => invoke<void>("tasks_reorder", { day, ids }),
+  taskSetExtendedRepeat: (id: string, repeat: ExtendedRepeat | null) =>
+    invoke<void>("task_set_extended_repeat", { id, repeat }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
   tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
 
