@@ -191,6 +191,10 @@ Baixe o instalador da sua plataforma em **[Releases](https://github.com/juninmd/
 > Os instaladores ainda não têm assinatura de código: o SmartScreen (Windows) e o Gatekeeper (macOS) avisam na
 > primeira abertura. As atualizações automáticas são conferidas pela assinatura própria do projeto antes de rodar.
 
+Manifestos prontos para winget e Homebrew (e um esqueleto para Flatpak, hoje bloqueado) ficam em
+[`packaging/`](packaging/README.md) — preparados e verificados localmente, mas ainda não publicados nesses
+repositórios: publicar é uma decisão e uma ação manual do mantenedor.
+
 ## 🔒 Segurança em uma tela
 
 | Camada | Proteção |

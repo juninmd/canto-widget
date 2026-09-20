@@ -1,0 +1,24 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.defaultLocale.1.6.0.schema.json
+PackageIdentifier: Juninmd.Canto
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Antonio Carlos
+PublisherUrl: https://github.com/juninmd
+PublisherSupportUrl: https://github.com/juninmd/canto-widget/issues
+PackageName: Canto
+PackageUrl: https://github.com/juninmd/canto-widget
+License: MIT
+LicenseUrl: https://github.com/juninmd/canto-widget/blob/main/LICENSE
+ShortDescription: Encrypted desktop widget for tasks, notes, clipboard history and agenda
+Description: >-
+  Canto is a desktop widget that keeps tasks, notes, clipboard history, meeting transcripts,
+  the Google Calendar agenda and GitHub/GitLab issues and PRs in an encrypted local vault
+  (Argon2id + AES-256-GCM).
+Tags:
+  - productivity
+  - widget
+  - tasks
+  - notes
+  - clipboard-manager
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

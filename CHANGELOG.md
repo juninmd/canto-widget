@@ -70,6 +70,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   outra máquina ao destrancar e a cada ~5 min, sem precisar de exportar/importar manual.
 - **Anotações do Gemini no resumo do dia**: quando uma reunião tem anotações do Gemini anexadas, o resumo
   leva o link delas na mesma linha da reunião.
+- **Manifestos para winget e Homebrew** em `packaging/`, prontos para publicar (não publicados: exige PR nos
+  repositórios de cada gerenciador). O de Flatpak fica bloqueado — o gerador de dependências JS do Flathub não
+  lê `bun.lock`; detalhes em `packaging/README.md`.
 
 ### Alterado
 
