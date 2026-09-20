@@ -112,6 +112,30 @@ pub fn task_rename(state: State<'_, AppState>, id: String, title: String) -> Res
     })
 }
 
+fn pr_url(raw: Option<String>) -> Result<Option<String>> {
+    let Some(raw) = raw else { return Ok(None) };
+    let clean = raw.trim();
+    if clean.is_empty() {
+        return Ok(None);
+    }
+    if !(clean.starts_with("https://") || clean.starts_with("http://")) {
+        return Err(AppError::Config("link precisa comecar com http(s)://".into()));
+    }
+    Ok(Some(clean.to_string()))
+}
+
+/// `url: None` clears the link, matching the "unset by omission" shape the frontend already uses for schedule.
+#[tauri::command(async)]
+pub fn task_link_pr(state: State<'_, AppState>, id: String, url: Option<String>) -> Result<()> {
+    let url = pr_url(url)?;
+    state.mutate(|d| {
+        if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
+            t.pr_url = url;
+            t.updated_at = now_ms();
+        }
+    })
+}
+
 /// Marks deliberate user activity to postpone auto-lock.
 #[tauri::command]
 pub fn vault_touch(state: State<'_, AppState>) {
@@ -167,5 +191,17 @@ mod tests {
     fn ids_generated_in_sequence_do_not_repeat() {
         let ids: std::collections::HashSet<String> = (0..500).map(|_| new_id()).collect();
         assert_eq!(ids.len(), 500);
+    }
+
+    #[test]
+    fn pr_url_accepts_trimmed_https_and_clears_on_blank() {
+        assert_eq!(pr_url(Some("  https://github.com/o/r/pull/1  ".into())).unwrap(), Some("https://github.com/o/r/pull/1".into()));
+        assert_eq!(pr_url(Some("   ".into())).unwrap(), None);
+        assert_eq!(pr_url(None).unwrap(), None);
+    }
+
+    #[test]
+    fn pr_url_rejects_a_non_http_scheme() {
+        assert!(matches!(pr_url(Some("javascript:alert(1)".into())), Err(AppError::Config(_))));
     }
 }

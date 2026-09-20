@@ -33,6 +33,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **PRs/MRs abertos hoje** no resumo do dia.
 - **Abas visíveis** em Ajustes: esconda as abas que você não usa; `Alt+1`… seguem as que ficaram.
 - **Antecedência do lembrete de tarefa**, em Ajustes → Lembretes (na hora, 5, 10, 15 ou 30 min antes).
+- **Vincular tarefa a um PR/MR**: link no ⏰ da tarefa, com ícone na linha para abrir direto.
 
 ### Alterado
 

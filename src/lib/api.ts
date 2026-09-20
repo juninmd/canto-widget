@@ -18,6 +18,7 @@ export type Task = {
   hora?: string | null;
   repetir?: Repeat | null;
   serie?: string | null;
+  pr_url?: string | null;
 };
 
 export type Note = {
@@ -102,6 +103,8 @@ export const api = {
   carryOver: (day: string) => invoke<number>("tasks_carry_over", { day }),
   taskSetSchedule: (id: string, time: string | null, repeat: Repeat | null) =>
     invoke<void>("task_set_schedule", { id, time, repeat }),
+  /** `url: null` clears the link. */
+  taskLinkPr: (id: string, url: string | null) => invoke<void>("task_link_pr", { id, url }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
   tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
 

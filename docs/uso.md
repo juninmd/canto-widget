@@ -38,6 +38,8 @@
   **lembrete de tarefa** e o botão **concluir tarefa**, e o sistema mostra uma notificação com o título da tarefa. Funciona em qualquer aba ou com o widget escondido.
 - **Antecedência do lembrete** — em **Ajustes → Lembretes**, escolha avisar 5, 10, 15 ou 30 min antes do
   horário (padrão: na hora).
+- **Vincular PR/MR** — no ⏰ da tarefa, cole o link de um pull/merge request; a linha ganha um ícone que abre o
+  link no navegador. Só aceita `http(s)://`.
 - **Horário direto no título** — "Daily às 9h30", "às 14h ligar para o banco" ou "Deploy 18:00" criam a
   tarefa já com o lembrete. "14h" sozinho não conta: "Estudar 2h de Rust" é duração, não horário.
 - **Adiar** — o aviso de reunião ou de tarefa tem **adiar 10 min**: ele some e volta depois. Tarefa concluída

@@ -121,6 +121,7 @@ pub fn run() {
             commands::task_toggle,
             commands::task_rename,
             commands::task_complete,
+            commands::task_link_pr,
             commands::tasks_carry_over,
             cmd_notes::notes_search,
             cmd_notes::note_save,

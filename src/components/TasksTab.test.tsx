@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
 
-const task = {
+const baseTask = {
   id: "t1",
   title: "comprar leite",
   done: false,
@@ -13,6 +13,7 @@ const task = {
   created_at: 1,
   updated_at: 1,
 };
+let task: typeof baseTask & { pr_url?: string | null } = { ...baseTask };
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
@@ -21,6 +22,10 @@ mock.module("@tauri-apps/api/core", () => ({
     if (cmd === "task_add") return Promise.resolve({ ...task, id: "t2", title: args?.title });
     if (cmd === "item_delete") return Promise.resolve("chave-1");
     if (cmd === "trash_undo") return Promise.resolve(true);
+    if (cmd === "task_link_pr") {
+      task = { ...task, pr_url: args?.url as string | null };
+      return Promise.resolve(null);
+    }
     return Promise.resolve(null);
   },
 }));
@@ -46,6 +51,7 @@ async function openEditing() {
 
 beforeEach(() => {
   calls.length = 0;
+  task = { ...baseTask };
 });
 
 afterEach(cleanup);
@@ -150,6 +156,42 @@ test("time and repeat save immediately; weekly uses the task's day of week", asy
     fireEvent.change(repeat, { target: { value: "semanal" } });
   });
   expect(calls.find((c) => c.cmd === "task_set_schedule")?.args?.repeat).toEqual({ tipo: "semanal", dia: 3 });
+});
+
+test("a PR link is saved on Enter and opens from the badge chip", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  const field = screen.getByLabelText("link do PR ou MR de comprar leite");
+  await act(async () => {
+    fireEvent.change(field, { target: { value: "https://github.com/o/r/pull/1" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+  });
+  expect(calls.find((c) => c.cmd === "task_link_pr")?.args).toEqual({ id: "t1", url: "https://github.com/o/r/pull/1" });
+
+  calls.length = 0;
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("abrir PR/MR de comprar leite"));
+  });
+  expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://github.com/o/r/pull/1" });
+});
+
+test("clearing the PR field sends null", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+  });
+  const field = screen.getByLabelText("link do PR ou MR de comprar leite") as HTMLInputElement;
+  await act(async () => {
+    fireEvent.change(field, { target: { value: "https://github.com/o/r/pull/1" } });
+    fireEvent.keyDown(field, { key: "Enter" });
+  });
+  await act(async () => {
+    fireEvent.change(field, { target: { value: "" } });
+    fireEvent.blur(field);
+  });
+  expect(calls.filter((c) => c.cmd === "task_link_pr").at(-1)?.args).toEqual({ id: "t1", url: null });
 });
 
 test("day summary shows the text and returns with Esc", async () => {

@@ -1,6 +1,8 @@
+import { useState } from "react";
+import { api } from "../lib/api";
 import type { Repeat, Task } from "../lib/api";
 import { dayOfWeek, REPEAT_LABEL } from "../lib/reminders";
-import { ClockIcon } from "./Icons";
+import { ClockIcon, PullIcon } from "./Icons";
 
 const WEEK = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 
@@ -8,16 +10,19 @@ function repeatValue(r: Repeat | null | undefined): string {
   return r?.tipo ?? "";
 }
 
-/** A task's time and repeat rule. Every change saves immediately: there's no "save" to forget. */
+/** A task's time, repeat rule and linked PR/MR. Every change saves immediately: there's no "save" to forget. */
 export default function TaskDetails({
   task,
   onChange,
+  onLinkPr,
   onClose,
 }: {
   task: Task;
   onChange: (time: string | null, repeat: Repeat | null) => void;
+  onLinkPr: (url: string | null) => void;
   onClose: () => void;
 }) {
+  const [prUrl, setPrUrl] = useState(task.pr_url ?? "");
   const weekly: Repeat = { tipo: "semanal", dia: dayOfWeek(task.day) };
   const options: { value: string; label: string; rule: Repeat | null }[] = [
     { value: "", label: "não repete", rule: null },
@@ -54,6 +59,19 @@ export default function TaskDetails({
           </option>
         ))}
       </select>
+      <label className="flex flex-1 items-center gap-1">
+        PR/MR
+        <input
+          type="url"
+          aria-label={`link do PR ou MR de ${task.title}`}
+          value={prUrl}
+          placeholder="https://..."
+          onChange={(e) => setPrUrl(e.target.value)}
+          onBlur={() => prUrl.trim() !== (task.pr_url ?? "") && onLinkPr(prUrl.trim() || null)}
+          onKeyDown={(e) => e.key === "Enter" && onLinkPr(prUrl.trim() || null)}
+          className="min-w-0 flex-1 rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+        />
+      </label>
       <button type="button" onClick={onClose} className="ml-auto min-h-6 px-1 hover:text-fg">
         fechar
       </button>
@@ -70,6 +88,17 @@ export function TaskBadge({ task: t, open, onToggle }: { task: Task; open: boole
           {t.hora}
           {t.repetir && <span aria-label={`repete ${REPEAT_LABEL[t.repetir.tipo]}`}> ↻</span>}
         </span>
+      )}
+      {t.pr_url && (
+        <button
+          type="button"
+          onClick={() => void api.openLink(t.pr_url!)}
+          className="grid size-6 shrink-0 place-items-center rounded text-faint hover:text-fg"
+          aria-label={`abrir PR/MR de ${t.title}`}
+          title="abrir PR/MR"
+        >
+          <PullIcon />
+        </button>
       )}
       <button
         type="button"

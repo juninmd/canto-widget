@@ -191,6 +191,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
                 <TaskDetails
                   task={t}
                   onChange={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
+                  onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
                   onClose={() => setDetails("")}
                 />
               </li>

@@ -42,6 +42,9 @@ pub struct Task {
     /// Id of the first task in the series; instances get id `<series>-<day>`.
     #[serde(default, rename = "serie")]
     pub series: Option<String>,
+    /// Linked PR/MR, http(s) only. New field: no legacy vault has it, so plain default is enough.
+    #[serde(default)]
+    pub pr_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
