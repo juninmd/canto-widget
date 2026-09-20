@@ -117,6 +117,7 @@ impl AppState {
             data: VaultData::default(),
         };
         self.persist(&session)?;
+        self.sync_after_persist();
         *self.session.lock().unwrap() = Some(session);
         self.touch();
         Ok(())
@@ -164,11 +165,15 @@ impl AppState {
     fn persist(&self, session: &Session) -> Result<()> {
         let plain = serde_json::to_vec(&session.data)?;
         let blob = SealedBlob::seal(&session.key, &session.salt, &plain, VAULT_AAD, now_ms())?;
-        store::write_json_atomic(&store::vault_path(&self.dir), &blob)?;
-        // Best-effort: a synced folder that's momentarily unreachable (unmounted drive, offline
-        // cloud client) must never fail the save that triggered it.
+        store::write_json_atomic(&store::vault_path(&self.dir), &blob)
+    }
+
+    /// Best-effort, and deliberately called after the session lock is released: `export_now` only
+    /// reads the vault file `persist` already wrote, but a synced folder that's momentarily
+    /// unreachable (unmounted drive, offline cloud client materializing a placeholder) must never
+    /// hold the mutex every other command needs, just because this one save also touches it.
+    fn sync_after_persist(&self) {
         let _ = crate::sync::export_now(&self.dir);
-        Ok(())
     }
 
     /// Applies a mutation to the unlocked vault and persists it in the same step.
@@ -178,6 +183,8 @@ impl AppState {
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         let out = f(&mut session.data);
         self.persist(session)?;
+        drop(guard);
+        self.sync_after_persist();
         Ok(out)
     }
 
@@ -189,6 +196,10 @@ impl AppState {
         if changed {
             self.persist(session)?;
         }
+        drop(guard);
+        if changed {
+            self.sync_after_persist();
+        }
         Ok(out)
     }
 
@@ -197,8 +208,13 @@ impl AppState {
         self.touch();
         let mut guard = self.session.lock().unwrap();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
-        if f(&mut session.data) {
+        let changed = f(&mut session.data);
+        if changed {
             self.persist(session)?;
+        }
+        drop(guard);
+        if changed {
+            self.sync_after_persist();
         }
         Ok(())
     }
