@@ -134,6 +134,7 @@ pub fn run() {
             cmd_notes::notes_search,
             cmd_notes::note_save,
             cmd_notes::note_pin,
+            cmd_notes::note_export_md,
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
             routine::tasks_reminders,

@@ -1,5 +1,6 @@
 use serde::Serialize;
 use tauri::State;
+use tauri_plugin_dialog::DialogExt;
 
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
@@ -122,4 +123,46 @@ pub fn note_pin(state: State<'_, AppState>, id: String) -> Result<bool> {
         n.updated_at = now_ms();
         Ok(n.pinned)
     })?
+}
+
+pub fn to_markdown(n: &Note) -> String {
+    let mut out = format!("# {}\n\n{}\n", n.title, n.body);
+    if !n.tags.is_empty() {
+        out.push_str(&format!("\n_tags: {}_\n", n.tags.join(", ")));
+    }
+    out
+}
+
+/// Keeps the note title recognizable as a file name across Windows/macOS/Linux; falls back when it strips to nothing.
+pub fn file_stem(title: &str) -> String {
+    let slug: String = title
+        .trim()
+        .chars()
+        .map(|c| if c.is_alphanumeric() { c.to_ascii_lowercase() } else { '-' })
+        .collect();
+    let slug: String = slug.split('-').filter(|s| !s.is_empty()).collect::<Vec<_>>().join("-");
+    let slug: String = slug.chars().take(80).collect();
+    if slug.is_empty() {
+        "nota".into()
+    } else {
+        slug
+    }
+}
+
+/// The path comes from the native dialog, never from the webview: the UI doesn't choose where Rust writes.
+#[tauri::command(async)]
+pub fn note_export_md(app: tauri::AppHandle, state: State<'_, AppState>, id: String) -> Result<Option<String>> {
+    let note = state.read(|d| d.notes.iter().find(|n| n.id == id).cloned())?.ok_or(AppError::NotFound)?;
+    let Some(chosen) = app
+        .dialog()
+        .file()
+        .add_filter("Markdown", &["md"])
+        .set_file_name(format!("{}.md", file_stem(&note.title)))
+        .blocking_save_file()
+    else {
+        return Ok(None);
+    };
+    let destination = chosen.into_path().map_err(|e| AppError::Io(e.to_string()))?;
+    std::fs::write(&destination, to_markdown(&note)).map_err(|e| AppError::Io(e.to_string()))?;
+    Ok(Some(destination.display().to_string()))
 }

@@ -132,6 +132,8 @@ export const api = {
     invoke<Note>("note_save", { id: note.id ?? null, link: note.link ?? null, ...note }),
   /** Returns whether the note ended up pinned. */
   notePin: (id: string) => invoke<boolean>("note_pin", { id }),
+  /** Opens a native save dialog; `null` when the user cancels. */
+  noteExportMd: (id: string) => invoke<string | null>("note_export_md", { id }),
   /** Returns the key for `trashUndo`, or `null` if nothing was removed. */
   itemDelete: (id: string) => invoke<string | null>("item_delete", { id }),
   trashUndo: (key: string) => invoke<boolean>("trash_undo", { key }),

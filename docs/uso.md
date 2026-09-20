@@ -62,6 +62,8 @@
 - **Busca destacada** — o termo buscado aparece marcado dentro do título e do corpo dos cards encontrados.
 - **Vincular nota a tarefa ou evento** — no editor, "vincular a uma tarefa ou evento" mostra as tarefas do
   dia e os eventos da agenda; a nota ganha um selo que leva direto para a aba correspondente.
+- **Exportar nota como .md** — o ícone de download no card abre o diálogo nativo de salvar e grava o título,
+  o corpo e as tags num arquivo `.md`.
 - **Resumo do dia** — texto com o que foi concluído, o que ficou pendente, as reuniões e os **PRs/MRs que você
   abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
   não responder, o resumo diz qual e traz o resto.

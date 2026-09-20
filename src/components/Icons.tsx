@@ -32,6 +32,12 @@ export const GripIcon = () => (
   </svg>
 );
 
+export const DownloadIcon = () => (
+  <svg {...base}>
+    <path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16" />
+  </svg>
+);
+
 export const PullIcon = () => (
   <svg {...base}>
     <circle cx="6" cy="5" r="2" />

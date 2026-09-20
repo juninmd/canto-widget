@@ -1,7 +1,7 @@
 import type { Note } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { highlight } from "../lib/highlight";
-import { PinIcon } from "./Icons";
+import { DownloadIcon, PinIcon } from "./Icons";
 
 type Props = {
   note: Note;
@@ -12,9 +12,10 @@ type Props = {
   onDelete: () => void;
   onTag: (tag: string) => void;
   onOpenLink: (kind: "task" | "event") => void;
+  onExport: () => void;
 };
 
-export default function NoteCard({ note: n, className, query, onOpen, onPin, onDelete, onTag, onOpenLink }: Props) {
+export default function NoteCard({ note: n, className, query, onOpen, onPin, onDelete, onTag, onOpenLink, onExport }: Props) {
   const actionBtn = "grid size-6 shrink-0 place-items-center rounded focus-visible:opacity-100 group-hover:opacity-100";
   return (
     <li className={`group rounded-lg border bg-ink/60 p-2 ${n.fixada ? "border-accent/60" : "border-edge"} ${className}`}>
@@ -33,6 +34,15 @@ export default function NoteCard({ note: n, className, query, onOpen, onPin, onD
           className={`${actionBtn} ${n.fixada ? "text-accent" : "text-faint opacity-0 hover:text-fg"}`}
         >
           <PinIcon filled={!!n.fixada} />
+        </button>
+        <button
+          type="button"
+          onClick={onExport}
+          aria-label={`exportar ${n.title} como markdown`}
+          title="exportar como .md"
+          className={`${actionBtn} text-faint opacity-0 hover:text-fg`}
+        >
+          <DownloadIcon />
         </button>
         <button type="button" onClick={onDelete} className={`${actionBtn} text-faint opacity-0 hover:text-danger`} aria-label={`excluir ${n.title}`}>
           ×

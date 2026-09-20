@@ -61,6 +61,15 @@ ${lim}`);
     }
   }
 
+  async function exportMd(n: Note) {
+    try {
+      const where = await api.noteExportMd(n.id);
+      if (where) setAnnouncement(`"${n.title}" exportada em ${where}`);
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
   useEffect(() => {
     setLimit(PAGE);
     const t = setTimeout(() => void reload(query, PAGE), 150);
@@ -146,6 +155,7 @@ ${lim}`);
             onDelete={() => void leave(n.id, () => remove(n))}
             onTag={(t) => setQuery(`#${t}`)}
             onOpenLink={(kind) => (kind === "task" ? onOpenTasks() : onOpenAgenda())}
+            onExport={() => void exportMd(n)}
           />
         ))}
         {total > notes.length && (

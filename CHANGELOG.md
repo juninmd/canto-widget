@@ -43,6 +43,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Destaque do termo buscado** dentro do título e do corpo dos cards de notas encontrados.
 - **Vincular nota a uma tarefa ou evento** da agenda: a nota ganha um selo que leva direto para a aba
   correspondente.
+- **Exportar nota como .md**: ícone de download no card, com diálogo nativo de salvar.
 
 ### Alterado
 

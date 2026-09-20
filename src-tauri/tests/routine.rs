@@ -156,7 +156,7 @@ fn old_vault_without_the_new_fields_opens_the_same() {
 }
 
 mod notes {
-    use canto_widget_lib::cmd_notes::{note_matches, sort, validate_link};
+    use canto_widget_lib::cmd_notes::{file_stem, note_matches, sort, to_markdown, validate_link};
     use canto_widget_lib::error::AppError;
     use canto_widget_lib::model::{Note, NoteLink};
 
@@ -200,6 +200,22 @@ mod notes {
             validate_link(&NoteLink::Event { id: "e1".into(), label: " ".into() }),
             Err(AppError::Config(_))
         ));
+    }
+
+    #[test]
+    fn markdown_export_keeps_title_body_and_tags_readable() {
+        let n = Note { title: "Wifi de casa".into(), body: "senha: 12345".into(), tags: vec!["casa".into()], ..note("n1", &[], false, 1) };
+        let md = to_markdown(&n);
+        assert!(md.starts_with("# Wifi de casa\n\n"));
+        assert!(md.contains("senha: 12345"));
+        assert!(md.contains("_tags: casa_"));
+    }
+
+    #[test]
+    fn export_file_name_is_a_safe_slug_even_for_an_empty_or_symbol_only_title() {
+        assert_eq!(file_stem("Reunião c/ Time: Sprint #3!"), "reunião-c-time-sprint-3");
+        assert_eq!(file_stem("   "), "nota");
+        assert_eq!(file_stem("!!!"), "nota");
     }
 }
 

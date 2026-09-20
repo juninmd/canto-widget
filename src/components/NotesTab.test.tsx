@@ -14,6 +14,7 @@ mock.module("@tauri-apps/api/core", () => ({
       return Promise.resolve({ total: notes.length, items: notes.slice(0, limit) });
     }
     if (cmd === "note_pin") return Promise.resolve(true);
+    if (cmd === "note_export_md") return Promise.resolve("C:\\fake\\wifi.md");
     return Promise.resolve(null);
   },
 }));
@@ -115,6 +116,16 @@ test("pinning asks the vault, reloads, and announces it to the screen reader", a
   expect(calls.find((c) => c.cmd === "note_pin")?.args).toEqual({ id: "n1" });
   expect(calls.filter((c) => c.cmd === "notes_search").length).toBeGreaterThan(before);
   expect(screen.getByText(/fixada no topo/).getAttribute("role")).toBe("status");
+});
+
+test("exporting asks the vault for a path and announces where it was saved", async () => {
+  await listWith({});
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("exportar wifi como markdown"));
+    await Promise.resolve();
+  });
+  expect(calls.find((c) => c.cmd === "note_export_md")?.args).toEqual({ id: "n1" });
+  expect(screen.getByText(/exportada em C:\\fake\\wifi\.md/).getAttribute("role")).toBe("status");
 });
 
 test("typing a search term highlights it inside the visible cards", async () => {
