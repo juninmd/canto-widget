@@ -51,7 +51,7 @@ pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task
     state.mutate_if(|d| crate::routine::materialize(d, &day, now_ms()) > 0)?;
     state.read(|d| {
         let mut list: Vec<Task> = d.tasks.iter().filter(|t| t.day == day).cloned().collect();
-        list.sort_by_key(|t| (t.done, t.created_at));
+        list.sort_by_key(|t| (t.done, t.order.unwrap_or(t.created_at), t.created_at));
         list
     })
 }

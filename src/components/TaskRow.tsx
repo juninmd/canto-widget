@@ -1,6 +1,7 @@
 import type { Priority, Repeat, Task } from "../lib/api";
 import TaskDetails, { TaskBadge } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
+import { GripIcon } from "./Icons";
 import { ENTER_CLASS, EXIT_CLASS } from "../lib/motion";
 
 type Editing = { id: string; title: string } | null;
@@ -12,6 +13,7 @@ type Props = {
   checking: boolean;
   editing: Editing;
   detailsOpen: boolean;
+  draggable: boolean;
   onToggleDone: () => void;
   onCheckAnimationEnd: () => void;
   onStartEdit: () => void;
@@ -25,6 +27,9 @@ type Props = {
   onPriority: (priority: Priority | null) => void;
   onSubtasksChange: () => void;
   onError: (m: string) => void;
+  onDragStart: () => void;
+  onDragOver: (e: React.DragEvent) => void;
+  onDrop: () => void;
 };
 
 /** One task line, plus its expandable schedule/PR/checklist panel. */
@@ -35,6 +40,7 @@ export default function TaskRow({
   checking,
   editing,
   detailsOpen,
+  draggable,
   onToggleDone,
   onCheckAnimationEnd,
   onStartEdit,
@@ -48,14 +54,29 @@ export default function TaskRow({
   onPriority,
   onSubtasksChange,
   onError,
+  onDragStart,
+  onDragOver,
+  onDrop,
 }: Props) {
   return (
     <>
       <li
+        onDragOver={draggable ? onDragOver : undefined}
+        onDrop={draggable ? onDrop : undefined}
         className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
         }`}
       >
+        {draggable && (
+          <span
+            draggable
+            onDragStart={onDragStart}
+            aria-label={`arrastar ${t.title} para reordenar`}
+            className="grid size-4 shrink-0 cursor-grab place-items-center text-faint opacity-0 hover:text-fg group-hover:opacity-100"
+          >
+            <GripIcon />
+          </span>
+        )}
         <input
           type="checkbox"
           checked={t.done}

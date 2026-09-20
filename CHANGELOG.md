@@ -36,6 +36,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Vincular tarefa a um PR/MR**: link no ⏰ da tarefa, com ícone na linha para abrir direto.
 - **Subtarefas**: checklist dentro do ⏰ da tarefa, com contagem `feitas/total` na linha.
 - **Prioridade da tarefa** (alta/média/baixa) com bolinha na linha e filtro acima da lista.
+- **Arrastar para reordenar** as tarefas do dia pela alça (⠿) que aparece ao passar o mouse.
 
 ### Alterado
 

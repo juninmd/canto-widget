@@ -49,6 +49,9 @@ pub struct Task {
     pub subtasks: Vec<Subtask>,
     #[serde(default)]
     pub priority: Option<Priority>,
+    /// Manual position within its day, from dragging to reorder. Falls back to `created_at` when unset.
+    #[serde(default)]
+    pub order: Option<i64>,
 }
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]

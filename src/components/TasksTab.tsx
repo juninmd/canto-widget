@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
-import { PRIORITY_LABEL } from "../lib/priority";
 import DaySummary from "./DaySummary";
 import TaskRow from "./TaskRow";
+import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
 import { useNewIds, useExit } from "../lib/motion";
 
@@ -24,6 +24,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
+  const dragId = useRef<string | null>(null);
 
   async function reload() {
     try {
@@ -86,6 +87,20 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const done = tasks.filter((t) => t.done).length;
   const visible = priorityFilter ? tasks.filter((t) => t.priority === priorityFilter) : tasks;
 
+  // Only reorders in the unfiltered view: a filtered subset can't express a total order for the hidden tasks too.
+  function dropOn(targetId: string) {
+    const draggedId = dragId.current;
+    dragId.current = null;
+    if (!draggedId || draggedId === targetId) return;
+    const ids = tasks.map((t) => t.id);
+    const from = ids.indexOf(draggedId);
+    const to = ids.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+    ids.splice(from, 1);
+    ids.splice(to, 0, draggedId);
+    void run(() => api.tasksReorder(today, ids));
+  }
+
   if (summary) {
     return <DaySummary day={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />;
   }
@@ -105,42 +120,14 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         </button>
       </form>
 
-      <div className="flex items-center justify-between text-[11px] text-muted">
-        <span>
-          {done}/{tasks.length} concluídas
-        </span>
-        <span className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setSummary(true)}
-            title="texto com o que foi feito, o que ficou e as reuniões, pronto para copiar"
-            className="min-h-6 underline decoration-dotted hover:text-fg"
-          >
-            resumo do dia
-          </button>
-          <button
-            type="button"
-            onClick={() => run(() => api.carryOver(today))}
-            title="traz para hoje as tarefas não concluídas dos dias anteriores"
-            className="min-h-6 underline decoration-dotted hover:text-fg"
-          >
-            puxar pendências
-          </button>
-          <select
-            aria-label="filtrar por prioridade"
-            value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value as Priority | "")}
-            className="rounded border border-line bg-ink px-1 py-0.5 text-[11px] text-muted outline-none focus:border-accent"
-          >
-            <option value="">todas as prioridades</option>
-            {(["high", "medium", "low"] as Priority[]).map((p) => (
-              <option key={p} value={p}>
-                {PRIORITY_LABEL[p]}
-              </option>
-            ))}
-          </select>
-        </span>
-      </div>
+      <TaskListHeader
+        done={done}
+        total={tasks.length}
+        priorityFilter={priorityFilter}
+        onPriorityFilter={setPriorityFilter}
+        onSummary={() => setSummary(true)}
+        onCarryOver={() => void run(() => api.carryOver(today))}
+      />
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
         {visible.map((t) => (
@@ -152,6 +139,10 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             checking={checking === t.id}
             editing={editing}
             detailsOpen={details === t.id}
+            draggable={priorityFilter === ""}
+            onDragStart={() => (dragId.current = t.id)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => dropOn(t.id)}
             onToggleDone={() => {
               setChecking(t.id);
               void run(() => api.taskToggle(t.id));

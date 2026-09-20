@@ -43,6 +43,8 @@
 - **Subtarefas** — no ⏰ da tarefa, um checklist: adicione, marque e apague itens. A linha mostra `feitas/total`.
 - **Prioridade** — no ⏰ da tarefa, marque alta/média/baixa; a linha ganha uma bolinha colorida. Filtro de
   prioridade acima da lista mostra só as tarefas daquele nível.
+- **Reordenar arrastando** — segure a alça (⠿) que aparece ao passar o mouse e solte sobre outra tarefa. Só
+  funciona com "todas as prioridades" selecionado no filtro.
 - **Horário direto no título** — "Daily às 9h30", "às 14h ligar para o banco" ou "Deploy 18:00" criam a
   tarefa já com o lembrete. "14h" sozinho não conta: "Estudar 2h de Rust" é duração, não horário.
 - **Adiar** — o aviso de reunião ou de tarefa tem **adiar 10 min**: ele some e volta depois. Tarefa concluída

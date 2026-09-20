@@ -114,6 +114,7 @@ export const api = {
   subtaskToggle: (id: string, subtaskId: string) => invoke<void>("subtask_toggle", { id, subtaskId }),
   subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
   taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
+  tasksReorder: (day: string, ids: string[]) => invoke<void>("tasks_reorder", { day, ids }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
   tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
 

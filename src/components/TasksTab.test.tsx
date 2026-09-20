@@ -230,6 +230,30 @@ test("filtering by priority hides tasks that don't match", async () => {
   expect(screen.getByText("pagar conta")).toBeTruthy();
 });
 
+test("dragging a task's grip onto another reorders them", async () => {
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
+  await mount();
+  const grip = screen.getByLabelText("arrastar comprar leite para reordenar");
+  const targetRow = screen.getByText("pagar conta").closest("li")!;
+  await act(async () => {
+    fireEvent.dragStart(grip);
+    fireEvent.dragOver(targetRow);
+    fireEvent.drop(targetRow);
+  });
+  expect(calls.find((c) => c.cmd === "tasks_reorder")?.args).toEqual({ day: "2026-09-09", ids: ["t3", "t1"] });
+});
+
+test("the drag handle is hidden while a priority filter is active", async () => {
+  task = { ...task, priority: "low" };
+  await mount();
+  expect(screen.queryByLabelText("arrastar comprar leite para reordenar")).toBeTruthy();
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("filtrar por prioridade"), { target: { value: "low" } });
+  });
+  expect(screen.getByText("comprar leite")).toBeTruthy();
+  expect(screen.queryByLabelText("arrastar comprar leite para reordenar")).toBeNull();
+});
+
 test("clearing the PR field sends null", async () => {
   await mount();
   await act(async () => {

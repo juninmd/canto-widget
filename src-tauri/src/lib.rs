@@ -47,6 +47,7 @@ pub mod routine;
 pub mod snooze;
 pub mod store;
 pub mod subtask;
+pub mod task_order;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
@@ -129,6 +130,7 @@ pub fn run() {
             subtask::subtask_toggle,
             subtask::subtask_remove,
             priority::task_set_priority,
+            task_order::tasks_reorder,
             cmd_notes::notes_search,
             cmd_notes::note_save,
             cmd_notes::note_pin,
