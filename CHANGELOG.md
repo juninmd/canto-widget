@@ -15,6 +15,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Anotações e transcrições do Gemini na aba Reuniões**: os documentos que o Gemini anexa às reuniões dos
   últimos 14 dias aparecem acima dos arquivos da pasta e abrem no navegador.
 - **Carregamento visível**: agenda, GitHub e transcrições mostram cartões de espera em vez de uma área vazia.
+- **GitLab e GitLab self-hosted**: nova aba (ative em Ajustes → Abas visíveis) com revisão pedida, atribuídos, MRs e issues que você abriu, com
+  endereço da instância e token `read_api` cifrados no cofre.
+- **Ordenação** nas abas GitHub e GitLab: por atualização, criação ou comentários (só GitHub), crescente ou
+  decrescente.
+- **Cache e limite de requisições**: as listas ficam 5 min na memória e o Canto para antes de esgotar a cota da
+  API, mostrando a última cópia e quando chegam dados novos.
+- **PRs/MRs abertos hoje** no resumo do dia.
+- **Abas visíveis** em Ajustes: esconda as abas que você não usa; `Alt+1`… seguem as que ficaram.
 
 ### Alterado
 

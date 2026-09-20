@@ -17,6 +17,7 @@
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |
 | Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`, nome mantido por compatibilidade) |
 | GitHub | token em `github.json`, cifrado com a chave do cofre e nunca enviado à webview. Token pessoal validado por formato antes de sair da máquina; token de GitHub App que expira é renovado 1 min antes do vencimento, uma renovação por vez. Links só abrem se forem `https://github.com/` |
+| GitLab | endereço e token em `gitlab.json`, cifrados e nunca enviados à webview. Só `https://`, sem seguir redirecionamentos, e links só abrem se forem da instância configurada. As listas de GitHub e GitLab ficam em cache só na RAM, apagado ao trancar |
 | Troca de senha | exige a senha atual. Tudo é lido com a chave antiga e selado com a nova **antes** de gravar: senha errada ou arquivo ilegível não alteram nada. As cópias novas esperam como `<arquivo>.next` e só substituem as antigas depois que o cofre é gravado; se a troca for interrompida, o próximo destrancar termina ou desfaz. As cópias em `backups/` acompanham a senha nova. `.canto` exportados antes continuam com a senha antiga |
 | Desfazer | remoções recentes ficam só em RAM (últimas 20) e somem ao trancar; a webview só conhece uma chave opaca, nunca reenvia o conteúdo |
 | Windows Hello | opcional. A senha mestra é cifrada (AES-256-GCM) com uma chave derivada da assinatura RSA de um desafio aleatório, feita por um par de chaves do Windows Hello preso ao TPM e liberado só por rosto, digital ou PIN. `biometria.json` não serve sem esse chip e esse gesto, e nunca entra em backup. A ativação assina, grava e reabre na hora (o Windows pede o gesto duas vezes): hardware com assinatura instável é recusado ali, não descoberto na tela de bloqueio. Cofre recriado com outra senha desliga a biometria sozinho. macOS/Linux: indisponível por enquanto |
@@ -64,6 +65,7 @@ Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 - `backups/*.canto` — cópias diárias e de antes de importar, cifradas (últimas 10);
 - `drive.json` — credenciais OAuth da agenda, cifradas com a mesma chave;
 - `github.json` — token do GitHub, cifrado com a mesma chave (fora do backup);
+- `gitlab.json` — endereço da instância e token do GitLab, cifrados com a mesma chave (fora do backup);
 - `clipboard.json` — histórico da área de transferência, cifrado e nunca sincronizado;
 - `settings.json` — preferências não sensíveis (pasta de transcrições, skin);
 - `janela.json` — posição, tamanho e "sempre no topo";

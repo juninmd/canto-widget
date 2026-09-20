@@ -42,8 +42,11 @@
 - **Notas fixadas** — o alfinete leva o card para o topo; clicar numa `#tag` filtra só por ela.
 - **Muitas notas** — a aba mostra 50 cards por vez (fixados primeiro) e **mostrar mais** traz os próximos; a busca
   procura em todos. Um card aceita até 100 mil caracteres e o título, 300.
-- **Resumo do dia** — texto com o que foi concluído, o que ficou pendente e as reuniões, pronto
-  para copiar.
+- **Resumo do dia** — texto com o que foi concluído, o que ficou pendente, as reuniões e os **PRs/MRs que você
+  abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
+  não responder, o resumo diz qual e traz o resto.
+- **Abas visíveis** — em **Ajustes → Abas visíveis**, desmarque as abas que você não usa. Os dados continuam no
+  cofre, e `Alt+1`, `Alt+2`… seguem a ordem das abas que ficaram. Ajustes nunca some.
 
 | Horário e repetição | Resumo do dia | Lembrete |
 |---|---|---|

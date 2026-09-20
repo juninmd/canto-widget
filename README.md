@@ -100,8 +100,9 @@ nada: ele guarda o começo e avisa. No Windows, ignora o que gerenciadores de se
 ### 🐙 Seu GitHub numa olhada
 
 **Revisão pedida a mim**, atribuídos a mim, PRs e issues que eu abri, com ícone de PR ou issue e quem abriu.
-Filtre por texto, `repo:` ou `label:`, só PRs ou só issues, e role com **mostrar mais**.
-Entra com token pessoal só leitura ou pelo navegador (device flow).
+Filtre por texto, `repo:` ou `label:`, só PRs ou só issues, ordene por atualização, criação ou comentários e role
+com **mostrar mais**. Também tem **GitLab.com e GitLab self-hosted**, e um cache de 5 min que respeita o limite de
+requisições. Entra com token pessoal só leitura ou pelo navegador (device flow).
 
 </td>
 </tr>
@@ -198,6 +199,7 @@ Baixe o instalador da sua plataforma em **[Releases](https://github.com/juninmd/
 | Rede | só o processo Rust fala com a rede; a webview não tem origem remota (CSP) e nunca vê tokens |
 | Google | opcional, só `calendar.events.readonly` + perfil, OAuth com PKCE e loopback |
 | GitHub | opcional, token cifrado; itens só abrem se o link for `https://github.com/` |
+| GitLab | opcional, endereço e token cifrados; só `https://`, sem redirecionamento, links só da instância configurada |
 | Atualização | só instala pacote assinado pela chave do projeto; download adulterado é descartado antes de rodar |
 
 Modelo completo, backup, merge entre máquinas e onde cada arquivo fica: [docs/seguranca.md](docs/seguranca.md).
