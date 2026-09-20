@@ -161,6 +161,13 @@ export const api = {
   backupExport: () => invoke<string | null>("backup_export"),
   backupImport: () => invoke<ImportSummary | null>("backup_import"),
 
+  syncGet: () => invoke<string | null>("sync_get"),
+  /** `null` when the user cancels the folder dialog. */
+  syncSetFolder: () => invoke<string | null>("sync_set_folder"),
+  syncClear: () => invoke<void>("sync_clear"),
+  /** `null` when there was nothing new to merge. */
+  syncNow: () => invoke<ImportSummary | null>("sync_now"),
+
   driveStatus: () => invoke<DriveStatus>("drive_status"),
   driveConfigure: (clientId: string, clientSecret: string) =>
     invoke<void>("drive_configure", { clientId, clientSecret }),

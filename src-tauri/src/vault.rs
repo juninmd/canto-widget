@@ -137,6 +137,8 @@ impl AppState {
             data,
         });
         self.touch();
+        // Best-effort: whatever showed up in a synced folder merges in right away.
+        let _ = crate::sync::poll_and_merge(self);
         Ok(())
     }
 
@@ -162,7 +164,11 @@ impl AppState {
     fn persist(&self, session: &Session) -> Result<()> {
         let plain = serde_json::to_vec(&session.data)?;
         let blob = SealedBlob::seal(&session.key, &session.salt, &plain, VAULT_AAD, now_ms())?;
-        store::write_json_atomic(&store::vault_path(&self.dir), &blob)
+        store::write_json_atomic(&store::vault_path(&self.dir), &blob)?;
+        // Best-effort: a synced folder that's momentarily unreachable (unmounted drive, offline
+        // cloud client) must never fail the save that triggered it.
+        let _ = crate::sync::export_now(&self.dir);
+        Ok(())
     }
 
     /// Applies a mutation to the unlocked vault and persists it in the same step.

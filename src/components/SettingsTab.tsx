@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, errText } from "../lib/api";
 import BackupSection from "./BackupSection";
+import SyncSection from "./SyncSection";
 import GoogleSection from "./GoogleSection";
 import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
@@ -75,6 +76,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
       <SecuritySection onError={onError} />
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />
+      <SyncSection onError={onError} />
       <GoogleSection onError={onError} />
       <UpdateSection />
     </div>

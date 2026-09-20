@@ -19,6 +19,7 @@ pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_notes;
+pub mod cmd_sync;
 pub mod commands;
 pub mod crypto;
 pub mod drive;
@@ -50,6 +51,7 @@ pub mod routine;
 pub mod snooze;
 pub mod store;
 pub mod subtask;
+pub mod sync;
 pub mod task_order;
 pub mod transcripts;
 pub mod trash;
@@ -96,6 +98,7 @@ pub fn run() {
             cmd_extras::watch_clipboard(app.handle().clone());
             watch_idle(app.handle().clone());
             watch_backup(dir);
+            watch_sync(app.handle().clone());
             build_tray(app.handle())?;
             tray_live::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
@@ -173,6 +176,10 @@ pub fn run() {
             autolock::autolock_set,
             cmd_backup::backup_export,
             cmd_backup::backup_import,
+            cmd_sync::sync_get,
+            cmd_sync::sync_set_folder,
+            cmd_sync::sync_clear,
+            cmd_sync::sync_now,
             trash::trash_undo,
             cmd_biometric::biometric_status,
             cmd_biometric::biometric_enable,
@@ -247,6 +254,19 @@ fn watch_backup(dir: std::path::PathBuf) {
             eprintln!("backup diario falhou: {e}");
         }
         std::thread::sleep(std::time::Duration::from_secs(30 * 60));
+    });
+}
+
+/// Merges in whatever showed up in a synced folder; a no-op without one configured or while locked.
+fn watch_sync(app: tauri::AppHandle) {
+    std::thread::spawn(move || loop {
+        std::thread::sleep(std::time::Duration::from_secs(5 * 60));
+        let Some(state) = app.try_state::<AppState>() else {
+            continue;
+        };
+        if let Err(e) = sync::poll_and_merge(&state) {
+            eprintln!("sincronizacao automatica falhou: {e}");
+        }
     });
 }
 

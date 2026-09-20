@@ -111,8 +111,9 @@ requisições. Entra com token pessoal só leitura ou pelo navegador (device flo
 
 ### ⚙️ Ajustes e atualização automática
 
-Troca de senha mestra, Windows Hello, backup `.canto`, início com o sistema e a seção **Atualizações**, com a
-**versão instalada** e a **última publicada** lado a lado e um botão para atualizar e reiniciar.
+Troca de senha mestra, Windows Hello, backup `.canto`, pasta sincronizada com merge automático (Dropbox,
+OneDrive, Syncthing...), início com o sistema e a seção **Atualizações**, com a **versão instalada** e a
+**última publicada** lado a lado e um botão para atualizar e reiniciar.
 
 </td>
 <td><img src="docs/prints/app/18-atualizacoes.png" alt="Ajustes com a versão instalada, a última publicada e o botão de atualizar"></td>

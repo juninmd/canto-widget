@@ -65,6 +65,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   juntos.
 - **Boas-vindas na primeira execução**: ao criar o cofre pela primeira vez, uma tela resume os atalhos
   essenciais. Aparece uma única vez — destrancar depois nunca mostra de novo.
+- **Pasta sincronizada com merge automático** (Ajustes → Pasta sincronizada): aponte para uma pasta do
+  Dropbox/OneDrive/Syncthing e o Canto cuida do resto — exporta a cada alteração e mescla o que chegar de
+  outra máquina ao destrancar e a cada ~5 min, sem precisar de exportar/importar manual.
 
 ### Alterado
 
