@@ -6,10 +6,13 @@
 //! Dock renders the real count natively.
 use tauri::{AppHandle, Manager};
 
+#[cfg(any(target_os = "windows", test))]
 const DOT_SIZE: u32 = 20;
+#[cfg(any(target_os = "windows", test))]
 const RED: [u8; 4] = [220, 38, 38, 255];
 
 /// A filled circle on a transparent square, computed by hand: no image/font crate needed for one dot.
+#[cfg(any(target_os = "windows", test))]
 fn red_dot() -> tauri::image::Image<'static> {
     let r = DOT_SIZE as i32 / 2;
     let mut rgba = vec![0u8; (DOT_SIZE * DOT_SIZE * 4) as usize];
