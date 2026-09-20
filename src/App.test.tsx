@@ -6,13 +6,18 @@ type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
 let agendaItems: unknown[] = [];
 let reminders: unknown[] | null = null;
+let vaultStatus = { exists: true, unlocked: true };
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
     switch (cmd) {
       case "vault_status":
-        return Promise.resolve({ exists: true, unlocked: true });
+        return Promise.resolve(vaultStatus);
+      case "vault_create":
+      case "vault_unlock":
+        vaultStatus = { exists: true, unlocked: true };
+        return Promise.resolve(null);
       case "agenda_today":
         return Promise.resolve(agendaItems);
       case "tasks_reminders":
@@ -83,6 +88,8 @@ beforeEach(() => {
   calls.length = 0;
   agendaItems = [];
   reminders = null;
+  vaultStatus = { exists: true, unlocked: true };
+  localStorage.clear();
   // Before render: the alert clock is created when App mounts.
   jest.useFakeTimers();
 });
@@ -237,6 +244,33 @@ test("Ctrl+K opens the global search; picking a note result jumps to Notes with 
   expect(dialog.isConnected, "the overlay should have closed").toBe(false);
   expect(screen.getByRole("tab", { name: "Notas" }).getAttribute("aria-selected")).toBe("true");
   expect((screen.getByLabelText("buscar notas") as HTMLInputElement).value).toBe("reuniao");
+});
+
+test("creating the vault shows onboarding once; a later unlock never shows it again", async () => {
+  vaultStatus = { exists: false, unlocked: false };
+  render(<App />);
+  await settle();
+
+  fireEvent.change(screen.getByLabelText("senha mestra"), { target: { value: "abcd" } });
+  fireEvent.change(screen.getByLabelText("repita a senha"), { target: { value: "abcd" } });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Criar cofre" }));
+  });
+  await settle();
+
+  expect(calls.some((c) => c.cmd === "vault_create")).toBe(true);
+  const dialog = screen.getByRole("dialog", { name: "Bem-vindo ao canto" });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "entendi" }));
+  });
+  expect(dialog.isConnected).toBe(false);
+
+  // Locking and unlocking again afterwards must not bring onboarding back.
+  cleanup();
+  vaultStatus = { exists: true, unlocked: true };
+  render(<App />);
+  await settle();
+  expect(screen.queryByRole("dialog", { name: "Bem-vindo ao canto" })).toBeNull();
 });
 
 test("F11 enters and exits fullscreen, and the top button reflects the state", async () => {

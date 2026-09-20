@@ -63,6 +63,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   não navega entre dias.
 - **Tamanho da interface** (Ajustes → Aparência): compacta, padrão ou confortável, escalando texto e espaçamento
   juntos.
+- **Boas-vindas na primeira execução**: ao criar o cofre pela primeira vez, uma tela resume os atalhos
+  essenciais. Aparece uma única vez — destrancar depois nunca mostra de novo.
 
 ### Alterado
 

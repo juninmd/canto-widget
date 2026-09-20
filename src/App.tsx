@@ -9,6 +9,8 @@ import { useFullscreen } from "./lib/useFullscreen";
 import { focusShortcut, useShortcuts } from "./lib/shortcuts";
 import ShortcutsHelp from "./components/ShortcutsHelp";
 import GlobalSearch from "./components/GlobalSearch";
+import Onboarding from "./components/Onboarding";
+import { markOnboardingSeen, onboardingSeen } from "./lib/onboarding";
 import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
@@ -58,6 +60,7 @@ function Canto() {
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
   const fullscreen = useFullscreen();
   const toggleFullscreen = () => void fullscreen.toggle().catch((e) => setError(errText(e)));
   // Completing from the toast changes the task outside the tab: the list needs to reread.
@@ -68,7 +71,7 @@ function Canto() {
     if (action.type === "fullscreen") return toggleFullscreen();
     if (action.type === "privacy") return togglePrivacy();
     if (action.type === "globalSearch") return setSearchOpen((v) => !v);
-    if (helpOpen || searchOpen) return;
+    if (helpOpen || searchOpen || onboardingOpen) return;
     if (action.type === "tab") return tabs[action.index - 1] && changeTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
     focusShortcut(action.target);
@@ -81,6 +84,15 @@ function Canto() {
       setError(errText(e));
     }
   }, [setError]);
+
+  // Only a fresh "criar cofre" sets justCreated; a plain unlock never shows onboarding again.
+  const openVault = useCallback(
+    (justCreated?: boolean) => {
+      if (justCreated && !onboardingSeen()) setOnboardingOpen(true);
+      void refresh();
+    },
+    [refresh],
+  );
 
   useEffect(() => {
     void refresh();
@@ -128,6 +140,7 @@ function Canto() {
   async function lock() {
     setHelpOpen(false);
     setSearchOpen(false);
+    setOnboardingOpen(false);
     await api.lock();
     await refresh();
   }
@@ -140,6 +153,14 @@ function Canto() {
     >
       {alert && <Alert event={alert} onClose={() => setAlert(null)} onCompleted={() => setTasksVersion((v) => v + 1)} />}
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
+      {onboardingOpen && status?.unlocked && (
+        <Onboarding
+          onClose={() => {
+            markOnboardingSeen();
+            setOnboardingOpen(false);
+          }}
+        />
+      )}
       {searchOpen && status?.unlocked && (
         <GlobalSearch
           today={today}
@@ -212,7 +233,7 @@ function Canto() {
       {!status ? (
         <div className="flex-1" />
       ) : !status.unlocked ? (
-        <Lock exists={status.exists} onOpen={refresh} />
+        <Lock exists={status.exists} onOpen={openVault} />
       ) : (
         <>
           <TabBar current={tab} onChange={changeTab} tabs={tabs} />
