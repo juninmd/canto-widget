@@ -5,6 +5,7 @@ use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::path::{Path, PathBuf};
+use std::sync::Mutex;
 
 use crate::backup::{self, ImportSummary};
 use crate::error::Result;
@@ -13,6 +14,13 @@ use crate::vault::AppState;
 
 /// Fixed name inside the folder: the sync tool sees one file being edited, not a new one each save.
 const FILE_NAME: &str = "canto.canto";
+
+/// Serializes `export_now`'s read-modify-write of `sincronizacao.json` against itself: two
+/// concurrent saves (a UI mutation racing the ~5 min background poll, say) could otherwise lose
+/// one machine's `ultimo_hash` update to the other's. Not the session mutex on purpose: a
+/// `poll_and_merge` that finds a change calls back into `AppState::mutate`, which calls
+/// `export_now` again — reusing the session lock here would deadlock on that reentry.
+static EXPORT_LOCK: Mutex<()> = Mutex::new(());
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 struct Prefs {
@@ -60,6 +68,7 @@ pub fn clear_folder(dir: &Path) -> Result<()> {
 /// what was written so the next poll can tell it apart from someone else's change.
 pub fn export_now(dir: &Path) -> Result<()> {
     let Some(folder) = folder(dir) else { return Ok(()) };
+    let _guard = EXPORT_LOCK.lock().unwrap();
     let dest = target(&folder);
     backup::export(dir, &dest)?;
     let bytes = std::fs::read(&dest)?;
