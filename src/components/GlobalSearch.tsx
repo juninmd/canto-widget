@@ -21,6 +21,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
   const [notesTotal, setNotesTotal] = useState(0);
   const [clips, setClips] = useState<ClipItem[]>([]);
   const input = useRef<HTMLInputElement>(null);
+  const seq = useRef(0);
   const mask = privacy ? "blur-sm select-none" : "";
 
   useEffect(() => input.current?.focus(), []);
@@ -28,6 +29,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
   useEffect(() => {
     const q = query.trim();
     if (!q) {
+      seq.current++;
       setTasks([]);
       setNotes([]);
       setNotesTotal(0);
@@ -35,22 +37,24 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       return;
     }
     const t = setTimeout(() => {
+      const id = ++seq.current;
       const low = q.toLowerCase();
       void api
         .tasksForDay(today)
-        .then((all) => setTasks(all.filter((x) => x.title.toLowerCase().includes(low))))
-        .catch((e) => onError(errText(e)));
+        .then((all) => id === seq.current && setTasks(all.filter((x) => x.title.toLowerCase().includes(low))))
+        .catch((e) => id === seq.current && onError(errText(e)));
       void api
         .notesSearch(q, CAP)
         .then((page) => {
+          if (id !== seq.current) return;
           setNotes(page.items);
           setNotesTotal(page.total);
         })
-        .catch((e) => onError(errText(e)));
+        .catch((e) => id === seq.current && onError(errText(e)));
       void api
         .clipList(q)
-        .then((list) => setClips(list.items))
-        .catch((e) => onError(errText(e)));
+        .then((list) => id === seq.current && setClips(list.items))
+        .catch((e) => id === seq.current && onError(errText(e)));
     }, 150);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
