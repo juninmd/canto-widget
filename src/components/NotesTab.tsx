@@ -8,9 +8,16 @@ import NoteEditor, { type Draft } from "./NoteEditor";
 const PAGE = 50;
 const EMPTY: Draft = { id: undefined, title: "", body: "", tags: "", link: null };
 
-type Props = { today: string; agenda?: AgendaItem[]; onOpenTasks: () => void; onOpenAgenda: () => void; onError: (m: string) => void };
+type Props = {
+  today: string;
+  agenda?: AgendaItem[];
+  privacy: boolean;
+  onOpenTasks: () => void;
+  onOpenAgenda: () => void;
+  onError: (m: string) => void;
+};
 
-export default function NotesTab({ today, agenda = [], onOpenTasks, onOpenAgenda, onError }: Props) {
+export default function NotesTab({ today, agenda = [], privacy, onOpenTasks, onOpenAgenda, onError }: Props) {
   const [query, setQuery] = useState("");
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
@@ -146,6 +153,7 @@ ${lim}`);
             key={n.id}
             note={n}
             query={query}
+            privacy={privacy}
             className={`${isNew(n.id) ? ENTER_CLASS : ""} ${leaving.has(n.id) ? EXIT_CLASS : ""}`}
             onOpen={() => {
               setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", "), link: n.link ?? null });

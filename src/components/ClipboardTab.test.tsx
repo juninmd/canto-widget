@@ -21,10 +21,10 @@ mock.module("@tauri-apps/api/core", () => ({
 const { default: ClipboardTab } = await import("./ClipboardTab");
 const { ToastProvider } = await import("../lib/toast");
 
-async function show() {
+async function show(privacy = false) {
   render(
     <ToastProvider>
-      <ClipboardTab onError={() => {}} />
+      <ClipboardTab privacy={privacy} onError={() => {}} />
     </ToastProvider>,
   );
   // The list only loads after ClipboardTab's own 150ms search debounce.
@@ -65,4 +65,10 @@ test("changing the pinned limit saves it through clip_set_max_pinned, clamped", 
     fireEvent.change(input, { target: { value: "0" } });
   });
   expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 1 } });
+});
+
+test("privacy mode blurs the preview text without hiding the card itself", async () => {
+  await show(true);
+  expect(screen.getByText("anotação qualquer").className).toContain("blur-sm");
+  expect(screen.getByLabelText("máximo de itens fixados")).toBeTruthy();
 });

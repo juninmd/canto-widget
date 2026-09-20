@@ -7,6 +7,7 @@ type Props = {
   note: Note;
   className: string;
   query: string;
+  privacy: boolean;
   onOpen: () => void;
   onPin: () => void;
   onDelete: () => void;
@@ -15,14 +16,15 @@ type Props = {
   onExport: () => void;
 };
 
-export default function NoteCard({ note: n, className, query, onOpen, onPin, onDelete, onTag, onOpenLink, onExport }: Props) {
+export default function NoteCard({ note: n, className, query, privacy, onOpen, onPin, onDelete, onTag, onOpenLink, onExport }: Props) {
+  const mask = privacy ? "blur-sm select-none" : "";
   const actionBtn = "grid size-6 shrink-0 place-items-center rounded focus-visible:opacity-100 group-hover:opacity-100";
   return (
     <li className={`group rounded-lg border bg-ink/60 p-2 ${n.fixada ? "border-accent/60" : "border-edge"} ${className}`}>
       <div className="flex items-start justify-between gap-2">
         <button type="button" className="min-w-0 flex-1 text-left" onClick={onOpen}>
-          <p className="truncate text-sm font-medium text-fg">{highlight(n.title, query)}</p>
-          <p className="mt-0.5 line-clamp-3 whitespace-pre-line break-words text-xs text-muted">{highlight(n.body, query)}</p>
+          <p className={`truncate text-sm font-medium text-fg ${mask}`}>{highlight(n.title, query)}</p>
+          <p className={`mt-0.5 line-clamp-3 whitespace-pre-line break-words text-xs text-muted ${mask}`}>{highlight(n.body, query)}</p>
         </button>
         <button
           type="button"

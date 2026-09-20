@@ -52,6 +52,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   do cofre trancar sozinho.
 - **Registro local dos últimos desbloqueios** (até 20), com data/hora e se foi por senha ou Windows Hello, em
   Ajustes → Segurança.
+- **Modo privacidade**: `Alt+P` ou o ícone de olho no topo borra o texto do clipboard e das notas na tela sem
+  apagar nada, para compartilhar a tela sem se preocupar.
 
 ### Alterado
 

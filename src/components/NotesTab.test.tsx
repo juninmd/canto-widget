@@ -25,7 +25,7 @@ const { ToastProvider } = await import("../lib/toast");
 async function openEditor() {
   render(
     <ToastProvider>
-      <NotesTab today="2026-09-09" onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
+      <NotesTab today="2026-09-09" privacy={false} onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
     </ToastProvider>,
   );
   // The list search is debounced 150ms; let it settle inside act so the editor opens with no pending update.
@@ -88,7 +88,7 @@ async function listWith(note: Record<string, unknown>) {
   notes = [{ id: "n1", title: "wifi", body: "senha", tags: ["casa"], created_at: 1, updated_at: 1, fixada: false, ...note }];
   render(
     <ToastProvider>
-      <NotesTab today="2026-09-09" onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
+      <NotesTab today="2026-09-09" privacy={false} onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
     </ToastProvider>,
   );
   await act(async () => {
@@ -138,6 +138,20 @@ test("typing a search term highlights it inside the visible cards", async () => 
   expect(mark?.textContent).toBe("wifi");
 });
 
+test("privacy mode blurs the title and body without hiding the card", async () => {
+  notes = [{ id: "n1", title: "wifi", body: "senha", tags: [], created_at: 1, updated_at: 1, fixada: false }];
+  render(
+    <ToastProvider>
+      <NotesTab today="2026-09-09" privacy={true} onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await new Promise((ready) => setTimeout(ready, 250));
+  });
+  expect(screen.getByText("wifi").className).toContain("blur-sm");
+  expect(screen.getByText("senha").className).toContain("blur-sm");
+});
+
 test("a pinned note shows the pin without depending on hover", async () => {
   await listWith({ fixada: true });
   const pin = screen.getByLabelText("desafixar wifi");
@@ -149,7 +163,7 @@ test("a large vault renders one page and loads the rest on demand", async () => 
   notes = Array.from({ length: 120 }, (_, i) => ({ id: `n${i}`, title: `nota ${i}`, body: "", tags: [], created_at: i, updated_at: i }));
   render(
     <ToastProvider>
-      <NotesTab today="2026-09-09" onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
+      <NotesTab today="2026-09-09" privacy={false} onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
     </ToastProvider>,
   );
   await act(async () => {

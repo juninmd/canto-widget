@@ -16,10 +16,18 @@ const item = (over: Partial<ClipItem>): ClipItem => ({
   ...over,
 });
 
-function show(i: ClipItem, extra: { copied?: boolean; onCopy?: () => void } = {}) {
+function show(i: ClipItem, extra: { copied?: boolean; privacy?: boolean; onCopy?: () => void } = {}) {
   return render(
     <ul>
-      <ClipCard item={i} copied={!!extra.copied} className="" onCopy={extra.onCopy ?? (() => {})} onPin={() => {}} onDelete={() => {}} />
+      <ClipCard
+        item={i}
+        copied={!!extra.copied}
+        privacy={!!extra.privacy}
+        className=""
+        onCopy={extra.onCopy ?? (() => {})}
+        onPin={() => {}}
+        onDelete={() => {}}
+      />
     </ul>,
   );
 }
@@ -61,4 +69,12 @@ test("long code shows only its first lines and says there is more", () => {
   const rest = Array.from({ length: 9 }, (_, n) => `linha ${n}`).join("\n");
   const { container } = show(item({ preview: `const x = 1;\n${rest}`, chars: 80, kept: 80 }));
   expect(container.querySelector("pre")!.textContent).toBe("const x = 1;\nlinha 0\nlinha 1\nlinha 2…");
+});
+
+test("privacy mode blurs the text but the card and its actions stay usable", () => {
+  let copied = 0;
+  show(item({ preview: "conteúdo sensível" }), { privacy: true, onCopy: () => copied++ });
+  expect(screen.getByText("conteúdo sensível").className).toContain("blur-sm");
+  fireEvent.click(screen.getByTitle("clique para copiar de novo"));
+  expect(copied).toBe(1);
 });

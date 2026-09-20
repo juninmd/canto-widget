@@ -148,6 +148,9 @@ Atalho global escondendo e trazendo o widget de volta:
   mestra continua sendo o único jeito de abrir um backup em outra máquina.
 - **Últimos desbloqueios** — em **Ajustes → Segurança**, a lista "últimos desbloqueios" mostra quando (e por
   senha ou Windows Hello) o cofre foi destrancado nas últimas 20 vezes, para notar um acesso que você não fez.
+- **Modo privacidade** — o ícone de olho no topo (ou `Alt+P`) borra o texto dos cards de clipboard e notas na
+  hora, sem apagar nada; os botões continuam funcionando. Útil antes de compartilhar a tela. Não persiste entre
+  aberturas do app: cada abertura começa sem o modo ativo.
 
 ## Janela
 

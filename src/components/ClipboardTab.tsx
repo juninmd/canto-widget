@@ -7,7 +7,9 @@ import ClipCard from "./ClipCard";
 
 const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
 
-export default function ClipboardTab({ onError }: { onError: (m: string) => void }) {
+type Props = { privacy: boolean; onError: (m: string) => void };
+
+export default function ClipboardTab({ privacy, onError }: Props) {
   const [query, setQuery] = useState("");
   const [kindFilter, setKindFilter] = useState<ClipKind | "all">("all");
   const [items, setItems] = useState<ClipItem[]>([]);
@@ -122,6 +124,7 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
             key={i.id}
             item={i}
             copied={copied === i.id}
+            privacy={privacy}
             className={`${isNew(i.id) ? ENTER_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
             onCopy={() =>
               run(async () => {

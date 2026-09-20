@@ -5,7 +5,8 @@ export type Action =
   | { type: "lock" }
   | { type: "focus"; target: "search" | "new" }
   | { type: "help" }
-  | { type: "fullscreen" };
+  | { type: "fullscreen" }
+  | { type: "privacy" };
 
 export type Shortcut = { keys: string[]; description: string };
 
@@ -25,6 +26,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
     items: [
       { keys: ["N"], description: "nova tarefa ou novo card" },
       { keys: ["Alt", "L"], description: "trancar o cofre" },
+      { keys: ["Alt", "P"], description: "ativar ou desativar o modo privacidade (borra clipboard e notas)" },
     ],
   },
   {
@@ -46,6 +48,7 @@ export function interpret(e: Key, typing: boolean): Action | null {
     const n = /^Digit([1-9])$/.exec(e.code);
     if (n) return { type: "tab", index: Number(n[1]) };
     if (e.code === "KeyL") return { type: "lock" };
+    if (e.code === "KeyP") return { type: "privacy" };
     return null;
   }
   if (typing || e.ctrlKey || e.metaKey || e.altKey) return null;

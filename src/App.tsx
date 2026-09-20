@@ -20,8 +20,10 @@ import GithubTab from "./components/GithubTab";
 import GitlabTab from "./components/GitlabTab";
 import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import { useReminderLead } from "./lib/reminderLead";
+import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
+import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
 
 export default function App() {
@@ -44,6 +46,7 @@ function Canto() {
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
   const [reminderLead, setReminderLead] = useReminderLead();
+  const { privacy, togglePrivacy } = usePrivacyMode();
   useReminders(status?.unlocked === true, today, reminderLead);
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -55,6 +58,7 @@ function Canto() {
   useShortcuts(status?.unlocked === true && !alert, (action) => {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
+    if (action.type === "privacy") return togglePrivacy();
     if (helpOpen) return;
     if (action.type === "tab") return tabs[action.index - 1] && setTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
@@ -148,6 +152,16 @@ function Canto() {
               <button type="button" onClick={lock} title="trancar (Alt+L)" className="min-h-6 rounded px-1.5 hover:text-fg">
                 trancar
               </button>
+              <button
+                type="button"
+                onClick={togglePrivacy}
+                aria-pressed={privacy}
+                aria-label={privacy ? "desativar modo privacidade" : "ativar modo privacidade"}
+                title={privacy ? "modo privacidade ativo (Alt+P)" : "modo privacidade: borra clipboard e notas (Alt+P)"}
+                className={`grid size-6 place-items-center rounded hover:text-fg ${privacy ? "text-accent" : ""}`}
+              >
+                {privacy ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
             </>
           )}
           <button
@@ -191,12 +205,13 @@ function Canto() {
               <NotesTab
                 today={today}
                 agenda={agenda.items}
+                privacy={privacy}
                 onOpenTasks={() => setTab("tasks")}
                 onOpenAgenda={() => setTab("agenda")}
                 onError={setError}
               />
             )}
-            {tab === "clipboard" && <ClipboardTab onError={setError} />}
+            {tab === "clipboard" && <ClipboardTab privacy={privacy} onError={setError} />}
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}

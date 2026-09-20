@@ -31,6 +31,11 @@ test("Ctrl+N and Ctrl+Alt+L are left to the system", () => {
   expect(interpret(key("l", { code: "KeyL", altKey: true }), false)).toEqual({ type: "lock" });
 });
 
+test("Alt+P toggles privacy mode", () => {
+  expect(interpret(key("p", { code: "KeyP", altKey: true }), false)).toEqual({ type: "privacy" });
+  expect(interpret(key("p", { code: "KeyP", altKey: true }), true)).toEqual({ type: "privacy" });
+});
+
 test("F11 toggles fullscreen even while typing, but not with a modifier", () => {
   expect(interpret(key("F11", { code: "F11" }), true)).toEqual({ type: "fullscreen" });
   expect(interpret(key("F11", { code: "F11", ctrlKey: true }), false)).toBeNull();
