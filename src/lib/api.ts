@@ -62,6 +62,7 @@ export const UPDATE_PROGRESS_EVENT = "canto://update-progress";
 
 // `preview` is the first 500 characters; copying fetches the stored text in Rust.
 export type ClipItem = { id: string; preview: string; chars: number; kept: number; truncated: boolean; copied_at: number; pinned: boolean };
+export type ClipList = { items: ClipItem[]; max_pinned: number };
 export type TranscriptMeta = { name: string; modified_at: number; size: number; preview: string };
 export type AgendaItem = {
   id: string;
@@ -135,11 +136,12 @@ export const api = {
   driveConnect: () => invoke<string>("drive_connect"),
   driveDisconnect: () => invoke<void>("drive_disconnect"),
 
-  clipList: (query: string) => invoke<ClipItem[]>("clip_list", { query }),
+  clipList: (query: string) => invoke<ClipList>("clip_list", { query }),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
   clipPin: (id: string) => invoke<void>("clip_pin", { id }),
   clipDelete: (id: string) => invoke<string | null>("clip_delete", { id }),
   clipClear: () => invoke<string | null>("clip_clear"),
+  clipSetMaxPinned: (max: number) => invoke<void>("clip_set_max_pinned", { max }),
 
   transcriptsDir: () => invoke<string>("transcripts_dir"),
   transcriptsSetDir: (dir: string) => invoke<void>("transcripts_set_dir", { dir }),

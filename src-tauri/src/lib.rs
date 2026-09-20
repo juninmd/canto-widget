@@ -39,6 +39,7 @@ pub mod net;
 pub mod next_meeting;
 pub mod notification;
 pub mod oauth;
+pub mod paste_plain;
 pub mod plain_text;
 pub mod password;
 pub mod routine;
@@ -136,6 +137,7 @@ pub fn run() {
             cmd_extras::clip_pin,
             cmd_extras::clip_delete,
             cmd_extras::clip_clear,
+            cmd_extras::clip_set_max_pinned,
             cmd_extras::transcripts_dir,
             cmd_extras::transcripts_set_dir,
             cmd_extras::transcripts_list,
@@ -255,8 +257,19 @@ fn join_shortcut() -> Shortcut {
 
 pub const JOIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Cmd+Alt+M" } else { "Ctrl+Alt+M" };
 
+/// Global "strip clipboard formatting" shortcut. Ctrl+Alt+V (Cmd+Alt+V on macOS).
+fn paste_plain_shortcut() -> Shortcut {
+    #[cfg(target_os = "macos")]
+    let mods = Modifiers::SUPER | Modifiers::ALT;
+    #[cfg(not(target_os = "macos"))]
+    let mods = Modifiers::CONTROL | Modifiers::ALT;
+    Shortcut::new(Some(mods), Code::KeyV)
+}
+
+pub const PASTE_PLAIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Cmd+Alt+V" } else { "Ctrl+Alt+V" };
+
 fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let (toggle, join) = (toggle_shortcut(), join_shortcut());
+    let (toggle, join, paste_plain) = (toggle_shortcut(), join_shortcut(), paste_plain_shortcut());
     app.plugin(
         tauri_plugin_global_shortcut::Builder::new()
             .with_handler(move |app, shortcut, event| {
@@ -267,16 +280,21 @@ fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
                     let _ = window::toggle(app);
                 } else if shortcut == &join {
                     tray_live::join_next_meeting(app);
+                } else if shortcut == &paste_plain {
+                    paste_plain::strip_formatting(app);
                 }
             })
             .build(),
     )?;
     // A shortcut already taken by another app must not bring down the widget: the tray still works.
-    if let Err(e) = app.global_shortcut().register(toggle_shortcut()) {
-        eprintln!("atalho global indisponivel ({TOGGLE_SHORTCUT_LABEL}): {e}");
-    }
-    if let Err(e) = app.global_shortcut().register(join_shortcut()) {
-        eprintln!("atalho de entrar na reuniao indisponivel ({JOIN_SHORTCUT_LABEL}): {e}");
+    for (shortcut, label) in [
+        (toggle_shortcut(), TOGGLE_SHORTCUT_LABEL),
+        (join_shortcut(), JOIN_SHORTCUT_LABEL),
+        (paste_plain_shortcut(), PASTE_PLAIN_SHORTCUT_LABEL),
+    ] {
+        if let Err(e) = app.global_shortcut().register(shortcut) {
+            eprintln!("atalho global indisponivel ({label}): {e}");
+        }
     }
     Ok(())
 }

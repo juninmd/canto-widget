@@ -55,7 +55,7 @@ fn removing_a_missing_id_stores_nothing_to_undo() {
 
 #[test]
 fn restored_clipboard_comes_back_in_order_without_duplicating() {
-    let mut h = ClipHistory { items: vec![clip("c3", "novo", 300)] };
+    let mut h = ClipHistory { items: vec![clip("c3", "novo", 300)], ..Default::default() };
     h.restore(vec![clip("c1", "velho", 100), clip("c2", "novo", 200), clip("c3", "novo", 300)]);
     let texts: Vec<&str> = h.items.iter().map(|i| i.text.as_str()).collect();
     assert_eq!(texts, ["novo", "velho"], "duplicated text or lost chronological order");

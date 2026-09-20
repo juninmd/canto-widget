@@ -29,7 +29,7 @@ export default function ClipCard({ item: i, copied, className, onCopy, onPin, on
             <span className="size-5 shrink-0 rounded border border-line" style={{ background: i.preview.trim() }} aria-hidden />
             <span className="font-mono text-xs text-fg">{i.preview.trim()}</span>
           </span>
-        ) : kind === "code" ? (
+        ) : kind === "code" || kind === "json" ? (
           <pre className="overflow-hidden whitespace-pre rounded bg-panel px-2 py-1 font-mono text-[11px] leading-snug text-fg">
             {codeLines.slice(0, CODE_LINES).join("\n")}
             {codeLines.length > CODE_LINES && <span className="block text-faint">…</span>}

@@ -6,10 +6,15 @@
 
 - **clipboard** — o Rust observa a área de transferência, guarda os últimos itens (com dedupe,
   fixar e limite de tamanho) e permite copiar de volta. Local por definição, nunca sincronizado.
-  Cada card mostra o tipo (link, cor com amostra, código com fonte monoespaçada ou texto), há quanto tempo foi
-  copiado e o tamanho quando é grande. Cópias acima de 32 mil caracteres guardam só o começo, e o card diz quanto
+  Cada card mostra o tipo (link, cor com amostra, JSON, e-mail, telefone, código com fonte monoespaçada ou
+  texto), há quanto tempo foi copiado e o tamanho quando é grande. O filtro **por tipo**, ao lado da busca,
+  mostra só um tipo por vez. Cópias acima de 32 mil caracteres guardam só o começo, e o card diz quanto
   foi copiado e quanto ficou; copiar de volta devolve esse trecho. O histórico inteiro tem um teto de 1 milhão de
-  caracteres fora os fixados, e no Windows o Canto só lê o clipboard quando ele muda.
+  caracteres fora os fixados, e no Windows o Canto só lê o clipboard quando ele muda. **Máx. fixados**, ao lado
+  do filtro, limita quantos itens você pode fixar (100 por padrão, até 1.000); fixar além do limite é recusado,
+  desafixar sempre funciona. O atalho global **Ctrl+Alt+V** (`Cmd+Alt+V` no macOS) tira a formatação da área de
+  transferência atual (nunca cola sozinho: o Canto não envia teclas para outros programas), então um `Ctrl+V`
+  seu logo depois cola só texto puro.
 - **reuniões** — lista as transcrições da pasta configurada (padrão `~/Documents/Transcricoes`),
   limpando numeração/timestamps de `vtt`/`srt` para virar texto corrido pesquisável. Acima dos arquivos, a seção
   **Do Gemini** lista as anotações e transcrições que o Gemini anexou às reuniões dos últimos 14 dias (exige a

@@ -2,8 +2,10 @@ use std::path::PathBuf;
 use tauri::{Manager, State};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
+use serde::Serialize;
+
 use crate::calendar::{self, AgendaItem};
-use crate::clipboard::{ClipItem, ClipView};
+use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use sha2::{Digest, Sha256};
 use crate::trash::Removed;
 use crate::commands::new_id;
@@ -13,16 +15,31 @@ use crate::transcripts::{self, TranscriptMeta, TranscriptSettings};
 use crate::vault::AppState;
 use crate::{store, window};
 
+#[derive(Serialize)]
+pub struct ClipList {
+    pub items: Vec<ClipView>,
+    pub max_pinned: usize,
+}
+
 #[tauri::command(async)]
-pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<Vec<ClipView>> {
+pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> {
     let q = query.trim().to_lowercase();
     let hist = state.clip_load()?;
-    Ok(hist
+    let items = hist
         .items
         .iter()
         .filter(|i| q.is_empty() || i.text.to_lowercase().contains(&q))
         .map(ClipView::from)
-        .collect())
+        .collect();
+    Ok(ClipList { items, max_pinned: hist.max_pinned })
+}
+
+/// Clamped so a typo (`0`, a huge number) can't lock pinning out or defeat the cap's purpose.
+#[tauri::command(async)]
+pub fn clip_set_max_pinned(state: State<'_, AppState>, max: usize) -> Result<()> {
+    let mut hist = state.clip_load()?;
+    hist.max_pinned = max.clamp(1, MAX_PINNED_CEILING);
+    state.clip_save(&hist)
 }
 
 #[tauri::command(async)]
@@ -41,9 +58,7 @@ pub fn clip_copy(app: tauri::AppHandle, state: State<'_, AppState>, id: String) 
 #[tauri::command(async)]
 pub fn clip_pin(state: State<'_, AppState>, id: String) -> Result<()> {
     let mut hist = state.clip_load()?;
-    if let Some(i) = hist.items.iter_mut().find(|i| i.id == id) {
-        i.pinned = !i.pinned;
-    }
+    hist.toggle_pin(&id)?;
     state.clip_save(&hist)
 }
 

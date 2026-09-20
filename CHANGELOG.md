@@ -7,6 +7,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Colar como texto puro**: atalho global **Ctrl+Alt+V** (`Cmd+Alt+V` no macOS) tira HTML/RTF da área de
+  transferência atual, sem simular um Ctrl+V em outro app.
+- **Mais tipos no clipboard**: JSON e e-mail/telefone reconhecidos, além de link, cor e código; filtro por
+  tipo na aba.
+- **Limite de itens fixados** no clipboard, configurável (100 por padrão) — antes não havia limite nenhum.
 - **Entrar na próxima reunião pela bandeja**: item de menu que mostra a próxima reunião com Meet e entra nela
   direto, sem abrir o widget; atalho global **Ctrl+Alt+M** (`Cmd+Alt+M` no macOS) faz o mesmo.
 - **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você
