@@ -1,28 +1,36 @@
 import { useCallback, useRef, useState } from "react";
-import { api, errText, type GithubFilter, type GithubLists, type GithubSection } from "./api";
-import { appendPage, NO_FILTER } from "./github";
+import { errText, type ForgeFilter, type ForgeList, type ForgeLists, type ForgeSection } from "./api";
+import { appendPage, NO_FILTER } from "./forge";
 
-const FIRST_PAGES: Record<GithubSection, number> = { review_requested: 1, assigned: 1, my_prs: 1, my_issues: 1 };
+const FIRST_PAGES: Record<ForgeSection, number> = { review_requested: 1, assigned: 1, my_prs: 1, my_issues: 1 };
 
-export function useGithubLists() {
-  const [lists, setLists] = useState<GithubLists | null>(null);
-  const [filter, setFilter] = useState<GithubFilter>(NO_FILTER);
+export type ForgeSource = {
+  lists: (filter: ForgeFilter, force: boolean) => Promise<ForgeLists>;
+  section: (section: ForgeSection, page: number, filter: ForgeFilter) => Promise<ForgeList>;
+};
+
+export function useForgeLists(source: ForgeSource) {
+  const [lists, setLists] = useState<ForgeLists | null>(null);
+  const [filter, setFilter] = useState<ForgeFilter>(NO_FILTER);
   const [loading, setLoading] = useState(false);
   // A new filter hides the old list while it loads; if the search fails, that list and filter come back as they were.
   const [replacing, setReplacing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState<GithubSection | null>(null);
+  const [loadingMore, setLoadingMore] = useState<ForgeSection | null>(null);
   const [error, setError] = useState("");
   const pages = useRef(FIRST_PAGES);
   // A reply for an older filter must not overwrite the list of the current one.
   const seq = useRef(0);
+  const src = useRef(source);
+  src.current = source;
 
-  const load = useCallback(async (next: GithubFilter, keep: boolean) => {
+  /** `keep` leaves the current list on screen; `force` skips Rust's cache ("atualizar"). */
+  const load = useCallback(async (next: ForgeFilter, keep: boolean, force = false) => {
     const id = ++seq.current;
     setError("");
     setLoading(true);
     setReplacing(!keep);
     try {
-      const fresh = await api.githubLists(next);
+      const fresh = await src.current.lists(next, force);
       if (id !== seq.current) return;
       pages.current = FIRST_PAGES;
       setFilter(next);
@@ -38,12 +46,12 @@ export function useGithubLists() {
   }, []);
 
   const more = useCallback(
-    async (section: GithubSection) => {
+    async (section: ForgeSection) => {
       const id = seq.current;
       const page = pages.current[section] + 1;
       setLoadingMore(section);
       try {
-        const got = await api.githubSection(section, page, filter);
+        const got = await src.current.section(section, page, filter);
         if (id !== seq.current) return;
         pages.current = { ...pages.current, [section]: page };
         setLists((l) => (l ? { ...l, [section]: appendPage(l[section], got) } : l));
@@ -63,3 +71,5 @@ export function useGithubLists() {
 
   return { lists: replacing ? null : lists, filter, loading, loadingMore, error, setError, load, more, clear };
 }
+
+export type ForgeListsState = ReturnType<typeof useForgeLists>;

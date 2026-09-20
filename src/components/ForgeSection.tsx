@@ -1,17 +1,17 @@
-import { api, type GithubItem, type GithubList } from "../lib/api";
+import { api, type ForgeItem, type ForgeList } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { IssueIcon, PullIcon } from "./Icons";
 
 type Props = {
   title: string;
-  list: GithubList;
+  list: ForgeList;
   login: string;
   filtered: boolean;
   loadingMore: boolean;
   onMore: () => void;
 };
 
-export default function GithubSection({ title, list, login, filtered, loadingMore, onMore }: Props) {
+export default function ForgeSection({ title, list, login, filtered, loadingMore, onMore }: Props) {
   const rest = list.total - list.items.length;
   return (
     <section aria-label={title}>
@@ -41,7 +41,7 @@ export default function GithubSection({ title, list, login, filtered, loadingMor
   );
 }
 
-function Row({ item, login }: { item: GithubItem; login: string }) {
+function Row({ item, login }: { item: ForgeItem; login: string }) {
   const kind = item.is_pr ? (item.draft ? "PR rascunho" : "PR") : "issue";
   return (
     <li>
@@ -57,9 +57,7 @@ function Row({ item, login }: { item: GithubItem; login: string }) {
         <span className="min-w-0 flex-1">
           <span className="line-clamp-2 text-sm text-fg">{item.title}</span>
           <span className="mt-0.5 flex gap-2 text-[11px] text-muted">
-            <span className="truncate">
-              {item.repo}#{item.number}
-            </span>
+            <span className="truncate">{item.reference}</span>
             {item.draft && <span className="shrink-0 text-faint">rascunho</span>}
             {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
             <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>

@@ -12,16 +12,24 @@ pub mod cmd_backup;
 pub mod cmd_drive;
 pub mod cmd_extras;
 pub mod cmd_gemini;
+pub mod cmd_forges;
 pub mod cmd_github;
+pub mod cmd_github_lists;
+pub mod cmd_gitlab;
 pub mod cmd_notes;
 pub mod commands;
 pub mod crypto;
 pub mod drive;
 pub mod error;
+pub mod forge;
+pub mod forge_cache;
+pub mod forge_filter;
 pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
 pub mod github_query;
+pub mod gitlab;
+pub mod gitlab_query;
 #[cfg(windows)]
 pub mod hello;
 pub mod meet;
@@ -155,8 +163,14 @@ pub fn run() {
             cmd_github::github_device_finish,
             cmd_github::github_device_cancel,
             cmd_github::github_disconnect,
-            cmd_github::github_lists,
-            cmd_github::github_section,
+            cmd_github_lists::github_lists,
+            cmd_github_lists::github_section,
+            cmd_gitlab::gitlab_status,
+            cmd_gitlab::gitlab_connect,
+            cmd_gitlab::gitlab_disconnect,
+            cmd_gitlab::gitlab_lists,
+            cmd_gitlab::gitlab_section,
+            cmd_forges::forges_opened_since,
         ])
         .on_window_event(|win, event| match event {
             // Closing hides the widget; quitting for real only from the tray.

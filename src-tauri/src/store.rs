@@ -8,6 +8,7 @@ use crate::error::{AppError, Result};
 pub const VAULT_AAD: &[u8] = b"canto.vault.v1";
 pub const DRIVE_AAD: &[u8] = b"canto.drive.v1";
 pub const GITHUB_AAD: &[u8] = b"canto.github.v1";
+pub const GITLAB_AAD: &[u8] = b"canto.gitlab.v1";
 const FORMAT_VERSION: u32 = 1;
 
 /// Written to disk and sent to Drive; salt and nonce are public by design, the key never leaves memory.
@@ -98,6 +99,10 @@ pub fn clip_path(dir: &Path) -> PathBuf {
 
 pub fn github_path(dir: &Path) -> PathBuf {
     dir.join("github.json")
+}
+
+pub fn gitlab_path(dir: &Path) -> PathBuf {
+    dir.join("gitlab.json")
 }
 
 pub fn settings_path(dir: &Path) -> PathBuf {

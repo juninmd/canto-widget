@@ -20,6 +20,11 @@ pub enum AppError {
     Drive(String),
     #[error("github: {0}")]
     Github(String),
+    #[error("gitlab: {0}")]
+    Gitlab(String),
+    /// The forge's quota ran out; `reset_at` (ms) tells the cache when to try again.
+    #[error("{message}")]
+    RateLimited { message: String, reset_at: i64 },
     /// Shown after "Não foi possível verificar:" or "A atualização não foi instalada:", so no prefix of its own.
     #[error("{0}")]
     Update(String),

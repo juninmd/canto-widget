@@ -1,4 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus } from "./forgeTypes";
+
+export type * from "./forgeTypes";
 
 // wire keys mirror the synced vault format (frozen across app versions)
 /** `dia` of `semanal`: 0 = Sunday ... 6 = Saturday. */
@@ -50,22 +53,6 @@ export type DriveStatus = {
 };
 export type ImportSummary = { tasks: number; notes: number };
 
-export type GithubItem = {
-  repo: string;
-  number: number;
-  title: string;
-  url: string;
-  updated_at: string;
-  is_pr: boolean;
-  draft: boolean;
-  author: string;
-};
-/** `total` is GitHub's count; `items` only carries the first page (up to 30). */
-export type GithubList = { total: number; items: GithubItem[] };
-export type GithubSection = "review_requested" | "assigned" | "my_prs" | "my_issues";
-export type GithubKind = "all" | "pr" | "issue";
-export type GithubFilter = { text: string; kind: GithubKind };
-export type GithubLists = { assigned: GithubList; my_prs: GithubList; review_requested: GithubList; my_issues: GithubList };
 export type GithubStatus = { connected: boolean; login: string; source: string; device_flow: boolean };
 export type DeviceCode = { user_code: string; url: string; expires_in_s: number };
 /** `latest` is the newest published version, even when it is not newer than `current`. */
@@ -176,9 +163,20 @@ export const api = {
   githubDeviceFinish: () => invoke<string>("github_device_finish"),
   githubDeviceCancel: () => invoke<void>("github_device_cancel"),
   githubDisconnect: () => invoke<void>("github_disconnect"),
-  githubLists: (filter: GithubFilter) => invoke<GithubLists>("github_lists", { filter }),
-  githubSection: (section: GithubSection, page: number, filter: GithubFilter) =>
-    invoke<GithubList>("github_section", { section, page, filter }),
+  /** Served from Rust's cache for 5 min unless `force`; the rate-limit guard applies either way. */
+  githubLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("github_lists", { filter, force }),
+  githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
+    invoke<ForgeList>("github_section", { section, page, filter }),
+
+  gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
+  /** Validates address and token against the instance; returns the username. */
+  gitlabConnect: (baseUrl: string, token: string) => invoke<string>("gitlab_connect", { baseUrl, token }),
+  gitlabDisconnect: () => invoke<void>("gitlab_disconnect"),
+  gitlabLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("gitlab_lists", { filter, force }),
+  gitlabSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
+    invoke<ForgeList>("gitlab_section", { section, page, filter }),
+  /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
+  forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

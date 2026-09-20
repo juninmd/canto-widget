@@ -7,12 +7,13 @@ use zeroize::Zeroizing;
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
-use crate::github::{self, GithubList, GithubLists};
-use crate::github_query::{GithubFilter, Section};
+use crate::github;
 use crate::github_auth::{self as auth, embedded_client_id, PollResult, Tokens};
 use crate::model::now_ms;
 use crate::store::{self, SealedBlob, GITHUB_AAD};
 use crate::vault::AppState;
+
+pub(crate) const FORGE: &str = "github";
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct GithubConfig {
@@ -93,7 +94,9 @@ pub async fn github_save_token(app: tauri::AppHandle, token: String) -> Result<S
     run(move || {
         let login = github::user(&token)?;
         let tokens = Tokens { access_token: token.to_string(), ..Default::default() };
-        app.state::<AppState>().save_github(&GithubConfig { tokens, login: login.clone(), source: "pat".into(), client_id: String::new() })?;
+        let state = app.state::<AppState>();
+        state.save_github(&GithubConfig { tokens, login: login.clone(), source: "pat".into(), client_id: String::new() })?;
+        state.forges.forget(FORGE);
         Ok(login)
     })
     .await
@@ -152,6 +155,7 @@ fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
             Ok(PollResult::Ready(tokens)) => {
                 let saved = github::user(&tokens.access_token).and_then(|login| {
                     let cfg = GithubConfig { tokens, login: login.clone(), source: "app".into(), client_id: client_id.into() };
+                    state.forges.forget(FORGE);
                     state.save_github(&cfg).map(|_| login)
                 });
                 return end(saved);
@@ -172,26 +176,11 @@ pub fn github_disconnect(state: State<'_, AppState>) -> Result<()> {
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
+    state.forges.forget(FORGE);
     match std::fs::remove_file(store::github_path(&state.dir)) {
         Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
         _ => Ok(()),
     }
-}
-
-#[tauri::command]
-pub async fn github_lists(app: tauri::AppHandle, filter: Option<GithubFilter>) -> Result<GithubLists> {
-    run(move || github::lists(&token(&app)?, &filter.unwrap_or_default())).await
-}
-
-#[tauri::command]
-pub async fn github_section(app: tauri::AppHandle, section: Section, page: u32, filter: Option<GithubFilter>) -> Result<GithubList> {
-    run(move || github::section(&token(&app)?, section, page, &filter.unwrap_or_default())).await
-}
-
-fn token(app: &tauri::AppHandle) -> Result<Zeroizing<String>> {
-    let state = app.state::<AppState>();
-    state.touch();
-    valid_token(&state, &app.state::<GithubState>(), now_ms())
 }
 
 #[cfg(test)]

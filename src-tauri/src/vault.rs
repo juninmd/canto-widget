@@ -54,6 +54,8 @@ pub struct AppState {
     /// Last event that triggered the pop-up, read by the alert window.
     pub alert: Mutex<Option<crate::calendar::AgendaItem>>,
     pub trash: crate::trash::Trash,
+    /// GitHub/GitLab lists; dropped on lock like the rest of the plaintext.
+    pub forges: crate::forge_cache::ForgeCache,
     /// Auto-lock baseline; background polls (clipboard, agenda) deliberately don't touch this.
     last_active: Mutex<i64>,
 }
@@ -65,6 +67,7 @@ impl AppState {
             session: Mutex::new(None),
             alert: Mutex::new(None),
             trash: Default::default(),
+            forges: Default::default(),
             last_active: Mutex::new(now_ms()),
         }
     }
@@ -141,6 +144,7 @@ impl AppState {
     pub fn lock(&self) {
         *self.session.lock().unwrap() = None;
         self.trash.clear();
+        self.forges.clear();
     }
 
     pub fn is_unlocked(&self) -> bool {
