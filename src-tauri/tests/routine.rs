@@ -1,6 +1,6 @@
 use canto_widget_lib::error::AppError;
-use canto_widget_lib::model::{Repeat, Task, VaultData};
-use canto_widget_lib::routine::{set_schedule, weekday_of, instance_id, materialize, validate_time};
+use canto_widget_lib::model::{ExtendedRepeat, Repeat, Task, VaultData};
+use canto_widget_lib::routine::{instance_id, materialize, set_extended_repeat, set_schedule, weekday_of, validate_time};
 
 fn task(id: &str, day: &str) -> Task {
     Task { id: id.into(), title: "tomar remedio".into(), day: day.into(), created_at: 1, updated_at: 1, ..Default::default() }
@@ -98,6 +98,54 @@ fn a_time_outside_the_format_is_rejected_before_the_vault() {
     assert!(t.repeat.is_none() && t.series.is_none(), "state changed despite the error");
 }
 
+fn with_extended_series(day: &str, r: ExtendedRepeat) -> VaultData {
+    let mut t = task("s1", day);
+    set_extended_repeat(&mut t, Some(r), 2).unwrap();
+    VaultData { tasks: vec![t], ..Default::default() }
+}
+
+#[test]
+fn monthly_fires_only_on_the_chosen_day_of_month() {
+    let mut d = with_extended_series("2026-09-05", ExtendedRepeat::Monthly { day: 5 });
+    assert_eq!(materialize(&mut d, "2026-09-06", 10), 0);
+    assert_eq!(materialize(&mut d, "2026-10-05", 10), 1);
+}
+
+#[test]
+fn a_day_of_month_a_shorter_month_lacks_simply_does_not_fire_that_month() {
+    let mut d = with_extended_series("2026-01-31", ExtendedRepeat::Monthly { day: 31 });
+    assert_eq!(materialize(&mut d, "2026-02-28", 10), 0, "February has no 31st");
+    assert_eq!(materialize(&mut d, "2026-03-31", 10), 1);
+}
+
+#[test]
+fn specific_days_fires_on_any_of_the_chosen_weekdays() {
+    // Monday (1) and Wednesday (3), starting Monday 2026-09-14.
+    let mut d = with_extended_series("2026-09-14", ExtendedRepeat::SpecificDays { days: vec![1, 3] });
+    assert_eq!(materialize(&mut d, "2026-09-15", 10), 0, "tuesday is not chosen");
+    assert_eq!(materialize(&mut d, "2026-09-16", 10), 1, "wednesday is chosen");
+}
+
+#[test]
+fn setting_one_recurrence_kind_clears_the_other() {
+    let mut t = task("x", "2026-09-14");
+    set_schedule(&mut t, None, Some(Repeat::Daily), 1).unwrap();
+    set_extended_repeat(&mut t, Some(ExtendedRepeat::Monthly { day: 1 }), 2).unwrap();
+    assert!(t.repeat.is_none(), "legacy repeat survived setting the extended kind");
+
+    set_schedule(&mut t, None, Some(Repeat::Weekdays), 3).unwrap();
+    assert!(t.extended_repeat.is_none(), "extended repeat survived setting the legacy kind");
+}
+
+#[test]
+fn extended_repeat_rejects_an_out_of_range_day_or_weekday() {
+    let mut t = task("x", "2026-09-14");
+    assert!(set_extended_repeat(&mut t, Some(ExtendedRepeat::Monthly { day: 32 }), 1).is_err());
+    assert!(set_extended_repeat(&mut t, Some(ExtendedRepeat::SpecificDays { days: vec![] }), 1).is_err());
+    assert!(set_extended_repeat(&mut t, Some(ExtendedRepeat::SpecificDays { days: vec![7] }), 1).is_err());
+    assert!(t.extended_repeat.is_none(), "state changed despite the error");
+}
+
 #[test]
 fn old_vault_without_the_new_fields_opens_the_same() {
     let json = r#"{"tasks":[{"id":"a","title":"t","done":false,"day":"2026-09-14","created_at":1,"updated_at":1}],
@@ -108,8 +156,9 @@ fn old_vault_without_the_new_fields_opens_the_same() {
 }
 
 mod notes {
-    use canto_widget_lib::cmd_notes::{note_matches, sort};
-    use canto_widget_lib::model::Note;
+    use canto_widget_lib::cmd_notes::{file_stem, note_matches, sort, to_markdown, validate_link};
+    use canto_widget_lib::error::AppError;
+    use canto_widget_lib::model::{Note, NoteLink};
 
     fn note(id: &str, tags: &[&str], pinned: bool, updated_at: i64) -> Note {
         Note {
@@ -138,6 +187,35 @@ mod notes {
         assert!(!note_matches(&trab, "#trabalho"));
         assert!(!note_matches(&work, "#trab"), "#tag turned into a substring search");
         assert!(note_matches(&work, "trab"), "free search stopped matching a tag substring");
+    }
+
+    #[test]
+    fn a_link_needs_both_a_real_id_and_a_label() {
+        assert!(validate_link(&NoteLink::Task { id: "t1".into(), label: "comprar leite".into() }).is_ok());
+        assert!(matches!(
+            validate_link(&NoteLink::Task { id: "  ".into(), label: "comprar leite".into() }),
+            Err(AppError::Config(_))
+        ));
+        assert!(matches!(
+            validate_link(&NoteLink::Event { id: "e1".into(), label: " ".into() }),
+            Err(AppError::Config(_))
+        ));
+    }
+
+    #[test]
+    fn markdown_export_keeps_title_body_and_tags_readable() {
+        let n = Note { title: "Wifi de casa".into(), body: "senha: 12345".into(), tags: vec!["casa".into()], ..note("n1", &[], false, 1) };
+        let md = to_markdown(&n);
+        assert!(md.starts_with("# Wifi de casa\n\n"));
+        assert!(md.contains("senha: 12345"));
+        assert!(md.contains("_tags: casa_"));
+    }
+
+    #[test]
+    fn export_file_name_is_a_safe_slug_even_for_an_empty_or_symbol_only_title() {
+        assert_eq!(file_stem("Reunião c/ Time: Sprint #3!"), "reunião-c-time-sprint-3");
+        assert_eq!(file_stem("   "), "nota");
+        assert_eq!(file_stem("!!!"), "nota");
     }
 }
 

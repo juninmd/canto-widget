@@ -1,13 +1,27 @@
 import { useEffect, useState } from "react";
 import { api, errText } from "../lib/api";
 import BackupSection from "./BackupSection";
+import SyncSection from "./SyncSection";
 import GoogleSection from "./GoogleSection";
 import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
+import DensityPicker from "./DensityPicker";
 import UpdateSection from "./UpdateSection";
+import TabsSection from "./TabsSection";
+import RemindersSection from "./RemindersSection";
+import type { Tab } from "./TabBar";
+import type { LeadMinutes } from "../lib/reminderLead";
 
-export default function SettingsTab({ onError }: { onError: (m: string) => void }) {
+type Props = {
+  onError: (m: string) => void;
+  hiddenTabs: Tab[];
+  onHiddenTabs: (hidden: Tab[]) => void;
+  reminderLead: LeadMinutes;
+  onReminderLead: (lead: LeadMinutes) => void;
+};
+
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminderLead, onReminderLead }: Props) {
   const [autostart, setAutostart] = useState(false);
   const [busy, setBusy] = useState(false);
 
@@ -56,9 +70,13 @@ export default function SettingsTab({ onError }: { onError: (m: string) => void 
         </label>
       </section>
       <SkinPicker />
+      <DensityPicker />
+      <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
+      <RemindersSection lead={reminderLead} onChange={onReminderLead} />
       <SecuritySection onError={onError} />
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />
+      <SyncSection onError={onError} />
       <GoogleSection onError={onError} />
       <UpdateSection />
     </div>

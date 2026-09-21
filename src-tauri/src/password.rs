@@ -8,7 +8,7 @@ use crate::clipboard::CLIP_AAD;
 use crate::crypto::VaultKey;
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
-use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, VAULT_AAD};
+use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, GITLAB_AAD, VAULT_AAD};
 use crate::vault::{AppState, MIN_PASSWORD_LEN};
 
 /// Envelope read with the old key and already sealed with the new one, ready to write.
@@ -40,6 +40,7 @@ impl AppState {
         for (path, aad, disposable) in [
             (store::drive_path(&self.dir), DRIVE_AAD, false),
             (store::github_path(&self.dir), GITHUB_AAD, false),
+            (store::gitlab_path(&self.dir), GITLAB_AAD, false),
             (store::clip_path(&self.dir), CLIP_AAD, true),
         ] {
             match reencrypt(&path, aad, &session.key, &key, &salt) {
@@ -79,7 +80,7 @@ impl AppState {
 
 /// Settles staged copies left by a change: same salt as the vault means it was written, so swap; anything else is stale.
 pub(crate) fn finish_interrupted(dir: &Path, vault_salt: &[u8]) -> Result<()> {
-    let peripherals = [store::drive_path(dir), store::github_path(dir), store::clip_path(dir)];
+    let peripherals = [store::drive_path(dir), store::github_path(dir), store::gitlab_path(dir), store::clip_path(dir)];
     for path in peripherals.into_iter().chain(backup_files(dir)) {
         let next = staged(&path);
         match store::read_json::<SealedBlob>(&next) {

@@ -11,10 +11,9 @@ const key = (key: string, extra: Partial<{ code: string; altKey: boolean; ctrlKe
 });
 
 test("Alt+number switches tabs by the physical code, even inside a field", () => {
-  expect(interpret(key("1", { code: "Digit1", altKey: true }), true)).toEqual({ type: "tab", tab: "tasks" });
-  expect(interpret(key("¹", { code: "Digit6", altKey: true }), false)).toEqual({ type: "tab", tab: "github" });
-  expect(interpret(key("7", { code: "Digit7", altKey: true }), false)).toEqual({ type: "tab", tab: "settings" });
-  expect(interpret(key("8", { code: "Digit8", altKey: true }), false)).toBeNull();
+  expect(interpret(key("1", { code: "Digit1", altKey: true }), true)).toEqual({ type: "tab", index: 1 });
+  expect(interpret(key("¹", { code: "Digit6", altKey: true }), false)).toEqual({ type: "tab", index: 6 });
+  expect(interpret(key("0", { code: "Digit0", altKey: true }), false)).toBeNull();
 });
 
 test("a bare key doesn't steal typing", () => {
@@ -32,7 +31,18 @@ test("Ctrl+N and Ctrl+Alt+L are left to the system", () => {
   expect(interpret(key("l", { code: "KeyL", altKey: true }), false)).toEqual({ type: "lock" });
 });
 
+test("Alt+P toggles privacy mode", () => {
+  expect(interpret(key("p", { code: "KeyP", altKey: true }), false)).toEqual({ type: "privacy" });
+  expect(interpret(key("p", { code: "KeyP", altKey: true }), true)).toEqual({ type: "privacy" });
+});
+
 test("F11 toggles fullscreen even while typing, but not with a modifier", () => {
   expect(interpret(key("F11", { code: "F11" }), true)).toEqual({ type: "fullscreen" });
   expect(interpret(key("F11", { code: "F11", ctrlKey: true }), false)).toBeNull();
+});
+
+test("Ctrl+K opens the global search even while typing, but not with Alt or Meta added", () => {
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true }), true)).toEqual({ type: "globalSearch" });
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, altKey: true }), false)).toBeNull();
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, metaKey: true }), false)).toBeNull();
 });

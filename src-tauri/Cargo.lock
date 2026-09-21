@@ -513,6 +513,7 @@ dependencies = [
  "rand 0.10.2",
  "reqwest",
  "rustls",
+ "security-framework",
  "serde",
  "serde_json",
  "sha2 0.11.0",

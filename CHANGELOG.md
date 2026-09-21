@@ -7,6 +7,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Colar como texto puro**: atalho global **Ctrl+Alt+V** (`Cmd+Alt+V` no macOS) tira HTML/RTF da área de
+  transferência atual, sem simular um Ctrl+V em outro app.
+- **Mais tipos no clipboard**: JSON e e-mail/telefone reconhecidos, além de link, cor e código; filtro por
+  tipo na aba.
+- **Limite de itens fixados** no clipboard, configurável (100 por padrão) — antes não havia limite nenhum.
+- **Entrar na próxima reunião pela bandeja**: item de menu que mostra a próxima reunião com Meet e entra nela
+  direto, sem abrir o widget; atalho global **Ctrl+Alt+M** (`Cmd+Alt+M` no macOS) faz o mesmo.
+- **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você
+  (GitHub + GitLab); número exato no Dock do macOS, ponto vermelho no Windows/Linux.
 - **Detalhes do evento na agenda**: clicar num evento mostra quem organizou, quem criou, quantos convidados,
   a descrição e os anexos, como as anotações do Gemini, com **abrir no Calendar**. O aviso de reunião traz o
   mesmo.
@@ -15,6 +24,55 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Anotações e transcrições do Gemini na aba Reuniões**: os documentos que o Gemini anexa às reuniões dos
   últimos 14 dias aparecem acima dos arquivos da pasta e abrem no navegador.
 - **Carregamento visível**: agenda, GitHub e transcrições mostram cartões de espera em vez de uma área vazia.
+- **GitLab e GitLab self-hosted**: nova aba (ative em Ajustes → Abas visíveis) com revisão pedida, atribuídos, MRs e issues que você abriu, com
+  endereço da instância e token `read_api` cifrados no cofre.
+- **Ordenação** nas abas GitHub e GitLab: por atualização, criação ou comentários (só GitHub), crescente ou
+  decrescente.
+- **Cache e limite de requisições**: as listas ficam 5 min na memória e o Canto para antes de esgotar a cota da
+  API, mostrando a última cópia e quando chegam dados novos.
+- **PRs/MRs abertos hoje** no resumo do dia.
+- **Abas visíveis** em Ajustes: esconda as abas que você não usa; `Alt+1`… seguem as que ficaram.
+- **Antecedência do lembrete de tarefa**, em Ajustes → Lembretes (na hora, 5, 10, 15 ou 30 min antes).
+- **Vincular tarefa a um PR/MR**: link no ⏰ da tarefa, com ícone na linha para abrir direto.
+- **Subtarefas**: checklist dentro do ⏰ da tarefa, com contagem `feitas/total` na linha.
+- **Prioridade da tarefa** (alta/média/baixa) com bolinha na linha e filtro acima da lista.
+- **Arrastar para reordenar** as tarefas do dia pela alça (⠿) que aparece ao passar o mouse.
+- **Recorrência mensal e por dias específicos da semana** para tarefas, além de todo dia/dias úteis/semanal.
+- **Visualizar markdown na nota**: alternar entre escrever e visualizar renderiza negrito, itálico, código,
+  listas e links (só `http(s)://` abrem no navegador).
+- **Destaque do termo buscado** dentro do título e do corpo dos cards de notas encontrados.
+- **Vincular nota a uma tarefa ou evento** da agenda: a nota ganha um selo que leva direto para a aba
+  correspondente.
+- **Exportar nota como .md**: ícone de download no card, com diálogo nativo de salvar.
+- **Status do CI/pipeline no card do PR/MR**: botão "ver CI" busca sob demanda (GitHub: checks combinados do
+  commit; GitLab: pipeline da MR) e mostra passou/falhou/rodando/sem CI.
+- **Tempo aguardando revisão**: na lista "revisão pedida a mim", cada PR/MR mostra há quantos dias foi aberto,
+  em vermelho a partir de 3 dias.
+- **Auto-trava configurável**: em Ajustes → Segurança, escolha 5, 15 (padrão), 30 ou 60 minutos sem uso antes
+  do cofre trancar sozinho.
+- **Registro local dos últimos desbloqueios** (até 20), com data/hora e se foi por senha ou Windows Hello, em
+  Ajustes → Segurança.
+- **Modo privacidade**: `Alt+P` ou o ícone de olho no topo borra o texto do clipboard e das notas na tela sem
+  apagar nada, para compartilhar a tela sem se preocupar.
+- **Destravar com Touch ID no macOS**: mesmo fluxo do Windows Hello, senha mestra guardada no Chaveiro do
+  sistema protegida por biometria. Melhor esforço — implementado e revisado contra a documentação do
+  `security-framework`, mas não compilado nem testado nesta máquina (sem Mac disponível); precisa da CI de
+  macOS para confirmar.
+- **Busca global entre abas** (`Ctrl+K`): busca ao mesmo tempo em tarefas de hoje, notas e clipboard; escolher
+  um resultado troca de aba com o texto já buscado. Tarefas de outros dias ficam fora da busca — o app ainda
+  não navega entre dias.
+- **Tamanho da interface** (Ajustes → Aparência): compacta, padrão ou confortável, escalando texto e espaçamento
+  juntos.
+- **Boas-vindas na primeira execução**: ao criar o cofre pela primeira vez, uma tela resume os atalhos
+  essenciais. Aparece uma única vez — destrancar depois nunca mostra de novo.
+- **Pasta sincronizada com merge automático** (Ajustes → Pasta sincronizada): aponte para uma pasta do
+  Dropbox/OneDrive/Syncthing e o Canto cuida do resto — exporta a cada alteração e mescla o que chegar de
+  outra máquina ao destrancar e a cada ~5 min, sem precisar de exportar/importar manual.
+- **Anotações do Gemini no resumo do dia**: quando uma reunião tem anotações do Gemini anexadas, o resumo
+  leva o link delas na mesma linha da reunião.
+- **Manifestos para winget e Homebrew** em `packaging/`, prontos para publicar (não publicados: exige PR nos
+  repositórios de cada gerenciador). O de Flatpak fica bloqueado — o gerador de dependências JS do Flathub não
+  lê `bun.lock`; detalhes em `packaging/README.md`.
 
 ### Alterado
 

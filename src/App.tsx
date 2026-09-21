@@ -8,6 +8,9 @@ import { useUpdateNotice } from "./lib/useUpdateNotice";
 import { useFullscreen } from "./lib/useFullscreen";
 import { focusShortcut, useShortcuts } from "./lib/shortcuts";
 import ShortcutsHelp from "./components/ShortcutsHelp";
+import GlobalSearch from "./components/GlobalSearch";
+import Onboarding from "./components/Onboarding";
+import { markOnboardingSeen, onboardingSeen } from "./lib/onboarding";
 import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
@@ -17,8 +20,13 @@ import ClipboardTab from "./components/ClipboardTab";
 import TranscriptsTab from "./components/TranscriptsTab";
 import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
+import GitlabTab from "./components/GitlabTab";
+import { useHiddenTabs, visibleTabs } from "./lib/tabs";
+import { useReminderLead } from "./lib/reminderLead";
+import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
+import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
 
 export default function App() {
@@ -31,16 +39,28 @@ export default function App() {
 
 function Canto() {
   const [status, setStatus] = useState<VaultStatus | null>(null);
-  const [tab, setTab] = useState<Tab>("tasks");
-  const openSettings = useCallback(() => setTab("settings"), []);
+  const [hiddenTabs, setHiddenTabs] = useHiddenTabs();
+  const tabs = visibleTabs(hiddenTabs);
+  const [tab, setTab] = useState<Tab>(() => tabs[0].id);
+  // Cleared on every manual tab switch so a stale jump doesn't re-seed a tab's search later.
+  const [jumpQuery, setJumpQuery] = useState("");
+  const changeTab = useCallback((id: Tab) => {
+    setJumpQuery("");
+    setTab(id);
+  }, []);
+  const openSettings = useCallback(() => changeTab("settings"), [changeTab]);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
   const [alert, setAlert] = useState<AgendaItem | null>(null);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
-  useReminders(status?.unlocked === true, today);
+  const [reminderLead, setReminderLead] = useReminderLead();
+  const { privacy, togglePrivacy } = usePrivacyMode();
+  useReminders(status?.unlocked === true, today, reminderLead);
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
   const fullscreen = useFullscreen();
   const toggleFullscreen = () => void fullscreen.toggle().catch((e) => setError(errText(e)));
   // Completing from the toast changes the task outside the tab: the list needs to reread.
@@ -49,8 +69,10 @@ function Canto() {
   useShortcuts(status?.unlocked === true && !alert, (action) => {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
-    if (helpOpen) return;
-    if (action.type === "tab") return setTab(action.tab);
+    if (action.type === "privacy") return togglePrivacy();
+    if (action.type === "globalSearch") return setSearchOpen((v) => !v);
+    if (helpOpen || searchOpen || onboardingOpen) return;
+    if (action.type === "tab") return tabs[action.index - 1] && changeTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
     focusShortcut(action.target);
   });
@@ -62,6 +84,15 @@ function Canto() {
       setError(errText(e));
     }
   }, [setError]);
+
+  // Only a fresh "criar cofre" sets justCreated; a plain unlock never shows onboarding again.
+  const openVault = useCallback(
+    (justCreated?: boolean) => {
+      if (justCreated && !onboardingSeen()) setOnboardingOpen(true);
+      void refresh();
+    },
+    [refresh],
+  );
 
   useEffect(() => {
     void refresh();
@@ -108,6 +139,8 @@ function Canto() {
 
   async function lock() {
     setHelpOpen(false);
+    setSearchOpen(false);
+    setOnboardingOpen(false);
     await api.lock();
     await refresh();
   }
@@ -120,6 +153,27 @@ function Canto() {
     >
       {alert && <Alert event={alert} onClose={() => setAlert(null)} onCompleted={() => setTasksVersion((v) => v + 1)} />}
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
+      {onboardingOpen && status?.unlocked && (
+        <Onboarding
+          onClose={() => {
+            markOnboardingSeen();
+            setOnboardingOpen(false);
+          }}
+        />
+      )}
+      {searchOpen && status?.unlocked && (
+        <GlobalSearch
+          today={today}
+          privacy={privacy}
+          onError={setError}
+          onClose={() => setSearchOpen(false)}
+          onNavigate={(target, q) => {
+            setJumpQuery(q);
+            setTab(target);
+            setSearchOpen(false);
+          }}
+        />
+      )}
       <header
         data-tauri-drag-region
         className="flex items-center justify-between border-b border-edge px-3 py-2"
@@ -141,6 +195,16 @@ function Canto() {
               </button>
               <button type="button" onClick={lock} title="trancar (Alt+L)" className="min-h-6 rounded px-1.5 hover:text-fg">
                 trancar
+              </button>
+              <button
+                type="button"
+                onClick={togglePrivacy}
+                aria-pressed={privacy}
+                aria-label={privacy ? "desativar modo privacidade" : "ativar modo privacidade"}
+                title={privacy ? "modo privacidade ativo (Alt+P)" : "modo privacidade: borra clipboard e notas (Alt+P)"}
+                className={`grid size-6 place-items-center rounded hover:text-fg ${privacy ? "text-accent" : ""}`}
+              >
+                {privacy ? <EyeOffIcon /> : <EyeIcon />}
               </button>
             </>
           )}
@@ -169,10 +233,10 @@ function Canto() {
       {!status ? (
         <div className="flex-1" />
       ) : !status.unlocked ? (
-        <Lock exists={status.exists} onOpen={refresh} />
+        <Lock exists={status.exists} onOpen={openVault} />
       ) : (
         <>
-          <TabBar current={tab} onChange={setTab} />
+          <TabBar current={tab} onChange={changeTab} tabs={tabs} />
           <main
             id={panelId(tab)}
             key={tab}
@@ -181,12 +245,31 @@ function Canto() {
             className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
           >
             {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
-            {tab === "notes" && <NotesTab onError={setError} />}
-            {tab === "clipboard" && <ClipboardTab onError={setError} />}
+            {tab === "notes" && (
+              <NotesTab
+                today={today}
+                agenda={agenda.items}
+                privacy={privacy}
+                initialQuery={jumpQuery}
+                onOpenTasks={() => changeTab("tasks")}
+                onOpenAgenda={() => changeTab("agenda")}
+                onError={setError}
+              />
+            )}
+            {tab === "clipboard" && <ClipboardTab privacy={privacy} initialQuery={jumpQuery} onError={setError} />}
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}
-            {tab === "settings" && <SettingsTab onError={setError} />}
+            {tab === "gitlab" && <GitlabTab onError={setError} />}
+            {tab === "settings" && (
+              <SettingsTab
+                onError={setError}
+                hiddenTabs={hiddenTabs}
+                onHiddenTabs={setHiddenTabs}
+                reminderLead={reminderLead}
+                onReminderLead={setReminderLead}
+              />
+            )}
           </main>
         </>
       )}

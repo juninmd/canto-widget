@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
-import { api, errText, type Note } from "../lib/api";
+import { api, errText, type AgendaItem, type Note, type Task } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import NoteCard from "./NoteCard";
 import NoteEditor, { type Draft } from "./NoteEditor";
 
 const PAGE = 50;
-const EMPTY: Draft = { id: undefined, title: "", body: "", tags: "" };
+const EMPTY: Draft = { id: undefined, title: "", body: "", tags: "", link: null };
 
-export default function NotesTab({ onError }: { onError: (m: string) => void }) {
-  const [query, setQuery] = useState("");
+type Props = {
+  today: string;
+  agenda?: AgendaItem[];
+  privacy: boolean;
+  /** Seeds the search field once, e.g. arriving from the global search overlay. */
+  initialQuery?: string;
+  onOpenTasks: () => void;
+  onOpenAgenda: () => void;
+  onError: (m: string) => void;
+};
+
+export default function NotesTab({ today, agenda = [], privacy, initialQuery, onOpenTasks, onOpenAgenda, onError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);
   const [draft, setDraft] = useState(EMPTY);
   const [editing, setEditing] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const [announcement, setAnnouncement] = useState("");
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
@@ -58,12 +70,27 @@ ${lim}`);
     }
   }
 
+  async function exportMd(n: Note) {
+    try {
+      const where = await api.noteExportMd(n.id);
+      if (where) setAnnouncement(`"${n.title}" exportada em ${where}`);
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
   useEffect(() => {
     setLimit(PAGE);
     const t = setTimeout(() => void reload(query, PAGE), 150);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
+  // Fetched only when the editor opens: the link picker needs today's list, nothing else does.
+  useEffect(() => {
+    if (!editing) return;
+    api.tasksForDay(today).then(setTasks).catch(() => setTasks([]));
+  }, [editing, today]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -74,6 +101,7 @@ ${lim}`);
         title: draft.title.trim() || "sem titulo",
         body: draft.body,
         tags: draft.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        link: draft.link,
       });
       setDraft(EMPTY);
       setEditing(false);
@@ -89,9 +117,7 @@ ${lim}`);
   }
 
   if (editing) {
-    return (
-      <NoteEditor draft={draft} onChange={setDraft} onSave={save} onCancel={cancel} />
-    );
+    return <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={cancel} />;
   }
 
   return (
@@ -128,14 +154,18 @@ ${lim}`);
           <NoteCard
             key={n.id}
             note={n}
+            query={query}
+            privacy={privacy}
             className={`${isNew(n.id) ? ENTER_CLASS : ""} ${leaving.has(n.id) ? EXIT_CLASS : ""}`}
             onOpen={() => {
-              setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", ") });
+              setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", "), link: n.link ?? null });
               setEditing(true);
             }}
             onPin={() => void pin(n)}
             onDelete={() => void leave(n.id, () => remove(n))}
             onTag={(t) => setQuery(`#${t}`)}
+            onOpenLink={(kind) => (kind === "task" ? onOpenTasks() : onOpenAgenda())}
+            onExport={() => void exportMd(n)}
           />
         ))}
         {total > notes.length && (

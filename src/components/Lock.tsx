@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { api, errText, type BiometricStatus } from "../lib/api";
 
-export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () => void }) {
+type Props = { exists: boolean; onOpen: (justCreated?: boolean) => void };
+
+export default function Lock({ exists, onOpen }: Props) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
@@ -42,7 +44,7 @@ export default function Lock({ exists, onOpen }: { exists: boolean; onOpen: () =
       await (exists ? api.unlock(password) : api.create(password));
       setPassword("");
       setConfirm("");
-      onOpen();
+      onOpen(!exists);
     } catch (e) {
       setError(errText(e));
     } finally {

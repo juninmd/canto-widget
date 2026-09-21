@@ -1,0 +1,38 @@
+# BLOCKED, see packaging/README.md: Flathub builds from source in an offline sandbox, and the
+# generator that vendors JS dependencies for that sandbox (flatpak-node-generator) only reads
+# package-lock.json/yarn.lock/pnpm-lock.yaml, not this project's bun.lock. This manifest is a
+# skeleton for whoever picks that up, not something `flatpak-builder` can run today.
+id: com.junin.canto
+runtime: org.freedesktop.Platform
+runtime-version: "23.08"
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-stable
+command: canto-widget
+finish-args:
+  - --share=ipc
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --socket=pulseaudio
+  - --share=network
+  - --device=dri
+  - --filesystem=xdg-documents
+  - --talk-name=org.freedesktop.Notifications
+modules:
+  - name: canto-widget
+    buildsystem: simple
+    build-options:
+      append-path: /usr/lib/sdk/rust-stable/bin
+    build-commands:
+      # TODO once the sources below exist: `bun install --frozen-lockfile && bun run build`
+      # (dist/ is embedded into the Rust binary by generate_context!, so it must exist first).
+      - cargo build --release --manifest-path src-tauri/Cargo.toml --frozen
+      - install -Dm755 src-tauri/target/release/canto-widget /app/bin/canto-widget
+      - install -Dm644 packaging/flatpak/com.junin.canto.desktop /app/share/applications/com.junin.canto.desktop
+      - install -Dm644 src-tauri/icons/icon.png /app/share/icons/hicolor/512x512/apps/com.junin.canto.png
+    sources:
+      - type: git
+        url: https://github.com/juninmd/canto-widget.git
+        tag: v0.1.0
+      # - generated-sources.json  # `flatpak-cargo-generator src-tauri/Cargo.lock -o generated-sources.json`
+      # - TODO: no equivalent generator reads bun.lock; see packaging/README.md

@@ -2,14 +2,23 @@
 
 [← voltar ao README](../README.md)
 
+Na primeira vez que o cofre é criado, uma tela de boas-vindas mostra os atalhos essenciais (mostrar/esconder,
+trocar de aba, busca global, nova tarefa, trancar, ajuda). Aparece só uma vez — destrancar o cofre depois
+nunca mostra de novo.
+
 ## Abas locais
 
 - **clipboard** — o Rust observa a área de transferência, guarda os últimos itens (com dedupe,
   fixar e limite de tamanho) e permite copiar de volta. Local por definição, nunca sincronizado.
-  Cada card mostra o tipo (link, cor com amostra, código com fonte monoespaçada ou texto), há quanto tempo foi
-  copiado e o tamanho quando é grande. Cópias acima de 32 mil caracteres guardam só o começo, e o card diz quanto
+  Cada card mostra o tipo (link, cor com amostra, JSON, e-mail, telefone, código com fonte monoespaçada ou
+  texto), há quanto tempo foi copiado e o tamanho quando é grande. O filtro **por tipo**, ao lado da busca,
+  mostra só um tipo por vez. Cópias acima de 32 mil caracteres guardam só o começo, e o card diz quanto
   foi copiado e quanto ficou; copiar de volta devolve esse trecho. O histórico inteiro tem um teto de 1 milhão de
-  caracteres fora os fixados, e no Windows o Canto só lê o clipboard quando ele muda.
+  caracteres fora os fixados, e no Windows o Canto só lê o clipboard quando ele muda. **Máx. fixados**, ao lado
+  do filtro, limita quantos itens você pode fixar (100 por padrão, até 1.000); fixar além do limite é recusado,
+  desafixar sempre funciona. O atalho global **Ctrl+Alt+V** (`Cmd+Alt+V` no macOS) tira a formatação da área de
+  transferência atual (nunca cola sozinho: o Canto não envia teclas para outros programas), então um `Ctrl+V`
+  seu logo depois cola só texto puro.
 - **reuniões** — lista as transcrições da pasta configurada (padrão `~/Documents/Transcricoes`),
   limpando numeração/timestamps de `vtt`/`srt` para virar texto corrido pesquisável. Acima dos arquivos, a seção
   **Do Gemini** lista as anotações e transcrições que o Gemini anexou às reuniões dos últimos 14 dias (exige a
@@ -31,31 +40,70 @@
 
 - **Horário e lembrete** — o ⏰ da tarefa define um horário: na hora, o widget aparece com
   **lembrete de tarefa** e o botão **concluir tarefa**, e o sistema mostra uma notificação com o título da tarefa. Funciona em qualquer aba ou com o widget escondido.
+- **Antecedência do lembrete** — em **Ajustes → Lembretes**, escolha avisar 5, 10, 15 ou 30 min antes do
+  horário (padrão: na hora).
+- **Vincular PR/MR** — no ⏰ da tarefa, cole o link de um pull/merge request; a linha ganha um ícone que abre o
+  link no navegador. Só aceita `http(s)://`.
+- **Subtarefas** — no ⏰ da tarefa, um checklist: adicione, marque e apague itens. A linha mostra `feitas/total`.
+- **Prioridade** — no ⏰ da tarefa, marque alta/média/baixa; a linha ganha uma bolinha colorida. Filtro de
+  prioridade acima da lista mostra só as tarefas daquele nível.
+- **Reordenar arrastando** — segure a alça (⠿) que aparece ao passar o mouse e solte sobre outra tarefa. Só
+  funciona com "todas as prioridades" selecionado no filtro.
 - **Horário direto no título** — "Daily às 9h30", "às 14h ligar para o banco" ou "Deploy 18:00" criam a
   tarefa já com o lembrete. "14h" sozinho não conta: "Estudar 2h de Rust" é duração, não horário.
 - **Adiar** — o aviso de reunião ou de tarefa tem **adiar 10 min**: ele some e volta depois. Tarefa concluída
   ou apagada nesse meio-tempo não volta a tocar.
-- **Recorrência** — todo dia, dias úteis ou toda semana no mesmo dia. A tarefa do dia é criada
+- **Recorrência** — todo dia, dias úteis, toda semana no mesmo dia, todo mês (no mesmo dia do mês; um mês
+  sem esse dia simplesmente não gera tarefa) ou em dias específicos da semana. A tarefa do dia é criada
   quando o dia chega, com id determinístico (`<série>-<dia>`): duas máquinas geram a mesma e o merge
   não duplica. Excluir o dia de hoje não apaga a série; "não repete" encerra. "Puxar pendências"
   ignora tarefas recorrentes, que já ganham a sua própria.
 - **Notas fixadas** — o alfinete leva o card para o topo; clicar numa `#tag` filtra só por ela.
 - **Muitas notas** — a aba mostra 50 cards por vez (fixados primeiro) e **mostrar mais** traz os próximos; a busca
   procura em todos. Um card aceita até 100 mil caracteres e o título, 300.
-- **Resumo do dia** — texto com o que foi concluído, o que ficou pendente e as reuniões, pronto
-  para copiar.
+- **Visualizar markdown** — no editor de uma nota, alterne entre **escrever** e **visualizar** para ver
+  `**negrito**`, `*itálico*`, `` `código` ``, listas e links renderizados. Só links `http(s)://` abrem no navegador.
+- **Busca destacada** — o termo buscado aparece marcado dentro do título e do corpo dos cards encontrados.
+- **Vincular nota a tarefa ou evento** — no editor, "vincular a uma tarefa ou evento" mostra as tarefas do
+  dia e os eventos da agenda; a nota ganha um selo que leva direto para a aba correspondente.
+- **Exportar nota como .md** — o ícone de download no card abre o diálogo nativo de salvar e grava o título,
+  o corpo e as tags num arquivo `.md`.
+- **Resumo do dia** — texto com o que foi concluído, o que ficou pendente, as reuniões e os **PRs/MRs que você
+  abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
+  não responder, o resumo diz qual e traz o resto. Uma reunião com anotações do Gemini leva o link delas na
+  mesma linha.
+- **Abas visíveis** — em **Ajustes → Abas visíveis**, desmarque as abas que você não usa. Os dados continuam no
+  cofre, e `Alt+1`, `Alt+2`… seguem a ordem das abas que ficaram. Ajustes nunca some.
 
 | Horário e repetição | Resumo do dia | Lembrete |
 |---|---|---|
 | ![Detalhes da tarefa](prints/produtividade/1-tarefa-horario-repeticao.png) | ![Resumo do dia](prints/produtividade/2-resumo-do-dia.png) | ![Lembrete de tarefa](prints/produtividade/8-lembrete-tarefa.png) |
 | ![Nota fixada](prints/produtividade/3-notas-fixada.png) | ![Filtro por tag](prints/produtividade/4-notas-filtro-tag.png) | ![Windows Hello](prints/produtividade/5-trancado-windows-hello.png) |
 
+## GitHub e GitLab
+
+- **Abas github e gitlab** — issues e PRs/MRs abertos, em quatro listas: revisão pedida a mim, atribuídos a
+  mim, PRs/MRs que eu abri e issues que eu abri. Filtro por texto (ou qualificador do GitHub, como `repo:` e
+  `label:`), tipo, ordenação e **mostrar mais** em cada lista. As listas ficam 5 min guardadas em memória
+  para poupar a cota da API; **atualizar** força uma busca nova.
+- **Status do CI** — em cada PR/MR, o botão **ver CI** busca sob demanda a combinação dos checks (GitHub) ou
+  o pipeline (GitLab) do último commit e mostra passou/falhou/rodando/sem CI. Só busca quando você clica,
+  nunca ao abrir a lista.
+- **Tempo aguardando revisão** — na lista "revisão pedida a mim", cada PR/MR mostra há quanto tempo foi aberto;
+  passados 3 dias o texto fica em vermelho.
+
 ## Aparência e atalho
 
 - Skins, escolhidas em **ajustes → Aparência**: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Claro** e **Sistema**, que segue o tema
   claro/escuro do sistema operacional e troca sozinha quando ele muda. A clara passa AA em todo texto.
-- **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca, `Alt+L` tranca e
-  `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
+- **Tamanho da interface**, em **Ajustes → Tamanho da interface**: **compacta**, **padrão** ou **confortável** —
+  escala texto e espaçamento juntos, como um zoom do widget inteiro. A janela pode ser redimensionada pelas
+  bordas se o conteúdo não couber na densidade escolhida.
+- **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca na aba
+  atual, `Ctrl+K` abre a busca global, `Alt+L` tranca e `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
+- **Busca global** (`Ctrl+K`) busca ao mesmo tempo nas tarefas de hoje, nas notas e no clipboard; escolher um resultado
+  troca de aba e já leva o texto buscado para o campo de busca daquela aba. Tarefas de outros dias ficam de fora: hoje
+  o app não tem como navegar até outro dia, então um resultado assim não teria para onde ir.
 - Atalho global **Ctrl+Alt+Espaço** (`Cmd+Alt+Espaço` no macOS) mostra/esconde o widget.
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.
@@ -103,6 +151,22 @@ Atalho global escondendo e trazendo o widget de volta:
 |---|---|
 | ![Widget escondido](prints/33-atalho-escondeu.png) | ![Widget de volta](prints/34-atalho-voltou.png) |
 
+## Segurança
+
+- **Auto-trava** — em **Ajustes → Segurança**, escolha destrancar por 5, 15 (padrão), 30 ou 60 min sem uso;
+  passado esse tempo o cofre tranca sozinho e a chave sai da memória. Não há opção de desligar a auto-trava.
+- **Destravar com Windows Hello** (quando o computador tem o suporte), em **Ajustes → Segurança**. A senha
+  mestra continua sendo o único jeito de abrir um backup em outra máquina.
+- **Destravar com Touch ID no macOS** — mesmo lugar, mesma ideia: a senha mestra fica guardada no Chaveiro do
+  sistema, protegida por biometria; o macOS mostra o prompt do Touch ID sozinho ao ler o item. Melhor esforço:
+  sem um Mac para compilar e testar, só a CI de macOS confirma que funciona de fato.
+- **Últimos desbloqueios** — em **Ajustes → Segurança**, a lista "últimos desbloqueios" mostra quando (e por
+  senha, Windows Hello ou Touch ID) o cofre foi destrancado nas últimas 20 vezes, para notar um acesso que você
+  não fez.
+- **Modo privacidade** — o ícone de olho no topo (ou `Alt+P`) borra o texto dos cards de clipboard e notas na
+  hora, sem apagar nada; os botões continuam funcionando. Útil antes de compartilhar a tela. Não persiste entre
+  aberturas do app: cada abertura começa sem o modo ativo.
+
 ## Janela
 
 - Ancorada na **work area** do monitor atual (fora da barra de tarefas/dock), margem de 16 px.
@@ -114,7 +178,12 @@ Atalho global escondendo e trazendo o widget de volta:
   sobrescritos: ao sair, o widget volta ao que era.
 - Posição e tamanho ficam em `janela.json`. Se o monitor sumir ou a janela não couber mais, ela volta ao canto.
   Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
-- Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, trancar cofre, sair.
+- Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, **entrar na próxima reunião com Meet** (atualiza
+  sozinho a cada ~90 s enquanto o cofre está destrancado), trancar cofre, sair. O atalho global
+  **Ctrl+Alt+M** (`Cmd+Alt+M` no macOS) faz a mesma coisa sem abrir o menu; sem reunião em breve, não faz nada.
+- **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você.
+  No macOS aparece o número exato no Dock; no Windows e Linux, um ponto vermelho (a API do sistema não dá
+  para desenhar números sem depender de uma fonte).
 
 ## Atualizações
 

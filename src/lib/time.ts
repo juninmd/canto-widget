@@ -6,3 +6,7 @@ export function timeAgo(at: string | number, now = new Date()): string {
   if (min < 24 * 60) return `há ${Math.floor(min / 60)} h`;
   return `há ${Math.floor(min / (24 * 60))} d`;
 }
+
+export function daysSince(at: string, now = new Date()): number {
+  return Math.floor((now.getTime() - new Date(at).getTime()) / 86_400_000);
+}

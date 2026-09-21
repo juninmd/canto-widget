@@ -1,10 +1,11 @@
-import { Fragment, useEffect, useRef, useState } from "react";
-import { api, errText, type AgendaItem, type Task } from "../lib/api";
+import { useEffect, useRef, useState } from "react";
+import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
 import DaySummary from "./DaySummary";
-import TaskDetails, { TaskBadge } from "./TaskDetails";
+import TaskRow from "./TaskRow";
+import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
-import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import { useNewIds, useExit } from "../lib/motion";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -22,6 +23,8 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const { leaving, leave } = useExit();
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
+  const dragId = useRef<string | null>(null);
 
   async function reload() {
     try {
@@ -36,6 +39,12 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     void reload();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [today, version]);
+
+  // Only this tab knows "today" correctly; the tray badge just reflects whatever it last pushed.
+  useEffect(() => {
+    if (loadedFor !== today) return;
+    void api.badgeSetTasks(tasks.filter((t) => !t.done).length).catch(() => {});
+  }, [tasks, loadedFor, today]);
 
   async function add(e: React.FormEvent) {
     e.preventDefault();
@@ -76,6 +85,21 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   }
 
   const done = tasks.filter((t) => t.done).length;
+  const visible = priorityFilter ? tasks.filter((t) => t.priority === priorityFilter) : tasks;
+
+  // Only reorders in the unfiltered view: a filtered subset can't express a total order for the hidden tasks too.
+  function dropOn(targetId: string) {
+    const draggedId = dragId.current;
+    dragId.current = null;
+    if (!draggedId || draggedId === targetId) return;
+    const ids = tasks.map((t) => t.id);
+    const from = ids.indexOf(draggedId);
+    const to = ids.indexOf(targetId);
+    if (from < 0 || to < 0) return;
+    ids.splice(from, 1);
+    ids.splice(to, 0, draggedId);
+    void run(() => api.tasksReorder(today, ids));
+  }
 
   if (summary) {
     return <DaySummary day={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />;
@@ -96,103 +120,61 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         </button>
       </form>
 
-      <div className="flex items-center justify-between text-[11px] text-muted">
-        <span>
-          {done}/{tasks.length} concluídas
-        </span>
-        <span className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setSummary(true)}
-            title="texto com o que foi feito, o que ficou e as reuniões, pronto para copiar"
-            className="min-h-6 underline decoration-dotted hover:text-fg"
-          >
-            resumo do dia
-          </button>
-          <button
-            type="button"
-            onClick={() => run(() => api.carryOver(today))}
-            title="traz para hoje as tarefas não concluídas dos dias anteriores"
-            className="min-h-6 underline decoration-dotted hover:text-fg"
-          >
-            puxar pendências
-          </button>
-        </span>
-      </div>
+      <TaskListHeader
+        done={done}
+        total={tasks.length}
+        priorityFilter={priorityFilter}
+        onPriorityFilter={setPriorityFilter}
+        onSummary={() => setSummary(true)}
+        onCarryOver={() => void run(() => api.carryOver(today))}
+      />
 
       <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
-        {tasks.map((t) => (
-          <Fragment key={t.id}>
-            <li
-              className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew(t.id) ? ENTER_CLASS : ""} ${
-                leaving.has(t.id) ? EXIT_CLASS : ""
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={t.done}
-                onChange={() => {
-                  setChecking(t.id);
-                  void run(() => api.taskToggle(t.id));
-                }}
-                onAnimationEnd={() => setChecking("")}
-                className={`size-4 accent-[var(--color-accent)] ${checking === t.id ? "motion-safe:animate-marcar" : ""}`}
-              />
-              {editing?.id === t.id ? (
-                <input
-                  autoFocus
-                  value={editing.title}
-                  onChange={(e) => setEditing({ id: t.id, title: e.target.value })}
-                  onBlur={() => void rename()}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") void rename();
-                    if (e.key === "Escape") {
-                      editEnded.current = true;
-                      setEditing(null);
-                    }
-                  }}
-                  className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
-                />
-              ) : (
-                <span
-                  className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
-                  title={`${t.title}\n(clique duas vezes para renomear)`}
-                  onDoubleClick={() => {
-                    editEnded.current = false;
-                    setEditing({ id: t.id, title: t.title });
-                  }}
-                >
-                  {t.title}
-                </span>
-              )}
-              <TaskBadge task={t} open={details === t.id} onToggle={() => setDetails(details === t.id ? "" : t.id)} />
-              <button
-                type="button"
-                onClick={() =>
-                  void leave(t.id, () =>
-                    run(async () => undoable(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)),
-                  )
-                }
-                // Also visible on focus: hover-only would leave the keyboard user unable to find it.
-                className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-                aria-label={`excluir ${t.title}`}
-              >
-                ×
-              </button>
-            </li>
-            {details === t.id && (
-              <li>
-                <TaskDetails
-                  task={t}
-                  onChange={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
-                  onClose={() => setDetails("")}
-                />
-              </li>
-            )}
-          </Fragment>
+        {visible.map((t) => (
+          <TaskRow
+            key={t.id}
+            task={t}
+            isNew={isNew(t.id)}
+            isLeaving={leaving.has(t.id)}
+            checking={checking === t.id}
+            editing={editing}
+            detailsOpen={details === t.id}
+            draggable={priorityFilter === ""}
+            onDragStart={() => (dragId.current = t.id)}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={() => dropOn(t.id)}
+            onToggleDone={() => {
+              setChecking(t.id);
+              void run(() => api.taskToggle(t.id));
+            }}
+            onCheckAnimationEnd={() => setChecking("")}
+            onStartEdit={() => {
+              editEnded.current = false;
+              setEditing({ id: t.id, title: t.title });
+            }}
+            onEditChange={(value) => setEditing({ id: t.id, title: value })}
+            onEditCommit={() => void rename()}
+            onEditCancel={() => {
+              editEnded.current = true;
+              setEditing(null);
+            }}
+            onDelete={() =>
+              void leave(t.id, () => run(async () => undoable(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)))
+            }
+            onToggleDetails={() => setDetails(details === t.id ? "" : t.id)}
+            onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
+            onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(t.id, repeat))}
+            onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
+            onPriority={(priority) => void run(() => api.taskSetPriority(t.id, priority))}
+            onSubtasksChange={reload}
+            onError={onError}
+          />
         ))}
         {tasks.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda — escreva acima e tecle Enter</li>
+        )}
+        {tasks.length > 0 && visible.length === 0 && (
+          <li className="px-2 py-6 text-center text-xs text-faint">nenhuma tarefa com essa prioridade</li>
         )}
       </ul>
     </div>

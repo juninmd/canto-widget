@@ -21,6 +21,36 @@ export const IssueIcon = () => (
   </svg>
 );
 
+export const GripIcon = () => (
+  <svg {...base}>
+    <circle cx="9" cy="6" r="1" fill="currentColor" stroke="none" />
+    <circle cx="9" cy="12" r="1" fill="currentColor" stroke="none" />
+    <circle cx="9" cy="18" r="1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="6" r="1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="12" r="1" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="18" r="1" fill="currentColor" stroke="none" />
+  </svg>
+);
+
+export const EyeIcon = () => (
+  <svg {...base}>
+    <path d="M1.6 12c1.4-4 5.4-8 10.4-8s9 4 10.4 8c-1.4 4-5.4 8-10.4 8s-9-4-10.4-8Z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+);
+
+export const EyeOffIcon = () => (
+  <svg {...base}>
+    <path d="M3 3l18 18M10.6 10.6a2 2 0 0 0 2.8 2.8M9.4 4.6A10.4 10.4 0 0 1 12 4c5 0 9 4 10.4 8a13 13 0 0 1-3.2 4.6M6.3 6.3A13 13 0 0 0 1.6 12c1.4 4 5.4 8 10.4 8 1.4 0 2.7-.3 4-.8" />
+  </svg>
+);
+
+export const DownloadIcon = () => (
+  <svg {...base}>
+    <path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16" />
+  </svg>
+);
+
 export const PullIcon = () => (
   <svg {...base}>
     <circle cx="6" cy="5" r="2" />

@@ -42,6 +42,45 @@ pub struct Task {
     /// Id of the first task in the series; instances get id `<series>-<day>`.
     #[serde(default, rename = "serie")]
     pub series: Option<String>,
+    /// Linked PR/MR, http(s) only. New field: no legacy vault has it, so plain default is enough.
+    #[serde(default)]
+    pub pr_url: Option<String>,
+    #[serde(default)]
+    pub subtasks: Vec<Subtask>,
+    #[serde(default)]
+    pub priority: Option<Priority>,
+    /// Manual position within its day, from dragging to reorder. Falls back to `created_at` when unset.
+    #[serde(default)]
+    pub order: Option<i64>,
+    /// Monthly or specific-weekdays recurrence. Kept separate from `repeat` (never a new variant on it):
+    /// that field's tag is a frozen wire contract, and an unknown tag would fail deserializing the
+    /// whole task list on an older install. An unrecognized *field* is just ignored instead.
+    #[serde(default)]
+    pub extended_repeat: Option<ExtendedRepeat>,
+}
+
+/// `day` for `Monthly`: 1-31, matched exactly (a 30-day month has no 31st, so it just doesn't fire that month).
+/// `days` for `SpecificDays`: 0 = Sunday ... 6 = Saturday, same as `Repeat::Weekly`.
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "tipo", rename_all = "snake_case")]
+pub enum ExtendedRepeat {
+    Monthly { day: u8 },
+    SpecificDays { days: Vec<u8> },
+}
+
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub enum Priority {
+    Low,
+    Medium,
+    High,
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct Subtask {
+    pub id: String,
+    pub title: String,
+    pub done: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
@@ -55,6 +94,17 @@ pub struct Note {
     pub updated_at: i64,
     #[serde(default, rename = "fixada")]
     pub pinned: bool,
+    /// Optional reference to a task or an agenda event; `label` is a title snapshot for display,
+    /// since the linked item can be renamed or (for an event) never seen again by this vault.
+    #[serde(default)]
+    pub link: Option<NoteLink>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(tag = "kind", rename_all = "snake_case")]
+pub enum NoteLink {
+    Task { id: String, label: String },
+    Event { id: String, label: String },
 }
 
 impl Versioned for Task {

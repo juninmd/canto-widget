@@ -100,8 +100,9 @@ nada: ele guarda o começo e avisa. No Windows, ignora o que gerenciadores de se
 ### 🐙 Seu GitHub numa olhada
 
 **Revisão pedida a mim**, atribuídos a mim, PRs e issues que eu abri, com ícone de PR ou issue e quem abriu.
-Filtre por texto, `repo:` ou `label:`, só PRs ou só issues, e role com **mostrar mais**.
-Entra com token pessoal só leitura ou pelo navegador (device flow).
+Filtre por texto, `repo:` ou `label:`, só PRs ou só issues, ordene por atualização, criação ou comentários e role
+com **mostrar mais**. Também tem **GitLab.com e GitLab self-hosted**, e um cache de 5 min que respeita o limite de
+requisições. Entra com token pessoal só leitura ou pelo navegador (device flow).
 
 </td>
 </tr>
@@ -110,8 +111,9 @@ Entra com token pessoal só leitura ou pelo navegador (device flow).
 
 ### ⚙️ Ajustes e atualização automática
 
-Troca de senha mestra, Windows Hello, backup `.canto`, início com o sistema e a seção **Atualizações**, com a
-**versão instalada** e a **última publicada** lado a lado e um botão para atualizar e reiniciar.
+Troca de senha mestra, Windows Hello, backup `.canto`, pasta sincronizada com merge automático (Dropbox,
+OneDrive, Syncthing...), início com o sistema e a seção **Atualizações**, com a **versão instalada** e a
+**última publicada** lado a lado e um botão para atualizar e reiniciar.
 
 </td>
 <td><img src="docs/prints/app/18-atualizacoes.png" alt="Ajustes com a versão instalada, a última publicada e o botão de atualizar"></td>
@@ -189,15 +191,20 @@ Baixe o instalador da sua plataforma em **[Releases](https://github.com/juninmd/
 > Os instaladores ainda não têm assinatura de código: o SmartScreen (Windows) e o Gatekeeper (macOS) avisam na
 > primeira abertura. As atualizações automáticas são conferidas pela assinatura própria do projeto antes de rodar.
 
+Manifestos prontos para winget e Homebrew (e um esqueleto para Flatpak, hoje bloqueado) ficam em
+[`packaging/`](packaging/README.md) — preparados e verificados localmente, mas ainda não publicados nesses
+repositórios: publicar é uma decisão e uma ação manual do mantenedor.
+
 ## 🔒 Segurança em uma tela
 
 | Camada | Proteção |
 |---|---|
 | Cofre | Argon2id (19 MiB, t=2) → AES-256-GCM, nonce novo a cada gravação, gravação atômica com `fsync` |
-| Chave | só em RAM, zerada ao trancar; auto-lock após 15 min sem uso |
+| Chave | só em RAM, zerada ao trancar; auto-lock configurável (5 a 60 min sem uso, 15 min por padrão) |
 | Rede | só o processo Rust fala com a rede; a webview não tem origem remota (CSP) e nunca vê tokens |
 | Google | opcional, só `calendar.events.readonly` + perfil, OAuth com PKCE e loopback |
 | GitHub | opcional, token cifrado; itens só abrem se o link for `https://github.com/` |
+| GitLab | opcional, endereço e token cifrados; só `https://`, sem redirecionamento, links só da instância configurada |
 | Atualização | só instala pacote assinado pela chave do projeto; download adulterado é descartado antes de rodar |
 
 Modelo completo, backup, merge entre máquinas e onde cada arquivo fica: [docs/seguranca.md](docs/seguranca.md).

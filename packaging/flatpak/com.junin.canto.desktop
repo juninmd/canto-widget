@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Canto
+Comment=Encrypted desktop widget for tasks, notes, clipboard history and agenda
+Exec=canto-widget
+Icon=com.junin.canto
+Terminal=false
+Categories=Utility;Office;

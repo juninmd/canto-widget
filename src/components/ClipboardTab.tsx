@@ -2,11 +2,18 @@ import { useEffect, useState } from "react";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import { clipKind, KIND_LABEL, type ClipKind } from "../lib/clip";
 import ClipCard from "./ClipCard";
 
-export default function ClipboardTab({ onError }: { onError: (m: string) => void }) {
-  const [query, setQuery] = useState("");
+const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
+
+type Props = { privacy: boolean; initialQuery?: string; onError: (m: string) => void };
+
+export default function ClipboardTab({ privacy, initialQuery, onError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? "");
+  const [kindFilter, setKindFilter] = useState<ClipKind | "all">("all");
   const [items, setItems] = useState<ClipItem[]>([]);
+  const [maxPinned, setMaxPinned] = useState(100);
   const [copied, setCopied] = useState("");
 
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
@@ -14,8 +21,22 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
 
   async function reload(q = query) {
     try {
-      setItems(await api.clipList(q));
+      const list = await api.clipList(q);
+      setItems(list.items);
+      setMaxPinned(list.max_pinned);
       setLoadedFor(q);
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
+  const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
+
+  async function saveMaxPinned(next: number) {
+    const clamped = Math.min(1000, Math.max(1, Math.round(next) || 1));
+    setMaxPinned(clamped);
+    try {
+      await api.clipSetMaxPinned(clamped);
     } catch (e) {
       onError(errText(e));
     }
@@ -70,13 +91,40 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
           limpar
         </button>
       </div>
+      <div className="flex items-center gap-2 text-[11px]">
+        <select
+          value={kindFilter}
+          onChange={(e) => setKindFilter(e.target.value as ClipKind | "all")}
+          aria-label="filtrar por tipo"
+          className="rounded-lg border border-line bg-ink px-2 py-1 text-fg outline-none focus:border-accent"
+        >
+          {KIND_OPTIONS.map((k) => (
+            <option key={k} value={k}>
+              {k === "all" ? "todos os tipos" : KIND_LABEL[k]}
+            </option>
+          ))}
+        </select>
+        <label className="ml-auto flex items-center gap-1 text-faint" title="quantos itens fixados o histórico aceita">
+          máx. fixados
+          <input
+            type="number"
+            min={1}
+            max={1000}
+            value={maxPinned}
+            onChange={(e) => void saveMaxPinned(e.target.valueAsNumber)}
+            aria-label="máximo de itens fixados"
+            className="w-14 rounded border border-line bg-ink px-1.5 py-0.5 text-fg outline-none focus:border-accent"
+          />
+        </label>
+      </div>
 
       <ul className="flex-1 space-y-1.5 overflow-y-auto pr-1">
-        {items.map((i) => (
+        {visible.map((i) => (
           <ClipCard
             key={i.id}
             item={i}
             copied={copied === i.id}
+            privacy={privacy}
             className={`${isNew(i.id) ? ENTER_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
             onCopy={() =>
               run(async () => {
@@ -91,9 +139,9 @@ export default function ClipboardTab({ onError }: { onError: (m: string) => void
             }
           />
         ))}
-        {items.length === 0 && (
+        {visible.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">
-            {query ? "nada encontrado" : "copie algo e aparecerá aqui"}
+            {query || kindFilter !== "all" ? "nada encontrado" : "copie algo e aparecerá aqui"}
           </li>
         )}
       </ul>

@@ -54,6 +54,12 @@ pub struct AppState {
     /// Last event that triggered the pop-up, read by the alert window.
     pub alert: Mutex<Option<crate::calendar::AgendaItem>>,
     pub trash: crate::trash::Trash,
+    /// GitHub/GitLab lists; dropped on lock like the rest of the plaintext.
+    pub forges: crate::forge_cache::ForgeCache,
+    /// Soonest upcoming event with a Meet link, refreshed by `tray_live::watch`; read by the tray and the join shortcut.
+    pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
+    /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.
+    pub badge_tasks: Mutex<u32>,
     /// Auto-lock baseline; background polls (clipboard, agenda) deliberately don't touch this.
     last_active: Mutex<i64>,
 }
@@ -65,6 +71,9 @@ impl AppState {
             session: Mutex::new(None),
             alert: Mutex::new(None),
             trash: Default::default(),
+            forges: Default::default(),
+            next_meeting: Mutex::new(None),
+            badge_tasks: Mutex::new(0),
             last_active: Mutex::new(now_ms()),
         }
     }
@@ -108,6 +117,7 @@ impl AppState {
             data: VaultData::default(),
         };
         self.persist(&session)?;
+        self.sync_after_persist();
         *self.session.lock().unwrap() = Some(session);
         self.touch();
         Ok(())
@@ -128,6 +138,8 @@ impl AppState {
             data,
         });
         self.touch();
+        // Best-effort: whatever showed up in a synced folder merges in right away.
+        let _ = crate::sync::poll_and_merge(self);
         Ok(())
     }
 
@@ -141,6 +153,9 @@ impl AppState {
     pub fn lock(&self) {
         *self.session.lock().unwrap() = None;
         self.trash.clear();
+        self.forges.clear();
+        *self.next_meeting.lock().unwrap() = None;
+        *self.badge_tasks.lock().unwrap() = 0;
     }
 
     pub fn is_unlocked(&self) -> bool {
@@ -153,6 +168,14 @@ impl AppState {
         store::write_json_atomic(&store::vault_path(&self.dir), &blob)
     }
 
+    /// Best-effort, and deliberately called after the session lock is released: `export_now` only
+    /// reads the vault file `persist` already wrote, but a synced folder that's momentarily
+    /// unreachable (unmounted drive, offline cloud client materializing a placeholder) must never
+    /// hold the mutex every other command needs, just because this one save also touches it.
+    fn sync_after_persist(&self) {
+        let _ = crate::sync::export_now(&self.dir);
+    }
+
     /// Applies a mutation to the unlocked vault and persists it in the same step.
     pub fn mutate<T>(&self, f: impl FnOnce(&mut VaultData) -> T) -> Result<T> {
         self.touch();
@@ -160,6 +183,8 @@ impl AppState {
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         let out = f(&mut session.data);
         self.persist(session)?;
+        drop(guard);
+        self.sync_after_persist();
         Ok(out)
     }
 
@@ -171,6 +196,10 @@ impl AppState {
         if changed {
             self.persist(session)?;
         }
+        drop(guard);
+        if changed {
+            self.sync_after_persist();
+        }
         Ok(out)
     }
 
@@ -179,8 +208,13 @@ impl AppState {
         self.touch();
         let mut guard = self.session.lock().unwrap();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
-        if f(&mut session.data) {
+        let changed = f(&mut session.data);
+        if changed {
             self.persist(session)?;
+        }
+        drop(guard);
+        if changed {
+            self.sync_after_persist();
         }
         Ok(())
     }

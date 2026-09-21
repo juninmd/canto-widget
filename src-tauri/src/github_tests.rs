@@ -46,17 +46,10 @@ fn link_outside_github_is_dropped() {
 }
 
 #[test]
-fn assigned_merges_issues_and_prs_newest_to_oldest() {
-    let issues = convert(search_response(5, vec![raw(1, "https://github.com/o/r/issues/1", "2026-09-01T00:00:00Z", false)]));
-    let prs = convert(search_response(4, vec![raw(2, "https://github.com/o/r/pull/2", "2026-09-05T00:00:00Z", true)]));
-    let merged = merge(issues, prs);
-    assert_eq!(merged.total, 9);
-    assert_eq!(merged.items.iter().map(|i| i.number).collect::<Vec<_>>(), vec![2, 1]);
-}
-
-#[test]
-fn merge_keeps_both_full_pages_so_show_more_never_skips_items() {
-    let many = |pr| (0..PER_PAGE as u64).map(|n| raw(n, "https://github.com/o/r/issues/1", "2026-09-01T00:00:00Z", pr)).collect();
-    let merged = merge(convert(search_response(90, many(false))), convert(search_response(90, many(true))));
-    assert_eq!((merged.items.len(), merged.total), (2 * PER_PAGE, 180));
+fn item_keeps_what_the_sort_needs_and_a_ready_reference() {
+    let mut v = raw(9, "https://github.com/octo/canto/issues/9", "2026-09-10T10:00:00Z", false);
+    v["created_at"] = serde_json::json!("2026-09-01T08:00:00Z");
+    v["comments"] = serde_json::json!(4);
+    let it = &convert(search_response(1, vec![v])).items[0];
+    assert_eq!((it.created_at.as_str(), it.comments, it.reference.as_str()), ("2026-09-01T08:00:00Z", 4, "octo/canto#9"));
 }

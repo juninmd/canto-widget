@@ -2,6 +2,7 @@ use tauri::{Manager, State};
 
 use crate::biometric;
 use crate::error::{AppError, Result};
+use crate::model::now_ms;
 use crate::vault::AppState;
 
 #[derive(serde::Serialize)]
@@ -14,7 +15,10 @@ pub struct BiometricStatus {
 #[cfg(windows)]
 use crate::hello::{available, create, delete, NAME, VAULT};
 
-#[cfg(not(windows))]
+#[cfg(target_os = "macos")]
+use crate::hello_mac::{available, delete, NAME};
+
+#[cfg(not(any(windows, target_os = "macos")))]
 mod platform {
     use crate::error::{AppError, Result};
     pub const NAME: &str = "biometria";
@@ -33,7 +37,7 @@ mod platform {
     }
     pub fn delete() {}
 }
-#[cfg(not(windows))]
+#[cfg(not(any(windows, target_os = "macos")))]
 use platform::{available, create, delete, NAME, VAULT};
 
 /// The system prompt opens behind an "always on top" window; release it during the gesture.
@@ -56,6 +60,7 @@ pub fn biometric_status(state: State<'_, AppState>) -> BiometricStatus {
 }
 
 /// Async on purpose: the prompt blocks until the gesture and must not stall the UI thread.
+#[cfg(not(target_os = "macos"))]
 #[tauri::command(async)]
 pub fn biometric_enable(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
     let password = state.session_password()?;
@@ -65,16 +70,48 @@ pub fn biometric_enable(app: tauri::AppHandle, state: State<'_, AppState>) -> Re
     })
 }
 
+/// The Keychain, not `biometric::enable_verified`, does the signing-less store-then-reopen dance here.
+#[cfg(target_os = "macos")]
+#[tauri::command(async)]
+pub fn biometric_enable(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
+    let password = state.session_password()?;
+    without_always_on_top(&app, || crate::hello_mac::enable_verified(&password))?;
+    biometric::mark(&state.dir)
+}
+
+#[cfg(not(target_os = "macos"))]
 #[tauri::command(async)]
 pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
     let password = without_always_on_top(&app, || biometric::open(&state.dir, &VAULT))?;
     match state.unlock(&password) {
+        Ok(()) => {
+            crate::unlock_log::record(&state.dir, "windows_hello", now_ms());
+            Ok(())
+        }
         // Vault recreated with another password: the stored copy is now useless.
         Err(AppError::WrongPassword) => {
             let _ = biometric::disable(&state.dir);
             Err(AppError::Config(format!("a senha mestra mudou; ative o {NAME} de novo em Ajustes")))
         }
-        other => other,
+        Err(e) => Err(e),
+    }
+}
+
+#[cfg(target_os = "macos")]
+#[tauri::command(async)]
+pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
+    let password = without_always_on_top(&app, crate::hello_mac::open)?;
+    match state.unlock(&password) {
+        Ok(()) => {
+            crate::unlock_log::record(&state.dir, "touch_id", now_ms());
+            Ok(())
+        }
+        // Vault recreated with another password: the stored copy is now useless.
+        Err(AppError::WrongPassword) => {
+            let _ = biometric::disable(&state.dir);
+            Err(AppError::Config(format!("a senha mestra mudou; ative o {NAME} de novo em Ajustes")))
+        }
+        Err(e) => Err(e),
     }
 }
 
