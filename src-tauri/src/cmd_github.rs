@@ -10,7 +10,7 @@ use crate::error::{AppError, Result};
 use crate::github;
 use crate::github_auth::{self as auth, embedded_client_id, PollResult, Tokens};
 use crate::model::now_ms;
-use crate::store::{self, SealedBlob, GITHUB_AAD};
+use crate::store::{self, GITHUB_AAD};
 use crate::vault::AppState;
 
 pub(crate) const FORGE: &str = "github";
@@ -28,20 +28,11 @@ pub struct GithubConfig {
 
 impl AppState {
     pub fn github_config(&self) -> Result<Option<GithubConfig>> {
-        let guard = self.session.lock().unwrap();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        match store::read_json::<SealedBlob>(&store::github_path(&self.dir))? {
-            None => Ok(None),
-            Some(blob) => Ok(Some(serde_json::from_slice(&Zeroizing::new(blob.open(session.key(), GITHUB_AAD)?))?)),
-        }
+        self.sealed(&store::github_path(&self.dir), GITHUB_AAD)
     }
 
     pub fn save_github(&self, cfg: &GithubConfig) -> Result<()> {
-        let guard = self.session.lock().unwrap();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        let plain = Zeroizing::new(serde_json::to_vec(cfg)?);
-        let blob = SealedBlob::seal(session.key(), session.salt(), &plain, GITHUB_AAD, now_ms())?;
-        store::write_json_atomic(&store::github_path(&self.dir), &blob)
+        self.save_sealed(&store::github_path(&self.dir), GITHUB_AAD, cfg)
     }
 }
 

@@ -3,33 +3,12 @@ use std::sync::Mutex;
 use zeroize::Zeroizing;
 
 use crate::crypto::VaultKey;
-use crate::drive::DriveTokens;
 use crate::error::{AppError, Result};
 use crate::model::{now_ms, VaultData};
-use crate::store::{self, SealedBlob, DRIVE_AAD, VAULT_AAD};
+use crate::store::{self, SealedBlob, VAULT_AAD};
 
 /// Kept short deliberately: the envelope leaves the machine in backups and is attackable offline with no attempt limit, so only Argon2id cost protects it.
 pub const MIN_PASSWORD_LEN: usize = 4;
-
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-pub struct DriveConfig {
-    #[serde(default)]
-    pub client_id: String,
-    #[serde(default)]
-    pub client_secret: String,
-    /// Saved by the user in Settings. A pre-embedded-client credential doesn't count.
-    #[serde(default, alias = "cliente_proprio")]
-    pub owned_client: bool,
-    #[serde(default)]
-    pub tokens: Option<DriveTokens>,
-    #[serde(default)]
-    pub email: String,
-    #[serde(default, alias = "nome")]
-    pub name: String,
-    /// Account photo as a `data:` URL; empty when absent or it failed validation.
-    #[serde(default)]
-    pub avatar: String,
-}
 
 pub struct Session {
     pub(crate) key: VaultKey,
@@ -221,21 +200,28 @@ impl AppState {
         Ok(f(&session.data))
     }
 
-    pub fn drive_config(&self) -> Result<DriveConfig> {
+    /// Reads a sealed JSON file at `path`, decrypted with the session key. `None` when the file
+    /// doesn't exist yet (a config never saved). Shared by drive/GitHub/GitLab config, which used
+    /// to hand-copy this same open-and-decode shape three times.
+    pub fn sealed<T: serde::de::DeserializeOwned>(&self, path: &std::path::Path, aad: &[u8]) -> Result<Option<T>> {
         let guard = self.session.lock().unwrap();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
-        match store::read_json::<SealedBlob>(&store::drive_path(&self.dir))? {
-            None => Ok(DriveConfig::default()),
-            Some(blob) => Ok(serde_json::from_slice(&blob.open(&session.key, DRIVE_AAD)?)?),
+        match store::read_json::<SealedBlob>(path)? {
+            None => Ok(None),
+            Some(blob) => {
+                let plain = Zeroizing::new(blob.open(&session.key, aad)?);
+                Ok(Some(serde_json::from_slice(&plain)?))
+            }
         }
     }
 
-    pub fn save_drive_config(&self, cfg: &DriveConfig) -> Result<()> {
+    /// Seals `value` with the session key and writes it atomically to `path`.
+    pub fn save_sealed<T: serde::Serialize>(&self, path: &std::path::Path, aad: &[u8], value: &T) -> Result<()> {
         let guard = self.session.lock().unwrap();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
-        let plain = serde_json::to_vec(cfg)?;
-        let blob = SealedBlob::seal(&session.key, &session.salt, &plain, DRIVE_AAD, now_ms())?;
-        store::write_json_atomic(&store::drive_path(&self.dir), &blob)
+        let plain = Zeroizing::new(serde_json::to_vec(value)?);
+        let blob = SealedBlob::seal(&session.key, &session.salt, &plain, aad, now_ms())?;
+        store::write_json_atomic(path, &blob)
     }
 
     /// Uses the envelope's own salt, not the session's: a backup made on another machine has its own salt.

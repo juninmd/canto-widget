@@ -1,6 +1,6 @@
 use super::*;
 use crate::clipboard::ClipHistory;
-use crate::vault::DriveConfig;
+use crate::cmd_drive::DriveConfig;
 
 fn state(name: &str) -> AppState {
     let dir = std::env::temp_dir().join(format!("canto-password-{name}-{}-{}", std::process::id(), now_ms()));

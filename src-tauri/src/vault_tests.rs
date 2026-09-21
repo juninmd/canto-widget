@@ -96,15 +96,6 @@ fn background_clipboard_does_not_postpone_auto_lock() {
     let _ = std::fs::remove_dir_all(&st.dir);
 }
 
-#[test]
-fn drive_config_deserializes_legacy_portuguese_keys() {
-    let legacy = r#"{"client_id":"id","client_secret":"secret","cliente_proprio":true,"nome":"Ana","email":"a@b.com"}"#;
-    let cfg: DriveConfig = serde_json::from_str(legacy).unwrap();
-    assert!(cfg.owned_client);
-    assert_eq!(cfg.name, "Ana");
-    assert_eq!(cfg.email, "a@b.com");
-}
-
 /// Regression for ecff1f4: a `mutate` whose synced-folder export is slow must release the
 /// session lock before running it, so a concurrent `read()` never waits on that export.
 #[test]

@@ -90,6 +90,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - Trait `Forge` (`src-tauri/src/forge.rs`) unifica a orquestração de cache que as abas GitHub e GitLab
   reimplementavam quase idêntica; cada uma vira um adaptador fino (token vs. conta), sem mudar nenhum
   comando ou nome de IPC.
+- `AppState::sealed`/`save_sealed` (`src-tauri/src/vault.rs`) substituem a leitura/gravação de config
+  cifrada hand-copiada três vezes (Drive, GitHub, GitLab); `DriveConfig` migrou de `vault.rs` para
+  `cmd_drive.rs`, ao lado de `GithubConfig`/`GitlabConfig` nos seus próprios módulos.
 
 ## [0.1.0] - 2026-09-18
 

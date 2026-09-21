@@ -10,8 +10,7 @@ use crate::forge_cache::Quota;
 use crate::forge_filter::{ForgeFilter, Section};
 use crate::gitlab::{self, Account};
 use crate::gitlab_query;
-use crate::model::now_ms;
-use crate::store::{self, SealedBlob, GITLAB_AAD};
+use crate::store::{self, GITLAB_AAD};
 use crate::vault::AppState;
 
 const FORGE: &str = "gitlab";
@@ -41,20 +40,11 @@ pub struct GitlabConfig {
 
 impl AppState {
     pub fn gitlab_config(&self) -> Result<Option<GitlabConfig>> {
-        let guard = self.session.lock().unwrap();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        match store::read_json::<SealedBlob>(&store::gitlab_path(&self.dir))? {
-            None => Ok(None),
-            Some(blob) => Ok(Some(serde_json::from_slice(&Zeroizing::new(blob.open(session.key(), GITLAB_AAD)?))?)),
-        }
+        self.sealed(&store::gitlab_path(&self.dir), GITLAB_AAD)
     }
 
     pub fn save_gitlab(&self, cfg: &GitlabConfig) -> Result<()> {
-        let guard = self.session.lock().unwrap();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        let plain = Zeroizing::new(serde_json::to_vec(cfg)?);
-        let blob = SealedBlob::seal(session.key(), session.salt(), &plain, GITLAB_AAD, now_ms())?;
-        store::write_json_atomic(&store::gitlab_path(&self.dir), &blob)
+        self.save_sealed(&store::gitlab_path(&self.dir), GITLAB_AAD, cfg)
     }
 }
 
