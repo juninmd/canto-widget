@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type TranscriptMeta } from "../lib/api";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import GeminiDocs from "./GeminiDocs";
 import Skeleton from "./Skeleton";
 
@@ -12,23 +13,34 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
   // Folder error stays in the tab, next to the folder: it's context, not a loose alert (NN/g).
   const [folderError, setFolderError] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const { bump, isLatest } = useLatestRequest();
 
+  // The debounced search and an explicit "await reload()" (after changing the folder) can overlap;
+  // without this guard, a slower older reply could land after a newer one and overwrite it.
   async function reload(q = query) {
+    const id = bump();
     try {
-      setDir(await api.transcriptsDir());
+      const dir = await api.transcriptsDir();
+      if (!isLatest(id)) return;
+      setDir(dir);
     } catch (e) {
-      onError(errText(e));
-      setLoaded(true);
+      if (isLatest(id)) {
+        onError(errText(e));
+        setLoaded(true);
+      }
       return;
     }
     try {
-      setItems(await api.transcriptsList(q));
+      const items = await api.transcriptsList(q);
+      if (!isLatest(id)) return;
+      setItems(items);
       setFolderError("");
     } catch (e) {
+      if (!isLatest(id)) return;
       setItems([]);
       setFolderError(errText(e));
     } finally {
-      setLoaded(true);
+      if (isLatest(id)) setLoaded(true);
     }
   }
 

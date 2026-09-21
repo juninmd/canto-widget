@@ -2,6 +2,7 @@ pub mod account;
 pub mod autolock;
 pub mod autostart;
 pub mod backup;
+pub mod background;
 pub mod badge;
 pub mod biometric;
 pub mod blocking;
@@ -94,11 +95,8 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
-            watch_window_state(app.handle().clone(), dir.clone());
+            background::start(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
-            watch_idle(app.handle().clone());
-            watch_backup(dir);
-            watch_sync(app.handle().clone());
             build_tray(app.handle())?;
             tray_live::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
@@ -219,55 +217,6 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o Canto");
-}
-
-pub const AUTO_LOCK_EVENT: &str = "canto://auto-lock";
-
-/// Without this, an unlocked vault would survive any amount of time away from the machine.
-fn watch_idle(app: tauri::AppHandle) {
-    std::thread::spawn(move || loop {
-        std::thread::sleep(std::time::Duration::from_secs(20));
-        let Some(state) = app.try_state::<AppState>() else {
-            continue;
-        };
-        let limit_ms = autolock::minutes(&state.dir) * 60_000;
-        if state.lock_if_idle(limit_ms) {
-            let _ = tauri::Emitter::emit(&app, AUTO_LOCK_EVENT, limit_ms / 60_000);
-        }
-    });
-}
-
-/// Position and size hit disk at most every 2s, not on every dragged pixel.
-fn watch_window_state(app: tauri::AppHandle, dir: std::path::PathBuf) {
-    std::thread::spawn(move || loop {
-        std::thread::sleep(std::time::Duration::from_secs(2));
-        if let Err(e) = app.state::<window_state::WindowState>().save_if_dirty(&dir) {
-            eprintln!("posicao da janela nao gravou: {e}");
-        }
-    });
-}
-
-/// Daily copy of the encrypted envelope; doesn't need the vault unlocked.
-fn watch_backup(dir: std::path::PathBuf) {
-    std::thread::spawn(move || loop {
-        if let Err(e) = backup::daily(&dir, &backup::today_utc()) {
-            eprintln!("backup diario falhou: {e}");
-        }
-        std::thread::sleep(std::time::Duration::from_secs(30 * 60));
-    });
-}
-
-/// Merges in whatever showed up in a synced folder; a no-op without one configured or while locked.
-fn watch_sync(app: tauri::AppHandle) {
-    std::thread::spawn(move || loop {
-        std::thread::sleep(std::time::Duration::from_secs(5 * 60));
-        let Some(state) = app.try_state::<AppState>() else {
-            continue;
-        };
-        if let Err(e) = sync::poll_and_merge(&state) {
-            eprintln!("sincronizacao automatica falhou: {e}");
-        }
-    });
 }
 
 /// Global show/hide shortcut. Ctrl+Alt+Space (Cmd+Alt+Space on macOS).

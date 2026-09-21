@@ -5,15 +5,31 @@ use zeroize::{Zeroize, ZeroizeOnDrop, Zeroizing};
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
-use crate::forge::{ChecksStatus, ForgeList, ForgeLists};
-use crate::forge_filter::{cache_key, ForgeFilter, Section};
+use crate::forge::{self, ChecksStatus, Forge, ForgeList, ForgeLists};
+use crate::forge_cache::Quota;
+use crate::forge_filter::{ForgeFilter, Section};
 use crate::gitlab::{self, Account};
 use crate::gitlab_query;
-use crate::model::now_ms;
-use crate::store::{self, SealedBlob, GITLAB_AAD};
+use crate::store::{self, GITLAB_AAD};
 use crate::vault::AppState;
 
 const FORGE: &str = "gitlab";
+
+/// The GitLab side of the `Forge` trait: base URL + token + username.
+pub struct Gitlab;
+
+impl Forge for Gitlab {
+    const NAME: &'static str = FORGE;
+    type Credential = Account;
+
+    fn fetch_section(cred: &Self::Credential, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+        gitlab::section(cred, section, page, f)
+    }
+
+    fn fetch_opened_since(cred: &Self::Credential, since: &str) -> Result<(ForgeList, Option<Quota>)> {
+        gitlab::mrs_opened_since(cred, since)
+    }
+}
 
 #[derive(Clone, Default, PartialEq, Serialize, Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct GitlabConfig {
@@ -24,20 +40,11 @@ pub struct GitlabConfig {
 
 impl AppState {
     pub fn gitlab_config(&self) -> Result<Option<GitlabConfig>> {
-        let guard = self.session.lock().unwrap();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        match store::read_json::<SealedBlob>(&store::gitlab_path(&self.dir))? {
-            None => Ok(None),
-            Some(blob) => Ok(Some(serde_json::from_slice(&Zeroizing::new(blob.open(session.key(), GITLAB_AAD)?))?)),
-        }
+        self.sealed(&store::gitlab_path(&self.dir), GITLAB_AAD)
     }
 
     pub fn save_gitlab(&self, cfg: &GitlabConfig) -> Result<()> {
-        let guard = self.session.lock().unwrap();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        let plain = Zeroizing::new(serde_json::to_vec(cfg)?);
-        let blob = SealedBlob::seal(session.key(), session.salt(), &plain, GITLAB_AAD, now_ms())?;
-        store::write_json_atomic(&store::gitlab_path(&self.dir), &blob)
+        self.save_sealed(&store::gitlab_path(&self.dir), GITLAB_AAD, cfg)
     }
 }
 
@@ -91,9 +98,9 @@ pub fn gitlab_disconnect(state: State<'_, AppState>) -> Result<()> {
 #[tauri::command]
 pub async fn gitlab_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, force: Option<bool>) -> Result<ForgeLists> {
     run(move || {
-        let (acc, f) = (account(&app)?, filter.unwrap_or_default());
+        let acc = account(&app)?;
         let cache = &app.state::<AppState>().forges;
-        ForgeLists::collect(|s| cache.get(FORGE, &cache_key(s, 1, &f), force.unwrap_or(false), now_ms(), || gitlab::section(&acc, s, 1, &f)))
+        forge::list_all::<Gitlab>(cache, &acc, &filter.unwrap_or_default(), force.unwrap_or(false))
     })
     .await
 }
@@ -101,9 +108,9 @@ pub async fn gitlab_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, fo
 #[tauri::command]
 pub async fn gitlab_section(app: tauri::AppHandle, section: Section, page: u32, filter: Option<ForgeFilter>) -> Result<ForgeList> {
     run(move || {
-        let (acc, f) = (account(&app)?, filter.unwrap_or_default());
+        let acc = account(&app)?;
         let cache = &app.state::<AppState>().forges;
-        cache.get(FORGE, &cache_key(section, page, &f), false, now_ms(), || gitlab::section(&acc, section, page, &f))
+        forge::list_page::<Gitlab>(cache, &acc, section, page, &filter.unwrap_or_default(), false)
     })
     .await
 }
@@ -121,7 +128,7 @@ pub(crate) fn opened_since(state: &AppState, since: &str) -> Option<Result<Forge
         Ok(Some(c)) => to_account(&c),
         Err(e) => return Some(Err(e)),
     };
-    Some(state.forges.get(FORGE, &format!("opened|{since}"), false, now_ms(), || gitlab::mrs_opened_since(&acc, since)))
+    Some(forge::opened_since::<Gitlab>(&state.forges, &acc, since))
 }
 
 /// `None` when GitLab isn't connected: the badge simply doesn't count it.
@@ -131,8 +138,7 @@ pub(crate) fn review_requested(state: &AppState) -> Option<Result<u64>> {
         Ok(Some(c)) => to_account(&c),
         Err(e) => return Some(Err(e)),
     };
-    let f = ForgeFilter::default();
-    Some(state.forges.get(FORGE, &cache_key(Section::ReviewRequested, 1, &f), false, now_ms(), || gitlab::section(&acc, Section::ReviewRequested, 1, &f)).map(|l| l.total))
+    Some(forge::review_requested::<Gitlab>(&state.forges, &acc))
 }
 
 fn account(app: &tauri::AppHandle) -> Result<Account> {

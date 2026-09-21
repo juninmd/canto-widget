@@ -1,9 +1,40 @@
 use tauri::{Manager, State};
 
-use crate::drive;
+use crate::drive::{self, DriveTokens};
 use crate::error::{AppError, Result};
 use crate::oauth::{Loopback, Pkce};
+use crate::store::{self, DRIVE_AAD};
 use crate::vault::AppState;
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct DriveConfig {
+    #[serde(default)]
+    pub client_id: String,
+    #[serde(default)]
+    pub client_secret: String,
+    /// Saved by the user in Settings. A pre-embedded-client credential doesn't count.
+    #[serde(default, alias = "cliente_proprio")]
+    pub owned_client: bool,
+    #[serde(default)]
+    pub tokens: Option<DriveTokens>,
+    #[serde(default)]
+    pub email: String,
+    #[serde(default, alias = "nome")]
+    pub name: String,
+    /// Account photo as a `data:` URL; empty when absent or it failed validation.
+    #[serde(default)]
+    pub avatar: String,
+}
+
+impl AppState {
+    pub fn drive_config(&self) -> Result<DriveConfig> {
+        Ok(self.sealed(&store::drive_path(&self.dir), DRIVE_AAD)?.unwrap_or_default())
+    }
+
+    pub fn save_drive_config(&self, cfg: &DriveConfig) -> Result<()> {
+        self.save_sealed(&store::drive_path(&self.dir), DRIVE_AAD, cfg)
+    }
+}
 
 #[derive(serde::Serialize)]
 pub struct DriveStatus {
@@ -91,7 +122,7 @@ fn connect(state: &AppState) -> Result<String> {
 }
 
 /// Switching accounts without a photo must not inherit the previous name and photo.
-fn forget_account(cfg: &mut crate::vault::DriveConfig) {
+fn forget_account(cfg: &mut DriveConfig) {
     cfg.tokens = None;
     cfg.email.clear();
     cfg.name.clear();
@@ -99,7 +130,7 @@ fn forget_account(cfg: &mut crate::vault::DriveConfig) {
 }
 
 /// A credential saved in Settings wins, else login uses the embedded client and copies it into the vault, so refresh always uses the client that issued the tokens.
-pub fn use_client(cfg: &mut crate::vault::DriveConfig, embedded: Option<(&str, &str)>) -> bool {
+pub fn use_client(cfg: &mut DriveConfig, embedded: Option<(&str, &str)>) -> bool {
     if !cfg.owned_client {
         if let Some((id, secret)) = embedded {
             cfg.client_id = id.to_string();
@@ -117,7 +148,6 @@ fn open_in_browser(url: &str) -> Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::vault::DriveConfig;
 
     #[test]
     fn own_credential_wins_over_the_embedded_one() {
@@ -174,5 +204,14 @@ mod tests {
     fn without_any_credential_connecting_is_refused() {
         let mut cfg = DriveConfig::default();
         assert!(!use_client(&mut cfg, None));
+    }
+
+    #[test]
+    fn drive_config_deserializes_legacy_portuguese_keys() {
+        let legacy = r#"{"client_id":"id","client_secret":"secret","cliente_proprio":true,"nome":"Ana","email":"a@b.com"}"#;
+        let cfg: DriveConfig = serde_json::from_str(legacy).unwrap();
+        assert!(cfg.owned_client);
+        assert_eq!(cfg.name, "Ana");
+        assert_eq!(cfg.email, "a@b.com");
     }
 }

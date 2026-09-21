@@ -2,7 +2,9 @@
 use serde::Serialize;
 
 use crate::error::Result;
-use crate::forge_filter::{ForgeFilter, Order, Section, Sort};
+use crate::forge_cache::{ForgeCache, Quota};
+use crate::forge_filter::{cache_key, ForgeFilter, Order, Section, Sort};
+use crate::model::now_ms;
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct ForgeItem {
@@ -79,6 +81,42 @@ impl ForgeLists {
     }
 }
 
+/// One forge (GitHub, GitLab, ...) behind the cache-backed "list a section" orchestration every
+/// tab and the day summary share. `Credential` is the one place that differs by shape (a bearer
+/// token vs base URL + token + username) — getting one, and deciding whether the account is even
+/// connected, stays with each command module, since that step needs different context per forge
+/// (GitHub's OAuth refresh needs its own extra state; GitLab's doesn't). Everything downstream of
+/// "I already have a credential" is identical and lives here, so it's testable without a Tauri
+/// app: a fake `Forge` impl over cache + credential is enough.
+pub trait Forge {
+    /// Quota bucket and cache-key prefix; a disconnect only drops this forge's own entries.
+    const NAME: &'static str;
+    type Credential;
+
+    fn fetch_section(cred: &Self::Credential, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)>;
+    fn fetch_opened_since(cred: &Self::Credential, since: &str) -> Result<(ForgeList, Option<Quota>)>;
+}
+
+/// The four sections of a tab, each served from the cache unless `force`.
+pub fn list_all<F: Forge>(cache: &ForgeCache, cred: &F::Credential, filter: &ForgeFilter, force: bool) -> Result<ForgeLists> {
+    ForgeLists::collect(|s| list_page::<F>(cache, cred, s, 1, filter, force))
+}
+
+/// A single page of a single section (a tab's own request, or "mostrar mais").
+pub fn list_page<F: Forge>(cache: &ForgeCache, cred: &F::Credential, section: Section, page: u32, filter: &ForgeFilter, force: bool) -> Result<ForgeList> {
+    cache.get(F::NAME, &cache_key(section, page, filter), force, now_ms(), || F::fetch_section(cred, section, page, filter))
+}
+
+/// Background aggregation for the day summary.
+pub fn opened_since<F: Forge>(cache: &ForgeCache, cred: &F::Credential, since: &str) -> Result<ForgeList> {
+    cache.get(F::NAME, &format!("opened|{since}"), false, now_ms(), || F::fetch_opened_since(cred, since))
+}
+
+/// Background aggregation for the tray badge.
+pub fn review_requested<F: Forge>(cache: &ForgeCache, cred: &F::Credential) -> Result<u64> {
+    Ok(list_page::<F>(cache, cred, Section::ReviewRequested, 1, &ForgeFilter::default(), false)?.total)
+}
+
 /// A section's queries don't overlap (issues vs PRs): concatenate, then order the way the forge did.
 /// No cap: dropping the tail of a page would make "show more" skip those items for good.
 pub fn merge(a: ForgeList, b: ForgeList, filter: &ForgeFilter) -> ForgeList {
@@ -116,57 +154,7 @@ pub(crate) fn item(number: u64, created: &str, updated: &str, comments: u64) -> 
     }
 }
 
+
 #[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn list(total: u64, items: Vec<ForgeItem>) -> ForgeList {
-        ForgeList { total, items, ..Default::default() }
-    }
-
-    fn numbers(l: &ForgeList) -> Vec<u64> {
-        l.items.iter().map(|i| i.number).collect()
-    }
-
-    fn pages() -> (ForgeList, ForgeList) {
-        let a = list(5, vec![item(1, "2026-09-01T00:00:00Z", "2026-09-09T00:00:00Z", 9)]);
-        let b = list(4, vec![item(2, "2026-09-03T00:00:00Z", "2026-09-05T00:00:00Z", 1)]);
-        (a, b)
-    }
-
-    #[test]
-    fn merged_pages_follow_the_order_the_user_picked() {
-        let by = |sort, order| {
-            let (a, b) = pages();
-            numbers(&merge(a, b, &ForgeFilter { sort, order, ..Default::default() }))
-        };
-        assert_eq!(by(Sort::Updated, Order::Desc), vec![1, 2]);
-        assert_eq!(by(Sort::Created, Order::Desc), vec![2, 1]);
-        assert_eq!(by(Sort::Created, Order::Asc), vec![1, 2]);
-        assert_eq!(by(Sort::Comments, Order::Asc), vec![2, 1]);
-    }
-
-    #[test]
-    fn merge_adds_totals_and_keeps_every_item() {
-        let (a, b) = pages();
-        let merged = merge(a, b, &ForgeFilter::default());
-        assert_eq!((merged.total, merged.items.len()), (9, 2));
-    }
-
-    #[test]
-    fn github_combined_status_maps_to_the_three_states_the_ui_shows() {
-        assert_eq!(checks_from_github("success"), ChecksStatus::Success);
-        assert_eq!(checks_from_github("failure"), ChecksStatus::Failure);
-        assert_eq!(checks_from_github("pending"), ChecksStatus::Running);
-        assert_eq!(checks_from_github("whatever-github-adds-later"), ChecksStatus::None);
-    }
-
-    #[test]
-    fn gitlab_pipeline_status_maps_to_the_three_states_the_ui_shows() {
-        assert_eq!(checks_from_gitlab(Some("success")), ChecksStatus::Success);
-        assert_eq!(checks_from_gitlab(Some("failed")), ChecksStatus::Failure);
-        assert_eq!(checks_from_gitlab(Some("running")), ChecksStatus::Running);
-        assert_eq!(checks_from_gitlab(Some("canceled")), ChecksStatus::None);
-        assert_eq!(checks_from_gitlab(None), ChecksStatus::None, "an MR with no pipeline configured");
-    }
-}
+#[path = "forge_tests.rs"]
+mod tests;
