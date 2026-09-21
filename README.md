@@ -69,7 +69,7 @@ no Meet**, toca um som e manda notificação do sistema, esteja você em qualque
 Clique no evento para ver quem organizou, a pauta, os convidados e os anexos, como as anotações do Gemini.
 
 </td>
-<td width="36%"><img src="docs/prints/app/07-aviso-reuniao.png" alt="Aviso de reunião com entrar no Meet e adiar"></td>
+<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Detalhes do evento com organizador, convidados e anotações do Gemini"></td>
 </tr>
 <tr>
 <td><img src="docs/prints/app/02-notas.png" alt="Cards de notas com tags e nota fixada"></td>
@@ -139,15 +139,27 @@ Também tem 🎙️ **Reuniões**: as anotações e transcrições do Gemini das
 E **Seguir o sistema**, que troca entre clara e escura junto com o sistema operacional. Todas passam contraste AA.
 
 <details>
-<summary>🖥️ Mais telas: tela cheia, cofre trancado, lembrete de tarefa, conectar o GitHub e trocar senha</summary>
+<summary>🖥️ Mais telas: onboarding, busca global, GitLab, subtarefas, markdown, segurança, sincronização, densidade e mais</summary>
 
 <br>
 
 ![Aba GitHub em tela cheia](docs/prints/app/12-tela-cheia.png)
 
-| Cofre trancado | Lembrete de tarefa | Conectar o GitHub | Trocar senha mestra |
+| Boas-vindas na primeira execução | Busca global (`Ctrl+K`) | Aba GitLab self-hosted | Aviso de reunião |
 |---|---|---|---|
-| ![Tela de senha com Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Lembrete com concluir e adiar](docs/prints/app/08-lembrete-tarefa.png) | ![Conectar com token ou pelo navegador](docs/prints/app/10-github-conectar.png) | ![Formulário de troca de senha](docs/prints/app/13-trocar-senha.png) |
+| ![Onboarding com os atalhos essenciais](docs/prints/app/19-onboarding.png) | ![Busca em tarefas, notas e clipboard ao mesmo tempo](docs/prints/app/20-busca-global.png) | ![Revisão pedida, atribuídos e issues no GitLab self-hosted](docs/prints/app/21-gitlab.png) | ![Aviso de reunião com entrar no Meet e adiar](docs/prints/app/07-aviso-reuniao.png) |
+
+| Tarefa com subtarefas, prioridade e PR | Nota em markdown | Mais tipos no clipboard | Segurança: auto-trava e desbloqueios |
+|---|---|---|---|
+| ![Checklist, prioridade e link de PR numa tarefa](docs/prints/app/23-tarefas-detalhes.png) | ![Nota renderizada em markdown vinculada a uma tarefa](docs/prints/app/24-notas-markdown.png) | ![Clipboard reconhecendo link, cor, json, e-mail e telefone](docs/prints/app/25-clipboard-tipos.png) | ![Auto-trava configurável e registro dos últimos desbloqueios](docs/prints/app/26-ajustes-seguranca.png) |
+
+| Pasta sincronizada | Densidade compacta | Cofre trancado | Conectar o GitHub |
+|---|---|---|---|
+| ![Ajustes apontando para uma pasta do Dropbox](docs/prints/app/27-ajustes-sync.png) | ![Interface compacta na aba Tarefas](docs/prints/app/28-densidade-compacta.png) | ![Tela de senha com Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Conectar com token ou pelo navegador](docs/prints/app/10-github-conectar.png) |
+
+| Lembrete de tarefa | Trocar senha mestra |
+|---|---|
+| ![Lembrete com concluir e adiar](docs/prints/app/08-lembrete-tarefa.png) | ![Formulário de troca de senha](docs/prints/app/13-trocar-senha.png) |
 
 </details>
 
