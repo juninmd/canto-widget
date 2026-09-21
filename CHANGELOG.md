@@ -5,6 +5,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.2.0] - 2026-09-20
+
 ### Adicionado
 
 - **Colar como texto puro**: atalho global **Ctrl+Alt+V** (`Cmd+Alt+V` no macOS) tira HTML/RTF da área de
