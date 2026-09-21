@@ -87,6 +87,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - Novo hook `useLatestRequest` (`src/lib/`) descarta a resposta de uma busca desatualizada; unifica o padrão
   que a busca global já tinha e o GitHub/GitLab reimplementava, e passa a proteger também clipboard e
   transcrições, que não tinham essa proteção e podiam mostrar um resultado antigo por cima de um mais novo.
+- Trait `Forge` (`src-tauri/src/forge.rs`) unifica a orquestração de cache que as abas GitHub e GitLab
+  reimplementavam quase idêntica; cada uma vira um adaptador fino (token vs. conta), sem mudar nenhum
+  comando ou nome de IPC.
 
 ## [0.1.0] - 2026-09-18
 

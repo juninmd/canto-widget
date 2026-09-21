@@ -5,19 +5,36 @@ use zeroize::Zeroizing;
 use crate::blocking::run;
 use crate::cmd_github::{valid_token, GithubState, FORGE};
 use crate::error::Result;
-use crate::forge::{ChecksStatus, ForgeList, ForgeLists};
-use crate::forge_filter::{cache_key, ForgeFilter, Section};
+use crate::forge::{self, ChecksStatus, Forge, ForgeList, ForgeLists};
+use crate::forge_cache::Quota;
+use crate::forge_filter::{ForgeFilter, Section};
 use crate::github;
 use crate::model::now_ms;
 use crate::vault::AppState;
+
+/// The GitHub side of the `Forge` trait: a bearer token.
+pub struct Github;
+
+impl Forge for Github {
+    const NAME: &'static str = FORGE;
+    type Credential = Zeroizing<String>;
+
+    fn fetch_section(cred: &Self::Credential, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+        github::section(cred, section, page, f)
+    }
+
+    fn fetch_opened_since(cred: &Self::Credential, since: &str) -> Result<(ForgeList, Option<Quota>)> {
+        github::prs_opened_since(cred, since)
+    }
+}
 
 /// Four sections cost up to six searches of the 30 per minute: served from the cache unless `force`.
 #[tauri::command]
 pub async fn github_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, force: Option<bool>) -> Result<ForgeLists> {
     run(move || {
-        let (token, f) = (token(&app)?, filter.unwrap_or_default());
+        let cred = token(&app)?;
         let cache = &app.state::<AppState>().forges;
-        ForgeLists::collect(|s| cache.get(FORGE, &cache_key(s, 1, &f), force.unwrap_or(false), now_ms(), || github::section(&token, s, 1, &f)))
+        forge::list_all::<Github>(cache, &cred, &filter.unwrap_or_default(), force.unwrap_or(false))
     })
     .await
 }
@@ -25,9 +42,9 @@ pub async fn github_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, fo
 #[tauri::command]
 pub async fn github_section(app: tauri::AppHandle, section: Section, page: u32, filter: Option<ForgeFilter>) -> Result<ForgeList> {
     run(move || {
-        let (token, f) = (token(&app)?, filter.unwrap_or_default());
+        let cred = token(&app)?;
         let cache = &app.state::<AppState>().forges;
-        cache.get(FORGE, &cache_key(section, page, &f), false, now_ms(), || github::section(&token, section, page, &f))
+        forge::list_page::<Github>(cache, &cred, section, page, &filter.unwrap_or_default(), false)
     })
     .await
 }
@@ -46,8 +63,9 @@ pub(crate) fn opened_since(app: &tauri::AppHandle, since: &str) -> Option<Result
         Ok(Some(_)) => {}
     }
     let fetch = || {
-        let token = token(app)?;
-        app.state::<AppState>().forges.get(FORGE, &format!("opened|{since}"), false, now_ms(), || github::prs_opened_since(&token, since))
+        let cred = token(app)?;
+        let cache = &app.state::<AppState>().forges;
+        forge::opened_since::<Github>(cache, &cred, since)
     };
     Some(fetch())
 }
@@ -60,10 +78,9 @@ pub(crate) fn review_requested(app: &tauri::AppHandle) -> Option<Result<u64>> {
         Ok(Some(_)) => {}
     }
     let fetch = || {
-        let token = token(app)?;
-        let f = ForgeFilter::default();
+        let cred = token(app)?;
         let cache = &app.state::<AppState>().forges;
-        Ok(cache.get(FORGE, &cache_key(Section::ReviewRequested, 1, &f), false, now_ms(), || github::section(&token, Section::ReviewRequested, 1, &f))?.total)
+        forge::review_requested::<Github>(cache, &cred)
     };
     Some(fetch())
 }
