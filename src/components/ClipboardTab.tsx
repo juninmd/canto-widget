@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { clipKind, KIND_LABEL, type ClipKind } from "../lib/clip";
 import ClipCard from "./ClipCard";
@@ -18,15 +19,20 @@ export default function ClipboardTab({ privacy, initialQuery, onError }: Props) 
 
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const { leaving, leave } = useExit();
+  const { bump, isLatest } = useLatestRequest();
 
+  // The 150ms debounce and the 2.5s background poll can both be in flight at once; without this
+  // guard, an older (slower) reply could land after a newer one and overwrite fresher data.
   async function reload(q = query) {
+    const id = bump();
     try {
       const list = await api.clipList(q);
+      if (!isLatest(id)) return;
       setItems(list.items);
       setMaxPinned(list.max_pinned);
       setLoadedFor(q);
     } catch (e) {
-      onError(errText(e));
+      if (isLatest(id)) onError(errText(e));
     }
   }
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type ClipItem, type Note, type Task } from "../lib/api";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import type { Tab } from "./TabBar";
 
 const CAP = 5;
@@ -21,7 +22,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
   const [notesTotal, setNotesTotal] = useState(0);
   const [clips, setClips] = useState<ClipItem[]>([]);
   const input = useRef<HTMLInputElement>(null);
-  const seq = useRef(0);
+  const { bump, isLatest } = useLatestRequest();
   const mask = privacy ? "blur-sm select-none" : "";
 
   useEffect(() => input.current?.focus(), []);
@@ -29,7 +30,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
   useEffect(() => {
     const q = query.trim();
     if (!q) {
-      seq.current++;
+      bump();
       setTasks([]);
       setNotes([]);
       setNotesTotal(0);
@@ -37,24 +38,24 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       return;
     }
     const t = setTimeout(() => {
-      const id = ++seq.current;
+      const id = bump();
       const low = q.toLowerCase();
       void api
         .tasksForDay(today)
-        .then((all) => id === seq.current && setTasks(all.filter((x) => x.title.toLowerCase().includes(low))))
-        .catch((e) => id === seq.current && onError(errText(e)));
+        .then((all) => isLatest(id) && setTasks(all.filter((x) => x.title.toLowerCase().includes(low))))
+        .catch((e) => isLatest(id) && onError(errText(e)));
       void api
         .notesSearch(q, CAP)
         .then((page) => {
-          if (id !== seq.current) return;
+          if (!isLatest(id)) return;
           setNotes(page.items);
           setNotesTotal(page.total);
         })
-        .catch((e) => id === seq.current && onError(errText(e)));
+        .catch((e) => isLatest(id) && onError(errText(e)));
       void api
         .clipList(q)
-        .then((list) => id === seq.current && setClips(list.items))
-        .catch((e) => id === seq.current && onError(errText(e)));
+        .then((list) => isLatest(id) && setClips(list.items))
+        .catch((e) => isLatest(id) && onError(errText(e)));
     }, 150);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps

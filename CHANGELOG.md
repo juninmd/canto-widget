@@ -84,6 +84,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   helper para a sequência trava → muda → grava → destrava → sincroniza, em vez de repeti-la cada um por conta
   própria — essa repetição foi a causa de 2 dos últimos 3 bugs de concorrência do cofre. Testes de regressão
   novos cobrem os dois cenários.
+- Novo hook `useLatestRequest` (`src/lib/`) descarta a resposta de uma busca desatualizada; unifica o padrão
+  que a busca global já tinha e o GitHub/GitLab reimplementava, e passa a proteger também clipboard e
+  transcrições, que não tinham essa proteção e podiam mostrar um resultado antigo por cima de um mais novo.
 
 ## [0.1.0] - 2026-09-18
 
