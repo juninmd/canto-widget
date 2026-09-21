@@ -93,6 +93,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - `AppState::sealed`/`save_sealed` (`src-tauri/src/vault.rs`) substituem a leitura/gravação de config
   cifrada hand-copiada três vezes (Drive, GitHub, GitLab); `DriveConfig` migrou de `vault.rs` para
   `cmd_drive.rs`, ao lado de `GithubConfig`/`GitlabConfig` nos seus próprios módulos.
+- Os quatro watchers de fundo (`watch_idle`, `watch_window_state`, `watch_backup`, `watch_sync`), antes soltos
+  em `lib.rs`, agora moram juntos em `src-tauri/src/background.rs`, com os intervalos de polling nomeados;
+  `lib.rs` passa a só chamar `background::start`.
 
 ## [0.1.0] - 2026-09-18
 
