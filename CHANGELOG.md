@@ -80,6 +80,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   `aes-gcm` 0.11, `argon2` 0.6, `sha2` 0.11, `rand` 0.10 e `reqwest` 0.13. Cofres gravados pela 0.1.0 continuam
   abrindo (há um teste com um cofre real dessa versão), e o app deixou de carregar duas cópias do cliente HTTP.
   Compilar exige Rust 1.85.
+- `AppState::mutate`/`mutate_if`/`in_background` (`src-tauri/src/vault.rs`) passam a compartilhar um único
+  helper para a sequência trava → muda → grava → destrava → sincroniza, em vez de repeti-la cada um por conta
+  própria — essa repetição foi a causa de 2 dos últimos 3 bugs de concorrência do cofre. Testes de regressão
+  novos cobrem os dois cenários.
 
 ## [0.1.0] - 2026-09-18
 

@@ -173,23 +173,17 @@ impl AppState {
     /// unreachable (unmounted drive, offline cloud client materializing a placeholder) must never
     /// hold the mutex every other command needs, just because this one save also touches it.
     fn sync_after_persist(&self) {
+        #[cfg(test)]
+        test_hooks::delay_before_sync();
         let _ = crate::sync::export_now(&self.dir);
     }
 
-    /// Applies a mutation to the unlocked vault and persists it in the same step.
-    pub fn mutate<T>(&self, f: impl FnOnce(&mut VaultData) -> T) -> Result<T> {
-        self.touch();
-        let mut guard = self.session.lock().unwrap();
-        let session = guard.as_mut().ok_or(AppError::Locked)?;
-        let out = f(&mut session.data);
-        self.persist(session)?;
-        drop(guard);
-        self.sync_after_persist();
-        Ok(out)
-    }
-
-    /// For background watchers: doesn't count as use and only persists when the closure says something changed.
-    pub fn in_background<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
+    /// Single seam for the lock -> mutate -> persist-if-changed -> unlock -> sync-if-changed
+    /// skeleton: `mutate`, `mutate_if` and `in_background` used to hand-copy this sequencing,
+    /// which is what let two of them (ecff1f4, b2ee9f4) drift out of sync with the "release the
+    /// lock before syncing" invariant. `f` reports whether it actually changed the data, since
+    /// `in_background` and `mutate_if` must skip persist/sync entirely when nothing did.
+    fn with_session<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
         let mut guard = self.session.lock().unwrap();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         let (out, changed) = f(&mut session.data);
@@ -203,20 +197,21 @@ impl AppState {
         Ok(out)
     }
 
+    /// Applies a mutation to the unlocked vault and persists it in the same step.
+    pub fn mutate<T>(&self, f: impl FnOnce(&mut VaultData) -> T) -> Result<T> {
+        self.touch();
+        self.with_session(|data| (f(data), true))
+    }
+
+    /// For background watchers: doesn't count as use and only persists when the closure says something changed.
+    pub fn in_background<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
+        self.with_session(f)
+    }
+
     /// User mutation that might change nothing: persists only if `f` returns `true`.
     pub fn mutate_if(&self, f: impl FnOnce(&mut VaultData) -> bool) -> Result<()> {
         self.touch();
-        let mut guard = self.session.lock().unwrap();
-        let session = guard.as_mut().ok_or(AppError::Locked)?;
-        let changed = f(&mut session.data);
-        if changed {
-            self.persist(session)?;
-        }
-        drop(guard);
-        if changed {
-            self.sync_after_persist();
-        }
-        Ok(())
+        self.with_session(|data| ((), f(data)))
     }
 
     pub fn read<T>(&self, f: impl FnOnce(&VaultData) -> T) -> Result<T> {
@@ -258,111 +253,36 @@ impl AppState {
     }
 }
 
+/// Test-only seam: lets a concurrency test force `sync_after_persist` to run slowly and
+/// deterministically, instead of depending on real (and flaky) filesystem latency to expose a
+/// lock-held-too-long regression.
 #[cfg(test)]
-mod tests {
-    use super::*;
+mod test_hooks {
+    use std::sync::atomic::{AtomicU64, Ordering};
 
-    fn state(name: &str) -> AppState {
-        let dir = std::env::temp_dir().join(format!(
-            "canto-vault-{name}-{}-{}",
-            std::process::id(),
-            now_ms()
-        ));
-        let _ = std::fs::remove_dir_all(&dir);
-        AppState::new(dir)
+    static DELAY_MS: AtomicU64 = AtomicU64::new(0);
+
+    pub(super) struct SlowSync;
+
+    impl Drop for SlowSync {
+        fn drop(&mut self) {
+            DELAY_MS.store(0, Ordering::SeqCst);
+        }
     }
 
-    #[test]
-    fn short_password_does_not_create_vault() {
-        let st = state("curta");
-        assert!(st.create("abc").is_err(), "accepted a password below the floor");
-        assert!(!st.vault_exists());
-        let _ = std::fs::remove_dir_all(&st.dir);
+    pub(super) fn slow_sync(ms: u64) -> SlowSync {
+        DELAY_MS.store(ms, Ordering::SeqCst);
+        SlowSync
     }
 
-    #[test]
-    fn password_at_exact_floor_is_accepted() {
-        let st = state("piso");
-        let password: String = "a".repeat(MIN_PASSWORD_LEN);
-        st.create(&password).unwrap();
-        assert!(st.is_unlocked());
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn floor_counts_chars_not_bytes() {
-        let st = state("unicode");
-        // 4 chars, 16 bytes in UTF-8: must pass.
-        assert!(st.create("🔐🔐🔐🔐").is_ok());
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn created_vault_unlocks_with_same_password_and_rejects_another() {
-        let st = state("abre");
-        st.create("senha-mestra").unwrap();
-        st.lock();
-        assert!(matches!(st.unlock("outra-senha"), Err(AppError::WrongPassword)));
-        st.unlock("senha-mestra").unwrap();
-        assert!(st.is_unlocked());
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn auto_lock_fires_once_past_the_limit() {
-        let st = state("idle");
-        st.create("senha-mestra").unwrap();
-        assert!(!st.lock_if_idle(60_000), "locked a just-used vault");
-        *st.last_active.lock().unwrap() = now_ms() - 61_000;
-        assert!(st.lock_if_idle(60_000), "did not lock past the limit");
-        assert!(!st.is_unlocked());
-        assert!(!st.lock_if_idle(60_000), "reported the same lock twice");
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn using_the_vault_postpones_auto_lock() {
-        let st = state("adia");
-        st.create("senha-mestra").unwrap();
-        *st.last_active.lock().unwrap() = now_ms() - 61_000;
-        st.read(|d| d.tasks.len()).unwrap();
-        assert!(!st.lock_if_idle(60_000), "user read did not postpone the timer");
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn reminder_watcher_does_not_postpone_auto_lock_nor_persist_without_change() {
-        let st = state("em-fundo");
-        st.create("senha-mestra").unwrap();
-        let before = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
-        *st.last_active.lock().unwrap() = now_ms() - 61_000;
-        std::thread::sleep(std::time::Duration::from_millis(20));
-        st.in_background(|d| (d.tasks.len(), false)).unwrap();
-        let after = std::fs::metadata(store::vault_path(&st.dir)).unwrap().modified().unwrap();
-        assert_eq!(before, after, "rewrote the vault with nothing changed");
-        assert!(st.lock_if_idle(60_000), "the background watcher held the vault open");
-        assert!(matches!(st.in_background(|_| ((), true)), Err(AppError::Locked)));
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn background_clipboard_does_not_postpone_auto_lock() {
-        let st = state("fundo");
-        st.create("senha-mestra").unwrap();
-        *st.last_active.lock().unwrap() = now_ms() - 61_000;
-        // Background poll: reads and writes history without going through read/mutate.
-        let history = st.clip_load().unwrap();
-        st.clip_save(&history).unwrap();
-        assert!(st.lock_if_idle(60_000), "the clipboard watcher held the vault open");
-        let _ = std::fs::remove_dir_all(&st.dir);
-    }
-
-    #[test]
-    fn drive_config_deserializes_legacy_portuguese_keys() {
-        let legacy = r#"{"client_id":"id","client_secret":"secret","cliente_proprio":true,"nome":"Ana","email":"a@b.com"}"#;
-        let cfg: DriveConfig = serde_json::from_str(legacy).unwrap();
-        assert!(cfg.owned_client);
-        assert_eq!(cfg.name, "Ana");
-        assert_eq!(cfg.email, "a@b.com");
+    pub(super) fn delay_before_sync() {
+        let ms = DELAY_MS.load(Ordering::SeqCst);
+        if ms > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(ms));
+        }
     }
 }
+
+#[cfg(test)]
+#[path = "vault_tests.rs"]
+mod tests;
