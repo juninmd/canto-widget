@@ -77,8 +77,7 @@ export function releaseNotes(message: string, candidate: Candidate, repository: 
   const title = lines[0]?.startsWith("Merge pull request") ? lines[1] ?? lines[0] : lines[0];
   if (!title) throw new Error("Commit sem título");
   const markdownSpecials = new Set("\\`*_{}[]()<>#+.!|");
-  const safeTitle = [...title.slice(0, 240)]
-    .map((char) => (markdownSpecials.has(char) ? `\\${char}` : char))
+  const safeTitle = Array.from(title.slice(0, 240), (char) => (markdownSpecials.has(char) ? `\\${char}` : char))
     .join("");
   const root = `https://github.com/${repository}`;
   return `## Alterações\n\n- ${safeTitle} ([${candidate.sha.slice(0, 7)}](${root}/commit/${candidate.sha}))\n\n[Comparar com ${candidate.previousTag}](${root}/compare/${candidate.previousTag}...${candidate.tag})\n`;
