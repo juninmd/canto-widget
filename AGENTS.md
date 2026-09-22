@@ -80,6 +80,12 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   (release workflow), so local `tauri build` does not need the key. Never commit a private key.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
+- **Releases are automated.** `semantic-release.yml` runs on every push to `main` and, from Conventional Commits
+  since the last tag, bumps `package.json`, `src-tauri/Cargo.toml`/`Cargo.lock` and `tauri.conf.json`, dates
+  `CHANGELOG.md`'s `## [Não publicado]` section, commits, tags (`.releaserc.json`, `scripts/bump-version.ts`),
+  and dispatches `release.yml` at that tag. **Never hand-edit the version in those files or hand-push a `v*`
+  tag** — that fights the next automated bump. A commit type outside `feat`/`fix`/`BREAKING CHANGE` (e.g.
+  `docs:`, `chore:`) never triggers a release, by design.
 
 ## Security rules
 

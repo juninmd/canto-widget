@@ -1,10 +1,13 @@
 name: Release
 
 # A v* tag (e.g. v0.2.0) builds Windows, macOS and Linux installers into a DRAFT release.
-# Publishing the draft is a manual decision in the Releases tab.
+# Publishing the draft is a manual decision in the Releases tab. workflow_dispatch exists so
+# semantic-release.yml can trigger this explicitly at the new tag: a push made with the default
+# GITHUB_TOKEN never re-triggers other workflows, so the `push: tags` trigger alone would miss it.
 on:
   push:
     tags: ["v*"]
+  workflow_dispatch:
 
 permissions:
   contents: read
