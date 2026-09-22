@@ -157,9 +157,9 @@ E **Seguir o sistema**, que troca entre clara e escura junto com o sistema opera
 |---|---|---|---|
 | ![Ajustes apontando para uma pasta do Dropbox](docs/prints/app/27-ajustes-sync.png) | ![Interface compacta na aba Tarefas](docs/prints/app/28-densidade-compacta.png) | ![Tela de senha com Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Conectar com token ou pelo navegador](docs/prints/app/10-github-conectar.png) |
 
-| Lembrete de tarefa | Trocar senha mestra |
-|---|---|
-| ![Lembrete com concluir e adiar](docs/prints/app/08-lembrete-tarefa.png) | ![Formulário de troca de senha](docs/prints/app/13-trocar-senha.png) |
+| Lembrete de tarefa | Trocar senha mestra | Status API (oculta por padrão) |
+|---|---|---|
+| ![Lembrete com concluir e adiar](docs/prints/app/08-lembrete-tarefa.png) | ![Formulário de troca de senha](docs/prints/app/13-trocar-senha.png) | ![Feeds de status agrupados por provedor em acordions](docs/prints/app/29-status-api.png) |
 
 </details>
 
