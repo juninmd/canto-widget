@@ -1,6 +1,6 @@
 import { useRef } from "react";
 
-export type Tab = "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "gitlab" | "settings";
+export type Tab = "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "gitlab" | "status" | "settings";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: "Tarefas" },
@@ -10,6 +10,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "agenda", label: "Agenda" },
   { id: "github", label: "GitHub" },
   { id: "gitlab", label: "GitLab" },
+  { id: "status", label: "Status API" },
   { id: "settings", label: "Ajustes" },
 ];
 

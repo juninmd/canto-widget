@@ -98,6 +98,8 @@ export type Attachment = { title: string; url: string; mime: string };
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
+export type StatusItem = { title: string; link: string; published_at: number };
+export type StatusResult = { id: string; label: string; items: StatusItem[]; error: string | null };
 
 export const api = {
   status: () => invoke<VaultStatus>("vault_status"),
@@ -223,6 +225,9 @@ export const api = {
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
   /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
   badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
+
+  /** RSS/Atom incident history from services the team depends on; served from a 5 min cache unless `force`. */
+  apiStatus: (force = false) => invoke<StatusResult[]>("api_status", { force }),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

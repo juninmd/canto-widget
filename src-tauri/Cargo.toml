@@ -29,6 +29,8 @@ sha2 = "0.11"
 # Same TLS setup as tauri-plugin-updater: rustls with ring, so one HTTP stack and no aws-lc build.
 reqwest = { version = "0.13", default-features = false, features = ["json", "blocking", "query", "form", "rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
+# RSS/Atom parsing for the API-status tab: MIT, actively maintained, no transitive HTTP client of its own.
+feed-rs = "2"
 url = "2"
 time = "0.3"
 tauri-plugin-global-shortcut = "2.3.2"
