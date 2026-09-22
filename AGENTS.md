@@ -59,6 +59,9 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`); body explains why.
 - Every behavior change ships with a test that fails before and passes after, plus a `CHANGELOG.md` entry under
   **Não publicado** (and README when user-visible).
+- **Any new or changed UI adds or updates a screenshot in `docs/prints/` and the README** (features table, tour,
+  or the "mais telas" section) in the same PR — fictitious data only, per Security rules. A tab hidden by
+  default (`DEFAULT_HIDDEN` in `src/lib/tabs.ts`) still needs one; skipping this is a scope gap, not optional.
 
 ## Contracts you must not break
 
@@ -104,4 +107,5 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 ## Definition of done
 
 `bun run lint`, `bun test`, `bun run build`, `cargo clippy ... -D warnings` and `cargo test --locked` are green;
-changed behavior has a test; docs and CHANGELOG updated; no debug output, commented-out code or TODO without an issue.
+changed behavior has a test; docs and CHANGELOG updated; UI changes have a README screenshot; no debug output,
+commented-out code or TODO without an issue.
