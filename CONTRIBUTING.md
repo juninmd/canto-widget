@@ -24,7 +24,9 @@ bun run tauri build      # instalador da plataforma atual
 2. Commits no padrão [Conventional Commits](https://www.conventionalcommits.org/pt-br/): `feat:`, `fix:`, `docs:`,
    `test:`, `chore:`. O corpo explica o porquê.
 3. Toda mudança de comportamento vem com teste que falha antes e passa depois.
-4. Mudança visível para o usuário entra no `CHANGELOG.md`, em **Não publicado**, e no `README.md` se for preciso.
+4. Mudança visível para o usuário entra no `CHANGELOG.md`, em **Não publicado**, e no `README.md` (inglês,
+   canônico) se for preciso; as traduções (`README.pt-BR.md`, `README.es.md`, ...) não precisam acompanhar no
+   mesmo PR — ficam desatualizadas até alguém atualizar.
 5. Abra o PR; a CI roda tipos, testes do front e `cargo test` em Windows, macOS e Linux.
 
 ## Nunca versione

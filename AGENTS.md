@@ -62,6 +62,9 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - **Any new or changed UI adds or updates a screenshot in `docs/prints/` and the README** (features table, tour,
   or the "mais telas" section) in the same PR — fictitious data only, per Security rules. A tab hidden by
   default (`DEFAULT_HIDDEN` in `src/lib/tabs.ts`) still needs one; skipping this is a scope gap, not optional.
+- **`README.md` (English) is canonical.** `README.pt-BR.md` plus the other `README.<lang>.md` translations
+  (es, fr, it, ja, zh, de, ru, tr, hi) don't need to change in the same PR — they drift and get refreshed
+  separately. Never edit only a translation and leave `README.md` behind.
 
 ## Contracts you must not break
 
