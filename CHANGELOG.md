@@ -5,6 +5,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- Releases em `main` agora recebem uma tag por commit, notas geradas automaticamente e publicação após a
+  verificação dos instaladores assinados e do manifesto de atualização. O rascunho `v0.3.0` é retomado.
+
 ## [0.3.0] - 2026-09-22
 
 ### Adicionado
