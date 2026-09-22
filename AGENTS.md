@@ -26,7 +26,8 @@ bun run tauri build              # installer for the current OS
 ```
 
 CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests and build on Ubuntu; clippy and
-`cargo test` on Ubuntu, Windows and macOS. A `v*` tag runs `release.yml` and produces a **draft** release.
+`cargo test` on Ubuntu, Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which
+builds signed installers and publishes a release after the checks pass.
 
 ## Layout
 
@@ -83,12 +84,10 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   (release workflow), so local `tauri build` does not need the key. Never commit a private key.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
-- **Releases are automated.** `semantic-release.yml` runs on every push to `main` and, from Conventional Commits
-  since the last tag, bumps `package.json`, `src-tauri/Cargo.toml`/`Cargo.lock` and `tauri.conf.json`, dates
-  `CHANGELOG.md`'s `## [Não publicado]` section, commits, tags (`.releaserc.json`, `scripts/bump-version.ts`),
-  and dispatches `release.yml` at that tag. **Never hand-edit the version in those files or hand-push a `v*`
-  tag** — that fights the next automated bump. A commit type outside `feat`/`fix`/`BREAKING CHANGE` (e.g.
-  `docs:`, `chore:`) never triggers a release, by design.
+- **Releases are automated.** `release.yml` assigns one `v0.3.N` tag to each first-parent commit on `main`
+  after `v0.3.0`, including `docs:` and `chore:` commits. It resumes drafts, builds signed installers with
+  the tag version, verifies `latest.json`, and publishes with notes generated from the commit. A six-hour
+  schedule retries failed or missed runs. Never hand-push a `v0.3.N` tag or edit release versions manually.
 
 ## Security rules
 
