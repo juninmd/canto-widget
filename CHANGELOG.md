@@ -7,7 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
-- Releases em `main` agora recebem uma tag por commit, notas geradas automaticamente e publicação após a
+- Releases agora seguem Conventional Commits (`fix`/patch, `feat`/minor e breaking/major), ignoram commits sem
+  impacto de versão e geram os quatro instaladores em paralelo, com cache Rust por alvo, antes de montar o
+  manifesto do updater.
+- Releases em `main` agora recebem uma tag por commit elegível, notas geradas automaticamente e publicação após a
   verificação dos instaladores assinados e do manifesto de atualização. O rascunho `v0.3.0` é retomado.
 
 ## [0.3.0] - 2026-09-22

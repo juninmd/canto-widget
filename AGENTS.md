@@ -26,8 +26,8 @@ bun run tauri build              # installer for the current OS
 ```
 
 CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests and build on Ubuntu; clippy and
-`cargo test` on Ubuntu, Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which
-builds signed installers and publishes a release after the checks pass.
+`cargo test` on Ubuntu, Windows and macOS. Conventional `fix`, `feat` and breaking first-parent commits on `main`
+run `release.yml`, which builds signed installers and publishes a release after the checks pass.
 
 ## Layout
 
@@ -84,10 +84,11 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   (release workflow), so local `tauri build` does not need the key. Never commit a private key.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
-- **Releases are automated.** `release.yml` assigns one `v0.3.N` tag to each first-parent commit on `main`
-  after `v0.3.0`, including `docs:` and `chore:` commits. It resumes drafts, builds signed installers with
-  the tag version, verifies `latest.json`, and publishes with notes generated from the commit. A six-hour
-  schedule retries failed or missed runs. Never hand-push a `v0.3.N` tag or edit release versions manually.
+- **Releases are automated.** `release.yml` reads Conventional Commits on the first-parent history of `main`:
+  `fix` bumps patch, `feat` bumps minor, and `!` or `BREAKING CHANGE` bumps major. Other types do not release.
+  It resumes drafts, builds all platforms in parallel, creates and verifies `latest.json` after the uploads,
+  and publishes notes generated from the commit. A six-hour schedule retries failed or missed runs. Never
+  hand-push a version tag or edit release versions manually.
 
 ## Security rules
 
