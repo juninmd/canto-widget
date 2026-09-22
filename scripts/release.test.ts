@@ -62,10 +62,10 @@ test("refuses to reuse a version whose tag points to another commit", () => {
 });
 
 test("uses the merged pull request title for Portuguese release notes", () => {
-  const notes = releaseNotes(`Merge pull request #24 from feature\n\nfeat: aba Status API`, {
+  const notes = releaseNotes(`Merge pull request #24 from feature\n\nfeat: aba Status [API]`, {
     sha: a, tag: "v0.3.1", version: "0.3.1", previousTag: "v0.3.0",
   }, "juninmd/canto-widget");
-  expect(notes).toContain("feat: aba Status API");
+  expect(notes).toContain("feat: aba Status \\[API\\]");
   expect(notes).toContain("/compare/v0.3.0...v0.3.1");
   expect(notes).not.toContain("Merge pull request");
 });
