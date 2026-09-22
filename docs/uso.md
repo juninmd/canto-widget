@@ -1,6 +1,6 @@
 # Guia de uso
 
-[← voltar ao README](../README.md)
+[← voltar ao README](../README.pt-BR.md)
 
 Na primeira vez que o cofre é criado, uma tela de boas-vindas mostra os atalhos essenciais (mostrar/esconder,
 trocar de aba, busca global, nova tarefa, trancar, ajuda). Aparece só uma vez — destrancar o cofre depois

@@ -1,6 +1,6 @@
 # Benchmark: Canto e ferramentas parecidas
 
-[← voltar ao README](../README.md)
+[← voltar ao README](../README.pt-BR.md)
 
 Pesquisa feita em 2026-09-18 em fontes primárias (sites, repositórios e documentação oficiais, com link em cada
 linha). Onde a fonte não publica um número, a tabela diz "não publicado": nada foi estimado.

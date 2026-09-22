@@ -1,6 +1,6 @@
 # Integrações
 
-[← voltar ao README](../README.md)
+[← voltar ao README](../README.pt-BR.md)
 
 ## Agenda do Google (opcional)
 
