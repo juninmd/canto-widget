@@ -20,6 +20,7 @@ pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_notes;
+pub mod cmd_status;
 pub mod cmd_sync;
 pub mod commands;
 pub mod crypto;
@@ -50,6 +51,8 @@ pub mod password;
 pub mod priority;
 pub mod routine;
 pub mod snooze;
+pub mod status_cache;
+pub mod status_feed;
 pub mod store;
 pub mod subtask;
 pub mod sync;
@@ -93,6 +96,7 @@ pub fn run() {
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
             app.manage(cmd_github::GithubState::default());
+            app.manage(status_cache::StatusCache::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
             background::start(app.handle().clone(), dir.clone());
@@ -202,6 +206,7 @@ pub fn run() {
             cmd_gitlab::gitlab_section,
             cmd_gitlab::gitlab_mr_checks,
             cmd_forges::forges_opened_since,
+            cmd_status::api_status,
             tray_live::badge_set_tasks,
         ])
         .on_window_event(|win, event| match event {

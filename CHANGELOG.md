@@ -5,6 +5,18 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Aba Status API**: histórico de incidentes (RSS/Atom) de Claude, GitHub, OpenAI/Codex, AWS, Google Cloud,
+  Magalu Cloud, Cloudflare, Vercel, npm, crates.io, PyPI, Supabase e DigitalOcean, sem login nem token; cada
+  serviço num acordeão (um aberto por vez), cache de 5 min e botão **atualizar**. Oculta por padrão, como o
+  GitLab — ative em Ajustes > Abas visíveis.
+
+### Corrigido
+
+- **Rolagem no resumo do dia**: o resumo do dia agora fica delimitado à altura do painel e rola verticalmente com barra de scroll quando o texto é longo, sem sobrepor os botões de copiar e voltar.
+- **Reordenação de tarefas**: corrigido o arrastar e soltar de tarefas com `dataTransfer` compatível com webview/Chromium, realce visual no item alvo e atualização otimista instantânea na lista.
+
 ## [0.2.0] - 2026-09-20
 
 ### Adicionado
