@@ -5,6 +5,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+## [0.3.0] - 2026-09-22
+
 ### Adicionado
 
 - **Aba Status API**: histórico de incidentes (RSS/Atom) de Claude, GitHub, OpenAI/Codex, AWS, Google Cloud,
