@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import type { Priority } from "../lib/api";
 import { PRIORITY_LABEL } from "../lib/priority";
 
@@ -15,33 +16,31 @@ type Props = {
 export default function TaskListHeader({ done, total, priorityFilter, onPriorityFilter, onSummary, onCarryOver }: Props) {
   return (
     <div className="flex items-center justify-between text-[11px] text-muted">
-      <span>
-        {done}/{total} concluídas
-      </span>
+      <span>{t("tasks.doneCount", { done, total })}</span>
       <span className="flex gap-3">
         <button
           type="button"
           onClick={onSummary}
-          title="texto com o que foi feito, o que ficou e as reuniões, pronto para copiar"
+          title={t("tasks.summaryHint")}
           className="min-h-6 underline decoration-dotted hover:text-fg"
         >
-          resumo do dia
+          {t("summary.heading")}
         </button>
         <button
           type="button"
           onClick={onCarryOver}
-          title="traz para hoje as tarefas não concluídas dos dias anteriores"
+          title={t("tasks.carryOverHint")}
           className="min-h-6 underline decoration-dotted hover:text-fg"
         >
-          puxar pendências
+          {t("tasks.carryOver")}
         </button>
         <select
-          aria-label="filtrar por prioridade"
+          aria-label={t("priority.filter")}
           value={priorityFilter}
           onChange={(e) => onPriorityFilter(e.target.value as Priority | "")}
           className="rounded border border-line bg-ink px-1 py-0.5 text-[11px] text-muted outline-none focus:border-accent"
         >
-          <option value="">todas as prioridades</option>
+          <option value="">{t("priority.all")}</option>
           {PRIORITIES.map((p) => (
             <option key={p} value={p}>
               {PRIORITY_LABEL[p]}

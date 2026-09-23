@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { t } from "../i18n";
 import { api } from "../lib/api";
 import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import { REPEAT_LABEL } from "../lib/reminders";
@@ -9,7 +10,7 @@ import { ClockIcon, PullIcon } from "./Icons";
 const PRIORITIES: Priority[] = ["high", "medium", "low"];
 
 function extendedLabel(r: ExtendedRepeat): string {
-  return r.tipo === "monthly" ? `todo dia ${r.day} do mês` : "em dias específicos";
+  return r.tipo === "monthly" ? t("repeat.monthlyOn", { day: r.day }) : t("repeat.specificDaysLower");
 }
 
 /** A task's time, repeat rule, priority and linked PR/MR. Every change saves immediately: there's no "save" to forget. */
@@ -37,10 +38,10 @@ export default function TaskDetails({
       onKeyDown={(e) => e.key === "Escape" && onClose()}
     >
       <label className="flex items-center gap-1">
-        lembrar às
+        {t("tasks.remindAt")}
         <input
           type="time"
-          aria-label={`horário do lembrete de ${task.title}`}
+          aria-label={t("tasks.reminderTime", { title: task.title })}
           value={task.hora ?? ""}
           onChange={(e) => onChange(e.target.value || null, repeat)}
           className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
@@ -48,12 +49,12 @@ export default function TaskDetails({
       </label>
       <RepeatControl task={task} onLegacy={(r) => onChange(task.hora ?? null, r)} onExtended={onExtendedRepeat} />
       <select
-        aria-label={`prioridade de ${task.title}`}
+        aria-label={t("tasks.priorityOf", { title: task.title })}
         value={task.priority ?? ""}
         onChange={(e) => onPriority((e.target.value || null) as Priority | null)}
         className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
       >
-        <option value="">sem prioridade</option>
+        <option value="">{t("priority.none")}</option>
         {PRIORITIES.map((p) => (
           <option key={p} value={p}>
             {PRIORITY_LABEL[p]}
@@ -61,10 +62,10 @@ export default function TaskDetails({
         ))}
       </select>
       <label className="flex flex-1 items-center gap-1">
-        PR/MR
+        {t("tasks.prLabel")}
         <input
           type="url"
-          aria-label={`link do PR ou MR de ${task.title}`}
+          aria-label={t("tasks.prLink", { title: task.title })}
           value={prUrl}
           placeholder="https://..."
           onChange={(e) => setPrUrl(e.target.value)}
@@ -74,39 +75,39 @@ export default function TaskDetails({
         />
       </label>
       <button type="button" onClick={onClose} className="ml-auto min-h-6 px-1 hover:text-fg">
-        fechar
+        {t("tasks.close")}
       </button>
     </div>
   );
 }
 
 /** Time and ↻ visible on the row, plus the button that opens the details. */
-export function TaskBadge({ task: t, open, onToggle }: { task: Task; open: boolean; onToggle: () => void }) {
+export function TaskBadge({ task, open, onToggle }: { task: Task; open: boolean; onToggle: () => void }) {
   return (
     <>
-      {t.priority && <span className={`size-2 shrink-0 rounded-full ${PRIORITY_DOT[t.priority]}`} title={`prioridade ${PRIORITY_LABEL[t.priority]}`} />}
-      {(t.hora || t.repetir || t.extended_repeat) && (
+      {task.priority && <span className={`size-2 shrink-0 rounded-full ${PRIORITY_DOT[task.priority]}`} title={t("priority.dot", { label: PRIORITY_LABEL[task.priority] })} />}
+      {(task.hora || task.repetir || task.extended_repeat) && (
         <span
           className="shrink-0 text-[11px] text-muted"
-          title={t.repetir ? REPEAT_LABEL[t.repetir.tipo] : t.extended_repeat ? extendedLabel(t.extended_repeat) : undefined}
+          title={task.repetir ? REPEAT_LABEL[task.repetir.tipo] : task.extended_repeat ? extendedLabel(task.extended_repeat) : undefined}
         >
-          {t.hora}
-          {t.repetir && <span aria-label={`repete ${REPEAT_LABEL[t.repetir.tipo]}`}> ↻</span>}
-          {t.extended_repeat && <span aria-label={`repete ${extendedLabel(t.extended_repeat)}`}> ↻</span>}
+          {task.hora}
+          {task.repetir && <span aria-label={t("repeat.repeats", { label: REPEAT_LABEL[task.repetir.tipo] })}> ↻</span>}
+          {task.extended_repeat && <span aria-label={t("repeat.repeats", { label: extendedLabel(task.extended_repeat) })}> ↻</span>}
         </span>
       )}
-      {t.subtasks && t.subtasks.length > 0 && (
-        <span className="shrink-0 text-[11px] text-muted" title="subtarefas">
-          {t.subtasks.filter((s) => s.done).length}/{t.subtasks.length}
+      {task.subtasks && task.subtasks.length > 0 && (
+        <span className="shrink-0 text-[11px] text-muted" title={t("tasks.subtasks")}>
+          {task.subtasks.filter((s) => s.done).length}/{task.subtasks.length}
         </span>
       )}
-      {t.pr_url && (
+      {task.pr_url && (
         <button
           type="button"
-          onClick={() => void api.openLink(t.pr_url!)}
+          onClick={() => void api.openLink(task.pr_url!)}
           className="grid size-6 shrink-0 place-items-center rounded text-faint hover:text-fg"
-          aria-label={`abrir PR/MR de ${t.title}`}
-          title="abrir PR/MR"
+          aria-label={t("tasks.openPrOf", { title: task.title })}
+          title={t("tasks.openPr")}
         >
           <PullIcon />
         </button>
@@ -116,8 +117,8 @@ export function TaskBadge({ task: t, open, onToggle }: { task: Task; open: boole
         onClick={onToggle}
         aria-expanded={open}
         className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 aria-expanded:opacity-100"
-        aria-label={`horário e repetição de ${t.title}`}
-        title="horário e repetição"
+        aria-label={t("tasks.scheduleOf", { title: task.title })}
+        title={t("tasks.schedule")}
       >
         <ClockIcon />
       </button>

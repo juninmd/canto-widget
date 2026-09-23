@@ -1,7 +1,16 @@
+import { t } from "../i18n";
 import type { ExtendedRepeat, Repeat, Task } from "../lib/api";
 import { dayOfWeek } from "../lib/reminders";
 
-const WEEK = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
+const WEEK = [
+  t("repeat.sunday"),
+  t("repeat.monday"),
+  t("repeat.tuesday"),
+  t("repeat.wednesday"),
+  t("repeat.thursday"),
+  t("repeat.friday"),
+  t("repeat.saturday"),
+];
 type Kind = "" | "diaria" | "dias_uteis" | "semanal" | "mensal" | "dias_especificos";
 
 function kindOf(task: Task): Kind {
@@ -33,22 +42,22 @@ export default function RepeatControl({ task, onLegacy, onExtended }: Props) {
 
   return (
     <>
-      <select aria-label={`repetir ${task.title}`} value={kind} onChange={(e) => change(e.target.value as Kind)} className={fieldClass}>
-        <option value="">não repete</option>
-        <option value="diaria">todo dia</option>
-        <option value="dias_uteis">dias úteis (seg–sex)</option>
-        <option value="semanal">toda {WEEK[weekday]}</option>
-        <option value="mensal">todo mês</option>
-        <option value="dias_especificos">dias específicos</option>
+      <select aria-label={t("repeat.of", { title: task.title })} value={kind} onChange={(e) => change(e.target.value as Kind)} className={fieldClass}>
+        <option value="">{t("repeat.never")}</option>
+        <option value="diaria">{t("repeat.daily")}</option>
+        <option value="dias_uteis">{t("repeat.weekdaysRange")}</option>
+        <option value="semanal">{t("repeat.everyWeekday", { weekday: WEEK[weekday] })}</option>
+        <option value="mensal">{t("repeat.monthly")}</option>
+        <option value="dias_especificos">{t("repeat.specificDays")}</option>
       </select>
       {task.extended_repeat?.tipo === "monthly" && (
         <label className="flex items-center gap-1">
-          dia
+          {t("repeat.day")}
           <input
             type="number"
             min={1}
             max={31}
-            aria-label={`dia do mês de ${task.title}`}
+            aria-label={t("repeat.dayOfMonthOf", { title: task.title })}
             value={task.extended_repeat.day}
             onChange={(e) => onExtended({ tipo: "monthly", day: Math.min(31, Math.max(1, Number(e.target.value) || 1)) })}
             className={`${fieldClass} w-14`}
@@ -56,7 +65,7 @@ export default function RepeatControl({ task, onLegacy, onExtended }: Props) {
         </label>
       )}
       {task.extended_repeat?.tipo === "specific_days" && (
-        <div className="flex gap-1" role="group" aria-label={`dias específicos de ${task.title}`}>
+        <div className="flex gap-1" role="group" aria-label={t("repeat.specificDaysOf", { title: task.title })}>
           {WEEK.map((label, i) => {
             const days = task.extended_repeat?.tipo === "specific_days" ? task.extended_repeat.days : [];
             const on = days.includes(i);

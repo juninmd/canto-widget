@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useCallback, useEffect, useRef } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hour, people } from "../lib/agenda";
@@ -36,12 +37,12 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
     <div
       role="alertdialog"
       aria-modal="true"
-      aria-label={`${task ? "lembrete de tarefa" : "reunião começando"}: ${event.title}`}
+      aria-label={t("alert.dialogLabel", { kind: task ? t("alert.taskReminder") : t("alert.meetingStarting"), title: event.title })}
       className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
     >
       <div className="min-h-0 overflow-y-auto">
         <p className="text-[11px] uppercase tracking-widest text-accent">
-          {task ? "lembrete de tarefa" : "começando agora"}
+          {task ? t("alert.taskReminder") : t("alert.startingNow")}
         </p>
         <h1 className="mt-1 line-clamp-2 text-lg font-semibold">{event.title}</h1>
         <p className="mt-1 text-sm text-muted">{hour(event)}</p>
@@ -74,7 +75,7 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
             onClick={() => void api.taskComplete(task).then(onCompleted).finally(close)}
             className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent"
           >
-            concluir tarefa
+            {t("alert.completeTask")}
           </button>
         )}
         {event.meet && (
@@ -87,7 +88,7 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
             }}
             className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent"
           >
-            entrar no Meet
+            {t("alert.joinMeet")}
           </button>
         )}
         {!event.meet && event.link && (
@@ -97,7 +98,7 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
             onClick={() => void api.openLink(event.link)}
             className="flex-1 rounded-lg bg-edge px-3 py-2 text-sm text-fg"
           >
-            abrir no Calendar
+            {t("alert.openCalendar")}
           </button>
         )}
         <button
@@ -105,7 +106,7 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
           onClick={() => void api.alertSnooze(SNOOZE_MINUTES).then(onClose, close)}
           className="rounded-lg bg-edge px-3 py-2 text-sm text-fg"
         >
-          adiar {SNOOZE_MINUTES} min
+          {t("alert.snooze", { minutes: SNOOZE_MINUTES })}
         </button>
         <button
           type="button"
@@ -113,7 +114,7 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
           title="Esc"
           className="rounded-lg bg-edge px-3 py-2 text-sm text-muted"
         >
-          fechar
+          {t("alert.close")}
         </button>
       </div>
     </div>

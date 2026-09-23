@@ -1,4 +1,5 @@
 import type { AgendaItem, Repeat, Task } from "./api";
+import { t } from "../i18n";
 
 export const TASK_PREFIX = "task:";
 
@@ -15,9 +16,9 @@ export function toEvent(t: Task): AgendaItem {
 }
 
 export const REPEAT_LABEL: Record<Repeat["tipo"], string> = {
-  diaria: "todo dia",
-  dias_uteis: "dias úteis",
-  semanal: "toda semana",
+  diaria: t("repeat.daily"),
+  dias_uteis: t("repeat.weekdays"),
+  semanal: t("repeat.weekly"),
 };
 
 /** 0 = Sunday, same as Rust. */
