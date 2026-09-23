@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Base para tradução**: todos os textos da interface saíram dos componentes para um catálogo
+  (`src/i18n/pt-BR/`), com datas e números formatados por uma única configuração de idioma. Nada muda para quem
+  usa; o próximo idioma é um arquivo novo por área.
 - **Segurança**: a CSP de produção não aceita mais estilos inline (`style-src 'self'`); as cores dinâmicas já
   usam CSSOM, que a política permite.
 - **Status API com estado ao vivo**: serviços hospedados no Statuspage (Claude, GitHub, Cloudflare, Vercel, npm,

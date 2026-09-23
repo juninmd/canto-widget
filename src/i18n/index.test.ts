@@ -10,5 +10,7 @@ test("every message is a non-empty string", () => {
 
 test("t fills placeholders and leaves unknown ones visible", async () => {
   const { t } = await import("./index");
-  expect(t("app.name")).toBe("canto");
+  expect(t("status.updatedAgo", { ago: "agora" })).toBe("atualizado agora");
+  expect(t("status.updatedAgo")).toBe("atualizado {ago}");
+  expect(t("status.updatedAgo", { other: 1 })).toBe("atualizado {ago}");
 });
