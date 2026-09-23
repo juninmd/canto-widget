@@ -184,6 +184,9 @@ pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_resul
 
 #[tauri::command]
 pub fn alert_open(app: tauri::AppHandle, event: AgendaItem) -> Result<()> {
+    if !app.state::<crate::meeting_alert::Alerted>().first(&event) {
+        return Ok(());
+    }
     window::open_alert(&app, event).map_err(|e| AppError::Io(e.to_string()))
 }
 
