@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import { api, errText, type StatusResult } from "../lib/api";
 import { timeAgo } from "../lib/time";
-import { hasRecentIncident, lastIncident, sortByLastIncident } from "../lib/status";
+import { isTroubled, lastIncident, sortByLastIncident } from "../lib/status";
 import Skeleton from "./Skeleton";
 
 /** Incident history from services the team depends on: read-only, no account needed. */
@@ -66,7 +66,9 @@ export default function StatusTab() {
 function StatusAccordion({ result, open, onToggle }: { result: StatusResult; open: boolean; onToggle: () => void }) {
   const bodyId = useId();
   const last = lastIncident(result);
-  const troubled = !result.error && hasRecentIncident(result, Date.now());
+  const troubled = isTroubled(result, Date.now());
+  const maintenance = result.live?.indicator === "maintenance";
+  const liveText = troubled || maintenance ? result.live?.description : "";
   return (
     <section
       data-troubled={troubled || undefined}
@@ -77,13 +79,19 @@ function StatusAccordion({ result, open, onToggle }: { result: StatusResult; ope
           <span className="flex min-w-0 items-center gap-1.5">
             {troubled && <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-danger motion-safe:animate-pulse" />}
             <span className="truncate text-xs font-semibold text-fg">{result.label}</span>
-            {troubled && <span className="sr-only">com incidente nas últimas 24 h</span>}
+            {troubled && <span className="sr-only">{result.live ? "com problemas agora" : "com incidente nas últimas 24 h"}</span>}
           </span>
           <span className={`shrink-0 text-[11px] ${troubled ? "font-semibold text-danger" : "text-muted"}`}>
             {result.error ? "indisponível" : last > 0 ? timeAgo(last) : "sem incidentes"}{" "}
             <span aria-hidden="true">{open ? "▴" : "▾"}</span>
           </span>
         </span>
+        {liveText && (
+          <span className={`mt-0.5 block truncate text-[11px] ${troubled ? "text-danger" : "text-muted"}`}>
+            {maintenance ? "manutenção: " : "agora: "}
+            {liveText}
+          </span>
+        )}
       </button>
       {open && (
         <div id={bodyId} className="px-2 pb-2">

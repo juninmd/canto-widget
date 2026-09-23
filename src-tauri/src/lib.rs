@@ -54,6 +54,7 @@ pub mod routine;
 pub mod snooze;
 pub mod status_cache;
 pub mod status_feed;
+pub mod status_live;
 pub mod store;
 pub mod subtask;
 pub mod sync;

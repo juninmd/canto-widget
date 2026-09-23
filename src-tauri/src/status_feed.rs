@@ -46,6 +46,8 @@ pub struct StatusResult {
     pub items: Vec<StatusItem>,
     /// Set when the fetch or parse failed; `items` is then empty rather than stale.
     pub error: Option<String>,
+    /// Current state, for Statuspage-hosted services only.
+    pub live: Option<crate::status_live::Live>,
 }
 
 fn parse(bytes: &[u8]) -> Result<Vec<StatusItem>, String> {
@@ -74,11 +76,16 @@ fn fetch_one(client: &reqwest::blocking::Client, source: &Source) -> StatusResul
         .map_err(|e| e.to_string())
         .and_then(|r| r.bytes().map_err(|e| e.to_string()))
         .and_then(|b| parse(&b));
+    let live = crate::status_live::fetch(client, source.url);
     match outcome {
-        Ok(items) => StatusResult { id: source.id.into(), label: source.label.into(), items, error: None },
-        Err(error) => {
-            StatusResult { id: source.id.into(), label: source.label.into(), items: Vec::new(), error: Some(error) }
-        }
+        Ok(items) => StatusResult { id: source.id.into(), label: source.label.into(), items, error: None, live },
+        Err(error) => StatusResult {
+            id: source.id.into(),
+            label: source.label.into(),
+            items: Vec::new(),
+            error: Some(error),
+            live,
+        },
     }
 }
 
@@ -96,6 +103,7 @@ pub fn fetch_all() -> Vec<StatusResult> {
                     label: s.label.into(),
                     items: Vec::new(),
                     error: Some(e.to_string()),
+                    live: None,
                 })
                 .collect();
         }
@@ -111,6 +119,7 @@ pub fn fetch_all() -> Vec<StatusResult> {
                     label: source.label.into(),
                     items: Vec::new(),
                     error: Some("thread interrompida".into()),
+                    live: None,
                 })
             })
             .collect()

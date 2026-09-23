@@ -90,3 +90,11 @@ test("services are listed by last incident and the ones with an incident in the 
   expect(screen.getByText("GitHub").closest("section")?.hasAttribute("data-troubled")).toBe(true);
   expect(screen.getByText("Claude").closest("section")?.hasAttribute("data-troubled")).toBe(false);
 });
+
+test("a live outage from Statuspage is highlighted with its description even without recent history", async () => {
+  const down = { ...aws, id: "npm", label: "npm", live: { indicator: "major", description: "Partial System Outage" } };
+  status = () => Promise.resolve([down, claude]);
+  await show();
+  expect(screen.getByText("npm").closest("section")?.hasAttribute("data-troubled")).toBe(true);
+  expect(screen.getByText(/Partial System Outage/)).toBeTruthy();
+});

@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Status API com estado ao vivo**: serviços hospedados no Statuspage (Claude, GitHub, Cloudflare, Vercel, npm,
+  PyPI, Supabase, DigitalOcean...) mostram o estado atual ("agora: Partial System Outage") e só ficam em destaque
+  enquanto o problema está aberto; os demais seguem a regra de incidente nas últimas 24 h.
 - **Reordenar tarefas com filtro de prioridade**: o puxador continua disponível com o filtro ativo; só as tarefas
   visíveis trocam de lugar e as ocultas mantêm a posição.
 - **Status API**: os serviços aparecem ordenados pela hora do último incidente (mais recente primeiro; sem
