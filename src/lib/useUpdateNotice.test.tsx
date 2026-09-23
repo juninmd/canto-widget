@@ -14,10 +14,13 @@ const SIX_HOURS = 6 * 60 * 60 * 1000;
 let toasts: Toast[];
 let opened: number;
 
+// Async act() waits on real timers, which fake timers freeze: some bun builds then hang forever.
 async function advance(ms: number) {
-  await act(async () => {
+  act(() => {
     jest.advanceTimersByTime(ms);
   });
+  for (let i = 0; i < 5; i++) await Promise.resolve();
+  act(() => {});
 }
 
 beforeEach(() => {
