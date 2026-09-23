@@ -28,10 +28,7 @@ pub fn page(notes: &[Note], query: &str, limit: usize) -> NotesPage {
     let q = query.trim().to_lowercase();
     let mut hits: Vec<&Note> = notes.iter().filter(|n| q.is_empty() || note_matches(n, &q)).collect();
     hits.sort_by_key(|n| order(n));
-    NotesPage {
-        total: hits.len(),
-        items: hits.into_iter().take(limit.clamp(1, PAGE_MAX)).cloned().collect(),
-    }
+    NotesPage { total: hits.len(), items: hits.into_iter().take(limit.clamp(1, PAGE_MAX)).cloned().collect() }
 }
 
 /// Pinned on top; within each group, most recent first.
@@ -92,11 +89,7 @@ pub fn note_save(
         validate_link(l)?;
     }
     let now = now_ms();
-    let tags: Vec<String> = tags
-        .into_iter()
-        .map(|t| t.trim().to_lowercase())
-        .filter(|t| !t.is_empty())
-        .collect();
+    let tags: Vec<String> = tags.into_iter().map(|t| t.trim().to_lowercase()).filter(|t| !t.is_empty()).collect();
     state.mutate(move |d| match id.and_then(|id| d.notes.iter_mut().find(|n| n.id == id)) {
         Some(n) => {
             n.title = title;
@@ -107,7 +100,8 @@ pub fn note_save(
             n.clone()
         }
         None => {
-            let note = Note { id: new_id(), title, body, tags, created_at: now, updated_at: now, link, ..Default::default() };
+            let note =
+                Note { id: new_id(), title, body, tags, created_at: now, updated_at: now, link, ..Default::default() };
             d.notes.push(note.clone());
             note
         }
@@ -135,11 +129,8 @@ pub fn to_markdown(n: &Note) -> String {
 
 /// Keeps the note title recognizable as a file name across Windows/macOS/Linux; falls back when it strips to nothing.
 pub fn file_stem(title: &str) -> String {
-    let slug: String = title
-        .trim()
-        .chars()
-        .map(|c| if c.is_alphanumeric() { c.to_ascii_lowercase() } else { '-' })
-        .collect();
+    let slug: String =
+        title.trim().chars().map(|c| if c.is_alphanumeric() { c.to_ascii_lowercase() } else { '-' }).collect();
     let slug: String = slug.split('-').filter(|s| !s.is_empty()).collect::<Vec<_>>().join("-");
     let slug: String = slug.chars().take(80).collect();
     if slug.is_empty() {

@@ -122,7 +122,9 @@ pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, 
 
 fn validate_extended(repeat: &ExtendedRepeat) -> Result<()> {
     match repeat {
-        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => Err(AppError::Config("dia do mês inválido".into())),
+        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => {
+            Err(AppError::Config("dia do mês inválido".into()))
+        }
         ExtendedRepeat::SpecificDays { days } if days.is_empty() || days.iter().any(|d| *d > 6) => {
             Err(AppError::Config("dias da semana inválidos".into()))
         }
@@ -171,12 +173,7 @@ pub fn task_set_schedule(
 pub fn tasks_reminders(state: State<'_, AppState>, day: String) -> Result<Vec<Task>> {
     let list = state.in_background(|d| {
         let created = materialize(d, &day, now_ms());
-        let list = d
-            .tasks
-            .iter()
-            .filter(|t| t.day == day && !t.done && t.reminder_time.is_some())
-            .cloned()
-            .collect();
+        let list = d.tasks.iter().filter(|t| t.day == day && !t.done && t.reminder_time.is_some()).cloned().collect();
         (list, created > 0)
     });
     match list {

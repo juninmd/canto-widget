@@ -100,7 +100,9 @@ fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
     let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
     let h = res.headers();
     let quota = Quota::from_headers(h, "ratelimit-remaining", "ratelimit-reset", now_ms());
-    let header = |name: &str| h.get(name).and_then(|v| v.to_str().ok()).map(str::trim).filter(|v| !v.is_empty()).map(String::from);
+    let header = |name: &str| {
+        h.get(name).and_then(|v| v.to_str().ok()).map(str::trim).filter(|v| !v.is_empty()).map(String::from)
+    };
     let (total, next) = (header("x-total").and_then(|v| v.parse().ok()), header("x-next-page").is_some());
     let raw: Vec<RawItem> = response(res)?;
     Ok((convert(&acc.base, r, raw, total, next), quota))
@@ -123,13 +125,16 @@ fn network(e: reqwest::Error) -> AppError {
 fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
     let now = now_ms();
-    let spent = Quota::from_headers(res.headers(), "ratelimit-remaining", "ratelimit-reset", now).filter(|q| q.remaining == 0);
+    let spent =
+        Quota::from_headers(res.headers(), "ratelimit-remaining", "ratelimit-reset", now).filter(|q| q.remaining == 0);
     let err = |m: &str| Err(AppError::Gitlab(m.into()));
     match status {
         200..=299 => res.json().map_err(|e| AppError::Gitlab(format!("resposta inesperada: {e}"))),
         300..=399 => err("o endereço redirecionou para outro lugar; confira o endereço da instância"),
         401 => err("token inválido, expirado ou revogado; conecte de novo"),
-        403 | 429 if spent.is_some() || status == 429 => Err(rate_limited("gitlab", spent.map_or(now + 60_000, |q| q.reset_at), now)),
+        403 | 429 if spent.is_some() || status == 429 => {
+            Err(rate_limited("gitlab", spent.map_or(now + 60_000, |q| q.reset_at), now))
+        }
         403 => err("o token não tem acesso; ele precisa do escopo read_api"),
         404 => err("não achei a API do GitLab nesse endereço"),
         _ => Err(AppError::Gitlab(format!("o GitLab respondeu {status}"))),

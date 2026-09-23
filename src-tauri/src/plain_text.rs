@@ -54,7 +54,8 @@ mod tests {
 
     #[test]
     fn markup_from_calendar_becomes_readable_lines() {
-        let html = "Pauta:<br><ul><li>Roadmap</li><li>Riscos &amp; prazos</li></ul><p>Link: <a href=\"https://x\">doc</a></p>";
+        let html =
+            "Pauta:<br><ul><li>Roadmap</li><li>Riscos &amp; prazos</li></ul><p>Link: <a href=\"https://x\">doc</a></p>";
         assert_eq!(plain_text(html, 500), "Pauta:\nRoadmap\nRiscos & prazos\nLink: doc");
     }
 

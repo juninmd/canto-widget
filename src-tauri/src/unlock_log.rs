@@ -46,10 +46,13 @@ mod tests {
         let dir = tmpdir("order");
         record(&dir, "password", 1);
         record(&dir, "windows_hello", 2);
-        assert_eq!(history(&dir), vec![
-            UnlockEntry { at: 1, method: "password".into() },
-            UnlockEntry { at: 2, method: "windows_hello".into() },
-        ]);
+        assert_eq!(
+            history(&dir),
+            vec![
+                UnlockEntry { at: 1, method: "password".into() },
+                UnlockEntry { at: 2, method: "windows_hello".into() },
+            ]
+        );
         let _ = std::fs::remove_dir_all(&dir);
     }
 

@@ -56,9 +56,7 @@ pub fn enable_verified(password: &str) -> Result<()> {
 /// Reading a biometry-gated item triggers the system Touch ID prompt on its own; nothing else to call.
 pub fn open() -> Result<Zeroizing<String>> {
     let bytes = passwords::generic_password(options()).map_err(failure)?;
-    String::from_utf8(bytes)
-        .map(Zeroizing::new)
-        .map_err(|_| AppError::Format(format!("{NAME}: senha corrompida")))
+    String::from_utf8(bytes).map(Zeroizing::new).map_err(|_| AppError::Format(format!("{NAME}: senha corrompida")))
 }
 
 pub fn delete() {

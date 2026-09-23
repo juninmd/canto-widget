@@ -96,10 +96,7 @@ fn backup_files(dir: &Path) -> Vec<PathBuf> {
     let Ok(entries) = std::fs::read_dir(backups_dir(dir)) else {
         return Vec::new();
     };
-    entries
-        .filter_map(|e| e.ok().map(|e| e.path()))
-        .filter(|p| p.extension().is_some_and(|x| x == EXTENSION))
-        .collect()
+    entries.filter_map(|e| e.ok().map(|e| e.path())).filter(|p| p.extension().is_some_and(|x| x == EXTENSION)).collect()
 }
 
 /// Where the re-sealed copy waits until the vault itself is written.
@@ -120,14 +117,15 @@ fn reencrypt(path: &Path, aad: &[u8], old: &VaultKey, new: &VaultKey, salt: &[u8
 
 /// Backups follow the password change, otherwise none of them would import afterward; one already unreadable with the old key is left as-is.
 fn reencrypted_backups(dir: &Path, old: &VaultKey, new: &VaultKey, salt: &[u8]) -> Vec<Reencrypted> {
-    backup_files(dir)
-        .into_iter()
-        .filter_map(|p| reencrypt(&p, VAULT_AAD, old, new, salt).ok().flatten())
-        .collect()
+    backup_files(dir).into_iter().filter_map(|p| reencrypt(&p, VAULT_AAD, old, new, salt).ok().flatten()).collect()
 }
 
 #[tauri::command(async)]
-pub fn vault_change_password(state: State<'_, AppState>, current_password: String, new_password: String) -> Result<bool> {
+pub fn vault_change_password(
+    state: State<'_, AppState>,
+    current_password: String,
+    new_password: String,
+) -> Result<bool> {
     let (current_password, new_password) = (Zeroizing::new(current_password), Zeroizing::new(new_password));
     let biometric = state.change_password(&current_password, &new_password)?;
     if biometric {

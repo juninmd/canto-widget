@@ -11,7 +11,13 @@ fn machine(name: &str, password: &str) -> AppState {
 
 fn with_task(st: &AppState, id: &str) {
     st.mutate(|d| {
-        d.tasks.push(Task { id: id.into(), title: "regar planta".into(), day: "2026-09-14".into(), updated_at: now_ms(), ..Default::default() })
+        d.tasks.push(Task {
+            id: id.into(),
+            title: "regar planta".into(),
+            day: "2026-09-14".into(),
+            updated_at: now_ms(),
+            ..Default::default()
+        })
     })
     .unwrap();
 }
@@ -105,11 +111,7 @@ fn concurrent_mutates_do_not_drop_a_write_or_corrupt_the_synced_hash() {
 
     let bytes = std::fs::read(pasta.join("canto.canto")).unwrap();
     let recorded = load(&st.dir).ultimo_hash;
-    assert_eq!(
-        recorded,
-        Some(hash(&bytes)),
-        "ultimo_hash lost a concurrent export's update (b2ee9f4 regression)"
-    );
+    assert_eq!(recorded, Some(hash(&bytes)), "ultimo_hash lost a concurrent export's update (b2ee9f4 regression)");
 }
 
 #[test]

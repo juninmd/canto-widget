@@ -18,6 +18,7 @@ bun install --frozen-lockfile
 bun run lint                     # tsc --noEmit
 bun test                         # UI tests
 bun run build                    # tsc + vite build -> dist/ (needed before cargo: generate_context! embeds it)
+cd src-tauri && cargo fmt --check                         # rustfmt.toml: max_width 120
 cd src-tauri && cargo clippy --all-targets --locked -- -D warnings
 cd src-tauri && cargo test --locked
 cd src-tauri && cargo test --release --test scale -- --ignored --nocapture   # load harness, on demand
@@ -25,8 +26,8 @@ bun run tauri dev                # app with hot reload
 bun run tauri build              # installer for the current OS
 ```
 
-CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests and build on Ubuntu; clippy and
-`cargo test` on Ubuntu, Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which
+CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests, build and `bun audit` on
+Ubuntu; `cargo fmt --check` and `cargo audit` on Ubuntu; clippy and `cargo test` on Ubuntu, Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which
 builds signed installers and publishes a release after the checks pass.
 
 ## Layout
@@ -114,6 +115,7 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 
 ## Definition of done
 
-`bun run lint`, `bun test`, `bun run build`, `cargo clippy ... -D warnings` and `cargo test --locked` are green;
+`bun run lint`, `bun test`, `bun run build`, `cargo fmt --check`, `cargo clippy ... -D warnings` and
+`cargo test --locked` are green;
 changed behavior has a test; docs and CHANGELOG updated; UI changes have a README screenshot; no debug output,
 commented-out code or TODO without an issue.

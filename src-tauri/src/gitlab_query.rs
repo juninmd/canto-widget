@@ -80,7 +80,12 @@ pub fn base_url(input: &str) -> Result<String> {
     if url.scheme() != "https" {
         return Err(bad("o endereço precisa começar com https://"));
     }
-    if url.host_str().is_none_or(str::is_empty) || !url.username().is_empty() || url.password().is_some() || url.query().is_some() || url.fragment().is_some() {
+    if url.host_str().is_none_or(str::is_empty)
+        || !url.username().is_empty()
+        || url.password().is_some()
+        || url.query().is_some()
+        || url.fragment().is_some()
+    {
         return Err(bad("use só o endereço da instância, sem usuário, senha ou parâmetros"));
     }
     Ok(url.as_str().trim_end_matches('/').to_string())

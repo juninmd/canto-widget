@@ -13,7 +13,8 @@ const SLACK_MS: i64 = 60_000;
 
 /// GitHub App client id comes from the build (`CANTO_GITHUB_CLIENT_ID`); it's public, no secret.
 pub fn embedded_client_id() -> Option<&'static str> {
-    option_env!("CANTO_GITHUB_CLIENT_ID").filter(|id| !id.is_empty() && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '.'))
+    option_env!("CANTO_GITHUB_CLIENT_ID")
+        .filter(|id| !id.is_empty() && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '.'))
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
@@ -93,7 +94,8 @@ pub fn poll(client_id: &str, device_code: &str) -> Result<PollResult> {
 
 /// Device flow tokens renew without a client secret.
 pub fn refresh(client_id: &str, refresh_token: &str) -> Result<Tokens> {
-    let v = request_token(&[("client_id", client_id), ("grant_type", "refresh_token"), ("refresh_token", refresh_token)])?;
+    let v =
+        request_token(&[("client_id", client_id), ("grant_type", "refresh_token"), ("refresh_token", refresh_token)])?;
     match interpret(&v, now_ms())? {
         PollResult::Ready(t) => Ok(t),
         _ => Err(AppError::Github("a sessão do GitHub expirou; conecte de novo".into())),

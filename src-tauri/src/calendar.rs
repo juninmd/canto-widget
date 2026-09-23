@@ -55,10 +55,7 @@ pub fn events(token: &str, time_min: &str, time_max: &str, max_results: u32) -> 
         .map_err(|e| AppError::Drive(e.to_string()))?;
     if !res.status().is_success() {
         let status = res.status();
-        return Err(AppError::Drive(format!(
-            "calendar respondeu {status}: {}",
-            res.text().unwrap_or_default()
-        )));
+        return Err(AppError::Drive(format!("calendar respondeu {status}: {}", res.text().unwrap_or_default())));
     }
     let list: EventList = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
     Ok(list.items.into_iter().filter_map(RawEvent::into_item).collect())

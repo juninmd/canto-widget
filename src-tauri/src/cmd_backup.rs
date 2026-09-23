@@ -30,12 +30,7 @@ pub fn backup_import(app: tauri::AppHandle, state: State<'_, AppState>) -> Resul
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
-    let Some(chosen) = app
-        .dialog()
-        .file()
-        .add_filter("Backup do Canto", &[EXTENSION])
-        .blocking_pick_file()
-    else {
+    let Some(chosen) = app.dialog().file().add_filter("Backup do Canto", &[EXTENSION]).blocking_pick_file() else {
         return Ok(None);
     };
     backup::import(&state, &path(chosen)?).map(Some)

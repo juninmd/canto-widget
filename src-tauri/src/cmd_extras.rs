@@ -6,14 +6,14 @@ use serde::Serialize;
 
 use crate::calendar::{self, AgendaItem};
 use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
-use sha2::{Digest, Sha256};
-use crate::trash::Removed;
 use crate::commands::new_id;
 use crate::drive;
 use crate::error::{AppError, Result};
 use crate::transcripts::{self, TranscriptMeta, TranscriptSettings};
+use crate::trash::Removed;
 use crate::vault::AppState;
 use crate::{store, window};
+use sha2::{Digest, Sha256};
 
 #[derive(Serialize)]
 pub struct ClipList {
@@ -25,12 +25,8 @@ pub struct ClipList {
 pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> {
     let q = query.trim().to_lowercase();
     let hist = state.clip_load()?;
-    let items = hist
-        .items
-        .iter()
-        .filter(|i| q.is_empty() || i.text.to_lowercase().contains(&q))
-        .map(ClipView::from)
-        .collect();
+    let items =
+        hist.items.iter().filter(|i| q.is_empty() || i.text.to_lowercase().contains(&q)).map(ClipView::from).collect();
     Ok(ClipList { items, max_pinned: hist.max_pinned })
 }
 
@@ -45,14 +41,8 @@ pub fn clip_set_max_pinned(state: State<'_, AppState>, max: usize) -> Result<()>
 #[tauri::command(async)]
 pub fn clip_copy(app: tauri::AppHandle, state: State<'_, AppState>, id: String) -> Result<()> {
     let hist = state.clip_load()?;
-    let item = hist
-        .items
-        .iter()
-        .find(|i| i.id == id)
-        .ok_or(AppError::NotFound)?;
-    app.clipboard()
-        .write_text(item.text.clone())
-        .map_err(|e| AppError::Io(e.to_string()))
+    let item = hist.items.iter().find(|i| i.id == id).ok_or(AppError::NotFound)?;
+    app.clipboard().write_text(item.text.clone()).map_err(|e| AppError::Io(e.to_string()))
 }
 
 #[tauri::command(async)]
@@ -128,8 +118,7 @@ pub fn watch_clipboard(app: tauri::AppHandle) {
 }
 
 fn transcript_dir(state: &AppState) -> PathBuf {
-    let cfg: Option<TranscriptSettings> =
-        store::read_json(&store::settings_path(&state.dir)).unwrap_or_default();
+    let cfg: Option<TranscriptSettings> = store::read_json(&store::settings_path(&state.dir)).unwrap_or_default();
     match cfg.map(|c| c.dir).filter(|d| !d.is_empty()) {
         Some(d) => PathBuf::from(d),
         None => transcripts::default_dir(),
@@ -149,9 +138,7 @@ pub fn transcripts_set_dir(state: State<'_, AppState>, dir: String) -> Result<()
     }
     store::write_json_atomic(
         &store::settings_path(&state.dir),
-        &TranscriptSettings {
-            dir: path.to_string_lossy().to_string(),
-        },
+        &TranscriptSettings { dir: path.to_string_lossy().to_string() },
     )
 }
 
@@ -172,10 +159,7 @@ pub async fn agenda_today(app: tauri::AppHandle, time_min: String, time_max: Str
 
 pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_results: u32) -> Result<Vec<AgendaItem>> {
     let mut cfg = state.drive_config()?;
-    let tokens = cfg
-        .tokens
-        .as_mut()
-        .ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
+    let tokens = cfg.tokens.as_mut().ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
     let token = drive::fresh_access_token(tokens, &cfg.client_id, &cfg.client_secret)?;
     let events = calendar::events(&token, time_min, time_max, max_results)?;
     state.save_drive_config(&cfg)?;
