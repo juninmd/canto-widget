@@ -5,6 +5,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Status API**: os serviços aparecem ordenados pela hora do último incidente (mais recente primeiro; sem
+  incidentes no fim) e os que tiveram incidente nas últimas 24 h ganham destaque em vermelho, com ponto pulsante.
+
 ### Corrigido
 
 - **Reordenar tarefas** voltou a funcionar no Windows e no macOS: o arraste agora usa eventos de ponteiro (o

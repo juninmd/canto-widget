@@ -80,3 +80,13 @@ test("atualizar forces a fresh fetch instead of the cache", async () => {
   });
   expect(calls.find((c) => c.cmd === "api_status")?.args).toEqual({ force: true });
 });
+
+test("services are listed by last incident and the ones with an incident in the last 24h are highlighted", async () => {
+  const recent = { ...claude, id: "gh", label: "GitHub", items: [{ ...claude.items[0], published_at: Date.now() - 60_000 }] };
+  status = () => Promise.resolve([aws, claude, recent]);
+  await show();
+  const labels = [...document.querySelectorAll("section")].map((s) => s.querySelector(".font-semibold")?.textContent);
+  expect(labels).toEqual(["GitHub", "Claude", "AWS"]);
+  expect(screen.getByText("GitHub").closest("section")?.hasAttribute("data-troubled")).toBe(true);
+  expect(screen.getByText("Claude").closest("section")?.hasAttribute("data-troubled")).toBe(false);
+});
