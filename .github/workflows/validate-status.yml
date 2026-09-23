@@ -1,0 +1,45 @@
+name: validate-status-sources (temporary)
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Probe every Status API feed and Statuspage endpoint
+        run: |
+          for url in \
+            https://status.claude.com/history.rss \
+            https://www.githubstatus.com/history.rss \
+            https://status.openai.com/history.rss \
+            https://status.aws.amazon.com/rss/health.rss \
+            https://status.cloud.google.com/en/feed.atom \
+            https://status.magalu.cloud/rss \
+            https://www.cloudflarestatus.com/history.rss \
+            https://www.vercel-status.com/history.rss \
+            https://status.npmjs.org/history.rss \
+            https://status.crates.io/history.rss \
+            https://status.python.org/history.rss \
+            https://status.supabase.com/history.rss \
+            https://status.digitalocean.com/history.rss \
+            https://status.datadoghq.com/history.rss \
+            https://status.azion.com/history.rss \
+            https://www.akamaistatus.com/history.rss \
+            ; do
+            code=$(curl -sS -L -o /tmp/body -w '%{http_code} %{content_type}' -A canto-widget -m 15 "$url" || echo "ERR")
+            echo "FEED $url -> $code"
+            head -c 600 /tmp/body | tr '\n' ' '; echo
+            case "$url" in */history.rss)
+              live="${url%/history.rss}/api/v2/status.json"
+              lcode=$(curl -sS -L -o /tmp/live -w '%{http_code}' -A canto-widget -m 15 "$live" || echo "ERR")
+              echo "LIVE $live -> $lcode $(head -c 300 /tmp/live)"
+            ;; esac
+            echo "----"
+          done
+      - name: Magalu Cloud item titles (latest 15)
+        run: curl -sS -m 15 https://status.magalu.cloud/rss | grep -o '<title>[^<]*</title>' | head -16
