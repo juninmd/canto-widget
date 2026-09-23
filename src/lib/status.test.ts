@@ -28,3 +28,19 @@ test("the live Statuspage indicator wins over the 24h history rule", () => {
   expect(isTroubled({ ...svc("c", []), live: { indicator: "maintenance", description: "Scheduled" } }, now)).toBe(false);
   expect(isTroubled(recent, now)).toBe(true);
 });
+
+test("a component whose latest update says it recovered is not trouble (Magalu Cloud / Site24x7 feeds)", () => {
+  const now = 10 * 24 * 3600_000;
+  const item = (title: string, ago: number) => ({ title, link: "", published_at: now - ago });
+  const magalu = (items: ReturnType<typeof item>[]) => ({ id: "magalu", label: "Magalu Cloud", items, error: null });
+  expect(hasRecentIncident(magalu([item("Block Storage - Operational", 3600_000)]), now)).toBe(false);
+  expect(hasRecentIncident(magalu([item("Block Storage - Operacional", 3600_000)]), now)).toBe(false);
+  expect(
+    hasRecentIncident(magalu([item("Block Storage - Operational", 600_000), item("Block Storage - Major Outage", 3600_000)]), now),
+  ).toBe(false);
+  expect(
+    hasRecentIncident(magalu([item("Block Storage - Operational", 600_000), item("Kubernetes - Degraded Performance", 3600_000)]), now),
+    "another component is still degraded",
+  ).toBe(true);
+  expect(hasRecentIncident(magalu([item("Block Storage - Major Outage", 600_000)]), now)).toBe(true);
+});

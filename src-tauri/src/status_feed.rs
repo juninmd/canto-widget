@@ -29,6 +29,9 @@ pub const SOURCES: &[Source] = &[
     Source { id: "pypi", label: "PyPI", url: "https://status.python.org/history.rss" },
     Source { id: "supabase", label: "Supabase", url: "https://status.supabase.com/history.rss" },
     Source { id: "digitalocean", label: "DigitalOcean", url: "https://status.digitalocean.com/history.rss" },
+    Source { id: "datadog", label: "Datadog", url: "https://status.datadoghq.com/history.rss" },
+    Source { id: "azion", label: "Azion", url: "https://status.azion.com/history.rss" },
+    Source { id: "akamai", label: "Akamai", url: "https://www.akamaistatus.com/history.rss" },
 ];
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
