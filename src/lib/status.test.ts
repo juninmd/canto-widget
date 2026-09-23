@@ -51,3 +51,30 @@ test("a component whose latest update says it recovered is not trouble (Magalu C
     "API and Docs are different components even though both names contain a dash",
   ).toBe(true);
 });
+
+test("the real Magalu Cloud feed of 2026-09-23 (all components Operational) is not trouble", () => {
+  const now = Date.parse("2026-09-23T15:00:00-03:00");
+  const at = (d: string) => Date.parse(d);
+  const feed = [
+    ["Block Storage - Operational", "2026-09-17T02:00:00-03:00"],
+    ["Block Storage - Operational", "2026-09-23T02:00:00-03:00"],
+    ["DBaaS - Operational", "2026-09-23T02:00:00-03:00"],
+    ["Magalu Cloud - API - Operational", "2026-09-21T15:00:00-03:00"],
+    ["Magalu Cloud - Console - Operational", "2026-09-23T06:00:00-03:00"],
+    ["Object Storage - Operational", "2026-09-23T02:00:00-03:00"],
+    ["Virtual Machine - Operational", "2026-09-23T02:00:00-03:00"],
+    ["k8s - Operational", "2026-09-23T02:00:00-03:00"],
+  ].map(([title, date]) => ({ title, link: "https://status.magalu.cloud", published_at: at(date) }));
+  expect(hasRecentIncident({ id: "magalu", label: "Magalu Cloud", items: feed, error: null }, now)).toBe(false);
+});
+
+test("Google Cloud's RESOLVED titles are not trouble", () => {
+  const now = 10 * 24 * 3600_000;
+  const gcp = {
+    id: "gcp",
+    label: "Google Cloud",
+    items: [{ title: "RESOLVED: Multiple products in us-central1-b are experiencing network service degradation.", link: "", published_at: now - 3600_000 }],
+    error: null,
+  };
+  expect(hasRecentIncident(gcp, now)).toBe(false);
+});
