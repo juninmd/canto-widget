@@ -9,3 +9,5 @@ src-tauri/google-oauth.json
 client_secret_*.json
 # Updater signing key (minisign): lives in a GitHub secret, never in the repo.
 *.key
+test-results/
+playwright-report/

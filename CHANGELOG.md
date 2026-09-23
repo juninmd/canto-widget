@@ -14,6 +14,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   enquanto o problema está aberto; os demais seguem a regra de incidente nas últimas 24 h.
 - **Reordenar tarefas com filtro de prioridade**: o puxador continua disponível com o filtro ativo; só as tarefas
   visíveis trocam de lugar e as ocultas mantêm a posição.
+- **Testes**: smoke tests de ponta a ponta (`bun run e2e`) rodam a interface real no Chromium com o IPC do Tauri
+  simulado — abas, nova tarefa, cofre trancado e Status API — e ganharam um job próprio na CI.
 - **Status API**: os serviços aparecem ordenados pela hora do último incidente (mais recente primeiro; sem
   incidentes no fim) e os que tiveram incidente nas últimas 24 h ganham destaque em vermelho, com ponto pulsante.
 

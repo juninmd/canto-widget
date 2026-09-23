@@ -17,6 +17,7 @@ local vault. Public repository: treat everything you write, commit or screenshot
 bun install --frozen-lockfile
 bun run lint                     # tsc --noEmit
 bun test                         # UI tests
+bun run e2e                      # Playwright smoke tests (e2e/*.e2e.ts): real UI in Chromium, Tauri IPC mocked
 bun run build                    # tsc + vite build -> dist/ (needed before cargo: generate_context! embeds it)
 cd src-tauri && cargo fmt --check                         # rustfmt.toml: max_width 120
 cd src-tauri && cargo clippy --all-targets --locked -- -D warnings
@@ -27,8 +28,9 @@ bun run tauri build              # installer for the current OS
 ```
 
 CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests, build and `bun audit` on
-Ubuntu; `cargo fmt --check` and `cargo audit` on Ubuntu; clippy and `cargo test` on Ubuntu, Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which
-builds signed installers and publishes a release after the checks pass.
+Ubuntu; e2e smoke tests, `cargo fmt --check` and `cargo audit` on Ubuntu; clippy and `cargo test` on Ubuntu,
+Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which builds signed installers
+and publishes a release after the checks pass.
 
 ## Layout
 
