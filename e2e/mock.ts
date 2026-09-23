@@ -7,13 +7,18 @@ export type MockStatus = {
   items: { title: string; link: string; published_at: number }[];
   error: string | null;
 };
-export type MockOptions = { unlocked?: boolean; hiddenTabs?: string[]; statuses?: MockStatus[] };
+export type MockOptions = { unlocked?: boolean; hiddenTabs?: string[]; statuses?: MockStatus[]; language?: string | null };
 export type Call = { cmd: string; args: Record<string, unknown> };
 
 /** Stands in for the Tauri runtime so the real UI runs in plain Chromium; tasks survive reloads via sessionStorage. */
 export async function mockTauri(page: Page, opts: MockOptions = {}) {
   await page.addInitScript((o: MockOptions) => {
     localStorage.setItem("canto.onboarding.visto", "1");
+    // Assertions default to pt-BR; `null` leaves the choice on "auto" (Chromium reports en-US). Only the first
+    // load sets it, so a reload keeps whatever the page chose.
+    if (o.language !== null && localStorage.getItem("canto.language") === null) {
+      localStorage.setItem("canto.language", o.language ?? "pt-BR");
+    }
     if (o.hiddenTabs) localStorage.setItem("canto.hiddenTabs", JSON.stringify(o.hiddenTabs));
     const calls: Call[] = [];
     const tasks = (): MockTask[] => JSON.parse(sessionStorage.getItem("e2e.tasks") ?? "[]");

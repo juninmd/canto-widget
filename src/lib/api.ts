@@ -133,6 +133,7 @@ export const api = {
     invoke<void>("task_set_extended_repeat", { id, repeat }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
   reminderLeadSet: (minutes: number) => invoke<void>("reminder_lead_set", { minutes }),
+  languageSet: (lang: string) => invoke<void>("language_set", { lang }),
 
   notesSearch: (query: string, limit: number) => invoke<NotesPage>("notes_search", { query, limit }),
   noteSave: (note: { id?: string; title: string; body: string; tags: string[]; link?: NoteLink | null }) =>

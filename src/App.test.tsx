@@ -145,6 +145,7 @@ test("task reminders ring from Rust: the UI only pushes the lead time", async ()
   render(<App />);
   await settle();
   expect(calls.find((c) => c.cmd === "reminder_lead_set")?.args).toEqual({ minutes: 0 });
+  expect(calls.find((c) => c.cmd === "language_set")?.args, "Rust notifications follow the UI language").toEqual({ lang: "pt-BR" });
   expect(calls.some((c) => c.cmd === "tasks_reminders")).toBe(false);
 });
 

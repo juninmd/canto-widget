@@ -68,3 +68,18 @@ test("the Status API tab lists the services from api_status", async ({ page }) =
   await expect(page.getByText("Outro Serviço")).toBeVisible();
   await expect(page.getByText("sem incidentes")).toBeVisible();
 });
+
+test("English can be chosen and is pushed to Rust", async ({ page }) => {
+  await mockTauri(page, { language: "en" });
+  await page.goto("/");
+  const bar = page.getByRole("tablist");
+  await expect(bar.getByRole("tab", { name: "Tasks" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  expect((await calls(page)).find((c) => c.cmd === "language_set")?.args).toEqual({ lang: "en" });
+});
+
+test("with no choice saved, an English system gets the English UI", async ({ page }) => {
+  await mockTauri(page, { language: null });
+  await page.goto("/");
+  await expect(page.getByRole("tablist").getByRole("tab", { name: "Notes" })).toBeVisible();
+});

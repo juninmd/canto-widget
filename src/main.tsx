@@ -3,8 +3,10 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
+import { LANGUAGE } from "./i18n";
 import "./styles.css";
 
+document.documentElement.lang = LANGUAGE;
 applySkin(loadSkin());
 applyDensity(loadDensity());
 // Stays at boot, not in the picker: the system theme can change with Settings closed.
