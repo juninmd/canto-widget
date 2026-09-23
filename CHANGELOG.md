@@ -30,6 +30,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **macOS: o Canto não aparece mais no Dock** nem no Cmd+Tab, nem ao abrir. O pacote agora se declara app de
+  barra de menus (`LSUIElement`), e o widget vive só no ícone da barra de menus, como no Windows.
 - **Lembretes de tarefa com o widget escondido** (sobretudo no macOS): passam a ser disparados pelo núcleo em Rust,
   como o aviso de reunião, em vez do relógio do webview, que é congelado com a janela oculta.
 - **macOS: aviso de reunião não aparecia** com o widget escondido na bandeja. O relógio do aviso rodava no
