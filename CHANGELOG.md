@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Status API: Datadog, Azion e Akamai** entram na lista, com histórico e estado ao vivo (Statuspage).
 - **Idioma: português ou inglês**, em Ajustes > Idioma. "Automático (sistema)" é o padrão: português para
   sistemas em `pt-*`, inglês para os demais. A troca recarrega a interface na hora; notificações do sistema e o
   menu da bandeja acompanham o idioma. Mensagens de erro vindas do núcleo seguem em português.
@@ -30,6 +31,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Status API: Magalu Cloud não aparece mais com problema à toa.** O feed publica cada mudança de estado
+  ("Block Storage - Operational"); agora só conta a atualização mais recente de cada componente, e
+  "operacional/resolvido" não é incidente.
+- **macOS: o Canto não aparece mais no Dock** nem no Cmd+Tab, nem ao abrir. O pacote agora se declara app de
+  barra de menus (`LSUIElement`), e o widget vive só no ícone da barra de menus, como no Windows.
 - **Lembretes de tarefa com o widget escondido** (sobretudo no macOS): passam a ser disparados pelo núcleo em Rust,
   como o aviso de reunião, em vez do relógio do webview, que é congelado com a janela oculta.
 - **macOS: aviso de reunião não aparecia** com o widget escondido na bandeja. O relógio do aviso rodava no
