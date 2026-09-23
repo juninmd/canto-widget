@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type GithubStatus } from "../lib/api";
 import { NO_FILTER } from "../lib/forge";
+import { t } from "../i18n";
 import { useForgeLists } from "../lib/useForgeLists";
 import ForgeBoard from "./ForgeBoard";
 import GithubConnect from "./GithubConnect";
@@ -40,7 +41,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
   }
 
   if (!status) {
-    return statusError ? <p className="text-xs text-danger">{statusError}</p> : <Skeleton label="carregando o GitHub" />;
+    return statusError ? <p className="text-xs text-danger">{statusError}</p> : <Skeleton label={t("github.loading")} />;
   }
   if (!status.connected) return <GithubConnect device={status.device_flow} onConnected={() => void refresh()} />;
   return <ForgeBoard forge="github" login={status.login} lists={gh} onDisconnect={() => void disconnect()} />;

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type DriveStatus } from "../lib/api";
+import { t } from "../i18n";
 import GoogleAccount from "./GoogleAccount";
 
 export default function GoogleSection({ onError }: { onError: (m: string) => void }) {
@@ -38,20 +39,17 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
 
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-xs font-semibold text-fg">Agenda do Google</h2>
-      <p className="text-xs text-muted">
-        Opcional. A conta serve só para ler os eventos do dia (somente leitura); nenhum dado do cofre
-        vai para o Google.
-      </p>
+      <h2 className="text-xs font-semibold text-fg">{t("google.heading")}</h2>
+      <p className="text-xs text-muted">{t("google.intro")}</p>
 
       {/* Credentials are a one-time step: once the account is connected, they collapse (progressive disclosure). */}
       {/* Build with an embedded client: a custom credential becomes a collapsed, advanced option. */}
       <details open={!status.connected && !status.embedded}>
         <summary className="min-h-6 cursor-pointer text-[11px] text-muted hover:text-fg">
-          {status.embedded ? "usar credenciais OAuth próprias (avançado)" : `credenciais OAuth ${status.configured ? "(salvas)" : ""}`}
+          {status.embedded ? t("google.ownCredentials") : t("google.oauthCredentials", { saved: status.configured ? t("google.oauthSaved") : "" })}
         </summary>
         <div className="mt-2 flex flex-col gap-2 motion-safe:animate-aba">
-          <label htmlFor="google-client-id" className="text-[11px] text-muted">Client ID OAuth (app desktop)</label>
+          <label htmlFor="google-client-id" className="text-[11px] text-muted">{t("google.clientIdLabel")}</label>
           <input
             id="google-client-id"
             value={clientId}
@@ -59,7 +57,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
             placeholder="xxxx.apps.googleusercontent.com"
             className="rounded-lg border border-line bg-ink px-3 py-1.5 text-xs text-fg outline-none focus:border-accent"
           />
-          <label htmlFor="google-client-secret" className="text-[11px] text-muted">Client secret (opcional, apps desktop do Google)</label>
+          <label htmlFor="google-client-secret" className="text-[11px] text-muted">{t("google.clientSecretLabel")}</label>
           <input
             id="google-client-secret"
             type="password"
@@ -71,11 +69,11 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
             type="button"
             disabled={busy !== "" || !clientId.trim()}
             onClick={() =>
-              run("cfg", () => api.driveConfigure(clientId, clientSecret), "credenciais salvas no cofre")
+              run("cfg", () => api.driveConfigure(clientId, clientSecret), t("google.credentialsSavedInVault"))
             }
             className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
           >
-            salvar credenciais
+            {t("google.saveCredentials")}
           </button>
         </div>
       </details>
@@ -85,13 +83,13 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
           status={status}
           busy={busy !== ""}
           signingOut={busy === "out"}
-          onSignOut={() => void run("out", api.driveDisconnect, "você saiu da conta Google")}
+          onSignOut={() => void run("out", api.driveDisconnect, t("google.signedOut"))}
         />
       ) : (
         <div className="mt-1 flex items-center gap-2 text-xs">
           <span className="size-2 rounded-full bg-faint" />
           <span className="truncate text-muted">
-            {status.embedded ? "pronto para entrar" : status.configured ? "credenciais salvas" : "não configurado"}
+            {status.embedded ? t("google.readyToSignIn") : status.configured ? t("google.credentialsSaved") : t("google.notConfigured")}
           </span>
         </div>
       )}
@@ -99,10 +97,10 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
       <button
         type="button"
         disabled={busy !== "" || !status.configured}
-        onClick={() => run("conn", async () => setInfo(`entrou como ${(await api.driveConnect()) || "conta Google"}`), "")}
+        onClick={() => run("conn", async () => setInfo(t("google.signedInAs", { account: (await api.driveConnect()) || t("google.defaultAccount") })), "")}
         className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
       >
-        {busy === "conn" ? "aguardando navegador..." : status.connected ? "trocar de conta" : "entrar com o Google"}
+        {busy === "conn" ? t("google.waitingBrowser") : status.connected ? t("google.switchAccount") : t("google.signIn")}
       </button>
       {info && <p className="text-[11px] text-accent">{info}</p>}
     </section>

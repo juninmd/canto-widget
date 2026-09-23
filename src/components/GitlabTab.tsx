@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type GitlabStatus } from "../lib/api";
 import { NO_FILTER } from "../lib/forge";
+import { t } from "../i18n";
 import { useForgeLists } from "../lib/useForgeLists";
 import ForgeBoard from "./ForgeBoard";
 import GitlabConnect from "./GitlabConnect";
@@ -40,7 +41,7 @@ export default function GitlabTab({ onError }: { onError: (m: string) => void })
   }
 
   if (!status) {
-    return statusError ? <p className="text-xs text-danger">{statusError}</p> : <Skeleton label="carregando o GitLab" />;
+    return statusError ? <p className="text-xs text-danger">{statusError}</p> : <Skeleton label={t("gitlab.loading")} />;
   }
   if (!status.connected) return <GitlabConnect onConnected={() => void refresh()} />;
   const host = status.base_url.replace(/^https:\/\//, "");
