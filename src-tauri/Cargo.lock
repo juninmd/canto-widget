@@ -511,6 +511,7 @@ dependencies = [
  "argon2",
  "base64 0.23.1",
  "feed-rs",
+ "objc2-foundation",
  "rand 0.10.2",
  "reqwest",
  "rustls",

@@ -12,6 +12,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **macOS: aviso de reunião não aparecia** com o widget escondido na bandeja. O relógio do aviso rodava no
+  webview, que o macOS congela com a janela oculta (e o App Nap atrasa). Agora o núcleo em Rust confere a agenda a
+  cada 20 s e dispara a notificação do sistema e o aviso, sem duplicar com a interface.
 - **Reordenar tarefas** voltou a funcionar no Windows e no macOS: o arraste agora usa eventos de ponteiro (o
   arrastar-e-soltar HTML5 era engolido pelo webview), com realce do destino, **Esc** para cancelar e **↑/↓** no
   puxador para mover pelo teclado.

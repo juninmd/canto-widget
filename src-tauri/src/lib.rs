@@ -60,6 +60,7 @@ pub mod task_order;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
+pub mod meeting_alert;
 pub mod unlock_log;
 pub mod updater;
 pub mod vault;
@@ -100,12 +101,14 @@ pub fn run() {
             app.manage(AppState::new(dir.clone()));
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
+            app.manage(meeting_alert::Alerted::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
             background::start(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
             build_tray(app.handle())?;
             tray_live::watch(app.handle().clone());
+            meeting_alert::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
