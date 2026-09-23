@@ -91,9 +91,13 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_autostart::Builder::new().args([autostart::ARG_AUTOSTART]).build())
         .setup(|app| {
-            // A tray widget: no Dock icon or Cmd+Tab entry (`skipTaskbar` is a no-op on macOS).
+            // A tray widget: no Dock icon or Cmd+Tab entry (`skipTaskbar` is a no-op on macOS). The bundle's
+            // Info.plist (LSUIElement) covers launch; this covers `tauri dev` and any later policy reset.
             #[cfg(target_os = "macos")]
-            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+            {
+                app.set_activation_policy(tauri::ActivationPolicy::Accessory);
+                app.set_dock_visibility(false);
+            }
             register_toggle_shortcut(app.handle())?;
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
