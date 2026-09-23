@@ -4,7 +4,7 @@ use std::time::Duration;
 use zeroize::Zeroizing;
 
 use crate::error::{AppError, Result};
-use crate::forge::{checks_from_gitlab, merge, ChecksStatus, ForgeItem, ForgeList};
+use crate::forge::{checks_from_gitlab, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{ForgeFilter, Section, PER_PAGE};
 use crate::gitlab_query::{opened_since, requests, Request};
@@ -84,6 +84,9 @@ struct HeadPipeline {
 
 /// One call: unlike GitHub, GitLab already embeds the head pipeline in the MR detail.
 pub fn mr_checks(acc: &Account, project: &str, iid: u64) -> Result<ChecksStatus> {
+    if !valid_repo_path(project, 20) {
+        return Err(AppError::Format("projeto inválido".into()));
+    }
     let encoded = project.replace('/', "%2F");
     let url = format!("{}/api/v4/projects/{encoded}/merge_requests/{iid}", acc.base);
     let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
@@ -124,11 +127,11 @@ fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> R
     let err = |m: &str| Err(AppError::Gitlab(m.into()));
     match status {
         200..=299 => res.json().map_err(|e| AppError::Gitlab(format!("resposta inesperada: {e}"))),
-        300..=399 => err("o endereco redirecionou para outro lugar; confira o endereco da instancia"),
-        401 => err("token invalido, expirado ou revogado; conecte de novo"),
+        300..=399 => err("o endereço redirecionou para outro lugar; confira o endereço da instância"),
+        401 => err("token inválido, expirado ou revogado; conecte de novo"),
         403 | 429 if spent.is_some() || status == 429 => Err(rate_limited("gitlab", spent.map_or(now + 60_000, |q| q.reset_at), now)),
-        403 => err("o token nao tem acesso; ele precisa do escopo read_api"),
-        404 => err("nao achei a API do GitLab nesse endereco"),
+        403 => err("o token não tem acesso; ele precisa do escopo read_api"),
+        404 => err("não achei a API do GitLab nesse endereço"),
         _ => Err(AppError::Gitlab(format!("o GitLab respondeu {status}"))),
     }
 }

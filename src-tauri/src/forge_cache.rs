@@ -33,7 +33,7 @@ impl Quota {
 
 pub fn rate_limited(forge: &str, reset_at: i64, now: i64) -> AppError {
     let minutes = ((reset_at - now) as f64 / 60_000.0).ceil().max(1.0) as i64;
-    AppError::RateLimited { message: format!("{forge}: limite de requisicoes atingido; tente de novo em {minutes} min"), reset_at }
+    AppError::RateLimited { message: format!("{forge}: limite de requisições atingido; tente de novo em {minutes} min"), reset_at }
 }
 
 struct Entry {

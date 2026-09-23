@@ -47,7 +47,7 @@ pub fn autolock_get(state: State<'_, AppState>) -> i64 {
 #[tauri::command]
 pub fn autolock_set(state: State<'_, AppState>, minutes: i64) -> Result<()> {
     if !valid(minutes) {
-        return Err(AppError::Config("tempo de auto-trava invalido".into()));
+        return Err(AppError::Config("tempo de auto-trava inválido".into()));
     }
     store::write_json_atomic(&path(&state.dir), &Prefs { minutes })
 }

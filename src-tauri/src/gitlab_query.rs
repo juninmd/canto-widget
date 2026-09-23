@@ -23,7 +23,7 @@ pub fn requests(section: Section, username: &str, p: u32, f: &ForgeFilter) -> Re
     let order_by = match f.sort {
         Sort::Updated => "updated_at",
         Sort::Created => "created_at",
-        Sort::Comments => return Err(AppError::Gitlab("o GitLab nao ordena por comentarios".into())),
+        Sort::Comments => return Err(AppError::Gitlab("o GitLab não ordena por comentários".into())),
     };
     let (issue, mr) = match section {
         // The MR list defaults to created_by_me; reviewer needs scope=all to look past the user's own MRs.
@@ -76,12 +76,12 @@ pub fn base_url(input: &str) -> Result<String> {
     let input = input.trim();
     let with_scheme = if input.contains("://") { input.to_string() } else { format!("https://{input}") };
     let bad = |m: &str| AppError::Gitlab(m.into());
-    let url = url::Url::parse(&with_scheme).map_err(|_| bad("endereco invalido; use algo como https://gitlab.com"))?;
+    let url = url::Url::parse(&with_scheme).map_err(|_| bad("endereço inválido; use algo como https://gitlab.com"))?;
     if url.scheme() != "https" {
-        return Err(bad("o endereco precisa comecar com https://"));
+        return Err(bad("o endereço precisa começar com https://"));
     }
     if url.host_str().is_none_or(str::is_empty) || !url.username().is_empty() || url.password().is_some() || url.query().is_some() || url.fragment().is_some() {
-        return Err(bad("use so o endereco da instancia, sem usuario, senha ou parametros"));
+        return Err(bad("use só o endereço da instância, sem usuário, senha ou parâmetros"));
     }
     Ok(url.as_str().trim_end_matches('/').to_string())
 }
@@ -92,7 +92,7 @@ pub fn token(input: &str) -> Result<&str> {
     if (20..=255).contains(&t.len()) && t.bytes().all(|b| b.is_ascii_graphic()) {
         Ok(t)
     } else {
-        Err(AppError::Gitlab("token invalido; gere um token de acesso pessoal com o escopo read_api".into()))
+        Err(AppError::Gitlab("token inválido; gere um token de acesso pessoal com o escopo read_api".into()))
     }
 }
 

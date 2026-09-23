@@ -67,7 +67,7 @@ pub fn note_matches(n: &Note, needle_lower: &str) -> bool {
 pub fn validate_link(link: &NoteLink) -> Result<()> {
     let (NoteLink::Task { id, label } | NoteLink::Event { id, label }) = link;
     if id.trim().is_empty() || label.trim().is_empty() {
-        return Err(AppError::Config("vinculo invalido".into()));
+        return Err(AppError::Config("vínculo inválido".into()));
     }
     Ok(())
 }

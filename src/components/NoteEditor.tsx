@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { MOD_KEY } from "../lib/platform";
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
 import NoteLinkPicker from "./NoteLinkPicker";
@@ -106,7 +107,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
       <div className="flex gap-2">
         <button
           type="submit"
-          title="Ctrl+Enter"
+          title={`${MOD_KEY}+Enter`}
           className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent"
         >
           salvar

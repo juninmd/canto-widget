@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { TOGGLE_LABEL } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
@@ -223,7 +224,7 @@ function Canto() {
             type="button"
             onClick={() => void getCurrentWindow().hide()}
             className="grid size-6 place-items-center rounded hover:text-fg"
-            title="esconder (Ctrl+Alt+Espaço para voltar)"
+            title={`esconder (${TOGGLE_LABEL} para voltar)`}
             aria-label="esconder widget"
           >
             —

@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissoes minimas: apenas a janela principal e abertura de URL externa no navegador",
+  "description": "Permissoes minimas: apenas a janela principal; URLs e clipboard passam pelos comandos em Rust",
   "windows": [
     "main"
   ],
@@ -13,9 +13,6 @@
     "core:window:allow-set-focus",
     "core:window:allow-close",
     "core:window:allow-set-fullscreen",
-    "core:window:allow-is-fullscreen",
-    "opener:allow-open-url",
-    "clipboard-manager:allow-read-text",
-    "clipboard-manager:allow-write-text"
+    "core:window:allow-is-fullscreen"
   ]
 }

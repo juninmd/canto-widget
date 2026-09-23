@@ -142,7 +142,7 @@ pub fn use_client(cfg: &mut DriveConfig, embedded: Option<(&str, &str)>) -> bool
 
 fn open_in_browser(url: &str) -> Result<()> {
     tauri_plugin_opener::open_url(url, None::<&str>)
-        .map_err(|e| AppError::Drive(format!("nao consegui abrir o navegador: {e}")))
+        .map_err(|e| AppError::Drive(format!("não consegui abrir o navegador: {e}")))
 }
 
 #[cfg(test)]

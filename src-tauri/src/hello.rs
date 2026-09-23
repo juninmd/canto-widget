@@ -18,7 +18,7 @@ fn check(status: KeyCredentialStatus) -> Result<()> {
     let msg = match status {
         KeyCredentialStatus::Success => return Ok(()),
         KeyCredentialStatus::UserCanceled | KeyCredentialStatus::UserPrefersPassword => "cancelado; use a senha mestra",
-        KeyCredentialStatus::NotFound => "credencial nao encontrada; ative de novo em Ajustes",
+        KeyCredentialStatus::NotFound => "credencial não encontrada; ative de novo em Ajustes",
         KeyCredentialStatus::SecurityDeviceLocked => "dispositivo bloqueado por tentativas; use a senha mestra",
         _ => "falhou; use a senha mestra",
     };

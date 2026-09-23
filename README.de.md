@@ -214,7 +214,7 @@ herunter:
 
 1. Beim ersten Start legst du das **Master-Passwort** fest. Es gibt keine Wiederherstellung: Passwort verloren,
    Daten verloren.
-2. `Ctrl+Alt+Space` (`Cmd+Alt+Space` unter macOS) zeigt und versteckt das Widget.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` unter macOS) zeigt und versteckt das Widget.
 3. Fertig. Wenn eine neue Version erscheint, benachrichtigt Canto dich, und **Einstellungen → Updates**
    aktualisiert mit einem Klick.
 

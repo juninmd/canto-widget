@@ -96,7 +96,7 @@ pub fn validate_time(time: &str) -> Result<String> {
         && [0, 1, 3, 4].iter().all(|&i| b[i].is_ascii_digit())
         && matches!((time[..2].parse::<u8>(), time[3..].parse::<u8>()), (Ok(h), Ok(m)) if h < 24 && m < 60);
     if !ok {
-        return Err(AppError::Config("horario invalido, use HH:MM".into()));
+        return Err(AppError::Config("horário inválido, use HH:MM".into()));
     }
     Ok(time.to_string())
 }
@@ -104,7 +104,7 @@ pub fn validate_time(time: &str) -> Result<String> {
 pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, now: i64) -> Result<()> {
     if let Some(Repeat::Weekly { weekday }) = repeat {
         if weekday > 6 {
-            return Err(AppError::Config("dia da semana invalido".into()));
+            return Err(AppError::Config("dia da semana inválido".into()));
         }
     }
     t.reminder_time = time.filter(|h| !h.is_empty()).map(|h| validate_time(&h)).transpose()?;
@@ -122,9 +122,9 @@ pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, 
 
 fn validate_extended(repeat: &ExtendedRepeat) -> Result<()> {
     match repeat {
-        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => Err(AppError::Config("dia do mes invalido".into())),
+        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => Err(AppError::Config("dia do mês inválido".into())),
         ExtendedRepeat::SpecificDays { days } if days.is_empty() || days.iter().any(|d| *d > 6) => {
-            Err(AppError::Config("dias da semana invalidos".into()))
+            Err(AppError::Config("dias da semana inválidos".into()))
         }
         _ => Ok(()),
     }

@@ -24,7 +24,7 @@ impl AppState {
             return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
         }
         if new_password == current_password {
-            return Err(AppError::Config("a nova senha e igual a atual".into()));
+            return Err(AppError::Config("a nova senha é igual à atual".into()));
         }
         // Held start to finish: no watcher writes with the old key mid-change.
         let mut guard = self.session.lock().unwrap();
@@ -32,7 +32,7 @@ impl AppState {
         let vault: SealedBlob = store::read_json(&store::vault_path(&self.dir))?.ok_or(AppError::NotFound)?;
         VaultKey::derive(current_password, &session.salt)
             .and_then(|k| vault.open(&k, VAULT_AAD))
-            .map_err(|_| AppError::Config("a senha atual nao confere".into()))?;
+            .map_err(|_| AppError::Config("a senha atual não confere".into()))?;
 
         let salt = store::new_salt();
         let key = VaultKey::derive(new_password, &salt)?;

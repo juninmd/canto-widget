@@ -211,7 +211,7 @@ Descarga el instalador para tu plataforma desde **[Releases](https://github.com/
 
 1. En el primer inicio creas la **contraseña maestra**. No hay recuperación: si pierdes la contraseña, pierdes
    los datos.
-2. `Ctrl+Alt+Space` (`Cmd+Alt+Space` en macOS) muestra y oculta el widget.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` en macOS) muestra y oculta el widget.
 3. Listo. Cuando se publique una nueva versión, Canto te avisa, y **Ajustes → Actualizaciones** actualiza con un
    clic.
 
