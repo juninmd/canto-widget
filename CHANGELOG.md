@@ -12,6 +12,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Lembretes de tarefa com o widget escondido** (sobretudo no macOS): passam a ser disparados pelo núcleo em Rust,
+  como o aviso de reunião, em vez do relógio do webview, que é congelado com a janela oculta.
 - **macOS: aviso de reunião não aparecia** com o widget escondido na bandeja. O relógio do aviso rodava no
   webview, que o macOS congela com a janela oculta (e o App Nap atrasa). Agora o núcleo em Rust confere a agenda a
   cada 20 s e dispara a notificação do sistema e o aviso, sem duplicar com a interface.

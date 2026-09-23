@@ -5,7 +5,6 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
 let agendaItems: unknown[] = [];
-let reminders: unknown[] | null = null;
 let vaultStatus = { exists: true, unlocked: true };
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -20,8 +19,6 @@ mock.module("@tauri-apps/api/core", () => ({
         return Promise.resolve(null);
       case "agenda_today":
         return Promise.resolve(agendaItems);
-      case "tasks_reminders":
-        return Promise.resolve(reminders);
       case "alert_payload":
         return Promise.resolve({ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" });
       case "notes_search":
@@ -87,7 +84,6 @@ async function settle() {
 beforeEach(() => {
   calls.length = 0;
   agendaItems = [];
-  reminders = null;
   vaultStatus = { exists: true, unlocked: true };
   localStorage.clear();
   // Before render: the alert clock is created when App mounts.
@@ -145,23 +141,11 @@ test("a distant meeting does not trigger a pop-up", async () => {
   expect(calls.some((c) => c.cmd === "alert_open")).toBe(false);
 });
 
-test("a task reminder opens the alert on time, only once", async () => {
-  const now = new Date();
-  const p = (n: number) => String(n).padStart(2, "0");
-  const { todayLocal } = await import("./lib/api");
-  reminders = [
-    { id: "t1", title: "tomar remédio", done: false, day: todayLocal(now), created_at: 1, updated_at: 1, hora: `${p(now.getHours())}:${p(now.getMinutes())}` },
-  ];
+test("task reminders ring from Rust: the UI only pushes the lead time", async () => {
   render(<App />);
   await settle();
-  await act(async () => {
-    jest.advanceTimersByTime(60_000);
-    await Promise.resolve();
-  });
-
-  const alerts = calls.filter((c) => c.cmd === "alert_open");
-  expect(alerts).toHaveLength(1);
-  expect((alerts[0]?.args?.event as { id: string }).id).toBe("task:t1");
+  expect(calls.find((c) => c.cmd === "reminder_lead_set")?.args).toEqual({ minutes: 0 });
+  expect(calls.some((c) => c.cmd === "tasks_reminders")).toBe(false);
 });
 
 test("Alt+2 goes to notes and ? opens the shortcuts help, which closes with Esc", async () => {

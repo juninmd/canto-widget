@@ -4,7 +4,6 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
 import { useAgenda } from "./lib/useAgenda";
-import { useReminders } from "./lib/useReminders";
 import { useUpdateNotice } from "./lib/useUpdateNotice";
 import { useFullscreen } from "./lib/useFullscreen";
 import { focusShortcut, useShortcuts } from "./lib/shortcuts";
@@ -58,7 +57,10 @@ function Canto() {
   const agenda = useAgenda(status?.unlocked === true);
   const [reminderLead, setReminderLead] = useReminderLead();
   const { privacy, togglePrivacy } = usePrivacyMode();
-  useReminders(status?.unlocked === true, today, reminderLead);
+  // Reminders ring from Rust (a hidden webview's timers are suspended); it only needs the lead time.
+  useEffect(() => {
+    void api.reminderLeadSet(reminderLead).catch(() => {});
+  }, [reminderLead]);
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);

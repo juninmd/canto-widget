@@ -1,25 +1,11 @@
 import type { AgendaItem, Repeat, Task } from "./api";
 
-/** Window during which the reminder still counts: the watcher runs every 30s and can run late. */
-const TOLERANCE_MIN = 2;
 export const TASK_PREFIX = "task:";
 
 function start(day: string, time: string): Date {
   const [y, m, d] = day.split("-").map(Number);
   const [h, min] = time.split(":").map(Number);
   return new Date(y, m - 1, d, h, min, 0);
-}
-
-/** Key includes day and time: rescheduling the task produces a new reminder. */
-export const reminderKey = (t: Task) => `${t.id}@${t.day}T${t.hora}`;
-
-/** Open tasks whose time (minus `leadMinutes`, default 0) arrived less than 2 min ago and haven't reminded yet. */
-export function dueReminders(tasks: Task[], alreadyNotified: Set<string>, now = new Date(), leadMinutes = 0): Task[] {
-  return tasks.filter((t) => {
-    if (t.done || !t.hora || alreadyNotified.has(reminderKey(t))) return false;
-    const elapsed = (now.getTime() - start(t.day, t.hora).getTime()) / 60_000 + leadMinutes;
-    return elapsed >= 0 && elapsed < TOLERANCE_MIN;
-  });
 }
 
 /** The alert overlay speaks the agenda's language; the task becomes an event with a tagged id. */

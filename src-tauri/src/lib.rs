@@ -58,6 +58,7 @@ pub mod store;
 pub mod subtask;
 pub mod sync;
 pub mod task_order;
+pub mod task_reminder;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
@@ -98,6 +99,7 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(meeting_alert::Alerted::default());
+            app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
             background::start(app.handle().clone(), dir.clone());
@@ -105,6 +107,7 @@ pub fn run() {
             build_tray(app.handle())?;
             tray_live::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
+            task_reminder::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -152,7 +155,7 @@ pub fn run() {
             cmd_notes::note_export_md,
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
-            routine::tasks_reminders,
+            task_reminder::reminder_lead_set,
             commands::item_delete,
             cmd_drive::drive_status,
             cmd_drive::drive_configure,
