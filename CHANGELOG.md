@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Reordenar tarefas com filtro de prioridade**: o puxador continua disponível com o filtro ativo; só as tarefas
+  visíveis trocam de lugar e as ocultas mantêm a posição.
 - **Status API**: os serviços aparecem ordenados pela hora do último incidente (mais recente primeiro; sem
   incidentes no fim) e os que tiveram incidente nas últimas 24 h ganham destaque em vermelho, com ponto pulsante.
 

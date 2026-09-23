@@ -6,7 +6,7 @@ import TaskRow from "./TaskRow";
 import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
 import { useNewIds, useExit } from "../lib/motion";
-import { useReorder } from "../lib/useReorder";
+import { mergeOrder, useReorder } from "../lib/useReorder";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -87,10 +87,14 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const done = tasks.filter((t) => t.done).length;
   const visible = priorityFilter ? tasks.filter((t) => t.priority === priorityFilter) : tasks;
 
-  // Only reorders in the unfiltered view: a filtered subset can't express a total order for the hidden tasks too.
+  // A filtered view reorders its own rows; hidden tasks keep their slots in the day's order.
   const reorder = useReorder(
-    tasks.map((t) => t.id),
-    (ids) => {
+    visible.map((t) => t.id),
+    (visibleIds) => {
+      const ids = mergeOrder(
+        tasks.map((t) => t.id),
+        visibleIds,
+      );
       const byId = new Map(tasks.map((t) => [t.id, t]));
       setTasks(ids.flatMap((id) => byId.get(id) ?? []));
       void run(() => api.tasksReorder(today, ids));
@@ -135,7 +139,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             checking={checking === t.id}
             editing={editing}
             detailsOpen={details === t.id}
-            draggable={priorityFilter === ""}
+            draggable
             dragging={reorder.dragging === t.id}
             dropTarget={reorder.dragging !== null && reorder.over === t.id && reorder.dragging !== t.id}
             onDragStart={() => reorder.start(t.id)}
