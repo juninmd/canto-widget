@@ -5,6 +5,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Idioma: português ou inglês**, em Ajustes > Idioma. "Automático (sistema)" é o padrão: português para
+  sistemas em `pt-*`, inglês para os demais. A troca recarrega a interface na hora; notificações do sistema e o
+  menu da bandeja acompanham o idioma. Mensagens de erro vindas do núcleo seguem em português.
+
 ### Alterado
 
 - **Base para tradução**: todos os textos da interface saíram dos componentes para um catálogo

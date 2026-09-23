@@ -57,9 +57,12 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 
 - **Code in English** (identifiers, files, comments, test names). **User-facing text in pt-BR** (UI, errors
   returned to the UI, notifications). Tests assert on the pt-BR text the user sees.
-- **UI text lives in the catalog**, never inline: `t("area.key", { param })` from `src/i18n`, with the pt-BR text
-  in `src/i18n/pt-BR/<area>.ts` (app, tasks, content, integrations). Dates and numbers use `LOCALE`, not a literal
-  `"pt-BR"`. Symbols, key names and brand names stay inline. Errors from Rust are still pt-BR strings in Rust.
+- **UI text lives in the catalog**, never inline: `t("area.key", { param })` from `src/i18n`, with the text in
+  `src/i18n/pt-BR/<area>.ts` and `src/i18n/en/<area>.ts` (app, tasks, content, integrations). A new key goes in
+  **both** languages (the type and a parity test fail otherwise). Dates and numbers use `LOCALE`, not a literal.
+  Symbols, key names and brand names stay inline. The language is chosen in Settings (`canto.language`, default
+  "auto") and resolved once at startup; Rust gets it via `language_set` for notifications and the tray
+  (`lang::tr`). Errors from Rust are still pt-BR strings in Rust. UI tests run in pt-BR (`src/test-setup.ts`).
 - Comments only for *why*, one line. No narrating comments, no section banners.
 - Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
 - One feature per module; commands are thin, logic is a pure function with a unit test.
