@@ -13,6 +13,7 @@ import TabsSection from "./TabsSection";
 import RemindersSection from "./RemindersSection";
 import type { Tab } from "./TabBar";
 import type { LeadMinutes } from "../lib/reminderLead";
+import { t } from "../i18n";
 
 type Props = {
   onError: (m: string) => void;
@@ -56,8 +57,8 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
     <div className="flex h-full flex-col gap-4 overflow-y-auto pr-1 text-sm">
       <section className="flex flex-col gap-2">
         <p className="text-xs text-muted">
-          Atalho global: <span className="text-muted">{TOGGLE_LABEL}</span> mostra ou esconde o widget. Tecle{" "}
-          <kbd className="rounded border border-line px-1 text-[11px]">?</kbd> para ver todos os atalhos.
+          {t("settings.shortcutHint.before")} <span className="text-muted">{TOGGLE_LABEL}</span> {t("settings.shortcutHint.middle")}{" "}
+          <kbd className="rounded border border-line px-1 text-[11px]">?</kbd> {t("settings.shortcutHint.after")}
         </p>
         <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
           <input
@@ -67,7 +68,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
             onChange={(e) => void toggle(e.target.checked)}
             className="size-4 accent-[var(--color-accent)]"
           />
-          abrir o Canto ao ligar o computador (direto na bandeja)
+          {t("settings.autostart")}
         </label>
       </section>
       <SkinPicker />

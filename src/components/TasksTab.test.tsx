@@ -24,12 +24,13 @@ type MockTask = typeof baseTask & {
 };
 let task: MockTask = { ...baseTask };
 let extraTask: MockTask | null = null;
+let extraTasks: MockTask[] = [];
 let nextSubtaskId = 0;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
-    if (cmd === "tasks_for_day") return Promise.resolve(extraTask ? [task, extraTask] : [task]);
+    if (cmd === "tasks_for_day") return Promise.resolve([task, ...extraTasks, ...(extraTask ? [extraTask] : [])]);
     if (cmd === "task_add") return Promise.resolve({ ...task, id: "t2", title: args?.title });
     if (cmd === "item_delete") return Promise.resolve("chave-1");
     if (cmd === "trash_undo") return Promise.resolve(true);
@@ -88,6 +89,7 @@ beforeEach(() => {
   calls.length = 0;
   task = { ...baseTask };
   extraTask = null;
+  extraTasks = [];
   nextSubtaskId = 0;
 });
 
@@ -358,15 +360,19 @@ test("arrow keys on the grip move the task one slot", async () => {
   expect(calls.find((c) => c.cmd === "tasks_reorder")?.args).toEqual({ day: "2026-09-09", ids: ["t3", "t1"] });
 });
 
-test("the drag handle is hidden while a priority filter is active", async () => {
+test("with a priority filter, reordering the visible tasks keeps the hidden ones in their slots", async () => {
   task = { ...task, priority: "low" };
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", priority: "low", created_at: 3, updated_at: 3 };
+  extraTasks = [{ ...baseTask, id: "t2", title: "ligar pro banco", priority: "high", created_at: 2, updated_at: 2 }];
   await mount();
-  expect(screen.queryByLabelText("arrastar comprar leite para reordenar")).toBeTruthy();
   await act(async () => {
     fireEvent.change(screen.getByLabelText("filtrar por prioridade"), { target: { value: "low" } });
   });
-  expect(screen.getByText("comprar leite")).toBeTruthy();
-  expect(screen.queryByLabelText("arrastar comprar leite para reordenar")).toBeNull();
+  expect(screen.queryByText("ligar pro banco")).toBeNull();
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("arrastar comprar leite para reordenar"), { key: "ArrowDown" });
+  });
+  expect(calls.find((c) => c.cmd === "tasks_reorder")?.args).toEqual({ day: "2026-09-09", ids: ["t3", "t2", "t1"] });
 });
 
 test("clearing the PR field sends null", async () => {

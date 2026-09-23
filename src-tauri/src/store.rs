@@ -33,12 +33,7 @@ pub struct KdfParams {
 
 impl Default for KdfParams {
     fn default() -> Self {
-        Self {
-            alg: "argon2id".into(),
-            m_kib: 19 * 1024,
-            t: 2,
-            p: 1,
-        }
+        Self { alg: "argon2id".into(), m_kib: 19 * 1024, t: 2, p: 1 }
     }
 }
 
@@ -56,23 +51,15 @@ impl SealedBlob {
     }
 
     pub fn salt_bytes(&self) -> Result<Vec<u8>> {
-        B64.decode(&self.salt)
-            .map_err(|e| AppError::Format(e.to_string()))
+        B64.decode(&self.salt).map_err(|e| AppError::Format(e.to_string()))
     }
 
     pub fn open(&self, key: &VaultKey, aad: &[u8]) -> Result<Vec<u8>> {
         if self.version != FORMAT_VERSION {
-            return Err(AppError::Format(format!(
-                "versão de cofre {} não suportada",
-                self.version
-            )));
+            return Err(AppError::Format(format!("versão de cofre {} não suportada", self.version)));
         }
-        let nonce = B64
-            .decode(&self.nonce)
-            .map_err(|e| AppError::Format(e.to_string()))?;
-        let ct = B64
-            .decode(&self.ciphertext)
-            .map_err(|e| AppError::Format(e.to_string()))?;
+        let nonce = B64.decode(&self.nonce).map_err(|e| AppError::Format(e.to_string()))?;
+        let ct = B64.decode(&self.ciphertext).map_err(|e| AppError::Format(e.to_string()))?;
         self.decrypt_parts(key, &nonce, &ct, aad)
     }
 

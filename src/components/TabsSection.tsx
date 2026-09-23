@@ -1,5 +1,6 @@
 import type { Tab } from "./TabBar";
 import { HIDEABLE } from "../lib/tabs";
+import { t } from "../i18n";
 
 type Props = { hidden: Tab[]; onChange: (hidden: Tab[]) => void };
 
@@ -8,27 +9,27 @@ export default function TabsSection({ hidden, onChange }: Props) {
   const shown = HIDEABLE.filter((t) => !hidden.includes(t.id)).length;
   return (
     <fieldset className="flex flex-col gap-1.5">
-      <legend className="mb-1 text-xs font-semibold text-fg">Abas visíveis</legend>
+      <legend className="mb-1 text-xs font-semibold text-fg">{t("settings.tabs.title")}</legend>
       <div className="grid grid-cols-2 gap-1">
-        {HIDEABLE.map((t) => {
-          const on = !hidden.includes(t.id);
+        {HIDEABLE.map((tab) => {
+          const on = !hidden.includes(tab.id);
           // At least one tab besides Ajustes stays, or the widget turns into a settings screen.
           const last = on && shown === 1;
           return (
-            <label key={t.id} className="flex min-h-6 items-center gap-2 text-xs text-muted">
+            <label key={tab.id} className="flex min-h-6 items-center gap-2 text-xs text-muted">
               <input
                 type="checkbox"
                 checked={on}
                 disabled={last}
-                onChange={(e) => onChange(e.target.checked ? hidden.filter((h) => h !== t.id) : [...hidden, t.id])}
+                onChange={(e) => onChange(e.target.checked ? hidden.filter((h) => h !== tab.id) : [...hidden, tab.id])}
                 className="size-4 accent-[var(--color-accent)]"
               />
-              {t.label}
+              {tab.label}
             </label>
           );
         })}
       </div>
-      <p className="text-[11px] text-faint">Ajustes fica sempre visível. Alt+1, Alt+2… seguem a ordem das abas visíveis.</p>
+      <p className="text-[11px] text-faint">{t("settings.tabs.hint")}</p>
     </fieldset>
   );
 }

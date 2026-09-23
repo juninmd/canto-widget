@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, errText, type AgendaItem } from "../lib/api";
+import { t } from "../i18n";
 import AgendaCard from "./AgendaCard";
 import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
@@ -9,16 +10,16 @@ function testEvent(): AgendaItem {
   const now = new Date();
   return {
     id: `teste-${now.getTime()}`,
-    title: "Reunião de teste do Canto",
+    title: t("agenda.test.title"),
     start: now.toISOString(),
     end: new Date(now.getTime() + 30 * 60_000).toISOString(),
     all_day: false,
-    location: "Sala virtual",
+    location: t("agenda.test.location"),
     meet: "https://meet.google.com/abc-defg-hij",
     link: "",
-    organizer: "você",
+    organizer: t("agenda.test.organizer"),
     guests: 3,
-    description: "Evento de exemplo para conferir o aviso, o som e os detalhes da reunião.",
+    description: t("agenda.test.description"),
   };
 }
 
@@ -35,22 +36,22 @@ export default function AgendaTab({
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex items-center justify-between text-[11px] text-faint">
-        <span>agenda de hoje · aviso 1 min antes</span>
+        <span>{t("agenda.header")}</span>
         <span className="flex gap-3">
           <button
             type="button"
-            title="abre o pop-up com um evento de exemplo, para conferir som e aviso"
+            title={t("agenda.testAlertTitle")}
             onClick={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
             className="min-h-6 underline decoration-dotted hover:text-muted"
           >
-            testar aviso
+            {t("agenda.testAlert")}
           </button>
           <button
             type="button"
             onClick={() => void reload()}
             className="min-h-6 underline decoration-dotted hover:text-muted"
           >
-            {loading ? "..." : "atualizar"}
+            {loading ? "..." : t("agenda.refresh")}
           </button>
         </span>
       </div>
@@ -61,12 +62,12 @@ export default function AgendaTab({
         ))}
         {items.length === 0 && loading && !error && (
           <li>
-            <Skeleton label="carregando a agenda" />
+            <Skeleton label={t("agenda.loading")} />
           </li>
         )}
         {items.length === 0 && !loading && (
           <li className="px-2 py-6 text-center text-xs text-faint">
-            {error || "nenhum evento hoje. Para ver sua agenda, entre com o Google em Ajustes."}
+            {error || t("agenda.empty")}
           </li>
         )}
       </ul>

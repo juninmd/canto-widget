@@ -29,7 +29,9 @@ fn assigned_hits_both_endpoints_unless_the_filter_picks_one() {
     assert_eq!(both.iter().map(|r| r.path).collect::<Vec<_>>(), vec!["issues", "merge_requests"]);
     let only_mr = requests(Section::Assigned, "ana", 1, &ForgeFilter { kind: Kind::Pr, ..Default::default() }).unwrap();
     assert_eq!(only_mr.len(), 1);
-    assert!(requests(Section::MyIssues, "ana", 1, &ForgeFilter { kind: Kind::Pr, ..Default::default() }).unwrap().is_empty());
+    assert!(requests(Section::MyIssues, "ana", 1, &ForgeFilter { kind: Kind::Pr, ..Default::default() })
+        .unwrap()
+        .is_empty());
 }
 
 #[test]
@@ -63,7 +65,15 @@ fn base_url_accepts_gitlab_com_and_self_hosted_prefixes() {
 
 #[test]
 fn base_url_refuses_what_could_leak_the_token() {
-    for bad in ["http://gitlab.acme.com", "ftp://gitlab.com", "https://user:pw@gitlab.com", "https://gitlab.com/?x=1", "https://gitlab.com/#a", "https://", ""] {
+    for bad in [
+        "http://gitlab.acme.com",
+        "ftp://gitlab.com",
+        "https://user:pw@gitlab.com",
+        "https://gitlab.com/?x=1",
+        "https://gitlab.com/#a",
+        "https://",
+        "",
+    ] {
         assert!(base_url(bad).is_err(), "{bad}");
     }
 }

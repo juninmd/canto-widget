@@ -32,7 +32,8 @@ pub fn alert_snooze(app: tauri::AppHandle, minutes: u64) -> Result<()> {
     std::thread::spawn(move || {
         std::thread::sleep(wait);
         let state = app.state::<AppState>();
-        let due = state.in_background(|d| (still_due(&event, Some(d)), false)).unwrap_or_else(|_| still_due(&event, None));
+        let due =
+            state.in_background(|d| (still_due(&event, Some(d)), false)).unwrap_or_else(|_| still_due(&event, None));
         if due {
             let _ = crate::window::open_alert(&app, event);
         }

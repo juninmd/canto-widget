@@ -25,10 +25,7 @@ pub struct Status {
 
 #[tauri::command]
 pub fn vault_status(state: State<'_, AppState>) -> Status {
-    Status {
-        exists: state.vault_exists(),
-        unlocked: state.is_unlocked(),
-    }
+    Status { exists: state.vault_exists(), unlocked: state.is_unlocked() }
 }
 
 #[tauri::command(async)]
@@ -68,15 +65,7 @@ pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task
 pub fn task_add(state: State<'_, AppState>, title: String, day: String) -> Result<Task> {
     let title = task_title(&title)?;
     let now = now_ms();
-    let task = Task {
-        id: new_id(),
-        title,
-        done: false,
-        day,
-        created_at: now,
-        updated_at: now,
-        ..Default::default()
-    };
+    let task = Task { id: new_id(), title, done: false, day, created_at: now, updated_at: now, ..Default::default() };
     let created = task.clone();
     state.mutate(|d| d.tasks.push(task))?;
     Ok(created)
@@ -188,10 +177,7 @@ mod tests {
     #[test]
     fn empty_or_whitespace_only_title_is_rejected() {
         for raw in ["", "   ", "\t\n", "\u{00a0}"] {
-            assert!(
-                matches!(task_title(raw), Err(AppError::Config(_))),
-                "aceitou {raw:?} como titulo"
-            );
+            assert!(matches!(task_title(raw), Err(AppError::Config(_))), "aceitou {raw:?} como titulo");
         }
     }
 
@@ -203,7 +189,10 @@ mod tests {
 
     #[test]
     fn pr_url_accepts_trimmed_https_and_clears_on_blank() {
-        assert_eq!(pr_url(Some("  https://github.com/o/r/pull/1  ".into())).unwrap(), Some("https://github.com/o/r/pull/1".into()));
+        assert_eq!(
+            pr_url(Some("  https://github.com/o/r/pull/1  ".into())).unwrap(),
+            Some("https://github.com/o/r/pull/1".into())
+        );
         assert_eq!(pr_url(Some("   ".into())).unwrap(), None);
         assert_eq!(pr_url(None).unwrap(), None);
     }

@@ -1,13 +1,14 @@
 import { useEffect, useRef } from "react";
 import { MOD_KEY, TOGGLE_LABEL } from "../lib/platform";
+import { t } from "../i18n";
 
 const TIPS = [
-  [TOGGLE_LABEL, "mostra ou esconde o widget, de qualquer app"],
-  ["Alt+1…Alt+9", "trocam de aba"],
-  [`${MOD_KEY}+K`, "busca ao mesmo tempo em tarefas, notas e clipboard"],
-  ["N", "cria uma tarefa ou card novo"],
-  ["Alt+L", "tranca o cofre na hora"],
-  ["?", "mostra a lista completa de atalhos, a qualquer momento"],
+  [TOGGLE_LABEL, t("onboarding.tip.toggle")],
+  ["Alt+1…Alt+9", t("onboarding.tip.tabs")],
+  [`${MOD_KEY}+K`, t("onboarding.tip.search")],
+  ["N", t("onboarding.tip.new")],
+  ["Alt+L", t("onboarding.tip.lock")],
+  ["?", t("onboarding.tip.help")],
 ];
 
 /** Shown once, right after the vault is created — never on a plain unlock. */
@@ -35,11 +36,10 @@ export default function Onboarding({ onClose }: { onClose: () => void }) {
     >
       <header>
         <h2 id="onboarding-titulo" className="text-sm font-semibold">
-          Bem-vindo ao canto
+          {t("onboarding.title")}
         </h2>
         <p className="mt-0.5 text-xs text-muted">
-          Cofre criado. Tarefas, notas, clipboard, reuniões, agenda e GitHub/GitLab ficam cifrados localmente,
-          numa aba cada.
+          {t("onboarding.intro")}
         </p>
       </header>
 
@@ -55,7 +55,7 @@ export default function Onboarding({ onClose }: { onClose: () => void }) {
       </ul>
 
       <button ref={closeButton} type="button" onClick={onClose} className="rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent">
-        entendi
+        {t("onboarding.close")}
       </button>
     </div>
   );

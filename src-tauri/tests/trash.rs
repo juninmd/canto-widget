@@ -1,14 +1,30 @@
 use canto_widget_lib::clipboard::{ClipHistory, ClipItem};
-use canto_widget_lib::trash::{undo, Removed};
 use canto_widget_lib::model::{now_ms, Note, Task, VaultData};
+use canto_widget_lib::trash::{undo, Removed};
 use canto_widget_lib::vault::AppState;
 
 fn task(id: &str, updated_at: i64) -> Task {
-    Task { id: id.into(), title: "pagar boleto".into(), done: false, day: "2026-09-14".into(), created_at: 1, updated_at, ..Default::default() }
+    Task {
+        id: id.into(),
+        title: "pagar boleto".into(),
+        done: false,
+        day: "2026-09-14".into(),
+        created_at: 1,
+        updated_at,
+        ..Default::default()
+    }
 }
 
 fn note(id: &str) -> Note {
-    Note { id: id.into(), title: "wifi".into(), body: "senha".into(), tags: vec![], created_at: 1, updated_at: 5, ..Default::default() }
+    Note {
+        id: id.into(),
+        title: "wifi".into(),
+        body: "senha".into(),
+        tags: vec![],
+        created_at: 1,
+        updated_at: 5,
+        ..Default::default()
+    }
 }
 
 fn clip(id: &str, text: &str, copied_at: i64) -> ClipItem {

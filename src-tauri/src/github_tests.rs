@@ -22,7 +22,8 @@ fn search_response(total: u64, items: Vec<serde_json::Value>) -> SearchResponse 
 
 #[test]
 fn search_result_becomes_an_item_with_repo_and_type() {
-    let list = convert(search_response(1, vec![raw(7, "https://github.com/octo/canto/pull/7", "2026-09-10T10:00:00Z", true)]));
+    let list =
+        convert(search_response(1, vec![raw(7, "https://github.com/octo/canto/pull/7", "2026-09-10T10:00:00Z", true)]));
     assert_eq!(list.total, 1);
     let it = &list.items[0];
     assert_eq!((it.repo.as_str(), it.number, it.is_pr, it.draft), ("octo/canto", 7, true, true));
@@ -31,17 +32,23 @@ fn search_result_becomes_an_item_with_repo_and_type() {
 
 #[test]
 fn issue_without_a_pr_field_is_not_marked_as_pr() {
-    let list = convert(search_response(1, vec![raw(3, "https://github.com/octo/canto/issues/3", "2026-09-10T10:00:00Z", false)]));
+    let list = convert(search_response(
+        1,
+        vec![raw(3, "https://github.com/octo/canto/issues/3", "2026-09-10T10:00:00Z", false)],
+    ));
     assert!(!list.items[0].is_pr);
     assert!(!list.items[0].draft);
 }
 
 #[test]
 fn link_outside_github_is_dropped() {
-    let list = convert(search_response(2, vec![
-        raw(1, "javascript:alert(1)", "2026-09-10T10:00:00Z", false),
-        raw(2, "https://evil.example/octo/canto/issues/2", "2026-09-10T10:00:00Z", false),
-    ]));
+    let list = convert(search_response(
+        2,
+        vec![
+            raw(1, "javascript:alert(1)", "2026-09-10T10:00:00Z", false),
+            raw(2, "https://evil.example/octo/canto/issues/2", "2026-09-10T10:00:00Z", false),
+        ],
+    ));
     assert!(list.items.is_empty());
 }
 
@@ -51,5 +58,8 @@ fn item_keeps_what_the_sort_needs_and_a_ready_reference() {
     v["created_at"] = serde_json::json!("2026-09-01T08:00:00Z");
     v["comments"] = serde_json::json!(4);
     let it = &convert(search_response(1, vec![v])).items[0];
-    assert_eq!((it.created_at.as_str(), it.comments, it.reference.as_str()), ("2026-09-01T08:00:00Z", 4, "octo/canto#9"));
+    assert_eq!(
+        (it.created_at.as_str(), it.comments, it.reference.as_str()),
+        ("2026-09-01T08:00:00Z", 4, "octo/canto#9")
+    );
 }

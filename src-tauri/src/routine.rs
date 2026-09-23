@@ -122,7 +122,9 @@ pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, 
 
 fn validate_extended(repeat: &ExtendedRepeat) -> Result<()> {
     match repeat {
-        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => Err(AppError::Config("dia do mês inválido".into())),
+        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => {
+            Err(AppError::Config("dia do mês inválido".into()))
+        }
         ExtendedRepeat::SpecificDays { days } if days.is_empty() || days.iter().any(|d| *d > 6) => {
             Err(AppError::Config("dias da semana inválidos".into()))
         }
@@ -166,21 +168,11 @@ pub fn task_set_schedule(
     })?
 }
 
-/// For the reminder watcher, which runs in the background: must not postpone auto-lock, and a locked vault returns an empty list instead of an error every 30s.
-#[tauri::command(async)]
-pub fn tasks_reminders(state: State<'_, AppState>, day: String) -> Result<Vec<Task>> {
-    let list = state.in_background(|d| {
-        let created = materialize(d, &day, now_ms());
-        let list = d
-            .tasks
-            .iter()
-            .filter(|t| t.day == day && !t.done && t.reminder_time.is_some())
-            .cloned()
-            .collect();
+/// Open tasks with a time on `day`, materializing the day's recurring instances first.
+pub fn reminders_for(state: &AppState, day: &str) -> Result<Vec<Task>> {
+    state.in_background(|d| {
+        let created = materialize(d, day, now_ms());
+        let list = d.tasks.iter().filter(|t| t.day == day && !t.done && t.reminder_time.is_some()).cloned().collect();
         (list, created > 0)
-    });
-    match list {
-        Err(AppError::Locked) => Ok(vec![]),
-        other => other,
-    }
+    })
 }

@@ -75,7 +75,11 @@ mod tests {
         let docs = from_events(vec![
             event("Daily", "2026-09-16T09:00:00Z", vec![notes]),
             event("Daily", "2026-09-17T09:00:00Z", vec![notes]),
-            event("Retro", "2026-09-18T15:00:00Z", vec![("Notes by Gemini", "https://docs.google.com/document/d/y", "")]),
+            event(
+                "Retro",
+                "2026-09-18T15:00:00Z",
+                vec![("Notes by Gemini", "https://docs.google.com/document/d/y", "")],
+            ),
         ]);
         let got: Vec<(&str, &str)> = docs.iter().map(|d| (d.meeting.as_str(), d.start.as_str())).collect();
         assert_eq!(got, vec![("Retro", "2026-09-18T15:00:00Z"), ("Daily", "2026-09-17T09:00:00Z")]);

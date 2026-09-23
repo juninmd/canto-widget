@@ -33,11 +33,7 @@ impl Default for Pkce {
 impl Pkce {
     pub fn new() -> Self {
         let verifier = random_b64(64);
-        Self {
-            challenge: challenge(&verifier),
-            verifier,
-            state: random_b64(24),
-        }
+        Self { challenge: challenge(&verifier), verifier, state: random_b64(24) }
     }
 }
 
@@ -62,10 +58,7 @@ impl Loopback {
         let listener = TcpListener::bind("127.0.0.1:0")?;
         listener.set_nonblocking(true)?;
         let port = listener.local_addr()?.port();
-        Ok(Self {
-            redirect_uri: format!("http://127.0.0.1:{port}"),
-            listener,
-        })
+        Ok(Self { redirect_uri: format!("http://127.0.0.1:{port}"), listener })
     }
 
     /// `state` is checked here: without that, any local page could inject a code from another account on this port.
@@ -108,8 +101,7 @@ fn parse_callback(request_line: &str, expected_state: &str) -> Result<String> {
         .split_whitespace()
         .nth(1)
         .ok_or_else(|| AppError::Drive("requisição de callback inválida".into()))?;
-    let url = url::Url::parse(&format!("http://127.0.0.1{path}"))
-        .map_err(|e| AppError::Drive(e.to_string()))?;
+    let url = url::Url::parse(&format!("http://127.0.0.1{path}")).map_err(|e| AppError::Drive(e.to_string()))?;
     let mut code = None;
     let mut state = None;
     for (k, v) in url.query_pairs() {

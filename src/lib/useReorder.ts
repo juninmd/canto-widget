@@ -11,6 +11,13 @@ export function moveId(ids: string[], id: string, target: string): string[] | nu
   return out;
 }
 
+/** Puts a filtered subset's new order back into the full list: hidden items keep their slots. */
+export function mergeOrder(all: string[], visible: string[]): string[] {
+  const shown = new Set(visible);
+  let next = 0;
+  return all.map((id) => (shown.has(id) ? visible[next++] : id));
+}
+
 /**
  * Pointer-driven reordering. HTML5 drag-and-drop is swallowed by the Tauri file-drop handler on
  * Windows and never starts in WKWebView (macOS) without dataTransfer data, so it can't be relied on.

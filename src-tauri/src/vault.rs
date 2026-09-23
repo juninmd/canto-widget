@@ -83,18 +83,11 @@ impl AppState {
             return Err(AppError::AlreadyExists);
         }
         if password.chars().count() < MIN_PASSWORD_LEN {
-            return Err(AppError::Config(format!(
-                "a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres"
-            )));
+            return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
         }
         let salt = store::new_salt();
         let key = VaultKey::derive(password, &salt)?;
-        let session = Session {
-            key,
-            password: Zeroizing::new(password.to_string()),
-            salt,
-            data: VaultData::default(),
-        };
+        let session = Session { key, password: Zeroizing::new(password.to_string()), salt, data: VaultData::default() };
         self.persist(&session)?;
         self.sync_after_persist();
         *self.session.lock().unwrap() = Some(session);
@@ -103,19 +96,14 @@ impl AppState {
     }
 
     pub fn unlock(&self, password: &str) -> Result<()> {
-        let blob: SealedBlob = store::read_json(&store::vault_path(&self.dir))?
-            .ok_or(AppError::NotFound)?;
+        let blob: SealedBlob = store::read_json(&store::vault_path(&self.dir))?.ok_or(AppError::NotFound)?;
         let salt = blob.salt_bytes()?;
         let key = VaultKey::derive(password, &salt)?;
         let plain = blob.open(&key, VAULT_AAD)?;
         let data: VaultData = serde_json::from_slice(&plain)?;
         crate::password::finish_interrupted(&self.dir, &salt)?;
-        *self.session.lock().unwrap() = Some(Session {
-            key,
-            password: Zeroizing::new(password.to_string()),
-            salt,
-            data,
-        });
+        *self.session.lock().unwrap() =
+            Some(Session { key, password: Zeroizing::new(password.to_string()), salt, data });
         self.touch();
         // Best-effort: whatever showed up in a synced folder merges in right away.
         let _ = crate::sync::poll_and_merge(self);
@@ -230,9 +218,7 @@ impl AppState {
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let key = VaultKey::derive(&session.password, &blob.salt_bytes()?)?;
         let plain = blob.open(&key, VAULT_AAD).map_err(|e| match e {
-            AppError::WrongPassword => {
-                AppError::Config("o backup foi criado com outra senha mestra".into())
-            }
+            AppError::WrongPassword => AppError::Config("o backup foi criado com outra senha mestra".into()),
             other => other,
         })?;
         Ok(serde_json::from_slice(&plain)?)

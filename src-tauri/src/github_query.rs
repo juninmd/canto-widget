@@ -54,7 +54,10 @@ mod tests {
     #[test]
     fn assigned_searches_issues_and_prs_unless_the_filter_picks_one() {
         assert_eq!(queries(Section::Assigned, &ForgeFilter::default()).len(), 2);
-        assert_eq!(queries(Section::Assigned, &filter("", Kind::Pr)), vec!["is:open is:pr archived:false assignee:@me"]);
+        assert_eq!(
+            queries(Section::Assigned, &filter("", Kind::Pr)),
+            vec!["is:open is:pr archived:false assignee:@me"]
+        );
     }
 
     #[test]

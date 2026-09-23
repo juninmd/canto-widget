@@ -168,7 +168,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Task reminder | Change master password | Status API (opt-in tab) |
 |---|---|---|
-| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident, the ones with an incident in the last 24 h highlighted](docs/prints/app/29-status-api.png) |
+| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident; ongoing outages highlighted with their live Statuspage state](docs/prints/app/29-status-api.png) |
 
 </details>
 

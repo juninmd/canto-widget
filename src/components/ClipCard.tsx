@@ -1,6 +1,7 @@
 import type { ClipItem } from "../lib/api";
 import { clipKind, compactCount, KIND_LABEL, sizeLabel } from "../lib/clip";
 import { timeAgo } from "../lib/time";
+import { LOCALE, t } from "../i18n";
 import { PinIcon } from "./Icons";
 
 type Props = {
@@ -19,7 +20,7 @@ const CODE_LINES = 4;
 export default function ClipCard({ item: i, copied, className, privacy, onCopy, onPin, onDelete }: Props) {
   const kind = clipKind(i.preview);
   const codeLines = i.preview.replace(/\s+$/, "").split("\n");
-  const copyTitle = i.truncated ? `copia só os primeiros ${sizeLabel(i.kept)}` : "clique para copiar de novo";
+  const copyTitle = i.truncated ? t("clipboard.copyTruncatedTitle", { size: sizeLabel(i.kept) }) : t("clipboard.copyAgainTitle");
   const actionBtn = "grid size-6 place-items-center rounded hover:text-fg";
   const mask = privacy ? "blur-sm select-none" : "";
 
@@ -44,17 +45,17 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
       </button>
       {i.truncated && (
         <p className="mt-1 rounded bg-edge px-2 py-1 text-[11px] text-muted">
-          Cópia grande ({sizeLabel(i.chars)}): guardei só os primeiros {compactCount(i.kept)}.
+          {t("clipboard.truncatedNote", { size: sizeLabel(i.chars), kept: compactCount(i.kept) })}
         </p>
       )}
       <div className="mt-1 flex items-center gap-2 text-[11px] text-faint">
         <span className="rounded bg-edge px-1.5 text-muted">{KIND_LABEL[kind]}</span>
         {copied ? (
           <span role="status" className="font-medium text-accent">
-            copiado ✓
+            {t("clipboard.copied")}
           </span>
         ) : (
-          <span title={new Date(i.copied_at).toLocaleString("pt-BR")}>{timeAgo(i.copied_at)}</span>
+          <span title={new Date(i.copied_at).toLocaleString(LOCALE)}>{timeAgo(i.copied_at)}</span>
         )}
         {i.chars >= SHOW_SIZE_FROM && !i.truncated && <span>· {sizeLabel(i.chars)}</span>}
         <span className="ml-auto flex gap-1">
@@ -62,13 +63,13 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
             type="button"
             onClick={onPin}
             aria-pressed={i.pinned}
-            aria-label={i.pinned ? "desafixar do histórico" : "fixar no histórico"}
-            title={i.pinned ? "desafixar" : "fixar: não sai com limpar nem com o limite"}
+            aria-label={i.pinned ? t("clipboard.unpinLabel") : t("clipboard.pinLabel")}
+            title={i.pinned ? t("clipboard.unpinTitle") : t("clipboard.pinTitle")}
             className={`${actionBtn} ${i.pinned ? "text-accent" : ""}`}
           >
             <PinIcon filled={i.pinned} />
           </button>
-          <button type="button" onClick={onDelete} aria-label="excluir do histórico" title="excluir" className={`${actionBtn} hover:text-danger`}>
+          <button type="button" onClick={onDelete} aria-label={t("clipboard.deleteLabel")} title={t("clipboard.deleteTitle")} className={`${actionBtn} hover:text-danger`}>
             ×
           </button>
         </span>

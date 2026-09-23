@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { IS_MAC, MOD_KEY, TOGGLE_KEYS } from "./platform";
+import { t } from "../i18n";
 /** `index` is 1-based and counts only the visible tabs, so Alt+N matches what the bar shows. */
 export type Action =
   | { type: "tab"; index: number }
@@ -15,28 +16,28 @@ export type Shortcut = { keys: string[]; description: string };
 /** Grouped by intent; the tabs become a single line instead of one per tab. */
 export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
   {
-    title: "Navegar",
+    title: t("shortcuts.group.navigate"),
     items: [
-      { keys: ["Alt", "1–9"], description: "trocar de aba, na ordem da barra" },
-      { keys: ["/"], description: "buscar na aba atual" },
-      { keys: [MOD_KEY, "K"], description: "busca global em tarefas de hoje, notas e clipboard" },
-      { keys: ["Esc"], description: "fechar ajuda, detalhes, edição ou a busca global" },
-      { keys: ["?"], description: "abrir ou fechar esta ajuda" },
+      { keys: ["Alt", "1–9"], description: t("shortcuts.tabs") },
+      { keys: ["/"], description: t("shortcuts.search") },
+      { keys: [MOD_KEY, "K"], description: t("shortcuts.globalSearch") },
+      { keys: ["Esc"], description: t("shortcuts.escape") },
+      { keys: ["?"], description: t("shortcuts.help") },
     ],
   },
   {
-    title: "Criar e proteger",
+    title: t("shortcuts.group.create"),
     items: [
-      { keys: ["N"], description: "nova tarefa ou novo card" },
-      { keys: ["Alt", "L"], description: "trancar o cofre" },
-      { keys: ["Alt", "P"], description: "ativar ou desativar o modo privacidade (borra clipboard e notas)" },
+      { keys: ["N"], description: t("shortcuts.new") },
+      { keys: ["Alt", "L"], description: t("shortcuts.lock") },
+      { keys: ["Alt", "P"], description: t("shortcuts.privacy") },
     ],
   },
   {
-    title: "Global",
+    title: t("shortcuts.group.global"),
     items: [
-      { keys: TOGGLE_KEYS, description: "mostrar ou esconder o widget, de qualquer app" },
-      { keys: ["F11"], description: "entrar ou sair da tela cheia" },
+      { keys: TOGGLE_KEYS, description: t("shortcuts.toggle") },
+      { keys: ["F11"], description: t("shortcuts.fullscreen") },
     ],
   },
 ];

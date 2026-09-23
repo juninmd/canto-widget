@@ -26,7 +26,13 @@ fn mr_request(page: u32) -> Request {
 
 #[test]
 fn an_mr_keeps_its_gitlab_reference_and_old_style_draft_flag() {
-    let list = convert(BASE, &mr_request(1), vec![raw(12, "https://gitlab.acme.io/g/sub/p/-/merge_requests/12", "g/sub/p!12")], Some(1), false);
+    let list = convert(
+        BASE,
+        &mr_request(1),
+        vec![raw(12, "https://gitlab.acme.io/g/sub/p/-/merge_requests/12", "g/sub/p!12")],
+        Some(1),
+        false,
+    );
     let it = &list.items[0];
     assert_eq!((it.repo.as_str(), it.reference.as_str(), it.number), ("g/sub/p", "g/sub/p!12", 12));
     assert!(it.is_pr && it.draft);
@@ -35,7 +41,11 @@ fn an_mr_keeps_its_gitlab_reference_and_old_style_draft_flag() {
 
 #[test]
 fn links_off_the_configured_instance_are_dropped() {
-    let evil = ["https://gitlab.acme.io.evil.com/g/p/-/issues/1", "javascript:alert(1)", "http://gitlab.acme.io/g/p/-/issues/1"];
+    let evil = [
+        "https://gitlab.acme.io.evil.com/g/p/-/issues/1",
+        "javascript:alert(1)",
+        "http://gitlab.acme.io/g/p/-/issues/1",
+    ];
     let raws = evil.iter().map(|u| raw(1, u, "g/p#1")).collect();
     let issues = Request { path: "issues", params: vec![] };
     assert!(convert(BASE, &issues, raws, None, false).items.is_empty());
@@ -73,7 +83,9 @@ fn a_redirect_is_not_followed_so_the_token_stays_on_the_instance() {
     let err = section(&account(base), Section::MyPrs, 1, &ForgeFilter::default()).unwrap_err();
     assert!(err.to_string().contains("redirecionou"), "{err}");
     let request = rx.recv().unwrap();
-    assert!(request.contains("scope=created_by_me") && request.to_lowercase().contains("authorization: bearer glpat-test"));
+    assert!(
+        request.contains("scope=created_by_me") && request.to_lowercase().contains("authorization: bearer glpat-test")
+    );
 }
 
 #[test]

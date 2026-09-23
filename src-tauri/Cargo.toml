@@ -32,6 +32,8 @@ rustls = { version = "0.23", default-features = false, features = ["ring"] }
 # RSS/Atom parsing for the API-status tab: MIT, actively maintained, no transitive HTTP client of its own.
 feed-rs = "2"
 url = "2"
+# Local wall-clock time for task reminders; already in the tree via feed-rs.
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 time = "0.3"
 tauri-plugin-global-shortcut = "2.3.2"
 tauri-plugin-clipboard-manager = "2.3.3"
@@ -61,6 +63,8 @@ tauri-plugin-updater = "2"
 [target.'cfg(target_os = "macos")'.dependencies]
 # Keychain access for Touch ID (hello_mac.rs): MIT/Apache-2.0, maintained by kornelski.
 security-framework = "3.7"
+# App Nap opt-out (meeting_alert.rs): already in the tree via tao/wry.
+objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSProcessInfo", "NSString", "NSObject"] }
 
 [profile.release]
 codegen-units = 1

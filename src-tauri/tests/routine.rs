@@ -1,9 +1,18 @@
 use canto_widget_lib::error::AppError;
 use canto_widget_lib::model::{ExtendedRepeat, Repeat, Task, VaultData};
-use canto_widget_lib::routine::{instance_id, materialize, set_extended_repeat, set_schedule, weekday_of, validate_time};
+use canto_widget_lib::routine::{
+    instance_id, materialize, set_extended_repeat, set_schedule, validate_time, weekday_of,
+};
 
 fn task(id: &str, day: &str) -> Task {
-    Task { id: id.into(), title: "tomar remedio".into(), day: day.into(), created_at: 1, updated_at: 1, ..Default::default() }
+    Task {
+        id: id.into(),
+        title: "tomar remedio".into(),
+        day: day.into(),
+        created_at: 1,
+        updated_at: 1,
+        ..Default::default()
+    }
 }
 
 fn with_series(day: &str, r: Repeat) -> VaultData {
@@ -173,7 +182,8 @@ mod notes {
 
     #[test]
     fn pinned_stays_on_top_even_if_older() {
-        let mut l = vec![note("nova", &[], false, 50), note("velha-fixada", &[], true, 1), note("media", &[], false, 20)];
+        let mut l =
+            vec![note("nova", &[], false, 50), note("velha-fixada", &[], true, 1), note("media", &[], false, 20)];
         sort(&mut l);
         let ids: Vec<_> = l.iter().map(|n| n.id.as_str()).collect();
         assert_eq!(ids, ["velha-fixada", "nova", "media"]);
@@ -204,7 +214,12 @@ mod notes {
 
     #[test]
     fn markdown_export_keeps_title_body_and_tags_readable() {
-        let n = Note { title: "Wifi de casa".into(), body: "senha: 12345".into(), tags: vec!["casa".into()], ..note("n1", &[], false, 1) };
+        let n = Note {
+            title: "Wifi de casa".into(),
+            body: "senha: 12345".into(),
+            tags: vec!["casa".into()],
+            ..note("n1", &[], false, 1)
+        };
         let md = to_markdown(&n);
         assert!(md.starts_with("# Wifi de casa\n\n"));
         assert!(md.contains("senha: 12345"));

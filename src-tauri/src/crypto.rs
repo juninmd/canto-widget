@@ -22,13 +22,11 @@ impl VaultKey {
         if salt.len() != SALT_LEN {
             return Err(AppError::Crypto("salt com tamanho inválido".into()));
         }
-        let params = Params::new(KDF_MEM_KIB, KDF_TIME, KDF_LANES, Some(32))
-            .map_err(|e| AppError::Crypto(e.to_string()))?;
+        let params =
+            Params::new(KDF_MEM_KIB, KDF_TIME, KDF_LANES, Some(32)).map_err(|e| AppError::Crypto(e.to_string()))?;
         let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
         let mut out = [0u8; 32];
-        argon
-            .hash_password_into(password.as_bytes(), salt, &mut out)
-            .map_err(|e| AppError::Crypto(e.to_string()))?;
+        argon.hash_password_into(password.as_bytes(), salt, &mut out).map_err(|e| AppError::Crypto(e.to_string()))?;
         let key = VaultKey(out);
         out.zeroize();
         Ok(key)
@@ -51,13 +49,7 @@ impl VaultKey {
         let nonce = Nonce::generate();
         let ciphertext = self
             .cipher()
-            .encrypt(
-                &nonce,
-                aes_gcm::aead::Payload {
-                    msg: plaintext,
-                    aad,
-                },
-            )
+            .encrypt(&nonce, aes_gcm::aead::Payload { msg: plaintext, aad })
             .map_err(|_| AppError::Crypto("falha ao cifrar".into()))?;
         Ok((nonce.to_vec(), ciphertext))
     }
@@ -65,13 +57,7 @@ impl VaultKey {
     pub fn decrypt(&self, nonce: &[u8], ciphertext: &[u8], aad: &[u8]) -> Result<Vec<u8>> {
         let nonce = Nonce::try_from(nonce).map_err(|_| AppError::Crypto("nonce com tamanho inválido".into()))?;
         self.cipher()
-            .decrypt(
-                &nonce,
-                aes_gcm::aead::Payload {
-                    msg: ciphertext,
-                    aad,
-                },
-            )
+            .decrypt(&nonce, aes_gcm::aead::Payload { msg: ciphertext, aad })
             .map_err(|_| AppError::WrongPassword)
     }
 }
@@ -107,13 +93,8 @@ mod tests {
     #[test]
     fn wrong_password_does_not_decrypt() {
         let salt = random_salt();
-        let (nonce, ct) = VaultKey::derive("certa", &salt)
-            .unwrap()
-            .encrypt(b"dado", AAD)
-            .unwrap();
-        let err = VaultKey::derive("errada", &salt)
-            .unwrap()
-            .decrypt(&nonce, &ct, AAD);
+        let (nonce, ct) = VaultKey::derive("certa", &salt).unwrap().encrypt(b"dado", AAD).unwrap();
+        let err = VaultKey::derive("errada", &salt).unwrap().decrypt(&nonce, &ct, AAD);
         assert!(matches!(err, Err(AppError::WrongPassword)));
     }
 

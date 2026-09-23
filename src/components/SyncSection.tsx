@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText } from "../lib/api";
+import { t } from "../i18n";
 
 export default function SyncSection({ onError }: { onError: (m: string) => void }) {
   const [folder, setFolder] = useState<string | null>(null);
@@ -50,7 +51,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
     setInfo("");
     try {
       const r = await api.syncNow();
-      setInfo(r ? `mesclado: o cofre tem ${r.tasks} tarefas e ${r.notes} notas` : "nada novo para mesclar");
+      setInfo(r ? t("settings.sync.merged", { tasks: r.tasks, notes: r.notes }) : t("settings.sync.nothingNew"));
     } catch (e) {
       onError(errText(e));
     } finally {
@@ -60,17 +61,16 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
 
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-xs font-semibold text-fg">Pasta sincronizada</h2>
+      <h2 className="text-xs font-semibold text-fg">{t("settings.sync.title")}</h2>
       <p className="text-xs text-muted">
-        Aponte para uma pasta do Dropbox, OneDrive ou Syncthing: cada alteração é copiada para lá, e o que
-        chegar de outra máquina é mesclado sozinho, ao destrancar e a cada poucos minutos.
+        {t("settings.sync.hint")}
       </p>
       {folder ? (
         <p className="break-all rounded-lg border border-edge bg-ink/40 px-2.5 py-1.5 text-[11px] text-fg">
           {folder}
         </p>
       ) : (
-        <p className="text-[11px] text-faint">nenhuma pasta escolhida</p>
+        <p className="text-[11px] text-faint">{t("settings.sync.none")}</p>
       )}
       <div className="flex gap-2">
         <button
@@ -79,7 +79,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
           onClick={() => void choose()}
           className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent disabled:opacity-40"
         >
-          {folder ? "trocar pasta" : "escolher pasta"}
+          {folder ? t("settings.sync.change") : t("settings.sync.choose")}
         </button>
         {folder && (
           <>
@@ -89,7 +89,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
               onClick={() => void syncNow()}
               className="flex-1 rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
             >
-              sincronizar agora
+              {t("settings.sync.now")}
             </button>
             <button
               type="button"
@@ -97,7 +97,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
               onClick={() => void clear()}
               className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
             >
-              parar
+              {t("settings.sync.stop")}
             </button>
           </>
         )}

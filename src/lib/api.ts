@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus } from "./forgeTypes";
+import { t } from "../i18n";
 
 export type * from "./forgeTypes";
 
@@ -99,7 +100,8 @@ export type Attachment = { title: string; url: string; mime: string };
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 export type StatusItem = { title: string; link: string; published_at: number };
-export type StatusResult = { id: string; label: string; items: StatusItem[]; error: string | null };
+export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
+export type StatusResult = { id: string; label: string; items: StatusItem[]; error: string | null; live?: StatusLive | null };
 
 export const api = {
   status: () => invoke<VaultStatus>("vault_status"),
@@ -130,7 +132,7 @@ export const api = {
   taskSetExtendedRepeat: (id: string, repeat: ExtendedRepeat | null) =>
     invoke<void>("task_set_extended_repeat", { id, repeat }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
-  tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
+  reminderLeadSet: (minutes: number) => invoke<void>("reminder_lead_set", { minutes }),
 
   notesSearch: (query: string, limit: number) => invoke<NotesPage>("notes_search", { query, limit }),
   noteSave: (note: { id?: string; title: string; body: string; tags: string[]; link?: NoteLink | null }) =>
@@ -235,5 +237,5 @@ export const api = {
 };
 
 export function errText(e: unknown): string {
-  return typeof e === "string" ? e : e instanceof Error ? e.message : "erro inesperado";
+  return typeof e === "string" ? e : e instanceof Error ? e.message : t("app.unexpectedError");
 }

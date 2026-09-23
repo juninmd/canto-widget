@@ -1,6 +1,7 @@
 import type { Note } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { highlight } from "../lib/highlight";
+import { LOCALE, t } from "../i18n";
 import { DownloadIcon, PinIcon } from "./Icons";
 
 type Props = {
@@ -30,8 +31,8 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
           type="button"
           onClick={onPin}
           aria-pressed={!!n.fixada}
-          aria-label={n.fixada ? `desafixar ${n.title}` : `fixar ${n.title} no topo`}
-          title={n.fixada ? "desafixar" : "fixar no topo"}
+          aria-label={n.fixada ? t("notes.unpinLabel", { title: n.title }) : t("notes.pinLabel", { title: n.title })}
+          title={n.fixada ? t("notes.unpinTitle") : t("notes.pinTitle")}
           // Pinned always stays visible: the pin is the sign for why the card is on top.
           className={`${actionBtn} ${n.fixada ? "text-accent" : "text-faint opacity-0 hover:text-fg"}`}
         >
@@ -40,13 +41,13 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
         <button
           type="button"
           onClick={onExport}
-          aria-label={`exportar ${n.title} como markdown`}
-          title="exportar como .md"
+          aria-label={t("notes.exportLabel", { title: n.title })}
+          title={t("notes.exportTitle")}
           className={`${actionBtn} text-faint opacity-0 hover:text-fg`}
         >
           <DownloadIcon />
         </button>
-        <button type="button" onClick={onDelete} className={`${actionBtn} text-faint opacity-0 hover:text-danger`} aria-label={`excluir ${n.title}`}>
+        <button type="button" onClick={onDelete} className={`${actionBtn} text-faint opacity-0 hover:text-danger`} aria-label={t("notes.deleteLabel", { title: n.title })}>
           ×
         </button>
       </div>
@@ -55,25 +56,25 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
             <button
               type="button"
               onClick={() => onOpenLink(n.link!.kind)}
-              title={n.link.kind === "task" ? "ir para Tarefas" : "ir para Agenda"}
+              title={n.link.kind === "task" ? t("notes.goToTasks") : t("notes.goToAgenda")}
               className="min-h-6 max-w-full truncate rounded bg-edge px-1.5 text-[11px] text-muted hover:text-fg"
             >
               {n.link.kind === "task" ? "✓" : "📅"} {n.link.label}
             </button>
           )}
-          {n.tags.map((t) => (
+          {n.tags.map((tag) => (
             <button
-              key={t}
+              key={tag}
               type="button"
-              onClick={() => onTag(t)}
-              title={`ver só cards com #${t}`}
+              onClick={() => onTag(tag)}
+              title={t("notes.filterByTag", { tag })}
               className="min-h-6 rounded bg-edge px-1.5 text-[11px] text-muted hover:text-fg"
             >
-              #{t}
+              #{tag}
             </button>
           ))}
-        <span className="ml-auto text-[11px] text-faint" title={new Date(n.updated_at).toLocaleString("pt-BR")}>
-          editado {timeAgo(n.updated_at)}
+        <span className="ml-auto text-[11px] text-faint" title={new Date(n.updated_at).toLocaleString(LOCALE)}>
+          {t("notes.edited", { ago: timeAgo(n.updated_at) })}
         </span>
       </div>
     </li>

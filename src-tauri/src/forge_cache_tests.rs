@@ -6,7 +6,11 @@ use std::cell::Cell;
 const T0: i64 = 1_000_000_000;
 
 fn page(n: u64) -> ForgeList {
-    ForgeList { total: 1, items: vec![item(n, "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z", 0)], ..Default::default() }
+    ForgeList {
+        total: 1,
+        items: vec![item(n, "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z", 0)],
+        ..Default::default()
+    }
 }
 
 fn quota(remaining: u32) -> Option<Quota> {
@@ -44,7 +48,8 @@ fn refresh_bypasses_the_ttl() {
 fn near_the_limit_the_cached_copy_is_served_and_says_until_when() {
     let cache = ForgeCache::default();
     cache.get("github", "k", false, T0, || Ok((page(1), quota(RESERVE)))).unwrap();
-    let got = cache.get("github", "k", true, T0 + 1, || panic!("must not call the forge with the quota spent")).unwrap();
+    let got =
+        cache.get("github", "k", true, T0 + 1, || panic!("must not call the forge with the quota spent")).unwrap();
     assert_eq!((number(&got), got.limited_until), (1, Some(T0 + 60_000)));
     let err = cache.get("github", "other", false, T0 + 1, || panic!("no call without quota")).unwrap_err();
     assert!(matches!(err, AppError::RateLimited { reset_at, .. } if reset_at == T0 + 60_000), "{err}");
@@ -92,11 +97,12 @@ fn quotas_are_per_forge_and_forget_drops_only_that_forge() {
 #[test]
 fn a_reply_that_lands_after_a_lock_is_not_kept() {
     let cache = ForgeCache::default();
-    cache.get("github", "k", false, T0, || {
-        cache.clear();
-        Ok((page(1), quota(29)))
-    })
-    .unwrap();
+    cache
+        .get("github", "k", false, T0, || {
+            cache.clear();
+            Ok((page(1), quota(29)))
+        })
+        .unwrap();
     let got = cache.get("github", "k", false, T0 + 1, || Ok((page(2), quota(29)))).unwrap();
     assert_eq!(number(&got), 2);
 }
@@ -116,9 +122,15 @@ fn headers_become_a_quota_and_retry_after_means_stop() {
     let mut h = HeaderMap::new();
     h.insert("x-ratelimit-remaining", HeaderValue::from_static("7"));
     h.insert("x-ratelimit-reset", HeaderValue::from_static("1700000000"));
-    assert_eq!(Quota::from_headers(&h, "x-ratelimit-remaining", "x-ratelimit-reset", T0), Some(Quota { remaining: 7, reset_at: 1_700_000_000_000 }));
+    assert_eq!(
+        Quota::from_headers(&h, "x-ratelimit-remaining", "x-ratelimit-reset", T0),
+        Some(Quota { remaining: 7, reset_at: 1_700_000_000_000 })
+    );
     h.insert("retry-after", HeaderValue::from_static("30"));
-    assert_eq!(Quota::from_headers(&h, "x-ratelimit-remaining", "x-ratelimit-reset", T0), Some(Quota { remaining: 0, reset_at: T0 + 30_000 }));
+    assert_eq!(
+        Quota::from_headers(&h, "x-ratelimit-remaining", "x-ratelimit-reset", T0),
+        Some(Quota { remaining: 0, reset_at: T0 + 30_000 })
+    );
     assert_eq!(Quota::from_headers(&HeaderMap::new(), "a", "b", T0), None);
     let mut junk = HeaderMap::new();
     junk.insert("ratelimit-remaining", HeaderValue::from_static("-4"));

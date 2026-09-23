@@ -158,11 +158,7 @@ impl VaultData {
     }
 }
 
-fn merge_list<T: Versioned + Clone>(
-    mine: Vec<T>,
-    theirs: Vec<T>,
-    deleted: &HashMap<String, i64>,
-) -> Vec<T> {
+fn merge_list<T: Versioned + Clone>(mine: Vec<T>, theirs: Vec<T>, deleted: &HashMap<String, i64>) -> Vec<T> {
     let mut by_id: HashMap<String, T> = HashMap::new();
     for item in mine.into_iter().chain(theirs) {
         match by_id.get(item.id()) {
@@ -172,10 +168,8 @@ fn merge_list<T: Versioned + Clone>(
             }
         }
     }
-    let mut out: Vec<T> = by_id
-        .into_values()
-        .filter(|i| deleted.get(i.id()).is_none_or(|at| *at < i.updated_at()))
-        .collect();
+    let mut out: Vec<T> =
+        by_id.into_values().filter(|i| deleted.get(i.id()).is_none_or(|at| *at < i.updated_at())).collect();
     out.sort_by_key(|i| i.updated_at());
     out
 }

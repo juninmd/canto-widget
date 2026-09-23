@@ -22,7 +22,12 @@ impl Forge for Gitlab {
     const NAME: &'static str = FORGE;
     type Credential = Account;
 
-    fn fetch_section(cred: &Self::Credential, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+    fn fetch_section(
+        cred: &Self::Credential,
+        section: Section,
+        page: u32,
+        f: &ForgeFilter,
+    ) -> Result<(ForgeList, Option<Quota>)> {
         gitlab::section(cred, section, page, f)
     }
 
@@ -96,7 +101,11 @@ pub fn gitlab_disconnect(state: State<'_, AppState>) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn gitlab_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, force: Option<bool>) -> Result<ForgeLists> {
+pub async fn gitlab_lists(
+    app: tauri::AppHandle,
+    filter: Option<ForgeFilter>,
+    force: Option<bool>,
+) -> Result<ForgeLists> {
     run(move || {
         let acc = account(&app)?;
         let cache = &app.state::<AppState>().forges;
@@ -106,7 +115,12 @@ pub async fn gitlab_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, fo
 }
 
 #[tauri::command]
-pub async fn gitlab_section(app: tauri::AppHandle, section: Section, page: u32, filter: Option<ForgeFilter>) -> Result<ForgeList> {
+pub async fn gitlab_section(
+    app: tauri::AppHandle,
+    section: Section,
+    page: u32,
+    filter: Option<ForgeFilter>,
+) -> Result<ForgeList> {
     run(move || {
         let acc = account(&app)?;
         let cache = &app.state::<AppState>().forges;

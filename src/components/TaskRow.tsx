@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import TaskDetails, { TaskBadge } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
@@ -37,7 +38,7 @@ type Props = {
 
 /** One task line, plus its expandable schedule/PR/checklist panel. */
 export default function TaskRow({
-  task: t,
+  task,
   isNew,
   isLeaving,
   checking,
@@ -67,7 +68,7 @@ export default function TaskRow({
   return (
     <>
       <li
-        data-reorder-id={draggable ? t.id : undefined}
+        data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
         className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
@@ -88,8 +89,8 @@ export default function TaskRow({
                 onMove(e.key === "ArrowUp" ? -1 : 1);
               }
             }}
-            aria-label={`arrastar ${t.title} para reordenar`}
-            title="arraste ou use ↑/↓ para reordenar"
+            aria-label={t("tasks.dragLabel", { title: task.title })}
+            title={t("tasks.dragHint")}
             className="grid size-4 shrink-0 cursor-grab touch-none place-items-center text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
           >
             <GripIcon />
@@ -97,12 +98,12 @@ export default function TaskRow({
         )}
         <input
           type="checkbox"
-          checked={t.done}
+          checked={task.done}
           onChange={onToggleDone}
           onAnimationEnd={onCheckAnimationEnd}
           className={`size-4 accent-[var(--color-accent)] ${checking ? "motion-safe:animate-marcar" : ""}`}
         />
-        {editing?.id === t.id ? (
+        {editing?.id === task.id ? (
           <input
             autoFocus
             value={editing.title}
@@ -116,20 +117,20 @@ export default function TaskRow({
           />
         ) : (
           <span
-            className={`flex-1 truncate text-sm ${t.done ? "text-faint line-through" : "text-fg"}`}
-            title={`${t.title}\n(clique duas vezes para renomear)`}
+            className={`flex-1 truncate text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}
+            title={t("tasks.renameHint", { title: task.title })}
             onDoubleClick={onStartEdit}
           >
-            {t.title}
+            {task.title}
           </span>
         )}
-        <TaskBadge task={t} open={detailsOpen} onToggle={onToggleDetails} />
+        <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} />
         <button
           type="button"
           onClick={onDelete}
           // Also visible on focus: hover-only would leave the keyboard user unable to find it.
           className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-          aria-label={`excluir ${t.title}`}
+          aria-label={t("tasks.delete", { title: task.title })}
         >
           ×
         </button>
@@ -137,14 +138,14 @@ export default function TaskRow({
       {detailsOpen && (
         <li className="flex flex-col gap-1">
           <TaskDetails
-            task={t}
+            task={task}
             onChange={onSchedule}
             onExtendedRepeat={onExtendedRepeat}
             onLinkPr={onLinkPr}
             onPriority={onPriority}
             onClose={onToggleDetails}
           />
-          <TaskSubtasks taskId={t.id} subtasks={t.subtasks ?? []} onError={onError} onChange={onSubtasksChange} />
+          <TaskSubtasks taskId={task.id} subtasks={task.subtasks ?? []} onError={onError} onChange={onSubtasksChange} />
         </li>
       )}
     </>

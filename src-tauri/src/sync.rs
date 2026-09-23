@@ -55,7 +55,10 @@ pub fn folder(dir: &Path) -> Option<PathBuf> {
 /// Points sync at `folder`, pulling in whatever is already there (so a folder shared from another
 /// machine isn't silently overwritten by this one's possibly-empty vault) before pushing out.
 pub fn set_folder(state: &AppState, folder: PathBuf) -> Result<()> {
-    store::write_json_atomic(&path(&state.dir), &Prefs { pasta: Some(folder.display().to_string()), ultimo_hash: None })?;
+    store::write_json_atomic(
+        &path(&state.dir),
+        &Prefs { pasta: Some(folder.display().to_string()), ultimo_hash: None },
+    )?;
     poll_and_merge(state)?;
     export_now(&state.dir)
 }

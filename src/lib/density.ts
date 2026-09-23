@@ -1,9 +1,10 @@
+import { t } from "../i18n";
 export type DensityId = "compacta" | "padrao" | "confortavel";
 
 export const DENSITIES: { id: DensityId; name: string }[] = [
-  { id: "compacta", name: "Compacta" },
-  { id: "padrao", name: "Padrão" },
-  { id: "confortavel", name: "Confortável" },
+  { id: "compacta", name: t("settings.density.compact") },
+  { id: "padrao", name: t("settings.density.default") },
+  { id: "confortavel", name: t("settings.density.comfortable") },
 ];
 
 const KEY = "canto.densidade";

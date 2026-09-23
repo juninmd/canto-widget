@@ -35,7 +35,10 @@ fn expired_or_denied_code_ends_the_login() {
 fn expiring_token_stores_the_expiry_and_the_refresh_token() {
     let v = json!({"access_token": "ghu_x", "refresh_token": "ghr_y", "expires_in": 28800});
     let PollResult::Ready(t) = interpret(&v, 1_000).unwrap() else { panic!("esperava token") };
-    assert_eq!(t, Tokens { access_token: "ghu_x".into(), refresh_token: "ghr_y".into(), expires_at: 1_000 + 28_800_000 });
+    assert_eq!(
+        t,
+        Tokens { access_token: "ghu_x".into(), refresh_token: "ghr_y".into(), expires_at: 1_000 + 28_800_000 }
+    );
 }
 
 #[test]

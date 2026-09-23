@@ -1,8 +1,8 @@
 pub mod account;
 pub mod autolock;
 pub mod autostart;
-pub mod backup;
 pub mod background;
+pub mod backup;
 pub mod badge;
 pub mod biometric;
 pub mod blocking;
@@ -10,12 +10,12 @@ pub mod calendar;
 pub mod calendar_event;
 pub mod clip_os;
 pub mod clipboard;
-pub mod cmd_biometric;
 pub mod cmd_backup;
+pub mod cmd_biometric;
 pub mod cmd_drive;
 pub mod cmd_extras;
-pub mod cmd_gemini;
 pub mod cmd_forges;
+pub mod cmd_gemini;
 pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
@@ -40,23 +40,26 @@ pub mod hello;
 #[cfg(target_os = "macos")]
 pub mod hello_mac;
 pub mod meet;
+pub mod meeting_alert;
 pub mod model;
 pub mod net;
 pub mod next_meeting;
 pub mod notification;
 pub mod oauth;
+pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
-pub mod password;
 pub mod priority;
 pub mod routine;
 pub mod snooze;
 pub mod status_cache;
 pub mod status_feed;
+pub mod status_live;
 pub mod store;
 pub mod subtask;
 pub mod sync;
 pub mod task_order;
+pub mod task_reminder;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
@@ -67,9 +70,9 @@ pub mod window;
 pub mod window_state;
 
 use tauri::menu::{Menu, MenuItem};
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 use tauri::tray::TrayIconBuilder;
 use tauri::Manager;
+use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 use crate::vault::AppState;
 
@@ -85,11 +88,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(
-            tauri_plugin_autostart::Builder::new()
-                .args([autostart::ARG_AUTOSTART])
-                .build(),
-        )
+        .plugin(tauri_plugin_autostart::Builder::new().args([autostart::ARG_AUTOSTART]).build())
         .setup(|app| {
             // A tray widget: no Dock icon or Cmd+Tab entry (`skipTaskbar` is a no-op on macOS).
             #[cfg(target_os = "macos")]
@@ -100,12 +99,16 @@ pub fn run() {
             app.manage(AppState::new(dir.clone()));
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
+            app.manage(meeting_alert::Alerted::default());
+            app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
             background::start(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
             build_tray(app.handle())?;
             tray_live::watch(app.handle().clone());
+            meeting_alert::watch(app.handle().clone());
+            task_reminder::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -153,7 +156,7 @@ pub fn run() {
             cmd_notes::note_export_md,
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
-            routine::tasks_reminders,
+            task_reminder::reminder_lead_set,
             commands::item_delete,
             cmd_drive::drive_status,
             cmd_drive::drive_configure,
@@ -239,11 +242,8 @@ fn toggle_shortcut() -> Shortcut {
     Shortcut::new(Some(mods), Code::Space)
 }
 
-pub const TOGGLE_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") {
-    "Cmd+Shift+Espaço"
-} else {
-    "Ctrl+Alt+Espaço"
-};
+pub const TOGGLE_SHORTCUT_LABEL: &str =
+    if cfg!(target_os = "macos") { "Cmd+Shift+Espaço" } else { "Ctrl+Alt+Espaço" };
 
 /// Global "join the next meeting" shortcut. Ctrl+Alt+M (Ctrl+Cmd+M on macOS, where Cmd+Alt+M minimizes all
 /// windows); does nothing without a cached next meeting (see `tray_live::join_next_meeting`).
@@ -300,13 +300,8 @@ fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
 }
 
 fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let toggle = MenuItem::with_id(
-        app,
-        "toggle",
-        format!("Mostrar / esconder  ({TOGGLE_SHORTCUT_LABEL})"),
-        true,
-        None::<&str>,
-    )?;
+    let toggle =
+        MenuItem::with_id(app, "toggle", format!("Mostrar / esconder  ({TOGGLE_SHORTCUT_LABEL})"), true, None::<&str>)?;
     let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, "Sem reunião com Meet em breve", false, None::<&str>)?;
     let lock = MenuItem::with_id(app, "lock", "Trancar cofre", true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", "Sair", true, None::<&str>)?;
