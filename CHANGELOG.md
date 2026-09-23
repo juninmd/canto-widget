@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Segurança**: a CSP de produção não aceita mais estilos inline (`style-src 'self'`); as cores dinâmicas já
+  usam CSSOM, que a política permite.
 - **Status API com estado ao vivo**: serviços hospedados no Statuspage (Claude, GitHub, Cloudflare, Vercel, npm,
   PyPI, Supabase, DigitalOcean...) mostram o estado atual ("agora: Partial System Outage") e só ficam em destaque
   enquanto o problema está aberto; os demais seguem a regra de incidente nas últimas 24 h.
