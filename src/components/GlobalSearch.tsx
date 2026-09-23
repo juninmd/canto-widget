@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type ClipItem, type Note, type Task } from "../lib/api";
 import { useLatestRequest } from "../lib/useLatestRequest";
+import { t } from "../i18n";
 import type { Tab } from "./TabBar";
 
 const CAP = 5;
@@ -37,7 +38,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       setClips([]);
       return;
     }
-    const t = setTimeout(() => {
+    const timer = setTimeout(() => {
       const id = bump();
       const low = q.toLowerCase();
       void api
@@ -57,7 +58,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
         .then((list) => isLatest(id) && setClips(list.items))
         .catch((e) => isLatest(id) && onError(errText(e)));
     }, 150);
-    return () => clearTimeout(t);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, today]);
 
@@ -69,7 +70,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="busca global"
+      aria-label={t("search.label")}
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.stopPropagation();
@@ -83,38 +84,38 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
         type="search"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="buscar em tarefas de hoje, notas e clipboard"
-        aria-label="busca global"
+        placeholder={t("search.placeholder")}
+        aria-label={t("search.label")}
         className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
       />
 
       <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
         {!query.trim() ? (
-          <p className="px-1 text-xs text-muted">digite para buscar nas três abas ao mesmo tempo</p>
+          <p className="px-1 text-xs text-muted">{t("search.hint")}</p>
         ) : tasks.length === 0 && notes.length === 0 && clips.length === 0 ? (
-          <p className="px-1 text-xs text-muted">nada encontrado</p>
+          <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
         ) : (
           <>
-            <Group title="tarefas de hoje" empty={tasks.length === 0} onOpen={() => go("tasks")}>
-              {tasks.slice(0, CAP).map((t) => (
-                <li key={t.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
-                  {t.title}
+            <Group title={t("search.groupTasks")} empty={tasks.length === 0} onOpen={() => go("tasks")}>
+              {tasks.slice(0, CAP).map((task) => (
+                <li key={task.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
+                  {task.title}
                 </li>
               ))}
             </Group>
             <Group
-              title="notas"
+              title={t("search.groupNotes")}
               empty={notes.length === 0}
               more={notesTotal > CAP ? notesTotal - CAP : 0}
               onOpen={() => go("notes")}
             >
               {notes.map((n) => (
                 <li key={n.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
-                  {n.title || "(sem título)"}
+                  {n.title || t("search.untitled")}
                 </li>
               ))}
             </Group>
-            <Group title="clipboard" empty={clips.length === 0} onOpen={() => go("clipboard")}>
+            <Group title={t("search.groupClipboard")} empty={clips.length === 0} onOpen={() => go("clipboard")}>
               {clips.slice(0, CAP).map((c) => (
                 <li key={c.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
                   {c.preview}
@@ -152,7 +153,7 @@ function Group({
         {title} →
       </button>
       <ul className="divide-y divide-edge rounded-lg border border-edge bg-ink/40">{children}</ul>
-      {!!more && <p className="mt-1 px-1 text-[11px] text-faint">e mais {more}</p>}
+      {!!more && <p className="mt-1 px-1 text-[11px] text-faint">{t("search.more", { n: more })}</p>}
     </section>
   );
 }

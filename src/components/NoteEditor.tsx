@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MOD_KEY } from "../lib/platform";
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
 import { renderMarkdown } from "../lib/markdown";
+import { t } from "../i18n";
 import NoteLinkPicker from "./NoteLinkPicker";
 
 // Mirror MAX_TITLE_CHARS / MAX_BODY_CHARS in cmd_notes.rs; the backend is the real guard.
@@ -35,7 +36,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
         autoFocus
         value={draft.title}
         onChange={(e) => onChange({ ...draft, title: e.target.value })}
-        placeholder="título"
+        placeholder={t("notes.titlePlaceholder")}
         maxLength={MAX_TITLE}
         className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
       />
@@ -46,7 +47,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
           aria-pressed={!preview}
           className={`min-h-6 rounded px-2 ${!preview ? "bg-edge text-fg" : "text-muted hover:text-fg"}`}
         >
-          escrever
+          {t("notes.write")}
         </button>
         <button
           type="button"
@@ -54,18 +55,18 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
           aria-pressed={preview}
           className={`min-h-6 rounded px-2 ${preview ? "bg-edge text-fg" : "text-muted hover:text-fg"}`}
         >
-          visualizar
+          {t("notes.preview")}
         </button>
       </div>
       {preview ? (
         <div className="flex-1 overflow-y-auto rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg [&_ol]:my-1 [&_p]:mb-2 [&_ul]:my-1">
-          {draft.body.trim() ? renderMarkdown(draft.body) : <p className="text-faint">nada para visualizar ainda</p>}
+          {draft.body.trim() ? renderMarkdown(draft.body) : <p className="text-faint">{t("notes.previewEmpty")}</p>}
         </div>
       ) : (
         <textarea
           value={draft.body}
           onChange={(e) => onChange({ ...draft, body: e.target.value })}
-          placeholder="conteúdo do card (aceita **negrito**, *itálico*, `código`, listas e links)"
+          placeholder={t("notes.bodyPlaceholder")}
           maxLength={MAX_BODY}
           className="flex-1 resize-none rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
         />
@@ -73,7 +74,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
       <input
         value={draft.tags}
         onChange={(e) => onChange({ ...draft, tags: e.target.value })}
-        placeholder="tags separadas por vírgula"
+        placeholder={t("notes.tagsPlaceholder")}
         className="rounded-lg border border-line bg-ink px-3 py-1.5 text-xs text-muted outline-none focus:border-accent"
       />
       {picking ? (
@@ -92,7 +93,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
             {draft.link.kind === "task" ? "✓" : "📅"} {draft.link.label}
           </span>
           <button type="button" onClick={() => onChange({ ...draft, link: null })} className="min-h-6 px-1 hover:text-danger">
-            desvincular
+            {t("notes.unlink")}
           </button>
         </div>
       ) : (
@@ -101,7 +102,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
           onClick={() => setPicking(true)}
           className="min-h-6 self-start text-xs text-muted underline decoration-dotted hover:text-fg"
         >
-          vincular a uma tarefa ou evento
+          {t("notes.link")}
         </button>
       )}
       <div className="flex gap-2">
@@ -110,7 +111,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
           title={`${MOD_KEY}+Enter`}
           className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent"
         >
-          salvar
+          {t("notes.save")}
         </button>
         <button
           type="button"
@@ -118,7 +119,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
           title="Esc"
           className="rounded-lg bg-edge px-3 py-1.5 text-sm text-fg"
         >
-          cancelar
+          {t("notes.cancel")}
         </button>
       </div>
     </form>
