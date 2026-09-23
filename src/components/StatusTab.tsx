@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import { api, errText, type StatusResult } from "../lib/api";
 import { timeAgo } from "../lib/time";
+import { hasRecentIncident, lastIncident, sortByLastIncident } from "../lib/status";
 import Skeleton from "./Skeleton";
 
 /** Incident history from services the team depends on: read-only, no account needed. */
@@ -14,7 +15,7 @@ export default function StatusTab() {
   const load = useCallback(async (force: boolean) => {
     setLoading(true);
     try {
-      setResults(await api.apiStatus(force));
+      setResults(sortByLastIncident(await api.apiStatus(force)));
       setFetchedAt(Date.now());
       setError("");
     } catch (e) {
@@ -64,14 +65,22 @@ export default function StatusTab() {
 
 function StatusAccordion({ result, open, onToggle }: { result: StatusResult; open: boolean; onToggle: () => void }) {
   const bodyId = useId();
-  const latest = result.items[0];
+  const last = lastIncident(result);
+  const troubled = !result.error && hasRecentIncident(result, Date.now());
   return (
-    <section className="rounded-lg border border-edge bg-ink/60">
+    <section
+      data-troubled={troubled || undefined}
+      className={`rounded-lg border bg-ink/60 ${troubled ? "border-danger/70 bg-danger/10" : "border-edge"}`}
+    >
       <button type="button" onClick={onToggle} aria-expanded={open} aria-controls={bodyId} className="block w-full p-2 text-left">
         <span className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-xs font-semibold text-fg">{result.label}</span>
-          <span className="shrink-0 text-[11px] text-muted">
-            {result.error ? "indisponível" : latest ? timeAgo(latest.published_at) : "sem incidentes"}{" "}
+          <span className="flex min-w-0 items-center gap-1.5">
+            {troubled && <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-danger motion-safe:animate-pulse" />}
+            <span className="truncate text-xs font-semibold text-fg">{result.label}</span>
+            {troubled && <span className="sr-only">com incidente nas últimas 24 h</span>}
+          </span>
+          <span className={`shrink-0 text-[11px] ${troubled ? "font-semibold text-danger" : "text-muted"}`}>
+            {result.error ? "indisponível" : last > 0 ? timeAgo(last) : "sem incidentes"}{" "}
             <span aria-hidden="true">{open ? "▴" : "▾"}</span>
           </span>
         </span>
