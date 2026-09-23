@@ -41,5 +41,18 @@ jobs:
             ;; esac
             echo "----"
           done
-      - name: Magalu Cloud item titles (latest 15)
-        run: curl -sS -m 15 https://status.magalu.cloud/rss | grep -o '<title>[^<]*</title>' | head -16
+      - name: Magalu Cloud items (title | pubDate)
+        run: |
+          curl -sS -m 15 https://status.magalu.cloud/rss -o /tmp/m.xml
+          python3 - <<'PY'
+          import xml.etree.ElementTree as ET
+          root = ET.parse("/tmp/m.xml").getroot()
+          items = root.findall("./channel/item")
+          print("items:", len(items))
+          for it in items:
+              print(it.findtext("title"), "|", it.findtext("pubDate"), "|", (it.findtext("description") or "")[:80])
+          PY
+      - name: AWS and GCP latest titles
+        run: |
+          curl -sS -m 15 https://status.aws.amazon.com/rss/health.rss | grep -o '<title>[^<]*</title>' | head -6
+          curl -sS -m 15 https://status.cloud.google.com/en/feed.atom | grep -o '<title>[^<]*</title>' | head -6

@@ -43,4 +43,11 @@ test("a component whose latest update says it recovered is not trouble (Magalu C
     "another component is still degraded",
   ).toBe(true);
   expect(hasRecentIncident(magalu([item("Block Storage - Major Outage", 600_000)]), now)).toBe(true);
+  expect(
+    hasRecentIncident(
+      magalu([item("Magalu Cloud - Docs - Operational", 600_000), item("Magalu Cloud - API - Major Outage", 3600_000)]),
+      now,
+    ),
+    "API and Docs are different components even though both names contain a dash",
+  ).toBe(true);
 });

@@ -8,8 +8,11 @@ export const lastIncident = (r: StatusResult) => r.items.reduce((max, i) => Math
 /** A state update saying things are fine again (Site24x7 feeds post "Block Storage - Operational"). */
 const RECOVERED = /\b(operational|resolved|completed|recovered|operacional|resolvid[oa]|normalizad[oa]|conclu[ií]d[oa])\b/i;
 
-/** "Component - State" titles share a component; other titles stand alone. */
-const subject = (title: string) => title.split(" - ")[0].trim().toLowerCase();
+/** "Component - State" titles share a component; the component itself may contain " - " ("Magalu Cloud - API"). */
+const subject = (title: string) => {
+  const cut = title.lastIndexOf(" - ");
+  return (cut < 0 ? title : title.slice(0, cut)).trim().toLowerCase();
+};
 
 /**
  * True when some component's latest update in the last 24 h is not a recovery. Feeds that post every state
