@@ -3,7 +3,7 @@ use serde::Deserialize;
 use std::time::Duration;
 
 use crate::error::{AppError, Result};
-use crate::forge::{checks_from_github, merge, ChecksStatus, ForgeItem, ForgeList};
+use crate::forge::{checks_from_github, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{self as filter, ForgeFilter, Section, Sort, PER_PAGE};
 use crate::github_query::{opened_since, queries};
@@ -86,6 +86,9 @@ struct CombinedStatus {
 
 /// Two calls (head sha, then its combined status): only on an explicit click, never per row of a list.
 pub fn pr_checks(token: &str, repo: &str, number: u64) -> Result<ChecksStatus> {
+    if !valid_repo_path(repo, 2) {
+        return Err(AppError::Format("repositório inválido".into()));
+    }
     let pr: PullDetail = response(client()?.get(format!("{API}/repos/{repo}/pulls/{number}")).bearer_auth(token).send().map_err(network)?)?;
     let status: CombinedStatus =
         response(client()?.get(format!("{API}/repos/{repo}/commits/{}/status", pr.head.sha)).bearer_auth(token).send().map_err(network)?)?;

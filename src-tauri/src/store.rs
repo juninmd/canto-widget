@@ -63,7 +63,7 @@ impl SealedBlob {
     pub fn open(&self, key: &VaultKey, aad: &[u8]) -> Result<Vec<u8>> {
         if self.version != FORMAT_VERSION {
             return Err(AppError::Format(format!(
-                "versao de cofre {} nao suportada",
+                "versão de cofre {} não suportada",
                 self.version
             )));
         }

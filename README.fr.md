@@ -211,7 +211,7 @@ Téléchargez l'installateur pour votre plateforme depuis **[Releases](https://g
 
 1. Au premier lancement, vous créez le **mot de passe principal**. Il n'y a pas de récupération : si vous
    perdez le mot de passe, vous perdez les données.
-2. `Ctrl+Alt+Space` (`Cmd+Alt+Space` sur macOS) affiche et masque le widget.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` sur macOS) affiche et masque le widget.
 3. C'est fait. Quand une nouvelle version sort, Canto vous prévient, et **Paramètres → Mises à jour** met à
    jour en un clic.
 

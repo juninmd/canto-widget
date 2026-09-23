@@ -5,11 +5,28 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Status API**: os serviços aparecem ordenados pela hora do último incidente (mais recente primeiro; sem
+  incidentes no fim) e os que tiveram incidente nas últimas 24 h ganham destaque em vermelho, com ponto pulsante.
+
 ### Corrigido
 
 - Releases agora seguem Conventional Commits (`fix`/patch, `feat`/minor e breaking/major), ignoram commits sem
   impacto de versão e geram os quatro instaladores em paralelo, com cache Rust por alvo, antes de montar o
   manifesto do updater.
+- **Reordenar tarefas** voltou a funcionar no Windows e no macOS: o arraste agora usa eventos de ponteiro (o
+  arrastar-e-soltar HTML5 era engolido pelo webview), com realce do destino, **Esc** para cancelar e **↑/↓** no
+  puxador para mover pelo teclado.
+- **macOS**: atalhos globais trocados para não colidir com o sistema — **Cmd+Shift+Espaço** (mostrar/esconder),
+  **Ctrl+Cmd+M** (entrar na reunião) e **Ctrl+Cmd+V** (colar como texto puro); busca global com **Cmd+K** e
+  rótulos com ⌘; o widget não aparece mais no Dock/Cmd+Tab e abre por cima de apps em tela cheia.
+- **Segurança**: o webview perdeu as permissões diretas de leitura/escrita do clipboard e de abrir URLs (tudo
+  passa pelos comandos em Rust); CSP de produção sem `unsafe-inline` em scripts nem o websocket do Vite; o
+  repositório/projeto enviado para checar CI de um PR/MR é validado antes de montar a URL autenticada.
+- **Textos em pt-BR**: mensagens de erro vindas do núcleo em Rust (cofre, GitHub, GitLab, biometria, lembretes,
+  transcrições) e o atalho no menu da bandeja agora têm acentuação correta ("cofre já existe", "horário
+  inválido", "Ctrl+Alt+Espaço"); os READMEs traduzidos citam o novo atalho do macOS.
 - Releases em `main` agora recebem uma tag por commit elegível, notas geradas automaticamente e publicação após a
   verificação dos instaladores assinados e do manifesto de atualização. O rascunho `v0.3.0` é retomado.
 

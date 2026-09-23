@@ -88,7 +88,7 @@ pub fn exchange_code(
     }
     let res = post_token(&form)?;
     let refresh_token = res.refresh_token.ok_or_else(|| {
-        AppError::Drive("Google nao devolveu refresh_token; revogue o acesso e conecte de novo".into())
+        AppError::Drive("Google não devolveu refresh_token; revogue o acesso e conecte de novo".into())
     })?;
     Ok(DriveTokens {
         refresh_token,

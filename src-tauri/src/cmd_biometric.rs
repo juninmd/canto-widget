@@ -26,14 +26,14 @@ mod platform {
     pub const VAULT: Platform = Platform;
     impl crate::biometric::Signer for Platform {
         fn sign(&self, _: &[u8]) -> Result<Vec<u8>> {
-            Err(AppError::Config("biometria indisponivel neste sistema".into()))
+            Err(AppError::Config("biometria indisponível neste sistema".into()))
         }
     }
     pub fn available() -> bool {
         false
     }
     pub fn create() -> Result<Platform> {
-        Err(AppError::Config("biometria indisponivel neste sistema".into()))
+        Err(AppError::Config("biometria indisponível neste sistema".into()))
     }
     pub fn delete() {}
 }

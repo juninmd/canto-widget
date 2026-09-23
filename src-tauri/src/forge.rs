@@ -44,6 +44,16 @@ pub enum ChecksStatus {
     None,
 }
 
+/// `owner/repo` (or `group/sub/project` on GitLab) coming from the webview: only safe path segments, so a
+/// crafted value can't steer the authenticated request to another endpoint (`..`, `?`, `#`, `%`).
+pub fn valid_repo_path(path: &str, max_segments: usize) -> bool {
+    let segments: Vec<&str> = path.split('/').collect();
+    (2..=max_segments).contains(&segments.len())
+        && segments.iter().all(|s| {
+            !s.is_empty() && *s != "." && *s != ".." && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+        })
+}
+
 pub fn checks_from_github(state: &str) -> ChecksStatus {
     match state {
         "success" => ChecksStatus::Success,

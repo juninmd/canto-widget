@@ -166,9 +166,9 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Task reminder | Change master password |
-|---|---|
-| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) |
+| Task reminder | Change master password | Status API (opt-in tab) |
+|---|---|---|
+| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident, the ones with an incident in the last 24 h highlighted](docs/prints/app/29-status-api.png) |
 
 </details>
 
@@ -205,7 +205,7 @@ Download the installer for your platform from **[Releases](https://github.com/ju
 | 🐧 Linux | `.AppImage`, `.deb` or `.rpm` |
 
 1. On first run you create the **master password**. There's no recovery: lose the password, lose the data.
-2. `Ctrl+Alt+Space` (`Cmd+Alt+Space` on macOS) shows and hides the widget.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` on macOS) shows and hides the widget.
 3. Done. When a new version ships, Canto notifies you, and **Settings → Updates** updates with one click.
 
 > [!NOTE]

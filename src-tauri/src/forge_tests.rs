@@ -113,3 +113,16 @@ fn gitlab_pipeline_status_maps_to_the_three_states_the_ui_shows() {
     assert_eq!(checks_from_gitlab(Some("canceled")), ChecksStatus::None);
     assert_eq!(checks_from_gitlab(None), ChecksStatus::None, "an MR with no pipeline configured");
 }
+
+#[test]
+fn repo_paths_from_the_webview_only_accept_plain_segments() {
+    assert!(valid_repo_path("octo/canto-widget", 2));
+    assert!(valid_repo_path("group/sub/my.project", 20));
+    assert!(!valid_repo_path("group/sub/project", 2), "GitHub repos have exactly two segments");
+    assert!(!valid_repo_path("octo/../../user", 20));
+    assert!(!valid_repo_path("octo/x?per_page=1", 2));
+    assert!(!valid_repo_path("octo/x#frag", 2));
+    assert!(!valid_repo_path("octo/%2e%2e", 2));
+    assert!(!valid_repo_path("octo", 2));
+    assert!(!valid_repo_path("octo//x", 20));
+}

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { TOGGLE_LABEL } from "../lib/platform";
 import { api, errText } from "../lib/api";
 import BackupSection from "./BackupSection";
 import SyncSection from "./SyncSection";
@@ -55,7 +56,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
     <div className="flex h-full flex-col gap-4 overflow-y-auto pr-1 text-sm">
       <section className="flex flex-col gap-2">
         <p className="text-xs text-muted">
-          Atalho global: <span className="text-muted">Ctrl+Alt+Espaço</span> mostra ou esconde o widget. Tecle{" "}
+          Atalho global: <span className="text-muted">{TOGGLE_LABEL}</span> mostra ou esconde o widget. Tecle{" "}
           <kbd className="rounded border border-line px-1 text-[11px]">?</kbd> para ver todos os atalhos.
         </p>
         <label className="flex min-h-6 items-center gap-2 text-xs text-muted">

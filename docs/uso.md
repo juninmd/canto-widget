@@ -16,7 +16,7 @@ nunca mostra de novo.
   foi copiado e quanto ficou; copiar de volta devolve esse trecho. O histórico inteiro tem um teto de 1 milhão de
   caracteres fora os fixados, e no Windows o Canto só lê o clipboard quando ele muda. **Máx. fixados**, ao lado
   do filtro, limita quantos itens você pode fixar (100 por padrão, até 1.000); fixar além do limite é recusado,
-  desafixar sempre funciona. O atalho global **Ctrl+Alt+V** (`Cmd+Alt+V` no macOS) tira a formatação da área de
+  desafixar sempre funciona. O atalho global **Ctrl+Alt+V** (`Ctrl+Cmd+V` no macOS) tira a formatação da área de
   transferência atual (nunca cola sozinho: o Canto não envia teclas para outros programas), então um `Ctrl+V`
   seu logo depois cola só texto puro.
 - **reuniões** — lista as transcrições da pasta configurada (padrão `~/Documents/Transcricoes`),
@@ -104,7 +104,7 @@ nunca mostra de novo.
 - **Busca global** (`Ctrl+K`) busca ao mesmo tempo nas tarefas de hoje, nas notas e no clipboard; escolher um resultado
   troca de aba e já leva o texto buscado para o campo de busca daquela aba. Tarefas de outros dias ficam de fora: hoje
   o app não tem como navegar até outro dia, então um resultado assim não teria para onde ir.
-- Atalho global **Ctrl+Alt+Espaço** (`Cmd+Alt+Espaço` no macOS) mostra/esconde o widget.
+- Atalho global **Ctrl+Alt+Espaço** (`Cmd+Shift+Espaço` no macOS) mostra/esconde o widget.
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.
 - A lista de tarefas vira sozinha à meia-noite, sem precisar reabrir o widget.
@@ -180,7 +180,7 @@ Atalho global escondendo e trazendo o widget de volta:
   Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
 - Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, **entrar na próxima reunião com Meet** (atualiza
   sozinho a cada ~90 s enquanto o cofre está destrancado), trancar cofre, sair. O atalho global
-  **Ctrl+Alt+M** (`Cmd+Alt+M` no macOS) faz a mesma coisa sem abrir o menu; sem reunião em breve, não faz nada.
+  **Ctrl+Alt+M** (`Ctrl+Cmd+M` no macOS) faz a mesma coisa sem abrir o menu; sem reunião em breve, não faz nada.
 - **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você.
   No macOS aparece o número exato no Dock; no Windows e Linux, um ponto vermelho (a API do sistema não dá
   para desenhar números sem depender de uma fonte).

@@ -28,9 +28,11 @@ type Props = {
   onPriority: (priority: Priority | null) => void;
   onSubtasksChange: () => void;
   onError: (m: string) => void;
+  dragging: boolean;
+  dropTarget: boolean;
   onDragStart: () => void;
-  onDragOver: (e: React.DragEvent) => void;
-  onDrop: () => void;
+  onDragHover: () => void;
+  onMove: (delta: -1 | 1) => void;
 };
 
 /** One task line, plus its expandable schedule/PR/checklist panel. */
@@ -56,28 +58,42 @@ export default function TaskRow({
   onPriority,
   onSubtasksChange,
   onError,
+  dragging,
+  dropTarget,
   onDragStart,
-  onDragOver,
-  onDrop,
+  onDragHover,
+  onMove,
 }: Props) {
   return (
     <>
       <li
-        onDragOver={draggable ? onDragOver : undefined}
-        onDrop={draggable ? onDrop : undefined}
+        data-reorder-id={draggable ? t.id : undefined}
+        onPointerEnter={draggable ? onDragHover : undefined}
+        onPointerMove={draggable ? onDragHover : undefined}
         className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
-        }`}
+        } ${dragging ? "opacity-50" : ""} ${dropTarget ? "ring-1 ring-accent" : ""}`}
       >
         {draggable && (
-          <span
-            draggable
-            onDragStart={onDragStart}
+          <button
+            type="button"
+            onPointerDown={(e) => {
+              if (e.button !== 0) return;
+              e.preventDefault();
+              onDragStart();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+                e.preventDefault();
+                onMove(e.key === "ArrowUp" ? -1 : 1);
+              }
+            }}
             aria-label={`arrastar ${t.title} para reordenar`}
-            className="grid size-4 shrink-0 cursor-grab place-items-center text-faint opacity-0 hover:text-fg group-hover:opacity-100"
+            title="arraste ou use ↑/↓ para reordenar"
+            className="grid size-4 shrink-0 cursor-grab touch-none place-items-center text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
           >
             <GripIcon />
-          </span>
+          </button>
         )}
         <input
           type="checkbox"

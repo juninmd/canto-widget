@@ -204,7 +204,7 @@ OneDrive、Syncthing 等)、开机自启,以及**更新**栏目,并排显示**�
 | 🐧 Linux | `.AppImage`、`.deb` 或 `.rpm` |
 
 1. 首次启动时需要设置**主密码**。没有找回机制:密码一旦丢失,数据也随之丢失。
-2. `Ctrl+Alt+Space`(macOS 上为 `Cmd+Alt+Space`)可以显示或隐藏小组件。
+2. `Ctrl+Alt+Space`(macOS 上为 `Cmd+Shift+Space`)可以显示或隐藏小组件。
 3. 完成。有新版本发布时 Canto 会通知你,在**设置 → 更新**中一键即可更新。
 
 > [!NOTE]
