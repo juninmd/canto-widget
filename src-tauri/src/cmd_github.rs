@@ -76,7 +76,12 @@ pub struct GithubStatus {
 #[tauri::command(async)]
 pub fn github_status(state: State<'_, AppState>) -> Result<GithubStatus> {
     let cfg = state.github_config()?.unwrap_or_default();
-    Ok(GithubStatus { connected: !cfg.tokens.access_token.is_empty(), login: cfg.login, source: cfg.source, device_flow: embedded_client_id().is_some() })
+    Ok(GithubStatus {
+        connected: !cfg.tokens.access_token.is_empty(),
+        login: cfg.login,
+        source: cfg.source,
+        device_flow: embedded_client_id().is_some(),
+    })
 }
 
 #[tauri::command]
@@ -86,7 +91,12 @@ pub async fn github_save_token(app: tauri::AppHandle, token: String) -> Result<S
         let login = github::user(&token)?;
         let tokens = Tokens { access_token: token.to_string(), ..Default::default() };
         let state = app.state::<AppState>();
-        state.save_github(&GithubConfig { tokens, login: login.clone(), source: "pat".into(), client_id: String::new() })?;
+        state.save_github(&GithubConfig {
+            tokens,
+            login: login.clone(),
+            source: "pat".into(),
+            client_id: String::new(),
+        })?;
         state.forges.forget(FORGE);
         Ok(login)
     })
@@ -102,7 +112,8 @@ pub struct DeviceCode {
 
 #[tauri::command]
 pub async fn github_device_start(app: tauri::AppHandle) -> Result<DeviceCode> {
-    let client_id = embedded_client_id().ok_or_else(|| AppError::Github("esta build não traz um GitHub App; use um token pessoal".into()))?;
+    let client_id = embedded_client_id()
+        .ok_or_else(|| AppError::Github("esta build não traz um GitHub App; use um token pessoal".into()))?;
     if !app.state::<AppState>().is_unlocked() {
         return Err(AppError::Locked);
     }
@@ -113,7 +124,8 @@ pub async fn github_device_start(app: tauri::AppHandle) -> Result<DeviceCode> {
     run(move || {
         let d = auth::start(client_id)?;
         let expires_at = now_ms() + d.expires_in as i64 * 1000;
-        *app.state::<GithubState>().flow.lock().unwrap() = Some(Flow { device_code: d.device_code, interval: d.interval, expires_at, client_id });
+        *app.state::<GithubState>().flow.lock().unwrap() =
+            Some(Flow { device_code: d.device_code, interval: d.interval, expires_at, client_id });
         Ok(DeviceCode { user_code: d.user_code, url: d.verification_uri, expires_in_s: d.expires_in })
     })
     .await
@@ -126,8 +138,11 @@ pub async fn github_device_finish(app: tauri::AppHandle) -> Result<String> {
 }
 
 fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
-    let current = |gh: &GithubState| gh.flow.lock().unwrap().as_ref().map(|f| (f.device_code.clone(), f.interval, f.expires_at, f.client_id));
-    let (code, mut interval, expires_at, client_id) = current(gh).ok_or_else(|| AppError::Github("nenhum login em andamento".into()))?;
+    let current = |gh: &GithubState| {
+        gh.flow.lock().unwrap().as_ref().map(|f| (f.device_code.clone(), f.interval, f.expires_at, f.client_id))
+    };
+    let (code, mut interval, expires_at, client_id) =
+        current(gh).ok_or_else(|| AppError::Github("nenhum login em andamento".into()))?;
     let end = |r: Result<String>| {
         *gh.flow.lock().unwrap() = None;
         r
@@ -145,7 +160,12 @@ fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
             Ok(PollResult::SlowDown(n)) => interval = n,
             Ok(PollResult::Ready(tokens)) => {
                 let saved = github::user(&tokens.access_token).and_then(|login| {
-                    let cfg = GithubConfig { tokens, login: login.clone(), source: "app".into(), client_id: client_id.into() };
+                    let cfg = GithubConfig {
+                        tokens,
+                        login: login.clone(),
+                        source: "app".into(),
+                        client_id: client_id.into(),
+                    };
                     state.forges.forget(FORGE);
                     state.save_github(&cfg).map(|_| login)
                 });

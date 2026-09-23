@@ -89,9 +89,16 @@ pub fn pr_checks(token: &str, repo: &str, number: u64) -> Result<ChecksStatus> {
     if !valid_repo_path(repo, 2) {
         return Err(AppError::Format("repositório inválido".into()));
     }
-    let pr: PullDetail = response(client()?.get(format!("{API}/repos/{repo}/pulls/{number}")).bearer_auth(token).send().map_err(network)?)?;
-    let status: CombinedStatus =
-        response(client()?.get(format!("{API}/repos/{repo}/commits/{}/status", pr.head.sha)).bearer_auth(token).send().map_err(network)?)?;
+    let pr: PullDetail = response(
+        client()?.get(format!("{API}/repos/{repo}/pulls/{number}")).bearer_auth(token).send().map_err(network)?,
+    )?;
+    let status: CombinedStatus = response(
+        client()?
+            .get(format!("{API}/repos/{repo}/commits/{}/status", pr.head.sha))
+            .bearer_auth(token)
+            .send()
+            .map_err(network)?,
+    )?;
     Ok(checks_from_github(&status.state))
 }
 
@@ -132,11 +139,14 @@ pub(crate) fn network(e: reqwest::Error) -> AppError {
 fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
     let now = now_ms();
-    let spent = Quota::from_headers(res.headers(), "x-ratelimit-remaining", "x-ratelimit-reset", now).filter(|q| q.remaining == 0);
+    let spent = Quota::from_headers(res.headers(), "x-ratelimit-remaining", "x-ratelimit-reset", now)
+        .filter(|q| q.remaining == 0);
     match status {
         200..=299 => res.json().map_err(|e| AppError::Github(format!("resposta inesperada: {e}"))),
         401 => Err(AppError::Github("token expirado ou revogado; conecte de novo".into())),
-        403 | 429 if spent.is_some() || status == 429 => Err(rate_limited("github", spent.map_or(now + 60_000, |q| q.reset_at), now)),
+        403 | 429 if spent.is_some() || status == 429 => {
+            Err(rate_limited("github", spent.map_or(now + 60_000, |q| q.reset_at), now))
+        }
         _ => Err(AppError::Github(format!("o GitHub respondeu {status}"))),
     }
 }

@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
@@ -6,7 +7,7 @@ import TaskRow from "./TaskRow";
 import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
 import { useNewIds, useExit } from "../lib/motion";
-import { useReorder } from "../lib/useReorder";
+import { mergeOrder, useReorder } from "../lib/useReorder";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -43,7 +44,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   // Only this tab knows "today" correctly; the tray badge just reflects whatever it last pushed.
   useEffect(() => {
     if (loadedFor !== today) return;
-    void api.badgeSetTasks(tasks.filter((t) => !t.done).length).catch(() => {});
+    void api.badgeSetTasks(tasks.filter((task) => !task.done).length).catch(() => {});
   }, [tasks, loadedFor, today]);
 
   async function add(e: React.FormEvent) {
@@ -62,7 +63,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
 
   const undoable = useUndo(onError, reload);
   const isNew = useNewIds(
-    tasks.map((t) => t.id),
+    tasks.map((task) => task.id),
     loadedFor,
   );
 
@@ -80,18 +81,22 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     editEnded.current = true;
     const target = editing;
     setEditing(null);
-    if (!target.title.trim() || target.title === tasks.find((t) => t.id === target.id)?.title) return;
+    if (!target.title.trim() || target.title === tasks.find((task) => task.id === target.id)?.title) return;
     await run(() => api.taskRename(target.id, target.title));
   }
 
-  const done = tasks.filter((t) => t.done).length;
-  const visible = priorityFilter ? tasks.filter((t) => t.priority === priorityFilter) : tasks;
+  const done = tasks.filter((task) => task.done).length;
+  const visible = priorityFilter ? tasks.filter((task) => task.priority === priorityFilter) : tasks;
 
-  // Only reorders in the unfiltered view: a filtered subset can't express a total order for the hidden tasks too.
+  // A filtered view reorders its own rows; hidden tasks keep their slots in the day's order.
   const reorder = useReorder(
-    tasks.map((t) => t.id),
-    (ids) => {
-      const byId = new Map(tasks.map((t) => [t.id, t]));
+    visible.map((task) => task.id),
+    (visibleIds) => {
+      const ids = mergeOrder(
+        tasks.map((task) => task.id),
+        visibleIds,
+      );
+      const byId = new Map(tasks.map((task) => [task.id, task]));
       setTasks(ids.flatMap((id) => byId.get(id) ?? []));
       void run(() => api.tasksReorder(today, ids));
     },
@@ -108,10 +113,10 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           value={title}
           data-shortcut="new"
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="nova tarefa (ex.: Daily às 9h30)"
+          placeholder={t("tasks.addPlaceholder")}
           className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
-        <button type="submit" aria-label="adicionar tarefa" className="rounded-lg bg-edge px-3 text-sm text-fg">
+        <button type="submit" aria-label={t("tasks.add")} className="rounded-lg bg-edge px-3 text-sm text-fg">
           +
         </button>
       </form>
@@ -126,53 +131,53 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
       />
 
       <ul className={`flex-1 space-y-1 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
-        {visible.map((t) => (
+        {visible.map((task) => (
           <TaskRow
-            key={t.id}
-            task={t}
-            isNew={isNew(t.id)}
-            isLeaving={leaving.has(t.id)}
-            checking={checking === t.id}
+            key={task.id}
+            task={task}
+            isNew={isNew(task.id)}
+            isLeaving={leaving.has(task.id)}
+            checking={checking === task.id}
             editing={editing}
-            detailsOpen={details === t.id}
-            draggable={priorityFilter === ""}
-            dragging={reorder.dragging === t.id}
-            dropTarget={reorder.dragging !== null && reorder.over === t.id && reorder.dragging !== t.id}
-            onDragStart={() => reorder.start(t.id)}
-            onDragHover={() => reorder.hover(t.id)}
-            onMove={(delta) => reorder.step(t.id, delta)}
+            detailsOpen={details === task.id}
+            draggable
+            dragging={reorder.dragging === task.id}
+            dropTarget={reorder.dragging !== null && reorder.over === task.id && reorder.dragging !== task.id}
+            onDragStart={() => reorder.start(task.id)}
+            onDragHover={() => reorder.hover(task.id)}
+            onMove={(delta) => reorder.step(task.id, delta)}
             onToggleDone={() => {
-              setChecking(t.id);
-              void run(() => api.taskToggle(t.id));
+              setChecking(task.id);
+              void run(() => api.taskToggle(task.id));
             }}
             onCheckAnimationEnd={() => setChecking("")}
             onStartEdit={() => {
               editEnded.current = false;
-              setEditing({ id: t.id, title: t.title });
+              setEditing({ id: task.id, title: task.title });
             }}
-            onEditChange={(value) => setEditing({ id: t.id, title: value })}
+            onEditChange={(value) => setEditing({ id: task.id, title: value })}
             onEditCommit={() => void rename()}
             onEditCancel={() => {
               editEnded.current = true;
               setEditing(null);
             }}
             onDelete={() =>
-              void leave(t.id, () => run(async () => undoable(await api.itemDelete(t.id), `tarefa "${t.title}" excluída`)))
+              void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title }))))
             }
-            onToggleDetails={() => setDetails(details === t.id ? "" : t.id)}
-            onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(t.id, time, repeat))}
-            onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(t.id, repeat))}
-            onLinkPr={(url) => void run(() => api.taskLinkPr(t.id, url))}
-            onPriority={(priority) => void run(() => api.taskSetPriority(t.id, priority))}
+            onToggleDetails={() => setDetails(details === task.id ? "" : task.id)}
+            onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(task.id, time, repeat))}
+            onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(task.id, repeat))}
+            onLinkPr={(url) => void run(() => api.taskLinkPr(task.id, url))}
+            onPriority={(priority) => void run(() => api.taskSetPriority(task.id, priority))}
             onSubtasksChange={reload}
             onError={onError}
           />
         ))}
         {tasks.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">nada para hoje ainda — escreva acima e tecle Enter</li>
+          <li className="px-2 py-6 text-center text-xs text-faint">{t("tasks.empty")}</li>
         )}
         {tasks.length > 0 && visible.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">nenhuma tarefa com essa prioridade</li>
+          <li className="px-2 py-6 text-center text-xs text-faint">{t("tasks.emptyPriority")}</li>
         )}
       </ul>
     </div>

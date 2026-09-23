@@ -14,6 +14,7 @@ bun install
 bun run tauri dev        # app em desenvolvimento
 bun run lint             # tipos (tsc)
 bun test                 # testes da interface
+bun run e2e              # smoke tests no Chromium com o IPC do Tauri simulado (Playwright)
 cd src-tauri && cargo test   # testes do núcleo em Rust
 bun run tauri build      # instalador da plataforma atual
 ```
@@ -27,7 +28,7 @@ bun run tauri build      # instalador da plataforma atual
 4. Mudança visível para o usuário entra no `CHANGELOG.md`, em **Não publicado**, e no `README.md` (inglês,
    canônico) se for preciso; as traduções (`README.pt-BR.md`, `README.es.md`, ...) não precisam acompanhar no
    mesmo PR — ficam desatualizadas até alguém atualizar.
-5. Abra o PR; a CI roda tipos, testes do front e `cargo test` em Windows, macOS e Linux.
+5. Abra o PR; a CI roda tipos, testes do front, smoke tests e2e e `cargo test` em Windows, macOS e Linux.
 
 ## Nunca versione
 

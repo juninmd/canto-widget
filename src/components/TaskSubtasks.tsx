@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { t } from "../i18n";
 import { api, errText, type Subtask } from "../lib/api";
 
 type Props = { taskId: string; subtasks: Subtask[]; onError: (m: string) => void; onChange: () => void };
@@ -29,9 +30,7 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
   return (
     <div className="ml-6 flex flex-col gap-1.5 rounded-lg border border-edge bg-ink/60 p-2 text-xs text-muted motion-safe:animate-aba">
       {subtasks.length > 0 && (
-        <span className="text-[11px] text-faint">
-          {done}/{subtasks.length} subtarefas
-        </span>
+        <span className="text-[11px] text-faint">{t("tasks.subtaskCount", { done, total: subtasks.length })}</span>
       )}
       <ul className="flex flex-col gap-1">
         {subtasks.map((s) => (
@@ -48,7 +47,7 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
               type="button"
               onClick={() => void run(() => api.subtaskRemove(taskId, s.id))}
               className="grid size-5 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-              aria-label={`excluir subtarefa ${s.title}`}
+              aria-label={t("tasks.subtaskDelete", { title: s.title })}
             >
               ×
             </button>
@@ -59,11 +58,11 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="nova subtarefa"
-          aria-label="nova subtarefa"
+          placeholder={t("tasks.subtaskNew")}
+          aria-label={t("tasks.subtaskNew")}
           className="flex-1 rounded border border-line bg-ink px-1.5 py-0.5 text-fg outline-none focus:border-accent"
         />
-        <button type="submit" aria-label="adicionar subtarefa" className="rounded bg-edge px-2 text-fg">
+        <button type="submit" aria-label={t("tasks.subtaskAdd")} className="rounded bg-edge px-2 text-fg">
           +
         </button>
       </form>

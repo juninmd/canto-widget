@@ -50,7 +50,10 @@ pub fn valid_repo_path(path: &str, max_segments: usize) -> bool {
     let segments: Vec<&str> = path.split('/').collect();
     (2..=max_segments).contains(&segments.len())
         && segments.iter().all(|s| {
-            !s.is_empty() && *s != "." && *s != ".." && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
+            !s.is_empty()
+                && *s != "."
+                && *s != ".."
+                && s.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '-' | '_' | '.'))
         })
 }
 
@@ -103,18 +106,37 @@ pub trait Forge {
     const NAME: &'static str;
     type Credential;
 
-    fn fetch_section(cred: &Self::Credential, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)>;
+    fn fetch_section(
+        cred: &Self::Credential,
+        section: Section,
+        page: u32,
+        f: &ForgeFilter,
+    ) -> Result<(ForgeList, Option<Quota>)>;
     fn fetch_opened_since(cred: &Self::Credential, since: &str) -> Result<(ForgeList, Option<Quota>)>;
 }
 
 /// The four sections of a tab, each served from the cache unless `force`.
-pub fn list_all<F: Forge>(cache: &ForgeCache, cred: &F::Credential, filter: &ForgeFilter, force: bool) -> Result<ForgeLists> {
+pub fn list_all<F: Forge>(
+    cache: &ForgeCache,
+    cred: &F::Credential,
+    filter: &ForgeFilter,
+    force: bool,
+) -> Result<ForgeLists> {
     ForgeLists::collect(|s| list_page::<F>(cache, cred, s, 1, filter, force))
 }
 
 /// A single page of a single section (a tab's own request, or "mostrar mais").
-pub fn list_page<F: Forge>(cache: &ForgeCache, cred: &F::Credential, section: Section, page: u32, filter: &ForgeFilter, force: bool) -> Result<ForgeList> {
-    cache.get(F::NAME, &cache_key(section, page, filter), force, now_ms(), || F::fetch_section(cred, section, page, filter))
+pub fn list_page<F: Forge>(
+    cache: &ForgeCache,
+    cred: &F::Credential,
+    section: Section,
+    page: u32,
+    filter: &ForgeFilter,
+    force: bool,
+) -> Result<ForgeList> {
+    cache.get(F::NAME, &cache_key(section, page, filter), force, now_ms(), || {
+        F::fetch_section(cred, section, page, filter)
+    })
 }
 
 /// Background aggregation for the day summary.
@@ -163,7 +185,6 @@ pub(crate) fn item(number: u64, created: &str, updated: &str, comments: u64) -> 
         author: "octocat".into(),
     }
 }
-
 
 #[cfg(test)]
 #[path = "forge_tests.rs"]

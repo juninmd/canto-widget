@@ -98,9 +98,7 @@ pub fn open(dir: &Path, signer: &dyn Signer) -> Result<Zeroizing<String>> {
     let plain = derive_key(&signature)
         .decrypt(&b(&env.nonce)?, &b(&env.ciphertext)?, AAD)
         .map_err(|_| AppError::Config("a biometria não confere com a deste cofre; ative de novo".into()))?;
-    String::from_utf8(plain)
-        .map(Zeroizing::new)
-        .map_err(|_| AppError::Format("biometria corrompida".into()))
+    String::from_utf8(plain).map(Zeroizing::new).map_err(|_| AppError::Format("biometria corrompida".into()))
 }
 
 pub fn disable(dir: &Path) -> Result<()> {

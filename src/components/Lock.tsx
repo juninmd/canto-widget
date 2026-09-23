@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText, type BiometricStatus } from "../lib/api";
+import { t } from "../i18n";
 
 type Props = { exists: boolean; onOpen: (justCreated?: boolean) => void };
 
@@ -36,7 +37,7 @@ export default function Lock({ exists, onOpen }: Props) {
     e.preventDefault();
     setError("");
     if (!exists && password !== confirm) {
-      setError("as senhas não conferem — digite a mesma senha nos dois campos");
+      setError(t("lock.mismatch"));
       return;
     }
     setBusy(true);
@@ -59,30 +60,30 @@ export default function Lock({ exists, onOpen }: Props) {
     >
       <div>
         <h2 className="text-sm font-semibold text-fg">
-          {exists ? "Cofre trancado" : "Criar cofre"}
+          {exists ? t("lock.title.locked") : t("lock.title.create")}
         </h2>
         <p className="mt-1 text-xs text-muted">
           {exists
-            ? "Digite a senha mestra para abrir suas tarefas e notas."
-            : "A senha mestra cifra tudo localmente. Sem ela, nada é recuperável — nem por você."}
+            ? t("lock.hint.locked")
+            : t("lock.hint.create")}
         </p>
       </div>
       <input
         autoFocus
         type={showPassword ? "text" : "password"}
-        aria-label="senha mestra"
+        aria-label={t("lock.password")}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        placeholder="senha mestra"
+        placeholder={t("lock.password")}
         className="rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
       />
       {!exists && (
         <input
           type={showPassword ? "text" : "password"}
-          aria-label="repita a senha"
+          aria-label={t("lock.confirm")}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
-          placeholder="repita a senha"
+          placeholder={t("lock.confirm")}
           className="rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
         />
       )}
@@ -93,8 +94,8 @@ export default function Lock({ exists, onOpen }: Props) {
           onChange={(e) => setShowPassword(e.target.checked)}
           className="size-4 accent-[var(--color-accent)]"
         />
-        mostrar senha
-        {!exists && <span className="ml-auto text-faint">mínimo de 4 caracteres</span>}
+        {t("lock.showPassword")}
+        {!exists && <span className="ml-auto text-faint">{t("lock.minLength")}</span>}
       </label>
       {error && (
         <p role="alert" className="text-xs text-danger">
@@ -108,7 +109,7 @@ export default function Lock({ exists, onOpen }: Props) {
           disabled={busy}
           className="rounded-lg border border-accent px-3 py-2 text-sm font-semibold text-fg disabled:opacity-40"
         >
-          Destrancar com {bio.name}
+          {t("lock.biometric", { name: bio.name })}
         </button>
       )}
       <button
@@ -116,7 +117,7 @@ export default function Lock({ exists, onOpen }: Props) {
         disabled={busy || password.length === 0}
         className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent disabled:opacity-40"
       >
-        {busy ? (exists ? "abrindo..." : "criando...") : exists ? "Destrancar" : "Criar cofre"}
+        {busy ? (exists ? t("lock.opening") : t("lock.creating")) : exists ? t("lock.unlock") : t("lock.title.create")}
       </button>
     </form>
   );

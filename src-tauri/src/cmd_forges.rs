@@ -30,7 +30,8 @@ pub async fn forges_opened_since(app: tauri::AppHandle, since_ms: i64) -> Result
         if !state.is_unlocked() {
             return Err(AppError::Locked);
         }
-        let results = [crate::cmd_github_lists::opened_since(&app, &since), crate::cmd_gitlab::opened_since(&state, &since)];
+        let results =
+            [crate::cmd_github_lists::opened_since(&app, &since), crate::cmd_gitlab::opened_since(&state, &since)];
         Ok(combine(results.into_iter().flatten()))
     })
     .await
@@ -61,7 +62,8 @@ fn combine(results: impl Iterator<Item = Result<ForgeList>>) -> Opened {
 
 /// Built from numbers, never from user text: it goes straight into a search query.
 fn rfc3339(ms: i64) -> Result<String> {
-    let t = time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).map_err(|e| AppError::Config(e.to_string()))?;
+    let t =
+        time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).map_err(|e| AppError::Config(e.to_string()))?;
     Ok(format!(
         "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}+00:00",
         t.year(),

@@ -17,7 +17,9 @@ local vault. Public repository: treat everything you write, commit or screenshot
 bun install --frozen-lockfile
 bun run lint                     # tsc --noEmit
 bun test                         # UI tests
+bun run e2e                      # Playwright smoke tests (e2e/*.e2e.ts): real UI in Chromium, Tauri IPC mocked
 bun run build                    # tsc + vite build -> dist/ (needed before cargo: generate_context! embeds it)
+cd src-tauri && cargo fmt --check                         # rustfmt.toml: max_width 120
 cd src-tauri && cargo clippy --all-targets --locked -- -D warnings
 cd src-tauri && cargo test --locked
 cd src-tauri && cargo test --release --test scale -- --ignored --nocapture   # load harness, on demand
@@ -25,9 +27,10 @@ bun run tauri dev                # app with hot reload
 bun run tauri build              # installer for the current OS
 ```
 
-CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests and build on Ubuntu; clippy and
-`cargo test` on Ubuntu, Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which
-builds signed installers and publishes a release after the checks pass.
+CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests, build and `bun audit` on
+Ubuntu; e2e smoke tests, `cargo fmt --check` and `cargo audit` on Ubuntu; clippy and `cargo test` on Ubuntu,
+Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which builds signed installers
+and publishes a release after the checks pass.
 
 ## Layout
 
@@ -54,6 +57,9 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 
 - **Code in English** (identifiers, files, comments, test names). **User-facing text in pt-BR** (UI, errors
   returned to the UI, notifications). Tests assert on the pt-BR text the user sees.
+- **UI text lives in the catalog**, never inline: `t("area.key", { param })` from `src/i18n`, with the pt-BR text
+  in `src/i18n/pt-BR/<area>.ts` (app, tasks, content, integrations). Dates and numbers use `LOCALE`, not a literal
+  `"pt-BR"`. Symbols, key names and brand names stay inline. Errors from Rust are still pt-BR strings in Rust.
 - Comments only for *why*, one line. No narrating comments, no section banners.
 - Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
 - One feature per module; commands are thin, logic is a pure function with a unit test.
@@ -114,6 +120,7 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 
 ## Definition of done
 
-`bun run lint`, `bun test`, `bun run build`, `cargo clippy ... -D warnings` and `cargo test --locked` are green;
+`bun run lint`, `bun test`, `bun run build`, `cargo fmt --check`, `cargo clippy ... -D warnings` and
+`cargo test --locked` are green;
 changed behavior has a test; docs and CHANGELOG updated; UI changes have a README screenshot; no debug output,
 commented-out code or TODO without an issue.

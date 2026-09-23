@@ -1,13 +1,14 @@
 import { freshness, isFiltered, visibleSections, type Forge } from "../lib/forge";
 import type { ForgeListsState } from "../lib/useForgeLists";
 import { timeAgo } from "../lib/time";
+import { LOCALE, t } from "../i18n";
 import ForgeFilterBar from "./ForgeFilterBar";
 import ForgeSection from "./ForgeSection";
 import Skeleton from "./Skeleton";
 
 type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; onDisconnect: () => void };
 
-const clock = (ms: number) => new Date(ms).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+const clock = (ms: number) => new Date(ms).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
 
 /** Issue and PR/MR lists of one connected forge: header, filter, sections. */
 export default function ForgeBoard({ forge, login, host, lists: gh, onDisconnect }: Props) {
@@ -21,24 +22,24 @@ export default function ForgeBoard({ forge, login, host, lists: gh, onDisconnect
           {host && ` · ${host}`}
         </span>
         <span className="flex shrink-0 gap-3">
-          {fresh?.fetchedAt && <span title="as listas ficam guardadas por 5 min para poupar o limite da API">atualizado {timeAgo(fresh.fetchedAt)}</span>}
+          {fresh?.fetchedAt && <span title={t("forge.cacheTitle")}>{t("forge.updatedAgo", { ago: timeAgo(fresh.fetchedAt) })}</span>}
           <button
             type="button"
             onClick={() => void gh.load(gh.filter, true, true)}
             disabled={gh.loading}
             className="min-h-6 underline decoration-dotted hover:text-muted"
           >
-            {gh.loading ? "..." : "atualizar"}
+            {gh.loading ? "..." : t("forge.refresh")}
           </button>
           <button type="button" onClick={onDisconnect} className="min-h-6 underline decoration-dotted hover:text-muted">
-            desconectar
+            {t("forge.disconnect")}
           </button>
         </span>
       </div>
       <ForgeFilterBar forge={forge} filter={gh.filter} onApply={(f) => void gh.load(f, false)} />
       {fresh?.limitedUntil && (
         <p role="status" className="text-[11px] text-muted">
-          limite de requisições perto do fim: mostrando a última cópia; dados novos a partir das {clock(fresh.limitedUntil)}
+          {t("forge.rateLimited", { time: clock(fresh.limitedUntil) })}
         </p>
       )}
       {gh.error && (
@@ -47,7 +48,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, onDisconnect
         </p>
       )}
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-        {!lists && gh.loading && <Skeleton label="carregando issues e PRs" rows={4} />}
+        {!lists && gh.loading && <Skeleton label={t("forge.loading")} rows={4} />}
         {lists &&
           visibleSections(forge, gh.filter.kind).map(({ key, title }) => (
             <ForgeSection

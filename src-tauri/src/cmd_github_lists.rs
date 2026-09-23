@@ -19,7 +19,12 @@ impl Forge for Github {
     const NAME: &'static str = FORGE;
     type Credential = Zeroizing<String>;
 
-    fn fetch_section(cred: &Self::Credential, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+    fn fetch_section(
+        cred: &Self::Credential,
+        section: Section,
+        page: u32,
+        f: &ForgeFilter,
+    ) -> Result<(ForgeList, Option<Quota>)> {
         github::section(cred, section, page, f)
     }
 
@@ -30,7 +35,11 @@ impl Forge for Github {
 
 /// Four sections cost up to six searches of the 30 per minute: served from the cache unless `force`.
 #[tauri::command]
-pub async fn github_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, force: Option<bool>) -> Result<ForgeLists> {
+pub async fn github_lists(
+    app: tauri::AppHandle,
+    filter: Option<ForgeFilter>,
+    force: Option<bool>,
+) -> Result<ForgeLists> {
     run(move || {
         let cred = token(&app)?;
         let cache = &app.state::<AppState>().forges;
@@ -40,7 +49,12 @@ pub async fn github_lists(app: tauri::AppHandle, filter: Option<ForgeFilter>, fo
 }
 
 #[tauri::command]
-pub async fn github_section(app: tauri::AppHandle, section: Section, page: u32, filter: Option<ForgeFilter>) -> Result<ForgeList> {
+pub async fn github_section(
+    app: tauri::AppHandle,
+    section: Section,
+    page: u32,
+    filter: Option<ForgeFilter>,
+) -> Result<ForgeList> {
     run(move || {
         let cred = token(&app)?;
         let cache = &app.state::<AppState>().forges;

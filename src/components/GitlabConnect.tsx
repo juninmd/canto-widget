@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { api, errText } from "../lib/api";
+import { t } from "../i18n";
 
 const FIELD = "rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent";
 
@@ -28,9 +29,9 @@ export default function GitlabConnect({ onConnected }: { onConnected: () => void
 
   return (
     <form onSubmit={save} className="flex flex-col gap-2 text-xs text-muted">
-      <p>Conecte o GitLab.com ou a instância da sua empresa para ver issues e merge requests abertos. O token fica cifrado no cofre.</p>
+      <p>{t("gitlab.intro")}</p>
       <label htmlFor="gitlab-url" className="text-fg">
-        Endereço do GitLab
+        {t("gitlab.urlLabel")}
       </label>
       <input
         id="gitlab-url"
@@ -39,11 +40,11 @@ export default function GitlabConnect({ onConnected }: { onConnected: () => void
         autoComplete="off"
         value={baseUrl}
         onChange={(e) => setBaseUrl(e.target.value)}
-        placeholder="https://gitlab.suaempresa.com"
+        placeholder={t("gitlab.urlPlaceholder")}
         className={FIELD}
       />
       <label htmlFor="gitlab-token" className="text-fg">
-        Token de acesso pessoal
+        {t("gitlab.tokenLabel")}
       </label>
       <input
         id="gitlab-token"
@@ -55,15 +56,15 @@ export default function GitlabConnect({ onConnected }: { onConnected: () => void
         className={FIELD}
       />
       <p className="text-[11px] text-faint">
-        Só o escopo <em>read_api</em>.{" "}
+        {t("gitlab.scopeHint")} <em>read_api</em>.{" "}
         {/^https:\/\//.test(baseUrl.trim()) && (
           <button type="button" onClick={() => void api.openLink(tokenPage).catch(() => {})} className="underline decoration-dotted hover:text-muted">
-            criar token
+            {t("gitlab.createToken")}
           </button>
         )}
       </p>
       <button type="submit" disabled={busy || !token.trim() || !baseUrl.trim()} className="min-h-7 self-start rounded-lg bg-edge px-3 text-fg disabled:opacity-40">
-        {busy ? "conferindo..." : "conectar"}
+        {busy ? t("gitlab.checking") : t("gitlab.connect")}
       </button>
       {error && (
         <p role="alert" className="text-danger">

@@ -1,3 +1,4 @@
+import { t } from "../i18n";
 import { useEffect, useMemo, useState } from "react";
 import { MOD_KEY } from "../lib/platform";
 import { api, errText, type AgendaItem, type ForgeOpened, type GeminiDoc, type Task } from "../lib/api";
@@ -56,13 +57,13 @@ export default function DaySummary({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      onError(`não deu para copiar; selecione o texto e use ${MOD_KEY}+C`);
+      onError(t("summary.copyFailed", { mod: MOD_KEY }));
     }
   }
 
   return (
     <section
-      aria-label="resumo do dia"
+      aria-label={t("summary.heading")}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
       className="flex min-h-0 flex-1 flex-col gap-2 motion-safe:animate-aba"
     >
@@ -71,12 +72,12 @@ export default function DaySummary({
       </pre>
       {!opened && (
         <p role="status" className="text-[11px] text-faint">
-          consultando PRs/MRs abertos hoje…
+          {t("summary.loadingForges")}
         </p>
       )}
       {opened?.errors.map((e) => (
         <p key={e} className="text-[11px] text-faint">
-          PRs/MRs fora do resumo: {e}
+          {t("summary.forgeError", { error: e })}
         </p>
       ))}
       <div className="flex gap-2">
@@ -86,10 +87,10 @@ export default function DaySummary({
           onClick={() => void copy()}
           className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent"
         >
-          {copied ? "copiado!" : "copiar resumo"}
+          {copied ? t("summary.copied") : t("summary.copy")}
         </button>
         <button type="button" onClick={onClose} title="Esc" className="rounded-lg bg-edge px-3 py-1.5 text-sm text-fg">
-          voltar
+          {t("summary.back")}
         </button>
       </div>
     </section>

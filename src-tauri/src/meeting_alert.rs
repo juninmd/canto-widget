@@ -44,15 +44,11 @@ pub fn start_ms(e: &AgendaItem) -> Option<i64> {
     if e.all_day {
         return None;
     }
-    time::OffsetDateTime::parse(&e.start, &Rfc3339)
-        .ok()
-        .map(|t| (t.unix_timestamp_nanos() / 1_000_000) as i64)
+    time::OffsetDateTime::parse(&e.start, &Rfc3339).ok().map(|t| (t.unix_timestamp_nanos() / 1_000_000) as i64)
 }
 
 pub fn due(items: &[AgendaItem], now: i64) -> impl Iterator<Item = &AgendaItem> {
-    items
-        .iter()
-        .filter(move |e| start_ms(e).is_some_and(|s| s - now <= LEAD_MS && s - now > -LATE_MS))
+    items.iter().filter(move |e| start_ms(e).is_some_and(|s| s - now <= LEAD_MS && s - now > -LATE_MS))
 }
 
 /// App Nap coalesces a hidden accessory app's timers by minutes: a 3-minute alert window would be missed.
@@ -60,10 +56,8 @@ pub fn due(items: &[AgendaItem], now: i64) -> impl Iterator<Item = &AgendaItem> 
 fn keep_timers_on_time() {
     use objc2_foundation::{NSActivityOptions, NSProcessInfo, NSString};
     let reason = NSString::from_str("avisos de reunião");
-    let token = NSProcessInfo::processInfo().beginActivityWithOptions_reason(
-        NSActivityOptions::UserInitiatedAllowingIdleSystemSleep,
-        &reason,
-    );
+    let token = NSProcessInfo::processInfo()
+        .beginActivityWithOptions_reason(NSActivityOptions::UserInitiatedAllowingIdleSystemSleep, &reason);
     // Held for the whole process: ending the activity would re-enable App Nap.
     std::mem::forget(token);
 }
@@ -99,12 +93,7 @@ pub fn watch(app: AppHandle) {
 
 fn fetch(app: &AppHandle) -> Option<Vec<AgendaItem>> {
     let now = now_ms();
-    let fmt = |ms: i64| {
-        time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000))
-            .ok()?
-            .format(&Rfc3339)
-            .ok()
-    };
+    let fmt = |ms: i64| time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).ok()?.format(&Rfc3339).ok();
     // Starts a little in the past so an event that began a minute ago is still caught.
     let (min, max) = (fmt(now - LATE_MS)?, fmt(now + LOOKAHEAD_MS)?);
     cmd_extras::agenda(&app.state::<AppState>(), &min, &max, 20).ok()
@@ -117,12 +106,7 @@ mod tests {
     const NOW: i64 = 1_789_700_400_000; // 2026-09-18T03:00:00Z
 
     fn event(id: &str, start: &str, all_day: bool) -> AgendaItem {
-        AgendaItem {
-            id: id.into(),
-            start: start.into(),
-            all_day,
-            ..Default::default()
-        }
+        AgendaItem { id: id.into(), start: start.into(), all_day, ..Default::default() }
     }
 
     fn due_ids(items: &[AgendaItem]) -> Vec<&str> {
@@ -143,10 +127,7 @@ mod tests {
 
     #[test]
     fn all_day_and_unparsable_events_never_ring() {
-        let items = [
-            event("all-day", "2026-09-18", true),
-            event("bad", "amanhã", false),
-        ];
+        let items = [event("all-day", "2026-09-18", true), event("bad", "amanhã", false)];
         assert!(due_ids(&items).is_empty());
     }
 
@@ -155,10 +136,7 @@ mod tests {
         let alerted = Alerted::default();
         let meeting = event("ev1", "", false);
         assert!(alerted.first(&meeting));
-        assert!(
-            !alerted.first(&meeting),
-            "the UI and the Rust watcher must not both ring"
-        );
+        assert!(!alerted.first(&meeting), "the UI and the Rust watcher must not both ring");
         let task = event("task:t1", "", false);
         assert!(alerted.first(&task) && alerted.first(&task));
     }

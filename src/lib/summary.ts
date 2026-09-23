@@ -1,5 +1,6 @@
 import type { AgendaItem, ForgeItem, GeminiDoc, Task } from "./api";
 import { hour } from "./agenda";
+import { LOCALE, t } from "../i18n";
 
 /** Local midnight of a `YYYY-MM-DD` day, in ms. */
 export function dayStart(day: string): number {
@@ -8,13 +9,13 @@ export function dayStart(day: string): number {
 }
 
 function longDate(day: string): string {
-  return new Date(dayStart(day)).toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "2-digit" });
+  return new Date(dayStart(day)).toLocaleDateString(LOCALE, { weekday: "long", day: "2-digit", month: "2-digit" });
 }
 
 /** Same event the Calendar attachment came from: title and start match exactly. */
 function geminiLink(e: AgendaItem, docs: GeminiDoc[]): string {
   const doc = docs.find((d) => d.meeting === e.title && d.start === e.start);
-  return doc ? ` — anotações do Gemini: ${doc.url}` : "";
+  return doc ? ` — ${t("summary.geminiNotes", { url: doc.url })}` : "";
 }
 
 /** Plain text, ready to paste into chat or email: no markdown that could break at the destination. */
@@ -27,15 +28,15 @@ export function daySummary(
 ): string {
   const done = tasks.filter((t) => t.done);
   const open = tasks.filter((t) => !t.done);
-  const lines = [`Resumo de ${longDate(day)}`, ""];
+  const lines = [t("summary.title", { date: longDate(day) }), ""];
   const section = (title: string, items: string[]) => {
     if (items.length === 0) return;
     lines.push(`${title} (${items.length})`, ...items.map((i) => `- ${i}`), "");
   };
-  section("Concluído", done.map((t) => t.title));
-  section("Pendente", open.map((t) => (t.hora ? `${t.title} (${t.hora})` : t.title)));
-  section("Reuniões", agenda.map((e) => `${hour(e)} ${e.title}${geminiLink(e, geminiDocs)}`));
-  section("PRs/MRs abertos", opened.map((i) => `${i.reference} ${i.title}${i.draft ? " (rascunho)" : ""}`));
-  if (lines.length === 2) lines.push("Nada registrado hoje.");
+  section(t("summary.done"), done.map((task) => task.title));
+  section(t("summary.pending"), open.map((task) => (task.hora ? `${task.title} (${task.hora})` : task.title)));
+  section(t("summary.meetings"), agenda.map((e) => `${hour(e)} ${e.title}${geminiLink(e, geminiDocs)}`));
+  section(t("summary.openedPrs"), opened.map((i) => `${i.reference} ${i.title}${i.draft ? ` (${t("summary.draft")})` : ""}`));
+  if (lines.length === 2) lines.push(t("summary.empty"));
   return lines.join("\n").trimEnd();
 }

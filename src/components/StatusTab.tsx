@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useId, useState } from "react";
 import { api, errText, type StatusResult } from "../lib/api";
 import { timeAgo } from "../lib/time";
-import { hasRecentIncident, lastIncident, sortByLastIncident } from "../lib/status";
+import { isTroubled, lastIncident, sortByLastIncident } from "../lib/status";
+import { t } from "../i18n";
 import Skeleton from "./Skeleton";
 
 /** Incident history from services the team depends on: read-only, no account needed. */
@@ -32,16 +33,16 @@ export default function StatusTab() {
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2 text-[11px] text-faint">
-        <span>status dos serviços</span>
+        <span>{t("status.header")}</span>
         <span className="flex shrink-0 items-center gap-3">
-          {fetchedAt > 0 && <span title="guardado por 5 min para poupar as páginas de status">atualizado {timeAgo(fetchedAt)}</span>}
+          {fetchedAt > 0 && <span title={t("status.cacheTitle")}>{t("status.updatedAgo", { ago: timeAgo(fetchedAt) })}</span>}
           <button
             type="button"
             onClick={() => void load(true)}
             disabled={loading}
             className="min-h-6 underline decoration-dotted hover:text-muted"
           >
-            {loading ? "..." : "atualizar"}
+            {loading ? "..." : t("status.refresh")}
           </button>
         </span>
       </div>
@@ -52,7 +53,7 @@ export default function StatusTab() {
       )}
       <div className="flex-1 space-y-3 overflow-y-auto pr-1">
         {results === null ? (
-          <Skeleton label="buscando o status dos serviços" rows={4} />
+          <Skeleton label={t("status.loading")} rows={4} />
         ) : (
           results.map((r) => (
             <StatusAccordion key={r.id} result={r} open={open === r.id} onToggle={() => setOpen(open === r.id ? null : r.id)} />
@@ -66,7 +67,9 @@ export default function StatusTab() {
 function StatusAccordion({ result, open, onToggle }: { result: StatusResult; open: boolean; onToggle: () => void }) {
   const bodyId = useId();
   const last = lastIncident(result);
-  const troubled = !result.error && hasRecentIncident(result, Date.now());
+  const troubled = isTroubled(result, Date.now());
+  const maintenance = result.live?.indicator === "maintenance";
+  const liveText = troubled || maintenance ? result.live?.description : "";
   return (
     <section
       data-troubled={troubled || undefined}
@@ -77,20 +80,26 @@ function StatusAccordion({ result, open, onToggle }: { result: StatusResult; ope
           <span className="flex min-w-0 items-center gap-1.5">
             {troubled && <span aria-hidden="true" className="size-2 shrink-0 rounded-full bg-danger motion-safe:animate-pulse" />}
             <span className="truncate text-xs font-semibold text-fg">{result.label}</span>
-            {troubled && <span className="sr-only">com incidente nas últimas 24 h</span>}
+            {troubled && <span className="sr-only">{result.live ? t("status.troubledNow") : t("status.recentIncident")}</span>}
           </span>
           <span className={`shrink-0 text-[11px] ${troubled ? "font-semibold text-danger" : "text-muted"}`}>
-            {result.error ? "indisponível" : last > 0 ? timeAgo(last) : "sem incidentes"}{" "}
+            {result.error ? t("status.unavailable") : last > 0 ? timeAgo(last) : t("status.noIncidents")}{" "}
             <span aria-hidden="true">{open ? "▴" : "▾"}</span>
           </span>
         </span>
+        {liveText && (
+          <span className={`mt-0.5 block truncate text-[11px] ${troubled ? "text-danger" : "text-muted"}`}>
+            {maintenance ? t("status.maintenancePrefix") : t("status.nowPrefix")}
+            {liveText}
+          </span>
+        )}
       </button>
       {open && (
         <div id={bodyId} className="px-2 pb-2">
           {result.error ? (
-            <p className="text-[11px] text-faint">indisponível: {result.error}</p>
+            <p className="text-[11px] text-faint">{t("status.unavailableWithError", { error: result.error })}</p>
           ) : result.items.length === 0 ? (
-            <p className="text-[11px] text-faint">nenhum incidente recente</p>
+            <p className="text-[11px] text-faint">{t("status.noRecentIncidents")}</p>
           ) : (
             <ul className="space-y-1">
               {result.items.map((it) => (

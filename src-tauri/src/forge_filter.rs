@@ -58,7 +58,8 @@ pub struct ForgeFilter {
 impl ForgeFilter {
     /// Control characters flattened, whitespace collapsed, capped: safe to append to a query.
     pub fn text(&self) -> String {
-        let flat: String = self.text.chars().map(|c| if c.is_control() { ' ' } else { c }).take(MAX_TEXT_CHARS).collect();
+        let flat: String =
+            self.text.chars().map(|c| if c.is_control() { ' ' } else { c }).take(MAX_TEXT_CHARS).collect();
         flat.split_whitespace().collect::<Vec<_>>().join(" ")
     }
 

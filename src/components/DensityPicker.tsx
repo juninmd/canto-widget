@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { applyDensity, loadDensity, DENSITIES, type DensityId } from "../lib/density";
+import { t } from "../i18n";
 
 /** Lives next to the skin picker: both are "how the widget looks", not vault state. */
 export default function DensityPicker() {
@@ -8,7 +9,7 @@ export default function DensityPicker() {
   return (
     <section className="flex flex-col gap-2">
       <h3 id="density-title" className="text-xs font-semibold text-fg">
-        Tamanho da interface
+        {t("settings.density.title")}
       </h3>
       <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-labelledby="density-title">
         {DENSITIES.map((d) => (

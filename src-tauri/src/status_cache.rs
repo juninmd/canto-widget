@@ -36,7 +36,7 @@ mod tests {
     use super::*;
 
     fn result(label: &str) -> Vec<StatusResult> {
-        vec![StatusResult { id: "x".into(), label: label.into(), items: Vec::new(), error: None }]
+        vec![StatusResult { id: "x".into(), label: label.into(), items: Vec::new(), error: None, live: None }]
     }
 
     #[test]

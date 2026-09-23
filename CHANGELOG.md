@@ -7,11 +7,25 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Base para tradução**: todos os textos da interface saíram dos componentes para um catálogo
+  (`src/i18n/pt-BR/`), com datas e números formatados por uma única configuração de idioma. Nada muda para quem
+  usa; o próximo idioma é um arquivo novo por área.
+- **Segurança**: a CSP de produção não aceita mais estilos inline (`style-src 'self'`); as cores dinâmicas já
+  usam CSSOM, que a política permite.
+- **Status API com estado ao vivo**: serviços hospedados no Statuspage (Claude, GitHub, Cloudflare, Vercel, npm,
+  PyPI, Supabase, DigitalOcean...) mostram o estado atual ("agora: Partial System Outage") e só ficam em destaque
+  enquanto o problema está aberto; os demais seguem a regra de incidente nas últimas 24 h.
+- **Reordenar tarefas com filtro de prioridade**: o puxador continua disponível com o filtro ativo; só as tarefas
+  visíveis trocam de lugar e as ocultas mantêm a posição.
+- **Testes**: smoke tests de ponta a ponta (`bun run e2e`) rodam a interface real no Chromium com o IPC do Tauri
+  simulado — abas, nova tarefa, cofre trancado e Status API — e ganharam um job próprio na CI.
 - **Status API**: os serviços aparecem ordenados pela hora do último incidente (mais recente primeiro; sem
   incidentes no fim) e os que tiveram incidente nas últimas 24 h ganham destaque em vermelho, com ponto pulsante.
 
 ### Corrigido
 
+- **Lembretes de tarefa com o widget escondido** (sobretudo no macOS): passam a ser disparados pelo núcleo em Rust,
+  como o aviso de reunião, em vez do relógio do webview, que é congelado com a janela oculta.
 - **macOS: aviso de reunião não aparecia** com o widget escondido na bandeja. O relógio do aviso rodava no
   webview, que o macOS congela com a janela oculta (e o App Nap atrasa). Agora o núcleo em Rust confere a agenda a
   cada 20 s e dispara a notificação do sistema e o aviso, sem duplicar com a interface.

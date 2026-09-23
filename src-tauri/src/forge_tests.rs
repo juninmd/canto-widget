@@ -8,7 +8,12 @@ impl Forge for FakeToken {
     const NAME: &'static str = "fake-token";
     type Credential = Arc<AtomicU32>;
 
-    fn fetch_section(calls: &Self::Credential, _s: Section, _p: u32, _f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+    fn fetch_section(
+        calls: &Self::Credential,
+        _s: Section,
+        _p: u32,
+        _f: &ForgeFilter,
+    ) -> Result<(ForgeList, Option<Quota>)> {
         calls.fetch_add(1, Ordering::SeqCst);
         Ok((list(1, vec![item(1, "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z", 0)]), None))
     }
@@ -28,7 +33,12 @@ impl Forge for FakeAccount {
     const NAME: &'static str = "fake-account";
     type Credential = FakeAccountCred;
 
-    fn fetch_section(cred: &Self::Credential, _s: Section, _p: u32, _f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+    fn fetch_section(
+        cred: &Self::Credential,
+        _s: Section,
+        _p: u32,
+        _f: &ForgeFilter,
+    ) -> Result<(ForgeList, Option<Quota>)> {
         cred.calls.fetch_add(1, Ordering::SeqCst);
         Ok((list(1, vec![item(1, "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z", 0)]), None))
     }

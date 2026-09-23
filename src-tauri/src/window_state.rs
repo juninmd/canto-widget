@@ -38,7 +38,10 @@ pub type Area = (f64, f64, f64, f64);
 /// A disconnected monitor or smaller resolution must not leave the widget stranded off-screen.
 pub fn fits(pos: (f64, f64), size: (f64, f64), areas: &[Area]) -> bool {
     areas.iter().any(|&(x, y, w, h)| {
-        pos.0 >= x - SLACK_PX && pos.1 >= y - SLACK_PX && pos.0 + size.0 <= x + w + SLACK_PX && pos.1 + size.1 <= y + h + SLACK_PX
+        pos.0 >= x - SLACK_PX
+            && pos.1 >= y - SLACK_PX
+            && pos.0 + size.0 <= x + w + SLACK_PX
+            && pos.1 + size.1 <= y + h + SLACK_PX
     })
 }
 
@@ -145,7 +148,11 @@ pub fn window_config(window_state: State<'_, WindowState>) -> WindowConfig {
 }
 
 #[tauri::command]
-pub fn window_set_always_on_top(app: tauri::AppHandle, window_state: State<'_, WindowState>, enabled: bool) -> Result<()> {
+pub fn window_set_always_on_top(
+    app: tauri::AppHandle,
+    window_state: State<'_, WindowState>,
+    enabled: bool,
+) -> Result<()> {
     if let Some(win) = app.get_webview_window("main") {
         win.set_always_on_top(enabled).map_err(|e| AppError::Io(e.to_string()))?;
     }

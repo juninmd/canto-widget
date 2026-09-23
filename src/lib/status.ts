@@ -17,3 +17,12 @@ export function sortByLastIncident(results: StatusResult[]): StatusResult[] {
     .sort((a, b) => b.last - a.last || a.i - b.i)
     .map((x) => x.r);
 }
+
+/**
+ * Statuspage's live indicator wins when there is one (a resolved incident an hour ago is not trouble);
+ * other providers only have history, so a recent incident stands in for "still happening".
+ */
+export function isTroubled(r: StatusResult, now: number): boolean {
+  if (r.live) return ["minor", "major", "critical"].includes(r.live.indicator);
+  return !r.error && hasRecentIncident(r, now);
+}

@@ -2,11 +2,7 @@ use super::*;
 use std::sync::Arc;
 
 fn state(name: &str) -> AppState {
-    let dir = std::env::temp_dir().join(format!(
-        "canto-vault-{name}-{}-{}",
-        std::process::id(),
-        now_ms()
-    ));
+    let dir = std::env::temp_dir().join(format!("canto-vault-{name}-{}-{}", std::process::id(), now_ms()));
     let _ = std::fs::remove_dir_all(&dir);
     AppState::new(dir)
 }
@@ -102,11 +98,7 @@ fn background_clipboard_does_not_postpone_auto_lock() {
 fn mutate_releases_the_session_lock_before_the_slow_synced_folder_write() {
     let st = Arc::new(state("libera-lock"));
     st.create("senha-mestra").unwrap();
-    let pasta = std::env::temp_dir().join(format!(
-        "canto-vault-sync-lenta-{}-{}",
-        std::process::id(),
-        now_ms()
-    ));
+    let pasta = std::env::temp_dir().join(format!("canto-vault-sync-lenta-{}-{}", std::process::id(), now_ms()));
     let _ = std::fs::remove_dir_all(&pasta);
     std::fs::create_dir_all(&pasta).unwrap();
     crate::sync::set_folder(&st, pasta.clone()).unwrap();

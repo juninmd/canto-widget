@@ -10,7 +10,11 @@ fn state(name: &str) -> AppState {
 }
 
 fn cfg() -> GitlabConfig {
-    GitlabConfig { base_url: "https://gitlab.acme.io".into(), token: "glpat-segredo-0123456789".into(), username: "ana".into() }
+    GitlabConfig {
+        base_url: "https://gitlab.acme.io".into(),
+        token: "glpat-segredo-0123456789".into(),
+        username: "ana".into(),
+    }
 }
 
 #[test]

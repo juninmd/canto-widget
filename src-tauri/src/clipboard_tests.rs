@@ -120,7 +120,6 @@ fn multibyte_text_is_cut_on_a_character_boundary() {
     assert!(h.items[0].text.chars().all(|c| c == 'é'));
 }
 
-
 #[test]
 fn copying_a_pinned_text_again_keeps_it_pinned() {
     let mut h = hist(&["guardar"]);

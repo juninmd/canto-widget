@@ -33,7 +33,10 @@ impl Quota {
 
 pub fn rate_limited(forge: &str, reset_at: i64, now: i64) -> AppError {
     let minutes = ((reset_at - now) as f64 / 60_000.0).ceil().max(1.0) as i64;
-    AppError::RateLimited { message: format!("{forge}: limite de requisições atingido; tente de novo em {minutes} min"), reset_at }
+    AppError::RateLimited {
+        message: format!("{forge}: limite de requisições atingido; tente de novo em {minutes} min"),
+        reset_at,
+    }
 }
 
 struct Entry {
@@ -57,7 +60,14 @@ pub struct ForgeCache {
 
 impl ForgeCache {
     /// `forge` names the quota bucket and prefixes the key, so a disconnect drops only its own entries.
-    pub fn get(&self, forge: &str, key: &str, force: bool, now: i64, fetch: impl FnOnce() -> Result<(ForgeList, Option<Quota>)>) -> Result<ForgeList> {
+    pub fn get(
+        &self,
+        forge: &str,
+        key: &str,
+        force: bool,
+        now: i64,
+        fetch: impl FnOnce() -> Result<(ForgeList, Option<Quota>)>,
+    ) -> Result<ForgeList> {
         let full = format!("{forge}|{key}");
         let generation = {
             let mut g = self.inner.lock().unwrap();
@@ -68,7 +78,11 @@ impl ForgeCache {
                 }
             }
             if let Some(q) = g.quotas.get(forge).copied().filter(|q| q.remaining <= RESERVE && now < q.reset_at) {
-                return g.entries.get(&full).map(|e| stamped(e, Some(q.reset_at))).ok_or_else(|| rate_limited(forge, q.reset_at, now));
+                return g
+                    .entries
+                    .get(&full)
+                    .map(|e| stamped(e, Some(q.reset_at)))
+                    .ok_or_else(|| rate_limited(forge, q.reset_at, now));
             }
             g.generation
         };
@@ -94,7 +108,10 @@ impl ForgeCache {
                     return Err(AppError::RateLimited { message, reset_at });
                 }
                 g.quotas.insert(forge.to_string(), Quota { remaining: 0, reset_at });
-                g.entries.get(&full).map(|e| stamped(e, Some(reset_at))).ok_or(AppError::RateLimited { message, reset_at })
+                g.entries
+                    .get(&full)
+                    .map(|e| stamped(e, Some(reset_at)))
+                    .ok_or(AppError::RateLimited { message, reset_at })
             }
             Err(e) => Err(e),
         }

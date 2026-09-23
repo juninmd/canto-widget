@@ -1,4 +1,5 @@
 import type { ForgeFilter, ForgeItem, ForgeKind, ForgeList, ForgeLists, ForgeSection, ForgeSort } from "./api";
+import { t } from "../i18n";
 
 export type Forge = "github" | "gitlab";
 
@@ -6,10 +7,10 @@ export type Forge = "github" | "gitlab";
 export function sections(forge: Forge): { key: ForgeSection; title: string; kinds: ForgeKind[] }[] {
   const pr = forge === "gitlab" ? "MRs" : "PRs";
   return [
-    { key: "review_requested", title: "Revisão pedida a mim", kinds: ["pr"] },
-    { key: "assigned", title: "Atribuídos a mim", kinds: ["pr", "issue"] },
-    { key: "my_prs", title: `${pr} que eu abri`, kinds: ["pr"] },
-    { key: "my_issues", title: "Issues que eu abri", kinds: ["issue"] },
+    { key: "review_requested", title: t("forge.section.reviewRequested"), kinds: ["pr"] },
+    { key: "assigned", title: t("forge.section.assigned"), kinds: ["pr", "issue"] },
+    { key: "my_prs", title: t("forge.section.myPrs", { pr }), kinds: ["pr"] },
+    { key: "my_issues", title: t("forge.section.myIssues"), kinds: ["issue"] },
   ];
 }
 
@@ -17,18 +18,18 @@ export const NO_FILTER: ForgeFilter = { text: "", kind: "all", sort: "updated", 
 
 export function kinds(forge: Forge): { kind: ForgeKind; label: string }[] {
   return [
-    { kind: "all", label: "tudo" },
+    { kind: "all", label: t("forge.kind.all") },
     { kind: "pr", label: forge === "gitlab" ? "MRs" : "PRs" },
-    { kind: "issue", label: "issues" },
+    { kind: "issue", label: t("forge.kind.issues") },
   ];
 }
 
 /** GitLab's list API has no "most commented" order; offering it would only produce an error. */
 export function sorts(forge: Forge): { sort: ForgeSort; label: string }[] {
   const all: { sort: ForgeSort; label: string }[] = [
-    { sort: "updated", label: "atualização" },
-    { sort: "created", label: "criação" },
-    { sort: "comments", label: "comentários" },
+    { sort: "updated", label: t("forge.sort.updated") },
+    { sort: "created", label: t("forge.sort.created") },
+    { sort: "comments", label: t("forge.sort.comments") },
   ];
   return forge === "gitlab" ? all.filter((s) => s.sort !== "comments") : all;
 }

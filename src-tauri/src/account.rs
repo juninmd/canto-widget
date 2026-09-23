@@ -35,13 +35,22 @@ fn drive(e: reqwest::Error) -> AppError {
 }
 
 pub fn fetch_profile(token: &str) -> Result<Profile> {
-    client()?.get(USERINFO_URL).bearer_auth(token).send().map_err(drive)?.error_for_status().map_err(drive)?.json().map_err(drive)
+    client()?
+        .get(USERINFO_URL)
+        .bearer_auth(token)
+        .send()
+        .map_err(drive)?
+        .error_for_status()
+        .map_err(drive)?
+        .json()
+        .map_err(drive)
 }
 
 /// The URL comes from Google's response, but we only download from its photo CDN, over HTTPS.
 pub fn is_trusted_photo(url: &str) -> bool {
     reqwest::Url::parse(url).is_ok_and(|u| {
-        u.scheme() == "https" && u.host_str().is_some_and(|h| h == "googleusercontent.com" || h.ends_with(".googleusercontent.com"))
+        u.scheme() == "https"
+            && u.host_str().is_some_and(|h| h == "googleusercontent.com" || h.ends_with(".googleusercontent.com"))
     })
 }
 

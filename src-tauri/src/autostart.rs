@@ -23,11 +23,8 @@ fn prefs_path(dir: &Path) -> PathBuf {
 
 /// First run enables autostart; after that the user's choice rules.
 pub fn ensure_default(app: &tauri::AppHandle) -> Result<()> {
-    let dir = app
-        .try_state::<AppState>()
-        .ok_or_else(|| AppError::Config("estado não inicializado".into()))?
-        .dir
-        .clone();
+    let dir =
+        app.try_state::<AppState>().ok_or_else(|| AppError::Config("estado não inicializado".into()))?.dir.clone();
     let path = prefs_path(&dir);
     let prefs: AutostartPrefs = store::read_json(&path)?.unwrap_or_default();
     if prefs.decided {
@@ -44,19 +41,13 @@ fn mark_decided(dir: &Path) -> Result<()> {
 
 fn set(app: &tauri::AppHandle, enabled: bool) -> Result<()> {
     let manager = app.autolaunch();
-    let r = if enabled {
-        manager.enable()
-    } else {
-        manager.disable()
-    };
+    let r = if enabled { manager.enable() } else { manager.disable() };
     r.map_err(|e| AppError::Io(e.to_string()))
 }
 
 #[tauri::command]
 pub fn autostart_status(app: tauri::AppHandle) -> Result<bool> {
-    app.autolaunch()
-        .is_enabled()
-        .map_err(|e| AppError::Io(e.to_string()))
+    app.autolaunch().is_enabled().map_err(|e| AppError::Io(e.to_string()))
 }
 
 #[tauri::command]
@@ -84,10 +75,7 @@ mod tests {
     }
 
     fn decided(dir: &Path) -> bool {
-        store::read_json::<AutostartPrefs>(&prefs_path(dir))
-            .unwrap()
-            .unwrap_or_default()
-            .decided
+        store::read_json::<AutostartPrefs>(&prefs_path(dir)).unwrap().unwrap_or_default().decided
     }
 
     #[test]

@@ -46,6 +46,8 @@ pub struct StatusResult {
     pub items: Vec<StatusItem>,
     /// Set when the fetch or parse failed; `items` is then empty rather than stale.
     pub error: Option<String>,
+    /// Current state, for Statuspage-hosted services only.
+    pub live: Option<crate::status_live::Live>,
 }
 
 fn parse(bytes: &[u8]) -> Result<Vec<StatusItem>, String> {
@@ -74,21 +76,35 @@ fn fetch_one(client: &reqwest::blocking::Client, source: &Source) -> StatusResul
         .map_err(|e| e.to_string())
         .and_then(|r| r.bytes().map_err(|e| e.to_string()))
         .and_then(|b| parse(&b));
+    let live = crate::status_live::fetch(client, source.url);
     match outcome {
-        Ok(items) => StatusResult { id: source.id.into(), label: source.label.into(), items, error: None },
-        Err(error) => StatusResult { id: source.id.into(), label: source.label.into(), items: Vec::new(), error: Some(error) },
+        Ok(items) => StatusResult { id: source.id.into(), label: source.label.into(), items, error: None, live },
+        Err(error) => StatusResult {
+            id: source.id.into(),
+            label: source.label.into(),
+            items: Vec::new(),
+            error: Some(error),
+            live,
+        },
     }
 }
 
 /// One thread per feed: a slow or dead status page must not delay the others.
 pub fn fetch_all() -> Vec<StatusResult> {
-    let client = crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(TIMEOUT_S)).build();
+    let client =
+        crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(TIMEOUT_S)).build();
     let client = match client {
         Ok(c) => Arc::new(c),
         Err(e) => {
             return SOURCES
                 .iter()
-                .map(|s| StatusResult { id: s.id.into(), label: s.label.into(), items: Vec::new(), error: Some(e.to_string()) })
+                .map(|s| StatusResult {
+                    id: s.id.into(),
+                    label: s.label.into(),
+                    items: Vec::new(),
+                    error: Some(e.to_string()),
+                    live: None,
+                })
                 .collect();
         }
     };
@@ -103,6 +119,7 @@ pub fn fetch_all() -> Vec<StatusResult> {
                     label: source.label.into(),
                     items: Vec::new(),
                     error: Some("thread interrompida".into()),
+                    live: None,
                 })
             })
             .collect()
@@ -142,11 +159,14 @@ mod tests {
     #[test]
     fn atom_entries_parse_too() {
         let items = parse(ATOM.as_bytes()).unwrap();
-        assert_eq!(items, vec![StatusItem {
-            title: "Network issue".into(),
-            link: "https://status.example.com/incidents/3".into(),
-            published_at: 1_789_732_800_000,
-        }]);
+        assert_eq!(
+            items,
+            vec![StatusItem {
+                title: "Network issue".into(),
+                link: "https://status.example.com/incidents/3".into(),
+                published_at: 1_789_732_800_000,
+            }]
+        );
     }
 
     #[test]

@@ -10,9 +10,7 @@ pub fn next_with_meet(items: &[AgendaItem], now_ms: i64) -> Option<&AgendaItem> 
 }
 
 fn ends_after(e: &AgendaItem, now_ms: i64) -> bool {
-    time::OffsetDateTime::parse(&e.end, &Rfc3339)
-        .map(|t| t.unix_timestamp() * 1000 > now_ms)
-        .unwrap_or(false)
+    time::OffsetDateTime::parse(&e.end, &Rfc3339).map(|t| t.unix_timestamp() * 1000 > now_ms).unwrap_or(false)
 }
 
 #[cfg(test)]

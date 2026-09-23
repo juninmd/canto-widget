@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, UPDATE_PROGRESS_EVENT, type UpdateInfo, type UpdateProgress } from "../lib/api";
+import { t } from "../i18n";
 
 const brDate = (iso: string) => iso.split("-").reverse().join("/");
 
@@ -22,7 +23,7 @@ export default function UpdateSection() {
     try {
       setInfo(await api.updateCheck());
     } catch (e) {
-      setError(`Não foi possível verificar: ${errText(e)}`);
+      setError(t("update.checkFailed", { error: errText(e) }));
     } finally {
       setChecking(false);
     }
@@ -46,7 +47,7 @@ export default function UpdateSection() {
     try {
       await api.updateInstall();
     } catch (e) {
-      setError(`A atualização não foi instalada: ${errText(e)}`);
+      setError(t("update.installFailed", { error: errText(e) }));
       setInstalling(false);
       setProgress(null);
     }
@@ -55,14 +56,14 @@ export default function UpdateSection() {
   return (
     <section className="flex flex-col gap-2" aria-labelledby="updates-title">
       <h3 id="updates-title" className="text-xs font-semibold text-fg">
-        Atualizações
+        {t("update.title")}
       </h3>
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
-        <dt className="text-muted">versão instalada</dt>
+        <dt className="text-muted">{t("update.current")}</dt>
         <dd className="font-mono text-fg">{info?.current ?? "…"}</dd>
-        <dt className="text-muted">última publicada</dt>
+        <dt className="text-muted">{t("update.latest")}</dt>
         <dd className="font-mono text-fg">
-          {info ? info.latest : checking ? "verificando…" : "—"}
+          {info ? info.latest : checking ? t("update.checking") : "—"}
           {info?.date && <span className="font-sans text-faint"> · {brDate(info.date)}</span>}
         </dd>
       </dl>
@@ -71,7 +72,7 @@ export default function UpdateSection() {
           {error}
         </p>
       )}
-      {info && !info.available && !error && <p className="text-[11px] text-faint">Você está na versão mais recente.</p>}
+      {info && !info.available && !error && <p className="text-[11px] text-faint">{t("update.upToDate")}</p>}
       {info?.available && (
         <div className="flex flex-col gap-2 rounded-lg border border-accent/60 p-2">
           {info.notes && <p className="line-clamp-4 whitespace-pre-line text-[11px] text-muted">{info.notes}</p>}
@@ -81,10 +82,10 @@ export default function UpdateSection() {
             disabled={installing}
             className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent disabled:opacity-70"
           >
-            {installing ? `baixando…${percent(progress)}` : `atualizar para ${info.latest} e reiniciar`}
+            {installing ? t("update.downloading", { percent: percent(progress) }) : t("update.install", { version: info.latest })}
           </button>
           <p role="status" className="text-[11px] text-faint">
-            {installing ? "O Canto fecha, instala e abre de novo; o cofre volta trancado." : "O instalador é conferido pela assinatura antes de rodar."}
+            {installing ? t("update.installingNote") : t("update.signatureNote")}
           </p>
         </div>
       )}
@@ -94,7 +95,7 @@ export default function UpdateSection() {
         disabled={checking || installing}
         className="self-start rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-60"
       >
-        {checking ? "verificando…" : "verificar agora"}
+        {checking ? t("update.checking") : t("update.checkNow")}
       </button>
     </section>
   );

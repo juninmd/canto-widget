@@ -26,28 +26,19 @@ fn note(id: &str, body: &str, updated_at: i64) -> Note {
 }
 
 fn data(tasks: Vec<Task>, notes: Vec<Note>, deleted: &[(&str, i64)]) -> VaultData {
-    VaultData {
-        tasks,
-        notes,
-        deleted: deleted
-            .iter()
-            .map(|(id, at)| (id.to_string(), *at))
-            .collect::<HashMap<_, _>>(),
-    }
+    VaultData { tasks, notes, deleted: deleted.iter().map(|(id, at)| (id.to_string(), *at)).collect::<HashMap<_, _>>() }
 }
 
 #[test]
 fn merges_items_exclusive_to_each_side() {
-    let merged = data(vec![task("a", "local", 10)], vec![], &[])
-        .merge(data(vec![task("b", "remoto", 5)], vec![], &[]));
+    let merged = data(vec![task("a", "local", 10)], vec![], &[]).merge(data(vec![task("b", "remoto", 5)], vec![], &[]));
     let ids: Vec<_> = merged.tasks.iter().map(|t| t.id.as_str()).collect();
     assert_eq!(ids, vec!["b", "a"]);
 }
 
 #[test]
 fn more_recent_edit_wins_on_the_same_id() {
-    let merged = data(vec![task("a", "antigo", 10)], vec![], &[])
-        .merge(data(vec![task("a", "novo", 20)], vec![], &[]));
+    let merged = data(vec![task("a", "antigo", 10)], vec![], &[]).merge(data(vec![task("a", "novo", 20)], vec![], &[]));
     assert_eq!(merged.tasks.len(), 1);
     assert_eq!(merged.tasks[0].title, "novo");
 }
@@ -61,8 +52,7 @@ fn removal_after_the_edit_deletes_the_item() {
 
 #[test]
 fn edit_after_the_removal_revives_the_item() {
-    let merged =
-        data(vec![], vec![], &[("a", 10)]).merge(data(vec![task("a", "revivido", 40)], vec![], &[]));
+    let merged = data(vec![], vec![], &[("a", 10)]).merge(data(vec![task("a", "revivido", 40)], vec![], &[]));
     assert_eq!(merged.tasks.len(), 1);
     assert_eq!(merged.tasks[0].title, "revivido");
 }

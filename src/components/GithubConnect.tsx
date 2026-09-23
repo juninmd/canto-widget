@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type DeviceCode } from "../lib/api";
+import { t } from "../i18n";
 
 const FIELD = "rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent";
 const TOKEN_URL = "https://github.com/settings/personal-access-tokens/new";
@@ -58,15 +59,15 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
   if (deviceCode) {
     return (
       <div className="flex flex-col gap-2 text-xs text-muted">
-        <p>Digite este código na página do GitHub que abriu no navegador:</p>
-        <p className="select-text text-center font-mono text-2xl font-semibold tracking-widest text-fg" aria-label="código de verificação">
+        <p>{t("github.deviceIntro")}</p>
+        <p className="select-text text-center font-mono text-2xl font-semibold tracking-widest text-fg" aria-label={t("github.deviceCodeLabel")}>
           {deviceCode.user_code}
         </p>
         <button type="button" onClick={() => void api.openLink(deviceCode.url)} className="min-h-7 rounded-lg bg-edge px-3 text-fg">
-          abrir {deviceCode.url.replace("https://", "")}
+          {t("github.openUrl", { url: deviceCode.url.replace("https://", "") })}
         </button>
         <button type="button" onClick={() => void api.githubDeviceCancel()} className="min-h-6 self-center underline decoration-dotted">
-          cancelar
+          {t("github.cancel")}
         </button>
       </div>
     );
@@ -74,15 +75,15 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
 
   return (
     <div className="flex flex-col gap-3 text-xs text-muted">
-      <p>Conecte sua conta para ver issues e PRs abertos. O token fica cifrado no cofre e nunca sai desta máquina.</p>
+      <p>{t("github.intro")}</p>
       {device && (
         <button type="button" onClick={() => void signInWithApp()} disabled={busy} className="min-h-8 rounded-lg bg-accent px-3 font-semibold text-on-accent disabled:opacity-40">
-          entrar com o GitHub
+          {t("github.signIn")}
         </button>
       )}
       <form onSubmit={saveToken} className="flex flex-col gap-2">
         <label htmlFor="github-token" className="text-fg">
-          {device ? "ou cole um token pessoal" : "Token pessoal do GitHub"}
+          {device ? t("github.orPasteToken") : t("github.tokenLabel")}
         </label>
         <input
           id="github-token"
@@ -94,13 +95,13 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
           className={FIELD}
         />
         <p className="text-[11px] text-faint">
-          Fine-grained, só leitura: Issues e Pull requests em <em>Read-only</em>.{" "}
+          {t("github.tokenHint")} <em>Read-only</em>.{" "}
           <button type="button" onClick={() => void api.openLink(TOKEN_URL)} className="underline decoration-dotted hover:text-muted">
-            criar token
+            {t("github.createToken")}
           </button>
         </p>
         <button type="submit" disabled={busy || !token.trim()} className="min-h-7 self-start rounded-lg bg-edge px-3 text-fg disabled:opacity-40">
-          {busy ? "conferindo..." : "salvar token"}
+          {busy ? t("github.checking") : t("github.saveToken")}
         </button>
       </form>
       {error && (
