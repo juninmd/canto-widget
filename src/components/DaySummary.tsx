@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { MOD_KEY } from "../lib/platform";
 import { api, errText, type AgendaItem, type ForgeOpened, type GeminiDoc, type Task } from "../lib/api";
 import { dayStart, daySummary } from "../lib/summary";
 
@@ -55,7 +56,7 @@ export default function DaySummary({
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
-      onError("não deu para copiar; selecione o texto e use Ctrl+C");
+      onError(`não deu para copiar; selecione o texto e use ${MOD_KEY}+C`);
     }
   }
 

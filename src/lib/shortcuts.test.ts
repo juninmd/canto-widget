@@ -42,7 +42,12 @@ test("F11 toggles fullscreen even while typing, but not with a modifier", () => 
 });
 
 test("Ctrl+K opens the global search even while typing, but not with Alt or Meta added", () => {
-  expect(interpret(key("k", { code: "KeyK", ctrlKey: true }), true)).toEqual({ type: "globalSearch" });
-  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, altKey: true }), false)).toBeNull();
-  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, metaKey: true }), false)).toBeNull();
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true }), true, false)).toEqual({ type: "globalSearch" });
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, altKey: true }), false, false)).toBeNull();
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true, metaKey: true }), false, false)).toBeNull();
+});
+
+test("on macOS the global search is Cmd+K, not Ctrl+K", () => {
+  expect(interpret(key("k", { code: "KeyK", metaKey: true }), true, true)).toEqual({ type: "globalSearch" });
+  expect(interpret(key("k", { code: "KeyK", ctrlKey: true }), false, true)).toBeNull();
 });

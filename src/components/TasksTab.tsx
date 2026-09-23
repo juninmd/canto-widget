@@ -6,6 +6,7 @@ import TaskRow from "./TaskRow";
 import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
 import { useNewIds, useExit } from "../lib/motion";
+import { useReorder } from "../lib/useReorder";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -24,7 +25,6 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
-  const dragId = useRef<string | null>(null);
 
   async function reload() {
     try {
@@ -88,18 +88,14 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const visible = priorityFilter ? tasks.filter((t) => t.priority === priorityFilter) : tasks;
 
   // Only reorders in the unfiltered view: a filtered subset can't express a total order for the hidden tasks too.
-  function dropOn(targetId: string) {
-    const draggedId = dragId.current;
-    dragId.current = null;
-    if (!draggedId || draggedId === targetId) return;
-    const ids = tasks.map((t) => t.id);
-    const from = ids.indexOf(draggedId);
-    const to = ids.indexOf(targetId);
-    if (from < 0 || to < 0) return;
-    ids.splice(from, 1);
-    ids.splice(to, 0, draggedId);
-    void run(() => api.tasksReorder(today, ids));
-  }
+  const reorder = useReorder(
+    tasks.map((t) => t.id),
+    (ids) => {
+      const byId = new Map(tasks.map((t) => [t.id, t]));
+      setTasks(ids.flatMap((id) => byId.get(id) ?? []));
+      void run(() => api.tasksReorder(today, ids));
+    },
+  );
 
   if (summary) {
     return <DaySummary day={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />;
@@ -129,7 +125,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         onCarryOver={() => void run(() => api.carryOver(today))}
       />
 
-      <ul className="flex-1 space-y-1 overflow-y-auto pr-1">
+      <ul className={`flex-1 space-y-1 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
         {visible.map((t) => (
           <TaskRow
             key={t.id}
@@ -140,9 +136,11 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             editing={editing}
             detailsOpen={details === t.id}
             draggable={priorityFilter === ""}
-            onDragStart={() => (dragId.current = t.id)}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={() => dropOn(t.id)}
+            dragging={reorder.dragging === t.id}
+            dropTarget={reorder.dragging !== null && reorder.over === t.id && reorder.dragging !== t.id}
+            onDragStart={() => reorder.start(t.id)}
+            onDragHover={() => reorder.hover(t.id)}
+            onMove={(delta) => reorder.step(t.id, delta)}
             onToggleDone={() => {
               setChecking(t.id);
               void run(() => api.taskToggle(t.id));

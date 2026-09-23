@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
+import { MOD_KEY, TOGGLE_LABEL } from "../lib/platform";
 
 const TIPS = [
-  ["Ctrl+Alt+Espaço", "mostra ou esconde o widget, de qualquer app"],
+  [TOGGLE_LABEL, "mostra ou esconde o widget, de qualquer app"],
   ["Alt+1…Alt+9", "trocam de aba"],
-  ["Ctrl+K", "busca ao mesmo tempo em tarefas, notas e clipboard"],
+  [`${MOD_KEY}+K`, "busca ao mesmo tempo em tarefas, notas e clipboard"],
   ["N", "cria uma tarefa ou card novo"],
   ["Alt+L", "tranca o cofre na hora"],
   ["?", "mostra a lista completa de atalhos, a qualquer momento"],

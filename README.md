@@ -205,7 +205,7 @@ Download the installer for your platform from **[Releases](https://github.com/ju
 | 🐧 Linux | `.AppImage`, `.deb` or `.rpm` |
 
 1. On first run you create the **master password**. There's no recovery: lose the password, lose the data.
-2. `Ctrl+Alt+Space` (`Cmd+Alt+Space` on macOS) shows and hides the widget.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` on macOS) shows and hides the widget.
 3. Done. When a new version ships, Canto notifies you, and **Settings → Updates** updates with one click.
 
 > [!NOTE]

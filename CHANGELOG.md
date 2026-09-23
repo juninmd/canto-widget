@@ -7,6 +7,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Reordenar tarefas** voltou a funcionar no Windows e no macOS: o arraste agora usa eventos de ponteiro (o
+  arrastar-e-soltar HTML5 era engolido pelo webview), com realce do destino, **Esc** para cancelar e **↑/↓** no
+  puxador para mover pelo teclado.
+- **macOS**: atalhos globais trocados para não colidir com o sistema — **Cmd+Shift+Espaço** (mostrar/esconder),
+  **Ctrl+Cmd+M** (entrar na reunião) e **Ctrl+Cmd+V** (colar como texto puro); busca global com **Cmd+K** e
+  rótulos com ⌘; o widget não aparece mais no Dock/Cmd+Tab e abre por cima de apps em tela cheia.
+- **Segurança**: o webview perdeu as permissões diretas de leitura/escrita do clipboard e de abrir URLs (tudo
+  passa pelos comandos em Rust); CSP de produção sem `unsafe-inline` em scripts nem o websocket do Vite; o
+  repositório/projeto enviado para checar CI de um PR/MR é validado antes de montar a URL autenticada.
 - Releases em `main` agora recebem uma tag por commit, notas geradas automaticamente e publicação após a
   verificação dos instaladores assinados e do manifesto de atualização. O rascunho `v0.3.0` é retomado.
 

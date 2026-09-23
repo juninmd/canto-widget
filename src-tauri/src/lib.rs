@@ -91,6 +91,9 @@ pub fn run() {
                 .build(),
         )
         .setup(|app| {
+            // A tray widget: no Dock icon or Cmd+Tab entry (`skipTaskbar` is a no-op on macOS).
+            #[cfg(target_os = "macos")]
+            app.set_activation_policy(tauri::ActivationPolicy::Accessory);
             register_toggle_shortcut(app.handle())?;
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
@@ -112,6 +115,9 @@ pub fn run() {
 
             if let Some(win) = app.get_webview_window("main") {
                 win.set_always_on_top(app.state::<window_state::WindowState>().cfg().always_on_top)?;
+                // Otherwise the global shortcut can't bring the widget over another app's fullscreen Space.
+                #[cfg(target_os = "macos")]
+                win.set_visible_on_all_workspaces(true)?;
                 window_state::place(&win)?;
                 // Boot startup stays in the tray only: nothing pops up on the user's screen.
                 if !autostart::started_by_system() {
@@ -224,43 +230,43 @@ pub fn run() {
         .expect("erro ao iniciar o Canto");
 }
 
-/// Global show/hide shortcut. Ctrl+Alt+Space (Cmd+Alt+Space on macOS).
+/// Global show/hide shortcut. Ctrl+Alt+Space (Cmd+Shift+Space on macOS, where Cmd+Alt+Space is Finder search).
 fn toggle_shortcut() -> Shortcut {
     #[cfg(target_os = "macos")]
-    let mods = Modifiers::SUPER | Modifiers::ALT;
+    let mods = Modifiers::SUPER | Modifiers::SHIFT;
     #[cfg(not(target_os = "macos"))]
     let mods = Modifiers::CONTROL | Modifiers::ALT;
     Shortcut::new(Some(mods), Code::Space)
 }
 
 pub const TOGGLE_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") {
-    "Cmd+Alt+Espaco"
+    "Cmd+Shift+Espaco"
 } else {
     "Ctrl+Alt+Espaco"
 };
 
-/// Global "join the next meeting" shortcut. Ctrl+Alt+M (Cmd+Alt+M on macOS); does nothing without
-/// a cached next meeting (see `tray_live::join_next_meeting`).
+/// Global "join the next meeting" shortcut. Ctrl+Alt+M (Ctrl+Cmd+M on macOS, where Cmd+Alt+M minimizes all
+/// windows); does nothing without a cached next meeting (see `tray_live::join_next_meeting`).
 fn join_shortcut() -> Shortcut {
     #[cfg(target_os = "macos")]
-    let mods = Modifiers::SUPER | Modifiers::ALT;
+    let mods = Modifiers::SUPER | Modifiers::CONTROL;
     #[cfg(not(target_os = "macos"))]
     let mods = Modifiers::CONTROL | Modifiers::ALT;
     Shortcut::new(Some(mods), Code::KeyM)
 }
 
-pub const JOIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Cmd+Alt+M" } else { "Ctrl+Alt+M" };
+pub const JOIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Ctrl+Cmd+M" } else { "Ctrl+Alt+M" };
 
-/// Global "strip clipboard formatting" shortcut. Ctrl+Alt+V (Cmd+Alt+V on macOS).
+/// Global "strip clipboard formatting" shortcut. Ctrl+Alt+V (Ctrl+Cmd+V on macOS, where Cmd+Alt+V is Finder's move).
 fn paste_plain_shortcut() -> Shortcut {
     #[cfg(target_os = "macos")]
-    let mods = Modifiers::SUPER | Modifiers::ALT;
+    let mods = Modifiers::SUPER | Modifiers::CONTROL;
     #[cfg(not(target_os = "macos"))]
     let mods = Modifiers::CONTROL | Modifiers::ALT;
     Shortcut::new(Some(mods), Code::KeyV)
 }
 
-pub const PASTE_PLAIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Cmd+Alt+V" } else { "Ctrl+Alt+V" };
+pub const PASTE_PLAIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Ctrl+Cmd+V" } else { "Ctrl+Alt+V" };
 
 fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
     let (toggle, join, paste_plain) = (toggle_shortcut(), join_shortcut(), paste_plain_shortcut());

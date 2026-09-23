@@ -324,9 +324,36 @@ test("dragging a task's grip onto another reorders them", async () => {
   const grip = screen.getByLabelText("arrastar comprar leite para reordenar");
   const targetRow = screen.getByText("pagar conta").closest("li")!;
   await act(async () => {
-    fireEvent.dragStart(grip);
-    fireEvent.dragOver(targetRow);
-    fireEvent.drop(targetRow);
+    fireEvent.pointerDown(grip, { button: 0 });
+  });
+  await act(async () => {
+    fireEvent.pointerMove(targetRow);
+    fireEvent.pointerUp(targetRow);
+  });
+  expect(calls.find((c) => c.cmd === "tasks_reorder")?.args).toEqual({ day: "2026-09-09", ids: ["t3", "t1"] });
+});
+
+test("Escape cancels a drag without reordering", async () => {
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
+  await mount();
+  const grip = screen.getByLabelText("arrastar comprar leite para reordenar");
+  const targetRow = screen.getByText("pagar conta").closest("li")!;
+  await act(async () => {
+    fireEvent.pointerDown(grip, { button: 0 });
+  });
+  await act(async () => {
+    fireEvent.pointerMove(targetRow);
+    fireEvent.keyDown(window, { key: "Escape" });
+    fireEvent.pointerUp(targetRow);
+  });
+  expect(calls.find((c) => c.cmd === "tasks_reorder")).toBeUndefined();
+});
+
+test("arrow keys on the grip move the task one slot", async () => {
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
+  await mount();
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("arrastar comprar leite para reordenar"), { key: "ArrowDown" });
   });
   expect(calls.find((c) => c.cmd === "tasks_reorder")?.args).toEqual({ day: "2026-09-09", ids: ["t3", "t1"] });
 });

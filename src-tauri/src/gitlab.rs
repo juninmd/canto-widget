@@ -4,7 +4,7 @@ use std::time::Duration;
 use zeroize::Zeroizing;
 
 use crate::error::{AppError, Result};
-use crate::forge::{checks_from_gitlab, merge, ChecksStatus, ForgeItem, ForgeList};
+use crate::forge::{checks_from_gitlab, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{ForgeFilter, Section, PER_PAGE};
 use crate::gitlab_query::{opened_since, requests, Request};
@@ -84,6 +84,9 @@ struct HeadPipeline {
 
 /// One call: unlike GitHub, GitLab already embeds the head pipeline in the MR detail.
 pub fn mr_checks(acc: &Account, project: &str, iid: u64) -> Result<ChecksStatus> {
+    if !valid_repo_path(project, 20) {
+        return Err(AppError::Format("projeto inválido".into()));
+    }
     let encoded = project.replace('/', "%2F");
     let url = format!("{}/api/v4/projects/{encoded}/merge_requests/{iid}", acc.base);
     let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
