@@ -16,6 +16,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Segurança**: o webview perdeu as permissões diretas de leitura/escrita do clipboard e de abrir URLs (tudo
   passa pelos comandos em Rust); CSP de produção sem `unsafe-inline` em scripts nem o websocket do Vite; o
   repositório/projeto enviado para checar CI de um PR/MR é validado antes de montar a URL autenticada.
+- **Textos em pt-BR**: mensagens de erro vindas do núcleo em Rust (cofre, GitHub, GitLab, biometria, lembretes,
+  transcrições) e o atalho no menu da bandeja agora têm acentuação correta ("cofre já existe", "horário
+  inválido", "Ctrl+Alt+Espaço"); os READMEs traduzidos citam o novo atalho do macOS.
 - Releases em `main` agora recebem uma tag por commit, notas geradas automaticamente e publicação após a
   verificação dos instaladores assinados e do manifesto de atualização. O rascunho `v0.3.0` é retomado.
 

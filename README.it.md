@@ -208,7 +208,7 @@ Scarica l'installer per la tua piattaforma da **[Releases](https://github.com/ju
 | 🐧 Linux | `.AppImage`, `.deb` o `.rpm` |
 
 1. Al primo avvio crei la **password principale**. Non c'è recupero: se perdi la password, perdi i dati.
-2. `Ctrl+Alt+Space` (`Cmd+Alt+Space` su macOS) mostra e nasconde il widget.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` su macOS) mostra e nasconde il widget.
 3. Fatto. Quando esce una nuova versione, Canto ti avvisa e **Impostazioni → Aggiornamenti** aggiorna con un click.
 
 > [!NOTE]

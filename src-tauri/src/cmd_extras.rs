@@ -201,7 +201,7 @@ pub fn alert_close(app: tauri::AppHandle) -> Result<()> {
 pub fn open_link(url: String) -> Result<()> {
     // http(s) links only: the alert must never become a local scheme executor.
     if !(url.starts_with("https://") || url.starts_with("http://")) {
-        return Err(AppError::Config("link nao suportado".into()));
+        return Err(AppError::Config("link não suportado".into()));
     }
     tauri_plugin_opener::open_url(url, None::<&str>).map_err(|e| AppError::Io(e.to_string()))
 }

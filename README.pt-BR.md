@@ -198,7 +198,7 @@ Baixe o instalador da sua plataforma em **[Releases](https://github.com/juninmd/
 | 🐧 Linux | `.AppImage`, `.deb` ou `.rpm` |
 
 1. Na primeira execução você cria a **senha mestra**. Não há recuperação: perder a senha é perder os dados.
-2. `Ctrl+Alt+Espaço` (`Cmd+Alt+Espaço` no macOS) mostra e esconde o widget.
+2. `Ctrl+Alt+Espaço` (`Cmd+Shift+Espaço` no macOS) mostra e esconde o widget.
 3. Pronto. Quando sair versão nova, o Canto avisa, e **Ajustes → Atualizações** atualiza com um clique.
 
 > [!NOTE]

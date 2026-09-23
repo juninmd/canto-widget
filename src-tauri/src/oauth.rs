@@ -107,7 +107,7 @@ fn parse_callback(request_line: &str, expected_state: &str) -> Result<String> {
     let path = request_line
         .split_whitespace()
         .nth(1)
-        .ok_or_else(|| AppError::Drive("requisicao de callback invalida".into()))?;
+        .ok_or_else(|| AppError::Drive("requisição de callback inválida".into()))?;
     let url = url::Url::parse(&format!("http://127.0.0.1{path}"))
         .map_err(|e| AppError::Drive(e.to_string()))?;
     let mut code = None;

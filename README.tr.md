@@ -208,7 +208,7 @@ Platformunuz için kurulum dosyasını **[Releases](https://github.com/juninmd/c
 
 1. İlk çalıştırmada **ana parolanızı** oluşturursunuz. Kurtarma yoktur: parolayı kaybederseniz veriyi
    kaybedersiniz.
-2. `Ctrl+Alt+Space` (macOS'ta `Cmd+Alt+Space`) widget'ı gösterir ve gizler.
+2. `Ctrl+Alt+Space` (macOS'ta `Cmd+Shift+Space`) widget'ı gösterir ve gizler.
 3. Bu kadar. Yeni bir sürüm yayınlandığında Canto sizi bilgilendirir ve **Ayarlar → Güncellemeler** tek tıkla
    güncellenir.
 

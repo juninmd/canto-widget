@@ -127,11 +127,11 @@ fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> R
     let err = |m: &str| Err(AppError::Gitlab(m.into()));
     match status {
         200..=299 => res.json().map_err(|e| AppError::Gitlab(format!("resposta inesperada: {e}"))),
-        300..=399 => err("o endereco redirecionou para outro lugar; confira o endereco da instancia"),
-        401 => err("token invalido, expirado ou revogado; conecte de novo"),
+        300..=399 => err("o endereço redirecionou para outro lugar; confira o endereço da instância"),
+        401 => err("token inválido, expirado ou revogado; conecte de novo"),
         403 | 429 if spent.is_some() || status == 429 => Err(rate_limited("gitlab", spent.map_or(now + 60_000, |q| q.reset_at), now)),
-        403 => err("o token nao tem acesso; ele precisa do escopo read_api"),
-        404 => err("nao achei a API do GitLab nesse endereco"),
+        403 => err("o token não tem acesso; ele precisa do escopo read_api"),
+        404 => err("não achei a API do GitLab nesse endereço"),
         _ => Err(AppError::Gitlab(format!("o GitLab respondeu {status}"))),
     }
 }

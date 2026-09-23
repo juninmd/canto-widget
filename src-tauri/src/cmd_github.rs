@@ -56,7 +56,7 @@ pub fn valid_token(state: &AppState, gh: &GithubState, now: i64) -> Result<Zeroi
     let mut cfg = state.github_config()?.ok_or_else(|| AppError::Github("conecte sua conta do GitHub".into()))?;
     if cfg.tokens.expired(now) {
         if cfg.tokens.refresh_token.is_empty() || cfg.client_id.is_empty() {
-            return Err(AppError::Github("a sessao do GitHub expirou; conecte de novo".into()));
+            return Err(AppError::Github("a sessão do GitHub expirou; conecte de novo".into()));
         }
         cfg.tokens = auth::refresh(&cfg.client_id, &cfg.tokens.refresh_token)?;
         state.save_github(&cfg)?;
@@ -102,13 +102,13 @@ pub struct DeviceCode {
 
 #[tauri::command]
 pub async fn github_device_start(app: tauri::AppHandle) -> Result<DeviceCode> {
-    let client_id = embedded_client_id().ok_or_else(|| AppError::Github("esta build nao traz um GitHub App; use um token pessoal".into()))?;
+    let client_id = embedded_client_id().ok_or_else(|| AppError::Github("esta build não traz um GitHub App; use um token pessoal".into()))?;
     if !app.state::<AppState>().is_unlocked() {
         return Err(AppError::Locked);
     }
     // A double click must not leave two watchers polling GitHub for 15 min.
     if app.state::<GithubState>().flow.lock().unwrap().as_ref().is_some_and(|f| now_ms() < f.expires_at) {
-        return Err(AppError::Github("ja ha um login em andamento".into()));
+        return Err(AppError::Github("já há um login em andamento".into()));
     }
     run(move || {
         let d = auth::start(client_id)?;
@@ -138,7 +138,7 @@ fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
             return Err(AppError::Github("login cancelado".into()));
         }
         if now_ms() > expires_at {
-            return end(Err(AppError::Github("o codigo expirou; comece de novo".into())));
+            return end(Err(AppError::Github("o código expirou; comece de novo".into())));
         }
         match auth::poll(client_id, &code) {
             Ok(PollResult::Pending) => {}

@@ -240,9 +240,9 @@ fn toggle_shortcut() -> Shortcut {
 }
 
 pub const TOGGLE_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") {
-    "Cmd+Shift+Espaco"
+    "Cmd+Shift+Espaço"
 } else {
-    "Ctrl+Alt+Espaco"
+    "Ctrl+Alt+Espaço"
 };
 
 /// Global "join the next meeting" shortcut. Ctrl+Alt+M (Ctrl+Cmd+M on macOS, where Cmd+Alt+M minimizes all

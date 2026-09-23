@@ -25,7 +25,7 @@ fn prefs_path(dir: &Path) -> PathBuf {
 pub fn ensure_default(app: &tauri::AppHandle) -> Result<()> {
     let dir = app
         .try_state::<AppState>()
-        .ok_or_else(|| AppError::Config("estado nao inicializado".into()))?
+        .ok_or_else(|| AppError::Config("estado não inicializado".into()))?
         .dir
         .clone();
     let path = prefs_path(&dir);

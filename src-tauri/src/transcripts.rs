@@ -39,14 +39,14 @@ fn documents_dir() -> PathBuf {
 /// Rejects any path that escapes `dir`: the name comes from the frontend and must never become an arbitrary path.
 fn resolve_within(dir: &Path, name: &str) -> Result<PathBuf> {
     if name.contains('/') || name.contains(char::from(92)) || name.contains("..") {
-        return Err(AppError::Config("nome de arquivo invalido".into()));
+        return Err(AppError::Config("nome de arquivo inválido".into()));
     }
     let base = dir
         .canonicalize()
         .map_err(|_| AppError::NotFound)?;
     let target = base.join(name).canonicalize().map_err(|_| AppError::NotFound)?;
     if !target.starts_with(&base) {
-        return Err(AppError::Config("caminho fora da pasta de transcricoes".into()));
+        return Err(AppError::Config("caminho fora da pasta de transcrições".into()));
     }
     Ok(target)
 }
@@ -143,7 +143,7 @@ pub fn read(dir: &Path, name: &str) -> Result<String> {
     let path = resolve_within(dir, name)?;
     let meta = std::fs::metadata(&path)?;
     if meta.len() > MAX_BYTES {
-        return Err(AppError::Config("transcricao maior que 5 MB".into()));
+        return Err(AppError::Config("transcrição maior que 5 MB".into()));
     }
     Ok(clean_subtitles(&std::fs::read_to_string(path)?))
 }

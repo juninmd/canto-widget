@@ -127,7 +127,7 @@ fn pr_url(raw: Option<String>) -> Result<Option<String>> {
         return Ok(None);
     }
     if !(clean.starts_with("https://") || clean.starts_with("http://")) {
-        return Err(AppError::Config("link precisa comecar com http(s)://".into()));
+        return Err(AppError::Config("link precisa começar com http(s)://".into()));
     }
     Ok(Some(clean.to_string()))
 }

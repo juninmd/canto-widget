@@ -20,7 +20,7 @@ impl VaultKey {
     /// Fixed cost by design: changing these parameters invalidates existing vaults.
     pub fn derive(password: &str, salt: &[u8]) -> Result<Self> {
         if salt.len() != SALT_LEN {
-            return Err(AppError::Crypto("salt com tamanho invalido".into()));
+            return Err(AppError::Crypto("salt com tamanho inválido".into()));
         }
         let params = Params::new(KDF_MEM_KIB, KDF_TIME, KDF_LANES, Some(32))
             .map_err(|e| AppError::Crypto(e.to_string()))?;
@@ -63,7 +63,7 @@ impl VaultKey {
     }
 
     pub fn decrypt(&self, nonce: &[u8], ciphertext: &[u8], aad: &[u8]) -> Result<Vec<u8>> {
-        let nonce = Nonce::try_from(nonce).map_err(|_| AppError::Crypto("nonce com tamanho invalido".into()))?;
+        let nonce = Nonce::try_from(nonce).map_err(|_| AppError::Crypto("nonce com tamanho inválido".into()))?;
         self.cipher()
             .decrypt(
                 &nonce,

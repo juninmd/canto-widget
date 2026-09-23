@@ -36,7 +36,7 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
     <div
       role="alertdialog"
       aria-modal="true"
-      aria-label={`${task ? "lembrete de tarefa" : "reuniao comecando"}: ${event.title}`}
+      aria-label={`${task ? "lembrete de tarefa" : "reunião começando"}: ${event.title}`}
       className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
     >
       <div className="min-h-0 overflow-y-auto">
