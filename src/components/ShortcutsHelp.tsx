@@ -1,15 +1,16 @@
 import { useEffect, useRef } from "react";
 import { SHORTCUT_GROUPS } from "../lib/shortcuts";
+import { t } from "../i18n";
 
 /** Key as a block with its own height: inline kbd with padding overflowed the line and got clipped. */
 function Keys({ keys }: { keys: string[] }) {
   return (
     <span className="flex shrink-0 items-center gap-1" aria-label={keys.join(" + ")}>
-      {keys.map((t, i) => (
-        <span key={t} className="flex items-center gap-1" aria-hidden="true">
+      {keys.map((k, i) => (
+        <span key={k} className="flex items-center gap-1" aria-hidden="true">
           {i > 0 && <span className="text-[11px] text-faint">+</span>}
           <kbd className="inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-b-2 border-line bg-ink px-1.5 font-sans text-[11px] leading-none text-fg">
-            {t}
+            {k}
           </kbd>
         </span>
       ))}
@@ -49,10 +50,10 @@ export default function ShortcutsHelp({ onClose }: { onClose: () => void }) {
     >
       <header>
         <h2 id="atalhos-titulo" className="text-sm font-semibold">
-          Atalhos de teclado
+          {t("shortcuts.title")}
         </h2>
         <p id="atalhos-dica" className="mt-0.5 text-[11px] text-muted">
-          Letras soltas não valem enquanto você digita num campo.
+          {t("shortcuts.hint")}
         </p>
       </header>
 
@@ -73,7 +74,7 @@ export default function ShortcutsHelp({ onClose }: { onClose: () => void }) {
       </div>
 
       <button ref={closeButton} type="button" onClick={onClose} title="Esc" className="rounded-lg bg-edge px-3 py-1.5 text-sm text-fg">
-        fechar
+        {t("shortcuts.close")}
       </button>
     </div>
   );

@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { exitDuration } from "./motion";
+import { t } from "../i18n";
 
 export type Toast = {
   message: string;
@@ -103,7 +104,7 @@ function ToastItem({ toast, close, durationMs }: { toast: ActiveToast; close: (i
       <button
         type="button"
         onClick={dismiss}
-        aria-label="fechar aviso"
+        aria-label={t("toast.dismiss")}
         className="grid size-6 shrink-0 place-items-center rounded text-muted hover:text-fg"
       >
         ×

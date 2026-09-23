@@ -29,6 +29,7 @@ import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
 import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
+import { t } from "./i18n";
 
 export default function App() {
   return (
@@ -105,7 +106,7 @@ function Canto() {
   // Rust locks the vault on its own after a period of inactivity; the UI needs to know.
   useEffect(() => {
     const stop = listen<number>("canto://auto-lock", (e) => {
-      notify({ message: `cofre trancado sozinho após ${e.payload} min sem uso` });
+      notify({ message: t("app.autoLocked", { min: e.payload }) });
       void refresh();
     });
     return () => {
@@ -183,7 +184,7 @@ function Canto() {
         className="flex items-center justify-between border-b border-edge px-3 py-2"
       >
         <span data-tauri-drag-region className="text-xs font-semibold tracking-wide text-muted">
-          canto
+          {t("app.name")}
         </span>
         <div className="flex items-center gap-2 text-[11px] text-muted">
           {status?.unlocked && (
@@ -191,21 +192,21 @@ function Canto() {
               <button
                 type="button"
                 onClick={() => setHelpOpen(true)}
-                aria-label="atalhos de teclado"
-                title="atalhos de teclado (?)"
+                aria-label={t("app.shortcuts")}
+                title={t("app.shortcuts.title")}
                 className="grid size-6 place-items-center rounded hover:text-fg"
               >
                 ?
               </button>
-              <button type="button" onClick={lock} title="trancar (Alt+L)" className="min-h-6 rounded px-1.5 hover:text-fg">
-                trancar
+              <button type="button" onClick={lock} title={t("app.lock.title")} className="min-h-6 rounded px-1.5 hover:text-fg">
+                {t("app.lock")}
               </button>
               <button
                 type="button"
                 onClick={togglePrivacy}
                 aria-pressed={privacy}
-                aria-label={privacy ? "desativar modo privacidade" : "ativar modo privacidade"}
-                title={privacy ? "modo privacidade ativo (Alt+P)" : "modo privacidade: borra clipboard e notas (Alt+P)"}
+                aria-label={privacy ? t("app.privacy.disable") : t("app.privacy.enable")}
+                title={privacy ? t("app.privacy.onTitle") : t("app.privacy.offTitle")}
                 className={`grid size-6 place-items-center rounded hover:text-fg ${privacy ? "text-accent" : ""}`}
               >
                 {privacy ? <EyeOffIcon /> : <EyeIcon />}
@@ -216,8 +217,8 @@ function Canto() {
             type="button"
             onClick={toggleFullscreen}
             aria-pressed={fullscreen.active}
-            aria-label={fullscreen.active ? "sair da tela cheia" : "tela cheia"}
-            title={fullscreen.active ? "sair da tela cheia (F11)" : "tela cheia (F11)"}
+            aria-label={fullscreen.active ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
+            title={fullscreen.active ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
             className="grid size-6 place-items-center rounded hover:text-fg"
           >
             {fullscreen.active ? "⤡" : "⤢"}
@@ -226,8 +227,8 @@ function Canto() {
             type="button"
             onClick={() => void getCurrentWindow().hide()}
             className="grid size-6 place-items-center rounded hover:text-fg"
-            title={`esconder (${TOGGLE_LABEL} para voltar)`}
-            aria-label="esconder widget"
+            title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
+            aria-label={t("app.hide")}
           >
             —
           </button>

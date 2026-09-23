@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus } from "./forgeTypes";
+import { t } from "../i18n";
 
 export type * from "./forgeTypes";
 
@@ -236,5 +237,5 @@ export const api = {
 };
 
 export function errText(e: unknown): string {
-  return typeof e === "string" ? e : e instanceof Error ? e.message : "erro inesperado";
+  return typeof e === "string" ? e : e instanceof Error ? e.message : t("app.unexpectedError");
 }
