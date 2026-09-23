@@ -12,7 +12,6 @@ use crate::vault::AppState;
 use crate::{badge, cmd_extras, cmd_forges, next_meeting};
 
 pub const JOIN_ITEM_ID: &str = "join_meeting";
-const NO_MEETING: &str = "Sem reunião com Meet em breve";
 /// Background poll cadence; the badge's forge half is cheap (5 min cache), the agenda half is one light GET.
 const TICK: Duration = Duration::from_secs(90);
 /// Google Calendar window ahead of "now": far enough to always have a next meeting queued.
@@ -72,11 +71,21 @@ fn to_rfc3339(ms: i64) -> Option<String> {
     time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).ok()?.format(&Rfc3339).ok()
 }
 
+pub fn no_meeting_label() -> &'static str {
+    crate::lang::tr("Sem reunião com Meet em breve", "No Meet meeting coming up")
+}
+
+/// Re-labels the join item in the current language, keeping the cached meeting.
+pub fn refresh_join_label(app: &AppHandle) {
+    let meeting = app.state::<AppState>().next_meeting.lock().unwrap().clone();
+    update_menu(app, meeting.as_ref());
+}
+
 fn update_menu(app: &AppHandle, meeting: Option<&AgendaItem>) {
     let Some(item) = app.try_state::<JoinMenuItem>() else { return };
     let (text, enabled) = match meeting {
-        Some(m) => (format!("Entrar: {}", m.title), true),
-        None => (NO_MEETING.to_string(), false),
+        Some(m) => (format!("{}: {}", crate::lang::tr("Entrar", "Join"), m.title), true),
+        None => (no_meeting_label().to_string(), false),
     };
     let _ = item.0.set_text(text);
     let _ = item.0.set_enabled(enabled);

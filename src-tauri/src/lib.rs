@@ -39,6 +39,7 @@ pub mod gitlab_query;
 pub mod hello;
 #[cfg(target_os = "macos")]
 pub mod hello_mac;
+pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
 pub mod model;
@@ -157,6 +158,7 @@ pub fn run() {
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
             task_reminder::reminder_lead_set,
+            lang::language_set,
             commands::item_delete,
             cmd_drive::drive_status,
             cmd_drive::drive_configure,
@@ -300,13 +302,13 @@ fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
 }
 
 fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let toggle =
-        MenuItem::with_id(app, "toggle", format!("Mostrar / esconder  ({TOGGLE_SHORTCUT_LABEL})"), true, None::<&str>)?;
-    let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, "Sem reunião com Meet em breve", false, None::<&str>)?;
-    let lock = MenuItem::with_id(app, "lock", "Trancar cofre", true, None::<&str>)?;
-    let quit = MenuItem::with_id(app, "quit", "Sair", true, None::<&str>)?;
+    let toggle = MenuItem::with_id(app, "toggle", lang::toggle_label(), true, None::<&str>)?;
+    let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, tray_live::no_meeting_label(), false, None::<&str>)?;
+    let lock = MenuItem::with_id(app, "lock", lang::tr("Trancar cofre", "Lock vault"), true, None::<&str>)?;
+    let quit = MenuItem::with_id(app, "quit", lang::tr("Sair", "Quit"), true, None::<&str>)?;
     let menu = Menu::with_items(app, &[&toggle, &join, &lock, &quit])?;
     app.manage(tray_live::JoinMenuItem(join));
+    app.manage(lang::TrayLabels { toggle, lock, quit });
 
     TrayIconBuilder::with_id("canto-tray")
         .icon(app.default_window_icon().cloned().unwrap())

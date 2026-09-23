@@ -8,6 +8,7 @@ import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
 import DensityPicker from "./DensityPicker";
+import LanguagePicker from "./LanguagePicker";
 import UpdateSection from "./UpdateSection";
 import TabsSection from "./TabsSection";
 import RemindersSection from "./RemindersSection";
@@ -73,6 +74,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
       </section>
       <SkinPicker />
       <DensityPicker />
+      <LanguagePicker />
       <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
       <RemindersSection lead={reminderLead} onChange={onReminderLead} />
       <SecuritySection onError={onError} />

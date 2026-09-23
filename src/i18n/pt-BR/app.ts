@@ -74,6 +74,8 @@ export const app = {
   "settings.password.submitting": "trocando...",
   "settings.password.cancel": "cancelar",
 
+  "settings.language.title": "Idioma",
+  "settings.language.auto": "Automático (sistema)",
   "settings.density.title": "Tamanho da interface",
   "settings.density.compact": "Compacta",
   "settings.density.default": "Padrão",

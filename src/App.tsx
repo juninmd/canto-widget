@@ -29,7 +29,7 @@ import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
 import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
-import { t } from "./i18n";
+import { LANGUAGE, t } from "./i18n";
 
 export default function App() {
   return (
@@ -62,6 +62,10 @@ function Canto() {
   useEffect(() => {
     void api.reminderLeadSet(reminderLead).catch(() => {});
   }, [reminderLead]);
+  // Notifications and the tray menu are built in Rust and follow the same language.
+  useEffect(() => {
+    void api.languageSet(LANGUAGE).catch(() => {});
+  }, []);
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);

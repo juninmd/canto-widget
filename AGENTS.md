@@ -1,11 +1,16 @@
-bun install --frozen-lockfile
-bun run lint                     # tsc --noEmit
-bun test                         # UI tests
-bun run e2e                      # Playwright smoke tests (e2e/*.e2e.ts): real UI in Chromium, Tauri IPC mocked
-bun run build                    # tsc + vite build -> dist/ (needed before cargo: generate_context! embeds it)
-cd src-tauri && cargo fmt --check                         # rustfmt.toml: max_width 120
-cd src-tauri && cargo clippy --all-targets --locked -- -D warnings
-cd src-tauri && cargo test --locked
-cd src-tauri && cargo test --release --test scale -- --ignored --nocapture   # load harness, on demand
-bun run tauri dev                # app with hot reload
-bun run tauri build              # installer for the current OS
+src/                      React UI (one component per file, tests next to it)
+  lib/api.ts              the only place that calls invoke(); IPC types live here
+  lib/                    pure logic (agenda, reminders, shortcuts, summary, theme, motion) + hooks
+  components/             tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, SettingsTab) and sections
+src-tauri/src/
+  lib.rs                  plugin setup, tray, background watchers, invoke_handler list
+  vault.rs, store.rs, crypto.rs   AppState/session, sealed envelopes, Argon2id + AES-256-GCM
+  model.rs                synced vault model (Task, Note, merge / tombstones)
+  commands.rs, cmd_*.rs   Tauri commands, grouped by feature
+  password.rs             master password change (re-seals every sealed file)
+  github.rs, github_auth.rs       GitHub search API and PAT / device-flow auth
+  biometric.rs, hello.rs  Windows Hello unlock
+  routine.rs, snooze.rs, notification.rs   reminders, recurring tasks, snoozing, OS notifications
+  clipboard.rs, clip_os.rs        clipboard history (size caps, previews), OS change counter and secret skip list
+  window.rs, window_state.rs      corner anchoring, saved position, fullscreen
+src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)
