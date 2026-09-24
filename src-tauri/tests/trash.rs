@@ -124,3 +124,15 @@ fn undo_with_a_locked_vault_answers_that_it_cannot_anymore() {
     st.lock();
     assert!(!undo(&st, &key).unwrap(), "should be Ok(false), not a locked-vault error");
 }
+#[test]
+fn a_failed_undo_keeps_the_item_so_the_user_can_try_again() {
+    let st = vault("desfaz-falha");
+    let key = st.store_in_trash(Removed::Clips(vec![clip("c1", "texto fictício", 100)])).unwrap();
+    // A directory where the history file should be makes reading it fail, like a locked or unreadable file.
+    let path = canto_widget_lib::store::clip_path(&st.dir);
+    std::fs::create_dir_all(&path).unwrap();
+    assert!(undo(&st, &key).is_err());
+    std::fs::remove_dir_all(&path).unwrap();
+    assert!(undo(&st, &key).unwrap(), "the failed attempt consumed the only copy of the removed items");
+    assert_eq!(st.clip_load().unwrap().items.len(), 1);
+}
