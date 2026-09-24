@@ -208,6 +208,32 @@ test("a PR waiting for review shows since when it was opened, in red once stale"
   expect(badge.className).toContain("text-danger");
 });
 
+test("a PR with no activity for a week is flagged as stale; a fresher one or an issue is not", async () => {
+  responses.github_status = connected;
+  const eightDaysAgo = new Date(Date.now() - 8 * 86_400_000).toISOString();
+  const sixDaysAgo = new Date(Date.now() - 6 * 86_400_000).toISOString();
+  const items = [
+    { ...item, url: "https://github.com/octo/canto/pull/1", title: "Parado", updated_at: eightDaysAgo },
+    { ...item, url: "https://github.com/octo/canto/pull/2", title: "Recente", updated_at: sixDaysAgo },
+    { ...item, url: "https://github.com/octo/canto/issues/3", title: "Issue velha", is_pr: false, updated_at: eightDaysAgo },
+  ];
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 3, items } }));
+  await mount();
+  const badges = screen.getAllByText(/parado há/);
+  expect(badges.map((b) => b.textContent)).toEqual(["parado há 8 d"]);
+  expect(badges[0].closest("li")?.textContent).toContain("Parado");
+});
+
+test("a review request shows only 'aguardando', never the stale badge", async () => {
+  responses.github_status = connected;
+  const tenDaysAgo = new Date(Date.now() - 10 * 86_400_000).toISOString();
+  responses.github_lists = () =>
+    Promise.resolve(lists({ review_requested: { total: 1, items: [{ ...item, created_at: tenDaysAgo, updated_at: tenDaysAgo }] } }));
+  await mount();
+  expect(screen.getByText(/aguardando há 10 d/)).toBeTruthy();
+  expect(screen.queryByText(/parado há/)).toBeNull();
+});
+
 test("ver CI asks the vault for the PR's combined status and shows the result, on click only", async () => {
   responses.github_status = connected;
   responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [item] } }));
