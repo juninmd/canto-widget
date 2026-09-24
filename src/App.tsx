@@ -4,6 +4,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
 import { useAgenda } from "./lib/useAgenda";
+import { useNoteDraft } from "./lib/useNoteDraft";
 import { useUpdateNotice } from "./lib/useUpdateNotice";
 import { useFullscreen } from "./lib/useFullscreen";
 import { focusShortcut, useShortcuts } from "./lib/shortcuts";
@@ -56,6 +57,7 @@ function Canto() {
   const [alert, setAlert] = useState<AgendaItem | null>(null);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
+  const noteDraft = useNoteDraft(status?.unlocked === true);
   const [reminderLead, setReminderLead] = useReminderLead();
   const { privacy, togglePrivacy } = usePrivacyMode();
   // Reminders ring from Rust (a hidden webview's timers are suspended); it only needs the lead time.
@@ -263,6 +265,7 @@ function Canto() {
                 onOpenTasks={() => changeTab("tasks")}
                 onOpenAgenda={() => changeTab("agenda")}
                 onError={setError}
+                note={noteDraft}
               />
             )}
             {tab === "clipboard" && <ClipboardTab privacy={privacy} initialQuery={jumpQuery} onError={setError} />}

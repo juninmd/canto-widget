@@ -5,10 +5,10 @@ import { useLatestRequest } from "../lib/useLatestRequest";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { t } from "../i18n";
 import NoteCard from "./NoteCard";
-import NoteEditor, { type Draft } from "./NoteEditor";
+import { useNoteDraft, type NoteDraft } from "../lib/useNoteDraft";
+import NoteEditor from "./NoteEditor";
 
 const PAGE = 50;
-const EMPTY: Draft = { id: undefined, title: "", body: "", tags: "", link: null };
 
 type Props = {
   today: string;
@@ -19,15 +19,17 @@ type Props = {
   onOpenTasks: () => void;
   onOpenAgenda: () => void;
   onError: (m: string) => void;
+  /** The draft being edited, owned by the caller so it outlives this tab; standalone uses its own. */
+  note?: NoteDraft;
 };
 
-export default function NotesTab({ today, agenda = [], privacy, initialQuery, onOpenTasks, onOpenAgenda, onError }: Props) {
+export default function NotesTab({ today, agenda = [], privacy, initialQuery, onOpenTasks, onOpenAgenda, onError, note }: Props) {
   const [query, setQuery] = useState(initialQuery ?? "");
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);
-  const [draft, setDraft] = useState(EMPTY);
-  const [editing, setEditing] = useState(false);
+  const own = useNoteDraft();
+  const { draft, editing, setDraft, open, close } = note ?? own;
   const [tasks, setTasks] = useState<Task[]>([]);
 
   const [announcement, setAnnouncement] = useState("");
@@ -108,21 +110,15 @@ ${lim}`);
         tags: draft.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
         link: draft.link,
       });
-      setDraft(EMPTY);
-      setEditing(false);
+      close();
       await reload();
     } catch (e) {
       onError(errText(e));
     }
   }
 
-  function cancel() {
-    setDraft(EMPTY);
-    setEditing(false);
-  }
-
   if (editing) {
-    return <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={cancel} />;
+    return <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={close} />;
   }
 
   return (
@@ -139,10 +135,7 @@ ${lim}`);
         />
         <button
           type="button"
-          onClick={() => {
-            setDraft(EMPTY);
-            setEditing(true);
-          }}
+          onClick={() => open()}
           aria-label={t("notes.newLabel")}
           data-shortcut="new"
           className="rounded-lg bg-edge px-3 text-sm text-fg"
@@ -162,10 +155,7 @@ ${lim}`);
             query={query}
             privacy={privacy}
             className={`${isNew(n.id) ? ENTER_CLASS : ""} ${leaving.has(n.id) ? EXIT_CLASS : ""}`}
-            onOpen={() => {
-              setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", "), link: n.link ?? null });
-              setEditing(true);
-            }}
+            onOpen={() => open({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", "), link: n.link ?? null })}
             onPin={() => void pin(n)}
             onDelete={() => void leave(n.id, () => remove(n))}
             onTag={(tag) => setQuery(`#${tag}`)}
