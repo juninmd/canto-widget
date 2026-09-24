@@ -68,6 +68,7 @@ export const app = {
   "settings.password.mismatch": "a nova senha e a confirmação não conferem",
   "settings.password.changed": "senha mestra trocada",
   "settings.password.changedBiometricOff": "senha mestra trocada; ative a biometria de novo para usar a senha nova",
+  "settings.password.pending": "tranque e destranque o Canto para terminar de atualizar um arquivo",
   "settings.password.backupsNote":
     "As cópias automáticas em backups/ passam para a senha nova. Arquivos .canto exportados antes continuam com a senha antiga.",
   "settings.password.submit": "trocar senha",

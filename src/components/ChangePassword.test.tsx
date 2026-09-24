@@ -3,7 +3,8 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 let calls: { cmd: string; args: unknown }[] = [];
-let response: () => Promise<unknown> = () => Promise.resolve(false);
+const ok = (biometricDisabled = false, pending = false) => () => Promise.resolve({ biometricDisabled, pending });
+let response: () => Promise<unknown> = ok();
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: unknown) => {
@@ -32,7 +33,7 @@ async function fill(current: string, next: string, confirm: string) {
 
 beforeEach(() => {
   calls = [];
-  response = () => Promise.resolve(false);
+  response = ok();
 });
 
 afterEach(cleanup);
@@ -51,7 +52,7 @@ test("the change sends current and new password to Rust and closes the form", as
 });
 
 test("biometrics disabled by the change is reported to the user", async () => {
-  response = () => Promise.resolve(true);
+  response = ok(true);
   await fill("velha", "nova-senha", "nova-senha");
   expect(screen.getByText(/ative a biometria de novo/)).toBeTruthy();
 });
@@ -61,4 +62,9 @@ test("a wrong current password stays on the form, with the vault's error", async
   await fill("chute", "nova-senha", "nova-senha");
   expect(screen.getByText("a senha atual nao confere")).toBeTruthy();
   expect(screen.getByLabelText("senha atual")).toBeTruthy();
+});
+test("a file still waiting after the change tells the user how to finish it", async () => {
+  response = ok(false, true);
+  await fill("velha", "nova-senha", "nova-senha");
+  expect(screen.getByText(/senha mestra trocada; tranque e destranque/)).toBeTruthy();
 });
