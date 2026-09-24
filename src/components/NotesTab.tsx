@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, errText, type AgendaItem, type Note, type Task } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { t } from "../i18n";
 import NoteCard from "./NoteCard";
@@ -32,10 +33,13 @@ export default function NotesTab({ today, agenda = [], privacy, initialQuery, on
   const [announcement, setAnnouncement] = useState("");
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const { leaving, leave } = useExit();
+  const { bump, isLatest } = useLatestRequest();
 
   async function reload(q = query, lim = limit) {
+    const id = bump();
     try {
       const page = await api.notesSearch(q, lim);
+      if (!isLatest(id)) return;
       setNotes(page.items);
       setTotal(page.total);
       setLoadedFor(`${q}
