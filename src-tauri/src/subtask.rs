@@ -2,7 +2,7 @@ use tauri::State;
 
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Subtask, Task};
+use crate::model::{next_version, now_ms, Subtask, Task};
 use crate::vault::AppState;
 
 fn subtask_title(raw: &str) -> Result<String> {
@@ -24,7 +24,7 @@ pub fn subtask_add(state: State<'_, AppState>, id: String, title: String) -> Res
         let t = find_task(d, &id)?;
         let subtask = Subtask { id: new_id(), title, done: false };
         t.subtasks.push(subtask.clone());
-        t.updated_at = now_ms();
+        t.updated_at = next_version(t.updated_at, now_ms());
         Ok(subtask)
     })?
 }
@@ -35,7 +35,7 @@ pub fn subtask_toggle(state: State<'_, AppState>, id: String, subtask_id: String
         let t = find_task(d, &id)?;
         let sub = t.subtasks.iter_mut().find(|s| s.id == subtask_id).ok_or(AppError::NotFound)?;
         sub.done = !sub.done;
-        t.updated_at = now_ms();
+        t.updated_at = next_version(t.updated_at, now_ms());
         Ok(())
     })?
 }
@@ -49,7 +49,7 @@ pub fn subtask_remove(state: State<'_, AppState>, id: String, subtask_id: String
         if t.subtasks.len() == before {
             return Err(AppError::NotFound);
         }
-        t.updated_at = now_ms();
+        t.updated_at = next_version(t.updated_at, now_ms());
         Ok(())
     })?
 }

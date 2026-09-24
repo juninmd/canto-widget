@@ -5,7 +5,7 @@ use tauri::State;
 use crate::clipboard::{ClipHistory, ClipItem};
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Note, Task, VaultData};
+use crate::model::{next_version, now_ms, Note, Task, VaultData};
 use crate::vault::AppState;
 
 /// A few removals are enough to undo from the toast; the cap stops the trash growing forever.
@@ -82,13 +82,13 @@ impl VaultData {
         match item {
             Removed::Task(mut t) => {
                 self.deleted.remove(&t.id);
-                t.updated_at = at;
+                t.updated_at = next_version(t.updated_at, at);
                 self.tasks.retain(|x| x.id != t.id);
                 self.tasks.push(t);
             }
             Removed::Note(mut n) => {
                 self.deleted.remove(&n.id);
-                n.updated_at = at;
+                n.updated_at = next_version(n.updated_at, at);
                 self.notes.retain(|x| x.id != n.id);
                 self.notes.push(n);
             }

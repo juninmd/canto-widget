@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Task};
+use crate::model::{next_version, now_ms, Task};
 use crate::vault::AppState;
 
 /// Task title always arrives trimmed and never empty, on create and on rename.
@@ -76,7 +76,7 @@ pub fn task_toggle(state: State<'_, AppState>, id: String) -> Result<()> {
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
             t.done = !t.done;
-            t.updated_at = now_ms();
+            t.updated_at = next_version(t.updated_at, now_ms());
         }
     })
 }
@@ -91,7 +91,7 @@ pub fn complete(d: &mut crate::model::VaultData, id: &str, now: i64) -> bool {
     match d.tasks.iter_mut().find(|t| t.id == id && !t.done) {
         Some(t) => {
             t.done = true;
-            t.updated_at = now;
+            t.updated_at = next_version(t.updated_at, now);
             true
         }
         None => false,
@@ -104,7 +104,7 @@ pub fn task_rename(state: State<'_, AppState>, id: String, title: String) -> Res
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
             t.title = title;
-            t.updated_at = now_ms();
+            t.updated_at = next_version(t.updated_at, now_ms());
         }
     })
 }
@@ -128,7 +128,7 @@ pub fn task_link_pr(state: State<'_, AppState>, id: String, url: Option<String>)
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
             t.pr_url = url;
-            t.updated_at = now_ms();
+            t.updated_at = next_version(t.updated_at, now_ms());
         }
     })
 }
@@ -151,7 +151,7 @@ pub fn tasks_carry_over(state: State<'_, AppState>, day: String) -> Result<usize
             // A recurring series gets its own instance for the day; carrying it over would duplicate the task.
             if !t.done && t.day < day && t.series.is_none() {
                 t.day = day.clone();
-                t.updated_at = now;
+                t.updated_at = next_version(t.updated_at, now);
                 moved += 1;
             }
         }

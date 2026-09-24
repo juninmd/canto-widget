@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, ExtendedRepeat, Repeat, Task, VaultData};
+use crate::model::{next_version, now_ms, ExtendedRepeat, Repeat, Task, VaultData};
 use crate::vault::AppState;
 
 /// Valid "YYYY-MM-DD", or `None`. The day comes from the webview: don't trust the format.
@@ -116,7 +116,7 @@ pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, 
     if repeat.is_some() && t.series.is_none() {
         t.series = Some(t.id.clone());
     }
-    t.updated_at = now;
+    t.updated_at = next_version(t.updated_at, now);
     Ok(())
 }
 
@@ -143,7 +143,7 @@ pub fn set_extended_repeat(t: &mut Task, repeat: Option<ExtendedRepeat>, now: i6
             t.series = Some(t.id.clone());
         }
     }
-    t.updated_at = now;
+    t.updated_at = next_version(t.updated_at, now);
     Ok(())
 }
 
