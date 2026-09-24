@@ -136,3 +136,13 @@ fn a_failed_undo_keeps_the_item_so_the_user_can_try_again() {
     assert!(undo(&st, &key).unwrap(), "the failed attempt consumed the only copy of the removed items");
     assert_eq!(st.clip_load().unwrap().items.len(), 1);
 }
+#[test]
+fn undoing_a_delete_of_an_item_stamped_ahead_beats_the_synced_tombstone() {
+    let mut d = VaultData { tasks: vec![task("t1", 10_000)], ..Default::default() };
+    let removed = d.remove("t1", 9_000).expect("task existed");
+    let tombstone = d.deleted["t1"];
+    d.restore(removed, 9_500);
+    // The other machine already got the tombstone before the undo.
+    let theirs = VaultData { deleted: [("t1".to_string(), tombstone)].into(), ..Default::default() };
+    assert_eq!(d.merge(theirs).tasks.len(), 1, "the undone task vanished on the next sync");
+}

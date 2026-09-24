@@ -81,14 +81,15 @@ impl VaultData {
     pub fn restore(&mut self, item: Removed, at: i64) {
         match item {
             Removed::Task(mut t) => {
-                self.deleted.remove(&t.id);
-                t.updated_at = next_version(t.updated_at, at);
+                // Past the tombstone too: another machine may already hold it.
+                let dead = self.deleted.remove(&t.id).unwrap_or(0);
+                t.updated_at = next_version(t.updated_at.max(dead), at);
                 self.tasks.retain(|x| x.id != t.id);
                 self.tasks.push(t);
             }
             Removed::Note(mut n) => {
-                self.deleted.remove(&n.id);
-                n.updated_at = next_version(n.updated_at, at);
+                let dead = self.deleted.remove(&n.id).unwrap_or(0);
+                n.updated_at = next_version(n.updated_at.max(dead), at);
                 self.notes.retain(|x| x.id != n.id);
                 self.notes.push(n);
             }
