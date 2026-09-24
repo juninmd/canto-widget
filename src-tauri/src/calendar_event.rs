@@ -67,9 +67,13 @@ struct Person {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Attendee {
     #[serde(default)]
     resource: bool,
+    #[serde(rename = "self", default)]
+    is_self: bool,
+    response_status: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -94,7 +98,9 @@ impl Person {
 
 impl RawEvent {
     pub fn into_item(self) -> Option<AgendaItem> {
-        if self.status.as_deref() == Some("cancelled") {
+        // A meeting the user declined stays on Google's list; showing it would also ring its alert.
+        let declined = self.attendees.iter().any(|a| a.is_self && a.response_status.as_deref() == Some("declined"));
+        if declined || self.status.as_deref() == Some("cancelled") {
             return None;
         }
         let start = self.start?;
