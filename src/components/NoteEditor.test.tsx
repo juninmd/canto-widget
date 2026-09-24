@@ -40,3 +40,19 @@ test("picking a task from the link picker sets the link, and it can be removed",
   fireEvent.click(screen.getByRole("button", { name: "✓ comprar leite" }));
   expect(changes.at(-1)).toEqual({ ...draft, link: { kind: "task", id: "t1", label: "comprar leite" } });
 });
+test("ticking a checklist item in preview updates the draft body", () => {
+  const changes: { body: string }[] = [];
+  render(
+    <NoteEditor
+      draft={{ ...draft, body: "- [ ] leite\n- [ ] pão" }}
+      tasks={[]}
+      agenda={[]}
+      onChange={(d) => changes.push(d)}
+      onSave={() => {}}
+      onCancel={() => {}}
+    />,
+  );
+  fireEvent.click(screen.getByRole("button", { name: "visualizar" }));
+  fireEvent.click(screen.getByRole("checkbox", { name: "pão" }));
+  expect(changes.at(-1)?.body).toBe("- [ ] leite\n- [x] pão");
+});
