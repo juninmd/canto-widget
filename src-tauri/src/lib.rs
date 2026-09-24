@@ -9,6 +9,7 @@ pub mod blocking;
 pub mod calendar;
 pub mod calendar_event;
 pub mod clip_os;
+pub mod clip_watch;
 pub mod clipboard;
 pub mod cmd_backup;
 pub mod cmd_biometric;
