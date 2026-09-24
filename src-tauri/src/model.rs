@@ -144,6 +144,11 @@ pub struct VaultData {
 
 impl VaultData {
     pub fn tombstone(&mut self, id: &str, at: i64) {
+        // Past the item's own stamp, or a copy stamped by a clock that runs ahead revives it on the next merge.
+        let tasks = self.tasks.iter().filter(|t| t.id == id).map(|t| t.updated_at);
+        let at = tasks
+            .chain(self.notes.iter().filter(|n| n.id == id).map(|n| n.updated_at))
+            .fold(at, |at, prev| next_version(prev, at));
         self.tasks.retain(|t| t.id != id);
         self.notes.retain(|n| n.id != id);
         self.deleted.insert(id.to_string(), at);

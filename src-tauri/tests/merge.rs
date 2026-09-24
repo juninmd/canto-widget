@@ -90,3 +90,11 @@ fn an_edit_after_syncing_a_future_stamp_still_wins() {
     let merged = data(vec![edited], vec![], &[]).merge(data(vec![task("t1", "antigo", future)], vec![], &[]));
     assert_eq!(merged.tasks[0].title, "editado aqui depois");
 }
+#[test]
+fn deleting_an_item_stamped_by_a_clock_ahead_stays_deleted_after_sync() {
+    let future = 10_000;
+    let mut here = data(vec![task("t1", "vindo do futuro", future)], vec![], &[]);
+    here.tombstone("t1", 9_000);
+    let merged = here.merge(data(vec![task("t1", "vindo do futuro", future)], vec![], &[]));
+    assert!(merged.tasks.is_empty(), "the deleted task came back from the other machine");
+}
