@@ -27,6 +27,22 @@ pub struct AgendaItem {
     pub guests: u32,
     #[serde(default)]
     pub attachments: Vec<Attachment>,
+    /// The user's own RSVP (accepted, declined, tentative, needsAction); empty when not on the guest list.
+    #[serde(default)]
+    pub response: String,
+    #[serde(default)]
+    pub attendees: Vec<Guest>,
+}
+
+/// A person on the guest list; rooms are left out.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct Guest {
+    pub name: String,
+    pub email: String,
+    pub response: String,
+    pub organizer: bool,
+    pub optional: bool,
+    pub me: bool,
 }
 
 /// A file linked to the event, such as the notes Gemini writes after a Meet.

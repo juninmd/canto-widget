@@ -1,4 +1,4 @@
-import type { AgendaItem } from "./api";
+import type { AgendaItem, Guest } from "./api";
 import { LOCALE, t } from "../i18n";
 
 /** Day window in RFC3339, from midnight to the end of the day. */
@@ -62,4 +62,39 @@ export function people(item: AgendaItem): string {
   const guests = item.guests ?? 0;
   if (guests > 0) parts.push(guests === 1 ? t("agenda.guests.one") : t("agenda.guests.other", { n: guests }));
   return parts.join(" · ");
+}
+
+/** Two letters for the avatar: first and last word, or the start of an e-mail. */
+export function initials(name: string): string {
+  const words = name.replace(/@.*/, "").split(/[\s._-]+/).filter(Boolean);
+  if (words.length === 0) return "?";
+  const pick = words.length > 1 ? words[0][0] + words[words.length - 1][0] : words[0].slice(0, 2);
+  return pick.toUpperCase();
+}
+
+const TONES = [
+  "bg-sky-500/30",
+  "bg-violet-500/30",
+  "bg-amber-500/30",
+  "bg-rose-500/30",
+  "bg-emerald-500/30",
+  "bg-cyan-500/30",
+  "bg-fuchsia-500/30",
+  "bg-orange-500/30",
+];
+
+/** Same person, same color, on every event: a hash of the e-mail (or name) picks the tone. */
+export function avatarTone(key: string): string {
+  let h = 0;
+  for (const c of key.toLowerCase()) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return TONES[h % TONES.length];
+}
+
+/** Answer counts for the guest list header. */
+export function tally(guests: Guest[]): { yes: number; no: number; maybe: number; pending: number } {
+  const count = (r: string) => guests.filter((g) => g.response === r).length;
+  const yes = count("accepted");
+  const no = count("declined");
+  const maybe = count("tentative");
+  return { yes, no, maybe, pending: guests.length - yes - no - maybe };
 }

@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Agenda: quem vai e quem não vai.** Cada evento mostra um selo com a sua resposta (aceitou, talvez, recusou,
+  sem resposta). Os detalhes trazem a lista de convidados com avatar de iniciais, a resposta de cada um
+  (organizador e opcionais marcados) e o placar sim/não/talvez/aguardando. Listas enormes param em 50 nomes.
 - **Status API: Datadog, Azion e Akamai** entram na lista, com histórico e estado ao vivo (Statuspage).
 - **Idioma: português ou inglês**, em Ajustes > Idioma. "Automático (sistema)" é o padrão: português para
   sistemas em `pt-*`, inglês para os demais. A troca recarrega a interface na hora; notificações do sistema e o

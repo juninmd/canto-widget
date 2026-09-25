@@ -1,11 +1,14 @@
 //! Google Calendar's event JSON, reduced to what the widget shows.
 use serde::Deserialize;
 
-use crate::calendar::{AgendaItem, Attachment};
+use crate::calendar::{AgendaItem, Attachment, Guest};
 use crate::meet::meet_link;
 use crate::plain_text::plain_text;
 
 const DESCRIPTION_CHARS: usize = 1500;
+/// Bounds what reaches the webview on all-hands invites.
+const MAX_GUESTS: usize = 50;
+const RESPONSES: [&str; 4] = ["accepted", "declined", "tentative", "needsAction"];
 
 #[derive(Deserialize)]
 pub struct EventList {
@@ -67,9 +70,20 @@ struct Person {
 }
 
 #[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct Attendee {
     #[serde(default)]
     resource: bool,
+    #[serde(default)]
+    email: String,
+    display_name: Option<String>,
+    response_status: Option<String>,
+    #[serde(default)]
+    organizer: bool,
+    #[serde(default)]
+    optional: bool,
+    #[serde(rename = "self", default)]
+    is_self: bool,
 }
 
 #[derive(Deserialize)]
@@ -89,6 +103,20 @@ impl Person {
             return "você".into();
         }
         self.display_name.filter(|n| !n.trim().is_empty()).unwrap_or(self.email)
+    }
+}
+
+impl Attendee {
+    fn into_guest(self) -> Guest {
+        let response = self.response_status.filter(|r| RESPONSES.contains(&r.as_str())).unwrap_or_default();
+        Guest {
+            name: self.display_name.filter(|n| !n.trim().is_empty()).unwrap_or_else(|| self.email.clone()),
+            email: self.email,
+            response,
+            organizer: self.organizer,
+            optional: self.optional,
+            me: self.is_self,
+        }
     }
 }
 
@@ -112,6 +140,13 @@ impl RawEvent {
             .unwrap_or_default();
         let location = self.location.unwrap_or_default();
         let raw_description = self.description.unwrap_or_default();
+        let mut attendees: Vec<Guest> =
+            self.attendees.into_iter().filter(|a| !a.resource).map(Attendee::into_guest).collect();
+        let guests = attendees.len() as u32;
+        let response = attendees.iter().find(|g| g.me).map(|g| g.response.clone()).unwrap_or_default();
+        // Organizer, then the user, then whoever answered first: the people that matter on a small screen.
+        attendees.sort_by_key(|g| (!g.organizer, !g.me, rank(&g.response)));
+        attendees.truncate(MAX_GUESTS);
         let meet = meet_link(self.hangout_link.as_deref(), &entries, &[raw_description.as_str(), location.as_str()]);
         Some(AgendaItem {
             id: self.id,
@@ -125,9 +160,20 @@ impl RawEvent {
             organizer: self.organizer.map(Person::label).unwrap_or_default(),
             creator: self.creator.map(Person::label).unwrap_or_default(),
             description: plain_text(&raw_description, DESCRIPTION_CHARS),
-            guests: self.attendees.iter().filter(|a| !a.resource).count() as u32,
+            guests,
             attachments: self.attachments.into_iter().filter_map(attachment).collect(),
+            response,
+            attendees,
         })
+    }
+}
+
+fn rank(response: &str) -> u8 {
+    match response {
+        "accepted" => 0,
+        "tentative" => 1,
+        "needsAction" | "" => 2,
+        _ => 3,
     }
 }
 

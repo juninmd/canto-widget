@@ -94,7 +94,11 @@ export type AgendaItem = {
   description?: string;
   guests?: number;
   attachments?: Attachment[];
+  response?: Rsvp | "";
+  attendees?: Guest[];
 };
+export type Rsvp = "accepted" | "declined" | "tentative" | "needsAction";
+export type Guest = { name: string; email: string; response: Rsvp | ""; organizer: boolean; optional: boolean; me: boolean };
 export type Attachment = { title: string; url: string; mime: string };
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";

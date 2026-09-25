@@ -73,10 +73,11 @@ reminder is already set. **Day summary** ready to paste and **pull over pending 
 
 Today's events come from Google Calendar (read-only). One minute before, the widget jumps onto the screen with
 **join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
-Click the event to see who organized it, the agenda, the guests and attachments, like Gemini's notes.
+Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
+it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
 
 </td>
-<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with organizer, guests and Gemini notes"></td>
+<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
 </tr>
 <tr>
 <td><img src="docs/prints/app/02-notas.png" alt="Note cards with tags and a pinned note"></td>
