@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Resumo do dia mais completo**: além dos PRs/MRs abertos, lista os **mergeados** e os **revisados/aprovados
+  por mim** no dia (GitHub e GitLab), e o título das reuniões traz o **tempo total** (sobreposições contam uma
+  vez; eventos de dia inteiro ficam fora).
 - **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
   diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
   seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o
@@ -54,6 +57,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Resumo do dia longo** não empurra mais os botões "copiar resumo" e "voltar" para fora da janela: o texto
+  rola dentro do painel.
 - **Aviso de reunião com o cofre trancado**: o Canto parava de avisar ao trancar, porque o token do Google só
   existe com o cofre aberto. Agora guarda em memória as reuniões das próximas 12 h (só título, horário, local e
   link; sem descrição nem convidados) e continua avisando a partir delas.

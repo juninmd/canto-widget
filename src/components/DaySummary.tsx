@@ -20,7 +20,7 @@ export default function DaySummary({
   const [opened, setOpened] = useState<ForgeOpened | null>(null);
   const [geminiDocs, setGeminiDocs] = useState<GeminiDoc[]>([]);
   const text = useMemo(
-    () => daySummary(day, tasks, agenda, opened?.items, geminiDocs),
+    () => daySummary(day, tasks, agenda, { opened: opened?.items, merged: opened?.merged, reviewed: opened?.reviewed }, geminiDocs),
     [day, tasks, agenda, opened, geminiDocs],
   );
 
@@ -65,7 +65,7 @@ export default function DaySummary({
     <section
       aria-label={t("summary.heading")}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="flex min-h-0 flex-1 flex-col gap-2 motion-safe:animate-aba"
+      className="flex h-full min-h-0 flex-col gap-2 motion-safe:animate-aba"
     >
       <pre className="min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap rounded-lg border border-edge bg-ink/60 p-2 font-sans text-xs text-fg select-text">
         {text}
@@ -80,7 +80,7 @@ export default function DaySummary({
           {t("summary.forgeError", { error: e })}
         </p>
       ))}
-      <div className="flex gap-2">
+      <div className="flex shrink-0 gap-2">
         <button
           type="button"
           autoFocus

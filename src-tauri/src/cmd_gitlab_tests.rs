@@ -39,7 +39,7 @@ fn locked_vault_does_not_hand_out_the_token() {
 #[test]
 fn without_an_account_the_day_summary_skips_gitlab() {
     let st = state("sem-conta");
-    assert!(opened_since(&st, "2026-09-18T03:00:00+00:00").is_none());
+    assert!(activity_since(&st, Activity::Opened, "2026-09-18T03:00:00+00:00").is_none());
     let _ = std::fs::remove_dir_all(&st.dir);
 }
 

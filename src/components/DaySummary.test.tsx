@@ -35,6 +35,21 @@ test("PRs/MRs opened since local midnight join the summary", async () => {
   expect(screen.getByRole("region", { name: "resumo do dia" }).textContent).toContain("PRs/MRs abertos (1)\n- octo/canto#7 Cache local");
 });
 
+test("merged and reviewed PRs/MRs from the forges reach the summary", async () => {
+  const merged = { reference: "octo/canto#5", title: "Fila de sync", draft: false };
+  opened = () => Promise.resolve({ items: [], merged: [merged], reviewed: [pr], errors: [] });
+  await mount();
+  const text = screen.getByRole("region", { name: "resumo do dia" }).textContent;
+  expect(text).toContain("PRs/MRs mergeados (1)\n- octo/canto#5 Fila de sync");
+  expect(text).toContain("PRs/MRs revisados/aprovados por mim (1)\n- octo/canto#7 Cache local");
+});
+
+test("a long summary scrolls inside the panel, keeping copy and back in view", async () => {
+  await mount();
+  expect(screen.getByRole("region", { name: "resumo do dia" }).className).toContain("h-full");
+  expect(screen.getByText("copiar resumo").parentElement?.className).toContain("shrink-0");
+});
+
 test("a forge that fails is named, and the rest of the summary still comes", async () => {
   opened = () => Promise.resolve({ items: [pr], errors: ["gitlab: sem resposta do GitLab"] });
   await mount();

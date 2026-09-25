@@ -18,7 +18,7 @@ impl Forge for FakeToken {
         Ok((list(1, vec![item(1, "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z", 0)]), None))
     }
 
-    fn fetch_opened_since(calls: &Self::Credential, _since: &str) -> Result<(ForgeList, Option<Quota>)> {
+    fn fetch_activity(calls: &Self::Credential, _a: Activity, _since: &str) -> Result<(ForgeList, Option<Quota>)> {
         calls.fetch_add(1, Ordering::SeqCst);
         Ok((ForgeList::default(), None))
     }
@@ -43,7 +43,7 @@ impl Forge for FakeAccount {
         Ok((list(1, vec![item(1, "2026-09-01T00:00:00Z", "2026-09-01T00:00:00Z", 0)]), None))
     }
 
-    fn fetch_opened_since(cred: &Self::Credential, _since: &str) -> Result<(ForgeList, Option<Quota>)> {
+    fn fetch_activity(cred: &Self::Credential, _a: Activity, _since: &str) -> Result<(ForgeList, Option<Quota>)> {
         cred.calls.fetch_add(1, Ordering::SeqCst);
         Ok((ForgeList::default(), None))
     }

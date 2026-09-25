@@ -52,8 +52,21 @@ fn sorting_by_comments_is_refused_instead_of_silently_ignored() {
 
 #[test]
 fn opened_today_includes_merged_and_closed_mrs() {
-    let r = opened_since("2026-09-18T03:00:00+00:00");
+    let r = activity_since(Activity::Opened, "ana", "2026-09-18T03:00:00+00:00");
     assert_eq!((param(&r, "state"), param(&r, "created_after")), (Some("all"), Some("2026-09-18T03:00:00+00:00")));
+}
+
+#[test]
+fn merged_today_are_my_mrs_and_reviewed_today_are_the_ones_i_review() {
+    let since = "2026-09-18T03:00:00+00:00";
+    let m = activity_since(Activity::Merged, "ana", since);
+    assert_eq!(
+        (param(&m, "scope"), param(&m, "state"), param(&m, "updated_after")),
+        (Some("created_by_me"), Some("merged"), Some(since))
+    );
+    let r = activity_since(Activity::Reviewed, "ana", since);
+    assert_eq!((param(&r, "scope"), param(&r, "reviewer_username")), (Some("all"), Some("ana")));
+    assert_eq!(param(&r, "approved_by_usernames[]"), Some("ana"));
 }
 
 #[test]

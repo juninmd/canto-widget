@@ -1,10 +1,11 @@
-//! What spans both forges: the PRs/MRs the user opened today, for the day summary.
+//! What spans both forges: the PRs/MRs the user opened, merged or reviewed today, for the day summary.
 use serde::Serialize;
 use tauri::Manager;
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
 use crate::forge::{ForgeItem, ForgeList};
+use crate::forge_filter::{Activity, ACTIVITIES};
 use crate::model::now_ms;
 use crate::vault::AppState;
 
@@ -13,7 +14,9 @@ const DAY_MS: i64 = 86_400_000;
 #[derive(Debug, Default, Serialize)]
 pub struct Opened {
     pub items: Vec<ForgeItem>,
-    /// One line per forge that failed; the other forge's items still come.
+    pub merged: Vec<ForgeItem>,
+    pub reviewed: Vec<ForgeItem>,
+    /// One line per distinct failure; the other forge's items still come.
     pub errors: Vec<String>,
 }
 
@@ -30,9 +33,12 @@ pub async fn forges_opened_since(app: tauri::AppHandle, since_ms: i64) -> Result
         if !state.is_unlocked() {
             return Err(AppError::Locked);
         }
-        let results =
-            [crate::cmd_github_lists::opened_since(&app, &since), crate::cmd_gitlab::opened_since(&state, &since)];
-        Ok(combine(results.into_iter().flatten()))
+        let results = ACTIVITIES.into_iter().flat_map(|a| {
+            let gh = crate::cmd_github_lists::activity_since(&app, a, &since);
+            let gl = crate::cmd_gitlab::activity_since(&state, a, &since);
+            [gh, gl].into_iter().flatten().map(move |r| (a, r))
+        });
+        Ok(combine(results))
     })
     .await
 }
@@ -48,15 +54,28 @@ pub(crate) fn review_requested_total(app: &tauri::AppHandle) -> u64 {
         .sum()
 }
 
-fn combine(results: impl Iterator<Item = Result<ForgeList>>) -> Opened {
+fn combine(results: impl Iterator<Item = (Activity, Result<ForgeList>)>) -> Opened {
     let mut out = Opened::default();
-    for r in results {
-        match r {
-            Ok(list) => out.items.extend(list.items),
-            Err(e) => out.errors.push(e.to_string()),
+    for (activity, r) in results {
+        let list = match r {
+            Ok(list) => list.items,
+            Err(e) => {
+                let e = e.to_string();
+                if !out.errors.contains(&e) {
+                    out.errors.push(e);
+                }
+                continue;
+            }
+        };
+        match activity {
+            Activity::Opened => out.items.extend(list),
+            Activity::Merged => out.merged.extend(list),
+            Activity::Reviewed => out.reviewed.extend(list),
         }
     }
-    out.items.sort_by(|a, b| a.created_at.cmp(&b.created_at));
+    for items in [&mut out.items, &mut out.merged, &mut out.reviewed] {
+        items.sort_by(|a, b| a.created_at.cmp(&b.created_at));
+    }
     out
 }
 
@@ -90,8 +109,28 @@ mod tests {
     fn one_forge_failing_keeps_the_other_ones_items_in_opening_order() {
         let gh = ForgeList { items: vec![item(2, "2026-09-18T15:00:00Z", "", 0)], ..Default::default() };
         let gl = ForgeList { items: vec![item(1, "2026-09-18T12:00:00Z", "", 0)], ..Default::default() };
-        let out = combine([Ok(gh), Err(AppError::Gitlab("sem resposta".into())), Ok(gl)].into_iter());
+        let out =
+            combine([(Activity::Opened, Ok(gh)), (Activity::Opened, err()), (Activity::Opened, Ok(gl))].into_iter());
         assert_eq!(out.items.iter().map(|i| i.number).collect::<Vec<_>>(), vec![1, 2]);
         assert_eq!(out.errors, vec!["gitlab: sem resposta"]);
+    }
+
+    fn err() -> Result<ForgeList> {
+        Err(AppError::Gitlab("sem resposta".into()))
+    }
+
+    #[test]
+    fn merged_and_reviewed_land_in_their_own_lists_and_a_repeated_failure_shows_once() {
+        let one = |n| ForgeList { items: vec![item(n, "2026-09-18T12:00:00Z", "", 0)], ..Default::default() };
+        let results = [
+            (Activity::Merged, Ok(one(3))),
+            (Activity::Reviewed, Ok(one(4))),
+            (Activity::Merged, err()),
+            (Activity::Reviewed, err()),
+        ];
+        let out = combine(results.into_iter());
+        assert!(out.items.is_empty());
+        assert_eq!((out.merged[0].number, out.reviewed[0].number), (3, 4));
+        assert_eq!(out.errors.len(), 1);
     }
 }

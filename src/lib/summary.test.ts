@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { AgendaItem, ForgeItem, GeminiDoc, Task } from "./api";
-import { dayStart, daySummary } from "./summary";
+import { dayStart, daySummary, meetingMinutes } from "./summary";
 
 const t = (title: string, done: boolean, hora: string | null = null): Task => ({ id: title, title, done, day: "2026-09-14", created_at: 1, updated_at: 1, hora });
 const meeting: AgendaItem = { id: "r", title: "Daily", start: new Date(2026, 8, 14, 9, 30).toISOString(), end: "", all_day: false, location: "", meet: "", link: "" };
@@ -15,7 +15,7 @@ test("separates done, pending and meetings with a count", () => {
 test("a meeting with Gemini notes carries the link in the summary line", () => {
   const doc: GeminiDoc = { meeting: "Daily", start: meeting.start, title: "Notas da Daily", url: "https://docs.google.com/x" };
   const other: GeminiDoc = { meeting: "Outra reunião", start: new Date(2026, 8, 14, 11, 0).toISOString(), title: "Y", url: "https://docs.google.com/y" };
-  const text = daySummary("2026-09-14", [], [meeting], [], [doc, other]);
+  const text = daySummary("2026-09-14", [], [meeting], {}, [doc, other]);
   expect(text).toContain("09:30 Daily — anotações do Gemini: https://docs.google.com/x");
   expect(text).not.toContain("docs.google.com/y");
 });
@@ -23,7 +23,7 @@ test("a meeting with Gemini notes carries the link in the summary line", () => {
 test("PRs and MRs opened today are listed with the forge's own reference", () => {
   const pr = { reference: "octo/canto#7", title: "Cache local", draft: false } as ForgeItem;
   const mr = { reference: "acme/api!12", title: "Rate limit", draft: true } as ForgeItem;
-  const text = daySummary("2026-09-14", [], [], [pr, mr]);
+  const text = daySummary("2026-09-14", [], [], { opened: [pr, mr] });
   expect(text).toContain("PRs/MRs abertos (2)\n- octo/canto#7 Cache local\n- acme/api!12 Rate limit (rascunho)");
   expect(text).not.toContain("Nada registrado");
 });
@@ -43,4 +43,28 @@ test("a section with no items disappears and the text doesn't end with a blank l
   const text = daySummary("2026-09-14", [t("a", true)], []);
   expect(text).not.toContain("Reuniões");
   expect(text.endsWith("\n")).toBe(false);
+});
+
+test("merged PRs and the ones I reviewed get their own sections", () => {
+  const merged = { reference: "octo/canto#5", title: "Fila de sync", draft: false } as ForgeItem;
+  const reviewed = { reference: "acme/api!9", title: "Timeout", draft: false } as ForgeItem;
+  const text = daySummary("2026-09-14", [], [], { merged: [merged], reviewed: [reviewed] });
+  expect(text).toContain("PRs/MRs mergeados (1)\n- octo/canto#5 Fila de sync");
+  expect(text).toContain("PRs/MRs revisados/aprovados por mim (1)\n- acme/api!9 Timeout");
+  expect(text).not.toContain("PRs/MRs abertos");
+});
+
+const at = (h: number, m: number) => new Date(2026, 8, 14, h, m).toISOString();
+const slot = (start: string, end: string, all_day = false): AgendaItem => ({ ...meeting, start, end, all_day });
+
+test("meeting time counts overlaps once and skips all-day events", () => {
+  const agenda = [slot(at(9, 0), at(10, 0)), slot(at(9, 30), at(10, 30)), slot(at(14, 0), at(14, 45)), slot(at(0, 0), at(23, 0), true)];
+  expect(meetingMinutes(agenda)).toBe(135);
+  expect(meetingMinutes([meeting])).toBe(0);
+});
+
+test("the meetings heading carries the total time", () => {
+  const text = daySummary("2026-09-14", [], [slot(at(9, 0), at(10, 0)), slot(at(14, 0), at(14, 45))]);
+  expect(text).toContain("Reuniões (2 · 1h45 no total)");
+  expect(daySummary("2026-09-14", [], [slot(at(9, 0), at(9, 30))])).toContain("Reuniões (1 · 30 min no total)");
 });

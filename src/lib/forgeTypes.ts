@@ -23,5 +23,6 @@ export type ForgeSort = "updated" | "created" | "comments";
 export type ForgeOrder = "desc" | "asc";
 export type ForgeFilter = { text: string; kind: ForgeKind; sort: ForgeSort; order: ForgeOrder };
 export type ForgeLists = Record<ForgeSection, ForgeList>;
-export type ForgeOpened = { items: ForgeItem[]; errors: string[] };
+/** `items` are the PRs/MRs opened today; `merged` and `reviewed` are optional for older mocks. */
+export type ForgeOpened = { items: ForgeItem[]; merged?: ForgeItem[]; reviewed?: ForgeItem[]; errors: string[] };
 export type GitlabStatus = { connected: boolean; username: string; base_url: string };

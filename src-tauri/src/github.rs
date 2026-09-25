@@ -5,8 +5,8 @@ use std::time::Duration;
 use crate::error::{AppError, Result};
 use crate::forge::{checks_from_github, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
-use crate::forge_filter::{self as filter, ForgeFilter, Section, Sort, PER_PAGE};
-use crate::github_query::{opened_since, queries};
+use crate::forge_filter::{self as filter, Activity, ForgeFilter, Section, Sort, PER_PAGE};
+use crate::github_query::{activity_since, queries};
 use crate::model::now_ms;
 
 const API: &str = "https://api.github.com";
@@ -58,9 +58,9 @@ pub fn section(token: &str, section: Section, page: u32, f: &ForgeFilter) -> Res
     Ok((out, quota))
 }
 
-/// First page of the PRs opened since `since` (RFC 3339), newest first.
-pub fn prs_opened_since(token: &str, since: &str) -> Result<(ForgeList, Option<Quota>)> {
-    search(token, &opened_since(since), 1, &ForgeFilter { sort: Sort::Created, ..Default::default() })
+/// First page of the day's PRs of one kind since `since` (RFC 3339), newest first.
+pub fn prs_since(token: &str, activity: Activity, since: &str) -> Result<(ForgeList, Option<Quota>)> {
+    search(token, &activity_since(activity, since), 1, &ForgeFilter { sort: Sort::Created, ..Default::default() })
 }
 
 pub fn user(token: &str) -> Result<String> {

@@ -41,6 +41,16 @@ pub enum Section {
     MyIssues,
 }
 
+/// What the day summary asks each forge about the user's own day.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum Activity {
+    Opened,
+    Merged,
+    Reviewed,
+}
+
+pub const ACTIVITIES: [Activity; 3] = [Activity::Opened, Activity::Merged, Activity::Reviewed];
+
 pub const SECTIONS: [Section; 4] = [Section::ReviewRequested, Section::Assigned, Section::MyPrs, Section::MyIssues];
 
 #[derive(Debug, Clone, Default, Deserialize)]

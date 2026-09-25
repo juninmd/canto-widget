@@ -1,6 +1,6 @@
 //! GitLab API v4 requests behind each tab section, and the checks on the instance address and token.
 use crate::error::{AppError, Result};
-use crate::forge_filter::{page, ForgeFilter, Kind, Section, Sort, PER_PAGE};
+use crate::forge_filter::{page, Activity, ForgeFilter, Kind, Section, Sort, PER_PAGE};
 
 #[derive(Debug, PartialEq)]
 pub struct Request {
@@ -55,17 +55,23 @@ pub fn requests(section: Section, username: &str, p: u32, f: &ForgeFilter) -> Re
     Ok(out)
 }
 
-/// MRs opened since `since` (RFC 3339) in any state, for the day summary.
-pub fn opened_since(since: &str) -> Request {
-    let params = [
-        ("scope", "created_by_me"),
-        ("state", "all"),
-        ("created_after", since),
-        ("order_by", "created_at"),
-        ("sort", "desc"),
-        ("page", "1"),
-    ];
+/// The day summary's MRs since `since` (RFC 3339): opened in any state, merged, or reviewed/approved by me.
+/// A merge bumps `updated_at`; `approved_by_usernames` is ignored on Free, where reviewer alone still narrows it.
+pub fn activity_since(activity: Activity, username: &str, since: &str) -> Request {
+    let params: Vec<(&'static str, &str)> = match activity {
+        Activity::Opened => vec![("scope", "created_by_me"), ("state", "all"), ("created_after", since)],
+        Activity::Merged => vec![("scope", "created_by_me"), ("state", "merged"), ("updated_after", since)],
+        Activity::Reviewed => vec![
+            ("scope", "all"),
+            ("state", "all"),
+            ("reviewer_username", username),
+            ("approved_by_usernames[]", username),
+            ("updated_after", since),
+        ],
+    };
+    let order = if activity == Activity::Opened { "created_at" } else { "updated_at" };
     let mut params: Vec<_> = params.into_iter().map(|(k, v)| (k, v.to_string())).collect();
+    params.extend([("order_by", order.to_string()), ("sort", "desc".to_string()), ("page", "1".to_string())]);
     params.push(("per_page", PER_PAGE.to_string()));
     Request { path: "merge_requests", params }
 }

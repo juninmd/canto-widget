@@ -62,7 +62,7 @@ sends a notification, with **snooze 10 min**.
 ### ✅ Tasks that remind you
 
 A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
-reminder is already set. **Day summary** ready to paste and **pull over pending items** from yesterday.
+reminder is already set. **Day summary** ready to paste (tasks, meetings with total time, PRs/MRs opened, merged and reviewed) and **pull over pending items** from yesterday.
 
 </td>
 </tr>
@@ -173,9 +173,9 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
-| Password changed, one file pending |
-|---|
-| ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) |
+| Password changed, one file pending | Day summary |
+|---|---|
+| ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |
 
 </details>
 

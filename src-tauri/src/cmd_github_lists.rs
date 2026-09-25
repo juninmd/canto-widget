@@ -7,7 +7,7 @@ use crate::cmd_github::{valid_token, GithubState, FORGE};
 use crate::error::Result;
 use crate::forge::{self, ChecksStatus, Forge, ForgeList, ForgeLists};
 use crate::forge_cache::Quota;
-use crate::forge_filter::{ForgeFilter, Section};
+use crate::forge_filter::{Activity, ForgeFilter, Section};
 use crate::github;
 use crate::model::now_ms;
 use crate::vault::AppState;
@@ -28,8 +28,8 @@ impl Forge for Github {
         github::section(cred, section, page, f)
     }
 
-    fn fetch_opened_since(cred: &Self::Credential, since: &str) -> Result<(ForgeList, Option<Quota>)> {
-        github::prs_opened_since(cred, since)
+    fn fetch_activity(cred: &Self::Credential, activity: Activity, since: &str) -> Result<(ForgeList, Option<Quota>)> {
+        github::prs_since(cred, activity, since)
     }
 }
 
@@ -70,7 +70,7 @@ pub async fn github_pr_checks(app: tauri::AppHandle, repo: String, number: u64) 
 }
 
 /// `None` when GitHub isn't connected: the day summary just leaves it out.
-pub(crate) fn opened_since(app: &tauri::AppHandle, since: &str) -> Option<Result<ForgeList>> {
+pub(crate) fn activity_since(app: &tauri::AppHandle, activity: Activity, since: &str) -> Option<Result<ForgeList>> {
     match app.state::<AppState>().github_config() {
         Ok(None) => return None,
         Err(e) => return Some(Err(e)),
@@ -79,7 +79,7 @@ pub(crate) fn opened_since(app: &tauri::AppHandle, since: &str) -> Option<Result
     let fetch = || {
         let cred = token(app)?;
         let cache = &app.state::<AppState>().forges;
-        forge::opened_since::<Github>(cache, &cred, since)
+        forge::activity_since::<Github>(cache, &cred, activity, since)
     };
     Some(fetch())
 }

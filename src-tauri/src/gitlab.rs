@@ -6,8 +6,8 @@ use zeroize::Zeroizing;
 use crate::error::{AppError, Result};
 use crate::forge::{checks_from_gitlab, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
-use crate::forge_filter::{ForgeFilter, Section, PER_PAGE};
-use crate::gitlab_query::{opened_since, requests, Request};
+use crate::forge_filter::{Activity, ForgeFilter, Section, PER_PAGE};
+use crate::gitlab_query::{activity_since, requests, Request};
 use crate::model::now_ms;
 
 pub struct Account {
@@ -67,8 +67,8 @@ pub fn section(acc: &Account, section: Section, page: u32, f: &ForgeFilter) -> R
     Ok((out, quota))
 }
 
-pub fn mrs_opened_since(acc: &Account, since: &str) -> Result<(ForgeList, Option<Quota>)> {
-    fetch(acc, &opened_since(since))
+pub fn mrs_since(acc: &Account, activity: Activity, since: &str) -> Result<(ForgeList, Option<Quota>)> {
+    fetch(acc, &activity_since(activity, &acc.username, since))
 }
 
 #[derive(Deserialize)]

@@ -1,5 +1,5 @@
 //! Search queries behind each GitHub tab section, with the user's filter applied.
-use crate::forge_filter::{ForgeFilter, Kind, Section};
+use crate::forge_filter::{Activity, ForgeFilter, Kind, Section};
 
 /// Qualifier for issues and for PRs; `None` where the section has no such items.
 fn qualifiers(section: Section) -> (Option<&'static str>, Option<&'static str>) {
@@ -27,9 +27,14 @@ pub fn queries(section: Section, filter: &ForgeFilter) -> Vec<String> {
     out
 }
 
-/// PRs opened since `since` (RFC 3339) in any state: the day summary counts what was opened, even if merged since.
-pub fn opened_since(since: &str) -> String {
-    format!("is:pr author:@me created:>={since}")
+/// The day summary's PRs since `since` (RFC 3339), in any state: opened counts even if merged since.
+/// Search can't filter by review date or verdict, so "reviewed" is any PR of others I reviewed that moved today.
+pub fn activity_since(activity: Activity, since: &str) -> String {
+    match activity {
+        Activity::Opened => format!("is:pr author:@me created:>={since}"),
+        Activity::Merged => format!("is:pr author:@me merged:>={since}"),
+        Activity::Reviewed => format!("is:pr reviewed-by:@me -author:@me updated:>={since}"),
+    }
 }
 
 #[cfg(test)]
@@ -74,7 +79,15 @@ mod tests {
 
     #[test]
     fn opened_today_includes_merged_and_closed_prs() {
-        let q = opened_since("2026-09-18T03:00:00+00:00");
+        let q = activity_since(Activity::Opened, "2026-09-18T03:00:00+00:00");
         assert!(!q.contains("is:open") && q.contains("created:>=2026-09-18T03:00:00+00:00"), "{q}");
+    }
+
+    #[test]
+    fn merged_and_reviewed_today_look_at_the_merge_and_at_others_prs() {
+        let since = "2026-09-18T03:00:00+00:00";
+        assert_eq!(activity_since(Activity::Merged, since), format!("is:pr author:@me merged:>={since}"));
+        let q = activity_since(Activity::Reviewed, since);
+        assert!(q.contains("reviewed-by:@me") && q.contains("-author:@me") && !q.contains("is:open"), "{q}");
     }
 }
