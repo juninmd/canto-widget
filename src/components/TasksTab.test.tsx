@@ -26,10 +26,12 @@ let task: MockTask = { ...baseTask };
 let extraTask: MockTask | null = null;
 let extraTasks: MockTask[] = [];
 let nextSubtaskId = 0;
+let forDay: ((day: string) => Promise<MockTask[]>) | null = null;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
+    if (cmd === "tasks_for_day" && forDay) return forDay(args?.day as string);
     if (cmd === "tasks_for_day") return Promise.resolve([task, ...extraTasks, ...(extraTask ? [extraTask] : [])]);
     if (cmd === "task_add") return Promise.resolve({ ...task, id: "t2", title: args?.title });
     if (cmd === "item_delete") return Promise.resolve("chave-1");
@@ -91,6 +93,7 @@ beforeEach(() => {
   extraTask = null;
   extraTasks = [];
   nextSubtaskId = 0;
+  forDay = null;
 });
 
 afterEach(cleanup);
@@ -473,4 +476,31 @@ test("the open task pushes its count to the tray badge", async () => {
     await Promise.resolve();
   });
   expect(calls.filter((c) => c.cmd === "badge_set_tasks").at(-1)?.args).toEqual({ count: 1 });
+});
+
+test("at midnight a slow reply for yesterday never replaces today's list", async () => {
+  const wait = (ms: number) => new Promise((ready) => setTimeout(ready, ms));
+  forDay = async (day) => {
+    // Yesterday's reply lands after today's.
+    await wait(day === "2026-09-09" ? 300 : 10);
+    return [{ ...baseTask, id: day, title: `tarefa de ${day}`, day }];
+  };
+  const { rerender } = render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    rerender(
+      <ToastProvider>
+        <TasksTab today="2026-09-10" onError={() => {}} />
+      </ToastProvider>,
+    );
+  });
+  await act(async () => {
+    await wait(500);
+  });
+  expect(calls.filter((c) => c.cmd === "tasks_for_day").map((c) => c.args?.day)).toEqual(["2026-09-09", "2026-09-10"]);
+  expect(screen.getByText("tarefa de 2026-09-10")).toBeTruthy();
+  expect(screen.queryByText("tarefa de 2026-09-09")).toBeNull();
 });

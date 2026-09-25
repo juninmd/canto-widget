@@ -172,6 +172,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident; ongoing outages highlighted with their live Statuspage state](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
+| Password changed, one file pending |
+|---|
+| ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) |
+
 </details>
 
 <sub>All screenshots use fictitious data.</sub>

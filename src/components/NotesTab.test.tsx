@@ -5,10 +5,12 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
 let notes: unknown[] = [];
+let search: ((args: Record<string, unknown>) => Promise<unknown>) | null = null;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
+    if (cmd === "notes_search" && search) return search(args ?? {});
     if (cmd === "notes_search") {
       const limit = (args?.limit as number) ?? notes.length;
       return Promise.resolve({ total: notes.length, items: notes.slice(0, limit) });
@@ -41,6 +43,7 @@ async function openEditor() {
 beforeEach(() => {
   calls.length = 0;
   notes = [];
+  search = null;
 });
 
 afterEach(cleanup);
@@ -176,4 +179,27 @@ test("a large vault renders one page and loads the rest on demand", async () => 
   });
   expect(screen.getAllByText(/^nota \d+$/).length).toBe(100);
   expect(calls.at(-1)?.args).toEqual({ query: "", limit: 100 });
+});
+
+test("a slow reply for an older search never replaces the results of the newer one", async () => {
+  const note = (title: string) => ({ id: title, title, body: "", tags: [], created_at: 1, updated_at: 1 });
+  const wait = (ms: number) => new Promise((ready) => setTimeout(ready, ms));
+  search = async (args) => {
+    if (args.query === "a") await wait(400);
+    return { total: 1, items: [note(args.query === "a" ? "111" : args.query === "ab" ? "222" : "000")] };
+  };
+  render(
+    <ToastProvider>
+      <NotesTab today="2026-09-09" privacy={false} onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await wait(250);
+    fireEvent.change(screen.getByLabelText("buscar notas"), { target: { value: "a" } });
+    await wait(200);
+    fireEvent.change(screen.getByLabelText("buscar notas"), { target: { value: "ab" } });
+    await wait(600);
+  });
+  expect(screen.getByText("222")).toBeTruthy();
+  expect(screen.queryByText("111")).toBeNull();
 });

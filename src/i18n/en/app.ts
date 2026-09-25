@@ -73,6 +73,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.password.changed": "master password changed",
   "settings.password.changedBiometricOff":
     "master password changed; turn biometrics on again to use the new password",
+  "settings.password.pending": "lock and unlock Canto to finish updating one file",
   "settings.password.backupsNote":
     "Automatic copies in backups/ switch to the new password. .canto files exported earlier keep the old password.",
   "settings.password.submit": "change password",

@@ -72,3 +72,29 @@ fn tombstone_removes_from_both_collections() {
     assert!(d.tasks.is_empty() && d.notes.is_empty());
     assert_eq!(d.deleted.get("a"), Some(&99));
 }
+#[test]
+fn a_tie_resolves_the_same_way_on_both_machines() {
+    let a = || data(vec![task("t1", "versão A", 50)], vec![], &[]);
+    let b = || data(vec![task("t1", "versão B", 50)], vec![], &[]);
+    let ab = a().merge(b());
+    let ba = b().merge(a());
+    assert_eq!(ab.tasks[0].title, ba.tasks[0].title, "each machine kept its own copy and they never converge");
+}
+#[test]
+fn an_edit_after_syncing_a_future_stamp_still_wins() {
+    // Another machine's clock ran ahead: its version carries a stamp later than this machine's "now".
+    let future = 10_000;
+    let local_now = 9_000;
+    let mut edited = task("t1", "editado aqui depois", future);
+    edited.updated_at = canto_widget_lib::model::next_version(edited.updated_at, local_now);
+    let merged = data(vec![edited], vec![], &[]).merge(data(vec![task("t1", "antigo", future)], vec![], &[]));
+    assert_eq!(merged.tasks[0].title, "editado aqui depois");
+}
+#[test]
+fn deleting_an_item_stamped_by_a_clock_ahead_stays_deleted_after_sync() {
+    let future = 10_000;
+    let mut here = data(vec![task("t1", "vindo do futuro", future)], vec![], &[]);
+    here.tombstone("t1", 9_000);
+    let merged = here.merge(data(vec![task("t1", "vindo do futuro", future)], vec![], &[]));
+    assert!(merged.tasks.is_empty(), "the deleted task came back from the other machine");
+}

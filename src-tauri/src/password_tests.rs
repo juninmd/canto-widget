@@ -95,9 +95,9 @@ fn unreadable_clipboard_is_discarded_without_blocking_the_change() {
 fn enabled_biometric_is_disabled_on_change_and_the_return_value_says_so() {
     let st = state("bio");
     std::fs::write(crate::biometric::path(&st.dir), b"{}").unwrap();
-    assert!(st.change_password("senha-velha", "senha-nova").unwrap());
+    assert!(st.change_password("senha-velha", "senha-nova").unwrap().biometric_disabled);
     assert!(!crate::biometric::enabled(&st.dir), "biometric stayed enabled with the old password");
-    assert!(!st.change_password("senha-nova", "senha-outra").unwrap());
+    assert!(!st.change_password("senha-nova", "senha-outra").unwrap().biometric_disabled);
     cleanup(&st);
 }
 
@@ -144,5 +144,17 @@ fn a_change_cut_short_after_the_vault_write_finishes_on_the_next_unlock() {
     st.unlock("senha-nova").unwrap();
     assert_eq!(st.drive_config().unwrap().email, "voce@exemplo.com");
     assert!(!staged(&drive).exists());
+    cleanup(&st);
+}
+#[test]
+fn a_leftover_that_cannot_be_settled_does_not_report_the_committed_change_as_failed() {
+    let st = state("pendente");
+    // A stale staged copy that can't be removed: the vault is already sealed with the new password by then.
+    std::fs::create_dir_all(staged(&store::drive_path(&st.dir))).unwrap();
+    let changed = st.change_password("senha-velha", "senha-nova").expect("the new password is already in effect");
+    assert!(changed.pending, "the user must hear that a file is still waiting");
+    std::fs::remove_dir_all(staged(&store::drive_path(&st.dir))).unwrap();
+    st.lock();
+    st.unlock("senha-nova").unwrap();
     cleanup(&st);
 }

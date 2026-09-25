@@ -99,7 +99,7 @@ fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
         .map_err(|e| AppError::Gitlab(e.to_string()))?;
     let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
     let h = res.headers();
-    let quota = Quota::from_headers(h, "ratelimit-remaining", "ratelimit-reset", now_ms());
+    let quota = Quota::from_headers(h, res.status().as_u16(), "ratelimit-remaining", "ratelimit-reset", now_ms());
     let header = |name: &str| {
         h.get(name).and_then(|v| v.to_str().ok()).map(str::trim).filter(|v| !v.is_empty()).map(String::from)
     };
@@ -125,8 +125,8 @@ fn network(e: reqwest::Error) -> AppError {
 fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
     let now = now_ms();
-    let spent =
-        Quota::from_headers(res.headers(), "ratelimit-remaining", "ratelimit-reset", now).filter(|q| q.remaining == 0);
+    let spent = Quota::from_headers(res.headers(), status, "ratelimit-remaining", "ratelimit-reset", now)
+        .filter(|q| q.remaining == 0);
     let err = |m: &str| Err(AppError::Gitlab(m.into()));
     match status {
         200..=299 => res.json().map_err(|e| AppError::Gitlab(format!("resposta inesperada: {e}"))),
