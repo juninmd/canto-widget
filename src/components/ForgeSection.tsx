@@ -46,10 +46,13 @@ export default function ForgeSection({ title, section, forge, list, login, filte
   );
 }
 
+const STALE_DAYS = 7;
 function Row({ item, login, forge, waiting }: { item: ForgeItem; login: string; forge: Forge; waiting: boolean }) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? daysSince(item.created_at) : null;
+  // Review requests already show "aguardando"; elsewhere a PR/MR nobody touched for a week is flagged.
+  const idle = !waiting && item.is_pr ? daysSince(item.updated_at) : null;
 
   async function loadChecks() {
     setChecks("loading");
@@ -79,6 +82,11 @@ function Row({ item, login, forge, waiting }: { item: ForgeItem; login: string; 
             {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
             {wait !== null && (
               <span className={`shrink-0 ${wait >= 3 ? "text-danger" : "text-faint"}`}>{t("forge.item.waiting", { wait: wait <= 0 ? t("forge.item.waitLessThanDay") : t("forge.item.waitDays", { n: wait }) })}</span>
+            )}
+            {idle !== null && idle >= STALE_DAYS && (
+              <span className="shrink-0 text-danger" title={t("forge.item.staleTitle", { n: idle })}>
+                {t("forge.item.stale", { n: idle })}
+              </span>
             )}
             <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>
           </span>

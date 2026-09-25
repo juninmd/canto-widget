@@ -25,7 +25,7 @@ export const content = {
   "notes.write": "escrever",
   "notes.preview": "visualizar",
   "notes.previewEmpty": "nada para visualizar ainda",
-  "notes.bodyPlaceholder": "conteúdo do card (aceita **negrito**, *itálico*, `código`, listas e links)",
+  "notes.bodyPlaceholder": "conteúdo do card (aceita **negrito**, *itálico*, `código`, ```blocos```, listas, - [ ] tarefas e links)",
   "notes.tagsPlaceholder": "tags separadas por vírgula",
   "notes.unlink": "desvincular",
   "notes.link": "vincular a uma tarefa ou evento",
