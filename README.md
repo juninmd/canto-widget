@@ -230,7 +230,7 @@ repositories: publishing is a manual decision and action by the maintainer.
 | Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, a fresh nonce on every write, atomic write with `fsync` |
 | Key | RAM only, zeroed on lock; configurable auto-lock (5 to 60 min idle, 15 min by default) |
 | Network | only the Rust process talks to the network; the webview has no remote origin (CSP) and never sees tokens |
-| Google | optional, only `calendar.events.readonly` plus profile, OAuth with PKCE and loopback |
+| Google | optional, only `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list) plus profile, OAuth with PKCE and loopback |
 | GitHub | optional, encrypted token; items only open if the link is `https://github.com/` |
 | GitLab | optional, encrypted address and token; `https://` only, no redirects, links only from the configured instance |
 | Updates | only installs a package signed by the project's key; a tampered download is discarded before running |

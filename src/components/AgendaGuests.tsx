@@ -12,8 +12,10 @@ const TONE: Record<string, { card: string; text: string }> = {
 };
 const PENDING = { card: "border-edge bg-ink/60", text: "text-muted" };
 
+type Props = { guests: Guest[]; total: number; photos?: Record<string, string>; needsConsent?: boolean };
+
 /** Who's invited and how each one answered, as mini cards; `total` counts guests Rust left off the capped list. */
-export default function AgendaGuests({ guests, total }: { guests: Guest[]; total: number }) {
+export default function AgendaGuests({ guests, total, photos = {}, needsConsent = false }: Props) {
   if (guests.length === 0) return null;
   const hidden = total - guests.length;
   return (
@@ -35,7 +37,7 @@ export default function AgendaGuests({ guests, total }: { guests: Guest[]; total
               data-response={g.response || "needsAction"}
               className={`flex min-w-0 items-center gap-2 rounded-lg border p-1.5 ${tone.card}`}
             >
-              <Avatar name={g.name} email={g.email} size="md" />
+              <Avatar name={g.name} email={g.email} size="md" photo={photos[g.email]} />
               <span className="flex min-w-0 flex-col">
                 <span className={`truncate text-[11px] font-semibold ${g.response === "declined" ? "text-faint line-through" : "text-fg"}`}>
                   {g.name}
@@ -59,6 +61,7 @@ export default function AgendaGuests({ guests, total }: { guests: Guest[]; total
         })}
       </ul>
       {hidden > 0 && <p className="text-faint">{t("agenda.guestsMore", { n: hidden })}</p>}
+      {needsConsent && <p className="text-faint">{t("agenda.photosNeedConsent")}</p>}
     </section>
   );
 }

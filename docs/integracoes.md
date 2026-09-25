@@ -9,11 +9,16 @@
 **entrar com o Google**. Sem o arquivo, o app pede as credenciais como abaixo.
 
 1. No Google Cloud Console: **APIs e serviços → Credenciais → Criar credencial → ID do cliente OAuth → App para computador**.
-2. Habilite a **Google Calendar API** no mesmo projeto.
+2. Habilite a **Google Calendar API** e a **People API** no mesmo projeto (a People API só busca as fotos dos
+   convidados no diretório do Google Workspace; sem ela, os avatares ficam com as iniciais).
 3. Na aba **ajustes**, cole o *Client ID* (e o *client secret*, que o Google emite para apps desktop) e salve.
 4. **entrar com o Google** abre o navegador; ao autorizar, o widget captura o code na porta loopback
    e mostra um cartão com foto, nome e e-mail da conta. **sair** revoga o token no Google e apaga a
    conta do cofre; as credenciais do cliente continuam salvas.
+
+Fotos dos convidados: o escopo `directory.readonly` lê só o diretório do Workspace da sua empresa, para
+mostrar a foto de cada colega na lista de convidados. Contas Gmail pessoais e convidados de fora ficam com as
+iniciais. Quem conectou antes desse escopo vê um aviso nos detalhes do evento: **sair** e entrar de novo.
 
 Quem conectou numa versão anterior (com sync no Drive): a agenda continua funcionando, mas o token
 ainda carrega o escopo `drive.appdata`. **sair** e entrar de novo para ficar só com a

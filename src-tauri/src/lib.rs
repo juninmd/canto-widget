@@ -36,6 +36,7 @@ pub mod github_auth;
 pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
+pub mod guest_photos;
 #[cfg(windows)]
 pub mod hello;
 #[cfg(target_os = "macos")]
@@ -228,6 +229,7 @@ pub fn run() {
             cmd_status::api_status,
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
+            guest_photos::guest_photos,
             tray_live::badge_set_tasks,
         ])
         .on_window_event(|win, event| match event {

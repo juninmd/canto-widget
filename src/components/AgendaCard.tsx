@@ -5,6 +5,7 @@ import { t } from "../i18n";
 import AgendaGuests from "./AgendaGuests";
 import Avatar from "./Avatar";
 import RsvpBadge from "./RsvpBadge";
+import { useGuestPhotos } from "../lib/useGuestPhotos";
 
 type Props = { event: AgendaItem; open: boolean; onToggle: () => void };
 
@@ -14,6 +15,10 @@ export default function AgendaCard({ event: e, open, onToggle }: Props) {
   const attachments = e.attachments ?? [];
   const attendees = e.attendees ?? [];
   const host = attendees.find((g) => g.organizer);
+  const { photos, needsConsent } = useGuestPhotos(
+    open,
+    attendees.map((g) => g.email).filter(Boolean),
+  );
 
   return (
     <li className={`rounded-lg border p-2 ${now ? "border-accent bg-accent/10" : "border-edge bg-ink/60"}`}>
@@ -43,12 +48,12 @@ export default function AgendaCard({ event: e, open, onToggle }: Props) {
         <div id={detailsId} className="mt-2 space-y-1.5 border-t border-edge pt-2 text-[11px] text-muted">
           {people(e) && (
             <p className="flex items-center gap-1.5">
-              {e.organizer && <Avatar name={host?.name ?? e.organizer} email={host?.email} size="md" />}
+              {e.organizer && <Avatar name={host?.name ?? e.organizer} email={host?.email} size="md" photo={host && photos[host.email]} />}
               <span>{people(e)}</span>
             </p>
           )}
           {e.description && <p className="max-h-32 overflow-y-auto whitespace-pre-line text-faint">{e.description}</p>}
-          <AgendaGuests guests={attendees} total={e.guests ?? attendees.length} />
+          <AgendaGuests guests={attendees} total={e.guests ?? attendees.length} photos={photos} needsConsent={needsConsent} />
           {attachments.length > 0 && (
             <ul aria-label={t("agenda.attachments")} className="space-y-1">
               {attachments.map((a) => (
