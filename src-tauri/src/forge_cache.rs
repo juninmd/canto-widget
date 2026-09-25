@@ -20,10 +20,17 @@ pub struct Quota {
 }
 
 impl Quota {
-    /// `Retry-After` wins: it's the forge saying "stop" regardless of what `remaining` shows.
-    pub fn from_headers(h: &reqwest::header::HeaderMap, remaining: &str, reset: &str, now: i64) -> Option<Quota> {
+    /// `Retry-After` on a 403/429 wins: it's the forge saying "stop" regardless of what `remaining` shows.
+    /// On a 503 or a redirect it only means "try later", not that the token ran out of calls.
+    pub fn from_headers(
+        h: &reqwest::header::HeaderMap,
+        status: u16,
+        remaining: &str,
+        reset: &str,
+        now: i64,
+    ) -> Option<Quota> {
         let num = |name: &str| h.get(name)?.to_str().ok()?.trim().parse::<i64>().ok();
-        if let Some(secs) = num("retry-after") {
+        if let Some(secs) = num("retry-after").filter(|_| matches!(status, 403 | 429)) {
             return Some(Quota { remaining: 0, reset_at: now + secs.max(0) * 1000 });
         }
         let remaining = num(remaining)?.clamp(0, u32::MAX as i64) as u32;

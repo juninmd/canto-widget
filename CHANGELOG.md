@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
+  atualiza o texto da nota.
+- **Blocos de código nas notas**: trechos entre ```` ``` ```` aparecem como código, sem interpretar o
+  markdown de dentro, e com cores para js/ts, rust, python, shell, sql, json, go e java/c#/c++.
+- **PR parado** nas abas GitHub e GitLab: PR/MR sem atividade há 7 dias ou mais ganha o selo
+  **parado há N d** (a revisão pedida continua mostrando **aguardando**).
 - **Status API: Datadog, Azion e Akamai** entram na lista, com histórico e estado ao vivo (Statuspage).
 - **Idioma: português ou inglês**, em Ajustes > Idioma. "Automático (sistema)" é o padrão: português para
   sistemas em `pt-*`, inglês para os demais. A troca recarrega a interface na hora; notificações do sistema e o
@@ -34,6 +40,23 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - Releases agora seguem Conventional Commits (`fix`/patch, `feat`/minor e breaking/major), ignoram commits sem
   impacto de versão e geram os quatro instaladores em paralelo, com cache Rust por alvo, antes de montar o
   manifesto do updater.
+- **Lembretes perto da meia-noite e na mudança de horário de verão**: um lembrete com antecedência que cai no dia
+  seguinte (tarefa às 00:10, aviso às 23:40) e uma tarefa às 23:59 não se perdem mais na virada do dia, e o
+  salto do relógio não pula os lembretes da hora que "some".
+- **Notas: o rascunho não some ao trocar de aba** (Alt+número funciona mesmo digitando). Trancar o cofre ainda
+  descarta o rascunho, de propósito.
+- **Busca de notas e lista de tarefas**: uma resposta atrasada (busca anterior, ou o dia de ontem logo depois da
+  meia-noite) não substitui mais o resultado atual.
+- **Adição rápida entende "at 9:30", "9:30am", "2 pm" e "11:15 p.m."**; "5 amigos" continua sem virar horário.
+- **Agenda: reuniões recusadas somem** da lista e não disparam mais o aviso de reunião.
+- **Desfazer da lixeira**: se a restauração falhar, o item continua disponível para tentar de novo.
+- **Troca de senha mestra**: se um arquivo ficar pendente depois que o cofre já foi selado com a senha nova, o
+  Canto confirma a troca (em vez de dizer que falhou) e pede para trancar e destrancar para concluir.
+- **Sincronização entre máquinas**: numa edição com o mesmo horário as duas máquinas passam a ficar com a mesma
+  versão, e uma edição local não perde mais para uma cópia vinda de um computador com o relógio adiantado.
+- **GitHub/GitLab**: um erro 503 com `Retry-After` não é mais tratado como limite de requisições esgotado.
+- **Histórico da área de transferência**: uma imagem copiada é verificada uma vez, não a cada 1,2 s enquanto
+  continua copiada.
 - **Status API: Magalu Cloud não aparece mais com problema à toa.** O feed publica cada mudança de estado
   ("Block Storage - Operational"); agora só conta a atualização mais recente de cada componente, e
   "operacional/resolvido" não é incidente.

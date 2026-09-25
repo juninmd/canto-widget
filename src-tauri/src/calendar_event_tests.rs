@@ -93,3 +93,12 @@ fn html_description_reaches_the_ui_as_plain_text_and_still_yields_the_meet_link(
     assert_eq!(item.description, "Pauta\nLink: https://meet.google.com/xyz-abcd-efg");
     assert_eq!(item.meet, "https://meet.google.com/xyz-abcd-efg");
 }
+
+#[test]
+fn a_meeting_the_user_declined_leaves_the_agenda_and_never_rings() {
+    let declined = r#"{"items":[{"id":"e9","summary":"Retro","start":{"dateTime":"2026-09-09T10:00:00-03:00"},
+        "attendees":[{"email":"eu@example.com","self":true,"responseStatus":"declined"},{"email":"ana@example.com"}]}]}"#;
+    assert!(parse(declined).is_none());
+    let accepted = declined.replace("declined", "accepted");
+    assert_eq!(parse(&accepted).unwrap().guests, 2);
+}

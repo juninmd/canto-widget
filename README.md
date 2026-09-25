@@ -84,8 +84,9 @@ Click the event to see who organized it, the agenda, the guests and attachments,
 
 ### 🗒️ Notes as cards
 
-Searchable cards with `#tags`, pin to top and one-click tag filter. Handles thousands of notes: the list is
-paged and search covers all of them.
+Searchable cards with `#tags`, pin to top and one-click tag filter. Markdown with `- [ ]` checklists you tick
+in the preview and fenced code blocks with syntax highlighting. Handles thousands of notes: the list is paged
+and search covers all of them.
 
 </td>
 </tr>
@@ -102,13 +103,14 @@ sensitive.
 <td><img src="docs/prints/app/03-clipboard.png" alt="Clipboard history with a link, a large log and code"></td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/05-github.png" alt="GitHub tab with review requested, assigned and open PRs"></td>
+<td><img src="docs/prints/app/05-github.png" alt="GitHub tab with review requested, assigned and a stalled PR"></td>
 <td>
 
 ### 🐙 Your GitHub at a glance
 
 **Review requested from me**, assigned to me, PRs and issues I opened, with a PR or issue icon and who opened
-it. Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
+it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and CI status is one
+click away. Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
 scroll with **show more**. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 respects the rate limit. Sign in with a read-only personal token or from the browser (device flow).
 
@@ -160,7 +162,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Task with subtasks, priority and PR | Note in markdown | More clipboard types | Security: auto-lock and unlocks |
 |---|---|---|---|
-| ![Checklist, priority and PR link on a task](docs/prints/app/23-tarefas-detalhes.png) | ![Note rendered in markdown linked to a task](docs/prints/app/24-notas-markdown.png) | ![Clipboard recognizing link, color, json, e-mail and phone](docs/prints/app/25-clipboard-tipos.png) | ![Configurable auto-lock and a log of the latest unlocks](docs/prints/app/26-ajustes-seguranca.png) |
+| ![Checklist, priority and PR link on a task](docs/prints/app/23-tarefas-detalhes.png) | ![Note in markdown with a checklist and a highlighted SQL block](docs/prints/app/24-notas-markdown.png) | ![Clipboard recognizing link, color, json, e-mail and phone](docs/prints/app/25-clipboard-tipos.png) | ![Configurable auto-lock and a log of the latest unlocks](docs/prints/app/26-ajustes-seguranca.png) |
 
 | Synced folder | Compact density | Locked vault | Connect GitHub |
 |---|---|---|---|
@@ -169,6 +171,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident; ongoing outages highlighted with their live Statuspage state](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
+
+| Password changed, one file pending |
+|---|
+| ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) |
 
 </details>
 

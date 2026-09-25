@@ -276,3 +276,27 @@ test("F11 enters and exits fullscreen, and the top button reflects the state", a
   expect(fullscreenOn).toBe(false);
   expect(screen.getByRole("button", { name: "tela cheia" })).toBeTruthy();
 });
+
+test("an unsaved note draft survives switching to another tab and back", async () => {
+  render(<App />);
+  await settle();
+  const toNotes = async () => {
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "2", code: "Digit2", altKey: true });
+      jest.advanceTimersByTime(200);
+    });
+    await settle();
+  };
+  await toNotes();
+  await act(async () => {
+    fireEvent.click(screen.getByText("+"));
+  });
+  fireEvent.change(screen.getByPlaceholderText("título"), { target: { value: "rascunho fictício" } });
+  await act(async () => {
+    fireEvent.keyDown(window, { key: "1", code: "Digit1", altKey: true });
+  });
+  await settle();
+  expect(screen.getByRole("tab", { name: "Tarefas" }).getAttribute("aria-selected")).toBe("true");
+  await toNotes();
+  expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("rascunho fictício");
+});
