@@ -5,6 +5,12 @@ pub fn now_ms() -> i64 {
     (time::OffsetDateTime::now_utc().unix_timestamp_nanos() / 1_000_000) as i64
 }
 
+/// Stamp for an edit: never at or below the current one, so a stamp synced from a machine whose clock
+/// runs ahead can't make a later local edit lose the merge.
+pub fn next_version(prev: i64, now: i64) -> i64 {
+    now.max(prev.saturating_add(1))
+}
+
 pub trait Versioned {
     fn id(&self) -> &str;
     fn updated_at(&self) -> i64;
@@ -138,6 +144,11 @@ pub struct VaultData {
 
 impl VaultData {
     pub fn tombstone(&mut self, id: &str, at: i64) {
+        // Past the item's own stamp, or a copy stamped by a clock that runs ahead revives it on the next merge.
+        let tasks = self.tasks.iter().filter(|t| t.id == id).map(|t| t.updated_at);
+        let at = tasks
+            .chain(self.notes.iter().filter(|n| n.id == id).map(|n| n.updated_at))
+            .fold(at, |at, prev| next_version(prev, at));
         self.tasks.retain(|t| t.id != id);
         self.notes.retain(|n| n.id != id);
         self.deleted.insert(id.to_string(), at);
@@ -158,11 +169,15 @@ impl VaultData {
     }
 }
 
-fn merge_list<T: Versioned + Clone>(mine: Vec<T>, theirs: Vec<T>, deleted: &HashMap<String, i64>) -> Vec<T> {
+fn merge_list<T: Versioned + Clone + Serialize>(
+    mine: Vec<T>,
+    theirs: Vec<T>,
+    deleted: &HashMap<String, i64>,
+) -> Vec<T> {
     let mut by_id: HashMap<String, T> = HashMap::new();
     for item in mine.into_iter().chain(theirs) {
         match by_id.get(item.id()) {
-            Some(cur) if cur.updated_at() >= item.updated_at() => {}
+            Some(cur) if !newer(&item, cur) => {}
             _ => {
                 by_id.insert(item.id().to_string(), item);
             }
@@ -172,4 +187,12 @@ fn merge_list<T: Versioned + Clone>(mine: Vec<T>, theirs: Vec<T>, deleted: &Hash
         by_id.into_values().filter(|i| deleted.get(i.id()).is_none_or(|at| *at < i.updated_at())).collect();
     out.sort_by_key(|i| i.updated_at());
     out
+}
+
+/// On a tie the content decides, so both machines keep the same copy whichever side merges.
+fn newer<T: Versioned + Serialize>(item: &T, cur: &T) -> bool {
+    match item.updated_at().cmp(&cur.updated_at()) {
+        std::cmp::Ordering::Equal => serde_json::to_string(item).ok() > serde_json::to_string(cur).ok(),
+        o => o.is_gt(),
+    }
 }

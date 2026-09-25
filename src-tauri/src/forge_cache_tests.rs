@@ -123,19 +123,19 @@ fn headers_become_a_quota_and_retry_after_means_stop() {
     h.insert("x-ratelimit-remaining", HeaderValue::from_static("7"));
     h.insert("x-ratelimit-reset", HeaderValue::from_static("1700000000"));
     assert_eq!(
-        Quota::from_headers(&h, "x-ratelimit-remaining", "x-ratelimit-reset", T0),
+        Quota::from_headers(&h, 429, "x-ratelimit-remaining", "x-ratelimit-reset", T0),
         Some(Quota { remaining: 7, reset_at: 1_700_000_000_000 })
     );
     h.insert("retry-after", HeaderValue::from_static("30"));
     assert_eq!(
-        Quota::from_headers(&h, "x-ratelimit-remaining", "x-ratelimit-reset", T0),
+        Quota::from_headers(&h, 429, "x-ratelimit-remaining", "x-ratelimit-reset", T0),
         Some(Quota { remaining: 0, reset_at: T0 + 30_000 })
     );
-    assert_eq!(Quota::from_headers(&HeaderMap::new(), "a", "b", T0), None);
+    assert_eq!(Quota::from_headers(&HeaderMap::new(), 429, "a", "b", T0), None);
     let mut junk = HeaderMap::new();
     junk.insert("ratelimit-remaining", HeaderValue::from_static("-4"));
     junk.insert("ratelimit-reset", HeaderValue::from_static("x"));
-    assert_eq!(Quota::from_headers(&junk, "ratelimit-remaining", "ratelimit-reset", T0), None);
+    assert_eq!(Quota::from_headers(&junk, 429, "ratelimit-remaining", "ratelimit-reset", T0), None);
 }
 
 #[test]
@@ -150,4 +150,14 @@ fn a_rate_limit_that_lands_after_a_disconnect_does_not_block_the_next_account() 
     assert!(matches!(err, AppError::RateLimited { .. }));
     let got = cache.get("gitlab", "k", false, T0 + 1, || Ok((page(5), None))).unwrap();
     assert_eq!(number(&got), 5);
+}
+
+#[test]
+fn retry_after_on_a_server_error_does_not_block_the_token() {
+    let mut h = HeaderMap::new();
+    h.insert("x-ratelimit-remaining", HeaderValue::from_static("4000"));
+    h.insert("x-ratelimit-reset", HeaderValue::from_static("1700000000"));
+    h.insert("retry-after", HeaderValue::from_static("3600"));
+    let quota = Quota::from_headers(&h, 503, "x-ratelimit-remaining", "x-ratelimit-reset", T0);
+    assert_eq!(quota, Some(Quota { remaining: 4000, reset_at: 1_700_000_000_000 }));
 }

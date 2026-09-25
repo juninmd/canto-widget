@@ -30,12 +30,11 @@ export default function ChangePassword({ onChanged }: { onChanged: () => void })
     if (next !== confirm) return setError(t("settings.password.mismatch"));
     setBusy(true);
     try {
-      const biometricsDisabled = await api.changePassword(current, next);
-      notify({
-        message: biometricsDisabled
-          ? t("settings.password.changedBiometricOff")
-          : t("settings.password.changed"),
-      });
+      const changed = await api.changePassword(current, next);
+      const done = changed.biometricDisabled
+        ? t("settings.password.changedBiometricOff")
+        : t("settings.password.changed");
+      notify({ message: changed.pending ? `${done}; ${t("settings.password.pending")}` : done });
       close();
       onChanged();
     } catch (e) {

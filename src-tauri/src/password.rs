@@ -1,4 +1,5 @@
 //! Master password change: everything the old key protects is re-encrypted with the new one.
+use serde::Serialize;
 use std::path::{Path, PathBuf};
 use tauri::State;
 use zeroize::Zeroizing;
@@ -18,8 +19,8 @@ struct Reencrypted {
 }
 
 impl AppState {
-    /// Nothing hits disk before every envelope opens with the old key, so a wrong password leaves the vault unchanged; returns `true` if biometrics was disabled.
-    pub fn change_password(&self, current_password: &str, new_password: &str) -> Result<bool> {
+    /// Nothing hits disk before every envelope opens with the old key, so a wrong password leaves the vault unchanged; once the vault is sealed with the new key the change stands.
+    pub fn change_password(&self, current_password: &str, new_password: &str) -> Result<PasswordChanged> {
         if new_password.chars().count() < MIN_PASSWORD_LEN {
             return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
         }
@@ -67,15 +68,23 @@ impl AppState {
         let plain = Zeroizing::new(serde_json::to_vec(&session.data)?);
         let blob = SealedBlob::seal(&key, &salt, &plain, VAULT_AAD, now_ms())?;
         store::write_json_atomic(&store::vault_path(&self.dir), &blob)?;
-        let swapped = finish_interrupted(&self.dir, &salt);
+        // The vault is sealed with the new password from here on: a leftover is settled on the next unlock, not an error.
+        let pending = finish_interrupted(&self.dir, &salt).is_err();
         session.key = key;
         session.salt = salt;
         session.password = Zeroizing::new(new_password.to_string());
         drop(guard);
         self.touch();
-        swapped?;
-        Ok(biometric)
+        Ok(PasswordChanged { biometric_disabled: biometric, pending })
     }
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PasswordChanged {
+    pub biometric_disabled: bool,
+    /// A re-sealed copy couldn't replace its file yet; the next unlock finishes it.
+    pub pending: bool,
 }
 
 /// Settles staged copies left by a change: same salt as the vault means it was written, so swap; anything else is stale.
@@ -125,13 +134,13 @@ pub fn vault_change_password(
     state: State<'_, AppState>,
     current_password: String,
     new_password: String,
-) -> Result<bool> {
+) -> Result<PasswordChanged> {
     let (current_password, new_password) = (Zeroizing::new(current_password), Zeroizing::new(new_password));
-    let biometric = state.change_password(&current_password, &new_password)?;
-    if biometric {
+    let changed = state.change_password(&current_password, &new_password)?;
+    if changed.biometric_disabled {
         crate::cmd_biometric::delete_credential();
     }
-    Ok(biometric)
+    Ok(changed)
 }
 
 #[cfg(test)]

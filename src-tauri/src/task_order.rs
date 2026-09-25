@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::error::Result;
-use crate::model::{now_ms, Task};
+use crate::model::{next_version, now_ms, Task};
 use crate::vault::AppState;
 
 /// `ids` is the day's tasks in their new order; unknown or other-day ids are ignored.
@@ -9,7 +9,7 @@ pub fn reorder(tasks: &mut [Task], day: &str, ids: &[String], now: i64) {
     for (position, id) in ids.iter().enumerate() {
         if let Some(t) = tasks.iter_mut().find(|t| &t.id == id && t.day == day) {
             t.order = Some(position as i64);
-            t.updated_at = now;
+            t.updated_at = next_version(t.updated_at, now);
         }
     }
 }

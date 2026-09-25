@@ -74,6 +74,8 @@ export const integrations: Record<keyof typeof source, string> = {
   "forge.item.waiting": "waiting for {wait}",
   "forge.item.waitLessThanDay": "less than 1 d",
   "forge.item.waitDays": "{n} d",
+  "forge.item.stale": "stalled for {n} d",
+  "forge.item.staleTitle": "no activity for {n} days",
   "forge.checks.show": "show CI",
   "forge.checks.loading": "checking…",
   "forge.checks.success": "✓ CI passed",

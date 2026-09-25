@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { MOD_KEY } from "../lib/platform";
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
-import { renderMarkdown } from "../lib/markdown";
+import { renderMarkdown, toggleChecklist } from "../lib/markdown";
 import { t } from "../i18n";
 import NoteLinkPicker from "./NoteLinkPicker";
 
@@ -60,7 +60,11 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
       </div>
       {preview ? (
         <div className="flex-1 overflow-y-auto rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg [&_ol]:my-1 [&_p]:mb-2 [&_ul]:my-1">
-          {draft.body.trim() ? renderMarkdown(draft.body) : <p className="text-faint">{t("notes.previewEmpty")}</p>}
+          {draft.body.trim() ? (
+            renderMarkdown(draft.body, (line) => onChange({ ...draft, body: toggleChecklist(draft.body, line) }))
+          ) : (
+            <p className="text-faint">{t("notes.previewEmpty")}</p>
+          )}
         </div>
       ) : (
         <textarea

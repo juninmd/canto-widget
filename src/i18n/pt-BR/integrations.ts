@@ -72,6 +72,8 @@ export const integrations = {
   "forge.item.waiting": "aguardando há {wait}",
   "forge.item.waitLessThanDay": "menos de 1 d",
   "forge.item.waitDays": "{n} d",
+  "forge.item.stale": "parado há {n} d",
+  "forge.item.staleTitle": "sem atividade há {n} dias",
   "forge.checks.show": "ver CI",
   "forge.checks.loading": "verificando…",
   "forge.checks.success": "✓ CI passou",

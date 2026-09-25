@@ -5,6 +5,7 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 use serde::Serialize;
 
 use crate::calendar::{self, AgendaItem};
+use crate::clip_watch::ClipWatch;
 use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use crate::commands::new_id;
 use crate::drive;
@@ -13,7 +14,6 @@ use crate::transcripts::{self, TranscriptMeta, TranscriptSettings};
 use crate::trash::Removed;
 use crate::vault::AppState;
 use crate::{store, window};
-use sha2::{Digest, Sha256};
 
 #[derive(Serialize)]
 pub struct ClipList {
@@ -80,8 +80,7 @@ fn store_clips(state: &AppState, items: Vec<ClipItem>) -> Option<String> {
 /// Only decrypts the history when the text actually changed, else it would pay a read + AES-GCM of the whole file 50 times a minute.
 pub fn watch_clipboard(app: tauri::AppHandle) {
     std::thread::spawn(move || {
-        let mut seen_seq: Option<u32> = None;
-        let mut seen_digest = [0u8; 32];
+        let mut seen = ClipWatch::default();
         loop {
             std::thread::sleep(std::time::Duration::from_millis(1200));
             let Some(state) = app.try_state::<AppState>() else {
@@ -89,26 +88,14 @@ pub fn watch_clipboard(app: tauri::AppHandle) {
             };
             if !state.is_unlocked() {
                 // Forget what was seen so the first copy after unlocking isn't mistaken for a repeat.
-                (seen_seq, seen_digest) = (None, [0; 32]);
+                seen = ClipWatch::default();
                 continue;
             }
-            let seq = crate::clip_os::sequence();
-            if seq.is_some() && seq == seen_seq {
-                continue;
-            }
-            if crate::clip_os::concealed() {
-                seen_seq = seq;
-                continue;
-            }
-            let Ok(text) = app.clipboard().read_text() else {
+            let Some(text) =
+                seen.next(crate::clip_os::sequence(), crate::clip_os::concealed, || app.clipboard().read_text().ok())
+            else {
                 continue;
             };
-            seen_seq = seq;
-            let digest: [u8; 32] = Sha256::digest(text.as_bytes()).into();
-            if digest == seen_digest || crate::clip_os::concealed() {
-                continue;
-            }
-            seen_digest = digest;
             let Ok(mut hist) = state.clip_load() else { continue };
             if hist.push(&text, new_id()) {
                 let _ = state.clip_save(&hist);

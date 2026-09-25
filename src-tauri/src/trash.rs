@@ -4,13 +4,14 @@ use tauri::State;
 
 use crate::clipboard::{ClipHistory, ClipItem};
 use crate::commands::new_id;
-use crate::error::Result;
-use crate::model::{now_ms, Note, Task, VaultData};
+use crate::error::{AppError, Result};
+use crate::model::{next_version, now_ms, Note, Task, VaultData};
 use crate::vault::AppState;
 
 /// A few removals are enough to undo from the toast; the cap stops the trash growing forever.
 const CAPACITY: usize = 20;
 
+#[derive(Clone)]
 pub enum Removed {
     Task(Task),
     Note(Note),
@@ -24,12 +25,15 @@ pub struct Trash(Mutex<VecDeque<(String, Removed)>>);
 impl Trash {
     pub fn store(&self, item: Removed) -> String {
         let key = new_id();
+        self.put(key.clone(), item);
+        key
+    }
+    fn put(&self, key: String, item: Removed) {
         let mut queue = self.0.lock().unwrap();
         if queue.len() == CAPACITY {
             queue.pop_front();
         }
-        queue.push_back((key.clone(), item));
-        key
+        queue.push_back((key, item));
     }
 
     pub fn take(&self, key: &str) -> Option<Removed> {
@@ -51,6 +55,13 @@ impl AppState {
         session.as_ref()?;
         Some(self.trash.store(item))
     }
+    /// Same guard as `store_in_trash`; keeps the key the webview already holds.
+    fn return_to_trash(&self, key: &str, item: Removed) {
+        let session = self.session.lock().unwrap();
+        if session.is_some() {
+            self.trash.put(key.to_string(), item);
+        }
+    }
 }
 
 impl VaultData {
@@ -70,14 +81,15 @@ impl VaultData {
     pub fn restore(&mut self, item: Removed, at: i64) {
         match item {
             Removed::Task(mut t) => {
-                self.deleted.remove(&t.id);
-                t.updated_at = at;
+                // Past the tombstone too: another machine may already hold it.
+                let dead = self.deleted.remove(&t.id).unwrap_or(0);
+                t.updated_at = next_version(t.updated_at.max(dead), at);
                 self.tasks.retain(|x| x.id != t.id);
                 self.tasks.push(t);
             }
             Removed::Note(mut n) => {
-                self.deleted.remove(&n.id);
-                n.updated_at = at;
+                let dead = self.deleted.remove(&n.id).unwrap_or(0);
+                n.updated_at = next_version(n.updated_at.max(dead), at);
                 self.notes.retain(|x| x.id != n.id);
                 self.notes.push(n);
             }
@@ -113,13 +125,24 @@ pub fn undo(state: &AppState, key: &str) -> Result<bool> {
     let Some(item) = state.trash.take(key) else {
         return Ok(false);
     };
+    match restore(state, item.clone()) {
+        Ok(()) => Ok(true),
+        Err(AppError::Locked) => Ok(false),
+        Err(e) => {
+            // Restoring is idempotent, so the toast's retry can run again without duplicating anything.
+            state.return_to_trash(key, item);
+            Err(e)
+        }
+    }
+}
+
+fn restore(state: &AppState, item: Removed) -> Result<()> {
     match item {
         Removed::Clips(items) => {
             let mut hist = state.clip_load()?;
             hist.restore(items);
-            state.clip_save(&hist)?;
+            state.clip_save(&hist)
         }
-        vault => state.mutate(|d| d.restore(vault, now_ms()))?,
+        vault => state.mutate(|d| d.restore(vault, now_ms())),
     }
-    Ok(true)
 }

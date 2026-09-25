@@ -47,6 +47,7 @@ export type Note = {
 export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
+export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
 export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean };
@@ -113,9 +114,9 @@ export const api = {
   unlock: (password: string) => invoke<void>("vault_unlock", { password }),
   lock: () => invoke<void>("vault_lock"),
   touch: () => invoke<void>("vault_touch"),
-  /** Returns `true` when biometrics was disabled because it stored the old password. */
+  /** `pending`: a re-sealed file waits for the next unlock; the new password is already in effect. */
   changePassword: (currentPassword: string, newPassword: string) =>
-    invoke<boolean>("vault_change_password", { currentPassword, newPassword }),
+    invoke<PasswordChanged>("vault_change_password", { currentPassword, newPassword }),
 
   tasksForDay: (day: string) => invoke<Task[]>("tasks_for_day", { day }),
   taskAdd: (title: string, day: string) => invoke<Task>("task_add", { title, day }),

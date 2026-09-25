@@ -27,7 +27,7 @@ export const content: Record<keyof typeof source, string> = {
   "notes.write": "write",
   "notes.preview": "preview",
   "notes.previewEmpty": "nothing to preview yet",
-  "notes.bodyPlaceholder": "card content (supports **bold**, *italic*, `code`, lists and links)",
+  "notes.bodyPlaceholder": "card content (supports **bold**, *italic*, `code`, ```blocks```, lists, - [ ] to-dos and links)",
   "notes.tagsPlaceholder": "comma-separated tags",
   "notes.unlink": "unlink",
   "notes.link": "link to a task or event",

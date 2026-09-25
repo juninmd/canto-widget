@@ -115,7 +115,13 @@ fn search(token: &str, query: &str, page: u32, f: &ForgeFilter) -> Result<(Forge
     )
     .map_err(|e| AppError::Github(e.to_string()))?;
     let res = client()?.get(url).bearer_auth(token).send().map_err(network)?;
-    let quota = Quota::from_headers(res.headers(), "x-ratelimit-remaining", "x-ratelimit-reset", now_ms());
+    let quota = Quota::from_headers(
+        res.headers(),
+        res.status().as_u16(),
+        "x-ratelimit-remaining",
+        "x-ratelimit-reset",
+        now_ms(),
+    );
     Ok((convert(response(res)?), quota))
 }
 
@@ -139,7 +145,7 @@ pub(crate) fn network(e: reqwest::Error) -> AppError {
 fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
     let now = now_ms();
-    let spent = Quota::from_headers(res.headers(), "x-ratelimit-remaining", "x-ratelimit-reset", now)
+    let spent = Quota::from_headers(res.headers(), status, "x-ratelimit-remaining", "x-ratelimit-reset", now)
         .filter(|q| q.remaining == 0);
     match status {
         200..=299 => res.json().map_err(|e| AppError::Github(format!("resposta inesperada: {e}"))),

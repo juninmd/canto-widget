@@ -6,6 +6,7 @@ import DaySummary from "./DaySummary";
 import TaskRow from "./TaskRow";
 import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { useNewIds, useExit } from "../lib/motion";
 import { mergeOrder, useReorder } from "../lib/useReorder";
 
@@ -23,13 +24,17 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const [checking, setChecking] = useState("");
   const { leaving, leave } = useExit();
+  const { bump, isLatest } = useLatestRequest();
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
 
   async function reload() {
+    const id = bump();
     try {
-      setTasks(await api.tasksForDay(today));
+      const list = await api.tasksForDay(today);
+      if (!isLatest(id)) return;
+      setTasks(list);
       setLoadedFor(today);
     } catch (e) {
       onError(errText(e));

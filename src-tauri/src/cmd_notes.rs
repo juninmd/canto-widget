@@ -4,7 +4,7 @@ use tauri_plugin_dialog::DialogExt;
 
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Note, NoteLink};
+use crate::model::{next_version, now_ms, Note, NoteLink};
 use crate::vault::AppState;
 
 pub const PAGE_DEFAULT: usize = 50;
@@ -96,7 +96,7 @@ pub fn note_save(
             n.body = body;
             n.tags = tags;
             n.link = link;
-            n.updated_at = now;
+            n.updated_at = next_version(n.updated_at, now);
             n.clone()
         }
         None => {
@@ -114,7 +114,7 @@ pub fn note_pin(state: State<'_, AppState>, id: String) -> Result<bool> {
         let n = d.notes.iter_mut().find(|n| n.id == id).ok_or(AppError::NotFound)?;
         n.pinned = !n.pinned;
         // Fresh timestamp: pinning on one machine needs to win the merge on the other.
-        n.updated_at = now_ms();
+        n.updated_at = next_version(n.updated_at, now_ms());
         Ok(n.pinned)
     })?
 }
