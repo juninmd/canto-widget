@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
+  atualiza o texto da nota.
+- **Blocos de código nas notas**: trechos entre ```` ``` ```` aparecem como código, sem interpretar o
+  markdown de dentro, e com cores para js/ts, rust, python, shell, sql, json, go e java/c#/c++.
+- **PR parado** nas abas GitHub e GitLab: PR/MR sem atividade há 7 dias ou mais ganha o selo
+  **parado há N d** (a revisão pedida continua mostrando **aguardando**).
 - **Status API: Datadog, Azion e Akamai** entram na lista, com histórico e estado ao vivo (Statuspage).
 - **Idioma: português ou inglês**, em Ajustes > Idioma. "Automático (sistema)" é o padrão: português para
   sistemas em `pt-*`, inglês para os demais. A troca recarrega a interface na hora; notificações do sistema e o
