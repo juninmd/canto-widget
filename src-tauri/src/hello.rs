@@ -18,7 +18,7 @@ fn check(status: KeyCredentialStatus) -> Result<()> {
     let msg = match status {
         KeyCredentialStatus::Success => return Ok(()),
         KeyCredentialStatus::UserCanceled | KeyCredentialStatus::UserPrefersPassword => "cancelado; use a senha mestra",
-        KeyCredentialStatus::NotFound => "credencial nao encontrada; ative de novo em Ajustes",
+        KeyCredentialStatus::NotFound => "credencial não encontrada; ative de novo em Ajustes",
         KeyCredentialStatus::SecurityDeviceLocked => "dispositivo bloqueado por tentativas; use a senha mestra",
         _ => "falhou; use a senha mestra",
     };
@@ -55,9 +55,10 @@ pub const VAULT: Hello = Hello(CREDENTIAL);
 
 fn create_with(name: &'static str) -> Result<Hello> {
     focus_dialog();
-    let r = KeyCredentialManager::RequestCreateAsync(&HSTRING::from(name), KeyCredentialCreationOption::ReplaceExisting)
-        .and_then(|op| op.get())
-        .map_err(failure)?;
+    let r =
+        KeyCredentialManager::RequestCreateAsync(&HSTRING::from(name), KeyCredentialCreationOption::ReplaceExisting)
+            .and_then(|op| op.get())
+            .map_err(failure)?;
     check(r.Status().map_err(failure)?)?;
     Ok(Hello(name))
 }
@@ -68,9 +69,8 @@ pub fn delete() {
 
 impl crate::biometric::Signer for Hello {
     fn sign(&self, challenge: &[u8]) -> Result<Vec<u8>> {
-        let opened = KeyCredentialManager::OpenAsync(&HSTRING::from(self.0))
-            .and_then(|op| op.get())
-            .map_err(failure)?;
+        let opened =
+            KeyCredentialManager::OpenAsync(&HSTRING::from(self.0)).and_then(|op| op.get()).map_err(failure)?;
         check(opened.Status().map_err(failure)?)?;
         let credential = opened.Credential().map_err(failure)?;
         focus_dialog();
@@ -100,7 +100,10 @@ mod tests {
         const TEST_CREDENTIAL: &str = "com.junin.canto.teste-determinismo";
         let h = super::create_with(TEST_CREDENTIAL).unwrap();
         let (a, b) = (h.sign(b"desafio fixo").unwrap(), h.sign(b"desafio fixo").unwrap());
-        let _ = windows::Security::Credentials::KeyCredentialManager::DeleteAsync(&windows::core::HSTRING::from(TEST_CREDENTIAL)).and_then(|op| op.get());
+        let _ = windows::Security::Credentials::KeyCredentialManager::DeleteAsync(&windows::core::HSTRING::from(
+            TEST_CREDENTIAL,
+        ))
+        .and_then(|op| op.get());
         assert_eq!(a, b, "signature changed between calls: the vault key would not be reconstructible");
     }
 }

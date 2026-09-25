@@ -6,20 +6,25 @@ pub enum AppError {
     WrongPassword,
     #[error("cofre trancado")]
     Locked,
-    #[error("cofre ja existe")]
+    #[error("cofre já existe")]
     AlreadyExists,
-    #[error("cofre ainda nao foi criado")]
+    #[error("cofre ainda não foi criado")]
     NotFound,
     #[error("erro de criptografia: {0}")]
     Crypto(String),
     #[error("erro de arquivo: {0}")]
     Io(String),
-    #[error("formato invalido: {0}")]
+    #[error("formato inválido: {0}")]
     Format(String),
     #[error("google: {0}")]
     Drive(String),
     #[error("github: {0}")]
     Github(String),
+    #[error("gitlab: {0}")]
+    Gitlab(String),
+    /// The forge's quota ran out; `reset_at` (ms) tells the cache when to try again.
+    #[error("{message}")]
+    RateLimited { message: String, reset_at: i64 },
     /// Shown after "Não foi possível verificar:" or "A atualização não foi instalada:", so no prefix of its own.
     #[error("{0}")]
     Update(String),
@@ -44,5 +49,17 @@ impl From<serde_json::Error> for AppError {
 impl Serialize for AppError {
     fn serialize<S: Serializer>(&self, s: S) -> std::result::Result<S::Ok, S::Error> {
         s.serialize_str(&self.to_string())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn user_facing_messages_are_accented_pt_br() {
+        assert_eq!(AppError::AlreadyExists.to_string(), "cofre já existe");
+        assert_eq!(AppError::NotFound.to_string(), "cofre ainda não foi criado");
+        assert_eq!(AppError::Format("x".into()).to_string(), "formato inválido: x");
     }
 }

@@ -17,7 +17,9 @@ local vault. Public repository: treat everything you write, commit or screenshot
 bun install --frozen-lockfile
 bun run lint                     # tsc --noEmit
 bun test                         # UI tests
+bun run e2e                      # Playwright smoke tests (e2e/*.e2e.ts): real UI in Chromium, Tauri IPC mocked
 bun run build                    # tsc + vite build -> dist/ (needed before cargo: generate_context! embeds it)
+cd src-tauri && cargo fmt --check                         # rustfmt.toml: max_width 120
 cd src-tauri && cargo clippy --all-targets --locked -- -D warnings
 cd src-tauri && cargo test --locked
 cd src-tauri && cargo test --release --test scale -- --ignored --nocapture   # load harness, on demand
@@ -25,8 +27,10 @@ bun run tauri dev                # app with hot reload
 bun run tauri build              # installer for the current OS
 ```
 
-CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests and build on Ubuntu; clippy and
-`cargo test` on Ubuntu, Windows and macOS. A `v*` tag runs `release.yml` and produces a **draft** release.
+CI (`.github/workflows/ci.yml`) runs exactly these gates on every PR: lint, UI tests, build and `bun audit` on
+Ubuntu; e2e smoke tests, `cargo fmt --check` and `cargo audit` on Ubuntu; clippy and `cargo test` on Ubuntu,
+Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which builds signed installers
+and publishes a release after the checks pass.
 
 ## Layout
 
@@ -53,12 +57,24 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 
 - **Code in English** (identifiers, files, comments, test names). **User-facing text in pt-BR** (UI, errors
   returned to the UI, notifications). Tests assert on the pt-BR text the user sees.
+- **UI text lives in the catalog**, never inline: `t("area.key", { param })` from `src/i18n`, with the text in
+  `src/i18n/pt-BR/<area>.ts` and `src/i18n/en/<area>.ts` (app, tasks, content, integrations). A new key goes in
+  **both** languages (the type and a parity test fail otherwise). Dates and numbers use `LOCALE`, not a literal.
+  Symbols, key names and brand names stay inline. The language is chosen in Settings (`canto.language`, default
+  "auto") and resolved once at startup; Rust gets it via `language_set` for notifications and the tray
+  (`lang::tr`). Errors from Rust are still pt-BR strings in Rust. UI tests run in pt-BR (`src/test-setup.ts`).
 - Comments only for *why*, one line. No narrating comments, no section banners.
 - Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
 - One feature per module; commands are thin, logic is a pure function with a unit test.
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`); body explains why.
 - Every behavior change ships with a test that fails before and passes after, plus a `CHANGELOG.md` entry under
   **Não publicado** (and README when user-visible).
+- **Any new or changed UI adds or updates a screenshot in `docs/prints/` and the README** (features table, tour,
+  or the "mais telas" section) in the same PR — fictitious data only, per Security rules. A tab hidden by
+  default (`DEFAULT_HIDDEN` in `src/lib/tabs.ts`) still needs one; skipping this is a scope gap, not optional.
+- **`README.md` (English) is canonical.** `README.pt-BR.md` plus the other `README.<lang>.md` translations
+  (es, fr, it, ja, zh, de, ru, tr, hi) don't need to change in the same PR — they drift and get refreshed
+  separately. Never edit only a translation and leave `README.md` behind.
 
 ## Contracts you must not break
 
@@ -77,6 +93,10 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   (release workflow), so local `tauri build` does not need the key. Never commit a private key.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
+- **Releases are automated.** `release.yml` assigns one `v0.3.N` tag to each first-parent commit on `main`
+  after `v0.3.0`, including `docs:` and `chore:` commits. It resumes drafts, builds signed installers with
+  the tag version, verifies `latest.json`, and publishes with notes generated from the commit. A six-hour
+  schedule retries failed or missed runs. Never hand-push a `v0.3.N` tag or edit release versions manually.
 
 ## Security rules
 
@@ -103,5 +123,7 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 
 ## Definition of done
 
-`bun run lint`, `bun test`, `bun run build`, `cargo clippy ... -D warnings` and `cargo test --locked` are green;
-changed behavior has a test; docs and CHANGELOG updated; no debug output, commented-out code or TODO without an issue.
+`bun run lint`, `bun test`, `bun run build`, `cargo fmt --check`, `cargo clippy ... -D warnings` and
+`cargo test --locked` are green;
+changed behavior has a test; docs and CHANGELOG updated; UI changes have a README screenshot; no debug output,
+commented-out code or TODO without an issue.

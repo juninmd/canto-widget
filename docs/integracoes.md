@@ -1,6 +1,6 @@
 # Integrações
 
-[← voltar ao README](../README.md)
+[← voltar ao README](../README.pt-BR.md)
 
 ## Agenda do Google (opcional)
 
@@ -35,7 +35,17 @@ pasta da aba **reuniões**.
 A aba **github** lista o que está aberto e é seu: **revisão pedida a mim**, **atribuídos a mim** (issues e PRs),
 **PRs que eu abri** e **issues que eu abri**, cada lista com o total no GitHub e 30 itens por vez, do mais recente
 para o mais antigo; **mostrar mais** traz a próxima página daquela lista, até o limite de 1.000 resultados da busca.
-Clicar abre no navegador. **atualizar** refaz as 5 buscas (a API de busca permite 30 por minuto).
+Clicar abre no navegador.
+
+**Ordenar por** atualização, criação ou comentários, com a seta alternando entre decrescente e crescente. Com
+centenas de issues, a ordem vale para a busca inteira, não só para a página na tela.
+
+**Cache e limite de requisições.** As listas ficam na memória por 5 minutos enquanto o cofre está aberto: voltar à
+aba, trocar de filtro e voltar, ou abrir o resumo do dia não gasta busca. O cabeçalho mostra há quanto tempo os dados
+vieram. **atualizar** ignora o cache. O Canto lê a cota que o GitHub devolve em cada resposta
+(`x-ratelimit-remaining`, `x-ratelimit-reset`, `Retry-After`) e para 2 chamadas antes do fim: aí mostra a última
+cópia e a hora em que dados novos voltam, sem bater no limite. O cache nunca vai para o disco (os títulos são
+privados) e some ao trancar o cofre ou desconectar a conta.
 
 O campo **filtrar** entra na busca do GitHub quando você aperta `Enter`, e aceita texto livre e qualificadores
 como `repo:dono/nome`, `label:bug` ou `org:acme`. Os botões **tudo · PRs · issues** escondem as listas que não
@@ -53,3 +63,22 @@ Duas formas de conectar:
 
 **desconectar** apaga o token deste computador. Para revogar de vez: GitHub → Settings → Applications
 (GitHub App) ou Personal access tokens.
+
+## GitLab e GitLab self-hosted (opcional)
+
+A aba **gitlab** (ative em **Ajustes → Abas visíveis**) mostra as mesmas quatro listas para merge requests e issues: **revisão pedida a mim**,
+**atribuídos a mim**, **MRs que eu abri** e **issues que eu abri**, com filtro por texto (título e descrição),
+**tudo · MRs · issues**, ordem por atualização ou criação (a API do GitLab não ordena por comentários) e o mesmo
+cache e controle de limite do GitHub (cabeçalhos `RateLimit-Remaining` e `RateLimit-Reset`).
+
+Para conectar, informe o endereço da instância (`https://gitlab.com` ou o da sua empresa; um caminho como
+`https://git.acme.io/gitlab` também vale) e um **token de acesso pessoal** com o escopo **read_api**: em
+*Preferences → Access tokens*, ou pelo link **criar token**, que abre a página já preenchida. O Canto confere o token
+na instância antes de salvar.
+
+- Só `https://`. Endereço com usuário, senha ou parâmetros é recusado.
+- O token só vai para o endereço digitado: o Canto não segue redirecionamentos.
+- Um item só abre se o link for da mesma instância.
+- Instância com certificado de CA própria (interna) ainda não é suportada.
+
+**desconectar** apaga endereço e token deste computador. Para revogar: GitLab → Preferences → Access tokens.

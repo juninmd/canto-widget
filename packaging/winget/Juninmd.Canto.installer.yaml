@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=https://aka.ms/winget-manifest.installer.1.6.0.schema.json
+PackageIdentifier: Juninmd.Canto
+PackageVersion: 0.1.0
+InstallerLocale: en-US
+InstallerType: nullsoft
+Scope: user
+InstallModes:
+  - interactive
+  - silent
+InstallerSwitches:
+  Silent: /S
+  SilentWithProgress: /S
+UpgradeBehavior: install
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/juninmd/canto-widget/releases/download/v0.1.0/Canto_0.1.0_x64-setup.exe
+    InstallerSha256: 2598E0217A803931F6C6DD0F2D0E31F5E0C18C523A94CDA04840C7EDD5BAF431
+ManifestType: installer
+ManifestVersion: 1.6.0

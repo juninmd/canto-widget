@@ -1,9 +1,40 @@
 use tauri::{Manager, State};
 
-use crate::drive;
+use crate::drive::{self, DriveTokens};
 use crate::error::{AppError, Result};
 use crate::oauth::{Loopback, Pkce};
+use crate::store::{self, DRIVE_AAD};
 use crate::vault::AppState;
+
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+pub struct DriveConfig {
+    #[serde(default)]
+    pub client_id: String,
+    #[serde(default)]
+    pub client_secret: String,
+    /// Saved by the user in Settings. A pre-embedded-client credential doesn't count.
+    #[serde(default, alias = "cliente_proprio")]
+    pub owned_client: bool,
+    #[serde(default)]
+    pub tokens: Option<DriveTokens>,
+    #[serde(default)]
+    pub email: String,
+    #[serde(default, alias = "nome")]
+    pub name: String,
+    /// Account photo as a `data:` URL; empty when absent or it failed validation.
+    #[serde(default)]
+    pub avatar: String,
+}
+
+impl AppState {
+    pub fn drive_config(&self) -> Result<DriveConfig> {
+        Ok(self.sealed(&store::drive_path(&self.dir), DRIVE_AAD)?.unwrap_or_default())
+    }
+
+    pub fn save_drive_config(&self, cfg: &DriveConfig) -> Result<()> {
+        self.save_sealed(&store::drive_path(&self.dir), DRIVE_AAD, cfg)
+    }
+}
 
 #[derive(serde::Serialize)]
 pub struct DriveStatus {
@@ -31,11 +62,7 @@ pub fn drive_status(state: State<'_, AppState>) -> Result<DriveStatus> {
 }
 
 #[tauri::command(async)]
-pub fn drive_configure(
-    state: State<'_, AppState>,
-    client_id: String,
-    client_secret: String,
-) -> Result<()> {
+pub fn drive_configure(state: State<'_, AppState>, client_id: String, client_secret: String) -> Result<()> {
     let mut cfg = state.drive_config()?;
     cfg.client_id = client_id.trim().to_string();
     cfg.client_secret = client_secret.trim().to_string();
@@ -73,13 +100,7 @@ fn connect(state: &AppState) -> Result<String> {
     let url = drive::authorize_url(&cfg.client_id, &server.redirect_uri, &pkce);
     open_in_browser(&url)?;
     let code = server.wait_for_code(&pkce.state)?;
-    let tokens = drive::exchange_code(
-        &cfg.client_id,
-        &cfg.client_secret,
-        &server.redirect_uri,
-        &code,
-        &pkce.verifier,
-    )?;
+    let tokens = drive::exchange_code(&cfg.client_id, &cfg.client_secret, &server.redirect_uri, &code, &pkce.verifier)?;
     let profile = crate::account::fetch_profile(&tokens.access_token).unwrap_or_default();
     cfg.avatar = crate::account::download_avatar(&profile.photo).unwrap_or_default();
     cfg.email = profile.email;
@@ -91,7 +112,7 @@ fn connect(state: &AppState) -> Result<String> {
 }
 
 /// Switching accounts without a photo must not inherit the previous name and photo.
-fn forget_account(cfg: &mut crate::vault::DriveConfig) {
+fn forget_account(cfg: &mut DriveConfig) {
     cfg.tokens = None;
     cfg.email.clear();
     cfg.name.clear();
@@ -99,7 +120,7 @@ fn forget_account(cfg: &mut crate::vault::DriveConfig) {
 }
 
 /// A credential saved in Settings wins, else login uses the embedded client and copies it into the vault, so refresh always uses the client that issued the tokens.
-pub fn use_client(cfg: &mut crate::vault::DriveConfig, embedded: Option<(&str, &str)>) -> bool {
+pub fn use_client(cfg: &mut DriveConfig, embedded: Option<(&str, &str)>) -> bool {
     if !cfg.owned_client {
         if let Some((id, secret)) = embedded {
             cfg.client_id = id.to_string();
@@ -111,13 +132,12 @@ pub fn use_client(cfg: &mut crate::vault::DriveConfig, embedded: Option<(&str, &
 
 fn open_in_browser(url: &str) -> Result<()> {
     tauri_plugin_opener::open_url(url, None::<&str>)
-        .map_err(|e| AppError::Drive(format!("nao consegui abrir o navegador: {e}")))
+        .map_err(|e| AppError::Drive(format!("não consegui abrir o navegador: {e}")))
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::vault::DriveConfig;
 
     #[test]
     fn own_credential_wins_over_the_embedded_one() {
@@ -167,12 +187,25 @@ mod tests {
         };
         forget_account(&mut cfg);
         assert!(cfg.tokens.is_none() && cfg.email.is_empty() && cfg.name.is_empty() && cfg.avatar.is_empty());
-        assert_eq!(cfg.client_id, "meu.apps.googleusercontent.com", "signing out must not require reconfiguring the client");
+        assert_eq!(
+            cfg.client_id, "meu.apps.googleusercontent.com",
+            "signing out must not require reconfiguring the client"
+        );
     }
 
     #[test]
     fn without_any_credential_connecting_is_refused() {
         let mut cfg = DriveConfig::default();
         assert!(!use_client(&mut cfg, None));
+    }
+
+    #[test]
+    fn drive_config_deserializes_legacy_portuguese_keys() {
+        let legacy =
+            r#"{"client_id":"id","client_secret":"secret","cliente_proprio":true,"nome":"Ana","email":"a@b.com"}"#;
+        let cfg: DriveConfig = serde_json::from_str(legacy).unwrap();
+        assert!(cfg.owned_client);
+        assert_eq!(cfg.name, "Ana");
+        assert_eq!(cfg.email, "a@b.com");
     }
 }

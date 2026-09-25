@@ -1,20 +1,33 @@
 import { useEffect, useState } from "react";
-import { api, errText, type Note } from "../lib/api";
+import { api, errText, type AgendaItem, type Note, type Task } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import { t } from "../i18n";
 import NoteCard from "./NoteCard";
 import NoteEditor, { type Draft } from "./NoteEditor";
 
 const PAGE = 50;
-const EMPTY: Draft = { id: undefined, title: "", body: "", tags: "" };
+const EMPTY: Draft = { id: undefined, title: "", body: "", tags: "", link: null };
 
-export default function NotesTab({ onError }: { onError: (m: string) => void }) {
-  const [query, setQuery] = useState("");
+type Props = {
+  today: string;
+  agenda?: AgendaItem[];
+  privacy: boolean;
+  /** Seeds the search field once, e.g. arriving from the global search overlay. */
+  initialQuery?: string;
+  onOpenTasks: () => void;
+  onOpenAgenda: () => void;
+  onError: (m: string) => void;
+};
+
+export default function NotesTab({ today, agenda = [], privacy, initialQuery, onOpenTasks, onOpenAgenda, onError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? "");
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);
   const [draft, setDraft] = useState(EMPTY);
   const [editing, setEditing] = useState(false);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const [announcement, setAnnouncement] = useState("");
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
@@ -40,7 +53,7 @@ ${lim}`);
 
   async function remove(n: Note) {
     try {
-      undoable(await api.itemDelete(n.id), `card "${n.title}" excluído`);
+      undoable(await api.itemDelete(n.id), t("notes.deleted", { title: n.title }));
       await reload();
     } catch (e) {
       onError(errText(e));
@@ -52,7 +65,16 @@ ${lim}`);
       const pinned = await api.notePin(n.id);
       await reload();
       // Without an announcement the note "jumps" to the top or vanishes with no explanation.
-      setAnnouncement(pinned ? `"${n.title}" fixada no topo` : `"${n.title}" desafixada`);
+      setAnnouncement(pinned ? t("notes.pinnedAnnouncement", { title: n.title }) : t("notes.unpinnedAnnouncement", { title: n.title }));
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
+  async function exportMd(n: Note) {
+    try {
+      const where = await api.noteExportMd(n.id);
+      if (where) setAnnouncement(t("notes.exportedAnnouncement", { title: n.title, where }));
     } catch (e) {
       onError(errText(e));
     }
@@ -60,10 +82,16 @@ ${lim}`);
 
   useEffect(() => {
     setLimit(PAGE);
-    const t = setTimeout(() => void reload(query, PAGE), 150);
-    return () => clearTimeout(t);
+    const timer = setTimeout(() => void reload(query, PAGE), 150);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
+
+  // Fetched only when the editor opens: the link picker needs today's list, nothing else does.
+  useEffect(() => {
+    if (!editing) return;
+    api.tasksForDay(today).then(setTasks).catch(() => setTasks([]));
+  }, [editing, today]);
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
@@ -71,9 +99,10 @@ ${lim}`);
     try {
       await api.noteSave({
         id: draft.id,
-        title: draft.title.trim() || "sem titulo",
+        title: draft.title.trim() || t("notes.untitledDefault"),
         body: draft.body,
-        tags: draft.tags.split(",").map((t) => t.trim()).filter(Boolean),
+        tags: draft.tags.split(",").map((tag) => tag.trim()).filter(Boolean),
+        link: draft.link,
       });
       setDraft(EMPTY);
       setEditing(false);
@@ -89,9 +118,7 @@ ${lim}`);
   }
 
   if (editing) {
-    return (
-      <NoteEditor draft={draft} onChange={setDraft} onSave={save} onCancel={cancel} />
-    );
+    return <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={cancel} />;
   }
 
   return (
@@ -101,9 +128,9 @@ ${lim}`);
           type="search"
           value={query}
           data-shortcut="search"
-          aria-label="buscar notas"
+          aria-label={t("notes.searchLabel")}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="buscar em títulos, corpo e #tag"
+          placeholder={t("notes.searchPlaceholder")}
           className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
         />
         <button
@@ -112,7 +139,7 @@ ${lim}`);
             setDraft(EMPTY);
             setEditing(true);
           }}
-          aria-label="novo card"
+          aria-label={t("notes.newLabel")}
           data-shortcut="new"
           className="rounded-lg bg-edge px-3 text-sm text-fg"
         >
@@ -128,14 +155,18 @@ ${lim}`);
           <NoteCard
             key={n.id}
             note={n}
+            query={query}
+            privacy={privacy}
             className={`${isNew(n.id) ? ENTER_CLASS : ""} ${leaving.has(n.id) ? EXIT_CLASS : ""}`}
             onOpen={() => {
-              setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", ") });
+              setDraft({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", "), link: n.link ?? null });
               setEditing(true);
             }}
             onPin={() => void pin(n)}
             onDelete={() => void leave(n.id, () => remove(n))}
-            onTag={(t) => setQuery(`#${t}`)}
+            onTag={(tag) => setQuery(`#${tag}`)}
+            onOpenLink={(kind) => (kind === "task" ? onOpenTasks() : onOpenAgenda())}
+            onExport={() => void exportMd(n)}
           />
         ))}
         {total > notes.length && (
@@ -148,13 +179,13 @@ ${lim}`);
               }}
               className="w-full rounded-lg bg-edge px-3 py-1.5 text-xs text-muted hover:text-fg"
             >
-              mostrar mais ({total - notes.length} restantes)
+              {t("notes.showMore", { n: total - notes.length })}
             </button>
           </li>
         )}
         {notes.length === 0 && (
           <li className="px-2 py-6 text-center text-xs text-faint">
-            {query ? "nenhum card encontrado" : "nenhum card salvo ainda — toque em + para criar"}
+            {query ? t("notes.emptySearch") : t("notes.empty")}
           </li>
         )}
       </ul>

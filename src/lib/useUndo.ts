@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { api, errText } from "./api";
 import { useToast } from "./toast";
+import { t } from "../i18n";
 
 /**
  * Deletion without confirmation, but reversible: the toast offers undo (Nielsen: user
@@ -14,11 +15,11 @@ export function useUndo(onError: (m: string) => void, reload: () => Promise<void
       notify({
         message,
         action: {
-          label: "desfazer",
+          label: t("toast.undo"),
           run: () =>
             void api
               .trashUndo(key)
-              .then((restored) => (restored ? reload() : onError("não dá mais para desfazer: o cofre foi trancado")))
+              .then((restored) => (restored ? reload() : onError(t("toast.undoExpired"))))
               .catch((e) => onError(errText(e))),
         },
       });

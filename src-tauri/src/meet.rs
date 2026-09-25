@@ -7,19 +7,13 @@ pub fn meet_link(raw_hangout: Option<&str>, entries: &[&str], texts: &[&str]) ->
     if let Some(l) = entries.iter().find(|u| u.contains("meet.google.com")) {
         return l.to_string();
     }
-    texts
-        .iter()
-        .filter_map(|t| extract_meet(t))
-        .next()
-        .unwrap_or_default()
+    texts.iter().filter_map(|t| extract_meet(t)).next().unwrap_or_default()
 }
 
 fn extract_meet(text: &str) -> Option<String> {
     let pos = text.find("https://meet.google.com/")?;
     let rest = &text[pos..];
-    let end = rest
-        .find(|c: char| c.is_whitespace() || c == '<' || c == '"' || c == ')')
-        .unwrap_or(rest.len());
+    let end = rest.find(|c: char| c.is_whitespace() || c == '<' || c == '"' || c == ')').unwrap_or(rest.len());
     Some(rest[..end].trim_end_matches(['.', ',']).to_string())
 }
 

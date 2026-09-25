@@ -35,7 +35,7 @@ pub fn import(state: &AppState, source: &Path) -> Result<ImportSummary> {
         return Err(AppError::Config("arquivo grande demais para ser um backup do Canto".into()));
     }
     let blob: SealedBlob = serde_json::from_slice(&std::fs::read(source)?)
-        .map_err(|_| AppError::Format("o arquivo nao e um backup do Canto".into()))?;
+        .map_err(|_| AppError::Format("o arquivo não é um backup do Canto".into()))?;
     let incoming = state.open_envelope(&blob)?;
     // Only after opening: a wrong password leaves no useless copy behind.
     save(&state.dir, &format!("{}T{}-import", today_utc(), now_ms()))?;

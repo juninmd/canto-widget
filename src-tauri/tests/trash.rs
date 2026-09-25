@@ -1,14 +1,30 @@
 use canto_widget_lib::clipboard::{ClipHistory, ClipItem};
-use canto_widget_lib::trash::{undo, Removed};
 use canto_widget_lib::model::{now_ms, Note, Task, VaultData};
+use canto_widget_lib::trash::{undo, Removed};
 use canto_widget_lib::vault::AppState;
 
 fn task(id: &str, updated_at: i64) -> Task {
-    Task { id: id.into(), title: "pagar boleto".into(), done: false, day: "2026-09-14".into(), created_at: 1, updated_at, ..Default::default() }
+    Task {
+        id: id.into(),
+        title: "pagar boleto".into(),
+        done: false,
+        day: "2026-09-14".into(),
+        created_at: 1,
+        updated_at,
+        ..Default::default()
+    }
 }
 
 fn note(id: &str) -> Note {
-    Note { id: id.into(), title: "wifi".into(), body: "senha".into(), tags: vec![], created_at: 1, updated_at: 5, ..Default::default() }
+    Note {
+        id: id.into(),
+        title: "wifi".into(),
+        body: "senha".into(),
+        tags: vec![],
+        created_at: 1,
+        updated_at: 5,
+        ..Default::default()
+    }
 }
 
 fn clip(id: &str, text: &str, copied_at: i64) -> ClipItem {
@@ -55,7 +71,7 @@ fn removing_a_missing_id_stores_nothing_to_undo() {
 
 #[test]
 fn restored_clipboard_comes_back_in_order_without_duplicating() {
-    let mut h = ClipHistory { items: vec![clip("c3", "novo", 300)] };
+    let mut h = ClipHistory { items: vec![clip("c3", "novo", 300)], ..Default::default() };
     h.restore(vec![clip("c1", "velho", 100), clip("c2", "novo", 200), clip("c3", "novo", 300)]);
     let texts: Vec<&str> = h.items.iter().map(|i| i.text.as_str()).collect();
     assert_eq!(texts, ["novo", "velho"], "duplicated text or lost chronological order");

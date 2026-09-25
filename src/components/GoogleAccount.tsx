@@ -1,10 +1,11 @@
 import type { DriveStatus } from "../lib/api";
+import { t } from "../i18n";
 
 type Props = { status: DriveStatus; busy: boolean; signingOut: boolean; onSignOut: () => void };
 
 /** Connected account card: who it is, with sign-out always in view. */
 export default function GoogleAccount({ status, busy, signingOut, onSignOut }: Props) {
-  const name = status.name?.trim() || status.email || "conta conectada";
+  const name = status.name?.trim() || status.email || t("google.connectedAccount");
   // Only image data: URLs go in the <img>; CSP blocks the rest, and the initial covers the gap.
   const photo = status.avatar?.startsWith("data:image/") ? status.avatar : "";
 
@@ -31,10 +32,10 @@ export default function GoogleAccount({ status, busy, signingOut, onSignOut }: P
         type="button"
         disabled={busy}
         onClick={onSignOut}
-        aria-label={`sair da conta ${status.email || name}`}
+        aria-label={t("google.signOutLabel", { account: status.email || name })}
         className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-xs text-fg hover:border-danger hover:text-danger disabled:opacity-40"
       >
-        {signingOut ? "saindo..." : "sair"}
+        {signingOut ? t("google.signingOut") : t("google.signOut")}
       </button>
     </div>
   );

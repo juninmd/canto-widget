@@ -18,9 +18,12 @@ const empty = { total: 0, items: [] };
 const item = {
   repo: "octo/canto",
   number: 42,
+  reference: "octo/canto#42",
   title: "Revisar o cofre",
   url: "https://github.com/octo/canto/pull/42",
+  created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
+  comments: 0,
   is_pr: true,
   draft: true,
   author: "octocat",
@@ -119,7 +122,11 @@ test("show more fetches the next page of that section only and skips repeats", a
   await act(async () => {
     fireEvent.click(screen.getByText("mostrar mais (2 restantes)"));
   });
-  expect(calls.find((c) => c.cmd === "github_section")?.args).toEqual({ section: "my_prs", page: 2, filter: { text: "", kind: "all" } });
+  expect(calls.find((c) => c.cmd === "github_section")?.args).toEqual({
+    section: "my_prs",
+    page: 2,
+    filter: { text: "", kind: "all", sort: "updated", order: "desc" },
+  });
   expect(screen.getAllByText("Revisar o cofre")).toHaveLength(1);
   expect(screen.getByText("Segundo PR")).toBeTruthy();
   expect(screen.getByText("mostrar mais (1 restantes)")).toBeTruthy();
@@ -134,10 +141,48 @@ test("the filter goes to the search and the issues chip hides PR-only sections",
     fireEvent.click(screen.getByText("issues"));
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
-  expect(calls.filter((c) => c.cmd === "github_lists").at(-1)?.args).toEqual({ filter: { text: "repo:acme/atlas", kind: "issue" } });
+  expect(calls.filter((c) => c.cmd === "github_lists").at(-1)?.args).toEqual({
+    filter: { text: "repo:acme/atlas", kind: "issue", sort: "updated", order: "desc" },
+    force: false,
+  });
   expect(screen.queryByRole("region", { name: "Revisão pedida a mim" })).toBeNull();
   expect(screen.getByRole("region", { name: "Issues que eu abri" })).toBeTruthy();
   expect(screen.getAllByText("nada com esse filtro").length).toBeGreaterThan(0);
+});
+
+test("sort and order go to the search, so 500 issues come back in the order asked", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists());
+  await mount();
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("ordenar por"), { target: { value: "comments" } });
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /ordem decrescente/ }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  const last = calls.filter((c) => c.cmd === "github_lists").at(-1)?.args as { filter: { sort: string; order: string } };
+  expect([last.filter.sort, last.filter.order]).toEqual(["comments", "asc"]);
+});
+
+test("opening the tab uses the cache; only atualizar forces a trip to GitHub", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists());
+  await mount();
+  expect((calls.find((c) => c.cmd === "github_lists")?.args as { force: boolean }).force).toBe(false);
+  await act(async () => {
+    fireEvent.click(screen.getByText("atualizar"));
+  });
+  expect((calls.filter((c) => c.cmd === "github_lists").at(-1)?.args as { force: boolean }).force).toBe(true);
+});
+
+test("near the rate limit the tab says it shows the last copy and when fresh data comes", async () => {
+  responses.github_status = connected;
+  const at = new Date(2026, 8, 18, 14, 32).getTime();
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [item], fetched_at: at - 600_000, limited_until: at } }));
+  await mount();
+  expect(screen.getByRole("status").textContent).toContain("14:32");
+  expect(screen.getByText(/atualizado há/)).toBeTruthy();
 });
 
 test("a slow answer for an old filter never replaces the current list", async () => {
@@ -152,6 +197,54 @@ test("a slow answer for an old filter never replaces the current list", async ()
   await act(async () => releaseOld(lists({ my_issues: { total: 1, items: [{ ...item, title: "Velho" }] } })));
   expect(screen.getByText("Atual")).toBeTruthy();
   expect(screen.queryByText("Velho")).toBeNull();
+});
+
+test("a PR waiting for review shows since when it was opened, in red once stale", async () => {
+  responses.github_status = connected;
+  const fourDaysAgo = new Date(Date.now() - 4 * 86_400_000).toISOString();
+  responses.github_lists = () => Promise.resolve(lists({ review_requested: { total: 1, items: [{ ...item, created_at: fourDaysAgo }] } }));
+  await mount();
+  const badge = screen.getByText(/aguardando há 4 d/);
+  expect(badge.className).toContain("text-danger");
+});
+
+test("a PR with no activity for a week is flagged as stale; a fresher one or an issue is not", async () => {
+  responses.github_status = connected;
+  const eightDaysAgo = new Date(Date.now() - 8 * 86_400_000).toISOString();
+  const sixDaysAgo = new Date(Date.now() - 6 * 86_400_000).toISOString();
+  const items = [
+    { ...item, url: "https://github.com/octo/canto/pull/1", title: "Parado", updated_at: eightDaysAgo },
+    { ...item, url: "https://github.com/octo/canto/pull/2", title: "Recente", updated_at: sixDaysAgo },
+    { ...item, url: "https://github.com/octo/canto/issues/3", title: "Issue velha", is_pr: false, updated_at: eightDaysAgo },
+  ];
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 3, items } }));
+  await mount();
+  const badges = screen.getAllByText(/parado há/);
+  expect(badges.map((b) => b.textContent)).toEqual(["parado há 8 d"]);
+  expect(badges[0].closest("li")?.textContent).toContain("Parado");
+});
+
+test("a review request shows only 'aguardando', never the stale badge", async () => {
+  responses.github_status = connected;
+  const tenDaysAgo = new Date(Date.now() - 10 * 86_400_000).toISOString();
+  responses.github_lists = () =>
+    Promise.resolve(lists({ review_requested: { total: 1, items: [{ ...item, created_at: tenDaysAgo, updated_at: tenDaysAgo }] } }));
+  await mount();
+  expect(screen.getByText(/aguardando há 10 d/)).toBeTruthy();
+  expect(screen.queryByText(/parado há/)).toBeNull();
+});
+
+test("ver CI asks the vault for the PR's combined status and shows the result, on click only", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [item] } }));
+  responses.github_pr_checks = () => Promise.resolve("success");
+  await mount();
+  expect(calls.some((c) => c.cmd === "github_pr_checks")).toBe(false);
+  await act(async () => {
+    fireEvent.click(screen.getByText("ver CI"));
+  });
+  expect(calls.find((c) => c.cmd === "github_pr_checks")?.args).toEqual({ repo: item.repo, number: item.number });
+  expect(screen.getByText("✓ CI passou")).toBeTruthy();
 });
 
 test("a failed filter change keeps the previous filter as the applied one", async () => {

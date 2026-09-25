@@ -1,7 +1,7 @@
 use tauri::State;
 
 use crate::error::{AppError, Result};
-use crate::model::{now_ms, Repeat, Task, VaultData};
+use crate::model::{now_ms, ExtendedRepeat, Repeat, Task, VaultData};
 use crate::vault::AppState;
 
 /// Valid "YYYY-MM-DD", or `None`. The day comes from the webview: don't trust the format.
@@ -39,6 +39,15 @@ impl Repeat {
     }
 }
 
+impl ExtendedRepeat {
+    pub fn applies_on(&self, day: &str) -> bool {
+        match self {
+            ExtendedRepeat::Monthly { day: target } => civil(day).is_some_and(|(_, _, d)| d == *target as u32),
+            ExtendedRepeat::SpecificDays { days } => weekday_of(day).is_some_and(|s| days.contains(&s)),
+        }
+    }
+}
+
 pub fn instance_id(series: &str, day: &str) -> String {
     format!("{series}-{day}")
 }
@@ -61,7 +70,9 @@ pub fn materialize(d: &mut VaultData, day: &str, now: i64) -> usize {
     let new_tasks: Vec<Task> = latest
         .into_iter()
         .filter(|(series, _)| !has_today.contains(series))
-        .filter(|(_, t)| t.repeat.is_some_and(|r| r.applies_on(day)))
+        .filter(|(_, t)| {
+            t.repeat.is_some_and(|r| r.applies_on(day)) || t.extended_repeat.as_ref().is_some_and(|r| r.applies_on(day))
+        })
         .map(|(series, t)| Task {
             id: instance_id(series, day),
             day: day.to_string(),
@@ -85,7 +96,7 @@ pub fn validate_time(time: &str) -> Result<String> {
         && [0, 1, 3, 4].iter().all(|&i| b[i].is_ascii_digit())
         && matches!((time[..2].parse::<u8>(), time[3..].parse::<u8>()), (Ok(h), Ok(m)) if h < 24 && m < 60);
     if !ok {
-        return Err(AppError::Config("horario invalido, use HH:MM".into()));
+        return Err(AppError::Config("horário inválido, use HH:MM".into()));
     }
     Ok(time.to_string())
 }
@@ -93,16 +104,55 @@ pub fn validate_time(time: &str) -> Result<String> {
 pub fn set_schedule(t: &mut Task, time: Option<String>, repeat: Option<Repeat>, now: i64) -> Result<()> {
     if let Some(Repeat::Weekly { weekday }) = repeat {
         if weekday > 6 {
-            return Err(AppError::Config("dia da semana invalido".into()));
+            return Err(AppError::Config("dia da semana inválido".into()));
         }
     }
     t.reminder_time = time.filter(|h| !h.is_empty()).map(|h| validate_time(&h)).transpose()?;
     t.repeat = repeat;
+    // The two recurrence kinds are mutually exclusive: picking one clears the other.
+    if repeat.is_some() {
+        t.extended_repeat = None;
+    }
     if repeat.is_some() && t.series.is_none() {
         t.series = Some(t.id.clone());
     }
     t.updated_at = now;
     Ok(())
+}
+
+fn validate_extended(repeat: &ExtendedRepeat) -> Result<()> {
+    match repeat {
+        ExtendedRepeat::Monthly { day } if !(1..=31).contains(day) => {
+            Err(AppError::Config("dia do mês inválido".into()))
+        }
+        ExtendedRepeat::SpecificDays { days } if days.is_empty() || days.iter().any(|d| *d > 6) => {
+            Err(AppError::Config("dias da semana inválidos".into()))
+        }
+        _ => Ok(()),
+    }
+}
+
+pub fn set_extended_repeat(t: &mut Task, repeat: Option<ExtendedRepeat>, now: i64) -> Result<()> {
+    if let Some(r) = &repeat {
+        validate_extended(r)?;
+    }
+    t.extended_repeat = repeat;
+    if t.extended_repeat.is_some() {
+        t.repeat = None;
+        if t.series.is_none() {
+            t.series = Some(t.id.clone());
+        }
+    }
+    t.updated_at = now;
+    Ok(())
+}
+
+#[tauri::command(async)]
+pub fn task_set_extended_repeat(state: State<'_, AppState>, id: String, repeat: Option<ExtendedRepeat>) -> Result<()> {
+    state.mutate(|d| match d.tasks.iter_mut().find(|t| t.id == id) {
+        Some(t) => set_extended_repeat(t, repeat, now_ms()),
+        None => Err(AppError::NotFound),
+    })?
 }
 
 #[tauri::command(async)]
@@ -118,21 +168,11 @@ pub fn task_set_schedule(
     })?
 }
 
-/// For the reminder watcher, which runs in the background: must not postpone auto-lock, and a locked vault returns an empty list instead of an error every 30s.
-#[tauri::command(async)]
-pub fn tasks_reminders(state: State<'_, AppState>, day: String) -> Result<Vec<Task>> {
-    let list = state.in_background(|d| {
-        let created = materialize(d, &day, now_ms());
-        let list = d
-            .tasks
-            .iter()
-            .filter(|t| t.day == day && !t.done && t.reminder_time.is_some())
-            .cloned()
-            .collect();
+/// Open tasks with a time on `day`, materializing the day's recurring instances first.
+pub fn reminders_for(state: &AppState, day: &str) -> Result<Vec<Task>> {
+    state.in_background(|d| {
+        let created = materialize(d, day, now_ms());
+        let list = d.tasks.iter().filter(|t| t.day == day && !t.done && t.reminder_time.is_some()).cloned().collect();
         (list, created > 0)
-    });
-    match list {
-        Err(AppError::Locked) => Ok(vec![]),
-        other => other,
-    }
+    })
 }

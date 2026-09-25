@@ -23,7 +23,9 @@ fn ler_cliente(caminho: &Path) -> Option<(String, String)> {
         Err(e) => panic!("{ARQUIVO_OAUTH} invalido: {e}"),
     };
     // O JSON do Console vem como {"installed": {...}}; so cliente desktop serve para o loopback.
-    let c = json.get("installed").unwrap_or_else(|| panic!("{ARQUIVO_OAUTH}: esperado cliente do tipo 'App para computador' (chave \"installed\")"));
+    let c = json.get("installed").unwrap_or_else(|| {
+        panic!("{ARQUIVO_OAUTH}: esperado cliente do tipo 'App para computador' (chave \"installed\")")
+    });
     let campo = |k: &str| c.get(k).and_then(|v| v.as_str()).map(str::to_string);
     let id = campo("client_id").filter(|id| id.ends_with(".apps.googleusercontent.com"))?;
     Some((id, campo("client_secret").unwrap_or_default()))

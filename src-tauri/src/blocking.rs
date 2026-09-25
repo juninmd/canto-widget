@@ -3,9 +3,7 @@ use crate::error::{AppError, Result};
 
 /// `reqwest::blocking` panics when dropped on a tokio thread, and an `async` command runs on exactly that thread.
 pub async fn run<T: Send + 'static>(f: impl FnOnce() -> Result<T> + Send + 'static) -> Result<T> {
-    tauri::async_runtime::spawn_blocking(f)
-        .await
-        .map_err(|e| AppError::Io(format!("tarefa interrompida: {e}")))?
+    tauri::async_runtime::spawn_blocking(f).await.map_err(|e| AppError::Io(format!("tarefa interrompida: {e}")))?
 }
 
 #[cfg(test)]

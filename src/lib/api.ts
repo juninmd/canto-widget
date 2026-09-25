@@ -1,8 +1,17 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus } from "./forgeTypes";
+import { t } from "../i18n";
+
+export type * from "./forgeTypes";
 
 // wire keys mirror the synced vault format (frozen across app versions)
 /** `dia` of `semanal`: 0 = Sunday ... 6 = Saturday. */
 export type Repeat = { tipo: "diaria" } | { tipo: "dias_uteis" } | { tipo: "semanal"; dia: number };
+
+export type Subtask = { id: string; title: string; done: boolean };
+export type Priority = "low" | "medium" | "high";
+/** `day`: 1-31, matched exactly. `days`: 0 = Sunday ... 6 = Saturday, same as `Repeat`'s `dia`. */
+export type ExtendedRepeat = { tipo: "monthly"; day: number } | { tipo: "specific_days"; days: number[] };
 
 export type Task = {
   id: string;
@@ -15,7 +24,14 @@ export type Task = {
   hora?: string | null;
   repetir?: Repeat | null;
   serie?: string | null;
+  pr_url?: string | null;
+  subtasks?: Subtask[];
+  priority?: Priority | null;
+  /** Mutually exclusive with `repetir`: monthly or specific-weekdays recurrence. */
+  extended_repeat?: ExtendedRepeat | null;
 };
+
+export type NoteLink = { kind: "task"; id: string; label: string } | { kind: "event"; id: string; label: string };
 
 export type Note = {
   id: string;
@@ -25,12 +41,14 @@ export type Note = {
   created_at: number;
   updated_at: number;
   fixada?: boolean;
+  link?: NoteLink | null;
 };
 
 export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
+export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
 export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean };
 
 /// User's local day as YYYY-MM-DD. Lives in the frontend because the Rust
@@ -50,22 +68,6 @@ export type DriveStatus = {
 };
 export type ImportSummary = { tasks: number; notes: number };
 
-export type GithubItem = {
-  repo: string;
-  number: number;
-  title: string;
-  url: string;
-  updated_at: string;
-  is_pr: boolean;
-  draft: boolean;
-  author: string;
-};
-/** `total` is GitHub's count; `items` only carries the first page (up to 30). */
-export type GithubList = { total: number; items: GithubItem[] };
-export type GithubSection = "review_requested" | "assigned" | "my_prs" | "my_issues";
-export type GithubKind = "all" | "pr" | "issue";
-export type GithubFilter = { text: string; kind: GithubKind };
-export type GithubLists = { assigned: GithubList; my_prs: GithubList; review_requested: GithubList; my_issues: GithubList };
 export type GithubStatus = { connected: boolean; login: string; source: string; device_flow: boolean };
 export type DeviceCode = { user_code: string; url: string; expires_in_s: number };
 /** `latest` is the newest published version, even when it is not newer than `current`. */
@@ -75,6 +77,7 @@ export const UPDATE_PROGRESS_EVENT = "canto://update-progress";
 
 // `preview` is the first 500 characters; copying fetches the stored text in Rust.
 export type ClipItem = { id: string; preview: string; chars: number; kept: number; truncated: boolean; copied_at: number; pinned: boolean };
+export type ClipList = { items: ClipItem[]; max_pinned: number };
 export type TranscriptMeta = { name: string; modified_at: number; size: number; preview: string };
 export type AgendaItem = {
   id: string;
@@ -93,7 +96,12 @@ export type AgendaItem = {
   attachments?: Attachment[];
 };
 export type Attachment = { title: string; url: string; mime: string };
+/** Combined CI/pipeline status of a PR/MR's head commit. */
+export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
+export type StatusItem = { title: string; link: string; published_at: number };
+export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
+export type StatusResult = { id: string; label: string; items: StatusItem[]; error: string | null; live?: StatusLive | null };
 
 export const api = {
   status: () => invoke<VaultStatus>("vault_status"),
@@ -114,14 +122,26 @@ export const api = {
   carryOver: (day: string) => invoke<number>("tasks_carry_over", { day }),
   taskSetSchedule: (id: string, time: string | null, repeat: Repeat | null) =>
     invoke<void>("task_set_schedule", { id, time, repeat }),
+  /** `url: null` clears the link. */
+  taskLinkPr: (id: string, url: string | null) => invoke<void>("task_link_pr", { id, url }),
+  subtaskAdd: (id: string, title: string) => invoke<Subtask>("subtask_add", { id, title }),
+  subtaskToggle: (id: string, subtaskId: string) => invoke<void>("subtask_toggle", { id, subtaskId }),
+  subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
+  taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
+  tasksReorder: (day: string, ids: string[]) => invoke<void>("tasks_reorder", { day, ids }),
+  taskSetExtendedRepeat: (id: string, repeat: ExtendedRepeat | null) =>
+    invoke<void>("task_set_extended_repeat", { id, repeat }),
   /** Background watcher: doesn't postpone auto-lock; locked returns an empty list. */
-  tasksReminders: (day: string) => invoke<Task[]>("tasks_reminders", { day }),
+  reminderLeadSet: (minutes: number) => invoke<void>("reminder_lead_set", { minutes }),
+  languageSet: (lang: string) => invoke<void>("language_set", { lang }),
 
   notesSearch: (query: string, limit: number) => invoke<NotesPage>("notes_search", { query, limit }),
-  noteSave: (note: { id?: string; title: string; body: string; tags: string[] }) =>
-    invoke<Note>("note_save", { id: note.id ?? null, ...note }),
+  noteSave: (note: { id?: string; title: string; body: string; tags: string[]; link?: NoteLink | null }) =>
+    invoke<Note>("note_save", { id: note.id ?? null, link: note.link ?? null, ...note }),
   /** Returns whether the note ended up pinned. */
   notePin: (id: string) => invoke<boolean>("note_pin", { id }),
+  /** Opens a native save dialog; `null` when the user cancels. */
+  noteExportMd: (id: string) => invoke<string | null>("note_export_md", { id }),
   /** Returns the key for `trashUndo`, or `null` if nothing was removed. */
   itemDelete: (id: string) => invoke<string | null>("item_delete", { id }),
   trashUndo: (key: string) => invoke<boolean>("trash_undo", { key }),
@@ -138,9 +158,20 @@ export const api = {
   autostartStatus: () => invoke<boolean>("autostart_status"),
   autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),
 
+  autolockGet: () => invoke<number>("autolock_get"),
+  autolockSet: (minutes: number) => invoke<void>("autolock_set", { minutes }),
+  unlockHistory: () => invoke<UnlockEntry[]>("unlock_history"),
+
   /** `null` when the user cancels the dialog. */
   backupExport: () => invoke<string | null>("backup_export"),
   backupImport: () => invoke<ImportSummary | null>("backup_import"),
+
+  syncGet: () => invoke<string | null>("sync_get"),
+  /** `null` when the user cancels the folder dialog. */
+  syncSetFolder: () => invoke<string | null>("sync_set_folder"),
+  syncClear: () => invoke<void>("sync_clear"),
+  /** `null` when there was nothing new to merge. */
+  syncNow: () => invoke<ImportSummary | null>("sync_now"),
 
   driveStatus: () => invoke<DriveStatus>("drive_status"),
   driveConfigure: (clientId: string, clientSecret: string) =>
@@ -148,11 +179,12 @@ export const api = {
   driveConnect: () => invoke<string>("drive_connect"),
   driveDisconnect: () => invoke<void>("drive_disconnect"),
 
-  clipList: (query: string) => invoke<ClipItem[]>("clip_list", { query }),
+  clipList: (query: string) => invoke<ClipList>("clip_list", { query }),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
   clipPin: (id: string) => invoke<void>("clip_pin", { id }),
   clipDelete: (id: string) => invoke<string | null>("clip_delete", { id }),
   clipClear: () => invoke<string | null>("clip_clear"),
+  clipSetMaxPinned: (max: number) => invoke<void>("clip_set_max_pinned", { max }),
 
   transcriptsDir: () => invoke<string>("transcripts_dir"),
   transcriptsSetDir: (dir: string) => invoke<void>("transcripts_set_dir", { dir }),
@@ -176,9 +208,29 @@ export const api = {
   githubDeviceFinish: () => invoke<string>("github_device_finish"),
   githubDeviceCancel: () => invoke<void>("github_device_cancel"),
   githubDisconnect: () => invoke<void>("github_disconnect"),
-  githubLists: (filter: GithubFilter) => invoke<GithubLists>("github_lists", { filter }),
-  githubSection: (section: GithubSection, page: number, filter: GithubFilter) =>
-    invoke<GithubList>("github_section", { section, page, filter }),
+  /** Served from Rust's cache for 5 min unless `force`; the rate-limit guard applies either way. */
+  githubLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("github_lists", { filter, force }),
+  githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
+    invoke<ForgeList>("github_section", { section, page, filter }),
+  /** One call per click, not per list row: never fetched for a whole page at once. */
+  githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
+
+  gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
+  /** Validates address and token against the instance; returns the username. */
+  gitlabConnect: (baseUrl: string, token: string) => invoke<string>("gitlab_connect", { baseUrl, token }),
+  gitlabDisconnect: () => invoke<void>("gitlab_disconnect"),
+  gitlabLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("gitlab_lists", { filter, force }),
+  gitlabSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
+    invoke<ForgeList>("gitlab_section", { section, page, filter }),
+  /** One call per click, not per list row: never fetched for a whole page at once. */
+  gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
+  /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
+  forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
+  /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
+  badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
+
+  /** RSS/Atom incident history from services the team depends on; served from a 5 min cache unless `force`. */
+  apiStatus: (force = false) => invoke<StatusResult[]>("api_status", { force }),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */
@@ -186,5 +238,5 @@ export const api = {
 };
 
 export function errText(e: unknown): string {
-  return typeof e === "string" ? e : e instanceof Error ? e.message : "erro inesperado";
+  return typeof e === "string" ? e : e instanceof Error ? e.message : t("app.unexpectedError");
 }

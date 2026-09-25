@@ -25,10 +25,7 @@ pub struct Status {
 
 #[tauri::command]
 pub fn vault_status(state: State<'_, AppState>) -> Status {
-    Status {
-        exists: state.vault_exists(),
-        unlocked: state.is_unlocked(),
-    }
+    Status { exists: state.vault_exists(), unlocked: state.is_unlocked() }
 }
 
 #[tauri::command(async)]
@@ -38,7 +35,15 @@ pub fn vault_create(state: State<'_, AppState>, password: String) -> Result<()> 
 
 #[tauri::command(async)]
 pub fn vault_unlock(state: State<'_, AppState>, password: String) -> Result<()> {
-    state.unlock(&password)
+    state.unlock(&password)?;
+    crate::unlock_log::record(&state.dir, "password", now_ms());
+    Ok(())
+}
+
+/// Read here, not through `state` at rest: the log survives across sessions without needing the vault open.
+#[tauri::command]
+pub fn unlock_history(state: State<'_, AppState>) -> Vec<crate::unlock_log::UnlockEntry> {
+    crate::unlock_log::history(&state.dir)
 }
 
 #[tauri::command]
@@ -51,7 +56,7 @@ pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task
     state.mutate_if(|d| crate::routine::materialize(d, &day, now_ms()) > 0)?;
     state.read(|d| {
         let mut list: Vec<Task> = d.tasks.iter().filter(|t| t.day == day).cloned().collect();
-        list.sort_by_key(|t| (t.done, t.created_at));
+        list.sort_by_key(|t| (t.done, t.order.unwrap_or(t.created_at), t.created_at));
         list
     })
 }
@@ -60,15 +65,7 @@ pub fn tasks_for_day(state: State<'_, AppState>, day: String) -> Result<Vec<Task
 pub fn task_add(state: State<'_, AppState>, title: String, day: String) -> Result<Task> {
     let title = task_title(&title)?;
     let now = now_ms();
-    let task = Task {
-        id: new_id(),
-        title,
-        done: false,
-        day,
-        created_at: now,
-        updated_at: now,
-        ..Default::default()
-    };
+    let task = Task { id: new_id(), title, done: false, day, created_at: now, updated_at: now, ..Default::default() };
     let created = task.clone();
     state.mutate(|d| d.tasks.push(task))?;
     Ok(created)
@@ -107,6 +104,30 @@ pub fn task_rename(state: State<'_, AppState>, id: String, title: String) -> Res
     state.mutate(|d| {
         if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
             t.title = title;
+            t.updated_at = now_ms();
+        }
+    })
+}
+
+fn pr_url(raw: Option<String>) -> Result<Option<String>> {
+    let Some(raw) = raw else { return Ok(None) };
+    let clean = raw.trim();
+    if clean.is_empty() {
+        return Ok(None);
+    }
+    if !(clean.starts_with("https://") || clean.starts_with("http://")) {
+        return Err(AppError::Config("link precisa começar com http(s)://".into()));
+    }
+    Ok(Some(clean.to_string()))
+}
+
+/// `url: None` clears the link, matching the "unset by omission" shape the frontend already uses for schedule.
+#[tauri::command(async)]
+pub fn task_link_pr(state: State<'_, AppState>, id: String, url: Option<String>) -> Result<()> {
+    let url = pr_url(url)?;
+    state.mutate(|d| {
+        if let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) {
+            t.pr_url = url;
             t.updated_at = now_ms();
         }
     })
@@ -156,10 +177,7 @@ mod tests {
     #[test]
     fn empty_or_whitespace_only_title_is_rejected() {
         for raw in ["", "   ", "\t\n", "\u{00a0}"] {
-            assert!(
-                matches!(task_title(raw), Err(AppError::Config(_))),
-                "aceitou {raw:?} como titulo"
-            );
+            assert!(matches!(task_title(raw), Err(AppError::Config(_))), "aceitou {raw:?} como titulo");
         }
     }
 
@@ -167,5 +185,20 @@ mod tests {
     fn ids_generated_in_sequence_do_not_repeat() {
         let ids: std::collections::HashSet<String> = (0..500).map(|_| new_id()).collect();
         assert_eq!(ids.len(), 500);
+    }
+
+    #[test]
+    fn pr_url_accepts_trimmed_https_and_clears_on_blank() {
+        assert_eq!(
+            pr_url(Some("  https://github.com/o/r/pull/1  ".into())).unwrap(),
+            Some("https://github.com/o/r/pull/1".into())
+        );
+        assert_eq!(pr_url(Some("   ".into())).unwrap(), None);
+        assert_eq!(pr_url(None).unwrap(), None);
+    }
+
+    #[test]
+    fn pr_url_rejects_a_non_http_scheme() {
+        assert!(matches!(pr_url(Some("javascript:alert(1)".into())), Err(AppError::Config(_))));
     }
 }

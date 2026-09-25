@@ -1,238 +1,269 @@
 <div align="center">
 
-<img src="docs/prints/readme/banner.webp" alt="Canto: seu dia inteiro no canto da tela. Tarefas, GitHub e aviso de reunião em janelas do widget." width="100%">
+<img src="docs/prints/readme/banner.webp" alt="Canto: your whole day in the corner of the screen. Tasks, GitHub and meeting alerts in widget windows." width="100%">
 
 <br><br>
 
-[![Baixar](https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20Baixar-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4ade80?style=for-the-badge&labelColor=0f172a)](https://github.com/juninmd/canto-widget/releases)
+[![Download](https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20Download-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4ade80?style=for-the-badge&labelColor=0f172a)](https://github.com/juninmd/canto-widget/releases)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/juninmd/canto-widget/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=0f172a)](https://github.com/juninmd/canto-widget/actions/workflows/ci.yml)
-[![Licença MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-4ade80?style=for-the-badge&labelColor=0f172a)](LICENSE)
+[![MIT License](https://img.shields.io/badge/license-MIT-4ade80?style=for-the-badge&labelColor=0f172a)](LICENSE)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-24c8db?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0f172a)](https://v2.tauri.app)
-[![Rust](https://img.shields.io/badge/Rust-n%C3%BAcleo%20cifrado-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](src-tauri)
+[![Rust](https://img.shields.io/badge/Rust-encrypted%20core-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](src-tauri)
 [![React 19](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=white&labelColor=0f172a)](src)
 
-**[Recursos](#-recursos)** · **[Skins](#-cinco-skins)** · **[Instalar](#%EF%B8%8F-instalar)** · **[Segurança](#-segurança-em-uma-tela)** · **[Documentação](#-documentação)**
+**[Features](#-features)** · **[Skins](#-five-skins)** · **[Install](#%EF%B8%8F-install)** · **[Security](#-security-at-a-glance)** · **[Documentation](#-documentation)**
+
+<sub>**English** · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [हिन्दी](README.hi.md)</sub>
 
 </div>
 
 <br>
 
-> **Tarefas com lembrete, notas, histórico do clipboard, agenda com aviso de reunião, transcrições e seus PRs do
-> GitHub numa janela pequena presa ao canto da tela.** Aparece com `Ctrl+Alt+Espaço`, some quando você não precisa
-> dela e guarda tudo cifrado na sua máquina, sem conta e sem servidor.
+> **Tasks with reminders, notes, clipboard history, an agenda with meeting alerts, transcripts and your GitHub PRs
+> in a small window pinned to the corner of the screen.** Pops up with `Ctrl+Alt+Space`, hides when you don't need
+> it and keeps everything encrypted on your machine, with no account and no server.
 
-## ✨ Por que o Canto
+## ✨ Why Canto
 
 <table>
 <tr>
-<td width="44%" align="center"><img src="docs/prints/readme/tour.gif" alt="Tour pelas abas Tarefas, Notas, Clipboard, Agenda e GitHub, pelo aviso de reunião e pelas skins" width="300"></td>
+<td width="44%" align="center"><img src="docs/prints/readme/tour.gif" alt="Tour through the Tasks, Notes, Clipboard, Agenda and GitHub tabs, the meeting alert and the skins" width="300"></td>
 <td>
 
-Quem vive entre reuniões, PRs e pequenas pendências acaba com cinco apps abertos. O Canto junta tudo num lugar só.
+If you live between meetings, PRs and small pending items, you end up with five apps open. Canto puts it all in
+one place.
 
-🔒 **Cifrado por padrão.** Argon2id + AES-256-GCM com senha mestra; a chave só existe em RAM. Windows Hello opcional.
+🔒 **Encrypted by default.** Argon2id + AES-256-GCM with a master password; the key only ever exists in RAM.
+Windows Hello optional.
 
-🏠 **Seus dados ficam com você.** Zero telemetria, zero servidor, nenhuma conta obrigatória. O backup é um arquivo `.canto` cifrado.
+🏠 **Your data stays with you.** Zero telemetry, zero server, no account required. Backup is a single encrypted
+`.canto` file.
 
-⏰ **Você não perde a hora.** 1 min antes da reunião e na hora do lembrete, o widget aparece, toca um som e manda notificação, com **adiar 10 min**.
+⏰ **You won't miss it.** 1 minute before a meeting and at reminder time, the widget pops up, plays a sound and
+sends a notification, with **snooze 10 min**.
 
-🪶 **Leve.** Tauri v2 (Rust + webview do sistema) em vez de Electron: instalador de 3,5 MB. [Números medidos](docs/benchmark.md#footprint-medido).
+🪶 **Light.** Tauri v2 (Rust + the system webview) instead of Electron: a 3.5 MB installer.
+[Measured numbers](docs/benchmark.md#footprint-medido).
 
-🔄 **Sempre em dia.** Atualiza pelo próprio app e só instala o que foi assinado pela chave do projeto.
+🔄 **Always up to date.** Updates from within the app and only installs what's signed by the project's own key.
 
 </td>
 </tr>
 </table>
 
-## 🧰 Recursos
+## 🧰 Features
 
 <table>
 <tr>
-<td width="36%"><img src="docs/prints/app/01-tarefas.png" alt="Tarefas do dia com horário e recorrência"></td>
+<td width="36%"><img src="docs/prints/app/01-tarefas.png" alt="Today's tasks with time and recurrence"></td>
 <td>
 
-### ✅ Tarefas que lembram de você
+### ✅ Tasks that remind you
 
-Checklist do dia com horário e recorrência (todo dia, dias úteis ou semanal). Digite **`Daily às 9h30`** e o
-lembrete já sai marcado. **Resumo do dia** pronto para colar e **puxar pendências** de ontem.
+A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
+reminder is already set. **Day summary** ready to paste and **pull over pending items** from yesterday.
 
 </td>
 </tr>
 <tr>
 <td>
 
-### 📅 Reunião começando? Ele avisa.
+### 📅 Meeting starting? It tells you.
 
-Os eventos do dia vêm do Google Calendar (somente leitura). Um minuto antes, o widget salta na tela com **entrar
-no Meet**, toca um som e manda notificação do sistema, esteja você em qualquer aba ou com ele escondido.
-Clique no evento para ver quem organizou, a pauta, os convidados e os anexos, como as anotações do Gemini.
-
-</td>
-<td width="36%"><img src="docs/prints/app/07-aviso-reuniao.png" alt="Aviso de reunião com entrar no Meet e adiar"></td>
-</tr>
-<tr>
-<td><img src="docs/prints/app/02-notas.png" alt="Cards de notas com tags e nota fixada"></td>
-<td>
-
-### 🗒️ Notas em cards
-
-Cards pesquisáveis com `#tags`, fixar no topo e filtro por tag com um clique. Aguenta milhares de notas: a lista
-chega em páginas e a busca procura em todas.
+Today's events come from Google Calendar (read-only). One minute before, the widget jumps onto the screen with
+**join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
+Click the event to see who organized it, the agenda, the guests and attachments, like Gemini's notes.
 
 </td>
+<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with organizer, guests and Gemini notes"></td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/02-notas.png" alt="Note cards with tags and a pinned note"></td>
 <td>
 
-### 📋 Clipboard que não esquece (nem vaza)
+### 🗒️ Notes as cards
 
-Histórico cifrado com busca e fixar; reconhece link, cor e código. Uma cópia gigante (um log de 100 MB) não trava
-nada: ele guarda o começo e avisa. No Windows, ignora o que gerenciadores de senha marcam como sensível.
-
-</td>
-<td><img src="docs/prints/app/03-clipboard.png" alt="Histórico do clipboard com link, log grande e código"></td>
-</tr>
-<tr>
-<td><img src="docs/prints/app/05-github.png" alt="Aba GitHub com revisão pedida, atribuídos e PRs abertos"></td>
-<td>
-
-### 🐙 Seu GitHub numa olhada
-
-**Revisão pedida a mim**, atribuídos a mim, PRs e issues que eu abri, com ícone de PR ou issue e quem abriu.
-Filtre por texto, `repo:` ou `label:`, só PRs ou só issues, e role com **mostrar mais**.
-Entra com token pessoal só leitura ou pelo navegador (device flow).
+Searchable cards with `#tags`, pin to top and one-click tag filter. Markdown with `- [ ]` checklists you tick
+in the preview and fenced code blocks with syntax highlighting. Handles thousands of notes: the list is paged
+and search covers all of them.
 
 </td>
 </tr>
 <tr>
 <td>
 
-### ⚙️ Ajustes e atualização automática
+### 📋 Clipboard that never forgets (or leaks)
 
-Troca de senha mestra, Windows Hello, backup `.canto`, início com o sistema e a seção **Atualizações**, com a
-**versão instalada** e a **última publicada** lado a lado e um botão para atualizar e reiniciar.
+Encrypted history with search and pin; recognizes links, colors and code. A giant copy (a 100 MB log) doesn't
+freeze anything: it keeps the start and warns you. On Windows, it skips whatever password managers mark as
+sensitive.
 
 </td>
-<td><img src="docs/prints/app/18-atualizacoes.png" alt="Ajustes com a versão instalada, a última publicada e o botão de atualizar"></td>
+<td><img src="docs/prints/app/03-clipboard.png" alt="Clipboard history with a link, a large log and code"></td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/05-github.png" alt="GitHub tab with review requested, assigned and a stalled PR"></td>
+<td>
+
+### 🐙 Your GitHub at a glance
+
+**Review requested from me**, assigned to me, PRs and issues I opened, with a PR or issue icon and who opened
+it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and CI status is one
+click away. Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
+scroll with **show more**. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+respects the rate limit. Sign in with a read-only personal token or from the browser (device flow).
+
+</td>
+</tr>
+<tr>
+<td>
+
+### ⚙️ Settings and automatic updates
+
+Master password change, Windows Hello, `.canto` backup, a synced folder with automatic merge (Dropbox,
+OneDrive, Syncthing...), start with the system and the **Updates** section, with the **installed version** and
+the **latest published** one side by side and a button to update and restart.
+
+</td>
+<td><img src="docs/prints/app/18-atualizacoes.png" alt="Settings showing installed version, latest published version and the update button"></td>
 </tr>
 </table>
 
-Também tem 🎙️ **Reuniões**: as anotações e transcrições do Gemini das últimas duas semanas, mais transcrições
-`.vtt`, `.srt`, `.txt` e `.md` de uma pasta local, limpas e pesquisáveis.
+Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two weeks, plus `.vtt`, `.srt`, `.txt`
+and `.md` transcripts from a local folder, cleaned up and searchable.
 
-⌨️ **Tudo por teclado:** `Alt+1`…`Alt+7` trocam de aba, `N` cria, `/` busca, `F11` tela cheia, `Alt+L` tranca e `?` lista os atalhos.
+⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
+locks and `?` lists the shortcuts.
 
-## 🎨 Cinco skins
+## 🎨 Five skins
 
 <table>
 <tr>
-<td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Skin Padrão" width="200"><br><b>Padrão</b></td>
-<td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Skin Hueco Mundo" width="200"><br><b>Hueco Mundo</b></td>
-<td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Skin Drácula" width="200"><br><b>Drácula</b></td>
-<td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Skin Clara" width="200"><br><b>Clara</b></td>
+<td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Default</b></td>
+<td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
+<td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
+<td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
 
-E **Seguir o sistema**, que troca entre clara e escura junto com o sistema operacional. Todas passam contraste AA.
+And **Follow system**, which switches between light and dark along with the OS. All pass AA contrast.
 
 <details>
-<summary>🖥️ Mais telas: tela cheia, cofre trancado, lembrete de tarefa, conectar o GitHub e trocar senha</summary>
+<summary>🖥️ More screens: onboarding, global search, GitLab, subtasks, markdown, security, sync, density and more</summary>
 
 <br>
 
-![Aba GitHub em tela cheia](docs/prints/app/12-tela-cheia.png)
+![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
-| Cofre trancado | Lembrete de tarefa | Conectar o GitHub | Trocar senha mestra |
+| First-run welcome | Global search (`Ctrl+K`) | Self-hosted GitLab tab | Meeting alert |
 |---|---|---|---|
-| ![Tela de senha com Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Lembrete com concluir e adiar](docs/prints/app/08-lembrete-tarefa.png) | ![Conectar com token ou pelo navegador](docs/prints/app/10-github-conectar.png) | ![Formulário de troca de senha](docs/prints/app/13-trocar-senha.png) |
+| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+
+| Task with subtasks, priority and PR | Note in markdown | More clipboard types | Security: auto-lock and unlocks |
+|---|---|---|---|
+| ![Checklist, priority and PR link on a task](docs/prints/app/23-tarefas-detalhes.png) | ![Note in markdown with a checklist and a highlighted SQL block](docs/prints/app/24-notas-markdown.png) | ![Clipboard recognizing link, color, json, e-mail and phone](docs/prints/app/25-clipboard-tipos.png) | ![Configurable auto-lock and a log of the latest unlocks](docs/prints/app/26-ajustes-seguranca.png) |
+
+| Synced folder | Compact density | Locked vault | Connect GitHub |
+|---|---|---|---|
+| ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
+
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
+|---|---|---|---|
+| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident; ongoing outages highlighted with their live Statuspage state](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
 </details>
 
-<sub>Todos os prints usam dados fictícios.</sub>
+<sub>All screenshots use fictitious data.</sub>
 
-## ⚖️ Comparado com o que já existe
+## ⚖️ Compared to what's out there
 
-Nenhuma das ferramentas pesquisadas cobre mais de duas destas frentes ao mesmo tempo. Fontes e detalhes em
+None of the tools researched cover more than two of these fronts at once. Sources and details in
 [docs/benchmark.md](docs/benchmark.md).
 
-| | Tarefas + lembrete | Notas | Clipboard | Reunião | GitHub | Cifra local por padrão |
+| | Tasks + reminder | Notes | Clipboard | Meetings | GitHub | Local encryption by default |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|
 | **Canto** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Todoist / TickTick | ✅ | ➖ | — | — | — | — |
-| Obsidian / Joplin | ➖ | ✅ | — | — | — | ➖ só no sync |
+| Obsidian / Joplin | ➖ | ✅ | — | — | — | ➖ sync only |
 | Raycast | ➖ | ✅ | ✅ | ➖ | ➖ | ? |
-| CopyQ / Ditto | — | — | ✅ | — | — | ➖ opcional |
+| CopyQ / Ditto | — | — | ✅ | — | — | ➖ optional |
 | MeetingBar | — | — | — | ✅ | — | n/a |
 | Gitify | — | — | — | — | ✅ | n/a |
 
-<sub>✅ nativo · ➖ parcial, via extensão ou opcional · — não tem · ? não publicado · n/a não guarda dados do usuário</sub>
+<sub>✅ native · ➖ partial, via extension or optional · — none · ? unpublished · n/a doesn't store user data</sub>
 
-O que o benchmark trouxe para cá: **horário direto no título da tarefa** (Todoist/TickTick), **adiar aviso**
-(TickTick) e **clipboard que respeita gerenciadores de senha** (CopyQ/Ditto).
+What the benchmark brought here: **time right in the task title** (Todoist/TickTick), **snooze the alert**
+(TickTick) and **clipboard that respects password managers** (CopyQ/Ditto).
 
-## ⬇️ Instalar
+## ⬇️ Install
 
-Baixe o instalador da sua plataforma em **[Releases](https://github.com/juninmd/canto-widget/releases)**:
+Download the installer for your platform from **[Releases](https://github.com/juninmd/canto-widget/releases)**:
 
-| Sistema | Arquivo |
+| System | File |
 |---|---|
-| 🪟 Windows 10/11 | `Canto_x.y.z_x64-setup.exe` (recomendado) ou `.msi` |
-| 🍎 macOS | `.dmg` para Apple Silicon ou Intel |
-| 🐧 Linux | `.AppImage`, `.deb` ou `.rpm` |
+| 🪟 Windows 10/11 | `Canto_x.y.z_x64-setup.exe` (recommended) or `.msi` |
+| 🍎 macOS | `.dmg` for Apple Silicon or Intel |
+| 🐧 Linux | `.AppImage`, `.deb` or `.rpm` |
 
-1. Na primeira execução você cria a **senha mestra**. Não há recuperação: perder a senha é perder os dados.
-2. `Ctrl+Alt+Espaço` (`Cmd+Alt+Espaço` no macOS) mostra e esconde o widget.
-3. Pronto. Quando sair versão nova, o Canto avisa, e **Ajustes → Atualizações** atualiza com um clique.
+1. On first run you create the **master password**. There's no recovery: lose the password, lose the data.
+2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` on macOS) shows and hides the widget.
+3. Done. When a new version ships, Canto notifies you, and **Settings → Updates** updates with one click.
 
 > [!NOTE]
-> Os instaladores ainda não têm assinatura de código: o SmartScreen (Windows) e o Gatekeeper (macOS) avisam na
-> primeira abertura. As atualizações automáticas são conferidas pela assinatura própria do projeto antes de rodar.
+> The installers aren't code-signed yet: SmartScreen (Windows) and Gatekeeper (macOS) warn on first launch.
+> Automatic updates are verified against the project's own signature before running.
 
-## 🔒 Segurança em uma tela
+Ready-made manifests for winget and Homebrew (plus a skeleton for Flatpak, currently blocked) live in
+[`packaging/`](packaging/README.md) — prepared and verified locally, but not yet published to those
+repositories: publishing is a manual decision and action by the maintainer.
 
-| Camada | Proteção |
+## 🔒 Security at a glance
+
+| Layer | Protection |
 |---|---|
-| Cofre | Argon2id (19 MiB, t=2) → AES-256-GCM, nonce novo a cada gravação, gravação atômica com `fsync` |
-| Chave | só em RAM, zerada ao trancar; auto-lock após 15 min sem uso |
-| Rede | só o processo Rust fala com a rede; a webview não tem origem remota (CSP) e nunca vê tokens |
-| Google | opcional, só `calendar.events.readonly` + perfil, OAuth com PKCE e loopback |
-| GitHub | opcional, token cifrado; itens só abrem se o link for `https://github.com/` |
-| Atualização | só instala pacote assinado pela chave do projeto; download adulterado é descartado antes de rodar |
+| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, a fresh nonce on every write, atomic write with `fsync` |
+| Key | RAM only, zeroed on lock; configurable auto-lock (5 to 60 min idle, 15 min by default) |
+| Network | only the Rust process talks to the network; the webview has no remote origin (CSP) and never sees tokens |
+| Google | optional, only `calendar.events.readonly` plus profile, OAuth with PKCE and loopback |
+| GitHub | optional, encrypted token; items only open if the link is `https://github.com/` |
+| GitLab | optional, encrypted address and token; `https://` only, no redirects, links only from the configured instance |
+| Updates | only installs a package signed by the project's key; a tampered download is discarded before running |
 
-Modelo completo, backup, merge entre máquinas e onde cada arquivo fica: [docs/seguranca.md](docs/seguranca.md).
-Achou uma falha? [SECURITY.md](SECURITY.md).
+Full model, backup, merge across machines and where each file lives: [docs/seguranca.md](docs/seguranca.md).
+Found a flaw? [SECURITY.md](SECURITY.md).
 
-## 📚 Documentação
+## 📚 Documentation
 
-| Documento | O que tem |
+| Document | What's in it |
 |---|---|
-| 📖 [Guia de uso](docs/uso.md) | abas, tarefas recorrentes, atalhos, skins, acessibilidade, janela, atualizações e início com o sistema |
-| 🔌 [Integrações](docs/integracoes.md) | agenda do Google e GitHub (token pessoal ou device flow) |
-| 🛡️ [Segurança e dados](docs/seguranca.md) | modelo de ameaça, backup `.canto`, merge, troca de senha, arquivos em disco |
-| 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify e testes de volume |
-| 📝 [CHANGELOG](CHANGELOG.md) | o que mudou em cada versão |
-| 🤝 [Como contribuir](CONTRIBUTING.md) | ambiente, testes, PR e como publicar um release |
-| 🤖 [Guia para agentes](AGENTS.md) | contratos e armadilhas para quem edita o código com IA |
+| 📖 [User guide](docs/uso.md) | tabs, recurring tasks, shortcuts, skins, accessibility, window, updates and start with the system |
+| 🔌 [Integrations](docs/integracoes.md) | Google agenda and GitHub (personal token or device flow) |
+| 🛡️ [Security and data](docs/seguranca.md) | threat model, `.canto` backup, merge, password change, files on disk |
+| 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify and volume tests |
+| 📝 [CHANGELOG](CHANGELOG.md) | what changed in each version |
+| 🤝 [How to contribute](CONTRIBUTING.md) | environment, tests, PRs and how to publish a release |
+| 🤖 [Agent guide](AGENTS.md) | contracts and traps for anyone editing the code with AI |
 
-## 🛠️ Desenvolvimento
+## 🛠️ Development
 
-Pré-requisitos: [Bun](https://bun.sh) ≥ 1.2, Rust estável ≥ 1.85 e as
-[dependências do Tauri v2](https://v2.tauri.app/start/prerequisites/) do seu sistema.
+Prerequisites: [Bun](https://bun.sh) ≥ 1.2, stable Rust ≥ 1.85 and the
+[Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) for your system.
 
 ```bash
 bun install
-bun run tauri dev                                        # app com hot reload
-bun run lint && bun test                                 # tipos e testes da interface
+bun run tauri dev                                        # app with hot reload
+bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
-bun run tauri build                                      # instalador da plataforma atual
+bun run tauri build                                      # installer for the current platform
 ```
 
-Todo PR roda a CI em Windows, macOS e Linux. Uma tag `v*` gera os instaladores assinados para atualização num
-release em rascunho (passo a passo em [CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
+Every PR runs CI on Windows, macOS and Linux. Each commit merged into `main` gets a version tag, generated
+release notes and signed installers; the release is published after verification (details in
+[CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
 
-## 📄 Licença
+## 📄 License
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Feito com 🦀 Rust, ⚛️ React e ☕ para quem vive entre reuniões.</sub></div>
+<div align="center"><sub>Made with 🦀 Rust, ⚛️ React and ☕ for those who live between meetings.</sub></div>

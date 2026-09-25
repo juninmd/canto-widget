@@ -28,7 +28,10 @@ fn canceled_event_is_dropped_from_the_agenda() {
 
 #[test]
 fn all_day_event_is_flagged() {
-    let item = parse(r#"{"items":[{"id":"e2","summary":"Feriado","start":{"date":"2026-09-07"},"end":{"date":"2026-09-08"}}]}"#).unwrap();
+    let item = parse(
+        r#"{"items":[{"id":"e2","summary":"Feriado","start":{"date":"2026-09-07"},"end":{"date":"2026-09-08"}}]}"#,
+    )
+    .unwrap();
     assert!(item.all_day);
     assert_eq!(item.start, "2026-09-07");
 }

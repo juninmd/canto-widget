@@ -120,7 +120,6 @@ fn multibyte_text_is_cut_on_a_character_boundary() {
     assert!(h.items[0].text.chars().all(|c| c == 'é'));
 }
 
-
 #[test]
 fn copying_a_pinned_text_again_keeps_it_pinned() {
     let mut h = hist(&["guardar"]);
@@ -128,6 +127,30 @@ fn copying_a_pinned_text_again_keeps_it_pinned() {
     h.push("outro", "o".into());
     h.push("guardar", "again".into());
     assert!(h.items[0].pinned, "re-copying silently unpinned the item");
+}
+
+#[test]
+fn pinning_past_the_configured_limit_is_refused() {
+    let mut h = hist(&["um", "dois"]);
+    h.max_pinned = 1;
+    h.toggle_pin("id0").unwrap();
+    assert!(h.toggle_pin("id1").is_err());
+    assert_eq!(h.pinned_count(), 1);
+}
+
+#[test]
+fn unpinning_always_works_even_at_the_limit() {
+    let mut h = hist(&["um"]);
+    h.max_pinned = 1;
+    h.toggle_pin("id0").unwrap();
+    assert!(h.toggle_pin("id0").is_ok());
+    assert_eq!(h.pinned_count(), 0);
+}
+
+#[test]
+fn an_old_history_without_the_field_gets_the_default_limit() {
+    let h: ClipHistory = serde_json::from_str(r#"{"items":[]}"#).unwrap();
+    assert_eq!(h.max_pinned, DEFAULT_MAX_PINNED);
 }
 
 #[test]

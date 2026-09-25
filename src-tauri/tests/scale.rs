@@ -84,9 +84,19 @@ fn large_vault_stays_responsive() {
         });
     }
     let (page_bytes, all_bytes) = st
-        .read(|d| (serde_json::to_vec(&page(&d.notes, "", PAGE_DEFAULT)).unwrap().len(), serde_json::to_vec(&d.notes).unwrap().len()))
+        .read(|d| {
+            (
+                serde_json::to_vec(&page(&d.notes, "", PAGE_DEFAULT)).unwrap().len(),
+                serde_json::to_vec(&d.notes).unwrap().len(),
+            )
+        })
         .unwrap();
-    println!("{:<34} {:>10.1} KB  (all notes: {:.1} MB)", "notes page payload to webview", page_bytes as f64 / 1e3, all_bytes as f64 / 1e6);
+    println!(
+        "{:<34} {:>10.1} KB  (all notes: {:.1} MB)",
+        "notes page payload to webview",
+        page_bytes as f64 / 1e3,
+        all_bytes as f64 / 1e6
+    );
     assert!(page_bytes < 500_000, "first page ships {page_bytes} bytes");
     let other = big_vault();
     time("merge with an equal-size vault", Duration::from_millis(1000), || {

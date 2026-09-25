@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hour, people, status } from "../lib/agenda";
+import { t } from "../i18n";
 
 type Props = { event: AgendaItem; open: boolean; onToggle: () => void };
 
@@ -33,7 +34,7 @@ export default function AgendaCard({ event: e, open, onToggle }: Props) {
           {people(e) && <p>{people(e)}</p>}
           {e.description && <p className="max-h-32 overflow-y-auto whitespace-pre-line text-faint">{e.description}</p>}
           {attachments.length > 0 && (
-            <ul aria-label="Anexos" className="space-y-1">
+            <ul aria-label={t("agenda.attachments")} className="space-y-1">
               {attachments.map((a) => (
                 <li key={a.url}>
                   <button
@@ -50,7 +51,7 @@ export default function AgendaCard({ event: e, open, onToggle }: Props) {
           )}
           {e.link && (
             <button type="button" onClick={() => void api.openLink(e.link)} className="min-h-6 underline decoration-dotted hover:text-fg">
-              abrir no Calendar
+              {t("agenda.openInCalendar")}
             </button>
           )}
         </div>
@@ -62,7 +63,7 @@ export default function AgendaCard({ event: e, open, onToggle }: Props) {
           onClick={() => void api.openLink(e.meet)}
           className={`mt-1.5 min-h-7 rounded px-2.5 text-xs font-semibold ${now ? "bg-accent text-on-accent" : "bg-edge text-fg"}`}
         >
-          entrar no Meet
+          {t("agenda.joinMeet")}
         </button>
       )}
     </li>

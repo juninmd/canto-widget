@@ -1,6 +1,6 @@
 # Segurança e dados
 
-[← voltar ao README](../README.md)
+[← voltar ao README](../README.pt-BR.md)
 
 ## Modelo de segurança
 
@@ -17,6 +17,7 @@
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |
 | Tokens | `refresh_token` guardado cifrado com a mesma chave do cofre (`drive.json`, nome mantido por compatibilidade) |
 | GitHub | token em `github.json`, cifrado com a chave do cofre e nunca enviado à webview. Token pessoal validado por formato antes de sair da máquina; token de GitHub App que expira é renovado 1 min antes do vencimento, uma renovação por vez. Links só abrem se forem `https://github.com/` |
+| GitLab | endereço e token em `gitlab.json`, cifrados e nunca enviados à webview. Só `https://`, sem seguir redirecionamentos, e links só abrem se forem da instância configurada. As listas de GitHub e GitLab ficam em cache só na RAM, apagado ao trancar |
 | Troca de senha | exige a senha atual. Tudo é lido com a chave antiga e selado com a nova **antes** de gravar: senha errada ou arquivo ilegível não alteram nada. As cópias novas esperam como `<arquivo>.next` e só substituem as antigas depois que o cofre é gravado; se a troca for interrompida, o próximo destrancar termina ou desfaz. As cópias em `backups/` acompanham a senha nova. `.canto` exportados antes continuam com a senha antiga |
 | Desfazer | remoções recentes ficam só em RAM (últimas 20) e somem ao trancar; a webview só conhece uma chave opaca, nunca reenvia o conteúdo |
 | Windows Hello | opcional. A senha mestra é cifrada (AES-256-GCM) com uma chave derivada da assinatura RSA de um desafio aleatório, feita por um par de chaves do Windows Hello preso ao TPM e liberado só por rosto, digital ou PIN. `biometria.json` não serve sem esse chip e esse gesto, e nunca entra em backup. A ativação assina, grava e reabre na hora (o Windows pede o gesto duas vezes): hardware com assinatura instável é recusado ali, não descoberto na tela de bloqueio. Cofre recriado com outra senha desliga a biometria sozinho. macOS/Linux: indisponível por enquanto |
@@ -50,6 +51,24 @@ Levar para outra máquina: crie o cofre lá **com a mesma senha mestra** e impor
 Além disso, o widget grava sozinho **uma cópia por dia** (data UTC) em `backups/`, mantendo as
 últimas 10 somando as de antes de importar. Não precisa do cofre destrancado.
 
+### Pasta sincronizada (ajustes → Pasta sincronizada)
+
+Alternativa ao exportar/importar manual: apontar para uma pasta já sincronizada por outra
+ferramenta (Dropbox, OneDrive, Syncthing) automatiza os dois lados.
+
+- Ao escolher a pasta, o Canto grava lá o envelope cifrado como `canto.canto` (nome fixo, para a
+  ferramenta de sync ver uma edição do mesmo arquivo, não um arquivo novo a cada vez). Se a pasta já
+  tiver um `canto.canto` de outra máquina, ele é mesclado antes — apontar para uma pasta existente
+  nunca sobrescreve o que já está lá.
+- Toda alteração no cofre reexporta para a pasta na hora (mesmo caminho do `persist` interno).
+- Ao destrancar, e a cada ~5 minutos com o cofre destrancado, o Canto confere se o arquivo na pasta
+  mudou desde a última vez que ele mesmo escreveu ali (por hash, não por data) e mescla se mudou —
+  mesma regra de last-write-wins com lápides do import manual, e a mesma cópia de segurança em
+  `backups/` antes de mesclar. Cofre trancado nunca lê a pasta.
+- **parar** só desliga a sincronização; não apaga o arquivo que já está na pasta.
+- `sincronizacao.json` guarda o caminho da pasta e o hash do último envio — não é segredo, mas nunca
+  entra em backup (é local à máquina, como `autolock.json`).
+
 Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 
 - item editado nos dois lados → vence a edição mais recente;
@@ -64,8 +83,10 @@ Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 - `backups/*.canto` — cópias diárias e de antes de importar, cifradas (últimas 10);
 - `drive.json` — credenciais OAuth da agenda, cifradas com a mesma chave;
 - `github.json` — token do GitHub, cifrado com a mesma chave (fora do backup);
+- `gitlab.json` — endereço da instância e token do GitLab, cifrados com a mesma chave (fora do backup);
 - `clipboard.json` — histórico da área de transferência, cifrado e nunca sincronizado;
 - `settings.json` — preferências não sensíveis (pasta de transcrições, skin);
 - `janela.json` — posição, tamanho e "sempre no topo";
 - `biometria.json` — senha mestra cifrada pela chave do Windows Hello (só se ativado);
-- `autostart.json` — marca que a escolha de iniciar com o sistema já foi feita.
+- `autostart.json` — marca que a escolha de iniciar com o sistema já foi feita;
+- `sincronizacao.json` — caminho da pasta sincronizada e hash do último envio, se configurada.

@@ -8,13 +8,13 @@ pub const TASK_PREFIX: &str = "task:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
-        return ("Lembrete de tarefa", event.title.clone());
+        return (crate::lang::tr("Lembrete de tarefa", "Task reminder"), event.title.clone());
     }
     let body = match event.location.trim() {
         "" => event.title.clone(),
         location => format!("{} · {location}", event.title),
     };
-    ("Reunião começando", body)
+    (crate::lang::tr("Reunião começando", "Meeting starting"), body)
 }
 
 /// Best effort: a denied or unavailable notification must not block the window alert.

@@ -8,7 +8,7 @@ use crate::clipboard::CLIP_AAD;
 use crate::crypto::VaultKey;
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
-use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, VAULT_AAD};
+use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, GITLAB_AAD, VAULT_AAD};
 use crate::vault::{AppState, MIN_PASSWORD_LEN};
 
 /// Envelope read with the old key and already sealed with the new one, ready to write.
@@ -24,7 +24,7 @@ impl AppState {
             return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
         }
         if new_password == current_password {
-            return Err(AppError::Config("a nova senha e igual a atual".into()));
+            return Err(AppError::Config("a nova senha é igual à atual".into()));
         }
         // Held start to finish: no watcher writes with the old key mid-change.
         let mut guard = self.session.lock().unwrap();
@@ -32,7 +32,7 @@ impl AppState {
         let vault: SealedBlob = store::read_json(&store::vault_path(&self.dir))?.ok_or(AppError::NotFound)?;
         VaultKey::derive(current_password, &session.salt)
             .and_then(|k| vault.open(&k, VAULT_AAD))
-            .map_err(|_| AppError::Config("a senha atual nao confere".into()))?;
+            .map_err(|_| AppError::Config("a senha atual não confere".into()))?;
 
         let salt = store::new_salt();
         let key = VaultKey::derive(new_password, &salt)?;
@@ -40,6 +40,7 @@ impl AppState {
         for (path, aad, disposable) in [
             (store::drive_path(&self.dir), DRIVE_AAD, false),
             (store::github_path(&self.dir), GITHUB_AAD, false),
+            (store::gitlab_path(&self.dir), GITLAB_AAD, false),
             (store::clip_path(&self.dir), CLIP_AAD, true),
         ] {
             match reencrypt(&path, aad, &session.key, &key, &salt) {
@@ -79,7 +80,7 @@ impl AppState {
 
 /// Settles staged copies left by a change: same salt as the vault means it was written, so swap; anything else is stale.
 pub(crate) fn finish_interrupted(dir: &Path, vault_salt: &[u8]) -> Result<()> {
-    let peripherals = [store::drive_path(dir), store::github_path(dir), store::clip_path(dir)];
+    let peripherals = [store::drive_path(dir), store::github_path(dir), store::gitlab_path(dir), store::clip_path(dir)];
     for path in peripherals.into_iter().chain(backup_files(dir)) {
         let next = staged(&path);
         match store::read_json::<SealedBlob>(&next) {
@@ -95,10 +96,7 @@ fn backup_files(dir: &Path) -> Vec<PathBuf> {
     let Ok(entries) = std::fs::read_dir(backups_dir(dir)) else {
         return Vec::new();
     };
-    entries
-        .filter_map(|e| e.ok().map(|e| e.path()))
-        .filter(|p| p.extension().is_some_and(|x| x == EXTENSION))
-        .collect()
+    entries.filter_map(|e| e.ok().map(|e| e.path())).filter(|p| p.extension().is_some_and(|x| x == EXTENSION)).collect()
 }
 
 /// Where the re-sealed copy waits until the vault itself is written.
@@ -119,14 +117,15 @@ fn reencrypt(path: &Path, aad: &[u8], old: &VaultKey, new: &VaultKey, salt: &[u8
 
 /// Backups follow the password change, otherwise none of them would import afterward; one already unreadable with the old key is left as-is.
 fn reencrypted_backups(dir: &Path, old: &VaultKey, new: &VaultKey, salt: &[u8]) -> Vec<Reencrypted> {
-    backup_files(dir)
-        .into_iter()
-        .filter_map(|p| reencrypt(&p, VAULT_AAD, old, new, salt).ok().flatten())
-        .collect()
+    backup_files(dir).into_iter().filter_map(|p| reencrypt(&p, VAULT_AAD, old, new, salt).ok().flatten()).collect()
 }
 
 #[tauri::command(async)]
-pub fn vault_change_password(state: State<'_, AppState>, current_password: String, new_password: String) -> Result<bool> {
+pub fn vault_change_password(
+    state: State<'_, AppState>,
+    current_password: String,
+    new_password: String,
+) -> Result<bool> {
     let (current_password, new_password) = (Zeroizing::new(current_password), Zeroizing::new(new_password));
     let biometric = state.change_password(&current_password, &new_password)?;
     if biometric {

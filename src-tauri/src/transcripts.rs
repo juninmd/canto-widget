@@ -39,23 +39,18 @@ fn documents_dir() -> PathBuf {
 /// Rejects any path that escapes `dir`: the name comes from the frontend and must never become an arbitrary path.
 fn resolve_within(dir: &Path, name: &str) -> Result<PathBuf> {
     if name.contains('/') || name.contains(char::from(92)) || name.contains("..") {
-        return Err(AppError::Config("nome de arquivo invalido".into()));
+        return Err(AppError::Config("nome de arquivo inválido".into()));
     }
-    let base = dir
-        .canonicalize()
-        .map_err(|_| AppError::NotFound)?;
+    let base = dir.canonicalize().map_err(|_| AppError::NotFound)?;
     let target = base.join(name).canonicalize().map_err(|_| AppError::NotFound)?;
     if !target.starts_with(&base) {
-        return Err(AppError::Config("caminho fora da pasta de transcricoes".into()));
+        return Err(AppError::Config("caminho fora da pasta de transcrições".into()));
     }
     Ok(target)
 }
 
 fn is_transcript(p: &Path) -> bool {
-    p.extension()
-        .and_then(|e| e.to_str())
-        .map(|e| EXTENSIONS.contains(&e.to_lowercase().as_str()))
-        .unwrap_or(false)
+    p.extension().and_then(|e| e.to_str()).map(|e| EXTENSIONS.contains(&e.to_lowercase().as_str())).unwrap_or(false)
 }
 
 fn mtime_ms(meta: &std::fs::Metadata) -> i64 {
@@ -71,10 +66,7 @@ pub fn clean_subtitles(raw: &str) -> String {
     let mut lines = Vec::new();
     for line in raw.lines() {
         let t = line.trim();
-        if t.is_empty()
-            || t == "WEBVTT"
-            || t.contains("-->")
-            || (t.chars().all(|c| c.is_ascii_digit()) && t.len() <= 5)
+        if t.is_empty() || t == "WEBVTT" || t.contains("-->") || (t.chars().all(|c| c.is_ascii_digit()) && t.len() <= 5)
         {
             continue;
         }
@@ -143,7 +135,7 @@ pub fn read(dir: &Path, name: &str) -> Result<String> {
     let path = resolve_within(dir, name)?;
     let meta = std::fs::metadata(&path)?;
     if meta.len() > MAX_BYTES {
-        return Err(AppError::Config("transcricao maior que 5 MB".into()));
+        return Err(AppError::Config("transcrição maior que 5 MB".into()));
     }
     Ok(clean_subtitles(&std::fs::read_to_string(path)?))
 }

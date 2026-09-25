@@ -1,39 +1,15 @@
 //! The user's open issues and PRs, via the GitHub REST API search.
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use std::time::Duration;
 
 use crate::error::{AppError, Result};
-use crate::github_query::{self as query, queries, GithubFilter, Section};
+use crate::forge::{checks_from_github, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
+use crate::forge_cache::{rate_limited, Quota};
+use crate::forge_filter::{self as filter, ForgeFilter, Section, Sort, PER_PAGE};
+use crate::github_query::{opened_since, queries};
+use crate::model::now_ms;
 
 const API: &str = "https://api.github.com";
-const PER_PAGE: usize = 30;
-
-#[derive(Debug, Clone, Serialize, PartialEq)]
-pub struct GithubItem {
-    pub repo: String,
-    pub number: u64,
-    pub title: String,
-    pub url: String,
-    pub updated_at: String,
-    pub is_pr: bool,
-    pub draft: bool,
-    pub author: String,
-}
-
-#[derive(Debug, Default, Serialize, PartialEq)]
-pub struct GithubList {
-    /// Total on GitHub; `items` only carries the requested page.
-    pub total: u64,
-    pub items: Vec<GithubItem>,
-}
-
-#[derive(Debug, Default, Serialize)]
-pub struct GithubLists {
-    pub assigned: GithubList,
-    pub my_prs: GithubList,
-    pub review_requested: GithubList,
-    pub my_issues: GithubList,
-}
 
 #[derive(Deserialize)]
 struct SearchResponse {
@@ -53,7 +29,11 @@ struct RawItem {
     #[serde(default)]
     repository_url: String,
     #[serde(default)]
+    created_at: String,
+    #[serde(default)]
     updated_at: String,
+    #[serde(default)]
+    comments: u64,
     #[serde(default)]
     draft: Option<bool>,
     #[serde(default)]
@@ -67,22 +47,20 @@ pub struct GithubUser {
     pub login: String,
 }
 
-pub fn lists(token: &str, filter: &GithubFilter) -> Result<GithubLists> {
-    Ok(GithubLists {
-        assigned: section(token, Section::Assigned, 1, filter)?,
-        my_prs: section(token, Section::MyPrs, 1, filter)?,
-        review_requested: section(token, Section::ReviewRequested, 1, filter)?,
-        my_issues: section(token, Section::MyIssues, 1, filter)?,
-    })
+/// One page of a section plus the search quota left; "assigned" pages issues and PRs side by side, so a page may bring up to 60.
+pub fn section(token: &str, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
+    let (mut out, mut quota) = (ForgeList::default(), None);
+    for q in queries(section, f) {
+        let (list, left) = search(token, &q, filter::page(page), f)?;
+        out = merge(out, list, f);
+        quota = left.or(quota);
+    }
+    Ok((out, quota))
 }
 
-/// One page of a section; "assigned" pages issues and PRs side by side, so a page may bring up to 60.
-pub fn section(token: &str, section: Section, page: u32, filter: &GithubFilter) -> Result<GithubList> {
-    let mut out = GithubList::default();
-    for q in queries(section, filter) {
-        out = merge(out, search(token, &q, query::page(page))?);
-    }
-    Ok(out)
+/// First page of the PRs opened since `since` (RFC 3339), newest first.
+pub fn prs_opened_since(token: &str, since: &str) -> Result<(ForgeList, Option<Quota>)> {
+    search(token, &opened_since(since), 1, &ForgeFilter { sort: Sort::Created, ..Default::default() })
 }
 
 pub fn user(token: &str) -> Result<String> {
@@ -90,14 +68,55 @@ pub fn user(token: &str) -> Result<String> {
     Ok(response::<GithubUser>(res)?.login)
 }
 
-fn search(token: &str, query: &str, page: u32) -> Result<GithubList> {
+#[derive(Deserialize)]
+struct PullDetail {
+    head: PullHead,
+}
+
+#[derive(Deserialize)]
+struct PullHead {
+    sha: String,
+}
+
+#[derive(Deserialize)]
+struct CombinedStatus {
+    #[serde(default)]
+    state: String,
+}
+
+/// Two calls (head sha, then its combined status): only on an explicit click, never per row of a list.
+pub fn pr_checks(token: &str, repo: &str, number: u64) -> Result<ChecksStatus> {
+    if !valid_repo_path(repo, 2) {
+        return Err(AppError::Format("repositório inválido".into()));
+    }
+    let pr: PullDetail = response(
+        client()?.get(format!("{API}/repos/{repo}/pulls/{number}")).bearer_auth(token).send().map_err(network)?,
+    )?;
+    let status: CombinedStatus = response(
+        client()?
+            .get(format!("{API}/repos/{repo}/commits/{}/status", pr.head.sha))
+            .bearer_auth(token)
+            .send()
+            .map_err(network)?,
+    )?;
+    Ok(checks_from_github(&status.state))
+}
+
+fn search(token: &str, query: &str, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
     let url = url::Url::parse_with_params(
         &format!("{API}/search/issues"),
-        [("q", query), ("sort", "updated"), ("order", "desc"), ("per_page", &PER_PAGE.to_string()), ("page", &page.to_string())],
+        [
+            ("q", query),
+            ("sort", f.sort.as_str()),
+            ("order", f.order.as_str()),
+            ("per_page", &PER_PAGE.to_string()),
+            ("page", &page.to_string()),
+        ],
     )
     .map_err(|e| AppError::Github(e.to_string()))?;
     let res = client()?.get(url).bearer_auth(token).send().map_err(network)?;
-    Ok(convert(response::<SearchResponse>(res)?))
+    let quota = Quota::from_headers(res.headers(), "x-ratelimit-remaining", "x-ratelimit-reset", now_ms());
+    Ok((convert(response(res)?), quota))
 }
 
 pub(crate) fn client() -> Result<reqwest::blocking::Client> {
@@ -119,47 +138,43 @@ pub(crate) fn network(e: reqwest::Error) -> AppError {
 
 fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
-    let no_quota = res.headers().get("x-ratelimit-remaining").is_some_and(|v| v == "0");
+    let now = now_ms();
+    let spent = Quota::from_headers(res.headers(), "x-ratelimit-remaining", "x-ratelimit-reset", now)
+        .filter(|q| q.remaining == 0);
     match status {
         200..=299 => res.json().map_err(|e| AppError::Github(format!("resposta inesperada: {e}"))),
         401 => Err(AppError::Github("token expirado ou revogado; conecte de novo".into())),
-        403 | 429 if no_quota || status == 429 => {
-            Err(AppError::Github("limite de requisicoes atingido; tente de novo em alguns minutos".into()))
+        403 | 429 if spent.is_some() || status == 429 => {
+            Err(rate_limited("github", spent.map_or(now + 60_000, |q| q.reset_at), now))
         }
         _ => Err(AppError::Github(format!("o GitHub respondeu {status}"))),
     }
 }
 
-fn convert(search: SearchResponse) -> GithubList {
+fn convert(search: SearchResponse) -> ForgeList {
     let items = search.items.into_iter().filter_map(item).collect();
-    GithubList { total: search.total_count, items }
+    ForgeList { total: search.total_count, items, ..Default::default() }
 }
 
 /// A link outside github.com is dropped: the UI opens this URL in the browser.
-fn item(b: RawItem) -> Option<GithubItem> {
+fn item(b: RawItem) -> Option<ForgeItem> {
     if !b.html_url.starts_with("https://github.com/") {
         return None;
     }
     let repo = b.repository_url.strip_prefix(&format!("{API}/repos/"))?.to_string();
-    Some(GithubItem {
+    Some(ForgeItem {
+        reference: format!("{repo}#{}", b.number),
         repo,
         number: b.number,
         title: b.title,
         url: b.html_url,
+        created_at: b.created_at,
         updated_at: b.updated_at,
+        comments: b.comments,
         is_pr: b.pull_request.is_some(),
         draft: b.draft.unwrap_or(false),
         author: b.user.map(|u| u.login).unwrap_or_default(),
     })
-}
-
-/// The queries don't overlap (one is `is:issue`, the other `is:pr`): just concatenate.
-/// No cap: dropping the tail of a page would make "show more" skip those items for good.
-fn merge(a: GithubList, b: GithubList) -> GithubList {
-    let mut items: Vec<GithubItem> = a.items.into_iter().chain(b.items).collect();
-    // RFC 3339 in UTC sorts as text.
-    items.sort_by(|x, y| y.updated_at.cmp(&x.updated_at));
-    GithubList { total: a.total + b.total, items }
 }
 
 #[cfg(test)]

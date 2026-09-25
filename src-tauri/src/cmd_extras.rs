@@ -2,48 +2,53 @@ use std::path::PathBuf;
 use tauri::{Manager, State};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
+use serde::Serialize;
+
 use crate::calendar::{self, AgendaItem};
-use crate::clipboard::{ClipItem, ClipView};
-use sha2::{Digest, Sha256};
-use crate::trash::Removed;
+use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use crate::commands::new_id;
 use crate::drive;
 use crate::error::{AppError, Result};
 use crate::transcripts::{self, TranscriptMeta, TranscriptSettings};
+use crate::trash::Removed;
 use crate::vault::AppState;
 use crate::{store, window};
+use sha2::{Digest, Sha256};
+
+#[derive(Serialize)]
+pub struct ClipList {
+    pub items: Vec<ClipView>,
+    pub max_pinned: usize,
+}
 
 #[tauri::command(async)]
-pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<Vec<ClipView>> {
+pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> {
     let q = query.trim().to_lowercase();
     let hist = state.clip_load()?;
-    Ok(hist
-        .items
-        .iter()
-        .filter(|i| q.is_empty() || i.text.to_lowercase().contains(&q))
-        .map(ClipView::from)
-        .collect())
+    let items =
+        hist.items.iter().filter(|i| q.is_empty() || i.text.to_lowercase().contains(&q)).map(ClipView::from).collect();
+    Ok(ClipList { items, max_pinned: hist.max_pinned })
+}
+
+/// Clamped so a typo (`0`, a huge number) can't lock pinning out or defeat the cap's purpose.
+#[tauri::command(async)]
+pub fn clip_set_max_pinned(state: State<'_, AppState>, max: usize) -> Result<()> {
+    let mut hist = state.clip_load()?;
+    hist.max_pinned = max.clamp(1, MAX_PINNED_CEILING);
+    state.clip_save(&hist)
 }
 
 #[tauri::command(async)]
 pub fn clip_copy(app: tauri::AppHandle, state: State<'_, AppState>, id: String) -> Result<()> {
     let hist = state.clip_load()?;
-    let item = hist
-        .items
-        .iter()
-        .find(|i| i.id == id)
-        .ok_or(AppError::NotFound)?;
-    app.clipboard()
-        .write_text(item.text.clone())
-        .map_err(|e| AppError::Io(e.to_string()))
+    let item = hist.items.iter().find(|i| i.id == id).ok_or(AppError::NotFound)?;
+    app.clipboard().write_text(item.text.clone()).map_err(|e| AppError::Io(e.to_string()))
 }
 
 #[tauri::command(async)]
 pub fn clip_pin(state: State<'_, AppState>, id: String) -> Result<()> {
     let mut hist = state.clip_load()?;
-    if let Some(i) = hist.items.iter_mut().find(|i| i.id == id) {
-        i.pinned = !i.pinned;
-    }
+    hist.toggle_pin(&id)?;
     state.clip_save(&hist)
 }
 
@@ -113,8 +118,7 @@ pub fn watch_clipboard(app: tauri::AppHandle) {
 }
 
 fn transcript_dir(state: &AppState) -> PathBuf {
-    let cfg: Option<TranscriptSettings> =
-        store::read_json(&store::settings_path(&state.dir)).unwrap_or_default();
+    let cfg: Option<TranscriptSettings> = store::read_json(&store::settings_path(&state.dir)).unwrap_or_default();
     match cfg.map(|c| c.dir).filter(|d| !d.is_empty()) {
         Some(d) => PathBuf::from(d),
         None => transcripts::default_dir(),
@@ -134,9 +138,7 @@ pub fn transcripts_set_dir(state: State<'_, AppState>, dir: String) -> Result<()
     }
     store::write_json_atomic(
         &store::settings_path(&state.dir),
-        &TranscriptSettings {
-            dir: path.to_string_lossy().to_string(),
-        },
+        &TranscriptSettings { dir: path.to_string_lossy().to_string() },
     )
 }
 
@@ -157,10 +159,7 @@ pub async fn agenda_today(app: tauri::AppHandle, time_min: String, time_max: Str
 
 pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_results: u32) -> Result<Vec<AgendaItem>> {
     let mut cfg = state.drive_config()?;
-    let tokens = cfg
-        .tokens
-        .as_mut()
-        .ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
+    let tokens = cfg.tokens.as_mut().ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
     let token = drive::fresh_access_token(tokens, &cfg.client_id, &cfg.client_secret)?;
     let events = calendar::events(&token, time_min, time_max, max_results)?;
     state.save_drive_config(&cfg)?;
@@ -169,6 +168,9 @@ pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_resul
 
 #[tauri::command]
 pub fn alert_open(app: tauri::AppHandle, event: AgendaItem) -> Result<()> {
+    if !app.state::<crate::meeting_alert::Alerted>().first(&event) {
+        return Ok(());
+    }
     window::open_alert(&app, event).map_err(|e| AppError::Io(e.to_string()))
 }
 
@@ -186,7 +188,7 @@ pub fn alert_close(app: tauri::AppHandle) -> Result<()> {
 pub fn open_link(url: String) -> Result<()> {
     // http(s) links only: the alert must never become a local scheme executor.
     if !(url.starts_with("https://") || url.starts_with("http://")) {
-        return Err(AppError::Config("link nao suportado".into()));
+        return Err(AppError::Config("link não suportado".into()));
     }
     tauri_plugin_opener::open_url(url, None::<&str>).map_err(|e| AppError::Io(e.to_string()))
 }

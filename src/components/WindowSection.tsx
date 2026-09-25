@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, errText } from "../lib/api";
+import { t } from "../i18n";
 
 export default function WindowSection({ onError }: { onError: (m: string) => void }) {
   const [onTop, setOnTop] = useState(true);
@@ -33,7 +34,7 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
 
   return (
     <section className="flex flex-col gap-2">
-      <h3 className="text-xs font-semibold text-fg">Janela</h3>
+      <h3 className="text-xs font-semibold text-fg">{t("settings.window.title")}</h3>
       <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
         <input
           type="checkbox"
@@ -41,10 +42,10 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
           onChange={(e) => void act(() => api.windowSetAlwaysOnTop(e.target.checked))}
           className="size-4 accent-[var(--color-accent)]"
         />
-        sempre na frente das outras janelas
+        {t("settings.window.alwaysOnTop")}
       </label>
       <p className="text-[11px] text-faint">
-        Arraste pela barra do topo e redimensione pelas bordas: posição e tamanho ficam salvos.
+        {t("settings.window.hint")}
       </p>
       {moved && (
         <button
@@ -52,7 +53,7 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
           onClick={() => void act(api.windowReset)}
           className="self-start rounded-lg bg-edge px-3 py-1.5 text-xs text-fg"
         >
-          voltar ao canto e ao tamanho original
+          {t("settings.window.reset")}
         </button>
       )}
     </section>

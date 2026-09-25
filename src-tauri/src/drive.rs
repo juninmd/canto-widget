@@ -23,24 +23,14 @@ struct TokenResponse {
 }
 
 fn client() -> Result<reqwest::blocking::Client> {
-    crate::net::client_builder()
-        .timeout(Duration::from_secs(30))
-        .build()
-        .map_err(|e| AppError::Drive(e.to_string()))
+    crate::net::client_builder().timeout(Duration::from_secs(30)).build().map_err(|e| AppError::Drive(e.to_string()))
 }
 
 fn post_token(form: &[(&str, &str)]) -> Result<TokenResponse> {
-    let res = client()?
-        .post(TOKEN_URL)
-        .form(form)
-        .send()
-        .map_err(|e| AppError::Drive(e.to_string()))?;
+    let res = client()?.post(TOKEN_URL).form(form).send().map_err(|e| AppError::Drive(e.to_string()))?;
     if !res.status().is_success() {
         let status = res.status();
-        return Err(AppError::Drive(format!(
-            "token endpoint respondeu {status}: {}",
-            res.text().unwrap_or_default()
-        )));
+        return Err(AppError::Drive(format!("token endpoint respondeu {status}: {}", res.text().unwrap_or_default())));
     }
     res.json().map_err(|e| AppError::Drive(e.to_string()))
 }
@@ -57,11 +47,7 @@ pub fn authorize_url(client_id: &str, redirect_uri: &str, pkce: &Pkce) -> String
         ("prompt", "consent"),
         ("state", pkce.state.as_str()),
     ];
-    let qs = q
-        .iter()
-        .map(|(k, v)| format!("{k}={}", urlencode(v)))
-        .collect::<Vec<_>>()
-        .join("&");
+    let qs = q.iter().map(|(k, v)| format!("{k}={}", urlencode(v))).collect::<Vec<_>>().join("&");
     format!("{}?{qs}", crate::oauth::AUTH_URL)
 }
 
@@ -88,7 +74,7 @@ pub fn exchange_code(
     }
     let res = post_token(&form)?;
     let refresh_token = res.refresh_token.ok_or_else(|| {
-        AppError::Drive("Google nao devolveu refresh_token; revogue o acesso e conecte de novo".into())
+        AppError::Drive("Google não devolveu refresh_token; revogue o acesso e conecte de novo".into())
     })?;
     Ok(DriveTokens {
         refresh_token,
@@ -98,11 +84,7 @@ pub fn exchange_code(
 }
 
 /// Renews the access token when less than 60s of validity remain.
-pub fn fresh_access_token(
-    tokens: &mut DriveTokens,
-    client_id: &str,
-    client_secret: &str,
-) -> Result<String> {
+pub fn fresh_access_token(tokens: &mut DriveTokens, client_id: &str, client_secret: &str) -> Result<String> {
     if !tokens.access_token.is_empty() && tokens.expires_at - crate::model::now_ms() > 60_000 {
         return Ok(tokens.access_token.clone());
     }

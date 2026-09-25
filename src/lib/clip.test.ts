@@ -22,6 +22,24 @@ describe("clipKind", () => {
     expect(clipKind("Obrigado pelo retorno! Sigo com a revisão amanhã.")).toBe("text");
     expect(clipKind("2026-09-18 14:00:10 INFO worker-0 job 4200")).toBe("code");
   });
+
+  test("a lone JSON object or array is parsed and shown as json, not code", () => {
+    expect(clipKind('{"nome":"Ana","idade":30}')).toBe("json");
+    expect(clipKind("[1, 2, 3]")).toBe("json");
+    expect(clipKind("{not valid json}")).toBe("code");
+  });
+
+  test("a lone e-mail address is recognized, a sentence containing one is not", () => {
+    expect(clipKind("ana@example.com")).toBe("email");
+    expect(clipKind("fale com ana@example.com amanhã")).toBe("text");
+  });
+
+  test("common phone shapes are recognized, a plain date is not", () => {
+    expect(clipKind("(11) 98765-4321")).toBe("phone");
+    expect(clipKind("+55 11 98765-4321")).toBe("phone");
+    expect(clipKind("11987654321")).toBe("phone");
+    expect(clipKind("2026-09-18")).toBe("text");
+  });
 });
 
 test("sizeLabel stays readable from a few characters to millions", () => {

@@ -37,6 +37,13 @@ pub fn enabled(dir: &Path) -> bool {
     path(dir).exists()
 }
 
+/// For a backend that doesn't use the envelope below (macOS's Keychain stores the password itself):
+/// just the presence marker `enabled`/`disable` already check for.
+#[cfg(target_os = "macos")]
+pub fn mark(dir: &Path) -> Result<()> {
+    store::write_json_atomic(&path(dir), &serde_json::json!({ "versao": VERSION }))
+}
+
 /// Requires a deterministic signature (RSA PKCS#1 v1.5, like Windows Hello's) so the key can be reconstructed.
 fn derive_key(signature: &[u8]) -> VaultKey {
     let mut h = Sha256::new();
@@ -70,8 +77,8 @@ pub fn enable_verified(dir: &Path, password: &str, signer: &dyn Signer) -> Resul
         other => {
             let _ = disable(dir);
             Err(match other {
-                Err(AppError::Config(m)) if m.contains("nao confere") => AppError::Config(
-                    "este dispositivo nao gera assinatura estavel; biometria nao pode proteger a senha aqui".into(),
+                Err(AppError::Config(m)) if m.contains("não confere") => AppError::Config(
+                    "este dispositivo não gera assinatura estável; biometria não pode proteger a senha aqui".into(),
                 ),
                 Err(e) => e,
                 Ok(_) => AppError::Crypto("biometria devolveu outra senha".into()),
@@ -82,18 +89,16 @@ pub fn enable_verified(dir: &Path, password: &str, signer: &dyn Signer) -> Resul
 
 pub fn open(dir: &Path, signer: &dyn Signer) -> Result<Zeroizing<String>> {
     let env: Envelope = store::read_json(&path(dir))?
-        .ok_or_else(|| AppError::Config("desbloqueio por biometria nao esta ativo".into()))?;
+        .ok_or_else(|| AppError::Config("desbloqueio por biometria não está ativo".into()))?;
     if env.version != VERSION {
-        return Err(AppError::Format("biometria de versao desconhecida; ative de novo".into()));
+        return Err(AppError::Format("biometria de versão desconhecida; ative de novo".into()));
     }
     let b = |s: &str| B64.decode(s).map_err(|e| AppError::Format(e.to_string()));
     let signature = Zeroizing::new(signer.sign(&b(&env.challenge)?)?);
     let plain = derive_key(&signature)
         .decrypt(&b(&env.nonce)?, &b(&env.ciphertext)?, AAD)
-        .map_err(|_| AppError::Config("a biometria nao confere com a deste cofre; ative de novo".into()))?;
-    String::from_utf8(plain)
-        .map(Zeroizing::new)
-        .map_err(|_| AppError::Format("biometria corrompida".into()))
+        .map_err(|_| AppError::Config("a biometria não confere com a deste cofre; ative de novo".into()))?;
+    String::from_utf8(plain).map(Zeroizing::new).map_err(|_| AppError::Format("biometria corrompida".into()))
 }
 
 pub fn disable(dir: &Path) -> Result<()> {
@@ -172,7 +177,7 @@ mod tests {
     fn unstable_signature_is_rejected_on_enable_without_leaving_a_file() {
         let d = dir("instavel");
         let err = enable_verified(&d, "senha-mestra", &Unstable).unwrap_err();
-        assert!(err.to_string().contains("assinatura estavel"), "{err}");
+        assert!(err.to_string().contains("assinatura estável"), "{err}");
         assert!(!enabled(&d), "left biometric enabled but it will never open");
         enable_verified(&d, "senha-mestra", &Fake(b"tpm-1")).unwrap();
         assert!(enabled(&d));

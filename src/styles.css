@@ -56,6 +56,14 @@
   --color-danger: #ff5555;
 }
 
+/* Tailwind's spacing and text sizes are all rem: scaling the root font-size zooms everything at once. */
+:root[data-density="compacta"] {
+  font-size: 87.5%;
+}
+:root[data-density="confortavel"] {
+  font-size: 112.5%;
+}
+
 @theme inline {
   --color-ink: var(--color-ink);
   --color-panel: var(--color-panel);

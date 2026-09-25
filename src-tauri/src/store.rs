@@ -8,6 +8,7 @@ use crate::error::{AppError, Result};
 pub const VAULT_AAD: &[u8] = b"canto.vault.v1";
 pub const DRIVE_AAD: &[u8] = b"canto.drive.v1";
 pub const GITHUB_AAD: &[u8] = b"canto.github.v1";
+pub const GITLAB_AAD: &[u8] = b"canto.gitlab.v1";
 const FORMAT_VERSION: u32 = 1;
 
 /// Written to disk and sent to Drive; salt and nonce are public by design, the key never leaves memory.
@@ -32,12 +33,7 @@ pub struct KdfParams {
 
 impl Default for KdfParams {
     fn default() -> Self {
-        Self {
-            alg: "argon2id".into(),
-            m_kib: 19 * 1024,
-            t: 2,
-            p: 1,
-        }
+        Self { alg: "argon2id".into(), m_kib: 19 * 1024, t: 2, p: 1 }
     }
 }
 
@@ -55,23 +51,15 @@ impl SealedBlob {
     }
 
     pub fn salt_bytes(&self) -> Result<Vec<u8>> {
-        B64.decode(&self.salt)
-            .map_err(|e| AppError::Format(e.to_string()))
+        B64.decode(&self.salt).map_err(|e| AppError::Format(e.to_string()))
     }
 
     pub fn open(&self, key: &VaultKey, aad: &[u8]) -> Result<Vec<u8>> {
         if self.version != FORMAT_VERSION {
-            return Err(AppError::Format(format!(
-                "versao de cofre {} nao suportada",
-                self.version
-            )));
+            return Err(AppError::Format(format!("versão de cofre {} não suportada", self.version)));
         }
-        let nonce = B64
-            .decode(&self.nonce)
-            .map_err(|e| AppError::Format(e.to_string()))?;
-        let ct = B64
-            .decode(&self.ciphertext)
-            .map_err(|e| AppError::Format(e.to_string()))?;
+        let nonce = B64.decode(&self.nonce).map_err(|e| AppError::Format(e.to_string()))?;
+        let ct = B64.decode(&self.ciphertext).map_err(|e| AppError::Format(e.to_string()))?;
         self.decrypt_parts(key, &nonce, &ct, aad)
     }
 
@@ -98,6 +86,10 @@ pub fn clip_path(dir: &Path) -> PathBuf {
 
 pub fn github_path(dir: &Path) -> PathBuf {
     dir.join("github.json")
+}
+
+pub fn gitlab_path(dir: &Path) -> PathBuf {
+    dir.join("gitlab.json")
 }
 
 pub fn settings_path(dir: &Path) -> PathBuf {

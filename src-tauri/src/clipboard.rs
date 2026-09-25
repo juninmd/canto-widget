@@ -11,11 +11,27 @@ pub const MAX_CHARS: usize = 32_000;
 // Unpinned total kept on disk: every copy re-seals the whole history, so it must stay small.
 const BUDGET_CHARS: usize = 1_000_000;
 pub const PREVIEW_CHARS: usize = 500;
+pub const DEFAULT_MAX_PINNED: usize = 100;
+pub const MAX_PINNED_CEILING: usize = 1000;
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ClipHistory {
     #[serde(default)]
     pub items: Vec<ClipItem>,
+    /// Unlike `MAX_ITEMS`, pinned items had no cap at all before this: a runaway pin loop could
+    /// grow the vault forever. `prune()` never evicts a pinned item; only `clip_pin` enforces it.
+    #[serde(default = "default_max_pinned")]
+    pub max_pinned: usize,
+}
+
+fn default_max_pinned() -> usize {
+    DEFAULT_MAX_PINNED
+}
+
+impl Default for ClipHistory {
+    fn default() -> Self {
+        Self { items: Vec::new(), max_pinned: default_max_pinned() }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -57,6 +73,23 @@ impl From<&ClipItem> for ClipView {
 }
 
 impl ClipHistory {
+    pub fn pinned_count(&self) -> usize {
+        self.items.iter().filter(|i| i.pinned).count()
+    }
+
+    /// Toggles pin, refusing to add a new one past `max_pinned`. Unpinning always succeeds.
+    pub fn toggle_pin(&mut self, id: &str) -> Result<()> {
+        let (pinned_now, max) = (self.pinned_count(), self.max_pinned);
+        let Some(item) = self.items.iter_mut().find(|i| i.id == id) else {
+            return Ok(());
+        };
+        if !item.pinned && pinned_now >= max {
+            return Err(crate::error::AppError::Config(format!("limite de {max} itens fixados atingido")));
+        }
+        item.pinned = !item.pinned;
+        Ok(())
+    }
+
     pub fn push(&mut self, text: &str, id: String) -> bool {
         let text = text.trim();
         if text.is_empty() {

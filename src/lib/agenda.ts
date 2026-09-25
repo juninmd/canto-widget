@@ -1,4 +1,5 @@
 import type { AgendaItem } from "./api";
+import { LOCALE, t } from "../i18n";
 
 /** Day window in RFC3339, from midnight to the end of the day. */
 export function dayWindow(now = new Date()): { timeMin: string; timeMax: string } {
@@ -8,11 +9,11 @@ export function dayWindow(now = new Date()): { timeMin: string; timeMax: string 
 }
 
 export function hour(item: AgendaItem): string {
-  if (item.all_day) return "dia inteiro";
+  if (item.all_day) return t("agenda.allDay");
   const d = new Date(item.start);
   return Number.isNaN(d.getTime())
     ? item.start
-    : d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+    : d.toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
 }
 
 /** Minutes until the event starts (negative if it has already started). */
@@ -46,19 +47,19 @@ export function status(item: AgendaItem, now = new Date()): { label: string; now
   if (!Number.isFinite(remaining)) return { label: "", now: false };
   const end = new Date(item.end).getTime();
   const ended = Number.isNaN(end) ? remaining <= -60 : end <= now.getTime();
-  if (ended) return { label: "encerrado", now: false };
-  if (remaining <= 0) return { label: "agora", now: true };
+  if (ended) return { label: t("agenda.ended"), now: false };
+  if (remaining <= 0) return { label: t("agenda.now"), now: true };
   const min = Math.ceil(remaining);
   const h = Math.floor(min / 60);
-  return { label: h ? `em ${h}h${String(min % 60).padStart(2, "0")}` : `em ${min} min`, now: false };
+  return { label: h ? t("agenda.inHours", { h, mm: String(min % 60).padStart(2, "0") }) : t("agenda.inMinutes", { n: min }), now: false };
 }
 
 /** "organizado por Ana · criado por Bruno · 5 convidados"; the creator only shows when it isn't the organizer. */
 export function people(item: AgendaItem): string {
   const parts: string[] = [];
-  if (item.organizer) parts.push(`organizado por ${item.organizer}`);
-  if (item.creator && item.creator !== item.organizer) parts.push(`criado por ${item.creator}`);
+  if (item.organizer) parts.push(t("agenda.organizedBy", { name: item.organizer }));
+  if (item.creator && item.creator !== item.organizer) parts.push(t("agenda.createdBy", { name: item.creator }));
   const guests = item.guests ?? 0;
-  if (guests > 0) parts.push(guests === 1 ? "1 convidado" : `${guests} convidados`);
+  if (guests > 0) parts.push(guests === 1 ? t("agenda.guests.one") : t("agenda.guests.other", { n: guests }));
   return parts.join(" · ");
 }

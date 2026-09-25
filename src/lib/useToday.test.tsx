@@ -14,26 +14,26 @@ afterEach(() => {
   cleanup();
 });
 
-test("rolls over the day without remounting the widget", async () => {
+test("rolls over the day without remounting the widget", () => {
   moment = new Date(2026, 8, 9, 23, 59, 30);
   jest.useFakeTimers();
   const { getByTestId } = render(<Probe />);
   expect(getByTestId("dia").textContent).toBe("2026-09-09");
 
   moment = new Date(2026, 8, 10, 0, 0, 5);
-  await act(async () => {
+  act(() => {
     jest.advanceTimersByTime(30_000);
   });
   expect(getByTestId("dia").textContent).toBe("2026-09-10");
 });
 
-test("does not re-render needlessly within the same day", async () => {
+test("does not re-render needlessly within the same day", () => {
   moment = new Date(2026, 8, 9, 10, 0, 0);
   jest.useFakeTimers();
   const { getByTestId } = render(<Probe />);
 
   moment = new Date(2026, 8, 9, 10, 30, 0);
-  await act(async () => {
+  act(() => {
     jest.advanceTimersByTime(30 * 60_000);
   });
   expect(getByTestId("dia").textContent).toBe("2026-09-09");

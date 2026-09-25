@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { api } from "./api";
 import type { Toast } from "./toast";
+import { t } from "../i18n";
 
 const FIRST_CHECK_MS = 5_000;
 const EVERY_MS = 6 * 60 * 60 * 1000;
@@ -14,7 +15,7 @@ export function useUpdateNotice(notify: (t: Toast) => void, openSettings: () => 
         const info = await api.updateCheck();
         if (!info?.available || told.current === info.latest) return;
         told.current = info.latest;
-        notify({ message: `Canto ${info.latest} disponível`, action: { label: "ver", run: openSettings } });
+        notify({ message: t("update.available", { version: info.latest }), action: { label: t("update.view"), run: openSettings } });
       } catch {
         // Offline or no release yet: the Settings section shows the error when the user asks.
       }
