@@ -54,6 +54,7 @@ pub mod plain_text;
 pub mod priority;
 pub mod routine;
 pub mod snooze;
+pub mod status_alert;
 pub mod status_cache;
 pub mod status_feed;
 pub mod status_live;
@@ -105,6 +106,7 @@ pub fn run() {
             app.manage(AppState::new(dir.clone()));
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
+            app.manage(status_alert::StatusAlerts::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
@@ -115,6 +117,7 @@ pub fn run() {
             tray_live::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
+            status_alert::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -223,6 +226,8 @@ pub fn run() {
             cmd_gitlab::gitlab_mr_checks,
             cmd_forges::forges_opened_since,
             cmd_status::api_status,
+            status_alert::status_alerts_get,
+            status_alert::status_alerts_set,
             tray_live::badge_set_tasks,
         ])
         .on_window_event(|win, event| match event {

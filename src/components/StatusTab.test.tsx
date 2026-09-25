@@ -3,11 +3,14 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 let status: () => Promise<unknown>;
+let watched: string[] = [];
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown>) => {
     calls.push({ cmd, args });
+    if (cmd === "status_alerts_get") return Promise.resolve(watched);
+    if (cmd === "status_alerts_set") return Promise.resolve((args as { ids: string[] }).ids);
     return cmd === "api_status" ? status() : Promise.resolve(null);
   },
 }));
@@ -30,6 +33,7 @@ async function show() {
 
 beforeEach(() => {
   calls.length = 0;
+  watched = [];
   status = () => Promise.resolve([claude, aws, magalu]);
 });
 afterEach(cleanup);
@@ -97,4 +101,49 @@ test("a live outage from Statuspage is highlighted with its description even wit
   await show();
   expect(screen.getByText("npm").closest("section")?.hasAttribute("data-troubled")).toBe(true);
   expect(screen.getByText(/Partial System Outage/)).toBeTruthy();
+});
+
+test("services are mini cards in a grid, and the header counts what is wrong", async () => {
+  const down = { ...aws, id: "npm", label: "npm", live: { indicator: "major", description: "Partial System Outage" } };
+  const fine = { ...aws, id: "github", label: "GitHub", live: { indicator: "none", description: "All Systems Operational" } };
+  status = () => Promise.resolve([down, fine]);
+  await show();
+  expect(document.querySelector(".grid.grid-cols-2")).toBeTruthy();
+  expect(screen.getByText("npm").closest("section")?.getAttribute("data-level")).toBe("down");
+  expect(screen.getByText("fora do ar")).toBeTruthy();
+  expect(screen.getByText("GitHub").closest("section")?.getAttribute("data-level")).toBe("ok");
+  expect(screen.getByText("1 com problema · 1 operacionais")).toBeTruthy();
+});
+
+test("the bell turns notifications on and off for a service with live status", async () => {
+  const fine = { ...aws, id: "github", label: "GitHub", live: { indicator: "none", description: "All Systems Operational" } };
+  status = () => Promise.resolve([fine, aws]);
+  await show();
+  const bell = screen.getByRole("button", { name: "avisar quando GitHub cair ou ficar instável" });
+  expect(bell.getAttribute("aria-pressed")).toBe("false");
+  await act(async () => {
+    fireEvent.click(bell);
+  });
+  expect(calls.find((c) => c.cmd === "status_alerts_set")?.args).toEqual({ ids: ["github"] });
+  const on = screen.getByRole("button", { name: "parar de avisar sobre GitHub" });
+  expect(on.getAttribute("aria-pressed")).toBe("true");
+  await act(async () => {
+    fireEvent.click(on);
+  });
+  expect(calls.filter((c) => c.cmd === "status_alerts_set").at(-1)?.args).toEqual({ ids: [] });
+});
+
+test("a service without live status can't be watched", async () => {
+  status = () => Promise.resolve([aws]);
+  await show();
+  const bell = screen.getByRole("button", { name: "AWS não tem status ao vivo: não dá para avisar" }) as HTMLButtonElement;
+  expect(bell.disabled).toBe(true);
+});
+
+test("watched services come back checked from Rust", async () => {
+  watched = ["github"];
+  const fine = { ...aws, id: "github", label: "GitHub", live: { indicator: "none", description: "ok" } };
+  status = () => Promise.resolve([fine]);
+  await show();
+  expect(screen.getByRole("button", { name: "parar de avisar sobre GitHub" }).getAttribute("aria-pressed")).toBe("true");
 });

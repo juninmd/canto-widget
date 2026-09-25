@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Status API em mini cards**: grade de dois por linha, cada card com a cor e a palavra do estado (operacional,
+  instável, fora do ar, manutenção, incidente recente, sem resposta), o último incidente e a descrição ao vivo;
+  o cabeçalho resume quantos estão com problema. Clicar abre o histórico do serviço na largura toda.
+- **Aviso quando um serviço cai**: o sino de cada card (serviços com status ao vivo do Statuspage) liga uma
+  notificação do sistema quando o serviço fica instável ou fora do ar, inclusive com o cofre trancado. A escolha
+  fica em `status_alertas.json`, fora do cofre (é só a lista de páginas públicas a consultar, a cada 3 min).
 - **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
   atualiza o texto da nota.
 - **Blocos de código nas notas**: trechos entre ```` ``` ```` aparecem como código, sem interpretar o

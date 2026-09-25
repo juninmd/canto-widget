@@ -171,7 +171,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
 |---|---|---|---|
-| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident; ongoing outages highlighted with their live Statuspage state](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
+| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
 | Password changed, one file pending |
 |---|

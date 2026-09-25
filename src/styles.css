@@ -13,6 +13,8 @@
   --color-faint: #8491a7;
   --color-line: #586781;
   --color-danger: #fb7185;
+  --color-ok: #4ade80;
+  --color-warn: #fbbf24;
 }
 
 /* Hueco Mundo: areia branca sob a lua, céu morto e o vermelho dos Espadas. */
@@ -27,6 +29,8 @@
   --color-faint: #948e86;
   --color-line: #62626b;
   --color-danger: #f87171;
+  --color-ok: #86efac;
+  --color-warn: #fbbf24;
 }
 
 /* Drácula: paleta oficial dracula-theme.com */
@@ -42,6 +46,8 @@
   --color-faint: #556173;
   --color-line: #7b8595;
   --color-danger: #be123c;
+  --color-ok: #15803d;
+  --color-warn: #b45309;
 }
 :root[data-skin="dracula"] {
   --color-ink: #21222c;
@@ -54,6 +60,8 @@
   --color-faint: #9ba6cf;
   --color-line: #737898;
   --color-danger: #ff5555;
+  --color-ok: #50fa7b;
+  --color-warn: #f1fa8c;
 }
 
 /* Tailwind's spacing and text sizes are all rem: scaling the root font-size zooms everything at once. */
@@ -75,6 +83,8 @@
   --color-faint: var(--color-faint);
   --color-line: var(--color-line);
   --color-danger: var(--color-danger);
+  --color-ok: var(--color-ok);
+  --color-warn: var(--color-warn);
 }
 
 /*

@@ -50,6 +50,8 @@ src-tauri/src/
   routine.rs, snooze.rs, notification.rs   reminders, recurring tasks, snoozing, OS notifications
   clipboard.rs, clip_os.rs        clipboard history (size caps, previews), OS change counter and secret skip list
   window.rs, window_state.rs      corner anchoring, saved position, fullscreen
+  meeting_alert.rs, task_reminder.rs   meeting alerts and task reminders rung from Rust (hidden webviews sleep)
+  status_feed.rs, status_live.rs, status_alert.rs   Status API feeds, live Statuspage state, opt-in outage alerts
 src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)
 ```
 

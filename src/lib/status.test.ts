@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { hasRecentIncident, isTroubled, sortByLastIncident } from "./status";
+import { canAlert, hasRecentIncident, isTroubled, level, sortByLastIncident } from "./status";
 
 const svc = (id: string, times: number[], error: string | null = null) => ({
   id,
@@ -77,4 +77,22 @@ test("Google Cloud's RESOLVED titles are not trouble", () => {
     error: null,
   };
   expect(hasRecentIncident(gcp, now)).toBe(false);
+});
+
+test("level: live indicator first, then feed errors, then the history rule", () => {
+  const now = 10 * 24 * 3600_000;
+  const live = (indicator: "none" | "minor" | "major" | "critical" | "maintenance") => ({
+    ...svc("s", []),
+    live: { indicator, description: "" },
+  });
+  expect(level(live("critical"), now)).toBe("down");
+  expect(level(live("major"), now)).toBe("down");
+  expect(level(live("minor"), now)).toBe("degraded");
+  expect(level(live("maintenance"), now)).toBe("maintenance");
+  expect(level(live("none"), now)).toBe("ok");
+  expect(level(svc("e", [], "sem resposta"), now)).toBe("unknown");
+  expect(level(svc("r", [now - 3600_000]), now)).toBe("recent");
+  expect(level(svc("q", [now - 30 * 3600_000]), now)).toBe("ok");
+  expect(canAlert(live("none"))).toBe(true);
+  expect(canAlert(svc("x", []))).toBe(false);
 });
