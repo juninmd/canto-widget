@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { dayWindow, hour, minutesUntil, people, shouldAlert, status } from "./agenda";
+import { avatarTone, dayWindow, hour, initials, minutesUntil, people, shouldAlert, status, tally } from "./agenda";
 import type { AgendaItem } from "./api";
 
 const base: AgendaItem = {
@@ -107,5 +107,20 @@ describe("people", () => {
 
   test("a task reminder has no people line", () => {
     expect(people(base)).toBe("");
+  });
+});
+
+describe("guests", () => {
+  test("initials take first and last name, or the start of an e-mail", () => {
+    expect([initials("Ana Maria Souza"), initials("bruno.lima@example.com"), initials("bot@example.com"), initials("")]).toEqual(["AS", "BL", "BO", "?"]);
+  });
+
+  test("the same person always gets the same avatar color", () => {
+    expect(avatarTone("Ana@Example.com")).toBe(avatarTone("ana@example.com"));
+  });
+
+  test("tally counts answers and treats unknown as awaiting", () => {
+    const g = (response: "" | "accepted" | "declined") => ({ name: "x", email: "", response, organizer: false, optional: false, me: false });
+    expect(tally([g("accepted"), g("accepted"), g("declined"), g("")])).toEqual({ yes: 2, no: 1, maybe: 0, pending: 1 });
   });
 });

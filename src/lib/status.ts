@@ -46,3 +46,18 @@ export function isTroubled(r: StatusResult, now: number): boolean {
   if (r.live) return ["minor", "major", "critical"].includes(r.live.indicator);
   return !r.error && hasRecentIncident(r, now);
 }
+
+export type Level = "down" | "degraded" | "recent" | "maintenance" | "ok" | "unknown";
+
+/** One word per card: the live indicator when there is one, otherwise the history rule. */
+export function level(r: StatusResult, now: number): Level {
+  if (r.live) {
+    const byIndicator: Record<string, Level> = { critical: "down", major: "down", minor: "degraded", maintenance: "maintenance" };
+    return byIndicator[r.live.indicator] ?? "ok";
+  }
+  if (r.error) return "unknown";
+  return hasRecentIncident(r, now) ? "recent" : "ok";
+}
+
+/** Only a live Statuspage indicator can say "it just broke"; the Rust watcher polls exactly these. */
+export const canAlert = (r: StatusResult) => r.live != null;

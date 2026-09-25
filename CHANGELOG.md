@@ -7,12 +7,25 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Convidados em mini cards**: nos detalhes do evento, cada convidado vira um card numa grade de dois, com
+  avatar, resposta (ícone e palavra: aceitou, talvez, recusou, aguardando), etiquetas de organizador, opcional e
+  você; quem recusou aparece esmaecido. "Aceitou" usa a cor de sucesso da skin, não o destaque (que é vermelho na
+  Hueco Mundo).
+- **Status API em mini cards**: grade de dois por linha, cada card com a cor e a palavra do estado (operacional,
+  instável, fora do ar, manutenção, incidente recente, sem resposta), o último incidente e a descrição ao vivo;
+  o cabeçalho resume quantos estão com problema. Clicar abre o histórico do serviço na largura toda.
+- **Aviso quando um serviço cai**: o sino de cada card (serviços com status ao vivo do Statuspage) liga uma
+  notificação do sistema quando o serviço fica instável ou fora do ar, inclusive com o cofre trancado. A escolha
+  fica em `status_alertas.json`, fora do cofre (é só a lista de páginas públicas a consultar, a cada 3 min).
 - **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
   atualiza o texto da nota.
 - **Blocos de código nas notas**: trechos entre ```` ``` ```` aparecem como código, sem interpretar o
   markdown de dentro, e com cores para js/ts, rust, python, shell, sql, json, go e java/c#/c++.
 - **PR parado** nas abas GitHub e GitLab: PR/MR sem atividade há 7 dias ou mais ganha o selo
   **parado há N d** (a revisão pedida continua mostrando **aguardando**).
+- **Agenda: quem vai e quem não vai.** Cada evento mostra um selo com a sua resposta (aceitou, talvez, recusou,
+  sem resposta). Os detalhes trazem a lista de convidados com avatar de iniciais, a resposta de cada um
+  (organizador e opcionais marcados) e o placar sim/não/talvez/aguardando. Listas enormes param em 50 nomes.
 - **Status API: Datadog, Azion e Akamai** entram na lista, com histórico e estado ao vivo (Statuspage).
 - **Idioma: português ou inglês**, em Ajustes > Idioma. "Automático (sistema)" é o padrão: português para
   sistemas em `pt-*`, inglês para os demais. A troca recarrega a interface na hora; notificações do sistema e o
@@ -37,6 +50,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Aviso de reunião com o cofre trancado**: o Canto parava de avisar ao trancar, porque o token do Google só
+  existe com o cofre aberto. Agora guarda em memória as reuniões das próximas 12 h (só título, horário, local e
+  link; sem descrição nem convidados) e continua avisando a partir delas.
 - Releases agora seguem Conventional Commits (`fix`/patch, `feat`/minor e breaking/major), ignoram commits sem
   impacto de versão e geram os quatro instaladores em paralelo, com cache Rust por alvo, antes de montar o
   manifesto do updater.

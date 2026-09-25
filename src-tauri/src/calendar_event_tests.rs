@@ -95,6 +95,51 @@ fn html_description_reaches_the_ui_as_plain_text_and_still_yields_the_meet_link(
 }
 
 #[test]
+fn guest_list_carries_each_answer_and_the_users_own_rsvp() {
+    let item = parse(
+        r#"{"items":[{"id":"e8","start":{"date":"2026-09-09"},"attendees":[
+        {"email":"caio@example.com","responseStatus":"declined"},
+        {"email":"eu@example.com","displayName":"Eu","responseStatus":"tentative","self":true},
+        {"email":"bia@example.com","displayName":"Bia Reis","responseStatus":"accepted","optional":true},
+        {"email":"ana@example.com","displayName":"Ana Souza","responseStatus":"accepted","organizer":true},
+        {"email":"dora@example.com","responseStatus":"<script>"},
+        {"email":"sala@resource.calendar.google.com","resource":true}]}]}"#,
+    )
+    .unwrap();
+    assert_eq!(item.response, "tentative");
+    let got: Vec<(&str, &str)> = item.attendees.iter().map(|g| (g.name.as_str(), g.response.as_str())).collect();
+    assert_eq!(
+        got,
+        vec![
+            ("Ana Souza", "accepted"),
+            ("Eu", "tentative"),
+            ("Bia Reis", "accepted"),
+            ("dora@example.com", ""),
+            ("caio@example.com", "declined")
+        ]
+    );
+    assert!(item.attendees[0].organizer && item.attendees[1].me && item.attendees[2].optional);
+    assert_eq!(item.guests, 5);
+}
+
+#[test]
+fn event_without_the_user_on_the_list_has_no_rsvp() {
+    let item = parse(r#"{"items":[{"id":"e9","start":{"date":"2026-09-09"},"attendees":[{"email":"a@x.com","responseStatus":"accepted"}]}]}"#).unwrap();
+    assert_eq!((item.response.as_str(), item.attendees.len()), ("", 1));
+}
+
+#[test]
+fn huge_guest_lists_are_capped_but_still_counted() {
+    let many: Vec<String> = (0..80).map(|i| format!(r#"{{"email":"p{i}@x.com"}}"#)).collect();
+    let item = parse(&format!(
+        r#"{{"items":[{{"id":"e10","start":{{"date":"2026-09-09"}},"attendees":[{}]}}]}}"#,
+        many.join(",")
+    ))
+    .unwrap();
+    assert_eq!((item.guests, item.attendees.len()), (80, MAX_GUESTS));
+}
+
+#[test]
 fn a_meeting_the_user_declined_leaves_the_agenda_and_never_rings() {
     let declined = r#"{"items":[{"id":"e9","summary":"Retro","start":{"dateTime":"2026-09-09T10:00:00-03:00"},
         "attendees":[{"email":"eu@example.com","self":true,"responseStatus":"declined"},{"email":"ana@example.com"}]}]}"#;

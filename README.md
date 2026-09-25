@@ -73,10 +73,11 @@ reminder is already set. **Day summary** ready to paste and **pull over pending 
 
 Today's events come from Google Calendar (read-only). One minute before, the widget jumps onto the screen with
 **join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
-Click the event to see who organized it, the agenda, the guests and attachments, like Gemini's notes.
+Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
+it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
 
 </td>
-<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with organizer, guests and Gemini notes"></td>
+<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
 </tr>
 <tr>
 <td><img src="docs/prints/app/02-notas.png" alt="Note cards with tags and a pinned note"></td>
@@ -170,7 +171,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
 |---|---|---|---|
-| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Services sorted by last incident; ongoing outages highlighted with their live Statuspage state](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
+| ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
 | Password changed, one file pending |
 |---|

@@ -95,7 +95,11 @@ export type AgendaItem = {
   description?: string;
   guests?: number;
   attachments?: Attachment[];
+  response?: Rsvp | "";
+  attendees?: Guest[];
 };
+export type Rsvp = "accepted" | "declined" | "tentative" | "needsAction";
+export type Guest = { name: string; email: string; response: Rsvp | ""; organizer: boolean; optional: boolean; me: boolean };
 export type Attachment = { title: string; url: string; mime: string };
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
@@ -232,6 +236,8 @@ export const api = {
 
   /** RSS/Atom incident history from services the team depends on; served from a 5 min cache unless `force`. */
   apiStatus: (force = false) => invoke<StatusResult[]>("api_status", { force }),
+  statusAlertsGet: () => invoke<string[]>("status_alerts_get"),
+  statusAlertsSet: (ids: string[]) => invoke<string[]>("status_alerts_set", { ids }),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

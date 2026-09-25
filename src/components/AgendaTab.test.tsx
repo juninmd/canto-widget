@@ -30,6 +30,12 @@ const planning: AgendaItem = {
   guests: 6,
   description: "Pauta:\nRiscos & prazos",
   attachments: [notes],
+  response: "tentative",
+  attendees: [
+    { name: "Ana Souza", email: "ana@example.com", response: "accepted", organizer: true, optional: false, me: false },
+    { name: "Eu", email: "eu@example.com", response: "tentative", organizer: false, optional: false, me: true },
+    { name: "Caio Dias", email: "caio@example.com", response: "declined", organizer: false, optional: true, me: false },
+  ],
 };
 
 function agenda(over: Partial<Agenda>): Agenda {
@@ -68,4 +74,26 @@ test("the first load shows a busy skeleton, not the empty-agenda message", () =>
   render(<AgendaTab agenda={agenda({ loading: true })} onError={() => {}} />);
   expect(screen.getByRole("status", { name: "carregando a agenda" })).toBeTruthy();
   expect(screen.queryByText(/nenhum evento hoje/)).toBeNull();
+});
+
+test("the card shows my answer as a badge and the details list each guest with theirs", () => {
+  render(<AgendaTab agenda={agenda({ items: [planning] })} onError={() => {}} />);
+  expect(screen.getByText("você talvez vá")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
+  const list = screen.getByRole("region", { name: "Convidados" });
+  expect(list.textContent).toContain("1 sim · 1 não · 1 talvez · 0 aguardando");
+  const card = (name: string) => screen.getByText(name).closest("li")!;
+  expect(list.querySelector("ul")?.className).toContain("grid-cols-2");
+  expect(card("Ana Souza").textContent).toContain("organizador");
+  expect(card("Caio Dias").textContent).toContain("opcional");
+  expect(list.querySelector('[data-response="declined"]')?.textContent).toContain("recusou");
+  expect(list.textContent).toContain("+3 não listados");
+  expect(screen.getAllByText("AS").length).toBe(2);
+});
+
+test("an event I'm not invited to shows no badge nor guest list", () => {
+  render(<AgendaTab agenda={agenda({ items: [{ ...planning, response: "", attendees: [] }] })} onError={() => {}} />);
+  expect(screen.queryByText(/você aceitou|você recusou|você talvez vá|sem resposta sua/)).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
+  expect(screen.queryByRole("region", { name: "Convidados" })).toBeNull();
 });

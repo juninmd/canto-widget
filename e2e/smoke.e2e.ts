@@ -63,10 +63,11 @@ test("the Status API tab lists the services from api_status", async ({ page }) =
   });
   await page.goto("/");
   await page.getByRole("tab", { name: "Status API" }).click();
-  await expect(page.getByText("status dos serviços")).toBeVisible();
+  await expect(page.getByText("1 com problema · 1 operacionais")).toBeVisible();
   await expect(page.getByText("Serviço Exemplo")).toBeVisible();
   await expect(page.getByText("Outro Serviço")).toBeVisible();
   await expect(page.getByText("sem incidentes")).toBeVisible();
+  await expect(page.getByText("incidente recente")).toBeVisible();
 });
 
 test("English can be chosen and is pushed to Rust", async ({ page }) => {
