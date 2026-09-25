@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Convidados em mini cards**: nos detalhes do evento, cada convidado vira um card numa grade de dois, com
+  avatar, resposta (ícone e palavra: aceitou, talvez, recusou, aguardando), etiquetas de organizador, opcional e
+  você; quem recusou aparece esmaecido. "Aceitou" usa a cor de sucesso da skin, não o destaque (que é vermelho na
+  Hueco Mundo).
 - **Status API em mini cards**: grade de dois por linha, cada card com a cor e a palavra do estado (operacional,
   instável, fora do ar, manutenção, incidente recente, sem resposta), o último incidente e a descrição ao vivo;
   o cabeçalho resume quantos estão com problema. Clicar abre o histórico do serviço na largura toda.

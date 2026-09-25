@@ -82,9 +82,11 @@ test("the card shows my answer as a badge and the details list each guest with t
   fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
   const list = screen.getByRole("region", { name: "Convidados" });
   expect(list.textContent).toContain("1 sim · 1 não · 1 talvez · 0 aguardando");
-  expect(list.textContent).toContain("Ana Souza · organizador");
-  expect(list.textContent).toContain("Caio Dias · opcional");
-  expect(list.textContent).toContain("recusou");
+  const card = (name: string) => screen.getByText(name).closest("li")!;
+  expect(list.querySelector("ul")?.className).toContain("grid-cols-2");
+  expect(card("Ana Souza").textContent).toContain("organizador");
+  expect(card("Caio Dias").textContent).toContain("opcional");
+  expect(list.querySelector('[data-response="declined"]')?.textContent).toContain("recusou");
   expect(list.textContent).toContain("+3 não listados");
   expect(screen.getAllByText("AS").length).toBe(2);
 });

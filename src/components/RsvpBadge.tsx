@@ -2,9 +2,9 @@ import type { Rsvp } from "../lib/api";
 import { t } from "../i18n";
 
 const LOOK: Record<Rsvp, { icon: string; tone: string }> = {
-  accepted: { icon: "✓", tone: "border-accent/60 text-accent" },
+  accepted: { icon: "✓", tone: "border-ok/60 text-ok" },
   declined: { icon: "✕", tone: "border-danger/60 text-danger line-through" },
-  tentative: { icon: "?", tone: "border-amber-500/60 text-amber-500" },
+  tentative: { icon: "?", tone: "border-warn/60 text-warn" },
   needsAction: { icon: "•", tone: "border-line text-muted" },
 };
 
