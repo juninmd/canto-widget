@@ -145,12 +145,16 @@ pub async fn agenda_today(app: tauri::AppHandle, time_min: String, time_max: Str
 }
 
 pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_results: u32) -> Result<Vec<AgendaItem>> {
+    calendar::events(&google_token(state)?, time_min, time_max, max_results)
+}
+
+/// A fresh Google access token; a refresh is persisted so the next call doesn't repeat it.
+pub(crate) fn google_token(state: &AppState) -> Result<String> {
     let mut cfg = state.drive_config()?;
     let tokens = cfg.tokens.as_mut().ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
     let token = drive::fresh_access_token(tokens, &cfg.client_id, &cfg.client_secret)?;
-    let events = calendar::events(&token, time_min, time_max, max_results)?;
     state.save_drive_config(&cfg)?;
-    Ok(events)
+    Ok(token)
 }
 
 #[tauri::command]

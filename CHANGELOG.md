@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
+  diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
+  seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o
+  Google vê um aviso para sair e entrar de novo (o escopo é novo).
 - **Convidados em mini cards**: nos detalhes do evento, cada convidado vira um card numa grade de dois, com
   avatar, resposta (ícone e palavra: aceitou, talvez, recusou, aguardando), etiquetas de organizador, opcional e
   você; quem recusou aparece esmaecido. "Aceitou" usa a cor de sucesso da skin, não o destaque (que é vermelho na

@@ -7,8 +7,10 @@ use std::time::{Duration, Instant};
 
 use crate::error::{AppError, Result};
 
-/// Minimum scope: app-private folder, read-only calendar and identity; the rest of Drive stays inaccessible.
-pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly openid email profile";
+/// Minimum scope: read-only calendar, identity and the Workspace directory (only for guests' photos); the rest of
+/// Drive stays inaccessible.
+pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly \
+https://www.googleapis.com/auth/directory.readonly openid email profile";
 /// A desktop app's client secret isn't confidential to Google; the flow is protected by PKCE + state.
 pub fn embedded_client() -> Option<(&'static str, &'static str)> {
     Some((option_env!("CANTO_GOOGLE_CLIENT_ID")?, option_env!("CANTO_GOOGLE_CLIENT_SECRET").unwrap_or("")))

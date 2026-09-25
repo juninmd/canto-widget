@@ -34,6 +34,7 @@ export const integrations = {
   "agenda.guest.organizer": "organizador",
   "agenda.guest.optional": "opcional",
   "agenda.guest.me": "você",
+  "agenda.photosNeedConsent": "para ver as fotos dos colegas, desconecte e conecte de novo o Google em Ajustes",
   "agenda.guestsMore": "+{n} não listados",
 
   "forge.section.reviewRequested": "Revisão pedida a mim",

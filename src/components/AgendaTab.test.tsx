@@ -5,9 +5,15 @@ import type { AgendaItem } from "../lib/api";
 import type { Agenda } from "../lib/useAgenda";
 
 const opened: string[] = [];
+const photoCalls: string[][] = [];
+let photos: unknown = null;
 mock.module("@tauri-apps/api/core", () => ({
-  invoke: (cmd: string, a?: { url?: string }) => {
+  invoke: (cmd: string, a?: { url?: string; emails?: string[] }) => {
     if (cmd === "open_link" && a?.url) opened.push(a.url);
+    if (cmd === "guest_photos") {
+      photoCalls.push(a?.emails ?? []);
+      return Promise.resolve(photos);
+    }
     return Promise.resolve(null);
   },
 }));
@@ -44,6 +50,8 @@ function agenda(over: Partial<Agenda>): Agenda {
 
 beforeEach(() => {
   opened.length = 0;
+  photoCalls.length = 0;
+  photos = null;
 });
 afterEach(cleanup);
 
@@ -96,4 +104,36 @@ test("an event I'm not invited to shows no badge nor guest list", () => {
   expect(screen.queryByText(/você aceitou|você recusou|você talvez vá|sem resposta sua/)).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
   expect(screen.queryByRole("region", { name: "Convidados" })).toBeNull();
+});
+
+test("directory photos replace the initials once the details open; others keep their initials", async () => {
+  photos = { photos: { "ana@example.com": "data:image/png;base64,QU5B" }, needs_consent: false };
+  render(<AgendaTab agenda={agenda({ items: [planning] })} onError={() => {}} />);
+  expect(photoCalls, "nothing is fetched while the card is closed").toEqual([]);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
+  });
+  expect(photoCalls).toEqual([["ana@example.com", "eu@example.com", "caio@example.com"]]);
+  const list = screen.getByRole("region", { name: "Convidados" });
+  expect(list.querySelector("img")?.getAttribute("src")).toBe("data:image/png;base64,QU5B");
+  expect(screen.getByText("CD"), "no photo: initials").toBeTruthy();
+  expect(screen.queryByText(/desconecte e conecte de novo/)).toBeNull();
+});
+
+test("a remote URL is never rendered as a photo", async () => {
+  photos = { photos: { "ana@example.com": "https://lh3.googleusercontent.com/a/x" }, needs_consent: false };
+  render(<AgendaTab agenda={agenda({ items: [planning] })} onError={() => {}} />);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
+  });
+  expect(document.querySelector("img")).toBeNull();
+});
+
+test("a Google connection without the directory scope suggests reconnecting", async () => {
+  photos = { photos: {}, needs_consent: true };
+  render(<AgendaTab agenda={agenda({ items: [planning] })} onError={() => {}} />);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /Planejamento da sprint/ }));
+  });
+  expect(screen.getByText("para ver as fotos dos colegas, desconecte e conecte de novo o Google em Ajustes")).toBeTruthy();
 });

@@ -11,7 +11,7 @@
 | Cifra | AES-256-GCM, nonce novo a cada gravação, AAD fixando o domínio (`canto.vault.v1`) |
 | Chave | só existe em RAM enquanto o cofre está destrancado; zeroizada ao trancar/sair |
 | Backup | o `.canto` exportado é o próprio envelope cifrado; a fusão do import acontece local, em claro, na RAM. O caminho vem do diálogo nativo aberto pelo Rust, nunca da webview |
-| Escopo OAuth | opcional, só para a agenda: `calendar.events.readonly` e `openid email profile` (nome, e-mail e foto da conta; a foto só é baixada de `*.googleusercontent.com` e fica no cofre). Nenhum escopo de Drive |
+| Escopo OAuth | opcional, só para a agenda: `calendar.events.readonly`, `directory.readonly` (foto dos colegas do Workspace na lista de convidados; fica só na memória e some ao trancar) e `openid email profile` (nome, e-mail e foto da conta; a foto só é baixada de `*.googleusercontent.com` e fica no cofre). Nenhum escopo de Drive |
 | Clipboard | histórico fica **só na máquina** (`clipboard.json`, cifrado), fora do `vault.json` — nunca entra no backup. No Windows, o que um gerenciador de senhas marca como sensível (`ExcludeClipboardContentFromMonitorProcessing` ou `Clipboard Viewer Ignore`, convenção do Windows seguida por gerenciadores como o KeePass) nem chega a ser lido |
 | Transcrições | leitura restrita à pasta configurada, extensões `txt/md/vtt/srt`, nome de arquivo validado contra travessia de caminho |
 | OAuth | Authorization Code + **PKCE (S256)** com loopback em `127.0.0.1:porta-efêmera` e checagem de `state` |

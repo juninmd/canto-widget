@@ -101,6 +101,7 @@ export type AgendaItem = {
 export type Rsvp = "accepted" | "declined" | "tentative" | "needsAction";
 export type Guest = { name: string; email: string; response: Rsvp | ""; organizer: boolean; optional: boolean; me: boolean };
 export type Attachment = { title: string; url: string; mime: string };
+export type GuestPhotos = { photos: Record<string, string>; needs_consent: boolean };
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
@@ -236,6 +237,7 @@ export const api = {
 
   /** RSS/Atom incident history from services the team depends on; served from a 5 min cache unless `force`. */
   apiStatus: (force = false) => invoke<StatusResult[]>("api_status", { force }),
+  guestPhotos: (emails: string[]) => invoke<GuestPhotos>("guest_photos", { emails }),
   statusAlertsGet: () => invoke<string[]>("status_alerts_get"),
   statusAlertsSet: (ids: string[]) => invoke<string[]>("status_alerts_set", { ids }),
 

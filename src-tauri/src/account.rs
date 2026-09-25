@@ -21,7 +21,7 @@ pub struct Profile {
     pub photo: String,
 }
 
-fn client() -> Result<reqwest::blocking::Client> {
+pub(crate) fn client() -> Result<reqwest::blocking::Client> {
     crate::net::client_builder()
         .timeout(Duration::from_secs(15))
         // A redirect would send the "trusted" photo to any host, including the local network.

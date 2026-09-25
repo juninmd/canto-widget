@@ -36,6 +36,7 @@ export const integrations: Record<keyof typeof source, string> = {
   "agenda.guest.organizer": "organizer",
   "agenda.guest.optional": "optional",
   "agenda.guest.me": "you",
+  "agenda.photosNeedConsent": "to see your colleagues' photos, disconnect and reconnect Google in Settings",
   "agenda.guestsMore": "+{n} not listed",
 
   "forge.section.reviewRequested": "Review requested from me",
