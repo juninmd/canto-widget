@@ -15,7 +15,9 @@ use crate::{cmd_extras, window};
 
 const TICK: Duration = Duration::from_secs(20);
 const REFRESH: Duration = Duration::from_secs(3 * 60);
-const LOOKAHEAD_MS: i64 = 60 * 60 * 1000;
+/// Far enough ahead to keep ringing through a long locked stretch: the Google token only exists unlocked.
+const LOOKAHEAD_MS: i64 = 12 * 60 * 60 * 1000;
+const MAX_EVENTS: u32 = 50;
 /// Same window as `shouldAlert` in `src/lib/agenda.ts`: from 1 min before the start to 2 min after.
 const LEAD_MS: i64 = 60_000;
 const LATE_MS: i64 = 2 * 60_000;
@@ -62,6 +64,31 @@ fn keep_timers_on_time() {
     std::mem::forget(token);
 }
 
+/// What the watcher keeps across a lock: only what the alert shows, never descriptions, guests or attachments.
+pub fn slim(e: &AgendaItem) -> AgendaItem {
+    AgendaItem {
+        id: e.id.clone(),
+        title: e.title.clone(),
+        start: e.start.clone(),
+        end: e.end.clone(),
+        all_day: e.all_day,
+        location: e.location.clone(),
+        meet: e.meet.clone(),
+        link: e.link.clone(),
+        ..Default::default()
+    }
+}
+
+/// One watcher step. Unlocked, the cache is refreshed when due; locked, it keeps ringing from the events
+/// fetched before the lock. Past events are dropped so the cache only shrinks while locked.
+pub fn step(cache: &mut Vec<AgendaItem>, refresh: Option<Vec<AgendaItem>>, now: i64) -> Vec<AgendaItem> {
+    if let Some(fresh) = refresh {
+        *cache = fresh.iter().map(slim).collect();
+    }
+    cache.retain(|e| start_ms(e).is_some_and(|s| s - now > -LATE_MS));
+    due(cache, now).cloned().collect()
+}
+
 pub fn watch(app: AppHandle) {
     #[cfg(target_os = "macos")]
     keep_timers_on_time();
@@ -69,21 +96,20 @@ pub fn watch(app: AppHandle) {
         let mut items: Vec<AgendaItem> = Vec::new();
         let mut fetched: Option<Instant> = None;
         loop {
-            if !app.state::<AppState>().is_unlocked() {
-                items.clear();
+            let refresh = if !app.state::<AppState>().is_unlocked() {
+                // Refetch as soon as the vault opens again.
                 fetched = None;
+                None
+            } else if fetched.is_none_or(|t| t.elapsed() >= REFRESH) {
+                fetched = Some(Instant::now());
+                fetch(&app)
             } else {
-                if fetched.is_none_or(|t| t.elapsed() >= REFRESH) {
-                    if let Some(fresh) = fetch(&app) {
-                        items = fresh;
-                    }
-                    fetched = Some(Instant::now());
-                }
-                let alerted = app.state::<Alerted>();
-                for event in due(&items, now_ms()) {
-                    if alerted.first(event) {
-                        let _ = window::open_alert(&app, event.clone());
-                    }
+                None
+            };
+            let alerted = app.state::<Alerted>();
+            for event in step(&mut items, refresh, now_ms()) {
+                if alerted.first(&event) {
+                    let _ = window::open_alert(&app, event);
                 }
             }
             std::thread::sleep(TICK);
@@ -96,7 +122,7 @@ fn fetch(app: &AppHandle) -> Option<Vec<AgendaItem>> {
     let fmt = |ms: i64| time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).ok()?.format(&Rfc3339).ok();
     // Starts a little in the past so an event that began a minute ago is still caught.
     let (min, max) = (fmt(now - LATE_MS)?, fmt(now + LOOKAHEAD_MS)?);
-    cmd_extras::agenda(&app.state::<AppState>(), &min, &max, 20).ok()
+    cmd_extras::agenda(&app.state::<AppState>(), &min, &max, MAX_EVENTS).ok()
 }
 
 #[cfg(test)]
@@ -139,5 +165,26 @@ mod tests {
         assert!(!alerted.first(&meeting), "the UI and the Rust watcher must not both ring");
         let task = event("task:t1", "", false);
         assert!(alerted.first(&task) && alerted.first(&task));
+    }
+
+    #[test]
+    fn keeps_ringing_from_the_cache_while_locked_and_drops_past_events() {
+        let mut cache = Vec::new();
+        let fetched = vec![
+            AgendaItem {
+                description: "pauta secreta".into(),
+                guests: 9,
+                ..event("soon", "2026-09-18T03:30:00Z", false)
+            },
+            event("over", "2026-09-18T02:00:00Z", false),
+        ];
+        assert!(step(&mut cache, Some(fetched), NOW).is_empty());
+        assert_eq!(cache.len(), 1, "an event that already started long ago is dropped");
+        assert!(cache[0].description.is_empty() && cache[0].guests == 0, "only what the alert shows is kept");
+
+        // Locked: no refresh, yet the cached meeting still rings at its time.
+        let at = NOW + 29 * 60_000 + 30_000;
+        let rung: Vec<_> = step(&mut cache, None, at).into_iter().map(|e| e.id).collect();
+        assert_eq!(rung, ["soon"]);
     }
 }
