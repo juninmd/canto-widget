@@ -47,7 +47,7 @@ default = []
 
 [target.'cfg(windows)'.dependencies]
 # Same version tauri already pulls in: features only, no new crate in the lockfile.
-windows = { version = "0.61", features = [
+windows = { version = "0.62", features = [
   "Foundation",
   "Security_Credentials",
   "Security_Cryptography",
