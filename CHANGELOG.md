@@ -49,6 +49,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Aviso de reunião com o cofre trancado**: o Canto parava de avisar ao trancar, porque o token do Google só
   existe com o cofre aberto. Agora guarda em memória as reuniões das próximas 12 h (só título, horário, local e
   link; sem descrição nem convidados) e continua avisando a partir delas.
+- Releases agora seguem Conventional Commits (`fix`/patch, `feat`/minor e breaking/major), ignoram commits sem
+  impacto de versão e geram os quatro instaladores em paralelo, com cache Rust por alvo, antes de montar o
+  manifesto do updater.
 - **Lembretes perto da meia-noite e na mudança de horário de verão**: um lembrete com antecedência que cai no dia
   seguinte (tarefa às 00:10, aviso às 23:40) e uma tarefa às 23:59 não se perdem mais na virada do dia, e o
   salto do relógio não pula os lembretes da hora que "some".
@@ -88,7 +91,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Textos em pt-BR**: mensagens de erro vindas do núcleo em Rust (cofre, GitHub, GitLab, biometria, lembretes,
   transcrições) e o atalho no menu da bandeja agora têm acentuação correta ("cofre já existe", "horário
   inválido", "Ctrl+Alt+Espaço"); os READMEs traduzidos citam o novo atalho do macOS.
-- Releases em `main` agora recebem uma tag por commit, notas geradas automaticamente e publicação após a
+- Releases em `main` agora recebem uma tag por commit elegível, notas geradas automaticamente e publicação após a
   verificação dos instaladores assinados e do manifesto de atualização. O rascunho `v0.3.0` é retomado.
 
 ## [0.3.0] - 2026-09-22

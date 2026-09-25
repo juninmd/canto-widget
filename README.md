@@ -263,8 +263,8 @@ bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && ca
 bun run tauri build                                      # installer for the current platform
 ```
 
-Every PR runs CI on Windows, macOS and Linux. Each commit merged into `main` gets a version tag, generated
-release notes and signed installers; the release is published after verification (details in
+Every PR runs CI on Windows, macOS and Linux. Conventional `fix`, `feat` and breaking commits merged into `main`
+get a SemVer tag, generated release notes and signed installers built in parallel; the release is published after verification (details in
 [CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
 
 ## 📄 License

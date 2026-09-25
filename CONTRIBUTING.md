@@ -43,12 +43,12 @@ usuário, e-mail real, conteúdo de clipboard ou de reunião de verdade. O repos
 
 ## Publicar uma versão
 
-1. Faça merge do PR em `main`. O workflow **Release** atribui a próxima tag `v0.3.N` ao commit da linha principal,
-   gera as notas a partir da mensagem do commit e executa os testes. Ele compila os instaladores de Windows, macOS
-   (Apple Silicon e Intel) e Linux, confere o `latest.json` e publica a release automaticamente. Se falhar,
+1. Faça merge do PR em `main` com título Conventional Commit. O workflow **Release** incrementa patch para `fix`,
+   minor para `feat` e major para `!` ou `BREAKING CHANGE`; `docs`, `chore`, `test`, `ci` e `refactor` sem quebra
+   não geram versão. Ele gera as notas, executa as verificações e compila em paralelo os instaladores de Windows,
+   macOS (Apple Silicon e Intel) e Linux. Depois reúne e confere o `latest.json` e publica a release. Se falhar,
    corrija a causa e execute novamente o workflow; uma verificação a cada seis horas também tenta retomar.
-2. Não crie uma tag `v0.3.N` nem edite a versão manualmente: a versão do instalador é definida no build da release.
-   O rascunho `v0.3.0` existente será retomado antes das versões novas.
+2. Não crie uma tag de versão nem edite a versão manualmente: a versão do instalador é definida no build da release.
 3. Obrigatórios para a atualização automática: secrets `TAURI_SIGNING_PRIVATE_KEY` (conteúdo da chave privada do
    updater) e `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. A chave pública correspondente está em `tauri.conf.json`
    (`plugins.updater.pubkey`). **Guarde a chave privada fora da máquina**: sem ela, nenhuma instalação existente

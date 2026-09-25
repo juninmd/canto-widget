@@ -95,10 +95,11 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   (release workflow), so local `tauri build` does not need the key. Never commit a private key.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
-- **Releases are automated.** `release.yml` assigns one `v0.3.N` tag to each first-parent commit on `main`
-  after `v0.3.0`, including `docs:` and `chore:` commits. It resumes drafts, builds signed installers with
-  the tag version, verifies `latest.json`, and publishes with notes generated from the commit. A six-hour
-  schedule retries failed or missed runs. Never hand-push a `v0.3.N` tag or edit release versions manually.
+- **Releases are automated and semantic.** `release.yml` versions each first-parent commit on `main` from its
+  Conventional Commit title: `fix` bumps patch, `feat` bumps minor, `!` or `BREAKING CHANGE` bumps major; `docs`,
+  `chore`, `test`, `ci` and `refactor` without a break publish nothing. It builds the signed installers in
+  parallel, merges and verifies `latest.json`, and publishes with notes generated from the commit. A six-hour
+  schedule retries failed or missed runs. Never hand-push a version tag or edit release versions manually.
 
 ## Security rules
 
