@@ -71,6 +71,9 @@ reminder is already set. **Day summary** ready to paste (tasks, meetings with to
 
 ### 📅 Meeting starting? It tells you.
 
+Join the next meeting with `Ctrl+Alt+M` (`Ctrl+Cmd+M` on macOS). If registration fails, Canto tries
+`Ctrl+Alt+Shift+M` (`Ctrl+Cmd+Shift+M` on macOS); the tray menu remains available if both are unavailable.
+
 Today's events come from Google Calendar (read-only). One minute before, the widget jumps onto the screen with
 **join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
 Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized

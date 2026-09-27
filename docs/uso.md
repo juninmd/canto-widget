@@ -180,7 +180,8 @@ Atalho global escondendo e trazendo o widget de volta:
   Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
 - Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, **entrar na próxima reunião com Meet** (atualiza
   sozinho a cada ~90 s enquanto o cofre está destrancado), trancar cofre, sair. O atalho global
-  **Ctrl+Alt+M** (`Ctrl+Cmd+M` no macOS) faz a mesma coisa sem abrir o menu; sem reunião em breve, não faz nada.
+  **Ctrl+Alt+M** (`Ctrl+Cmd+M` no macOS) faz a mesma coisa sem abrir o menu; se ele já estiver em uso por outro
+  aplicativo, o Canto usa **Ctrl+Alt+Shift+M** (`Ctrl+Cmd+Shift+M` no macOS). Sem reunião em breve, não faz nada.
 - **Indicador no ícone**: soma tarefas de hoje ainda não concluídas com PRs/MRs com revisão pedida a você.
   No macOS aparece o número exato no Dock; no Windows e Linux, um ponto vermelho (a API do sistema não dá
   para desenhar números sem depender de uma fonte).
