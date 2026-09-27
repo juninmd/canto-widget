@@ -54,6 +54,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Atalho de reunião ocupado**: quando outro aplicativo já registrou `Ctrl+Alt+M`, o Canto passa a usar
+  `Ctrl+Alt+Shift+M` automaticamente, sem deixar a ação de entrar na próxima reunião indisponível.
 - **Aviso de reunião com o cofre trancado**: o Canto parava de avisar ao trancar, porque o token do Google só
   existe com o cofre aberto. Agora guarda em memória as reuniões das próximas 12 h (só título, horário, local e
   link; sem descrição nem convidados) e continua avisando a partir delas.
