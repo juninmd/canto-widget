@@ -29,6 +29,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       // Objects, not lists: the `_list`/`_search` fallback below would crash these tabs on `items`.
       notes_search: { total: 0, items: [] },
       clip_list: { items: [], max_pinned: 100 },
+      agenda_today: [],
     };
     let callbackId = 1;
     const w = window as unknown as Record<string, unknown>;

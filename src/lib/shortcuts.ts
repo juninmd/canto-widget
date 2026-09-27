@@ -9,7 +9,11 @@ export type Action =
   | { type: "help" }
   | { type: "fullscreen" }
   | { type: "privacy" }
-  | { type: "globalSearch" };
+  | { type: "globalSearch" }
+  | { type: "palette" };
+
+/** Ctrl+K is already the global search; the palette takes the editor-style Ctrl+Shift+P instead. */
+export const PALETTE_KEYS = [MOD_KEY, IS_MAC ? "⇧" : "Shift", "P"];
 
 export type Shortcut = { keys: string[]; description: string };
 
@@ -21,6 +25,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
       { keys: ["Alt", "1–9"], description: t("shortcuts.tabs") },
       { keys: ["/"], description: t("shortcuts.search") },
       { keys: [MOD_KEY, "K"], description: t("shortcuts.globalSearch") },
+      { keys: PALETTE_KEYS, description: t("shortcuts.palette") },
       { keys: ["Esc"], description: t("shortcuts.escape") },
       { keys: ["?"], description: t("shortcuts.help") },
     ],
@@ -42,7 +47,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
   },
 ];
 
-type Key = { key: string; code: string; altKey: boolean; ctrlKey: boolean; metaKey: boolean };
+type Key = { key: string; code: string; altKey: boolean; ctrlKey: boolean; metaKey: boolean; shiftKey?: boolean };
 
 /** Bare keys (N, /, ?) only count outside text fields: otherwise nobody can type "n". */
 export function interpret(e: Key, typing: boolean, mac = IS_MAC): Action | null {
@@ -50,6 +55,7 @@ export function interpret(e: Key, typing: boolean, mac = IS_MAC): Action | null 
   if (e.key === "F11" && !e.altKey && !e.ctrlKey && !e.metaKey) return { type: "fullscreen" };
   // Like a browser's address-bar shortcut: opens the search even while typing elsewhere.
   const mod = mac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey;
+  if (mod && !e.altKey && e.shiftKey && e.code === "KeyP") return { type: "palette" };
   if (mod && !e.altKey && e.code === "KeyK") return { type: "globalSearch" };
   if (e.altKey && !e.ctrlKey && !e.metaKey) {
     const n = /^Digit([1-9])$/.exec(e.code);
@@ -87,10 +93,16 @@ export function useShortcuts(active: boolean, run: (a: Action) => void) {
 }
 
 /** Focuses the field marked with `data-shortcut` in the panel; a button (e.g. notes' "+") is clicked. */
-export function focusShortcut(target: "search" | "new"): boolean {
-  const el = document.querySelector<HTMLElement>(`[role="tabpanel"] [data-shortcut="${target}"]`);
+export function focusShortcut(target: "search" | "new", panel = '[role="tabpanel"]'): boolean {
+  const el = document.querySelector<HTMLElement>(`${panel} [data-shortcut="${target}"]`);
   if (!el) return false;
   if (el.tagName === "BUTTON") el.click();
   else el.focus();
   return true;
+}
+
+/** After a tab switch the new panel isn't rendered yet; scoping to its id keeps the old panel's "+" from firing. */
+export function focusShortcutSoon(target: "search" | "new", panelId: string, tries = 10): void {
+  if (focusShortcut(target, `#${panelId}`) || tries <= 0) return;
+  setTimeout(() => focusShortcutSoon(target, panelId, tries - 1), 30);
 }

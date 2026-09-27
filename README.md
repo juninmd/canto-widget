@@ -140,7 +140,8 @@ Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two 
 and `.md` transcripts from a local folder, cleaned up and searchable.
 
 ⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
-locks and `?` lists the shortcuts.
+locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
+action by name: go to a tab, new task or note, join the next meeting, copy the day's summary, switch skin, lock.
 
 ## 🎨 Five skins
 
@@ -156,7 +157,7 @@ locks and `?` lists the shortcuts.
 And **Follow system**, which switches between light and dark along with the OS. All pass AA contrast.
 
 <details>
-<summary>🖥️ More screens: onboarding, global search, GitLab, subtasks, markdown, security, sync, density and more</summary>
+<summary>🖥️ More screens: onboarding, global search, command palette, GitLab, subtasks, markdown, security, sync, density and more</summary>
 
 <br>
 
@@ -185,6 +186,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Agenda: next free time and conflicts | Agenda: free right now |
 |---|---|
 | ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) | ![Agenda saying "free now until 13:00" because the lunch invite was declined](docs/prints/app/34-agenda-livre-agora.png) |
+
+| Command palette (`Ctrl+Shift+P`) |
+|---|
+| ![Command palette listing tabs, new task, global search, join the next meeting and skins, with their shortcuts](docs/prints/app/38-paleta-comandos.png) |
 
 </details>
 

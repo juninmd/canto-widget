@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { TOGGLE_LABEL } from "./lib/platform";
+import { MOD_KEY, TOGGLE_LABEL } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
@@ -7,7 +7,11 @@ import { useAgenda } from "./lib/useAgenda";
 import { useNoteDraft } from "./lib/useNoteDraft";
 import { useUpdateNotice } from "./lib/useUpdateNotice";
 import { useFullscreen } from "./lib/useFullscreen";
-import { focusShortcut, useShortcuts } from "./lib/shortcuts";
+import { focusShortcut, focusShortcutSoon, useShortcuts } from "./lib/shortcuts";
+import CommandPalette from "./components/CommandPalette";
+import { buildCommands, nextMeeting } from "./lib/paletteCommands";
+import { copyDaySummary } from "./lib/copySummary";
+import { applySkin } from "./lib/theme";
 import ShortcutsHelp from "./components/ShortcutsHelp";
 import GlobalSearch from "./components/GlobalSearch";
 import Onboarding from "./components/Onboarding";
@@ -71,6 +75,7 @@ function Canto() {
   useUpdateNotice(notify, openSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   const fullscreen = useFullscreen();
   const toggleFullscreen = () => void fullscreen.toggle().catch((e) => setError(errText(e)));
@@ -82,7 +87,8 @@ function Canto() {
     if (action.type === "fullscreen") return toggleFullscreen();
     if (action.type === "privacy") return togglePrivacy();
     if (action.type === "globalSearch") return setSearchOpen((v) => !v);
-    if (helpOpen || searchOpen || onboardingOpen) return;
+    if (action.type === "palette") return setPaletteOpen((v) => !v);
+    if (helpOpen || searchOpen || paletteOpen || onboardingOpen) return;
     if (action.type === "tab") return tabs[action.index - 1] && changeTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
     focusShortcut(action.target);
@@ -151,10 +157,37 @@ function Canto() {
   async function lock() {
     setHelpOpen(false);
     setSearchOpen(false);
+    setPaletteOpen(false);
     setOnboardingOpen(false);
     await api.lock();
     await refresh();
   }
+
+  // Called only while the palette is open: it reflects the agenda and privacy at that moment.
+  const paletteCommands = () =>
+    buildCommands({
+      tabs,
+      privacy,
+      nextMeeting: nextMeeting(agenda.items),
+      goTab: changeTab,
+      focusNew: (target) => {
+        changeTab(target);
+        focusShortcutSoon("new", panelId(target));
+      },
+      searchTab: () => focusShortcut("search"),
+      globalSearch: () => setSearchOpen(true),
+      lock: () => void lock(),
+      joinMeeting: (e) => void api.openLink(e.meet).catch((err) => setError(errText(err))),
+      setSkin: applySkin,
+      togglePrivacy,
+      toggleFullscreen,
+      copySummary: () =>
+        void copyDaySummary(today, agenda.items)
+          .then(() => notify({ message: t("palette.summaryCopied") }))
+          .catch(() => setError(t("summary.copyFailed", { mod: MOD_KEY }))),
+      help: () => setHelpOpen(true),
+      hide: () => void getCurrentWindow().hide(),
+    });
 
   return (
     <div
@@ -182,6 +215,17 @@ function Canto() {
             setJumpQuery(q);
             setTab(target);
             setSearchOpen(false);
+          }}
+        />
+      )}
+      {paletteOpen && status?.unlocked && (
+        <CommandPalette
+          commands={paletteCommands()}
+          onClose={() => setPaletteOpen(false)}
+          onRun={(cmd) => {
+            setPaletteOpen(false);
+            // Runs after the palette unmounts and hands focus back, so a focused field keeps it.
+            setTimeout(() => void cmd.run(), 0);
           }}
         />
       )}

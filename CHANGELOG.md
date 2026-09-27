@@ -15,6 +15,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   disso, até a meia-noite) e ignora eventos de dia inteiro e convites que você recusou.
 - **Conflito na agenda**: eventos com horário que se sobrepõem ganham o selo "conflito", com o título do outro
   evento na dica e no nome acessível. Eventos que só encostam (um termina quando o outro começa) não contam.
+- **Paleta de comandos** (`Ctrl+Shift+P`, `Cmd+Shift+P` no macOS): todas as ações do app pelo nome, com busca
+  aproximada que ignora acentos — ir para cada aba visível, nova tarefa, nova nota, busca global, entrar na
+  próxima reunião, copiar o resumo do dia, abrir ajustes, trocar de tema, modo privacidade, tela cheia, esconder e
+  trancar o cofre. Setas escolhem, `Enter` executa, `Esc` fecha e devolve o foco. `Ctrl+K` segue sendo a busca
+  global de conteúdo. Aparece na ajuda de atalhos (`?`).
 - **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
   diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
   seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o
