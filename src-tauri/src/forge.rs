@@ -3,7 +3,7 @@ use serde::Serialize;
 
 use crate::error::Result;
 use crate::forge_cache::{ForgeCache, Quota};
-use crate::forge_filter::{cache_key, Activity, ForgeFilter, Order, Section, Sort};
+use crate::forge_filter::{cache_key, Activity, ForgeFilter, Order, Section, Sort, Window};
 use crate::model::now_ms;
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -112,7 +112,7 @@ pub trait Forge {
         page: u32,
         f: &ForgeFilter,
     ) -> Result<(ForgeList, Option<Quota>)>;
-    fn fetch_activity(cred: &Self::Credential, activity: Activity, since: &str) -> Result<(ForgeList, Option<Quota>)>;
+    fn fetch_activity(cred: &Self::Credential, activity: Activity, w: &Window) -> Result<(ForgeList, Option<Quota>)>;
 }
 
 /// The four sections of a tab, each served from the cache unless `force`.
@@ -139,14 +139,14 @@ pub fn list_page<F: Forge>(
     })
 }
 
-/// Background aggregation for the day summary.
+/// Background aggregation for the day summary and the period report.
 pub fn activity_since<F: Forge>(
     cache: &ForgeCache,
     cred: &F::Credential,
     activity: Activity,
-    since: &str,
+    w: &Window,
 ) -> Result<ForgeList> {
-    cache.get(F::NAME, &format!("{activity:?}|{since}"), false, now_ms(), || F::fetch_activity(cred, activity, since))
+    cache.get(F::NAME, &format!("{activity:?}|{}", w.key()), false, now_ms(), || F::fetch_activity(cred, activity, w))
 }
 
 /// Background aggregation for the tray badge.

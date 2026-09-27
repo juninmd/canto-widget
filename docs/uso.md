@@ -76,6 +76,14 @@ nunca mostra de novo.
   abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
   não responder, o resumo diz qual e traz o resto. Uma reunião com anotações do Gemini leva o link delas na
   mesma linha.
+- **Relatório da semana e do mês** — no topo do resumo, escolha **hoje**, **semana** (de segunda até hoje) ou
+  **mês** (do dia 1º até hoje). O relatório, em markdown, traz um panorama com os totais, as tarefas concluídas,
+  as notas criadas ou editadas, as reuniões agrupadas por título com o tempo total (sobreposições contam uma vez;
+  eventos de dia inteiro e reuniões recusadas ficam fora) e os PRs/MRs abertos, mergeados e revisados no período,
+  com link. Na semana, uma linha por dia útil resume tarefas e tempo em reuniões. O Canto não guarda a hora em
+  que uma tarefa foi concluída: ela conta no **dia a que pertence** (quem puxa pendências leva a tarefa para o dia
+  em que foi feita). Listas muito longas mostram as primeiras e dizem quantas ficaram de fora; a agenda vem
+  inteira até 1.000 eventos.
 - **Abas visíveis** — em **Ajustes → Abas visíveis**, desmarque as abas que você não usa. Os dados continuam no
   cofre, e `Alt+1`, `Alt+2`… seguem a ordem das abas que ficaram. Ajustes nunca some.
 

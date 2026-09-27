@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus } from "./forgeTypes";
+import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "./forgeTypes";
 import { t } from "../i18n";
 
 export type * from "./forgeTypes";
@@ -244,6 +244,12 @@ export const api = {
   gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
+  /** The period report's bounds are local midnights computed here (see AGENTS.md); `toMs` is exclusive. */
+  forgesActivityBetween: (fromMs: number, toMs: number) =>
+    invoke<ForgeOpened>("forges_activity_between", { fromMs, toMs }),
+  reportAgenda: (fromMs: number, toMs: number) => invoke<AgendaItem[]>("report_agenda", { fromMs, toMs }),
+  reportVault: (fromDay: string, toDay: string, fromMs: number, toMs: number) =>
+    invoke<VaultPeriod>("report_vault", { fromDay, toDay, fromMs, toMs }),
   /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
   badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
 

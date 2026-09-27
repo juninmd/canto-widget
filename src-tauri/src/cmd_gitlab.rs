@@ -7,7 +7,7 @@ use crate::blocking::run;
 use crate::error::{AppError, Result};
 use crate::forge::{self, ChecksStatus, Forge, ForgeList, ForgeLists};
 use crate::forge_cache::Quota;
-use crate::forge_filter::{Activity, ForgeFilter, Section};
+use crate::forge_filter::{Activity, ForgeFilter, Section, Window};
 use crate::gitlab::{self, Account};
 use crate::gitlab_query;
 use crate::store::{self, GITLAB_AAD};
@@ -31,8 +31,8 @@ impl Forge for Gitlab {
         gitlab::section(cred, section, page, f)
     }
 
-    fn fetch_activity(cred: &Self::Credential, activity: Activity, since: &str) -> Result<(ForgeList, Option<Quota>)> {
-        gitlab::mrs_since(cred, activity, since)
+    fn fetch_activity(cred: &Self::Credential, activity: Activity, w: &Window) -> Result<(ForgeList, Option<Quota>)> {
+        gitlab::mrs_since(cred, activity, w)
     }
 }
 
@@ -135,14 +135,14 @@ pub async fn gitlab_mr_checks(app: tauri::AppHandle, project: String, iid: u64) 
     run(move || gitlab::mr_checks(&account(&app)?, &project, iid)).await
 }
 
-/// `None` when GitLab isn't connected: the day summary just leaves it out.
-pub(crate) fn activity_since(state: &AppState, activity: Activity, since: &str) -> Option<Result<ForgeList>> {
+/// `None` when GitLab isn't connected: the summary just leaves it out.
+pub(crate) fn activity_since(state: &AppState, activity: Activity, w: &Window) -> Option<Result<ForgeList>> {
     let acc = match state.gitlab_config() {
         Ok(None) => return None,
         Ok(Some(c)) => to_account(&c),
         Err(e) => return Some(Err(e)),
     };
-    Some(forge::activity_since::<Gitlab>(&state.forges, &acc, activity, since))
+    Some(forge::activity_since::<Gitlab>(&state.forges, &acc, activity, w))
 }
 
 /// `None` when GitLab isn't connected: the badge simply doesn't count it.

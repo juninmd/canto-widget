@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Relatório da semana e do mês**: o resumo ganhou um seletor **hoje / semana / mês**. A semana vai de segunda
+  até hoje e o mês do dia 1º até hoje; o relatório sai em markdown, com panorama, uma linha por dia útil (na
+  semana), tarefas concluídas, notas criadas ou editadas, reuniões agrupadas por título com o tempo total e os
+  PRs/MRs abertos, mergeados e revisados no período, com link. A agenda do período é paginada (até 1.000
+  eventos) e listas longas dizem quantos itens ficaram de fora. Como o Canto não guarda a hora da conclusão, uma
+  tarefa concluída conta no dia a que pertence.
 - **Resumo do dia mais completo**: além dos PRs/MRs abertos, lista os **mergeados** e os **revisados/aprovados
   por mim** no dia (GitHub e GitLab), e o título das reuniões traz o **tempo total** (sobreposições contam uma
   vez; eventos de dia inteiro ficam fora).

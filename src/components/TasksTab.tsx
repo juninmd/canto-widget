@@ -2,7 +2,7 @@ import { t } from "../i18n";
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
-import DaySummary from "./DaySummary";
+import SummaryPanel from "./SummaryPanel";
 import TaskRow from "./TaskRow";
 import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
@@ -108,7 +108,9 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   );
 
   if (summary) {
-    return <DaySummary day={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />;
+    return (
+      <SummaryPanel today={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />
+    );
   }
 
   return (

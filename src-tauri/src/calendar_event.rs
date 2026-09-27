@@ -14,6 +14,8 @@ const RESPONSES: [&str; 4] = ["accepted", "declined", "tentative", "needsAction"
 pub struct EventList {
     #[serde(default)]
     pub items: Vec<RawEvent>,
+    #[serde(default, rename = "nextPageToken")]
+    pub next_page_token: Option<String>,
 }
 
 #[derive(Deserialize)]

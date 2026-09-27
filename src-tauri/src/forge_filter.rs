@@ -41,7 +41,7 @@ pub enum Section {
     MyIssues,
 }
 
-/// What the day summary asks each forge about the user's own day.
+/// What the day summary and the period report ask each forge about the user's own activity.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Activity {
     Opened,
@@ -50,6 +50,23 @@ pub enum Activity {
 }
 
 pub const ACTIVITIES: [Activity; 3] = [Activity::Opened, Activity::Merged, Activity::Reviewed];
+
+/// Interval searched, as RFC 3339 instants built from numbers; `until: None` means "up to now" (the day summary).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Window {
+    pub since: String,
+    pub until: Option<String>,
+}
+
+impl Window {
+    pub fn since(since: &str) -> Self {
+        Window { since: since.to_string(), until: None }
+    }
+
+    pub fn key(&self) -> String {
+        format!("{}|{}", self.since, self.until.as_deref().unwrap_or(""))
+    }
+}
 
 pub const SECTIONS: [Section; 4] = [Section::ReviewRequested, Section::Assigned, Section::MyPrs, Section::MyIssues];
 

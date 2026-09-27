@@ -65,7 +65,7 @@ export default function DaySummary({
     <section
       aria-label={t("summary.heading")}
       onKeyDown={(e) => e.key === "Escape" && onClose()}
-      className="flex h-full min-h-0 flex-col gap-2 motion-safe:animate-aba"
+      className="flex min-h-0 flex-1 flex-col gap-2 motion-safe:animate-aba"
     >
       <pre className="min-h-0 flex-1 overflow-y-auto whitespace-pre-wrap rounded-lg border border-edge bg-ink/60 p-2 font-sans text-xs text-fg select-text">
         {text}

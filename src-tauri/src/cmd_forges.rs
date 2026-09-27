@@ -1,11 +1,11 @@
-//! What spans both forges: the PRs/MRs the user opened, merged or reviewed today, for the day summary.
+//! What spans both forges: the PRs/MRs the user opened, merged or reviewed, for the day summary and period report.
 use serde::Serialize;
 use tauri::Manager;
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
 use crate::forge::{ForgeItem, ForgeList};
-use crate::forge_filter::{Activity, ACTIVITIES};
+use crate::forge_filter::{Activity, Window, ACTIVITIES};
 use crate::model::now_ms;
 use crate::vault::AppState;
 
@@ -18,6 +18,15 @@ pub struct Opened {
     pub reviewed: Vec<ForgeItem>,
     /// One line per distinct failure; the other forge's items still come.
     pub errors: Vec<String>,
+    /// What each forge counted, past the first page the lists carry: a month can outgrow it.
+    pub totals: Totals,
+}
+
+#[derive(Debug, Default, Serialize, PartialEq)]
+pub struct Totals {
+    pub opened: u64,
+    pub merged: u64,
+    pub reviewed: u64,
 }
 
 /// `since_ms` is local midnight from the UI; anything outside the last two days is refused rather than searched.
@@ -27,20 +36,22 @@ pub async fn forges_opened_since(app: tauri::AppHandle, since_ms: i64) -> Result
     if !(now - 2 * DAY_MS..=now + 60_000).contains(&since_ms) {
         return Err(AppError::Config("inicio do dia fora do intervalo".into()));
     }
-    let since = rfc3339(since_ms)?;
-    run(move || {
-        let state = app.state::<AppState>();
-        if !state.is_unlocked() {
-            return Err(AppError::Locked);
-        }
-        let results = ACTIVITIES.into_iter().flat_map(|a| {
-            let gh = crate::cmd_github_lists::activity_since(&app, a, &since);
-            let gl = crate::cmd_gitlab::activity_since(&state, a, &since);
-            [gh, gl].into_iter().flatten().map(move |r| (a, r))
-        });
-        Ok(combine(results))
-    })
-    .await
+    let w = Window::since(&rfc3339(since_ms)?);
+    run(move || activity(&app, &w)).await
+}
+
+/// Both forges, every activity, inside `w`; blocking, so callers run it off the async runtime.
+pub(crate) fn activity(app: &tauri::AppHandle, w: &Window) -> Result<Opened> {
+    let state = app.state::<AppState>();
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
+    let results = ACTIVITIES.into_iter().flat_map(|a| {
+        let gh = crate::cmd_github_lists::activity_since(app, a, w);
+        let gl = crate::cmd_gitlab::activity_since(&state, a, w);
+        [gh, gl].into_iter().flatten().map(move |r| (a, r))
+    });
+    Ok(combine(results))
 }
 
 /// Sum of "revisão pedida a mim" across every connected forge; a forge that fails or isn't
@@ -58,7 +69,15 @@ fn combine(results: impl Iterator<Item = (Activity, Result<ForgeList>)>) -> Open
     let mut out = Opened::default();
     for (activity, r) in results {
         let list = match r {
-            Ok(list) => list.items,
+            Ok(list) => {
+                let total = list.total.max(list.items.len() as u64);
+                *match activity {
+                    Activity::Opened => &mut out.totals.opened,
+                    Activity::Merged => &mut out.totals.merged,
+                    Activity::Reviewed => &mut out.totals.reviewed,
+                } += total;
+                list.items
+            }
             Err(e) => {
                 let e = e.to_string();
                 if !out.errors.contains(&e) {
@@ -80,7 +99,7 @@ fn combine(results: impl Iterator<Item = (Activity, Result<ForgeList>)>) -> Open
 }
 
 /// Built from numbers, never from user text: it goes straight into a search query.
-fn rfc3339(ms: i64) -> Result<String> {
+pub(crate) fn rfc3339(ms: i64) -> Result<String> {
     let t =
         time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).map_err(|e| AppError::Config(e.to_string()))?;
     Ok(format!(
@@ -132,5 +151,13 @@ mod tests {
         assert!(out.items.is_empty());
         assert_eq!((out.merged[0].number, out.reviewed[0].number), (3, 4));
         assert_eq!(out.errors.len(), 1);
+    }
+
+    #[test]
+    fn totals_count_past_the_first_page_and_add_both_forges() {
+        let gh = ForgeList { total: 45, items: vec![item(1, "2026-09-02T12:00:00Z", "", 0)], ..Default::default() };
+        let gl = ForgeList { total: 0, items: vec![item(2, "2026-09-03T12:00:00Z", "", 0)], ..Default::default() };
+        let out = combine([(Activity::Merged, Ok(gh)), (Activity::Merged, Ok(gl))].into_iter());
+        assert_eq!(out.totals, Totals { opened: 0, merged: 46, reviewed: 0 });
     }
 }

@@ -46,7 +46,8 @@ test("merged and reviewed PRs/MRs from the forges reach the summary", async () =
 
 test("a long summary scrolls inside the panel, keeping copy and back in view", async () => {
   await mount();
-  expect(screen.getByRole("region", { name: "resumo do dia" }).className).toContain("h-full");
+  // It sits under the period picker in a flex column: it takes the rest of the height, never more.
+  expect(screen.getByRole("region", { name: "resumo do dia" }).className).toContain("min-h-0 flex-1");
   expect(screen.getByText("copiar resumo").parentElement?.className).toContain("shrink-0");
 });
 

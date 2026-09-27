@@ -5,7 +5,7 @@ use std::time::Duration;
 use crate::error::{AppError, Result};
 use crate::forge::{merge, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
-use crate::forge_filter::{self as filter, Activity, ForgeFilter, Section, Sort, PER_PAGE};
+use crate::forge_filter::{self as filter, Activity, ForgeFilter, Section, Sort, Window, PER_PAGE};
 use crate::github_query::{activity_since, queries};
 use crate::model::now_ms;
 
@@ -58,9 +58,9 @@ pub fn section(token: &str, section: Section, page: u32, f: &ForgeFilter) -> Res
     Ok((out, quota))
 }
 
-/// First page of the day's PRs of one kind since `since` (RFC 3339), newest first.
-pub fn prs_since(token: &str, activity: Activity, since: &str) -> Result<(ForgeList, Option<Quota>)> {
-    search(token, &activity_since(activity, since), 1, &ForgeFilter { sort: Sort::Created, ..Default::default() })
+/// First page of the PRs of one kind inside `w`, newest first; `total` still counts the ones past it.
+pub fn prs_since(token: &str, activity: Activity, w: &Window) -> Result<(ForgeList, Option<Quota>)> {
+    search(token, &activity_since(activity, w), 1, &ForgeFilter { sort: Sort::Created, ..Default::default() })
 }
 
 pub fn user(token: &str) -> Result<String> {

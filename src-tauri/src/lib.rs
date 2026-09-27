@@ -22,6 +22,7 @@ pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_notes;
+pub mod cmd_report;
 pub mod cmd_status;
 pub mod cmd_sync;
 pub mod commands;
@@ -58,6 +59,7 @@ pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
 pub mod priority;
+pub mod report;
 pub mod review_alert;
 pub mod routine;
 pub mod snooze;
@@ -242,6 +244,9 @@ pub fn run() {
             cmd_gitlab::gitlab_section,
             cmd_gitlab::gitlab_mr_checks,
             cmd_forges::forges_opened_since,
+            cmd_report::forges_activity_between,
+            cmd_report::report_agenda,
+            cmd_report::report_vault,
             cmd_status::api_status,
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
