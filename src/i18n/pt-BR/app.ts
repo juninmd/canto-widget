@@ -102,6 +102,10 @@ export const app = {
   "settings.reminders.onTime": "na hora",
   "settings.reminders.before": "{min} min antes",
 
+  "settings.reviewAlerts.title": "Revisões no GitHub",
+  "settings.reviewAlerts.label": "avisar quando pedirem minha revisão",
+  "settings.reviewAlerts.hint": "Notificação do sistema para cada pedido novo, conferido a cada 5 min enquanto o cofre está aberto.",
+
   "settings.security.title": "Segurança",
   "settings.security.autolock": "trancar sozinho após",
   "settings.security.autolockOption": "{min} min sem uso",

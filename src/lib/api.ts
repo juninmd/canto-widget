@@ -106,6 +106,8 @@ export type Attachment = { title: string; url: string; mime: string };
 export type GuestPhotos = { photos: Record<string, string>; needs_consent: boolean };
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
+export type PrRef = { repo: string; number: number };
+export type PrChecks = PrRef & { status: ChecksStatus };
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 export type StatusItem = { title: string; link: string; published_at: number };
 export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
@@ -224,8 +226,12 @@ export const api = {
   githubLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("github_lists", { filter, force }),
   githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("github_section", { section, page, filter }),
-  /** One call per click, not per list row: never fetched for a whole page at once. */
+  /** Fallback click for a PR the batch left out; shares the batch's cache. */
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
+  /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
+  githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
+  reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
+  reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
 
   gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
   /** Validates address and token against the instance; returns the username. */

@@ -4,11 +4,12 @@ use zeroize::Zeroizing;
 
 use crate::blocking::run;
 use crate::cmd_github::{valid_token, GithubState, FORGE};
-use crate::error::Result;
+use crate::error::{AppError, Result};
 use crate::forge::{self, ChecksStatus, Forge, ForgeList, ForgeLists};
 use crate::forge_cache::Quota;
 use crate::forge_filter::{Activity, ForgeFilter, Section};
 use crate::github;
+use crate::github_checks::{self, GithubChecks, PrChecks, PrRef};
 use crate::model::now_ms;
 use crate::vault::AppState;
 
@@ -63,10 +64,33 @@ pub async fn github_section(
     .await
 }
 
-/// One click on one PR row, not a list: two calls (head sha, then its combined status), never cached.
+/// One click on a PR row the batch below left out; same cache, so a second click costs nothing.
 #[tauri::command]
 pub async fn github_pr_checks(app: tauri::AppHandle, repo: String, number: u64) -> Result<ChecksStatus> {
-    run(move || github::pr_checks(&token(&app)?, &repo, number)).await
+    let Some(pr) = github_checks::pick(vec![PrRef { repo, number }]).pop() else {
+        return Err(AppError::Format("repositório inválido".into()));
+    };
+    run(move || {
+        let cred = token(&app)?;
+        let cache = &app.state::<AppState>().forges.checks;
+        github_checks::status_for(cache, &GithubChecks::new(&cred)?, &pr, now_ms())
+    })
+    .await
+}
+
+/// CI badges for the PRs on screen, bounded to `MAX_PRS` and cached per head sha.
+#[tauri::command]
+pub async fn github_prs_checks(app: tauri::AppHandle, prs: Vec<PrRef>) -> Result<Vec<PrChecks>> {
+    let prs = github_checks::pick(prs);
+    run(move || {
+        if prs.is_empty() {
+            return Ok(Vec::new());
+        }
+        let cred = token(&app)?;
+        let cache = &app.state::<AppState>().forges.checks;
+        Ok(github_checks::statuses(cache, &GithubChecks::new(&cred)?, &prs, now_ms()))
+    })
+    .await
 }
 
 /// `None` when GitHub isn't connected: the day summary just leaves it out.

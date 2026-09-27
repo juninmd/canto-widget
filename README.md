@@ -116,8 +116,9 @@ sensitive.
 ### 🐙 Your GitHub at a glance
 
 **Review requested from me**, assigned to me, PRs and issues I opened, with a PR or issue icon and who opened
-it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and CI status is one
-click away. Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
+it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and each PR carries a small
+**CI badge** (passed, failed, running or no CI) from its head commit's checks. When someone **requests your
+review**, an OS notification tells you (on by default, switch it off in Settings). Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
 scroll with **show more**. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 respects the rate limit. Sign in with a read-only personal token or from the browser (device flow).
 
@@ -203,6 +204,14 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Image in a note |
 |---|
 | ![Note preview with an attached whiteboard sketch between the text and a checklist](docs/prints/app/37-notas-imagem.png) |
+
+| CI badge on every PR |
+|---|
+| ![GitHub tab where each PR shows a CI badge: passed, running and failed](docs/prints/app/35-ci-no-card.png) |
+
+| Review request notifications |
+|---|
+| ![Settings with the switch to be notified when someone requests your review on GitHub](docs/prints/app/36-ajustes-revisao.png) |
 
 </details>
 

@@ -3,13 +3,13 @@ use serde::Deserialize;
 use std::time::Duration;
 
 use crate::error::{AppError, Result};
-use crate::forge::{checks_from_github, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
+use crate::forge::{merge, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{self as filter, Activity, ForgeFilter, Section, Sort, PER_PAGE};
 use crate::github_query::{activity_since, queries};
 use crate::model::now_ms;
 
-const API: &str = "https://api.github.com";
+pub(crate) const API: &str = "https://api.github.com";
 
 #[derive(Deserialize)]
 struct SearchResponse {
@@ -68,40 +68,6 @@ pub fn user(token: &str) -> Result<String> {
     Ok(response::<GithubUser>(res)?.login)
 }
 
-#[derive(Deserialize)]
-struct PullDetail {
-    head: PullHead,
-}
-
-#[derive(Deserialize)]
-struct PullHead {
-    sha: String,
-}
-
-#[derive(Deserialize)]
-struct CombinedStatus {
-    #[serde(default)]
-    state: String,
-}
-
-/// Two calls (head sha, then its combined status): only on an explicit click, never per row of a list.
-pub fn pr_checks(token: &str, repo: &str, number: u64) -> Result<ChecksStatus> {
-    if !valid_repo_path(repo, 2) {
-        return Err(AppError::Format("repositório inválido".into()));
-    }
-    let pr: PullDetail = response(
-        client()?.get(format!("{API}/repos/{repo}/pulls/{number}")).bearer_auth(token).send().map_err(network)?,
-    )?;
-    let status: CombinedStatus = response(
-        client()?
-            .get(format!("{API}/repos/{repo}/commits/{}/status", pr.head.sha))
-            .bearer_auth(token)
-            .send()
-            .map_err(network)?,
-    )?;
-    Ok(checks_from_github(&status.state))
-}
-
 fn search(token: &str, query: &str, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
     let url = url::Url::parse_with_params(
         &format!("{API}/search/issues"),
@@ -142,7 +108,7 @@ pub(crate) fn network(e: reqwest::Error) -> AppError {
     AppError::Github(format!("sem resposta do GitHub: {e}"))
 }
 
-fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
+pub(crate) fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
     let now = now_ms();
     let spent = Quota::from_headers(res.headers(), status, "x-ratelimit-remaining", "x-ratelimit-reset", now)

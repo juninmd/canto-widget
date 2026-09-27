@@ -1,17 +1,18 @@
 import { freshness, isFiltered, visibleSections, type Forge } from "../lib/forge";
 import type { ForgeListsState } from "../lib/useForgeLists";
+import type { CiMap } from "../lib/forgeChecks";
 import { timeAgo } from "../lib/time";
 import { LOCALE, t } from "../i18n";
 import ForgeFilterBar from "./ForgeFilterBar";
 import ForgeSection from "./ForgeSection";
 import Skeleton from "./Skeleton";
 
-type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; onDisconnect: () => void };
+type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; onDisconnect: () => void };
 
 const clock = (ms: number) => new Date(ms).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
 
 /** Issue and PR/MR lists of one connected forge: header, filter, sections. */
-export default function ForgeBoard({ forge, login, host, lists: gh, onDisconnect }: Props) {
+export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDisconnect }: Props) {
   const { lists } = gh;
   const fresh = lists ? freshness(lists) : null;
   return (
@@ -61,6 +62,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, onDisconnect
               filtered={isFiltered(gh.filter)}
               loadingMore={gh.loadingMore === key}
               onMore={() => void gh.more(key)}
+              ci={ci}
             />
           ))}
       </div>

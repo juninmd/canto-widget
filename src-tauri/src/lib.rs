@@ -8,6 +8,7 @@ pub mod biometric;
 pub mod blocking;
 pub mod calendar;
 pub mod calendar_event;
+pub mod checks_cache;
 pub mod clip_os;
 pub mod clip_watch;
 pub mod clipboard;
@@ -34,6 +35,7 @@ pub mod forge_filter;
 pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
+pub mod github_checks;
 pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
@@ -56,6 +58,7 @@ pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
 pub mod priority;
+pub mod review_alert;
 pub mod routine;
 pub mod snooze;
 pub mod status_alert;
@@ -113,6 +116,7 @@ pub fn run() {
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
+            app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
@@ -125,6 +129,7 @@ pub fn run() {
             task_reminder::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
+            review_alert::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -227,6 +232,9 @@ pub fn run() {
             cmd_github_lists::github_lists,
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
+            cmd_github_lists::github_prs_checks,
+            review_alert::review_alerts_get,
+            review_alert::review_alerts_set,
             cmd_gitlab::gitlab_status,
             cmd_gitlab::gitlab_connect,
             cmd_gitlab::gitlab_disconnect,

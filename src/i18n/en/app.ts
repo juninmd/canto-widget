@@ -107,6 +107,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.reminders.onTime": "on time",
   "settings.reminders.before": "{min} min before",
 
+  "settings.reviewAlerts.title": "GitHub reviews",
+  "settings.reviewAlerts.label": "notify me when my review is requested",
+  "settings.reviewAlerts.hint": "OS notification for each new request, checked every 5 min while the vault is open.",
+
   "settings.security.title": "Security",
   "settings.security.autolock": "lock automatically after",
   "settings.security.autolockOption": "{min} min idle",

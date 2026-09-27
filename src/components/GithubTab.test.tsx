@@ -234,7 +234,26 @@ test("a review request shows only 'aguardando', never the stale badge", async ()
   expect(screen.queryByText(/parado há/)).toBeNull();
 });
 
-test("ver CI asks the vault for the PR's combined status and shows the result, on click only", async () => {
+test("PRs get their CI badge in one batch after the list, without a click", async () => {
+  responses.github_status = connected;
+  const other = { ...item, number: 7, reference: "octo/canto#7", url: "https://github.com/octo/canto/pull/7" };
+  responses.github_lists = () =>
+    Promise.resolve(lists({ review_requested: { total: 1, items: [item] }, my_prs: { total: 1, items: [other] } }));
+  responses.github_prs_checks = () =>
+    Promise.resolve([
+      { repo: "octo/canto", number: 42, status: "failure" },
+      { repo: "octo/canto", number: 7, status: "running" },
+    ]);
+  await mount();
+  expect(calls.filter((c) => c.cmd === "github_prs_checks").map((c) => c.args)).toEqual([
+    { prs: [{ repo: "octo/canto", number: 42 }, { repo: "octo/canto", number: 7 }] },
+  ]);
+  expect(screen.getByRole("img", { name: "✗ CI falhou" })).toBeTruthy();
+  expect(screen.getByRole("img", { name: "● CI rodando" })).toBeTruthy();
+  expect(screen.queryByText("ver CI")).toBeNull();
+});
+
+test("ver CI stays as the fallback for a PR the batch left out, and asks on click only", async () => {
   responses.github_status = connected;
   responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [item] } }));
   responses.github_pr_checks = () => Promise.resolve("success");

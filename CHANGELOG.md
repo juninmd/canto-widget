@@ -29,6 +29,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   `note-images/` (o cofre não fica mais pesado de gravar). Acompanham a troca de senha; **não entram no backup
   `.canto` nem na pasta sincronizada**, então a nota restaurada em outra máquina mostra "imagem indisponível".
   Imagens que nenhuma nota usa mais são apagadas depois de um dia.
+- **CI no card do PR**: na aba GitHub, cada PR mostra um selo com o CI do último commit (passou, falhou,
+  rodando ou sem CI), juntando GitHub Actions/check runs e commit statuses. São até 20 PRs por vez, com cache
+  por commit na memória (1 min enquanto roda, 15 min quando termina) para não gastar o limite da API; o link
+  "ver CI" segue para os PRs que ficaram de fora. O selo de CI pede as permissões *Checks* e *Commit statuses*
+  (leitura) no token. Só GitHub por enquanto.
+- **Aviso de revisão pedida**: com o cofre aberto e o GitHub conectado, uma notificação do sistema avisa
+  quando alguém pede sua revisão ("Revisão pedida: dono/repo#12 título"), conferido a cada 5 min. A primeira
+  leitura só memoriza o que já estava lá. Vem ligado; desliga em Ajustes → Revisões no GitHub.
 - **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
   diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
   seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o

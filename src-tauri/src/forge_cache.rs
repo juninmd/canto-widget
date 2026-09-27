@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 use std::sync::Mutex;
 
+use crate::checks_cache::ChecksCache;
 use crate::error::{AppError, Result};
 use crate::forge::ForgeList;
 
@@ -63,6 +64,8 @@ struct Inner {
 #[derive(Default)]
 pub struct ForgeCache {
     inner: Mutex<Inner>,
+    /// PR CI status, dropped together with the lists on disconnect or lock.
+    pub checks: ChecksCache,
 }
 
 impl ForgeCache {
@@ -130,6 +133,7 @@ impl ForgeCache {
         g.entries.retain(|k, _| !k.starts_with(&prefix));
         g.quotas.remove(forge);
         g.generation += 1;
+        self.checks.forget(forge);
     }
 
     pub fn clear(&self) {
@@ -137,6 +141,7 @@ impl ForgeCache {
         g.entries.clear();
         g.quotas.clear();
         g.generation += 1;
+        self.checks.clear();
     }
 }
 
