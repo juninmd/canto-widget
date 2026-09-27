@@ -25,6 +25,14 @@ ainda carrega o escopo `drive.appdata`. **sair** e entrar de novo para ficar só
 agenda. O `vault.enc` antigo (cifrado) segue na pasta oculta do app no Drive até ser apagado em
 Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 
+### Tempo livre e conflitos
+
+O topo da aba **agenda** mostra a próxima janela livre de pelo menos 15 minutos entre agora e o fim do dia útil
+(19:00; depois desse horário, a conta vai até a meia-noite, para quem trabalha à noite ainda ter resposta).
+Eventos de dia inteiro e convites recusados não ocupam tempo; eventos sobrepostos ou colados formam um bloco só.
+Dois eventos com horário que se sobrepõem (nenhum recusado) recebem o selo **conflito** com o título do outro;
+terminar exatamente quando o outro começa não é conflito.
+
 ### Anotações e transcrições do Gemini
 
 O Canto não gera transcrições. Quando alguém liga **Take notes for me** (anotações do Gemini) ou a transcrição

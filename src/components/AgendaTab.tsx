@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { api, errText, type AgendaItem } from "../lib/api";
 import { t } from "../i18n";
 import AgendaCard from "./AgendaCard";
+import { conflicts, freeLabel, nextFree } from "../lib/agendaFree";
 import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
+
+const systemNow = () => new Date();
 
 /// Synthetic event so the user can check the pop-up and sound without waiting for a meeting.
 function testEvent(): AgendaItem {
@@ -26,12 +29,20 @@ function testEvent(): AgendaItem {
 export default function AgendaTab({
   agenda,
   onError,
+  now = systemNow,
 }: {
   agenda: Agenda;
   onError: (m: string) => void;
+  now?: () => Date;
 }) {
   const { items, loading, error, reload } = agenda;
   const [open, setOpen] = useState<string | null>(null);
+  const [at, setAt] = useState(now);
+  useEffect(() => {
+    const tick = setInterval(() => setAt(now()), 30_000);
+    return () => clearInterval(tick);
+  }, [now]);
+  const clashes = useMemo(() => conflicts(items), [items]);
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -56,9 +67,15 @@ export default function AgendaTab({
         </span>
       </div>
 
+      {items.length > 0 && (
+        <p role="status" className="rounded-md bg-edge/60 px-2 py-1 text-[11px] font-medium text-muted">
+          {freeLabel(nextFree(items, at), at)}
+        </p>
+      )}
+
       <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
         {items.map((e) => (
-          <AgendaCard key={e.id} event={e} open={open === e.id} onToggle={() => setOpen(open === e.id ? null : e.id)} />
+          <AgendaCard key={e.id} event={e} conflicts={clashes.get(e.id)} open={open === e.id} onToggle={() => setOpen(open === e.id ? null : e.id)} />
         ))}
         {items.length === 0 && loading && !error && (
           <li>

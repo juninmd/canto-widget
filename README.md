@@ -78,6 +78,8 @@ Today's events come from Google Calendar (read-only). One minute before, the wid
 **join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
 Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
 it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
+The top line tells you the **next free slot** of at least 15 minutes (declined invites and all-day events don't
+count), and events that overlap get a **conflict** badge naming the other event.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -179,6 +181,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Password changed, one file pending | Day summary |
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |
+
+| Agenda: next free time and conflicts | Agenda: free right now |
+|---|---|
+| ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) | ![Agenda saying "free now until 13:00" because the lunch invite was declined](docs/prints/app/34-agenda-livre-agora.png) |
 
 </details>
 

@@ -10,6 +10,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Resumo do dia mais completo**: além dos PRs/MRs abertos, lista os **mergeados** e os **revisados/aprovados
   por mim** no dia (GitHub e GitLab), e o título das reuniões traz o **tempo total** (sobreposições contam uma
   vez; eventos de dia inteiro ficam fora).
+- **Próximo tempo livre na agenda**: no topo da aba, "próximo tempo livre: 14:30–16:00 (1 h 30 min)",
+  "livre agora até 15:00" ou "livre pelo resto do dia". Conta só janelas de 15 min ou mais até as 19:00 (depois
+  disso, até a meia-noite) e ignora eventos de dia inteiro e convites que você recusou.
+- **Conflito na agenda**: eventos com horário que se sobrepõem ganham o selo "conflito", com o título do outro
+  evento na dica e no nome acessível. Eventos que só encostam (um termina quando o outro começa) não contam.
 - **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
   diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
   seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o
