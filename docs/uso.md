@@ -42,6 +42,10 @@ nunca mostra de novo.
   **lembrete de tarefa** e o botão **concluir tarefa**, e o sistema mostra uma notificação com o título da tarefa. Funciona em qualquer aba ou com o widget escondido.
 - **Antecedência do lembrete** — em **Ajustes → Lembretes**, escolha avisar 5, 10, 15 ou 30 min antes do
   horário (padrão: na hora).
+- **Não perturbe** — em **Ajustes → Não perturbe**, silencie por 30 min, 1 h, 2 h, até amanhã às 8h ou até
+  desligar (o tray tem um atalho de 1 h). Enquanto ativo, nenhum aviso de reunião, lembrete de tarefa ou alerta de
+  status aparece e nenhuma notificação do sistema é enviada; o que tocaria nesse intervalo não volta depois. A lua
+  na barra do topo mostra até quando vai e desliga com um clique.
 - **Vincular PR/MR** — no ⏰ da tarefa, cole o link de um pull/merge request; a linha ganha um ícone que abre o
   link no navegador. Só aceita `http(s)://`.
 - **Subtarefas** — no ⏰ da tarefa, um checklist: adicione, marque e apague itens. A linha mostra `feitas/total`.

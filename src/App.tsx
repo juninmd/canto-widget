@@ -32,6 +32,7 @@ import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
+import DndIndicator from "./components/DndIndicator";
 import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
@@ -237,6 +238,7 @@ function Canto() {
           {t("app.name")}
         </span>
         <div className="flex items-center gap-2 text-[11px] text-muted">
+          <DndIndicator onError={setError} />
           {status?.unlocked && (
             <>
               <button

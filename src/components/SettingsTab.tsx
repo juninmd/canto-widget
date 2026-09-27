@@ -12,6 +12,7 @@ import LanguagePicker from "./LanguagePicker";
 import UpdateSection from "./UpdateSection";
 import TabsSection from "./TabsSection";
 import RemindersSection from "./RemindersSection";
+import DoNotDisturbSection from "./DoNotDisturbSection";
 import type { Tab } from "./TabBar";
 import type { LeadMinutes } from "../lib/reminderLead";
 import { t } from "../i18n";
@@ -77,6 +78,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
       <LanguagePicker />
       <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
       <RemindersSection lead={reminderLead} onChange={onReminderLead} />
+      <DoNotDisturbSection onError={onError} />
       <SecuritySection onError={onError} />
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />

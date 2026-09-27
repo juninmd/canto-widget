@@ -139,6 +139,10 @@ the **latest published** one side by side and a button to update and restart.
 Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two weeks, plus `.vtt`, `.srt`, `.txt`
 and `.md` transcripts from a local folder, cleaned up and searchable.
 
+🌙 **Do not disturb:** in Settings or the tray, silence meeting alerts, task reminders, status alerts and every
+system notification for 30 min, 1 h, 2 h, until tomorrow or until you turn it off. A moon in the top bar shows
+when it ends; one click turns it back off. It survives a restart and ends on its own.
+
 ⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
 locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
 action by name: go to a tab, new task or note, join the next meeting, copy the day's summary, switch skin, lock.
@@ -190,6 +194,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Command palette (`Ctrl+Shift+P`) |
 |---|
 | ![Command palette listing tabs, new task, global search, join the next meeting and skins, with their shortcuts](docs/prints/app/38-paleta-comandos.png) |
+
+| Do not disturb |
+|---|
+| ![Top-bar moon showing the end time and the Do not disturb section in Settings, on until 15:30](docs/prints/app/39-nao-perturbe.png) |
 
 </details>
 

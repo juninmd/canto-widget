@@ -8,7 +8,6 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
-use tauri_plugin_notification::NotificationExt;
 
 use crate::error::{AppError, Result};
 use crate::lang::tr;
@@ -107,10 +106,7 @@ pub fn watch(app: AppHandle) {
 
 fn notify(app: &AppHandle, label: &str, live: &Live) {
     let title = tr("Serviço com problema", "Service issue");
-    let body = format!("{label}: {}", live.description);
-    if let Err(e) = app.notification().builder().title(title).body(body).show() {
-        eprintln!("notificacao de status falhou: {e}");
-    }
+    crate::notification::notify_os(app, title, &format!("{label}: {}", live.description));
 }
 
 #[cfg(test)]

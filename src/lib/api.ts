@@ -47,6 +47,8 @@ export type Note = {
 export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
+/** Do not disturb; `untilMs: null` while active means until turned off. */
+export type DndState = { active: boolean; untilMs: number | null };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
@@ -240,6 +242,11 @@ export const api = {
   guestPhotos: (emails: string[]) => invoke<GuestPhotos>("guest_photos", { emails }),
   statusAlertsGet: () => invoke<string[]>("status_alerts_get"),
   statusAlertsSet: (ids: string[]) => invoke<string[]>("status_alerts_set", { ids }),
+
+  dndGet: () => invoke<DndState>("dnd_get"),
+  /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */
+  dndSet: (untilMs: number | null) => invoke<DndState>("dnd_set", { untilMs }),
+  dndClear: () => invoke<DndState>("dnd_clear"),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

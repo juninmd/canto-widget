@@ -25,6 +25,7 @@ pub mod cmd_status;
 pub mod cmd_sync;
 pub mod commands;
 pub mod crypto;
+pub mod do_not_disturb;
 pub mod drive;
 pub mod error;
 pub mod forge;
@@ -110,6 +111,7 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
+            app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
@@ -121,6 +123,7 @@ pub fn run() {
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
+            do_not_disturb::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -231,6 +234,9 @@ pub fn run() {
             cmd_status::api_status,
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
+            do_not_disturb::dnd_get,
+            do_not_disturb::dnd_set,
+            do_not_disturb::dnd_clear,
             guest_photos::guest_photos,
             tray_live::badge_set_tasks,
         ])
@@ -252,10 +258,13 @@ pub fn run() {
 fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let toggle = MenuItem::with_id(app, "toggle", lang::toggle_label(), true, None::<&str>)?;
     let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, tray_live::no_meeting_label(), false, None::<&str>)?;
+    let dnd_label = do_not_disturb::tray_label(do_not_disturb::current(app));
+    let dnd = MenuItem::with_id(app, do_not_disturb::TRAY_ITEM_ID, dnd_label, true, None::<&str>)?;
     let lock = MenuItem::with_id(app, "lock", lang::tr("Trancar cofre", "Lock vault"), true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", lang::tr("Sair", "Quit"), true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &join, &lock, &quit])?;
+    let menu = Menu::with_items(app, &[&toggle, &join, &dnd, &lock, &quit])?;
     app.manage(tray_live::JoinMenuItem(join));
+    app.manage(do_not_disturb::DndMenuItem(dnd));
     app.manage(lang::TrayLabels { toggle, lock, quit });
 
     TrayIconBuilder::with_id("canto-tray")
@@ -268,6 +277,7 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
                 let _ = window::toggle(app);
             }
             tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
+            do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),
             "lock" => {
                 if let Some(state) = app.try_state::<AppState>() {
                     state.lock();

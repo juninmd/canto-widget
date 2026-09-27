@@ -90,3 +90,4 @@ Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 - `biometria.json` — senha mestra cifrada pela chave do Windows Hello (só se ativado);
 - `autostart.json` — marca que a escolha de iniciar com o sistema já foi feita;
 - `sincronizacao.json` — caminho da pasta sincronizada e hash do último envio, se configurada.
+- `nao_perturbe.json` — fim do modo não perturbe (`until_ms`, ou `null` para até desligar); some ao desligar ou expirar.

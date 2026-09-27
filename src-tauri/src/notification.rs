@@ -17,9 +17,17 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
     (crate::lang::tr("Reunião começando", "Meeting starting"), body)
 }
 
-/// Best effort: a denied or unavailable notification must not block the window alert.
 pub fn send(app: &tauri::AppHandle, event: &AgendaItem) {
     let (title, body) = content(event);
+    notify_os(app, title, &body);
+}
+
+/// The only way to an OS notification, so do not disturb covers every kind. Best effort: a denied or
+/// unavailable notification must not block the window alert.
+pub fn notify_os(app: &tauri::AppHandle, title: &str, body: &str) {
+    if crate::do_not_disturb::quiet(app) {
+        return;
+    }
     if let Err(e) = app.notification().builder().title(title).body(body).show() {
         eprintln!("notificacao do sistema falhou: {e}");
     }

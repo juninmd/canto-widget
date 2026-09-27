@@ -20,6 +20,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   próxima reunião, copiar o resumo do dia, abrir ajustes, trocar de tema, modo privacidade, tela cheia, esconder e
   trancar o cofre. Setas escolhem, `Enter` executa, `Esc` fecha e devolve o foco. `Ctrl+K` segue sendo a busca
   global de conteúdo. Aparece na ajuda de atalhos (`?`).
+- **Modo não perturbe**: em Ajustes (30 min, 1 h, 2 h, até amanhã às 8h ou até desligar) ou pelo tray (1 h),
+  silencia avisos de reunião, lembretes de tarefa, alertas de status e toda notificação do sistema. Uma lua na
+  barra do topo mostra até quando vai; um clique desliga. O estado fica em `nao_perturbe.json`, fora do cofre,
+  sobrevive a reinício e expira sozinho.
 - **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
   diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
   seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o
