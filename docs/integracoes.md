@@ -25,6 +25,14 @@ ainda carrega o escopo `drive.appdata`. **sair** e entrar de novo para ficar só
 agenda. O `vault.enc` antigo (cifrado) segue na pasta oculta do app no Drive até ser apagado em
 Drive → Configurações → Gerenciar apps → *Excluir dados ocultos do app*.
 
+### Tempo livre e conflitos
+
+O topo da aba **agenda** mostra a próxima janela livre de pelo menos 15 minutos entre agora e o fim do dia útil
+(19:00; depois desse horário, a conta vai até a meia-noite, para quem trabalha à noite ainda ter resposta).
+Eventos de dia inteiro e convites recusados não ocupam tempo; eventos sobrepostos ou colados formam um bloco só.
+Dois eventos com horário que se sobrepõem (nenhum recusado) recebem o selo **conflito** com o título do outro;
+terminar exatamente quando o outro começa não é conflito.
+
 ### Anotações e transcrições do Gemini
 
 O Canto não gera transcrições. Quando alguém liga **Take notes for me** (anotações do Gemini) ou a transcrição
@@ -56,13 +64,28 @@ O campo **filtrar** entra na busca do GitHub quando você aperta `Enter`, e acei
 como `repo:dono/nome`, `label:bug` ou `org:acme`. Os botões **tudo · PRs · issues** escondem as listas que não
 têm aquele tipo e não gastam busca com elas.
 
+**CI no card.** Cada PR das listas ganha um selo com o estado do CI do último commit: **✓ CI passou**, **✗ CI
+falhou**, **● CI rodando** ou **sem CI**. O Canto pega o `head.sha` do PR e junta os *check runs* (GitHub Actions e
+apps) com os *commit statuses* antigos: qualquer falha (inclusive cancelado ou tempo esgotado) vale falhou, algo
+na fila ou rodando vale rodando, só verde/neutro/pulado vale passou, e nada reportado vale sem CI. São no máximo 20
+PRs por vez, 4 em paralelo, e o resultado fica na memória por sha: o PR é conferido a cada 2 min (um push novo
+troca o sha), um CI rodando a cada 1 min e um estado final a cada 15 min. Um PR que ficou de fora (lista longa,
+erro, limite da API) mantém o link **ver CI**. Só no GitHub; no GitLab o estado do pipeline segue a um clique.
+
+**Aviso de revisão pedida.** Com o cofre aberto e o GitHub conectado, o Canto confere a lista **revisão pedida a
+mim** a cada 5 minutos (pelo mesmo cache) e manda uma notificação do sistema para cada pedido novo: "Revisão pedida"
+e `dono/repo#12 título`. A primeira leitura só memoriza o que já estava lá; mais de três pedidos de uma vez viram um
+aviso só. Vem ligado e desliga em **Ajustes → Revisões no GitHub** (fica em `revisao_alertas.json`, sem nada
+secreto). Enquanto o cofre está trancado não há consulta; o que chegou nesse tempo avisa depois de destrancar.
+
 Duas formas de conectar:
 
 - **Token pessoal** (sempre disponível): crie um *fine-grained token* em
   <https://github.com/settings/personal-access-tokens/new> com **Issues** e **Pull requests** em *Read-only*
-  nos repositórios que quiser ver, e cole na aba.
+  nos repositórios que quiser ver, e cole na aba. Para o selo de CI, some **Checks** e **Commit statuses** em
+  *Read-only*.
 - **Entrar com o GitHub** (device flow): aparece quando a build traz o Client ID de um GitHub App.
-  Crie um GitHub App com permissões *Issues* e *Pull requests* em *Read-only*, marque **Enable Device Flow**
+  Crie um GitHub App com permissões *Issues*, *Pull requests*, *Checks* e *Commit statuses* em *Read-only*, marque **Enable Device Flow**
   e exporte `CANTO_GITHUB_CLIENT_ID=<client id>` antes do `bun run tauri build` (na CI, variável de repositório
   com o mesmo nome). O Client ID é público; não há client secret na build.
 

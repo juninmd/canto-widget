@@ -1,6 +1,7 @@
 import type { Note } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { highlight } from "../lib/highlight";
+import { stripImageRefs } from "../lib/noteImages";
 import { LOCALE, t } from "../i18n";
 import { DownloadIcon, PinIcon } from "./Icons";
 
@@ -25,7 +26,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
       <div className="flex items-start justify-between gap-2">
         <button type="button" className="min-w-0 flex-1 text-left" onClick={onOpen}>
           <p className={`truncate text-sm font-medium text-fg ${mask}`}>{highlight(n.title, query)}</p>
-          <p className={`mt-0.5 line-clamp-3 whitespace-pre-line break-words text-xs text-muted ${mask}`}>{highlight(n.body, query)}</p>
+          <p className={`mt-0.5 line-clamp-3 whitespace-pre-line break-words text-xs text-muted ${mask}`}>{highlight(stripImageRefs(n.body), query)}</p>
         </button>
         <button
           type="button"

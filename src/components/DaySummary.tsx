@@ -20,7 +20,7 @@ export default function DaySummary({
   const [opened, setOpened] = useState<ForgeOpened | null>(null);
   const [geminiDocs, setGeminiDocs] = useState<GeminiDoc[]>([]);
   const text = useMemo(
-    () => daySummary(day, tasks, agenda, opened?.items, geminiDocs),
+    () => daySummary(day, tasks, agenda, { opened: opened?.items, merged: opened?.merged, reviewed: opened?.reviewed }, geminiDocs),
     [day, tasks, agenda, opened, geminiDocs],
   );
 
@@ -80,7 +80,7 @@ export default function DaySummary({
           {t("summary.forgeError", { error: e })}
         </p>
       ))}
-      <div className="flex gap-2">
+      <div className="flex shrink-0 gap-2">
         <button
           type="button"
           autoFocus

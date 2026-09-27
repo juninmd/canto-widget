@@ -40,6 +40,21 @@ test("Alt+2 and a click switch tabs", async ({ page }) => {
   await expect(page.getByRole("tab", { name: "Clipboard" })).toHaveAttribute("aria-selected", "true");
 });
 
+test("Ctrl+Shift+P runs 'nova tarefa' from another tab: switches to Tarefas and focuses the field", async ({ page }) => {
+  await mockTauri(page);
+  await page.goto("/");
+  await page.keyboard.press("Alt+2");
+  await expect(page.getByRole("tab", { name: "Notas" })).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Control+Shift+P");
+  const input = page.getByRole("combobox", { name: "paleta de comandos" });
+  await expect(input).toBeFocused();
+  await input.fill("nova tarefa");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("dialog", { name: "paleta de comandos" })).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByPlaceholder("nova tarefa (ex.: Daily às 9h30)")).toBeFocused();
+});
+
 test("a locked vault asks for the master password", async ({ page }) => {
   await mockTauri(page, { unlocked: false });
   await page.goto("/");

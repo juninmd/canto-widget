@@ -52,6 +52,9 @@ pub const ALERT_EVENT: &str = "canto://alert";
 
 /// An overlay on the window itself avoids depending on creating a webview at runtime, which behaves differently on each platform.
 pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()> {
+    if crate::do_not_disturb::quiet(app) {
+        return Ok(());
+    }
     crate::notification::send(app, &event);
     if let Some(state) = app.try_state::<crate::vault::AppState>() {
         *state.alert.lock().unwrap() = Some(event);

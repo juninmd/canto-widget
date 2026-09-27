@@ -108,6 +108,8 @@ impl AppState {
         *self.session.lock().unwrap() =
             Some(Session { key, password: Zeroizing::new(password.to_string()), salt, data });
         self.touch();
+        // Best-effort: images of notes deleted before the last lock are no longer undoable.
+        let _ = self.note_images_gc(crate::note_images::ORPHAN_GRACE);
         // Best-effort: whatever showed up in a synced folder merges in right away.
         let _ = crate::sync::poll_and_merge(self);
         Ok(())

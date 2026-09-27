@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { MOD_KEY } from "../lib/platform";
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
 import { renderMarkdown, toggleChecklist } from "../lib/markdown";
 import { t } from "../i18n";
+import { attachImage, IMAGE_TYPES, imageFiles, insertAt } from "../lib/noteImages";
 import NoteLinkPicker from "./NoteLinkPicker";
 
 // Mirror MAX_TITLE_CHARS / MAX_BODY_CHARS in cmd_notes.rs; the backend is the real guard.
@@ -23,6 +24,28 @@ type Props = {
 export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onCancel }: Props) {
   const [preview, setPreview] = useState(false);
   const [picking, setPicking] = useState(false);
+  const [attaching, setAttaching] = useState(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const bodyRef = useRef<HTMLTextAreaElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  async function attach(files: File[]) {
+    if (files.length === 0) return;
+    setImageError(null);
+    setAttaching(true);
+    let body = draft.body;
+    let caret = bodyRef.current?.selectionStart ?? body.length;
+    try {
+      for (const file of files) ({ body, caret } = insertAt(body, caret, await attachImage(file)));
+    } catch (e) {
+      setImageError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setAttaching(false);
+      // Images saved before a failure stay referenced, so they aren't left as orphans.
+      if (body !== draft.body) onChange({ ...draft, body });
+    }
+  }
+
   return (
     <form
       onSubmit={onSave}
@@ -68,13 +91,55 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
         </div>
       ) : (
         <textarea
+          ref={bodyRef}
           value={draft.body}
+          onPaste={(e) => {
+            const files = imageFiles(e.clipboardData?.files);
+            if (files.length === 0) return;
+            e.preventDefault();
+            void attach(files);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            const files = imageFiles(e.dataTransfer?.files);
+            if (files.length === 0) return;
+            e.preventDefault();
+            void attach(files);
+          }}
           onChange={(e) => onChange({ ...draft, body: e.target.value })}
           placeholder={t("notes.bodyPlaceholder")}
           maxLength={MAX_BODY}
           className="flex-1 resize-none rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
         />
       )}
+      <div className="flex items-center gap-2 text-xs">
+        <button
+          type="button"
+          disabled={attaching}
+          onClick={() => fileRef.current?.click()}
+          className="min-h-6 text-muted underline decoration-dotted hover:text-fg disabled:opacity-50"
+        >
+          {attaching ? t("notes.imageAttaching") : t("notes.imageAttach")}
+        </button>
+        <input
+          ref={fileRef}
+          type="file"
+          accept={IMAGE_TYPES.join(",")}
+          multiple
+          hidden
+          aria-label={t("notes.imageAttach")}
+          onChange={(e) => {
+            const files = imageFiles(e.target.files);
+            e.target.value = "";
+            void attach(files);
+          }}
+        />
+        {imageError && (
+          <span role="alert" className="min-w-0 flex-1 truncate text-danger">
+            {imageError}
+          </span>
+        )}
+      </div>
       <input
         value={draft.tags}
         onChange={(e) => onChange({ ...draft, tags: e.target.value })}

@@ -50,6 +50,7 @@ pub fn language_set(app: AppHandle, lang: String) -> Result<()> {
         let _ = items.quit.set_text(tr("Sair", "Quit"));
     }
     crate::tray_live::refresh_join_label(&app);
+    crate::do_not_disturb::refresh_tray(&app);
     Ok(())
 }
 

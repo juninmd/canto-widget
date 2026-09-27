@@ -8,6 +8,7 @@ pub mod biometric;
 pub mod blocking;
 pub mod calendar;
 pub mod calendar_event;
+pub mod checks_cache;
 pub mod clip_os;
 pub mod clip_watch;
 pub mod clipboard;
@@ -21,10 +22,12 @@ pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_notes;
+pub mod cmd_report;
 pub mod cmd_status;
 pub mod cmd_sync;
 pub mod commands;
 pub mod crypto;
+pub mod do_not_disturb;
 pub mod drive;
 pub mod error;
 pub mod forge;
@@ -33,6 +36,7 @@ pub mod forge_filter;
 pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
+pub mod github_checks;
 pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
@@ -48,12 +52,15 @@ pub mod meeting_alert;
 pub mod model;
 pub mod net;
 pub mod next_meeting;
+pub mod note_images;
 pub mod notification;
 pub mod oauth;
 pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
 pub mod priority;
+pub mod report;
+pub mod review_alert;
 pub mod routine;
 pub mod snooze;
 pub mod status_alert;
@@ -110,6 +117,8 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
+            app.manage(do_not_disturb::DoNotDisturb::load(&dir));
+            app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
@@ -121,6 +130,8 @@ pub fn run() {
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
+            do_not_disturb::watch(app.handle().clone());
+            review_alert::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -166,6 +177,8 @@ pub fn run() {
             cmd_notes::note_save,
             cmd_notes::note_pin,
             cmd_notes::note_export_md,
+            note_images::note_image_save,
+            note_images::note_image_get,
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
             task_reminder::reminder_lead_set,
@@ -221,6 +234,9 @@ pub fn run() {
             cmd_github_lists::github_lists,
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
+            cmd_github_lists::github_prs_checks,
+            review_alert::review_alerts_get,
+            review_alert::review_alerts_set,
             cmd_gitlab::gitlab_status,
             cmd_gitlab::gitlab_connect,
             cmd_gitlab::gitlab_disconnect,
@@ -228,9 +244,15 @@ pub fn run() {
             cmd_gitlab::gitlab_section,
             cmd_gitlab::gitlab_mr_checks,
             cmd_forges::forges_opened_since,
+            cmd_report::forges_activity_between,
+            cmd_report::report_agenda,
+            cmd_report::report_vault,
             cmd_status::api_status,
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
+            do_not_disturb::dnd_get,
+            do_not_disturb::dnd_set,
+            do_not_disturb::dnd_clear,
             guest_photos::guest_photos,
             tray_live::badge_set_tasks,
         ])
@@ -252,10 +274,13 @@ pub fn run() {
 fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let toggle = MenuItem::with_id(app, "toggle", lang::toggle_label(), true, None::<&str>)?;
     let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, tray_live::no_meeting_label(), false, None::<&str>)?;
+    let dnd_label = do_not_disturb::tray_label(do_not_disturb::current(app));
+    let dnd = MenuItem::with_id(app, do_not_disturb::TRAY_ITEM_ID, dnd_label, true, None::<&str>)?;
     let lock = MenuItem::with_id(app, "lock", lang::tr("Trancar cofre", "Lock vault"), true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", lang::tr("Sair", "Quit"), true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &join, &lock, &quit])?;
+    let menu = Menu::with_items(app, &[&toggle, &join, &dnd, &lock, &quit])?;
     app.manage(tray_live::JoinMenuItem(join));
+    app.manage(do_not_disturb::DndMenuItem(dnd));
     app.manage(lang::TrayLabels { toggle, lock, quit });
 
     TrayIconBuilder::with_id("canto-tray")
@@ -268,6 +293,7 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
                 let _ = window::toggle(app);
             }
             tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
+            do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),
             "lock" => {
                 if let Some(state) = app.try_state::<AppState>() {
                     state.lock();

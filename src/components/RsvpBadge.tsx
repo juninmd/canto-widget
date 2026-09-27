@@ -20,3 +20,18 @@ export default function RsvpBadge({ response }: { response: Rsvp }) {
 }
 
 export const GUEST_ICON: Record<Rsvp | "", string> = { accepted: "✓", declined: "✕", tentative: "?", needsAction: "•", "": "•" };
+
+/** Overlapping events; the other titles go in the tooltip and accessible name. */
+export function ConflictBadge({ titles }: { titles: string[] }) {
+  const detail = t("agenda.conflictWith", { titles: titles.join(", ") });
+  return (
+    <span
+      title={detail}
+      className="inline-flex items-center gap-1 rounded-full border border-danger/60 px-1.5 text-[10px] font-semibold text-danger"
+    >
+      <span aria-hidden="true">⚠</span>
+      {t("agenda.conflict")}
+      <span className="sr-only">: {detail}</span>
+    </span>
+  );
+}

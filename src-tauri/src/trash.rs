@@ -42,6 +42,15 @@ impl Trash {
         queue.remove(pos).map(|(_, item)| item)
     }
 
+    /// Bodies of notes still undoable, so their images aren't collected as orphans.
+    pub fn note_bodies(&self) -> Vec<String> {
+        let queue = self.0.lock().unwrap();
+        queue
+            .iter()
+            .filter_map(|(_, item)| if let Removed::Note(n) = item { Some(n.body.clone()) } else { None })
+            .collect()
+    }
+
     /// Called on lock: plaintext content doesn't survive a closed vault.
     pub fn clear(&self) {
         self.0.lock().unwrap().clear();

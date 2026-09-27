@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus } from "./forgeTypes";
+import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "./forgeTypes";
 import { t } from "../i18n";
 
 export type * from "./forgeTypes";
@@ -47,6 +47,8 @@ export type Note = {
 export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
+/** Do not disturb; `untilMs: null` while active means until turned off. */
+export type DndState = { active: boolean; untilMs: number | null };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
@@ -104,6 +106,8 @@ export type Attachment = { title: string; url: string; mime: string };
 export type GuestPhotos = { photos: Record<string, string>; needs_consent: boolean };
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
+export type PrRef = { repo: string; number: number };
+export type PrChecks = PrRef & { status: ChecksStatus };
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 export type StatusItem = { title: string; link: string; published_at: number };
 export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
@@ -148,6 +152,10 @@ export const api = {
   notePin: (id: string) => invoke<boolean>("note_pin", { id }),
   /** Opens a native save dialog; `null` when the user cancels. */
   noteExportMd: (id: string) => invoke<string | null>("note_export_md", { id }),
+  /** Seals a pasted/dropped image (base64, no `data:` prefix) and returns its id for `canto-img:<id>`. */
+  noteImageSave: (data: string) => invoke<string>("note_image_save", { data }),
+  /** A `data:image/...;base64,` URL; rejects with "imagem indisponível" when missing. */
+  noteImageGet: (id: string) => invoke<string>("note_image_get", { id }),
   /** Returns the key for `trashUndo`, or `null` if nothing was removed. */
   itemDelete: (id: string) => invoke<string | null>("item_delete", { id }),
   trashUndo: (key: string) => invoke<boolean>("trash_undo", { key }),
@@ -218,8 +226,12 @@ export const api = {
   githubLists: (filter: ForgeFilter, force = false) => invoke<ForgeLists>("github_lists", { filter, force }),
   githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("github_section", { section, page, filter }),
-  /** One call per click, not per list row: never fetched for a whole page at once. */
+  /** Fallback click for a PR the batch left out; shares the batch's cache. */
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
+  /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
+  githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
+  reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
+  reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
 
   gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
   /** Validates address and token against the instance; returns the username. */
@@ -232,6 +244,12 @@ export const api = {
   gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),
+  /** The period report's bounds are local midnights computed here (see AGENTS.md); `toMs` is exclusive. */
+  forgesActivityBetween: (fromMs: number, toMs: number) =>
+    invoke<ForgeOpened>("forges_activity_between", { fromMs, toMs }),
+  reportAgenda: (fromMs: number, toMs: number) => invoke<AgendaItem[]>("report_agenda", { fromMs, toMs }),
+  reportVault: (fromDay: string, toDay: string, fromMs: number, toMs: number) =>
+    invoke<VaultPeriod>("report_vault", { fromDay, toDay, fromMs, toMs }),
   /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
   badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
 
@@ -240,6 +258,11 @@ export const api = {
   guestPhotos: (emails: string[]) => invoke<GuestPhotos>("guest_photos", { emails }),
   statusAlertsGet: () => invoke<string[]>("status_alerts_get"),
   statusAlertsSet: (ids: string[]) => invoke<string[]>("status_alerts_set", { ids }),
+
+  dndGet: () => invoke<DndState>("dnd_get"),
+  /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */
+  dndSet: (untilMs: number | null) => invoke<DndState>("dnd_set", { untilMs }),
+  dndClear: () => invoke<DndState>("dnd_clear"),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

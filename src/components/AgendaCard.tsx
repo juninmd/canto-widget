@@ -4,12 +4,12 @@ import { hour, people, status } from "../lib/agenda";
 import { t } from "../i18n";
 import AgendaGuests from "./AgendaGuests";
 import Avatar from "./Avatar";
-import RsvpBadge from "./RsvpBadge";
+import RsvpBadge, { ConflictBadge } from "./RsvpBadge";
 import { useGuestPhotos } from "../lib/useGuestPhotos";
 
-type Props = { event: AgendaItem; open: boolean; onToggle: () => void };
+type Props = { event: AgendaItem; conflicts?: string[]; open: boolean; onToggle: () => void };
 
-export default function AgendaCard({ event: e, open, onToggle }: Props) {
+export default function AgendaCard({ event: e, conflicts = [], open, onToggle }: Props) {
   const { label, now } = status(e);
   const detailsId = useId();
   const attachments = e.attachments ?? [];
@@ -35,10 +35,11 @@ export default function AgendaCard({ event: e, open, onToggle }: Props) {
             {hour(e)} <span aria-hidden="true">{open ? "▴" : "▾"}</span>
           </span>
         </span>
-        {(label || e.response) && (
+        {(label || e.response || conflicts.length > 0) && (
           <span className="flex flex-wrap items-center gap-1.5">
             {label && <span className={`text-[11px] font-semibold ${now ? "text-fg" : "text-muted"}`}>{label}</span>}
             {e.response && <RsvpBadge response={e.response} />}
+            {conflicts.length > 0 && <ConflictBadge titles={conflicts} />}
           </span>
         )}
         {e.location && <span className="block truncate text-[11px] text-faint">{e.location}</span>}

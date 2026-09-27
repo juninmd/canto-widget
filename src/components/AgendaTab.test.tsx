@@ -137,3 +137,23 @@ test("a Google connection without the directory scope suggests reconnecting", as
   });
   expect(screen.getByText("para ver as fotos dos colegas, desconecte e conecte de novo o Google em Ajustes")).toBeTruthy();
 });
+
+test("the top line shows the next free time and overlapping cards carry a conflict badge", () => {
+  const at = (hm: string) => new Date(`2026-09-09T${hm}:00`).toISOString();
+  const ev = (id: string, title: string, start: string, end: string): AgendaItem => ({
+    ...planning,
+    id,
+    title,
+    start: at(start),
+    end: at(end),
+    response: "accepted",
+    attendees: [],
+  });
+  const items = [ev("a", "Daily", "09:00", "10:00"), ev("b", "1:1 com Ana", "09:30", "10:30"), ev("c", "Revisão", "11:00", "12:00")];
+  render(<AgendaTab agenda={agenda({ items })} onError={() => {}} now={() => new Date(at("09:15"))} />);
+  expect(screen.getByRole("status").textContent).toBe("próximo tempo livre: 10:30–11:00 (30 min)");
+  const daily = screen.getByRole("button", { name: /^Daily/ });
+  expect(daily.textContent).toContain("conflito: conflita com: 1:1 com Ana");
+  expect(daily.querySelector('[title="conflita com: 1:1 com Ana"]')).toBeTruthy();
+  expect(screen.getByRole("button", { name: /^Revisão/ }).textContent).not.toContain("conflito");
+});

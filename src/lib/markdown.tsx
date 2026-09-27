@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import { api } from "./api";
 import { highlightCode } from "./codeHighlight";
+import NoteImage from "../components/NoteImage";
 
-/** Bold, italic, inline code and http(s) links; anything else stays literal text (React escapes it). */
+/** Bold, italic, inline code, http(s) links and sealed `canto-img:` images; anything else stays literal text (React escapes it). */
 function inline(text: string, keyPrefix: string): ReactNode[] {
-  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[([^\]]+)\]\(([^)]+)\)/g;
+  const re = /\*\*(.+?)\*\*|\*(.+?)\*|`(.+?)`|\[([^\]]+)\]\(([^)]+)\)|!\[([^\]]*)\]\(canto-img:([0-9a-f]{1,64})\)/g;
   const nodes: ReactNode[] = [];
   let last = 0;
   let key = 0;
@@ -20,6 +21,7 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
         </code>,
       );
     }
+    else if (m[7] !== undefined) nodes.push(<NoteImage key={`${keyPrefix}-${key++}`} id={m[7]} alt={m[6] ?? ""} />);
     else if (m[4] !== undefined && m[5] !== undefined) {
       const url = m[5];
       // Same rule as opening any other link in Canto: http(s) only, through the validated command.
@@ -72,7 +74,7 @@ export function toggleChecklist(text: string, line: number): string {
 }
 
 /**
- * A small, dependency-free subset: headings, lists, checklists, fenced code, bold/italic/code, links.
+ * A small, dependency-free subset: headings, lists, checklists, fenced code, bold/italic/code, links, note images.
  * No raw HTML passthrough. Checkboxes only toggle when `onToggle` is given (it gets the source line).
  */
 export function renderMarkdown(text: string, onToggle?: (line: number) => void): ReactNode {

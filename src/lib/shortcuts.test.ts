@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { interpret } from "./shortcuts";
+import { interpret, SHORTCUT_GROUPS } from "./shortcuts";
 
 const key = (key: string, extra: Partial<{ code: string; altKey: boolean; ctrlKey: boolean; metaKey: boolean }> = {}) => ({
   key,
@@ -50,4 +50,17 @@ test("Ctrl+K opens the global search even while typing, but not with Alt or Meta
 test("on macOS the global search is Cmd+K, not Ctrl+K", () => {
   expect(interpret(key("k", { code: "KeyK", metaKey: true }), true, true)).toEqual({ type: "globalSearch" });
   expect(interpret(key("k", { code: "KeyK", ctrlKey: true }), false, true)).toBeNull();
+});
+
+test("Ctrl+Shift+P (Cmd+Shift+P on macOS) opens the palette, even while typing", () => {
+  const shift = { shiftKey: true };
+  expect(interpret({ ...key("P", { code: "KeyP", ctrlKey: true }), ...shift }, true, false)).toEqual({ type: "palette" });
+  expect(interpret({ ...key("P", { code: "KeyP", metaKey: true }), ...shift }, false, true)).toEqual({ type: "palette" });
+  expect(interpret({ ...key("P", { code: "KeyP", ctrlKey: true, altKey: true }), ...shift }, false, false)).toBeNull();
+  expect(interpret(key("p", { code: "KeyP", ctrlKey: true }), false, false)).toBeNull();
+});
+
+test("the help lists the palette shortcut", () => {
+  const items = SHORTCUT_GROUPS.flatMap((g) => g.items);
+  expect(items.find((i) => i.description.startsWith("paleta de comandos"))?.keys).toEqual(["Ctrl", "Shift", "P"]);
 });

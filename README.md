@@ -62,7 +62,7 @@ sends a notification, with **snooze 10 min**.
 ### ✅ Tasks that remind you
 
 A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
-reminder is already set. **Day summary** ready to paste and **pull over pending items** from yesterday.
+reminder is already set. **Day summary** ready to paste (tasks, meetings with total time, PRs/MRs opened, merged and reviewed), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday.
 
 </td>
 </tr>
@@ -78,6 +78,8 @@ Today's events come from Google Calendar (read-only). One minute before, the wid
 **join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
 Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
 it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
+The top line tells you the **next free slot** of at least 15 minutes (declined invites and all-day events don't
+count), and events that overlap get a **conflict** badge naming the other event.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -89,7 +91,8 @@ it, the agenda, every guest with an initials avatar and their answer, and attach
 ### 🗒️ Notes as cards
 
 Searchable cards with `#tags`, pin to top and one-click tag filter. Markdown with `- [ ]` checklists you tick
-in the preview and fenced code blocks with syntax highlighting. Handles thousands of notes: the list is paged
+in the preview and fenced code blocks with syntax highlighting. Paste, drop or attach images (PNG, JPEG, GIF,
+WebP up to 2 MB), each sealed in its own encrypted file; they stay on this machine, outside `.canto` backups. Handles thousands of notes: the list is paged
 and search covers all of them.
 
 </td>
@@ -113,8 +116,9 @@ sensitive.
 ### 🐙 Your GitHub at a glance
 
 **Review requested from me**, assigned to me, PRs and issues I opened, with a PR or issue icon and who opened
-it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and CI status is one
-click away. Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
+it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and each PR carries a small
+**CI badge** (passed, failed, running or no CI) from its head commit's checks. When someone **requests your
+review**, an OS notification tells you (on by default, switch it off in Settings). Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
 scroll with **show more**. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 respects the rate limit. Sign in with a read-only personal token or from the browser (device flow).
 
@@ -137,8 +141,13 @@ the **latest published** one side by side and a button to update and restart.
 Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two weeks, plus `.vtt`, `.srt`, `.txt`
 and `.md` transcripts from a local folder, cleaned up and searchable.
 
+🌙 **Do not disturb:** in Settings or the tray, silence meeting alerts, task reminders, status alerts and every
+system notification for 30 min, 1 h, 2 h, until tomorrow or until you turn it off. A moon in the top bar shows
+when it ends; one click turns it back off. It survives a restart and ends on its own.
+
 ⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
-locks and `?` lists the shortcuts.
+locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
+action by name: go to a tab, new task or note, join the next meeting, copy the day's summary, switch skin, lock.
 
 ## 🎨 Five skins
 
@@ -154,7 +163,7 @@ locks and `?` lists the shortcuts.
 And **Follow system**, which switches between light and dark along with the OS. All pass AA contrast.
 
 <details>
-<summary>🖥️ More screens: onboarding, global search, GitLab, subtasks, markdown, security, sync, density and more</summary>
+<summary>🖥️ More screens: onboarding, global search, command palette, GitLab, subtasks, markdown, security, sync, density and more</summary>
 
 <br>
 
@@ -176,9 +185,25 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
-| Password changed, one file pending |
-|---|
-| ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) |
+| Password changed, one file pending | Day summary |
+|---|---|
+| ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |
+
+| Weekly report | Agenda: next free time and conflicts |
+|---|---|
+| ![Weekly report in markdown: totals, one line per workday, tasks done, notes, meetings grouped by title and PRs/MRs](docs/prints/app/40-relatorio-semanal.png) | ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) |
+
+| Agenda: free right now | Command palette (`Ctrl+Shift+P`) |
+|---|---|
+| ![Agenda saying "free now until 13:00" because the lunch invite was declined](docs/prints/app/34-agenda-livre-agora.png) | ![Command palette listing tabs, new task, global search, join the next meeting and skins, with their shortcuts](docs/prints/app/38-paleta-comandos.png) |
+
+| Do not disturb | Image in a note |
+|---|---|
+| ![Top-bar moon showing the end time and the Do not disturb section in Settings, on until 15:30](docs/prints/app/39-nao-perturbe.png) | ![Note preview with an attached whiteboard sketch between the text and a checklist](docs/prints/app/37-notas-imagem.png) |
+
+| CI badge on every PR | Review request notifications |
+|---|---|
+| ![GitHub tab where each PR shows a CI badge: passed, running and failed](docs/prints/app/35-ci-no-card.png) | ![Settings with the switch to be notified when someone requests your review on GitHub](docs/prints/app/36-ajustes-revisao.png) |
 
 </details>
 

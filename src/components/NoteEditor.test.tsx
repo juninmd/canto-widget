@@ -1,7 +1,13 @@
 import { afterEach, expect, mock, test } from "bun:test";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 
-mock.module("@tauri-apps/api/core", () => ({ invoke: () => Promise.resolve(null) }));
+const saved: unknown[] = [];
+mock.module("@tauri-apps/api/core", () => ({
+  invoke: (cmd: string, args?: Record<string, unknown>) => {
+    if (cmd === "note_image_save") saved.push(args?.data);
+    return Promise.resolve(cmd === "note_image_save" ? "f00d" : null);
+  },
+}));
 
 const { default: NoteEditor } = await import("./NoteEditor");
 
@@ -55,4 +61,25 @@ test("ticking a checklist item in preview updates the draft body", () => {
   fireEvent.click(screen.getByRole("button", { name: "visualizar" }));
   fireEvent.click(screen.getByRole("checkbox", { name: "pão" }));
   expect(changes.at(-1)?.body).toBe("- [ ] leite\n- [x] pão");
+});
+
+test("pasting an image stores it and inserts its reference at the caret", async () => {
+  const changes: { body: string }[] = [];
+  render(
+    <NoteEditor draft={{ ...draft, body: "oi" }} tasks={[]} agenda={[]} onChange={(d) => changes.push(d)} onSave={() => {}} onCancel={() => {}} />,
+  );
+  const file = new File([new Uint8Array([0x47, 0x49, 0x46])], "print.gif", { type: "image/gif" });
+  fireEvent.paste(screen.getByPlaceholderText(/conteúdo do card/), { clipboardData: { files: [file] } });
+  await waitFor(() => expect(changes.at(-1)?.body).toBe("oi\n![](canto-img:f00d)\n"));
+  expect(saved.at(-1)).toBe("R0lG");
+});
+
+test("picking an unsupported file through the button shows the error instead of inserting", async () => {
+  const changes: unknown[] = [];
+  render(<NoteEditor draft={draft} tasks={[]} agenda={[]} onChange={(d) => changes.push(d)} onSave={() => {}} onCancel={() => {}} />);
+  expect(screen.getByRole("button", { name: "anexar imagem" })).toBeTruthy();
+  const bmp = new File(["BM"], "a.bmp", { type: "image/bmp" });
+  fireEvent.change(screen.getByLabelText("anexar imagem", { selector: "input" }), { target: { files: [bmp] } });
+  expect((await screen.findByRole("alert")).textContent).toContain("formato de imagem não suportado");
+  expect(changes).toEqual([]);
 });

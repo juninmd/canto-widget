@@ -42,6 +42,10 @@ nunca mostra de novo.
   **lembrete de tarefa** e o botão **concluir tarefa**, e o sistema mostra uma notificação com o título da tarefa. Funciona em qualquer aba ou com o widget escondido.
 - **Antecedência do lembrete** — em **Ajustes → Lembretes**, escolha avisar 5, 10, 15 ou 30 min antes do
   horário (padrão: na hora).
+- **Não perturbe** — em **Ajustes → Não perturbe**, silencie por 30 min, 1 h, 2 h, até amanhã às 8h ou até
+  desligar (o tray tem um atalho de 1 h). Enquanto ativo, nenhum aviso de reunião, lembrete de tarefa ou alerta de
+  status aparece e nenhuma notificação do sistema é enviada; o que tocaria nesse intervalo não volta depois. A lua
+  na barra do topo mostra até quando vai e desliga com um clique.
 - **Vincular PR/MR** — no ⏰ da tarefa, cole o link de um pull/merge request; a linha ganha um ícone que abre o
   link no navegador. Só aceita `http(s)://`.
 - **Subtarefas** — no ⏰ da tarefa, um checklist: adicione, marque e apague itens. A linha mostra `feitas/total`.
@@ -72,6 +76,14 @@ nunca mostra de novo.
   abriu hoje** no GitHub e no GitLab conectados (inclusive os já mergeados), pronto para copiar. Se uma das contas
   não responder, o resumo diz qual e traz o resto. Uma reunião com anotações do Gemini leva o link delas na
   mesma linha.
+- **Relatório da semana e do mês** — no topo do resumo, escolha **hoje**, **semana** (de segunda até hoje) ou
+  **mês** (do dia 1º até hoje). O relatório, em markdown, traz um panorama com os totais, as tarefas concluídas,
+  as notas criadas ou editadas, as reuniões agrupadas por título com o tempo total (sobreposições contam uma vez;
+  eventos de dia inteiro e reuniões recusadas ficam fora) e os PRs/MRs abertos, mergeados e revisados no período,
+  com link. Na semana, uma linha por dia útil resume tarefas e tempo em reuniões. O Canto não guarda a hora em
+  que uma tarefa foi concluída: ela conta no **dia a que pertence** (quem puxa pendências leva a tarefa para o dia
+  em que foi feita). Listas muito longas mostram as primeiras e dizem quantas ficaram de fora; a agenda vem
+  inteira até 1.000 eventos.
 - **Abas visíveis** — em **Ajustes → Abas visíveis**, desmarque as abas que você não usa. Os dados continuam no
   cofre, e `Alt+1`, `Alt+2`… seguem a ordem das abas que ficaram. Ajustes nunca some.
 
@@ -100,10 +112,15 @@ nunca mostra de novo.
   escala texto e espaçamento juntos, como um zoom do widget inteiro. A janela pode ser redimensionada pelas
   bordas se o conteúdo não couber na densidade escolhida.
 - **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca na aba
-  atual, `Ctrl+K` abre a busca global, `Alt+L` tranca e `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
+  atual, `Ctrl+K` abre a busca global, `Ctrl+Shift+P` abre a paleta de comandos, `Alt+L` tranca e `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
 - **Busca global** (`Ctrl+K`) busca ao mesmo tempo nas tarefas de hoje, nas notas e no clipboard; escolher um resultado
   troca de aba e já leva o texto buscado para o campo de busca daquela aba. Tarefas de outros dias ficam de fora: hoje
   o app não tem como navegar até outro dia, então um resultado assim não teria para onde ir.
+- **Paleta de comandos** (`Ctrl+Shift+P`, `Cmd+Shift+P` no macOS) lista as ações do app pelo nome: ir para cada aba
+  visível, nova tarefa, nova nota, busca global, buscar na aba atual, entrar na próxima reunião, copiar o resumo do dia,
+  abrir ajustes, trocar de tema, modo privacidade, tela cheia, esconder o widget e trancar o cofre. A busca é
+  aproximada e ignora acentos (`ntrf` acha "Nova tarefa"); `↑`/`↓` escolhem, `Enter` executa e `Esc` fecha.
+  `Ctrl+K` continua sendo a busca de conteúdo; a paleta é para ações.
 - Atalho global **Ctrl+Alt+Espaço** (`Cmd+Shift+Espaço` no macOS) mostra/esconde o widget.
 - **tarefas** — clique duplo no título renomeia a tarefa; `Enter` confirma, `Esc` cancela.
 - **notas** — no editor, `Ctrl+Enter` salva e `Esc` cancela.

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { api, type ChecksStatus, type ForgeItem, type ForgeList, type ForgeSection as ForgeSectionKey } from "../lib/api";
 import type { Forge } from "../lib/forge";
+import { checkKey, type CiMap } from "../lib/forgeChecks";
 import { daysSince, timeAgo } from "../lib/time";
-import { t } from "../i18n";
+import { t, type MessageKey } from "../i18n";
 import { IssueIcon, PullIcon } from "./Icons";
 
 type Props = {
@@ -14,9 +15,11 @@ type Props = {
   filtered: boolean;
   loadingMore: boolean;
   onMore: () => void;
+  /** CI badges loaded in batch (GitHub); a PR missing here keeps the "ver CI" link. */
+  ci?: CiMap;
 };
 
-export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci }: Props) {
   const rest = list.total - list.items.length;
   return (
     <section aria-label={title}>
@@ -28,7 +31,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
       ) : (
         <ul className="space-y-1.5">
           {list.items.map((it) => (
-            <Row key={it.url} item={it} login={login} forge={forge} waiting={section === "review_requested"} />
+            <Row key={it.url} item={it} login={login} forge={forge} waiting={section === "review_requested"} ci={ci?.[checkKey(it.repo, it.number)]} />
           ))}
         </ul>
       )}
@@ -47,7 +50,8 @@ export default function ForgeSection({ title, section, forge, list, login, filte
 }
 
 const STALE_DAYS = 7;
-function Row({ item, login, forge, waiting }: { item: ForgeItem; login: string; forge: Forge; waiting: boolean }) {
+type RowProps = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus };
+function Row({ item, login, forge, waiting, ci }: RowProps) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? daysSince(item.created_at) : null;
@@ -77,6 +81,7 @@ function Row({ item, login, forge, waiting }: { item: ForgeItem; login: string; 
         <span className="min-w-0 flex-1">
           <span className="line-clamp-2 text-sm text-fg">{item.title}</span>
           <span className="mt-0.5 flex gap-2 text-[11px] text-muted">
+            {item.is_pr && ci && <CiPill status={ci} />}
             <span className="truncate">{item.reference}</span>
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
             {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
@@ -92,7 +97,7 @@ function Row({ item, login, forge, waiting }: { item: ForgeItem; login: string; 
           </span>
         </span>
       </button>
-      {item.is_pr && (
+      {item.is_pr && !ci && (
         <div className="mt-1 flex items-center gap-2 pl-7 text-[11px]">
           {checks === null ? (
             <button type="button" onClick={() => void loadChecks()} className="text-muted underline decoration-dotted hover:text-fg">
@@ -117,4 +122,22 @@ function ChecksBadge({ status }: { status: ChecksStatus | "loading" }) {
   };
   const { label, className } = map[status];
   return <span className={className}>{label}</span>;
+}
+
+const PILL: Record<ChecksStatus, { glyph: string; label: MessageKey; className: string }> = {
+  success: { glyph: "✓", label: "forge.checks.success", className: "text-accent" },
+  failure: { glyph: "✗", label: "forge.checks.failure", className: "text-danger" },
+  running: { glyph: "●", label: "forge.checks.running", className: "text-muted" },
+  none: { glyph: "○", label: "forge.checks.none", className: "text-faint" },
+};
+
+/** Compact so the reference still fits on a narrow widget; the full wording is the accessible name. */
+function CiPill({ status }: { status: ChecksStatus }) {
+  const { glyph, label, className } = PILL[status];
+  const text = t(label);
+  return (
+    <span role="img" aria-label={text} title={text} className={`shrink-0 rounded-full border border-edge px-1.5 leading-4 ${className}`}>
+      {glyph} CI
+    </span>
+  );
 }

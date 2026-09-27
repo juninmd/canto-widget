@@ -52,8 +52,36 @@ fn sorting_by_comments_is_refused_instead_of_silently_ignored() {
 
 #[test]
 fn opened_today_includes_merged_and_closed_mrs() {
-    let r = opened_since("2026-09-18T03:00:00+00:00");
+    let r = activity_since(Activity::Opened, "ana", &Window::since("2026-09-18T03:00:00+00:00"));
     assert_eq!((param(&r, "state"), param(&r, "created_after")), (Some("all"), Some("2026-09-18T03:00:00+00:00")));
+}
+
+#[test]
+fn merged_today_are_my_mrs_and_reviewed_today_are_the_ones_i_review() {
+    let since = "2026-09-18T03:00:00+00:00";
+    let m = activity_since(Activity::Merged, "ana", &Window::since(since));
+    assert_eq!(
+        (param(&m, "scope"), param(&m, "state"), param(&m, "updated_after")),
+        (Some("created_by_me"), Some("merged"), Some(since))
+    );
+    let r = activity_since(Activity::Reviewed, "ana", &Window::since(since));
+    assert_eq!((param(&r, "scope"), param(&r, "reviewer_username")), (Some("all"), Some("ana")));
+    assert_eq!(param(&r, "approved_by_usernames[]"), Some("ana"));
+    assert_eq!((param(&r, "updated_before"), param(&r, "created_before")), (None, None));
+}
+
+#[test]
+fn a_period_closes_the_range_on_the_same_date_each_activity_filters_on() {
+    let w = Window { since: "2026-09-01T03:00:00+00:00".into(), until: Some("2026-09-28T03:00:00+00:00".into()) };
+    let o = activity_since(Activity::Opened, "ana", &w);
+    assert_eq!(
+        (param(&o, "created_after"), param(&o, "created_before"), param(&o, "updated_before")),
+        (Some("2026-09-01T03:00:00+00:00"), Some("2026-09-28T03:00:00+00:00"), None)
+    );
+    for a in [Activity::Merged, Activity::Reviewed] {
+        let r = activity_since(a, "ana", &w);
+        assert_eq!(param(&r, "updated_before"), Some("2026-09-28T03:00:00+00:00"), "{a:?}");
+    }
 }
 
 #[test]
