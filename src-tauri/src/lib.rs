@@ -36,6 +36,7 @@ pub mod github_auth;
 pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
+pub mod global_shortcuts;
 pub mod guest_photos;
 #[cfg(windows)]
 pub mod hello;
@@ -73,10 +74,11 @@ pub mod vault;
 pub mod window;
 pub mod window_state;
 
+pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
+
 use tauri::menu::{Menu, MenuItem};
 use tauri::tray::TrayIconBuilder;
 use tauri::Manager;
-use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
 use crate::vault::AppState;
 
@@ -101,7 +103,7 @@ pub fn run() {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
                 app.set_dock_visibility(false);
             }
-            register_toggle_shortcut(app.handle())?;
+            global_shortcuts::register(app.handle())?;
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
@@ -245,72 +247,6 @@ pub fn run() {
         })
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o Canto");
-}
-
-/// Global show/hide shortcut. Ctrl+Alt+Space (Cmd+Shift+Space on macOS, where Cmd+Alt+Space is Finder search).
-fn toggle_shortcut() -> Shortcut {
-    #[cfg(target_os = "macos")]
-    let mods = Modifiers::SUPER | Modifiers::SHIFT;
-    #[cfg(not(target_os = "macos"))]
-    let mods = Modifiers::CONTROL | Modifiers::ALT;
-    Shortcut::new(Some(mods), Code::Space)
-}
-
-pub const TOGGLE_SHORTCUT_LABEL: &str =
-    if cfg!(target_os = "macos") { "Cmd+Shift+Espaço" } else { "Ctrl+Alt+Espaço" };
-
-/// Global "join the next meeting" shortcut. Ctrl+Alt+M (Ctrl+Cmd+M on macOS, where Cmd+Alt+M minimizes all
-/// windows); does nothing without a cached next meeting (see `tray_live::join_next_meeting`).
-fn join_shortcut() -> Shortcut {
-    #[cfg(target_os = "macos")]
-    let mods = Modifiers::SUPER | Modifiers::CONTROL;
-    #[cfg(not(target_os = "macos"))]
-    let mods = Modifiers::CONTROL | Modifiers::ALT;
-    Shortcut::new(Some(mods), Code::KeyM)
-}
-
-pub const JOIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Ctrl+Cmd+M" } else { "Ctrl+Alt+M" };
-
-/// Global "strip clipboard formatting" shortcut. Ctrl+Alt+V (Ctrl+Cmd+V on macOS, where Cmd+Alt+V is Finder's move).
-fn paste_plain_shortcut() -> Shortcut {
-    #[cfg(target_os = "macos")]
-    let mods = Modifiers::SUPER | Modifiers::CONTROL;
-    #[cfg(not(target_os = "macos"))]
-    let mods = Modifiers::CONTROL | Modifiers::ALT;
-    Shortcut::new(Some(mods), Code::KeyV)
-}
-
-pub const PASTE_PLAIN_SHORTCUT_LABEL: &str = if cfg!(target_os = "macos") { "Ctrl+Cmd+V" } else { "Ctrl+Alt+V" };
-
-fn register_toggle_shortcut(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let (toggle, join, paste_plain) = (toggle_shortcut(), join_shortcut(), paste_plain_shortcut());
-    app.plugin(
-        tauri_plugin_global_shortcut::Builder::new()
-            .with_handler(move |app, shortcut, event| {
-                if event.state != ShortcutState::Pressed {
-                    return;
-                }
-                if shortcut == &toggle {
-                    let _ = window::toggle(app);
-                } else if shortcut == &join {
-                    tray_live::join_next_meeting(app);
-                } else if shortcut == &paste_plain {
-                    paste_plain::strip_formatting(app);
-                }
-            })
-            .build(),
-    )?;
-    // A shortcut already taken by another app must not bring down the widget: the tray still works.
-    for (shortcut, label) in [
-        (toggle_shortcut(), TOGGLE_SHORTCUT_LABEL),
-        (join_shortcut(), JOIN_SHORTCUT_LABEL),
-        (paste_plain_shortcut(), PASTE_PLAIN_SHORTCUT_LABEL),
-    ] {
-        if let Err(e) = app.global_shortcut().register(shortcut) {
-            eprintln!("atalho global indisponivel ({label}): {e}");
-        }
-    }
-    Ok(())
 }
 
 fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
