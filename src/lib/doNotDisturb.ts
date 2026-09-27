@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, type DndState } from "./api";
-import { LOCALE } from "../i18n";
+import { LOCALE, t } from "../i18n";
+import { PALETTE_PROVIDERS, type PaletteCommand } from "./palette";
 
 export const DND_CHOICES = ["30m", "1h", "2h", "tomorrow", "off"] as const;
 export type DndChoice = (typeof DND_CHOICES)[number];
@@ -64,3 +65,20 @@ export function useDoNotDisturb(onError?: (m: string) => void) {
   const stop = useCallback(() => run(api.dndClear()), [run]);
   return { state, start, stop };
 }
+
+/** Palette entries; the palette doesn't know the current state, so both "turn on" and "turn off" are offered. */
+export function dndCommands(): PaletteCommand[] {
+  const keywords = [t("settings.dnd.title"), t("palette.keywords.dnd")];
+  return [
+    { id: "dnd.1h", title: t("palette.dnd1h"), keywords, run: () => api.dndSet(dndUntil("1h")).then(() => {}) },
+    {
+      id: "dnd.tomorrow",
+      title: t("palette.dndTomorrow"),
+      keywords,
+      run: () => api.dndSet(dndUntil("tomorrow")).then(() => {}),
+    },
+    { id: "dnd.off", title: t("app.dnd.turnOff"), keywords, run: () => api.dndClear().then(() => {}) },
+  ];
+}
+
+if (!PALETTE_PROVIDERS.includes(dndCommands)) PALETTE_PROVIDERS.push(dndCommands);

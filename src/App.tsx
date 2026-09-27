@@ -226,7 +226,7 @@ function Canto() {
           onRun={(cmd) => {
             setPaletteOpen(false);
             // Runs after the palette unmounts and hands focus back, so a focused field keeps it.
-            setTimeout(() => void cmd.run(), 0);
+            setTimeout(() => void Promise.resolve(cmd.run()).catch((e) => setError(errText(e))), 0);
           }}
         />
       )}
