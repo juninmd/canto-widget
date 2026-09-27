@@ -73,8 +73,9 @@ fn the_gate_silences_only_while_active() {
     std::fs::remove_dir_all(&dir).unwrap();
 }
 
+/// Windows checkouts may have CRLF line endings; the scans below look for `\n}\n`.
 fn source(file: &str) -> String {
-    std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("src").join(file)).unwrap()
+    std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("src").join(file)).unwrap().replace("\r\n", "\n")
 }
 
 fn body_of(src: &str, signature: &str) -> String {
