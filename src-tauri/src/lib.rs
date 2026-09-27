@@ -49,6 +49,7 @@ pub mod meeting_alert;
 pub mod model;
 pub mod net;
 pub mod next_meeting;
+pub mod note_images;
 pub mod notification;
 pub mod oauth;
 pub mod password;
@@ -169,6 +170,8 @@ pub fn run() {
             cmd_notes::note_save,
             cmd_notes::note_pin,
             cmd_notes::note_export_md,
+            note_images::note_image_save,
+            note_images::note_image_get,
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
             task_reminder::reminder_lead_set,

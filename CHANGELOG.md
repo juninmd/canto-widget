@@ -24,6 +24,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   silencia avisos de reunião, lembretes de tarefa, alertas de status e toda notificação do sistema. Uma lua na
   barra do topo mostra até quando vai; um clique desliga. O estado fica em `nao_perturbe.json`, fora do cofre,
   sobrevive a reinício e expira sozinho.
+- **Imagens nas notas**: cole (Ctrl+V), arraste ou use "anexar imagem" no editor; a visualização mostra a
+  imagem no meio do texto. PNG, JPEG, GIF ou WebP de até 2 MB, cada uma cifrada num arquivo próprio em
+  `note-images/` (o cofre não fica mais pesado de gravar). Acompanham a troca de senha; **não entram no backup
+  `.canto` nem na pasta sincronizada**, então a nota restaurada em outra máquina mostra "imagem indisponível".
+  Imagens que nenhuma nota usa mais são apagadas depois de um dia.
 - **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
   diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
   seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o

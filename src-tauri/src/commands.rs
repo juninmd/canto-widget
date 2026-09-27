@@ -162,7 +162,13 @@ pub fn tasks_carry_over(state: State<'_, AppState>, day: String) -> Result<usize
 #[tauri::command(async)]
 pub fn item_delete(state: State<'_, AppState>, id: String) -> Result<Option<String>> {
     let removed = state.mutate(|d| d.remove(&id, now_ms()))?;
-    Ok(removed.and_then(|r| state.store_in_trash(r)))
+    let was_note = matches!(removed, Some(crate::trash::Removed::Note(_)));
+    let key = removed.and_then(|r| state.store_in_trash(r));
+    if was_note {
+        // Best-effort: a leftover orphan is retried on the next delete or unlock.
+        let _ = state.note_images_gc(crate::note_images::ORPHAN_GRACE);
+    }
+    Ok(key)
 }
 
 #[cfg(test)]

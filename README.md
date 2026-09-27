@@ -91,7 +91,8 @@ count), and events that overlap get a **conflict** badge naming the other event.
 ### 🗒️ Notes as cards
 
 Searchable cards with `#tags`, pin to top and one-click tag filter. Markdown with `- [ ]` checklists you tick
-in the preview and fenced code blocks with syntax highlighting. Handles thousands of notes: the list is paged
+in the preview and fenced code blocks with syntax highlighting. Paste, drop or attach images (PNG, JPEG, GIF,
+WebP up to 2 MB), each sealed in its own encrypted file; they stay on this machine, outside `.canto` backups. Handles thousands of notes: the list is paged
 and search covers all of them.
 
 </td>
@@ -198,6 +199,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Do not disturb |
 |---|
 | ![Top-bar moon showing the end time and the Do not disturb section in Settings, on until 15:30](docs/prints/app/39-nao-perturbe.png) |
+
+| Image in a note |
+|---|
+| ![Note preview with an attached whiteboard sketch between the text and a checklist](docs/prints/app/37-notas-imagem.png) |
 
 </details>
 

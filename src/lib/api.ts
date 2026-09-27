@@ -150,6 +150,10 @@ export const api = {
   notePin: (id: string) => invoke<boolean>("note_pin", { id }),
   /** Opens a native save dialog; `null` when the user cancels. */
   noteExportMd: (id: string) => invoke<string | null>("note_export_md", { id }),
+  /** Seals a pasted/dropped image (base64, no `data:` prefix) and returns its id for `canto-img:<id>`. */
+  noteImageSave: (data: string) => invoke<string>("note_image_save", { data }),
+  /** A `data:image/...;base64,` URL; rejects with "imagem indisponível" when missing. */
+  noteImageGet: (id: string) => invoke<string>("note_image_get", { id }),
   /** Returns the key for `trashUndo`, or `null` if nothing was removed. */
   itemDelete: (id: string) => invoke<string | null>("item_delete", { id }),
   trashUndo: (key: string) => invoke<boolean>("trash_undo", { key }),

@@ -158,3 +158,15 @@ fn a_leftover_that_cannot_be_settled_does_not_report_the_committed_change_as_fai
     st.unlock("senha-nova").unwrap();
     cleanup(&st);
 }
+
+#[test]
+fn note_images_open_with_the_new_password() {
+    let st = state("imagens");
+    let id = st.note_image_save(b"GIF89a-imagem").unwrap();
+    st.change_password("senha-velha", "senha-nova").unwrap();
+    assert!(!staged(&crate::note_images::image_path(&st.dir, &id).unwrap()).exists());
+    st.lock();
+    st.unlock("senha-nova").unwrap();
+    assert!(st.note_image_data_url(&id).unwrap().starts_with("data:image/gif;base64,"), "image stuck on the old key");
+    cleanup(&st);
+}

@@ -9,6 +9,7 @@ use crate::clipboard::CLIP_AAD;
 use crate::crypto::VaultKey;
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
+use crate::note_images::{self, NOTE_IMAGE_AAD};
 use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, GITLAB_AAD, VAULT_AAD};
 use crate::vault::{AppState, MIN_PASSWORD_LEN};
 
@@ -57,6 +58,7 @@ impl AppState {
         for r in &batch {
             store::write_json_atomic(&staged(&r.path), &r.blob)?;
         }
+        stage_images(&self.dir, &session.key, &key, &salt)?;
         for path in discard {
             std::fs::remove_file(path)?;
         }
@@ -90,7 +92,7 @@ pub struct PasswordChanged {
 /// Settles staged copies left by a change: same salt as the vault means it was written, so swap; anything else is stale.
 pub(crate) fn finish_interrupted(dir: &Path, vault_salt: &[u8]) -> Result<()> {
     let peripherals = [store::drive_path(dir), store::github_path(dir), store::gitlab_path(dir), store::clip_path(dir)];
-    for path in peripherals.into_iter().chain(backup_files(dir)) {
+    for path in peripherals.into_iter().chain(backup_files(dir)).chain(note_images::files(dir)) {
         let next = staged(&path);
         match store::read_json::<SealedBlob>(&next) {
             Ok(None) => {}
@@ -127,6 +129,20 @@ fn reencrypt(path: &Path, aad: &[u8], old: &VaultKey, new: &VaultKey, salt: &[u8
 /// Backups follow the password change, otherwise none of them would import afterward; one already unreadable with the old key is left as-is.
 fn reencrypted_backups(dir: &Path, old: &VaultKey, new: &VaultKey, salt: &[u8]) -> Vec<Reencrypted> {
     backup_files(dir).into_iter().filter_map(|p| reencrypt(&p, VAULT_AAD, old, new, salt).ok().flatten()).collect()
+}
+
+/// Staged one at a time, not batched: dozens of 2 MB images would otherwise sit in RAM together.
+fn stage_images(dir: &Path, old: &VaultKey, new: &VaultKey, salt: &[u8]) -> Result<()> {
+    for path in note_images::files(dir) {
+        match reencrypt(&path, NOTE_IMAGE_AAD, old, new, salt) {
+            Ok(Some(r)) => store::write_json_atomic(&staged(&r.path), &r.blob)?,
+            Ok(None) => {}
+            Err(e @ AppError::Io(_)) => return Err(e),
+            // Already unreadable with the old key: left as-is, the note shows it as unavailable.
+            Err(_) => {}
+        }
+    }
+    Ok(())
 }
 
 #[tauri::command(async)]
