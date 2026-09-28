@@ -90,6 +90,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Imagens nas notas** só apareciam no modo "pré-visualizar" do editor: o card mostrava "[imagem]" e o modo
+  "escrever" só o código `![](canto-img:…)`. Agora o card e o editor mostram as imagens como miniaturas.
 - **Resumo do dia longo** não empurra mais os botões "copiar resumo" e "voltar" para fora da janela: o texto
   rola dentro do painel.
 - **Atalho de reunião ocupado**: quando outro aplicativo já registrou `Ctrl+Alt+M`, o Canto passa a usar

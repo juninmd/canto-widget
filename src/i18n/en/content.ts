@@ -39,6 +39,7 @@ export const content: Record<keyof typeof source, string> = {
   "notes.imageAttach": "attach image",
   "notes.imageAttaching": "attaching image…",
   "notes.imageLabel": "image",
+  "notes.imagesLabel": "note images",
   "notes.imageLoading": "loading image…",
   "notes.imageUnavailable": "image unavailable",
   "notes.imageType": "unsupported image format: use PNG, JPEG, GIF or WebP",

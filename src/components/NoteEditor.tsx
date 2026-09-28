@@ -5,6 +5,7 @@ import { renderMarkdown, toggleChecklist } from "../lib/markdown";
 import { t } from "../i18n";
 import { attachImage, IMAGE_TYPES, imageFiles, insertAt } from "../lib/noteImages";
 import NoteLinkPicker from "./NoteLinkPicker";
+import NoteThumbs from "./NoteThumbs";
 
 // Mirror MAX_TITLE_CHARS / MAX_BODY_CHARS in cmd_notes.rs; the backend is the real guard.
 const MAX_TITLE = 300;
@@ -112,6 +113,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
           className="flex-1 resize-none rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
         />
       )}
+      {!preview && <NoteThumbs body={draft.body} />}
       <div className="flex items-center gap-2 text-xs">
         <button
           type="button"

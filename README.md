@@ -92,7 +92,8 @@ count), and events that overlap get a **conflict** badge naming the other event.
 
 Searchable cards with `#tags`, pin to top and one-click tag filter. Markdown with `- [ ]` checklists you tick
 in the preview and fenced code blocks with syntax highlighting. Paste, drop or attach images (PNG, JPEG, GIF,
-WebP up to 2 MB), each sealed in its own encrypted file; they stay on this machine, outside `.canto` backups. Handles thousands of notes: the list is paged
+WebP up to 2 MB), each sealed in its own encrypted file and shown as thumbnails on the card and under the editor;
+they stay on this machine, outside `.canto` backups. Handles thousands of notes: the list is paged
 and search covers all of them.
 
 </td>
@@ -204,6 +205,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | CI badge on every PR | Review request notifications |
 |---|---|
 | ![GitHub tab where each PR shows a CI badge: passed, running and failed](docs/prints/app/35-ci-no-card.png) | ![Settings with the switch to be notified when someone requests your review on GitHub](docs/prints/app/36-ajustes-revisao.png) |
+
+| Note images as thumbnails |
+|---|
+| ![Notes list where cards show their attached images as thumbnails under the text](docs/prints/app/41-notas-miniaturas.png) |
 
 </details>
 

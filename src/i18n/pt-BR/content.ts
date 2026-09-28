@@ -37,6 +37,7 @@ export const content = {
   "notes.imageAttach": "anexar imagem",
   "notes.imageAttaching": "anexando imagem…",
   "notes.imageLabel": "imagem",
+  "notes.imagesLabel": "imagens da nota",
   "notes.imageLoading": "carregando imagem…",
   "notes.imageUnavailable": "imagem indisponível",
   "notes.imageType": "formato de imagem não suportado: use PNG, JPEG, GIF ou WebP",

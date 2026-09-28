@@ -4,6 +4,7 @@ import { highlight } from "../lib/highlight";
 import { stripImageRefs } from "../lib/noteImages";
 import { LOCALE, t } from "../i18n";
 import { DownloadIcon, PinIcon } from "./Icons";
+import NoteThumbs from "./NoteThumbs";
 
 type Props = {
   note: Note;
@@ -27,6 +28,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
         <button type="button" className="min-w-0 flex-1 text-left" onClick={onOpen}>
           <p className={`truncate text-sm font-medium text-fg ${mask}`}>{highlight(n.title, query)}</p>
           <p className={`mt-0.5 line-clamp-3 whitespace-pre-line break-words text-xs text-muted ${mask}`}>{highlight(stripImageRefs(n.body), query)}</p>
+          <NoteThumbs body={n.body} className={`mt-1 ${mask}`} />
         </button>
         <button
           type="button"

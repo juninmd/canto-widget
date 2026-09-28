@@ -16,9 +16,18 @@ export function isSafeImageUrl(url: unknown): url is string {
   return typeof url === "string" && SAFE_DATA_URL.test(url);
 }
 
-/** Card previews show a short label instead of the raw `![](canto-img:...)` markup. */
+/** Card previews drop the raw `![](canto-img:...)` markup; the images show as thumbnails instead. */
 export function stripImageRefs(body: string): string {
-  return body.replace(IMAGE_REF, `[${t("notes.imageLabel")}]`);
+  return body
+    .replace(IMAGE_REF, "")
+    .replace(/[ \t]+$/gm, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/** Ids of the images a note references, in order, each once. */
+export function imageIds(body: string): string[] {
+  return [...new Set([...body.matchAll(IMAGE_REF)].map((m) => m[2]))];
 }
 
 export function imageFiles(list: FileList | File[] | null | undefined): File[] {
