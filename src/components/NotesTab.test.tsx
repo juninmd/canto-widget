@@ -205,7 +205,7 @@ test("a slow reply for an older search never replaces the results of the newer o
   expect(screen.queryByText("111")).toBeNull();
 });
 
-test("a note's images show as thumbnails on the card and while writing, not as raw markup", async () => {
+test("a note's images show as thumbnails on the card and inline in the editor, never as raw markup", async () => {
   await listWith({ body: "planta da sala\n![](canto-img:ab12)\n![](canto-img:cd34)" });
   await act(async () => {
     await new Promise((ready) => setTimeout(ready, 0));
@@ -220,5 +220,39 @@ test("a note's images show as thumbnails on the card and while writing, not as r
     fireEvent.click(screen.getByText("wifi"));
     await new Promise((ready) => setTimeout(ready, 0));
   });
-  expect(screen.getByRole("group", { name: "imagens da nota" }).querySelectorAll("img")).toHaveLength(2);
+  const body = screen.getByRole("textbox", { name: "conteúdo do card" });
+  expect([...body.querySelectorAll("img")].map((i) => i.getAttribute("src"))).toEqual([
+    "data:image/png;base64,QUI=",
+    "data:image/png;base64,Q0Q=",
+  ]);
+  expect(body.textContent).not.toContain("canto-img");
+});
+
+test("formatting with the bar and saving sends the markdown body to note_save", async () => {
+  await listWith({ body: "comprar pão" });
+  await act(async () => {
+    fireEvent.click(screen.getByText("wifi"));
+  });
+  const body = screen.getByRole("textbox", { name: "conteúdo do card" });
+  const editor = (body as unknown as { editor: import("@tiptap/core").Editor }).editor;
+  await act(async () => {
+    editor.commands.setTextSelection({ from: 1, to: 12 });
+    fireEvent.click(screen.getByRole("button", { name: "lista de tarefas" }));
+    fireEvent.click(screen.getByRole("button", { name: "salvar" }));
+    await Promise.resolve();
+  });
+  expect(calls.find((c) => c.cmd === "note_save")?.args).toMatchObject({ id: "n1", title: "wifi", body: "- [ ] comprar pão" });
+});
+
+test("opening and saving a note without editing keeps its markdown byte for byte", async () => {
+  const legacy = "# lista\n- [x] leite\n* ovos\n__forte__ e 2 * 3\n| a | b |\n|---|---|";
+  await listWith({ body: legacy });
+  await act(async () => {
+    fireEvent.click(screen.getByText("wifi"));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "salvar" }));
+    await Promise.resolve();
+  });
+  expect(calls.find((c) => c.cmd === "note_save")?.args).toMatchObject({ body: legacy });
 });

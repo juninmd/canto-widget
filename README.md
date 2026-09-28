@@ -90,11 +90,13 @@ count), and events that overlap get a **conflict** badge naming the other event.
 
 ### 🗒️ Notes as cards
 
-Searchable cards with `#tags`, pin to top and one-click tag filter. Markdown with `- [ ]` checklists you tick
-in the preview and fenced code blocks with syntax highlighting. Paste, drop or attach images (PNG, JPEG, GIF,
-WebP up to 2 MB), each sealed in its own encrypted file and shown as thumbnails on the card and under the editor;
-they stay on this machine, outside `.canto` backups. Handles thousands of notes: the list is paged
-and search covers all of them.
+Searchable cards with `#tags`, pin to top and one-click tag filter. A **WYSIWYG editor** with a compact
+formatting bar (bold, italic, code, heading, lists, checklists you tick right in the text, code blocks with syntax
+highlighting, links, images) and markdown shortcuts as you type (`# `, `- `, `[ ] `, ` ``` `); an **MD** toggle
+shows the raw markdown, which is still how notes are stored, searched, synced and exported. Links open with
+`Ctrl`+click, http(s) only. Paste, drop or attach images (PNG, JPEG, GIF, WebP up to 2 MB), each sealed in its own
+encrypted file, shown inside the note and as thumbnails on the card; they stay on this machine, outside `.canto`
+backups. Handles thousands of notes: the list is paged and search covers all of them.
 
 </td>
 </tr>
@@ -164,7 +166,7 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 And **Follow system**, which switches between light and dark along with the OS. All pass AA contrast.
 
 <details>
-<summary>🖥️ More screens: onboarding, global search, command palette, GitLab, subtasks, markdown, security, sync, density and more</summary>
+<summary>🖥️ More screens: onboarding, global search, command palette, GitLab, subtasks, note editor, security, sync, density and more</summary>
 
 <br>
 
@@ -174,9 +176,9 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
 
-| Task with subtasks, priority and PR | Note in markdown | More clipboard types | Security: auto-lock and unlocks |
+| Task with subtasks, priority and PR | Note editor | More clipboard types | Security: auto-lock and unlocks |
 |---|---|---|---|
-| ![Checklist, priority and PR link on a task](docs/prints/app/23-tarefas-detalhes.png) | ![Note in markdown with a checklist and a highlighted SQL block](docs/prints/app/24-notas-markdown.png) | ![Clipboard recognizing link, color, json, e-mail and phone](docs/prints/app/25-clipboard-tipos.png) | ![Configurable auto-lock and a log of the latest unlocks](docs/prints/app/26-ajustes-seguranca.png) |
+| ![Checklist, priority and PR link on a task](docs/prints/app/23-tarefas-detalhes.png) | ![Note editor with a checklist and a highlighted SQL block](docs/prints/app/24-notas-markdown.png) | ![Clipboard recognizing link, color, json, e-mail and phone](docs/prints/app/25-clipboard-tipos.png) | ![Configurable auto-lock and a log of the latest unlocks](docs/prints/app/26-ajustes-seguranca.png) |
 
 | Synced folder | Compact density | Locked vault | Connect GitHub |
 |---|---|---|---|
@@ -200,15 +202,19 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Do not disturb | Image in a note |
 |---|---|
-| ![Top-bar moon showing the end time and the Do not disturb section in Settings, on until 15:30](docs/prints/app/39-nao-perturbe.png) | ![Note preview with an attached whiteboard sketch between the text and a checklist](docs/prints/app/37-notas-imagem.png) |
+| ![Top-bar moon showing the end time and the Do not disturb section in Settings, on until 15:30](docs/prints/app/39-nao-perturbe.png) | ![Note editor with an attached whiteboard sketch between the text and a checklist](docs/prints/app/37-notas-imagem.png) |
 
 | CI badge on every PR | Review request notifications |
 |---|---|
 | ![GitHub tab where each PR shows a CI badge: passed, running and failed](docs/prints/app/35-ci-no-card.png) | ![Settings with the switch to be notified when someone requests your review on GitHub](docs/prints/app/36-ajustes-revisao.png) |
 
-| Note images as thumbnails |
-|---|
-| ![Notes list where cards show their attached images as thumbnails under the text](docs/prints/app/41-notas-miniaturas.png) |
+| Note images as thumbnails | WYSIWYG note editor |
+|---|---|
+| ![Notes list where cards show their attached images as thumbnails under the text](docs/prints/app/41-notas-miniaturas.png) | ![Note editor with the formatting bar, a heading, a checklist, a SQL block and an attached sketch](docs/prints/app/42-notas-editor.png) |
+
+| Note editor: raw markdown (MD) | Note editor on the light skin |
+|---|---|
+| ![The same note in the raw markdown mode, with the image reference and its thumbnail](docs/prints/app/43-notas-editor-markdown.png) | ![The WYSIWYG note editor on the light skin](docs/prints/app/44-notas-editor-claro.png) |
 
 </details>
 

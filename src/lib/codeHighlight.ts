@@ -1,5 +1,3 @@
-import type { ReactNode } from "react";
-
 type Grammar = { comment: string[]; strings: string[]; keywords: string[]; ignoreCase?: boolean };
 
 const C_COMMENTS = ["//[^\\n]*", "/\\*[\\s\\S]*?\\*/"];
@@ -65,28 +63,22 @@ function grammarFor(lang: string): Grammar | undefined {
   return GRAMMARS[ALIASES[key] ?? key];
 }
 
-/** Colors comments, strings, numbers and keywords; an unknown language comes back as plain text. */
-export function highlightCode(code: string, lang: string): ReactNode {
-  const g = grammarFor(lang);
-  if (!g) return code;
+export type CodeToken = { from: number; to: number; className: string };
+
+/** Ranges to color (comments, strings, numbers, keywords); an unknown language gives none, so it stays plain text. */
+export function codeTokens(code: string, lang: string | null | undefined): CodeToken[] {
+  const g = grammarFor(lang ?? "");
+  if (!g) return [];
   const alt = (xs: string[]) => (xs.length ? xs.join("|") : "(?!)");
   const re = new RegExp(
     `(${alt(g.comment)})|(${alt(g.strings)})|(\\b(?:0x[\\da-fA-F]+|\\d[\\d_]*(?:\\.\\d+)?)\\b)|\\b(${g.keywords.join("|")})\\b`,
     g.ignoreCase ? "gi" : "g",
   );
-  const nodes: ReactNode[] = [];
-  let last = 0;
+  const tokens: CodeToken[] = [];
   let m: RegExpExecArray | null;
   while ((m = re.exec(code))) {
-    if (m.index > last) nodes.push(code.slice(last, m.index));
     const kind = m[1] !== undefined ? "comment" : m[2] !== undefined ? "string" : m[3] !== undefined ? "number" : "keyword";
-    nodes.push(
-      <span key={m.index} className={CLASSES[kind]}>
-        {m[0]}
-      </span>,
-    );
-    last = re.lastIndex;
+    tokens.push({ from: m.index, to: m.index + m[0].length, className: CLASSES[kind] });
   }
-  if (last < code.length) nodes.push(code.slice(last));
-  return nodes;
+  return tokens;
 }

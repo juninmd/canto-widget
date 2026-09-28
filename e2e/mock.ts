@@ -7,7 +7,16 @@ export type MockStatus = {
   items: { title: string; link: string; published_at: number }[];
   error: string | null;
 };
-export type MockOptions = { unlocked?: boolean; hiddenTabs?: string[]; statuses?: MockStatus[]; language?: string | null };
+export type MockNote = { id: string; title: string; body: string; tags: string[]; created_at: number; updated_at: number };
+export type MockOptions = {
+  unlocked?: boolean;
+  hiddenTabs?: string[];
+  statuses?: MockStatus[];
+  language?: string | null;
+  notes?: MockNote[];
+  /** Sealed note images by id, as the data URLs `note_image_get` returns. */
+  images?: Record<string, string>;
+};
 export type Call = { cmd: string; args: Record<string, unknown> };
 
 /** Stands in for the Tauri runtime so the real UI runs in plain Chromium; tasks survive reloads via sessionStorage. */
@@ -27,7 +36,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       vault_status: { exists: true, unlocked: o.unlocked ?? true },
       api_status: o.statuses ?? [],
       // Objects, not lists: the `_list`/`_search` fallback below would crash these tabs on `items`.
-      notes_search: { total: 0, items: [] },
+      notes_search: { total: o.notes?.length ?? 0, items: o.notes ?? [] },
       clip_list: { items: [], max_pinned: 100 },
       agenda_today: [],
     };
@@ -42,6 +51,8 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       invoke: async (cmd: string, args: Record<string, unknown> = {}) => {
         calls.push({ cmd, args });
         if (cmd in fixed) return fixed[cmd];
+        if (cmd === "note_image_get") return o.images?.[String(args.id)] ?? Promise.reject("imagem indisponível");
+        if (cmd === "note_image_save") return "e2e0";
         if (cmd === "tasks_for_day") return tasks().filter((t) => t.day === args.day);
         if (cmd === "task_add") {
           const now = Date.now();

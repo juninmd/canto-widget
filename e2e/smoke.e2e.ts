@@ -43,6 +43,8 @@ test("Alt+2 and a click switch tabs", async ({ page }) => {
 test("Ctrl+Shift+P runs 'nova tarefa' from another tab: switches to Tarefas and focuses the field", async ({ page }) => {
   await mockTauri(page);
   await page.goto("/");
+  // The shortcuts listen only once the app has rendered; a key pressed earlier is lost.
+  await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
   await page.keyboard.press("Alt+2");
   await expect(page.getByRole("tab", { name: "Notas" })).toHaveAttribute("aria-selected", "true");
   await page.keyboard.press("Control+Shift+P");

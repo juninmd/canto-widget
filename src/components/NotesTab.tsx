@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { api, errText, type AgendaItem, type Note, type Task } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
@@ -6,7 +6,10 @@ import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { t } from "../i18n";
 import NoteCard from "./NoteCard";
 import { useNoteDraft, type NoteDraft } from "../lib/useNoteDraft";
-import NoteEditor from "./NoteEditor";
+import type { Draft } from "./NoteEditor";
+
+// TipTap roughly doubles the bundle; only people who open a note pay for loading it.
+const NoteEditor = lazy(() => import("./NoteEditor"));
 
 const PAGE = 50;
 
@@ -99,8 +102,7 @@ ${lim}`);
     api.tasksForDay(today).then(setTasks).catch(() => setTasks([]));
   }, [editing, today]);
 
-  async function save(e: React.FormEvent) {
-    e.preventDefault();
+  async function save(draft: Draft) {
     if (!draft.title.trim() && !draft.body.trim()) return;
     try {
       await api.noteSave({
@@ -118,7 +120,11 @@ ${lim}`);
   }
 
   if (editing) {
-    return <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={close} />;
+    return (
+      <Suspense fallback={<p className="px-2 py-6 text-center text-xs text-faint">{t("notes.editorLoading")}</p>}>
+        <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={close} />
+      </Suspense>
+    );
   }
 
   return (

@@ -60,6 +60,8 @@ mock.module("@tauri-apps/api/event", () => ({
 }));
 
 const { default: App } = await import("./App");
+// Notes loads its editor lazily; warming the module keeps that load off the fake clock below.
+await import("./components/NoteEditor");
 
 const meetingIn = (minutes: number) => ({
   id: "reuniao-1",
@@ -91,8 +93,10 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  jest.useRealTimers();
   cleanup();
+  // The note editor tears down on a timer; left pending under fake timers it stalls later files' waitFor.
+  jest.runOnlyPendingTimers();
+  jest.useRealTimers();
 });
 
 test("warns of the meeting with the user on the tasks tab", async () => {
@@ -291,6 +295,7 @@ test("an unsaved note draft survives switching to another tab and back", async (
   await act(async () => {
     fireEvent.click(screen.getByText("+"));
   });
+  await settle();
   fireEvent.change(screen.getByPlaceholderText("título"), { target: { value: "rascunho fictício" } });
   await act(async () => {
     fireEvent.keyDown(window, { key: "1", code: "Digit1", altKey: true });

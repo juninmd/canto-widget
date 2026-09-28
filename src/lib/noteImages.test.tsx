@@ -16,7 +16,7 @@ mock.module("@tauri-apps/api/core", () => ({
   },
 }));
 
-const { renderMarkdown } = await import("./markdown");
+const { default: NoteImage } = await import("../components/NoteImage");
 const { attachImage, imageIds, insertAt, isSafeImageUrl, MAX_IMAGE_BYTES, stripImageRefs } = await import("./noteImages");
 
 beforeEach(() => {
@@ -27,28 +27,22 @@ afterEach(cleanup);
 
 test("a canto-img reference renders the sealed image as a data URL", async () => {
   images.ab12 = PNG_URL;
-  render(<div>{renderMarkdown("antes\n![planta](canto-img:ab12)")}</div>);
+  render(<NoteImage id="ab12" alt="planta" />);
   const img = (await screen.findByRole("img", { name: "planta" })) as HTMLImageElement;
   expect(img.getAttribute("src")).toBe(PNG_URL);
 });
 
 test("a missing image degrades to an unavailable placeholder", async () => {
-  render(<div>{renderMarkdown("![](canto-img:dead)")}</div>);
+  render(<NoteImage id="dead" alt="" />);
   expect(await screen.findByRole("img", { name: "imagem indisponível" })).toBeTruthy();
   expect(document.querySelector("img")).toBeNull();
 });
 
 test("a non-data URL from the backend never reaches an img", async () => {
   images.ab12 = "http://exemplo.invalid/x.png";
-  render(<div>{renderMarkdown("![](canto-img:ab12)")}</div>);
+  render(<NoteImage id="ab12" alt="" />);
   expect(await screen.findByText("imagem indisponível")).toBeTruthy();
   expect(document.querySelector("img")).toBeNull();
-});
-
-test("remote or file image markdown is not loaded", () => {
-  render(<div>{renderMarkdown("![x](https://exemplo.invalid/a.png) ![y](file:///c/a.png)")}</div>);
-  expect(document.querySelector("img")).toBeNull();
-  expect(calls.some((c) => c.cmd === "note_image_get")).toBe(false);
 });
 
 test("only base64 data URLs of the four accepted types are safe", () => {
