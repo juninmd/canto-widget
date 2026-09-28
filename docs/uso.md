@@ -49,7 +49,8 @@ nunca mostra de novo.
 - **Vincular PR/MR** — no ⏰ da tarefa, cole o link de um pull/merge request; a linha ganha um ícone que abre o
   link no navegador. Só aceita `http(s)://`.
 - **Subtarefas** — no ⏰ da tarefa, um checklist: adicione, marque e apague itens. A linha mostra `feitas/total`.
-- **Prioridade** — no ⏰ da tarefa, marque alta/média/baixa; a linha ganha uma bolinha colorida. Filtro de
+- **Prioridade** — escreva `!alta`, `!média` ou `!baixa` (ou `!1`, `!2`, `!3`) ao criar a tarefa, clique na
+  bolinha da linha para alternar (alta → média → baixa → sem) ou escolha no ⏰; a linha ganha uma bolinha colorida. Filtro de
   prioridade acima da lista mostra só as tarefas daquele nível.
 - **Reordenar arrastando** — segure a alça (⠿) que aparece ao passar o mouse e solte sobre outra tarefa. Só
   funciona com "todas as prioridades" selecionado no filtro.

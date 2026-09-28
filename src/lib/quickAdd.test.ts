@@ -37,4 +37,17 @@ describe("parseQuickTask", () => {
     expect(parseQuickTask("Algo 10:75")).toEqual({ title: "Algo 10:75", time: null });
     expect(parseQuickTask("às 9h")).toEqual({ title: "às 9h", time: null });
   });
+
+  test("!alta, !média and !baixa set the priority and leave the title", () => {
+    expect(parseQuickTask("Enviar relatório !alta")).toEqual({ title: "Enviar relatório", time: null, priority: "high" });
+    expect(parseQuickTask("!média Revisar PR às 15h")).toEqual({ title: "Revisar PR", time: "15:00", priority: "medium" });
+    expect(parseQuickTask("Regar plantas !Baixa")).toEqual({ title: "Regar plantas", time: null, priority: "low" });
+    expect(parseQuickTask("Deploy !1")).toEqual({ title: "Deploy", time: null, priority: "high" });
+  });
+
+  test("an exclamation that is not a priority stays in the title", () => {
+    expect(parseQuickTask("Comemorar!!")).toEqual({ title: "Comemorar!!", time: null });
+    expect(parseQuickTask("Ler !importante")).toEqual({ title: "Ler !importante", time: null });
+    expect(parseQuickTask("!alta")).toEqual({ title: "!alta", time: null });
+  });
 });

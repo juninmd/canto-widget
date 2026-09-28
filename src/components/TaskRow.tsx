@@ -117,14 +117,14 @@ export default function TaskRow({
           />
         ) : (
           <span
-            className={`flex-1 truncate text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}
+            className={`min-w-0 flex-1 whitespace-pre-wrap break-words text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}
             title={t("tasks.renameHint", { title: task.title })}
             onDoubleClick={onStartEdit}
           >
             {task.title}
           </span>
         )}
-        <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} />
+        <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} onPriority={onPriority} />
         <button
           type="button"
           onClick={onDelete}

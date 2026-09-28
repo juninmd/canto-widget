@@ -1,7 +1,7 @@
 import type { tasks as source } from "../pt-BR/tasks";
 
 export const tasks: Record<keyof typeof source, string> = {
-  "tasks.addPlaceholder": "new task (e.g.: Daily at 9:30)",
+  "tasks.addPlaceholder": "new task (e.g.: Daily at 9:30 !high)",
   "tasks.add": "add task",
   "tasks.deleted": 'task "{title}" deleted',
   "tasks.empty": "nothing for today yet — type above and press Enter",
@@ -19,8 +19,8 @@ export const tasks: Record<keyof typeof source, string> = {
   "tasks.subtasks": "subtasks",
   "tasks.openPr": "open PR/MR",
   "tasks.openPrOf": "open PR/MR for {title}",
-  "tasks.schedule": "time and repeat",
-  "tasks.scheduleOf": "time and repeat for {title}",
+  "tasks.schedule": "time, repeat, priority and PR",
+  "tasks.scheduleOf": "time, repeat, priority and PR for {title}",
   "tasks.doneCount": "{done}/{total} done",
   "tasks.summaryHint": "text for the day, week or month with what got done, the meetings and the PRs/MRs, ready to copy",
   "tasks.carryOver": "carry over pending",
@@ -35,6 +35,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "priority.none": "no priority",
   "priority.all": "all priorities",
   "priority.filter": "filter by priority",
+  "priority.cycle": "priority of {title}: {label} (click to change)",
   "priority.dot": "{label} priority",
   "repeat.daily": "every day",
   "repeat.weekdays": "weekdays",

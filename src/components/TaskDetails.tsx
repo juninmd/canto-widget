@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import { api } from "../lib/api";
 import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import { REPEAT_LABEL } from "../lib/reminders";
-import { PRIORITY_DOT, PRIORITY_LABEL } from "../lib/priority";
+import { nextPriority, PRIORITY_DOT, PRIORITY_LABEL } from "../lib/priority";
 import RepeatControl from "./RepeatControl";
 import { ClockIcon, PullIcon } from "./Icons";
 
@@ -82,10 +82,22 @@ export default function TaskDetails({
 }
 
 /** Time and ↻ visible on the row, plus the button that opens the details. */
-export function TaskBadge({ task, open, onToggle }: { task: Task; open: boolean; onToggle: () => void }) {
+type BadgeProps = { task: Task; open: boolean; onToggle: () => void; onPriority: (priority: Priority | null) => void };
+
+export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
+  const label = task.priority ? PRIORITY_LABEL[task.priority] : t("priority.none");
   return (
     <>
-      {task.priority && <span className={`size-2 shrink-0 rounded-full ${PRIORITY_DOT[task.priority]}`} title={t("priority.dot", { label: PRIORITY_LABEL[task.priority] })} />}
+      <button
+        type="button"
+        onClick={() => onPriority(nextPriority(task.priority))}
+        aria-label={t("priority.cycle", { title: task.title, label })}
+        title={t("priority.cycle", { title: task.title, label })}
+        // Unset stays out of the way like the other row actions; a set priority is always shown.
+        className={`grid size-6 shrink-0 place-items-center rounded hover:bg-edge ${task.priority ? "" : "opacity-0 focus-visible:opacity-100 group-hover:opacity-100"}`}
+      >
+        <span className={`size-2 rounded-full ${task.priority ? PRIORITY_DOT[task.priority] : "border border-faint"}`} />
+      </button>
       {(task.hora || task.repetir || task.extended_repeat) && (
         <span
           className="shrink-0 text-[11px] text-muted"
