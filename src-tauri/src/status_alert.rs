@@ -1,5 +1,5 @@
-//! Opt-in OS notifications when a Status API service goes down or degrades. Only Statuspage-hosted
-//! services have a live indicator, so only they can be watched; the feeds' history can't say "now".
+//! Opt-in OS notifications when a Status API service goes down or degrades. Only services with a current
+//! state (Statuspage's endpoint or a per-component state log) can be watched; plain history can't say "now".
 //! Public data and no vault access: keeps working while the vault is locked.
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -43,9 +43,10 @@ impl StatusAlerts {
     }
 }
 
-/// Only sources with a live Statuspage indicator can be watched.
 pub fn watchable(id: &str) -> bool {
-    SOURCES.iter().any(|s| s.id == id && status_live::url_for(s.url).is_some())
+    SOURCES
+        .iter()
+        .any(|s| s.id == id && (status_live::url_for(s.url).is_some() || crate::status_derived::derives(s.id)))
 }
 
 fn severity(indicator: &str) -> u8 {
@@ -91,7 +92,7 @@ pub fn watch(app: AppHandle) {
                 {
                     for source in SOURCES.iter().filter(|s| ids.iter().any(|id| id == s.id)) {
                         // A failed call keeps the last reading: no alert storm when the network drops.
-                        let Some(live) = status_live::fetch(&client, source.url) else { continue };
+                        let Some(live) = crate::status_feed::current(&client, source) else { continue };
                         if worsened(last.get(source.id).map(String::as_str), &live.indicator) {
                             notify(&app, source.label, &live);
                         }
@@ -125,9 +126,10 @@ mod tests {
     }
 
     #[test]
-    fn only_statuspage_services_can_be_watched() {
+    fn only_services_with_a_current_state_can_be_watched() {
         assert!(watchable("github") && watchable("azion"));
-        assert!(!watchable("aws") && !watchable("magalu") && !watchable("gcp"), "no live indicator");
+        assert!(watchable("magalu"), "state derived from its per-component feed");
+        assert!(!watchable("aws") && !watchable("gcp"), "history only");
         assert!(!watchable("nope"));
     }
 

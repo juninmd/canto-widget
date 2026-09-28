@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alertas da Magalu Cloud**: o status page da Magalu (Site24x7) não tem indicador ao vivo, então o estado atual
+  sai do feed, pelo último item de cada componente ("Block Storage - Degraded Performance"). O card mostra
+  "instável"/"fora do ar" com os componentes afetados e ganha o sino 🔔 para avisar quando algo piora.
 - **Prioridade direto na tarefa**: `!alta`, `!média` ou `!baixa` (ou `!1`, `!2`, `!3`) no texto da nova tarefa
   definem a prioridade; a bolinha na linha agora é um botão que alterna alta → média → baixa → sem. Antes a
   prioridade só existia escondida no ⏰ da tarefa.
