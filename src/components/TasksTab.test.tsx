@@ -183,7 +183,7 @@ async function mount() {
 test("time and repeat save immediately; weekly uses the task's day of week", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   await act(async () => {
     fireEvent.change(screen.getByLabelText("horário do lembrete de comprar leite"), { target: { value: "14:30" } });
@@ -203,7 +203,7 @@ test("time and repeat save immediately; weekly uses the task's day of week", asy
 test("monthly recurrence defaults to the task's day of month and can be edited", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   const repeat = screen.getByLabelText("repetir comprar leite");
   await act(async () => {
@@ -229,7 +229,7 @@ test("monthly recurrence defaults to the task's day of month and can be edited",
 test("specific weekdays start with today's weekday and toggle, keeping at least one", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   await act(async () => {
     fireEvent.change(screen.getByLabelText("repetir comprar leite"), { target: { value: "dias_especificos" } });
@@ -260,7 +260,7 @@ test("picking a legacy repeat option clears any extended repeat, and 'não repet
   task = { ...task, extended_repeat: { tipo: "monthly", day: 9 } };
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   const repeat = screen.getByLabelText("repetir comprar leite") as HTMLSelectElement;
   expect(repeat.value).toBe("mensal");
@@ -281,7 +281,7 @@ test("picking a legacy repeat option clears any extended repeat, and 'não repet
 test("a PR link is saved on Enter and opens from the badge chip", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   const field = screen.getByLabelText("link do PR ou MR de comprar leite");
   await act(async () => {
@@ -300,14 +300,14 @@ test("a PR link is saved on Enter and opens from the badge chip", async () => {
 test("setting a priority saves it and shows a dot with its label", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   const select = screen.getByLabelText("prioridade de comprar leite");
   await act(async () => {
     fireEvent.change(select, { target: { value: "high" } });
   });
   expect(calls.find((c) => c.cmd === "task_set_priority")?.args).toEqual({ id: "t1", priority: "high" });
-  expect(screen.getByTitle("prioridade alta")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "prioridade de comprar leite: alta (clique para trocar)" })).toBeTruthy();
 });
 
 test("filtering by priority hides tasks that don't match", async () => {
@@ -381,7 +381,7 @@ test("with a priority filter, reordering the visible tasks keeps the hidden ones
 test("clearing the PR field sends null", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   const field = screen.getByLabelText("link do PR ou MR de comprar leite") as HTMLInputElement;
   await act(async () => {
@@ -398,7 +398,7 @@ test("clearing the PR field sends null", async () => {
 test("a subtask is added, toggled and removed from the checklist", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("horário e repetição de comprar leite"));
+    fireEvent.click(screen.getByLabelText("horário, repetição, prioridade e PR de comprar leite"));
   });
   const field = screen.getByLabelText("nova subtarefa");
   await act(async () => {
@@ -503,4 +503,39 @@ test("at midnight a slow reply for yesterday never replaces today's list", async
   expect(calls.filter((c) => c.cmd === "tasks_for_day").map((c) => c.args?.day)).toEqual(["2026-09-09", "2026-09-10"]);
   expect(screen.getByText("tarefa de 2026-09-10")).toBeTruthy();
   expect(screen.queryByText("tarefa de 2026-09-09")).toBeNull();
+});
+
+test("!alta in a new task sets its priority and leaves the title", async () => {
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  const input = screen.getByPlaceholderText(/nova tarefa/);
+  await act(async () => {
+    fireEvent.change(input, { target: { value: "Enviar relatório !alta" } });
+    fireEvent.submit(input.closest("form")!);
+  });
+  expect(calls.find((c) => c.cmd === "task_add")?.args).toEqual({ title: "Enviar relatório", day: "2026-09-09" });
+  expect(calls.find((c) => c.cmd === "task_set_priority")?.args).toEqual({ id: "t2", priority: "high" });
+});
+
+test("the row's priority button cycles none, high, medium, low and back to none", async () => {
+  await mount();
+  const seen: unknown[] = [];
+  for (const label of ["sem prioridade", "alta", "média", "baixa"]) {
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: `prioridade de comprar leite: ${label} (clique para trocar)` }));
+    });
+    seen.push(calls.filter((c) => c.cmd === "task_set_priority").at(-1)?.args?.priority);
+  }
+  expect(seen).toEqual(["high", "medium", "low", null]);
+});
+
+test("a long title wraps instead of being cut off", async () => {
+  task = { ...baseTask, title: "revisar o contrato do fornecedor fictício e mandar as observações para o jurídico até sexta" };
+  await mount();
+  const title = screen.getByText(task.title);
+  expect(title.className).not.toContain("truncate");
+  expect(title.className).toContain("break-words");
 });

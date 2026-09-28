@@ -59,6 +59,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
       const quick = parseQuickTask(title);
       const created = await api.taskAdd(quick.title, today);
       if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
+      if (quick.priority) await api.taskSetPriority(created.id, quick.priority);
       setTitle("");
       await reload();
     } catch (e) {

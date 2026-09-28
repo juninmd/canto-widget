@@ -20,7 +20,7 @@ test("an unlocked vault shows the tab bar", async ({ page }) => {
 test("adding a task calls task_add and the task survives a reload", async ({ page }) => {
   await mockTauri(page);
   await page.goto("/");
-  await page.getByPlaceholder("nova tarefa (ex.: Daily às 9h30)").fill("Revisar relatório fictício");
+  await page.getByPlaceholder("nova tarefa (ex.: Daily às 9h30 !alta)").fill("Revisar relatório fictício");
   await page.getByRole("button", { name: "adicionar tarefa" }).click();
   await expect(page.getByText("Revisar relatório fictício")).toBeVisible();
   const added = (await calls(page)).find((c) => c.cmd === "task_add");
@@ -54,7 +54,7 @@ test("Ctrl+Shift+P runs 'nova tarefa' from another tab: switches to Tarefas and 
   await page.keyboard.press("Enter");
   await expect(page.getByRole("dialog", { name: "paleta de comandos" })).toHaveCount(0);
   await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
-  await expect(page.getByPlaceholder("nova tarefa (ex.: Daily às 9h30)")).toBeFocused();
+  await expect(page.getByPlaceholder("nova tarefa (ex.: Daily às 9h30 !alta)")).toBeFocused();
 });
 
 test("a locked vault asks for the master password", async ({ page }) => {
