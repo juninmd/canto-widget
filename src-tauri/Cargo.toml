@@ -30,7 +30,7 @@ sha2 = "0.11"
 reqwest = { version = "0.13", default-features = false, features = ["json", "blocking", "query", "form", "rustls-no-provider"] }
 rustls = { version = "0.23", default-features = false, features = ["ring"] }
 # RSS/Atom parsing for the API-status tab: MIT, actively maintained, no transitive HTTP client of its own.
-feed-rs = "2"
+feed-rs = "3"
 url = "2"
 # Local wall-clock time for task reminders; already in the tree via feed-rs.
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
@@ -47,7 +47,7 @@ default = []
 
 [target.'cfg(windows)'.dependencies]
 # Same version tauri already pulls in: features only, no new crate in the lockfile.
-windows = { version = "0.61", features = [
+windows = { version = "0.62", features = [
   "Foundation",
   "Security_Credentials",
   "Security_Cryptography",

@@ -42,7 +42,7 @@ fn focus_dialog() {
 }
 
 pub fn available() -> bool {
-    KeyCredentialManager::IsSupportedAsync().and_then(|op| op.get()).unwrap_or(false)
+    KeyCredentialManager::IsSupportedAsync().and_then(|op| op.join()).unwrap_or(false)
 }
 
 /// Creates (or replaces) the key pair; Windows prompts for the user gesture here.
@@ -57,25 +57,25 @@ fn create_with(name: &'static str) -> Result<Hello> {
     focus_dialog();
     let r =
         KeyCredentialManager::RequestCreateAsync(&HSTRING::from(name), KeyCredentialCreationOption::ReplaceExisting)
-            .and_then(|op| op.get())
+            .and_then(|op| op.join())
             .map_err(failure)?;
     check(r.Status().map_err(failure)?)?;
     Ok(Hello(name))
 }
 
 pub fn delete() {
-    let _ = KeyCredentialManager::DeleteAsync(&HSTRING::from(CREDENTIAL)).and_then(|op| op.get());
+    let _ = KeyCredentialManager::DeleteAsync(&HSTRING::from(CREDENTIAL)).and_then(|op| op.join());
 }
 
 impl crate::biometric::Signer for Hello {
     fn sign(&self, challenge: &[u8]) -> Result<Vec<u8>> {
         let opened =
-            KeyCredentialManager::OpenAsync(&HSTRING::from(self.0)).and_then(|op| op.get()).map_err(failure)?;
+            KeyCredentialManager::OpenAsync(&HSTRING::from(self.0)).and_then(|op| op.join()).map_err(failure)?;
         check(opened.Status().map_err(failure)?)?;
         let credential = opened.Credential().map_err(failure)?;
         focus_dialog();
         let data = CryptographicBuffer::CreateFromByteArray(challenge).map_err(failure)?;
-        let signed = credential.RequestSignAsync(&data).and_then(|op| op.get()).map_err(failure)?;
+        let signed = credential.RequestSignAsync(&data).and_then(|op| op.join()).map_err(failure)?;
         check(signed.Status().map_err(failure)?)?;
         let mut bytes = Array::<u8>::new();
         CryptographicBuffer::CopyToByteArray(&signed.Result().map_err(failure)?, &mut bytes).map_err(failure)?;
@@ -103,7 +103,7 @@ mod tests {
         let _ = windows::Security::Credentials::KeyCredentialManager::DeleteAsync(&windows::core::HSTRING::from(
             TEST_CREDENTIAL,
         ))
-        .and_then(|op| op.get());
+        .and_then(|op| op.join());
         assert_eq!(a, b, "signature changed between calls: the vault key would not be reconstructible");
     }
 }

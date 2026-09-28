@@ -86,6 +86,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Dependências atualizadas**: Tauri 2.12 (runtime, wry 0.57, plugins), `feed-rs` 3, `windows` 0.62 (a mesma
+  versão do Tauri; `hello.rs` passa a usar `join()` no lugar do `get()` removido), `marked` 18, Vite 8.3.1 e
+  Playwright 1.63; o resto do lockfile foi para as últimas versões compatíveis.
 - **Base para tradução**: todos os textos da interface saíram dos componentes para um catálogo
   (`src/i18n/pt-BR/`), com datas e números formatados por uma única configuração de idioma. Nada muda para quem
   usa; o próximo idioma é um arquivo novo por área.
