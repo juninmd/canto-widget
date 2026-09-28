@@ -49,11 +49,12 @@ pub struct StatusResult {
     pub items: Vec<StatusItem>,
     /// Set when the fetch or parse failed; `items` is then empty rather than stale.
     pub error: Option<String>,
-    /// Current state, for Statuspage-hosted services only.
+    /// Current state: Statuspage's endpoint, or derived from a per-component state log (Magalu Cloud).
     pub live: Option<crate::status_live::Live>,
 }
 
-fn parse(bytes: &[u8]) -> Result<Vec<StatusItem>, String> {
+/// Every entry, newest first: deriving the current state needs each component's latest item, not just the top few.
+fn parse_all(bytes: &[u8]) -> Result<Vec<StatusItem>, String> {
     let feed = feed_rs::parser::parse(bytes).map_err(|e| e.to_string())?;
     // Site24x7 (Magalu Cloud's provider) puts the link on the channel only, not on each item.
     let channel_link = feed.links.first().map(|l| l.href.clone()).unwrap_or_default();
@@ -67,21 +68,46 @@ fn parse(bytes: &[u8]) -> Result<Vec<StatusItem>, String> {
         })
         .collect();
     items.sort_by_key(|i| std::cmp::Reverse(i.published_at));
-    items.truncate(MAX_ITEMS);
     Ok(items)
 }
 
-fn fetch_one(client: &reqwest::blocking::Client, source: &Source) -> StatusResult {
-    let outcome = client
+#[cfg(test)]
+fn parse(bytes: &[u8]) -> Result<Vec<StatusItem>, String> {
+    parse_all(bytes).map(|mut items| {
+        items.truncate(MAX_ITEMS);
+        items
+    })
+}
+
+fn fetch_items(client: &reqwest::blocking::Client, source: &Source) -> Result<Vec<StatusItem>, String> {
+    client
         .get(source.url)
         .send()
         .and_then(|r| r.error_for_status())
         .map_err(|e| e.to_string())
         .and_then(|r| r.bytes().map_err(|e| e.to_string()))
-        .and_then(|b| parse(&b));
-    let live = crate::status_live::fetch(client, source.url);
+        .and_then(|b| parse_all(&b))
+}
+
+/// The current state alone, for the alert watcher; `None` when the source has none or the call failed.
+pub fn current(client: &reqwest::blocking::Client, source: &Source) -> Option<crate::status_live::Live> {
+    if crate::status_derived::derives(source.id) {
+        return crate::status_derived::live(&fetch_items(client, source).ok()?);
+    }
+    crate::status_live::fetch(client, source.url)
+}
+
+fn fetch_one(client: &reqwest::blocking::Client, source: &Source) -> StatusResult {
+    let outcome = fetch_items(client, source);
+    let live = match &outcome {
+        Ok(items) if crate::status_derived::derives(source.id) => crate::status_derived::live(items),
+        _ => crate::status_live::fetch(client, source.url),
+    };
     match outcome {
-        Ok(items) => StatusResult { id: source.id.into(), label: source.label.into(), items, error: None, live },
+        Ok(mut items) => {
+            items.truncate(MAX_ITEMS);
+            StatusResult { id: source.id.into(), label: source.label.into(), items, error: None, live }
+        }
         Err(error) => StatusResult {
             id: source.id.into(),
             label: source.label.into(),

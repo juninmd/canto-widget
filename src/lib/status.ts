@@ -59,5 +59,5 @@ export function level(r: StatusResult, now: number): Level {
   return hasRecentIncident(r, now) ? "recent" : "ok";
 }
 
-/** Only a live Statuspage indicator can say "it just broke"; the Rust watcher polls exactly these. */
+/** Only a current state (Statuspage, or Magalu Cloud derived in Rust) can say "it just broke"; the watcher polls these. */
 export const canAlert = (r: StatusResult) => r.live != null;
