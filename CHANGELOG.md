@@ -103,6 +103,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Tarefa em janela estreita**: com horário, ↻, subtarefas e PR na mesma linha, o título ficava com ~60 px na
+  janela mínima (360 px), uma palavra por linha. Esses selos agora ficam numa linha menor abaixo do título.
 - **Título longo de tarefa** não some mais cortado com reticências: quebra em quantas linhas precisar.
 - **Imagens nas notas** só apareciam no modo "pré-visualizar" do editor: o card mostrava "[imagem]" e o modo
   "escrever" só o código `![](canto-img:…)`. Agora o card e o editor mostram as imagens como miniaturas.

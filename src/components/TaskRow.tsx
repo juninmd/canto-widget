@@ -1,6 +1,6 @@
 import { t } from "../i18n";
 import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
-import TaskDetails, { TaskBadge } from "./TaskDetails";
+import TaskDetails, { TaskBadge, TaskMeta } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
 import { GripIcon } from "./Icons";
 import { ENTER_CLASS, EXIT_CLASS } from "../lib/motion";
@@ -71,7 +71,7 @@ export default function TaskRow({
         data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
-        className={`group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
+        className={`group flex items-start gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
         } ${dragging ? "opacity-50" : ""} ${dropTarget ? "ring-1 ring-accent" : ""}`}
       >
@@ -91,7 +91,7 @@ export default function TaskRow({
             }}
             aria-label={t("tasks.dragLabel", { title: task.title })}
             title={t("tasks.dragHint")}
-            className="grid size-4 shrink-0 cursor-grab touch-none place-items-center text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+            className="mt-0.5 grid size-4 shrink-0 cursor-grab touch-none place-items-center text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
           >
             <GripIcon />
           </button>
@@ -101,7 +101,7 @@ export default function TaskRow({
           checked={task.done}
           onChange={onToggleDone}
           onAnimationEnd={onCheckAnimationEnd}
-          className={`size-4 accent-[var(--color-accent)] ${checking ? "motion-safe:animate-marcar" : ""}`}
+          className={`mt-0.5 size-4 shrink-0 accent-[var(--color-accent)] ${checking ? "motion-safe:animate-marcar" : ""}`}
         />
         {editing?.id === task.id ? (
           <input
@@ -116,12 +116,15 @@ export default function TaskRow({
             className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
           />
         ) : (
-          <span
-            className={`min-w-0 flex-1 whitespace-pre-wrap break-words text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}
-            title={t("tasks.renameHint", { title: task.title })}
-            onDoubleClick={onStartEdit}
-          >
-            {task.title}
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span
+              className={`whitespace-pre-wrap break-words text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}
+              title={t("tasks.renameHint", { title: task.title })}
+              onDoubleClick={onStartEdit}
+            >
+              {task.title}
+            </span>
+            <TaskMeta task={task} />
           </span>
         )}
         <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} onPriority={onPriority} />

@@ -39,6 +39,9 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       notes_search: { total: o.notes?.length ?? 0, items: o.notes ?? [] },
       clip_list: { items: [], max_pinned: 100 },
       agenda_today: [],
+      // Rust always answers these with an object; null would crash the tabs, not test them.
+      github_status: { connected: false, login: "", source: "", device_flow: false },
+      drive_status: { configured: false, connected: false, email: "" },
     };
     let callbackId = 1;
     const w = window as unknown as Record<string, unknown>;

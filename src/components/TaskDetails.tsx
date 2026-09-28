@@ -81,7 +81,7 @@ export default function TaskDetails({
   );
 }
 
-/** Time and ↻ visible on the row, plus the button that opens the details. */
+/** The row's actions: the priority dot that cycles it, and the button that opens the details. */
 type BadgeProps = { task: Task; open: boolean; onToggle: () => void; onPriority: (priority: Priority | null) => void };
 
 export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
@@ -98,32 +98,6 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
       >
         <span className={`size-2 rounded-full ${task.priority ? PRIORITY_DOT[task.priority] : "border border-faint"}`} />
       </button>
-      {(task.hora || task.repetir || task.extended_repeat) && (
-        <span
-          className="shrink-0 text-[11px] text-muted"
-          title={task.repetir ? REPEAT_LABEL[task.repetir.tipo] : task.extended_repeat ? extendedLabel(task.extended_repeat) : undefined}
-        >
-          {task.hora}
-          {task.repetir && <span aria-label={t("repeat.repeats", { label: REPEAT_LABEL[task.repetir.tipo] })}> ↻</span>}
-          {task.extended_repeat && <span aria-label={t("repeat.repeats", { label: extendedLabel(task.extended_repeat) })}> ↻</span>}
-        </span>
-      )}
-      {task.subtasks && task.subtasks.length > 0 && (
-        <span className="shrink-0 text-[11px] text-muted" title={t("tasks.subtasks")}>
-          {task.subtasks.filter((s) => s.done).length}/{task.subtasks.length}
-        </span>
-      )}
-      {task.pr_url && (
-        <button
-          type="button"
-          onClick={() => void api.openLink(task.pr_url!)}
-          className="grid size-6 shrink-0 place-items-center rounded text-faint hover:text-fg"
-          aria-label={t("tasks.openPrOf", { title: task.title })}
-          title={t("tasks.openPr")}
-        >
-          <PullIcon />
-        </button>
-      )}
       <button
         type="button"
         onClick={onToggle}
@@ -135,5 +109,42 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
         <ClockIcon />
       </button>
     </>
+  );
+}
+
+/** Time, ↻, subtask count and PR under the title: on the right they left a narrow window almost no room for it. */
+export function TaskMeta({ task }: { task: Task }) {
+  const timed = task.hora || task.repetir || task.extended_repeat;
+  const subtasks = task.subtasks && task.subtasks.length > 0;
+  if (!timed && !subtasks && !task.pr_url) return null;
+  return (
+    <span className="flex flex-wrap items-center gap-x-2">
+      {timed && (
+        <span
+          className="shrink-0 text-[11px] text-muted"
+          title={task.repetir ? REPEAT_LABEL[task.repetir.tipo] : task.extended_repeat ? extendedLabel(task.extended_repeat) : undefined}
+        >
+          {task.hora}
+          {task.repetir && <span aria-label={t("repeat.repeats", { label: REPEAT_LABEL[task.repetir.tipo] })}> ↻</span>}
+          {task.extended_repeat && <span aria-label={t("repeat.repeats", { label: extendedLabel(task.extended_repeat) })}> ↻</span>}
+        </span>
+      )}
+      {subtasks && (
+        <span className="shrink-0 text-[11px] text-muted" title={t("tasks.subtasks")}>
+          {task.subtasks!.filter((s) => s.done).length}/{task.subtasks!.length}
+        </span>
+      )}
+      {task.pr_url && (
+        <button
+          type="button"
+          onClick={() => void api.openLink(task.pr_url!)}
+          className="grid size-5 shrink-0 place-items-center rounded text-faint hover:text-fg"
+          aria-label={t("tasks.openPrOf", { title: task.title })}
+          title={t("tasks.openPr")}
+        >
+          <PullIcon />
+        </button>
+      )}
+    </span>
   );
 }
