@@ -1,12 +1,8 @@
-import { afterEach, expect, test } from "bun:test";
-import { cleanup, render } from "@testing-library/react";
-import { highlightCode } from "./codeHighlight";
-
-afterEach(cleanup);
+import { expect, test } from "bun:test";
+import { codeTokens } from "./codeHighlight";
 
 function spans(code: string, lang: string) {
-  const { container } = render(<code>{highlightCode(code, lang)}</code>);
-  return [...container.querySelectorAll("span")].map((s) => ({ text: s.textContent, cls: s.className }));
+  return codeTokens(code, lang).map((tk) => ({ text: code.slice(tk.from, tk.to), cls: tk.className }));
 }
 
 test("keywords, strings, numbers and comments each get their own color", () => {
@@ -34,13 +30,8 @@ test("SQL keywords match regardless of case", () => {
   expect(spans("select * FROM t", "sql").map((s) => s.text)).toEqual(["select", "FROM"]);
 });
 
-test("an unknown or missing language comes back as the untouched text", () => {
-  expect(highlightCode("const x = 1", "cobol")).toBe("const x = 1");
-  expect(highlightCode("const x = 1", "")).toBe("const x = 1");
-});
-
-test("markup inside code is shown as text, never parsed as HTML", () => {
-  const { container } = render(<code>{highlightCode('el.innerHTML = "<img src=x onerror=alert(1)>"', "js")}</code>);
-  expect(container.querySelector("img")).toBeNull();
-  expect(container.textContent).toContain("<img src=x onerror=alert(1)>");
+test("an unknown or missing language gives no ranges, so the code stays plain text", () => {
+  expect(codeTokens("const x = 1", "cobol")).toEqual([]);
+  expect(codeTokens("const x = 1", "")).toEqual([]);
+  expect(codeTokens("const x = 1", null)).toEqual([]);
 });

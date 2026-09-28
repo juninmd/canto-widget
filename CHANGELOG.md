@@ -7,6 +7,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Editor de notas visual (WYSIWYG)**: as abas "escrever"/"visualizar" deram lugar a um editor que já mostra a
+  nota formatada, com uma barra compacta (negrito, itálico, código, título, lista, lista numerada, checklist, bloco
+  de código, link e anexar imagem), atalhos `Ctrl+B`/`I`/`E`, `Ctrl+K` para link e os atalhos de markdown ao
+  digitar (`# `, `- `, `[ ] `, ` ``` `). Checklists marcam direto no texto, blocos de código mantêm o realce e as
+  imagens aparecem no lugar. O botão **MD** mostra o markdown cru para editar à mão. A nota continua salva em
+  markdown (busca, card, sync, backup e exportação `.md` não mudam), e abrir e salvar sem editar não altera nem
+  um caractere; o que o editor não conhece (tabelas, HTML) fica como texto. Links só abrem com `Ctrl`+clique e
+  só http(s); HTML colado passa pelo filtro do editor (sem estilos, scripts ou imagens remotas).
 - **Relatório da semana e do mês**: o resumo ganhou um seletor **hoje / semana / mês**. A semana vai de segunda
   até hoje e o mês do dia 1º até hoje; o relatório sai em markdown, com panorama, uma linha por dia útil (na
   semana), tarefas concluídas, notas criadas ou editadas, reuniões agrupadas por título com o tempo total e os
@@ -30,8 +38,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   silencia avisos de reunião, lembretes de tarefa, alertas de status e toda notificação do sistema. Uma lua na
   barra do topo mostra até quando vai; um clique desliga. O estado fica em `nao_perturbe.json`, fora do cofre,
   sobrevive a reinício e expira sozinho.
-- **Imagens nas notas**: cole (Ctrl+V), arraste ou use "anexar imagem" no editor; a visualização mostra a
-  imagem no meio do texto. PNG, JPEG, GIF ou WebP de até 2 MB, cada uma cifrada num arquivo próprio em
+- **Imagens nas notas**: cole (Ctrl+V), arraste ou use "anexar imagem" no editor; ela aparece no meio do
+  texto. PNG, JPEG, GIF ou WebP de até 2 MB, cada uma cifrada num arquivo próprio em
   `note-images/` (o cofre não fica mais pesado de gravar). Acompanham a troca de senha; **não entram no backup
   `.canto` nem na pasta sincronizada**, então a nota restaurada em outra máquina mostra "imagem indisponível".
   Imagens que nenhuma nota usa mais são apagadas depois de um dia.

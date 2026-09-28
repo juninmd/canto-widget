@@ -42,11 +42,16 @@ async function toBase64(file: File): Promise<string> {
   return btoa(binary);
 }
 
-/** Checks type and size before the round trip, then stores the image and returns its markdown reference. */
-export async function attachImage(file: File): Promise<string> {
+/** Checks type and size before the round trip, then stores the image and returns its sealed id. */
+export async function storeImage(file: File): Promise<string> {
   if (!IMAGE_TYPES.includes(file.type)) throw new Error(t("notes.imageType"));
   if (file.size > MAX_IMAGE_BYTES) throw new Error(t("notes.imageTooBig"));
-  return imageMarkdown(await api.noteImageSave(await toBase64(file)));
+  return api.noteImageSave(await toBase64(file));
+}
+
+/** Same as `storeImage`, as the markdown reference the raw editor inserts. */
+export async function attachImage(file: File): Promise<string> {
+  return imageMarkdown(await storeImage(file));
 }
 
 /** Puts `snippet` on its own line at the caret, so it never glues onto a word. */
