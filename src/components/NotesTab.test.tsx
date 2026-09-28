@@ -17,6 +17,7 @@ mock.module("@tauri-apps/api/core", () => ({
     }
     if (cmd === "note_pin") return Promise.resolve(true);
     if (cmd === "note_export_md") return Promise.resolve("C:\\fake\\wifi.md");
+    if (cmd === "note_image_get") return Promise.resolve(`data:image/png;base64,${args?.id === "ab12" ? "QUI=" : "Q0Q="}`);
     return Promise.resolve(null);
   },
 }));
@@ -202,4 +203,22 @@ test("a slow reply for an older search never replaces the results of the newer o
   });
   expect(screen.getByText("222")).toBeTruthy();
   expect(screen.queryByText("111")).toBeNull();
+});
+
+test("a note's images show as thumbnails on the card and while writing, not as raw markup", async () => {
+  await listWith({ body: "planta da sala\n![](canto-img:ab12)\n![](canto-img:cd34)" });
+  await act(async () => {
+    await new Promise((ready) => setTimeout(ready, 0));
+  });
+  const thumbs = screen.getByRole("group", { name: "imagens da nota" });
+  expect([...thumbs.querySelectorAll("img")].map((i) => i.getAttribute("src"))).toEqual([
+    "data:image/png;base64,QUI=",
+    "data:image/png;base64,Q0Q=",
+  ]);
+  expect(screen.queryByText(/canto-img/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByText("wifi"));
+    await new Promise((ready) => setTimeout(ready, 0));
+  });
+  expect(screen.getByRole("group", { name: "imagens da nota" }).querySelectorAll("img")).toHaveLength(2);
 });

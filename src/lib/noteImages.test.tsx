@@ -17,7 +17,7 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { renderMarkdown } = await import("./markdown");
-const { attachImage, insertAt, isSafeImageUrl, MAX_IMAGE_BYTES, stripImageRefs } = await import("./noteImages");
+const { attachImage, imageIds, insertAt, isSafeImageUrl, MAX_IMAGE_BYTES, stripImageRefs } = await import("./noteImages");
 
 beforeEach(() => {
   calls.length = 0;
@@ -79,6 +79,12 @@ test("the reference lands on its own line at the caret", () => {
   expect(insertAt("a\n", 2, "IMG")).toEqual({ body: "a\nIMG\n", caret: 6 });
 });
 
-test("cards show a label instead of the raw reference", () => {
-  expect(stripImageRefs("veja ![](canto-img:ab12) aqui")).toBe("veja [imagem] aqui");
+test("cards drop the raw reference; the image shows as a thumbnail", () => {
+  expect(stripImageRefs("veja ![](canto-img:ab12) aqui")).toBe("veja  aqui");
+  expect(stripImageRefs("topo\n\n![](canto-img:ab12)\n\nfim")).toBe("topo\n\nfim");
+});
+
+test("image ids come out in order, each once", () => {
+  expect(imageIds("a ![](canto-img:ab12)\n![x](canto-img:cd34) ![](canto-img:ab12)")).toEqual(["ab12", "cd34"]);
+  expect(imageIds("![](https://example.com/x.png)")).toEqual([]);
 });
