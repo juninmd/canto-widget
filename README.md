@@ -62,7 +62,7 @@ sends a notification, with **snooze 10 min**.
 ### ✅ Tasks that remind you
 
 A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
-reminder is already set. **Day summary** ready to paste (tasks, meetings with total time, PRs/MRs opened, merged and reviewed), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Day summary** ready to paste (tasks, meetings with total time, PRs/MRs opened, merged and reviewed), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday.
 
 </td>
 </tr>
@@ -90,7 +90,7 @@ count), and events that overlap get a **conflict** badge naming the other event.
 
 ### 🗒️ Notes as cards
 
-Searchable cards with `#tags`, pin to top and one-click tag filter. A **WYSIWYG editor** with a compact
+Searchable cards with `#tags`, pin to top and one-click tag filter; each card shows the start of the note **rendered** (titles, checklists, code, links), not raw markdown. A **WYSIWYG editor** with a compact
 formatting bar (bold, italic, code, heading, lists, checklists you tick right in the text, code blocks with syntax
 highlighting, links, images) and markdown shortcuts as you type (`# `, `- `, `[ ] `, ` ``` `); an **MD** toggle
 shows the raw markdown, which is still how notes are stored, searched, synced and exported. Links open with
@@ -215,6 +215,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Note editor: raw markdown (MD) | Note editor on the light skin |
 |---|---|
 | ![The same note in the raw markdown mode, with the image reference and its thumbnail](docs/prints/app/43-notas-editor-markdown.png) | ![The WYSIWYG note editor on the light skin](docs/prints/app/44-notas-editor-claro.png) |
+
+| Tasks: priority on the row, long titles wrap | Notes list with rendered markdown |
+|---|---|
+| ![Task list where each row shows its priority dot and a long title wraps over several lines](docs/prints/app/45-tarefas-prioridade.png) | ![Note cards showing a heading, a checklist, a code block and a numbered list rendered instead of raw markdown](docs/prints/app/46-notas-card-markdown.png) |
 
 </details>
 

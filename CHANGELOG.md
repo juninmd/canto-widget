@@ -7,6 +7,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Prioridade direto na tarefa**: `!alta`, `!média` ou `!baixa` (ou `!1`, `!2`, `!3`) no texto da nova tarefa
+  definem a prioridade; a bolinha na linha agora é um botão que alterna alta → média → baixa → sem. Antes a
+  prioridade só existia escondida no ⏰ da tarefa.
+- **Notas renderizadas na lista**: o card mostra o começo da nota formatado (títulos, checklists, código, links,
+  listas numeradas) em vez do markdown cru; nada de HTML cru, e o texto longo esmaece no fim do card.
 - **Editor de notas visual (WYSIWYG)**: as abas "escrever"/"visualizar" deram lugar a um editor que já mostra a
   nota formatada, com uma barra compacta (negrito, itálico, código, título, lista, lista numerada, checklist, bloco
   de código, link e anexar imagem), atalhos `Ctrl+B`/`I`/`E`, `Ctrl+K` para link e os atalhos de markdown ao
@@ -98,6 +103,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Título longo de tarefa** não some mais cortado com reticências: quebra em quantas linhas precisar.
 - **Imagens nas notas** só apareciam no modo "pré-visualizar" do editor: o card mostrava "[imagem]" e o modo
   "escrever" só o código `![](canto-img:…)`. Agora o card e o editor mostram as imagens como miniaturas.
 - **Resumo do dia longo** não empurra mais os botões "copiar resumo" e "voltar" para fora da janela: o texto

@@ -153,7 +153,7 @@ test("privacy mode blurs the title and body without hiding the card", async () =
     await new Promise((ready) => setTimeout(ready, 250));
   });
   expect(screen.getByText("wifi").className).toContain("blur-sm");
-  expect(screen.getByText("senha").className).toContain("blur-sm");
+  expect(screen.getByText("senha").closest(".blur-sm")).toBeTruthy();
 });
 
 test("a pinned note shows the pin without depending on hover", async () => {
@@ -255,4 +255,26 @@ test("opening and saving a note without editing keeps its markdown byte for byte
     await Promise.resolve();
   });
   expect(calls.find((c) => c.cmd === "note_save")?.args).toMatchObject({ body: legacy });
+});
+
+test("the card shows the note's markdown rendered, not its raw syntax", async () => {
+  await listWith({
+    body: "# Pauta\n- [x] **escopo** fechado\n- [ ] prazo\n\nveja o [site](https://exemplo.com) e `npm test`\n<b>html cru</b>",
+  });
+  expect(screen.getByText("Pauta").closest("button")).toBeTruthy();
+  expect(screen.getByText("escopo").closest("strong")).toBeTruthy();
+  expect(screen.getByText("npm test").tagName).toBe("CODE");
+  expect(screen.getByText("site").closest(".underline")).toBeTruthy();
+  expect(screen.getAllByText("☑")).toHaveLength(1);
+  expect(screen.getAllByText("☐")).toHaveLength(1);
+  expect(screen.queryByText(/# Pauta|\*\*escopo|\]\(https/)).toBeNull();
+  expect(document.querySelector("b")).toBeNull();
+  expect(document.body.textContent).toContain("<b>html cru</b>");
+});
+
+test("a numbered list in the card starts at its own first number", async () => {
+  await listWith({ body: "1. um\n2. dois" });
+  const list = screen.getByText("um").closest("ol");
+  expect(list?.getAttribute("start")).toBe("1");
+  expect(list?.querySelectorAll("li")).toHaveLength(2);
 });
