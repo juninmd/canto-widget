@@ -28,6 +28,11 @@ async function savedBody(page: Page) {
   return (await calls(page)).find((c) => c.cmd === "note_save")?.args.body;
 }
 
+/** Lets rAF-scheduled editor work (TipTap's delayed focus, ProseMirror's selection read) run first. */
+async function nextFrames(page: Page) {
+  await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => done(null)))));
+}
+
 /** End right after a toolbar click is sometimes dropped at automation speed; retry until the caret sits at the line end. */
 async function caretToLineEnd(page: Page) {
   await expect(async () => {
@@ -61,7 +66,12 @@ test("formatting with the bar and markdown shortcuts saves the expected markdown
 test("a checklist item ticks right in the editor and the link bar only takes http(s)", async ({ page }) => {
   const editor = await openNote(page, "- [ ] leite\n- [ ] pão\n\nveja o site");
   await page.getByRole("checkbox", { name: "pão" }).click();
+  await expect(page.getByRole("checkbox", { name: "pão" })).toBeChecked();
+  // The tick refocuses the editor on the next frame and restores its old selection; select only after that.
+  await nextFrames(page);
   await editor.getByText("veja o site").dblclick();
+  await expect.poll(() => page.evaluate(() => getSelection()?.toString())).toBe("site");
+  await nextFrames(page);
   await page.keyboard.press("Control+k");
   const url = page.getByRole("textbox", { name: "endereço do link" });
   await url.fill("javascript:alert(1)");
