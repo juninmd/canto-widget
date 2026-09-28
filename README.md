@@ -218,7 +218,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Tasks: priority on the row, long titles wrap | Notes list with rendered markdown |
 |---|---|
-| ![Task list where each row shows its priority dot and a long title wraps over several lines](docs/prints/app/45-tarefas-prioridade.png) | ![Note cards showing a heading, a checklist, a code block and a numbered list rendered instead of raw markdown](docs/prints/app/46-notas-card-markdown.png) |
+| ![Task list where each row shows its priority dot, a long title wraps over several lines and the time sits under the title](docs/prints/app/45-tarefas-prioridade.png) | ![Note cards showing a heading, a checklist, a code block and a numbered list rendered instead of raw markdown](docs/prints/app/46-notas-card-markdown.png) |
 
 </details>
 
