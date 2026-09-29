@@ -9,9 +9,10 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
 
+use crate::calendar::AgendaItem;
 use crate::error::{AppError, Result};
-use crate::lang::tr;
-use crate::status_feed::SOURCES;
+use crate::notification::STATUS_PREFIX;
+use crate::status_feed::{Source, SOURCES};
 use crate::status_live::{self, Live};
 
 const TICK: Duration = Duration::from_secs(3 * 60);
@@ -94,7 +95,7 @@ pub fn watch(app: AppHandle) {
                         // A failed call keeps the last reading: no alert storm when the network drops.
                         let Some(live) = crate::status_feed::current(&client, source) else { continue };
                         if worsened(last.get(source.id).map(String::as_str), &live.indicator) {
-                            notify(&app, source.label, &live);
+                            let _ = crate::window::open_alert(&app, alert_event(source, &live));
                         }
                         last.insert(source.id.to_string(), live.indicator);
                     }
@@ -105,9 +106,22 @@ pub fn watch(app: AppHandle) {
     });
 }
 
-fn notify(app: &AppHandle, label: &str, live: &Live) {
-    let title = tr("Serviço com problema", "Service issue");
-    crate::notification::notify_os(app, title, &format!("{label}: {}", live.description));
+/// Goes through the window alert, not only the OS: a notification swallowed by focus mode left no trace at all.
+pub fn alert_event(source: &Source, live: &Live) -> AgendaItem {
+    AgendaItem {
+        id: format!("{STATUS_PREFIX}{}", source.id),
+        title: source.label.to_string(),
+        description: live.description.clone(),
+        link: page_url(source.url),
+        ..Default::default()
+    }
+}
+
+/// The status page itself: the feed's scheme and host.
+fn page_url(feed_url: &str) -> String {
+    let host_end = feed_url.find("://").map_or(0, |i| i + 3);
+    let end = feed_url[host_end..].find('/').map_or(feed_url.len(), |i| host_end + i);
+    feed_url[..end].to_string()
 }
 
 #[cfg(test)]
@@ -123,6 +137,18 @@ mod tests {
         assert!(!worsened(Some("major"), "minor"), "improving");
         assert!(!worsened(None, "none"));
         assert!(!worsened(Some("none"), "maintenance"), "planned maintenance is not an outage");
+    }
+
+    #[test]
+    fn a_worse_service_becomes_a_window_alert_linking_its_page() {
+        let github = SOURCES.iter().find(|s| s.id == "github").unwrap();
+        let live = Live { indicator: "major".into(), description: "Partial System Outage".into() };
+        let event = alert_event(github, &live);
+        assert_eq!(event.id, "status:github");
+        assert_eq!(event.title, "GitHub");
+        assert_eq!(event.description, "Partial System Outage");
+        assert_eq!(event.link, "https://www.githubstatus.com");
+        assert_eq!(crate::notification::content(&event).0, "Serviço com problema");
     }
 
     #[test]

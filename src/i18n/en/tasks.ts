@@ -104,5 +104,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "alert.joinMeet": "join Meet",
   "alert.openCalendar": "open in Calendar",
   "alert.snooze": "snooze {minutes} min",
+  "alert.serviceIssue": "service issue",
+  "alert.openStatus": "open status page",
   "alert.close": "close",
 };

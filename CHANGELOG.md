@@ -126,6 +126,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   - Apagar o campo "máx. fixados" não salva mais 1.
   - O resumo do dia ignora reuniões recusadas.
   - Ligar dois alertas de status rapidamente não perde o primeiro.
+  - Alerta de Status API agora abre o aviso na janela (com link para a página de status), além da notificação do
+    sistema: antes só havia a notificação, que o modo foco do sistema engolia sem deixar rastro.
 - **Tarefa em janela estreita**: com horário, ↻, subtarefas e PR na mesma linha, o título ficava com ~60 px na
   janela mínima (360 px), uma palavra por linha. Esses selos agora ficam numa linha menor abaixo do título.
 - **Título longo de tarefa** não some mais cortado com reticências: quebra em quantas linhas precisar.
