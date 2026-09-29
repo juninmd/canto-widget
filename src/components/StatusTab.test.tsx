@@ -133,6 +133,21 @@ test("the bell turns notifications on and off for a service with live status", a
   expect(calls.filter((c) => c.cmd === "status_alerts_set").at(-1)?.args).toEqual({ ids: [] });
 });
 
+test("two fast bell clicks on different services keep both watched", async () => {
+  const live = { indicator: "none", description: "ok" };
+  const github = { ...aws, id: "github", label: "GitHub", live };
+  const slack = { ...aws, id: "slack", label: "Slack", live };
+  status = () => Promise.resolve([github, slack]);
+  await show();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "avisar quando GitHub cair ou ficar instável" }));
+    fireEvent.click(screen.getByRole("button", { name: "avisar quando Slack cair ou ficar instável" }));
+  });
+  expect(calls.filter((c) => c.cmd === "status_alerts_set").at(-1)?.args).toEqual({ ids: ["github", "slack"] });
+  expect(screen.getByRole("button", { name: "parar de avisar sobre GitHub" }).getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByRole("button", { name: "parar de avisar sobre Slack" }).getAttribute("aria-pressed")).toBe("true");
+});
+
 test("a service without live status can't be watched", async () => {
   status = () => Promise.resolve([aws]);
   await show();

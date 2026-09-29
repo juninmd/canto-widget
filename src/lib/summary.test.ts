@@ -68,3 +68,14 @@ test("the meetings heading carries the total time", () => {
   expect(text).toContain("Reuniões (2 · 1h45 no total)");
   expect(daySummary("2026-09-14", [], [slot(at(9, 0), at(9, 30))])).toContain("Reuniões (1 · 30 min no total)");
 });
+
+test("declined meetings stay out of the summary list and the meeting time", () => {
+  const at = (h: number) => new Date(2026, 8, 14, h, 0).toISOString();
+  const kept: AgendaItem = { ...meeting, id: "a", title: "Planejamento", start: at(10), end: at(11) };
+  const declined: AgendaItem = { ...meeting, id: "b", title: "Recusada", start: at(14), end: at(16), response: "declined" };
+  expect(meetingMinutes([kept, declined])).toBe(60);
+  const text = daySummary("2026-09-14", [], [kept, declined]);
+  expect(text).toContain("Reuniões (1 · ");
+  expect(text).toContain("Planejamento");
+  expect(text).not.toContain("Recusada");
+});

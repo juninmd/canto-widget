@@ -9,7 +9,12 @@ export default function NoteLinkPicker({ tasks, agenda, onPick, onClose }: Props
   return (
     <div
       className="flex flex-col gap-1 rounded-lg border border-line bg-ink p-2 text-xs"
-      onKeyDown={(e) => e.key === "Escape" && onClose()}
+      onKeyDown={(e) => {
+        // Esc closes only the picker; bubbling to the note form would cancel the whole draft.
+        if (e.key !== "Escape") return;
+        e.stopPropagation();
+        onClose();
+      }}
     >
       <div className="flex items-center justify-between text-muted">
         <span>{t("notes.linkPickerTitle")}</span>

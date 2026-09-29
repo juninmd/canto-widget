@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { useQuerySeed } from "../lib/useQuerySeed";
 import { api, errText, type AgendaItem, type Note, type Task } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
@@ -19,6 +20,8 @@ type Props = {
   privacy: boolean;
   /** Seeds the search field once, e.g. arriving from the global search overlay. */
   initialQuery?: string;
+  /** Changes on each new jump, so an already-open tab picks up `initialQuery` again. */
+  querySeq?: number;
   onOpenTasks: () => void;
   onOpenAgenda: () => void;
   onError: (m: string) => void;
@@ -26,8 +29,9 @@ type Props = {
   note?: NoteDraft;
 };
 
-export default function NotesTab({ today, agenda = [], privacy, initialQuery, onOpenTasks, onOpenAgenda, onError, note }: Props) {
+export default function NotesTab({ today, agenda = [], privacy, initialQuery, querySeq, onOpenTasks, onOpenAgenda, onError, note }: Props) {
   const [query, setQuery] = useState(initialQuery ?? "");
+  useQuerySeed(initialQuery, querySeq, setQuery);
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);

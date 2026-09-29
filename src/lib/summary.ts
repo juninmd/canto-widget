@@ -21,7 +21,7 @@ function geminiLink(e: AgendaItem, docs: GeminiDoc[]): string {
 /** Time actually spent in timed meetings: overlapping ones count once, all-day ones not at all. */
 export function meetingMinutes(agenda: AgendaItem[]): number {
   const spans = agenda
-    .filter((e) => !e.all_day)
+    .filter((e) => !e.all_day && e.response !== "declined")
     .map((e) => [Date.parse(e.start), Date.parse(e.end)])
     .filter(([s, e]) => Number.isFinite(s) && Number.isFinite(e) && e > s)
     .sort((a, b) => a[0] - b[0]);
@@ -63,9 +63,10 @@ export function daySummary(
   };
   section(t("summary.done"), done.map((task) => task.title));
   section(t("summary.pending"), open.map((task) => (task.hora ? `${task.title} (${task.hora})` : task.title)));
-  const minutes = meetingMinutes(agenda);
+  const attended = agenda.filter((e) => e.response !== "declined");
+  const minutes = meetingMinutes(attended);
   const total = minutes > 0 ? ` · ${t("summary.meetingsTotal", { time: duration(minutes) })}` : "";
-  section(t("summary.meetings"), agenda.map((e) => `${hour(e)} ${e.title}${geminiLink(e, geminiDocs)}`), total);
+  section(t("summary.meetings"), attended.map((e) => `${hour(e)} ${e.title}${geminiLink(e, geminiDocs)}`), total);
   section(t("summary.openedPrs"), (forges.opened ?? []).map(forgeLine));
   section(t("summary.mergedPrs"), (forges.merged ?? []).map(forgeLine));
   section(t("summary.reviewedPrs"), (forges.reviewed ?? []).map(forgeLine));

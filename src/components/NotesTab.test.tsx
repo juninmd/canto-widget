@@ -88,6 +88,28 @@ test("Esc cancels the editor and discards the draft", async () => {
   expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("");
 });
 
+test("a new global-search jump re-seeds the already-open notes search, even with the same query", async () => {
+  const tab = (seq: number, q: string) => (
+    <ToastProvider>
+      <NotesTab today="2026-09-09" privacy={false} initialQuery={q} querySeq={seq} onOpenTasks={() => {}} onOpenAgenda={() => {}} onError={() => {}} />
+    </ToastProvider>
+  );
+  const view = render(tab(1, "wifi"));
+  const search = screen.getByLabelText("buscar notas") as HTMLInputElement;
+  expect(search.value).toBe("wifi");
+  await act(async () => {
+    fireEvent.change(search, { target: { value: "outra" } });
+  });
+  await act(async () => void view.rerender(tab(2, "wifi")));
+  expect(search.value).toBe("wifi");
+  await act(async () => void view.rerender(tab(3, "senha")));
+  expect(search.value).toBe("senha");
+  await act(async () => {
+    await new Promise((ready) => setTimeout(ready, 250));
+  });
+  expect(calls.filter((c) => c.cmd === "notes_search").at(-1)?.args?.query).toBe("senha");
+});
+
 async function listWith(note: Record<string, unknown>) {
   notes = [{ id: "n1", title: "wifi", body: "senha", tags: ["casa"], created_at: 1, updated_at: 1, fixada: false, ...note }];
   render(

@@ -62,7 +62,7 @@ test("the type filter only keeps items matching the selected kind", async () => 
   expect(screen.queryByText("anotação qualquer")).toBeNull();
 });
 
-test("changing the pinned limit saves it through clip_set_max_pinned, clamped", async () => {
+test("changing the pinned limit saves it through clip_set_max_pinned, clamped to 1000", async () => {
   await show();
   const input = screen.getByLabelText("máximo de itens fixados");
 
@@ -70,11 +70,65 @@ test("changing the pinned limit saves it through clip_set_max_pinned, clamped", 
     fireEvent.change(input, { target: { value: "5000" } });
   });
   expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 1000 } });
+});
 
+test("clearing or zeroing the pinned limit while typing saves nothing and the poll keeps the draft", async () => {
+  await show();
+  const input = screen.getByLabelText("máximo de itens fixados") as HTMLInputElement;
+
+  await act(async () => {
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: "" } });
+  });
   await act(async () => {
     fireEvent.change(input, { target: { value: "0" } });
   });
-  expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 1 } });
+  expect(calls.some((c) => c.cmd === "clip_set_max_pinned")).toBe(false);
+
+  await act(async () => {
+    fireEvent.change(input, { target: { value: "" } });
+  });
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 2700));
+  });
+  expect(calls.some((c) => c.cmd === "clip_list")).toBe(true);
+  expect(input.value).toBe("");
+
+  await act(async () => {
+    fireEvent.change(input, { target: { value: "25" } });
+  });
+  expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 25 } });
+});
+
+test("a new global-search jump re-seeds the already-open tab, even with the same query", async () => {
+  const view = render(
+    <ToastProvider>
+      <ClipboardTab privacy={false} initialQuery="pix" querySeq={1} onError={() => {}} />
+    </ToastProvider>,
+  );
+  const search = screen.getByLabelText("buscar no clipboard") as HTMLInputElement;
+  expect(search.value).toBe("pix");
+
+  await act(async () => {
+    fireEvent.change(search, { target: { value: "outra" } });
+  });
+  await act(async () =>
+    void view.rerender(
+      <ToastProvider>
+        <ClipboardTab privacy={false} initialQuery="pix" querySeq={2} onError={() => {}} />
+      </ToastProvider>,
+    ),
+  );
+  expect(search.value).toBe("pix");
+
+  await act(async () =>
+    void view.rerender(
+      <ToastProvider>
+        <ClipboardTab privacy={false} initialQuery="boleto" querySeq={3} onError={() => {}} />
+      </ToastProvider>,
+    ),
+  );
+  expect(search.value).toBe("boleto");
 });
 
 test("privacy mode blurs the preview text without hiding the card itself", async () => {

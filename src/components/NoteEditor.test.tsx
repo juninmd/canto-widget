@@ -193,6 +193,14 @@ test("picking a task from the link picker sets the link, and it can be removed",
   expect(changes.at(-1)?.link).toBeNull();
 });
 
+test("Esc inside the link picker closes only the picker, not the whole note", () => {
+  const { cancelled } = mount("x");
+  click("vincular a uma tarefa ou evento");
+  act(() => void fireEvent.keyDown(screen.getByText("✓ comprar leite"), { key: "Escape" }));
+  expect(cancelled()).toBe(0);
+  expect(screen.queryByText("✓ comprar leite")).toBeNull();
+});
+
 test("a 50 KB note opens in the editor without stalling", () => {
   const block = "## Seção\n\n- [ ] item com **negrito** e [link](https://exemplo.com)\n\n```ts\nconst x = 1;\n```\n\n";
   const start = performance.now();
