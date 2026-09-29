@@ -133,6 +133,10 @@ pub fn list(dir: &Path, query: &str) -> Result<Vec<TranscriptMeta>> {
 
 pub fn read(dir: &Path, name: &str) -> Result<String> {
     let path = resolve_within(dir, name)?;
+    // The folder is user-chosen, so the extension gate is what keeps `read` from exposing arbitrary files there.
+    if !is_transcript(Path::new(name)) || !is_transcript(&path) {
+        return Err(AppError::Config("arquivo não é uma transcrição".into()));
+    }
     let meta = std::fs::metadata(&path)?;
     if meta.len() > MAX_BYTES {
         return Err(AppError::Config("transcrição maior que 5 MB".into()));
@@ -190,6 +194,17 @@ mod tests {
         std::fs::write(&file, "ção").unwrap();
         // 3 bytes: whole "ç" (2 bytes), the half-cut "ã" is dropped.
         assert_eq!(read_prefix(&file, 3), "ç");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn read_rejects_a_file_that_is_not_a_transcript() {
+        let dir = std::env::temp_dir().join(format!("canto-transc-ext-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("segredo.env"), "TOKEN=x").unwrap();
+        std::fs::write(dir.join("ata.txt"), "Bom dia").unwrap();
+        assert!(read(&dir, "segredo.env").is_err(), "read a non-transcript file");
+        assert_eq!(read(&dir, "ata.txt").unwrap(), "Bom dia");
         let _ = std::fs::remove_dir_all(&dir);
     }
 

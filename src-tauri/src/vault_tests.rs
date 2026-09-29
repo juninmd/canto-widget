@@ -124,3 +124,24 @@ fn mutate_releases_the_session_lock_before_the_slow_synced_folder_write() {
     let _ = std::fs::remove_dir_all(&st.dir);
     let _ = std::fs::remove_dir_all(&pasta);
 }
+
+#[test]
+fn failed_persist_leaves_memory_as_it_was_on_disk() {
+    let st = state("persist-falha");
+    st.create("senha-mestra").unwrap();
+    // A directory where the temp file goes makes the atomic write fail.
+    std::fs::create_dir_all(st.dir.join("vault.json.tmp")).unwrap();
+    assert!(st.mutate(|d| d.deleted.insert("x".into(), 1)).is_err());
+    assert!(st.read(|d| d.deleted.is_empty()).unwrap(), "unsaved change stayed in memory");
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
+#[test]
+fn manual_lock_reports_the_transition_once() {
+    let st = state("tranca-bandeja");
+    st.create("senha-mestra").unwrap();
+    assert!(st.lock_now());
+    assert!(!st.is_unlocked());
+    assert!(!st.lock_now(), "a second lock must not notify the UI again");
+    let _ = std::fs::remove_dir_all(&st.dir);
+}

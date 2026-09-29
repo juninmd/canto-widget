@@ -147,11 +147,7 @@ pub fn undo(state: &AppState, key: &str) -> Result<bool> {
 
 fn restore(state: &AppState, item: Removed) -> Result<()> {
     match item {
-        Removed::Clips(items) => {
-            let mut hist = state.clip_load()?;
-            hist.restore(items);
-            state.clip_save(&hist)
-        }
+        Removed::Clips(items) => state.clip_update(|hist| Ok((hist.restore(items), true))),
         vault => state.mutate(|d| d.restore(vault, now_ms())),
     }
 }

@@ -121,7 +121,7 @@ function Canto() {
   // Rust locks the vault on its own after a period of inactivity; the UI needs to know.
   useEffect(() => {
     const stop = listen<number>("canto://auto-lock", (e) => {
-      notify({ message: t("app.autoLocked", { min: e.payload }) });
+      notify({ message: e.payload > 0 ? t("app.autoLocked", { min: e.payload }) : t("app.lockedFromTray") });
       void refresh();
     });
     return () => {

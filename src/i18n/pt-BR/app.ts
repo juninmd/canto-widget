@@ -1,6 +1,7 @@
 export const app = {
   "app.name": "canto",
   "app.autoLocked": "cofre trancado sozinho após {min} min sem uso",
+  "app.lockedFromTray": "cofre trancado pela bandeja",
   "app.shortcuts": "atalhos de teclado",
   "app.shortcuts.title": "atalhos de teclado (?)",
   "app.lock": "trancar",

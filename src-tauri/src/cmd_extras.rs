@@ -8,7 +8,6 @@ use crate::calendar::{self, AgendaItem};
 use crate::clip_watch::ClipWatch;
 use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use crate::commands::new_id;
-use crate::drive;
 use crate::error::{AppError, Result};
 use crate::transcripts::{self, TranscriptMeta, TranscriptSettings};
 use crate::trash::Removed;
@@ -33,9 +32,7 @@ pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> 
 /// Clamped so a typo (`0`, a huge number) can't lock pinning out or defeat the cap's purpose.
 #[tauri::command(async)]
 pub fn clip_set_max_pinned(state: State<'_, AppState>, max: usize) -> Result<()> {
-    let mut hist = state.clip_load()?;
-    hist.max_pinned = max.clamp(1, MAX_PINNED_CEILING);
-    state.clip_save(&hist)
+    state.clip_update(|hist| Ok((hist.max_pinned = max.clamp(1, MAX_PINNED_CEILING), true)))
 }
 
 #[tauri::command(async)]
@@ -47,26 +44,26 @@ pub fn clip_copy(app: tauri::AppHandle, state: State<'_, AppState>, id: String) 
 
 #[tauri::command(async)]
 pub fn clip_pin(state: State<'_, AppState>, id: String) -> Result<()> {
-    let mut hist = state.clip_load()?;
-    hist.toggle_pin(&id)?;
-    state.clip_save(&hist)
+    state.clip_update(|hist| Ok((hist.toggle_pin(&id)?, true)))
 }
 
 #[tauri::command(async)]
 pub fn clip_delete(state: State<'_, AppState>, id: String) -> Result<Option<String>> {
-    let mut hist = state.clip_load()?;
-    let (removed, kept) = std::mem::take(&mut hist.items).into_iter().partition(|i| i.id == id);
-    hist.items = kept;
-    state.clip_save(&hist)?;
+    let removed = state.clip_update(|hist| {
+        let (removed, kept) = std::mem::take(&mut hist.items).into_iter().partition(|i| i.id == id);
+        hist.items = kept;
+        Ok((removed, true))
+    })?;
     Ok(store_clips(&state, removed))
 }
 
 #[tauri::command(async)]
 pub fn clip_clear(state: State<'_, AppState>) -> Result<Option<String>> {
-    let mut hist = state.clip_load()?;
-    let (pinned, removed) = std::mem::take(&mut hist.items).into_iter().partition(|i| i.pinned);
-    hist.items = pinned;
-    state.clip_save(&hist)?;
+    let removed = state.clip_update(|hist| {
+        let (pinned, removed) = std::mem::take(&mut hist.items).into_iter().partition(|i| i.pinned);
+        hist.items = pinned;
+        Ok((removed, true))
+    })?;
     Ok(store_clips(&state, removed))
 }
 
@@ -96,10 +93,7 @@ pub fn watch_clipboard(app: tauri::AppHandle) {
             else {
                 continue;
             };
-            let Ok(mut hist) = state.clip_load() else { continue };
-            if hist.push(&text, new_id()) {
-                let _ = state.clip_save(&hist);
-            }
+            let _ = state.clip_update(|hist| Ok(((), hist.push(&text, new_id()))));
         }
     });
 }
@@ -148,13 +142,9 @@ pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_resul
     calendar::events(&google_token(state)?, time_min, time_max, max_results)
 }
 
-/// A fresh Google access token; a refresh is persisted so the next call doesn't repeat it.
+/// Kept here for existing callers; the logic lives in `google_token`.
 pub(crate) fn google_token(state: &AppState) -> Result<String> {
-    let mut cfg = state.drive_config()?;
-    let tokens = cfg.tokens.as_mut().ok_or_else(|| AppError::Config("entre com o Google para ver a agenda".into()))?;
-    let token = drive::fresh_access_token(tokens, &cfg.client_id, &cfg.client_secret)?;
-    state.save_drive_config(&cfg)?;
-    Ok(token)
+    crate::google_token::fresh(state)
 }
 
 #[tauri::command]

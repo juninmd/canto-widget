@@ -139,6 +139,17 @@ impl AppState {
         }
     }
 
+    /// Load-modify-save under `clip_lock`; saves only when `f` reports a change.
+    pub fn clip_update<T>(&self, f: impl FnOnce(&mut ClipHistory) -> Result<(T, bool)>) -> Result<T> {
+        let _serial = self.clip_lock.lock().unwrap();
+        let mut hist = self.clip_load()?;
+        let (out, changed) = f(&mut hist)?;
+        if changed {
+            self.clip_save(&hist)?;
+        }
+        Ok(out)
+    }
+
     pub fn clip_save(&self, hist: &ClipHistory) -> Result<()> {
         let guard = self.session.lock().unwrap();
         let Some(session) = guard.as_ref() else {
