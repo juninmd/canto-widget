@@ -7,6 +7,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Modelos IA** (escondida por padrão, liga em Ajustes → Abas visíveis): ranking de LLMs pelo **Intelligence Index**
+  da [Artificial Analysis](https://artificialanalysis.ai), com barra proporcional à nota, criador, preço
+  (`$x,xx / 1M tokens`, média 3:1 entrada/saída) e velocidade (`tok/s`). O botão de ordem alterna inteligência →
+  preço (mais barato primeiro) → velocidade (mais rápido primeiro); mostra os 50 primeiros. Precisa de uma chave
+  grátis da Artificial Analysis, colada na própria aba: fica cifrada no cofre, nunca chega à interface e pode ser
+  removida. Como a cota grátis é de ~10 chamadas por dia, o Canto busca no máximo uma vez a cada 3 h, mesmo no
+  "atualizar", e diz quando a próxima busca é permitida. O sino 🔔 (desligado por padrão) avisa quando um modelo
+  **entra no top 10** ou **sobe dentro dele**, conferindo a cada 6 h com o cofre aberto, mesmo com a janela
+  escondida; a primeira leitura só registra, sem avisar. Muitas mudanças de uma vez viram um aviso só. Selos "novo" e "subiu" ficam por 7 dias. Quem já tinha
+  escolhido as abas visíveis também recebe a nova aba escondida.
 - **Alertas da Magalu Cloud**: o status page da Magalu (Site24x7) não tem indicador ao vivo, então o estado atual
   sai do feed, pelo último item de cada componente ("Block Storage - Degraded Performance"). O card mostra
   "instável"/"fora do ar" com os componentes afetados e ganha o sino 🔔 para avisar quando algo piora.

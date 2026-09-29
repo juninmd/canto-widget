@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { useState } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { parseHidden, visibleTabs } from "./tabs";
+import { hideNewTabs, parseHidden, visibleTabs } from "./tabs";
 import TabsSection from "../components/TabsSection";
 import type { Tab } from "../components/TabBar";
 
@@ -12,13 +12,21 @@ test("saved data that isn't a list of known tabs is ignored, and Ajustes can nev
   expect(parseHidden('["settings","sumiu","notes"]')).toEqual(["notes"]);
   expect(parseHidden("{oops")).toEqual([]);
   expect(parseHidden('{"github":true}')).toEqual([]);
-  expect(parseHidden(null)).toEqual(["gitlab", "status"]);
+  expect(parseHidden(null)).toEqual(["gitlab", "status", "models"]);
   expect(parseHidden("[]")).toEqual([]);
 });
 
 test("hidden tabs leave the bar; the order of the rest is kept", () => {
   const ids = visibleTabs(["notes", "gitlab"]).map((t) => t.id);
-  expect(ids).toEqual(["tasks", "clipboard", "meetings", "agenda", "github", "status", "settings"]);
+  expect(ids).toEqual(["tasks", "clipboard", "meetings", "agenda", "github", "status", "models", "settings"]);
+});
+
+test("a tab hidden by default also starts hidden for someone who saved a choice before it existed", () => {
+  expect(hideNewTabs(["gitlab"], null)).toEqual(["gitlab", "models"]);
+  expect(hideNewTabs([], "{oops")).toEqual(["models"]);
+  const known = JSON.stringify(["tasks", "notes", "gitlab", "status", "models"]);
+  expect(hideNewTabs(["gitlab"], known)).toEqual(["gitlab"]);
+  expect(hideNewTabs(["models"], null)).toEqual(["models"]);
 });
 
 function Harness({ start }: { start: Tab[] }) {
@@ -27,7 +35,7 @@ function Harness({ start }: { start: Tab[] }) {
 }
 
 test("unchecking hides a tab and the last visible one can't be unchecked", () => {
-  render(<Harness start={["notes", "clipboard", "meetings", "agenda", "github", "status"]} />);
+  render(<Harness start={["notes", "clipboard", "meetings", "agenda", "github", "status", "models"]} />);
   const gitlab = screen.getByLabelText("GitLab") as HTMLInputElement;
   const tasks = screen.getByLabelText("Tarefas") as HTMLInputElement;
   expect(tasks.disabled).toBe(false);

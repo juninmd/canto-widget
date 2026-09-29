@@ -16,6 +16,10 @@ export type MockOptions = {
   notes?: MockNote[];
   /** Sealed note images by id, as the data URLs `note_image_get` returns. */
   images?: Record<string, string>;
+  /** What `models_get` answers; defaults to no key saved. */
+  models?: Record<string, unknown>;
+  /** Tabs the saved hidden list already knew about (`canto.knownTabs`), so new tabs aren't auto-hidden. */
+  knownTabs?: string[];
 };
 export type Call = { cmd: string; args: Record<string, unknown> };
 
@@ -29,6 +33,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       localStorage.setItem("canto.language", o.language ?? "pt-BR");
     }
     if (o.hiddenTabs) localStorage.setItem("canto.hiddenTabs", JSON.stringify(o.hiddenTabs));
+    if (o.knownTabs) localStorage.setItem("canto.knownTabs", JSON.stringify(o.knownTabs));
     const calls: Call[] = [];
     const tasks = (): MockTask[] => JSON.parse(sessionStorage.getItem("e2e.tasks") ?? "[]");
     const save = (list: MockTask[]) => sessionStorage.setItem("e2e.tasks", JSON.stringify(list));
@@ -42,6 +47,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       // Rust always answers these with an object; null would crash the tabs, not test them.
       github_status: { connected: false, login: "", source: "", device_flow: false },
       drive_status: { configured: false, connected: false, email: "" },
+      models_get: o.models ?? { connected: false, alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
     };
     let callbackId = 1;
     const w = window as unknown as Record<string, unknown>;

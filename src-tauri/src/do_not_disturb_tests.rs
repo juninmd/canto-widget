@@ -99,7 +99,8 @@ fn every_os_notification_goes_through_the_gate() {
     let notify_os = body_of(&source("notification.rs"), "pub fn notify_os(");
     assert!(notify_os.contains("do_not_disturb::quiet(app)"));
     assert!(body_of(&source("notification.rs"), "pub fn send(").contains("notify_os("), "meetings and tasks");
-    assert!(body_of(&source("status_alert.rs"), "fn notify(").contains("notify_os("), "status outages");
+    assert!(source("status_alert.rs").contains("window::open_alert("), "status outages ring through the alert window");
+    assert!(body_of(&source("models_alert.rs"), "pub fn notify(").contains("notify_os("), "AI models top 10");
 }
 
 #[test]
