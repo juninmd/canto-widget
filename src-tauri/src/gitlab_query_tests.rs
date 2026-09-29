@@ -113,3 +113,14 @@ fn token_must_look_like_a_token() {
         assert!(token(bad).is_err(), "{bad}");
     }
 }
+
+#[test]
+fn a_merge_counts_only_when_it_happened_inside_the_window() {
+    let w = Window { since: "2026-09-18T03:00:00+00:00".into(), until: Some("2026-09-25T03:00:00+00:00".into()) };
+    assert!(merged_in(Some("2026-09-18T10:00:00.000Z"), &w));
+    assert!(merged_in(Some("2026-09-18T03:00:00.000Z"), &w));
+    assert!(!merged_in(Some("2026-08-01T10:00:00.000Z"), &w), "old MR edited later");
+    assert!(!merged_in(Some("2026-09-26T10:00:00.000Z"), &w));
+    assert!(!merged_in(None, &w));
+    assert!(merged_in(Some("2030-01-01T00:00:00Z"), &Window::since("2026-09-18T03:00:00+00:00")));
+}

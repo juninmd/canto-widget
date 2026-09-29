@@ -80,6 +80,16 @@ pub fn activity_since(activity: Activity, username: &str, w: &Window) -> Request
     Request { path: "merge_requests", params }
 }
 
+/// `updated_after` only prefilters merged MRs (any later edit bumps it); the merge instant itself decides.
+/// An unreadable window keeps the item, falling back to the server-side prefilter.
+pub fn merged_in(merged_at: Option<&str>, w: &Window) -> bool {
+    let at = |s: &str| time::OffsetDateTime::parse(s, &time::format_description::well_known::Rfc3339).ok();
+    let Some(merged) = merged_at.and_then(at) else { return false };
+    let after_since = at(&w.since).is_none_or(|s| merged >= s);
+    let before_until = w.until.as_deref().and_then(at).is_none_or(|u| merged <= u);
+    after_since && before_until
+}
+
 /// https only, no credentials, query or fragment; a path stays for instances served under a prefix.
 /// Without a scheme, https is assumed: people paste `gitlab.acme.com`.
 pub fn base_url(input: &str) -> Result<String> {

@@ -163,3 +163,21 @@ fn a_50_million_char_copy_becomes_a_small_history() {
     assert_eq!(ClipView::from(&h.items[0]).chars, 50_000_000);
     assert!(started.elapsed() < std::time::Duration::from_secs(2), "took {:?}", started.elapsed());
 }
+
+#[test]
+fn concurrent_updates_do_not_lose_each_other() {
+    let dir = std::env::temp_dir().join(format!("canto-clip-serial-{}-{}", std::process::id(), now_ms()));
+    let st = std::sync::Arc::new(AppState::new(dir));
+    st.create("senha-mestra").unwrap();
+    let workers: Vec<_> = (0..8)
+        .map(|n| {
+            let st = st.clone();
+            std::thread::spawn(move || st.clip_update(|h| Ok(((), h.push(&format!("texto {n}"), format!("id{n}"))))))
+        })
+        .collect();
+    for w in workers {
+        w.join().unwrap().unwrap();
+    }
+    assert_eq!(st.clip_load().unwrap().items.len(), 8, "a load-save race dropped an entry");
+    let _ = std::fs::remove_dir_all(&st.dir);
+}

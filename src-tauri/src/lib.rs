@@ -41,6 +41,7 @@ pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
 pub mod global_shortcuts;
+pub mod google_token;
 pub mod guest_photos;
 #[cfg(windows)]
 pub mod hello;
@@ -296,9 +297,7 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
             tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
             do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),
             "lock" => {
-                if let Some(state) = app.try_state::<AppState>() {
-                    state.lock();
-                }
+                background::lock_from_tray(app);
             }
             "quit" => {
                 if let Ok(dir) = app.path().app_data_dir() {

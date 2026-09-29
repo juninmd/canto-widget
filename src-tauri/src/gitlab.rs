@@ -7,7 +7,7 @@ use crate::error::{AppError, Result};
 use crate::forge::{checks_from_gitlab, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{Activity, ForgeFilter, Section, Window, PER_PAGE};
-use crate::gitlab_query::{activity_since, requests, Request};
+use crate::gitlab_query::{activity_since, merged_in, requests, Request};
 use crate::model::now_ms;
 
 pub struct Account {
@@ -28,6 +28,8 @@ struct RawItem {
     created_at: String,
     #[serde(default)]
     updated_at: String,
+    #[serde(default)]
+    merged_at: Option<String>,
     #[serde(default)]
     user_notes_count: u64,
     #[serde(default)]
@@ -68,7 +70,11 @@ pub fn section(acc: &Account, section: Section, page: u32, f: &ForgeFilter) -> R
 }
 
 pub fn mrs_since(acc: &Account, activity: Activity, w: &Window) -> Result<(ForgeList, Option<Quota>)> {
-    fetch(acc, &activity_since(activity, &acc.username, w))
+    let r = activity_since(activity, &acc.username, w);
+    match activity {
+        Activity::Merged => fetch_where(acc, &r, |b| merged_in(b.merged_at.as_deref(), w)),
+        _ => fetch(acc, &r),
+    }
 }
 
 #[derive(Deserialize)]
@@ -95,6 +101,10 @@ pub fn mr_checks(acc: &Account, project: &str, iid: u64) -> Result<ChecksStatus>
 }
 
 fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
+    fetch_where(acc, r, |_| true)
+}
+
+fn fetch_where(acc: &Account, r: &Request, keep: impl Fn(&RawItem) -> bool) -> Result<(ForgeList, Option<Quota>)> {
     let url = url::Url::parse_with_params(&format!("{}/api/v4/{}", acc.base, r.path), &r.params)
         .map_err(|e| AppError::Gitlab(e.to_string()))?;
     let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
@@ -105,7 +115,16 @@ fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
     };
     let (total, next) = (header("x-total").and_then(|v| v.parse().ok()), header("x-next-page").is_some());
     let raw: Vec<RawItem> = response(res)?;
+    let (raw, total) = keep_only(raw, total, keep);
     Ok((convert(&acc.base, r, raw, total, next), quota))
+}
+
+/// Dropped items also leave the total, so the summary does not count them.
+fn keep_only(raw: Vec<RawItem>, total: Option<u64>, keep: impl Fn(&RawItem) -> bool) -> (Vec<RawItem>, Option<u64>) {
+    let before = raw.len() as u64;
+    let raw: Vec<RawItem> = raw.into_iter().filter(|b| keep(b)).collect();
+    let dropped = before - raw.len() as u64;
+    (raw, total.map(|t| t.saturating_sub(dropped)))
 }
 
 /// Redirects are refused: the token must only ever reach the address the user typed.

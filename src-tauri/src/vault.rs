@@ -41,6 +41,10 @@ pub struct AppState {
     pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
     /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.
     pub badge_tasks: Mutex<u32>,
+    /// Serializes clipboard history load-modify-save so a watcher write can't undo a clear.
+    pub clip_lock: Mutex<()>,
+    /// Serializes Google config writes so a token refresh can't resurrect a disconnected account.
+    pub drive_lock: Mutex<()>,
     /// Auto-lock baseline; background polls (clipboard, agenda) deliberately don't touch this.
     last_active: Mutex<i64>,
 }
@@ -56,6 +60,8 @@ impl AppState {
             guest_photos: Default::default(),
             next_meeting: Mutex::new(None),
             badge_tasks: Mutex::new(0),
+            clip_lock: Mutex::new(()),
+            drive_lock: Mutex::new(()),
             last_active: Mutex::new(now_ms()),
         }
     }
@@ -77,6 +83,13 @@ impl AppState {
         true
     }
 
+    /// Manual lock (tray); `true` only on the transition, so the UI is told once.
+    pub fn lock_now(&self) -> bool {
+        let was_unlocked = self.is_unlocked();
+        self.lock();
+        was_unlocked
+    }
+
     pub fn vault_exists(&self) -> bool {
         store::vault_path(&self.dir).exists()
     }
@@ -91,7 +104,7 @@ impl AppState {
         let salt = store::new_salt();
         let key = VaultKey::derive(password, &salt)?;
         let session = Session { key, password: Zeroizing::new(password.to_string()), salt, data: VaultData::default() };
-        self.persist(&session)?;
+        self.persist(&session, &session.data)?;
         self.sync_after_persist();
         *self.session.lock().unwrap() = Some(session);
         self.touch();
@@ -135,8 +148,8 @@ impl AppState {
         self.session.lock().unwrap().is_some()
     }
 
-    fn persist(&self, session: &Session) -> Result<()> {
-        let plain = serde_json::to_vec(&session.data)?;
+    fn persist(&self, session: &Session, data: &VaultData) -> Result<()> {
+        let plain = serde_json::to_vec(data)?;
         let blob = SealedBlob::seal(&session.key, &session.salt, &plain, VAULT_AAD, now_ms())?;
         store::write_json_atomic(&store::vault_path(&self.dir), &blob)
     }
@@ -159,9 +172,12 @@ impl AppState {
     fn with_session<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
         let mut guard = self.session.lock().unwrap();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
-        let (out, changed) = f(&mut session.data);
+        // Mutating a draft keeps memory equal to disk when persist fails; the clone is small next to the re-seal.
+        let mut draft = session.data.clone();
+        let (out, changed) = f(&mut draft);
         if changed {
-            self.persist(session)?;
+            self.persist(session, &draft)?;
+            session.data = draft;
         }
         drop(guard);
         if changed {

@@ -52,6 +52,8 @@ function Canto() {
   const [tab, setTab] = useState<Tab>(() => tabs[0].id);
   // Cleared on every manual tab switch so a stale jump doesn't re-seed a tab's search later.
   const [jumpQuery, setJumpQuery] = useState("");
+  // Bumped per global-search jump so an already-open tab re-seeds, even with the same query.
+  const [jumpSeq, setJumpSeq] = useState(0);
   const changeTab = useCallback((id: Tab) => {
     setJumpQuery("");
     setTab(id);
@@ -119,7 +121,7 @@ function Canto() {
   // Rust locks the vault on its own after a period of inactivity; the UI needs to know.
   useEffect(() => {
     const stop = listen<number>("canto://auto-lock", (e) => {
-      notify({ message: t("app.autoLocked", { min: e.payload }) });
+      notify({ message: e.payload > 0 ? t("app.autoLocked", { min: e.payload }) : t("app.lockedFromTray") });
       void refresh();
     });
     return () => {
@@ -214,6 +216,7 @@ function Canto() {
           onClose={() => setSearchOpen(false)}
           onNavigate={(target, q) => {
             setJumpQuery(q);
+            setJumpSeq((n) => n + 1);
             setTab(target);
             setSearchOpen(false);
           }}
@@ -308,13 +311,16 @@ function Canto() {
                 agenda={agenda.items}
                 privacy={privacy}
                 initialQuery={jumpQuery}
+                querySeq={jumpSeq}
                 onOpenTasks={() => changeTab("tasks")}
                 onOpenAgenda={() => changeTab("agenda")}
                 onError={setError}
                 note={noteDraft}
               />
             )}
-            {tab === "clipboard" && <ClipboardTab privacy={privacy} initialQuery={jumpQuery} onError={setError} />}
+            {tab === "clipboard" && (
+              <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
+            )}
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}

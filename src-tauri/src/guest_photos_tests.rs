@@ -53,3 +53,17 @@ fn only_a_missing_scope_asks_for_a_reconnect() {
         r#"{"error":{"status":"PERMISSION_DENIED","message":"Must be a G Suite domain user."}}"#
     ));
 }
+
+#[test]
+fn transient_failures_are_not_cached_as_no_photo() {
+    use reqwest::StatusCode;
+    for status in [StatusCode::TOO_MANY_REQUESTS, StatusCode::SERVICE_UNAVAILABLE, StatusCode::INTERNAL_SERVER_ERROR] {
+        assert_eq!(by_status(status), Some(Lookup::Transient), "{status}");
+    }
+    assert_eq!(by_status(StatusCode::NOT_FOUND), Some(Lookup::NoPhoto));
+    assert_eq!(by_status(StatusCode::OK), None);
+    assert_eq!(cache_entry(Lookup::Transient), None);
+    assert_eq!(cache_entry(Lookup::NeedsConsent), None);
+    assert_eq!(cache_entry(Lookup::NoPhoto), Some(None));
+    assert_eq!(cache_entry(Lookup::Photo("data:x".into())), Some(Some("data:x".into())));
+}

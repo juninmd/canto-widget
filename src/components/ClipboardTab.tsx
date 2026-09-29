@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQuerySeed } from "../lib/useQuerySeed";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
@@ -9,13 +10,16 @@ import ClipCard from "./ClipCard";
 
 const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
 
-type Props = { privacy: boolean; initialQuery?: string; onError: (m: string) => void };
+type Props = { privacy: boolean; initialQuery?: string; querySeq?: number; onError: (m: string) => void };
 
-export default function ClipboardTab({ privacy, initialQuery, onError }: Props) {
+export default function ClipboardTab({ privacy, initialQuery, querySeq, onError }: Props) {
   const [query, setQuery] = useState(initialQuery ?? "");
+  useQuerySeed(initialQuery, querySeq, setQuery);
   const [kindFilter, setKindFilter] = useState<ClipKind | "all">("all");
   const [items, setItems] = useState<ClipItem[]>([]);
-  const [maxPinned, setMaxPinned] = useState(100);
+  const [maxPinned, setMaxPinned] = useState("100");
+  // While the field is focused the poll must not overwrite what the user is typing.
+  const editingMax = useRef(false);
   const [copied, setCopied] = useState("");
 
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
@@ -30,7 +34,7 @@ export default function ClipboardTab({ privacy, initialQuery, onError }: Props) 
       const list = await api.clipList(q);
       if (!isLatest(id)) return;
       setItems(list.items);
-      setMaxPinned(list.max_pinned);
+      if (!editingMax.current) setMaxPinned(String(list.max_pinned));
       setLoadedFor(q);
     } catch (e) {
       if (isLatest(id)) onError(errText(e));
@@ -39,11 +43,14 @@ export default function ClipboardTab({ privacy, initialQuery, onError }: Props) 
 
   const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
 
-  async function saveMaxPinned(next: number) {
-    const clamped = Math.min(1000, Math.max(1, Math.round(next) || 1));
-    setMaxPinned(clamped);
+  async function editMaxPinned(text: string) {
+    setMaxPinned(text);
+    // Empty or partial input is a keystroke in progress, not a limit of 1.
+    if (!/^\d+$/.test(text.trim())) return;
+    const next = Math.min(1000, Number(text));
+    if (next < 1) return;
     try {
-      await api.clipSetMaxPinned(clamped);
+      await api.clipSetMaxPinned(next);
     } catch (e) {
       onError(errText(e));
     }
@@ -118,7 +125,12 @@ export default function ClipboardTab({ privacy, initialQuery, onError }: Props) 
             min={1}
             max={1000}
             value={maxPinned}
-            onChange={(e) => void saveMaxPinned(e.target.valueAsNumber)}
+            onChange={(e) => void editMaxPinned(e.target.value)}
+            onFocus={() => (editingMax.current = true)}
+            onBlur={() => {
+              editingMax.current = false;
+              void reload();
+            }}
             aria-label={t("clipboard.maxPinnedLabel")}
             className="w-14 rounded border border-line bg-ink px-1.5 py-0.5 text-fg outline-none focus:border-accent"
           />

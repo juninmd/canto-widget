@@ -76,13 +76,19 @@ pub async fn drive_disconnect(app: tauri::AppHandle) -> Result<()> {
 }
 
 fn disconnect(state: &AppState) -> Result<()> {
-    let mut cfg = state.drive_config()?;
-    // Revoking is best effort: without network, the account still leaves this computer.
-    if let Some(t) = cfg.tokens.take() {
+    let revoked = {
+        let _serial = state.drive_lock.lock().unwrap();
+        let mut cfg = state.drive_config()?;
+        let revoked = cfg.tokens.take();
+        forget_account(&mut cfg);
+        state.save_drive_config(&cfg)?;
+        revoked
+    };
+    // Revoking is best effort and outside the lock: without network, the account still leaves this computer.
+    if let Some(t) = revoked {
         let _ = crate::account::revoke(&t.refresh_token);
     }
-    forget_account(&mut cfg);
-    state.save_drive_config(&cfg)
+    Ok(())
 }
 
 #[tauri::command]

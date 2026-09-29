@@ -3,6 +3,7 @@ import type { app as source } from "../pt-BR/app";
 export const app: Record<keyof typeof source, string> = {
   "app.name": "canto",
   "app.autoLocked": "vault locked itself after {min} min idle",
+  "app.lockedFromTray": "vault locked from the tray",
   "app.shortcuts": "keyboard shortcuts",
   "app.shortcuts.title": "keyboard shortcuts (?)",
   "app.lock": "lock",

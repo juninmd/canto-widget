@@ -109,6 +109,23 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Revisão de bugs**:
+  - `transcript_read` só lê arquivos de transcrição; antes lia qualquer arquivo da pasta escolhida.
+  - Uma gravação do cofre que falha não deixa mais a mudança só na memória (ex.: excluir com disco cheio).
+  - "Bloquear cofre" na bandeja agora mostra a tela de bloqueio na hora.
+  - Histórico da área de transferência: limpar, fixar ou excluir não é mais desfeito pelo monitor de cópias.
+  - Desconectar Google ou GitHub não é mais desfeito por uma renovação de token em andamento; trocar de conta no
+    GitHub não mostra itens da conta anterior.
+  - Dois alertas ao mesmo tempo entram em fila em vez de o segundo apagar o primeiro.
+  - Um lembrete de tarefa não toca de novo depois de bloquear e desbloquear o cofre.
+  - O login do Google não trava nem falha com conexões extras do navegador ao endereço local.
+  - Falhas temporárias de rede não deixam mais os convidados sem foto até o bloqueio.
+  - O resumo do GitLab só conta como mesclados os MRs mesclados no período.
+  - Esc no seletor de vínculo fecha só o seletor, sem descartar a nota.
+  - A busca global aplica a consulta mesmo quando a aba já está aberta.
+  - Apagar o campo "máx. fixados" não salva mais 1.
+  - O resumo do dia ignora reuniões recusadas.
+  - Ligar dois alertas de status rapidamente não perde o primeiro.
 - **Tarefa em janela estreita**: com horário, ↻, subtarefas e PR na mesma linha, o título ficava com ~60 px na
   janela mínima (360 px), uma palavra por linha. Esses selos agora ficam numa linha menor abaixo do título.
 - **Título longo de tarefa** não some mais cortado com reticências: quebra em quantas linhas precisar.

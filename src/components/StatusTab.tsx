@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText, type StatusResult } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { isTroubled, sortByLastIncident } from "../lib/status";
@@ -13,7 +13,13 @@ export default function StatusTab() {
   const [loading, setLoading] = useState(false);
   const [fetchedAt, setFetchedAt] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
-  const [watched, setWatched] = useState<string[]>([]);
+  const [watched, setWatchedState] = useState<string[]>([]);
+  // Fast consecutive toggles must build on each other, not on the list captured at render.
+  const watchedRef = useRef<string[]>([]);
+  const setWatched = useCallback((ids: string[]) => {
+    watchedRef.current = ids;
+    setWatchedState(ids);
+  }, []);
 
   const load = useCallback(async (force: boolean) => {
     setLoading(true);
@@ -34,13 +40,17 @@ export default function StatusTab() {
       .statusAlertsGet()
       .then((ids) => setWatched(ids ?? []))
       .catch(() => {});
-  }, [load]);
+  }, [load, setWatched]);
 
   async function toggleWatch(id: string) {
-    const next = watched.includes(id) ? watched.filter((w) => w !== id) : [...watched, id];
+    const current = watchedRef.current;
+    const next = current.includes(id) ? current.filter((w) => w !== id) : [...current, id];
+    setWatched(next);
     try {
-      setWatched((await api.statusAlertsSet(next)) ?? next);
+      const saved = (await api.statusAlertsSet(next)) ?? next;
+      if (watchedRef.current === next) setWatched(saved);
     } catch (e) {
+      if (watchedRef.current === next) setWatched(current);
       setError(errText(e));
     }
   }

@@ -2,6 +2,9 @@ use tauri::{Emitter, LogicalPosition, Manager, WebviewWindow};
 
 use crate::calendar::AgendaItem;
 
+#[path = "alert_queue.rs"]
+mod alert_queue;
+
 const MARGIN: f64 = 16.0;
 
 pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
@@ -56,21 +59,48 @@ pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()
         return Ok(());
     }
     crate::notification::send(app, &event);
-    if let Some(state) = app.try_state::<crate::vault::AppState>() {
-        *state.alert.lock().unwrap() = Some(event);
+    let Some(state) = app.try_state::<crate::vault::AppState>() else { return Ok(()) };
+    let shown = {
+        let mut current = state.alert.lock().unwrap();
+        alert_queue::push(&mut current, &mut queue(app).0.lock().unwrap(), event)
+    };
+    if shown {
+        present_alert(app)?;
     }
+    Ok(())
+}
+
+pub fn close_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
+    take_alert(app);
+    Ok(())
+}
+
+/// Dismissing, snoozing or completing the alert on screen brings up the next one waiting; returns the dismissed one.
+pub fn take_alert(app: &tauri::AppHandle) -> Option<AgendaItem> {
+    let state = app.try_state::<crate::vault::AppState>()?;
+    let (dropped, next) = {
+        let mut current = state.alert.lock().unwrap();
+        alert_queue::advance(&mut current, &mut queue(app).0.lock().unwrap())
+    };
+    // Best effort: an error here must not fail the dismissal, or the UI would dismiss again and skip the next one.
+    if next {
+        let _ = present_alert(app);
+    }
+    dropped
+}
+
+/// Managed on first use so the queue needs no setup in `lib.rs`; a second `manage` is a no-op.
+fn queue(app: &tauri::AppHandle) -> tauri::State<'_, alert_queue::AlertQueue> {
+    app.manage(alert_queue::AlertQueue::default());
+    app.state()
+}
+
+fn present_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
     if let Some(win) = app.get_webview_window("main") {
         crate::window_state::place(&win)?;
         win.show()?;
         win.set_focus()?;
     }
     app.emit(ALERT_EVENT, ())?;
-    Ok(())
-}
-
-pub fn close_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
-    if let Some(state) = app.try_state::<crate::vault::AppState>() {
-        *state.alert.lock().unwrap() = None;
-    }
     Ok(())
 }

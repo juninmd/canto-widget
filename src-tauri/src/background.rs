@@ -37,6 +37,17 @@ fn watch_idle(app: AppHandle) {
     });
 }
 
+/// Same event as auto-lock: it's the only one the UI refreshes its locked state on.
+pub fn lock_from_tray(app: &AppHandle) {
+    let Some(state) = app.try_state::<AppState>() else {
+        return;
+    };
+    // Payload 0 tells the UI the lock was manual, not idle.
+    if state.lock_now() {
+        let _ = tauri::Emitter::emit(app, AUTO_LOCK_EVENT, 0u32);
+    }
+}
+
 /// Position and size hit disk at most every 2s, not on every dragged pixel.
 fn watch_window_state(app: AppHandle, dir: PathBuf) {
     std::thread::spawn(move || loop {
