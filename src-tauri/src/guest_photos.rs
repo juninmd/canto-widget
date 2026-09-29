@@ -17,7 +17,7 @@ const PARALLEL: usize = 6;
 /// Directory photos are served at any size by suffix; 96 px covers the 28 px avatar on a 3x display.
 const SIZE_SUFFIX: &str = "=s96-c";
 
-/// Lookups done this session, `None` when the person has no directory photo. Lives in `AppState`: RAM only,
+/// Definitive lookups done this session, `None` when the person has no directory photo. Lives in `AppState`: RAM only,
 /// cleared on lock.
 #[derive(Default)]
 pub struct GuestPhotos(Mutex<HashMap<String, Option<String>>>);
@@ -70,10 +70,44 @@ fn photo_url(search: &Search, email: &str) -> Option<String> {
     Some(format!("{base}{SIZE_SUFFIX}"))
 }
 
-/// `Err(())` means the token lacks `directory.readonly` (connected before it was requested): worth telling the user,
-/// not worth caching. Anything else that fails is "no photo".
-fn lookup(token: &str, email: &str) -> std::result::Result<Option<String>, ()> {
-    let Ok(client) = account::client() else { return Ok(None) };
+/// What one directory lookup found out.
+#[derive(Debug, PartialEq)]
+enum Lookup {
+    Photo(String),
+    /// Definitive: the person has no directory photo, or there's no directory at all.
+    NoPhoto,
+    /// Network error, rate limit, server error: worth asking again later, not worth remembering.
+    Transient,
+    /// The token lacks `directory.readonly` (connected before it was requested): worth telling the user.
+    NeedsConsent,
+}
+
+/// What goes in the session cache: transient failures and a missing scope are never remembered.
+fn cache_entry(outcome: Lookup) -> Option<Option<String>> {
+    match outcome {
+        Lookup::Photo(url) => Some(Some(url)),
+        Lookup::NoPhoto => Some(None),
+        Lookup::Transient | Lookup::NeedsConsent => None,
+    }
+}
+
+/// `None` for a success, whose body decides; 403 needs the body too and is handled by the caller.
+fn by_status(status: reqwest::StatusCode) -> Option<Lookup> {
+    if status.is_success() {
+        None
+    } else if status.is_server_error()
+        || status == reqwest::StatusCode::TOO_MANY_REQUESTS
+        || status == reqwest::StatusCode::REQUEST_TIMEOUT
+        || status == reqwest::StatusCode::UNAUTHORIZED
+    {
+        Some(Lookup::Transient)
+    } else {
+        Some(Lookup::NoPhoto)
+    }
+}
+
+fn lookup(token: &str, email: &str) -> Lookup {
+    let Ok(client) = account::client() else { return Lookup::Transient };
     let sent = client
         .get(SEARCH_URL)
         .query(&[
@@ -84,16 +118,21 @@ fn lookup(token: &str, email: &str) -> std::result::Result<Option<String>, ()> {
         ])
         .bearer_auth(token)
         .send();
-    let Ok(res) = sent else { return Ok(None) };
+    let Ok(res) = sent else { return Lookup::Transient };
     if res.status() == reqwest::StatusCode::FORBIDDEN {
         let header =
             res.headers().get(reqwest::header::WWW_AUTHENTICATE).and_then(|h| h.to_str().ok()).map(str::to_owned);
         let body = res.text().unwrap_or_default();
         // Personal Gmail accounts get a 403 too (no directory): only a missing scope is worth a reconnect.
-        return if missing_scope(header.as_deref(), &body) { Err(()) } else { Ok(None) };
+        return if missing_scope(header.as_deref(), &body) { Lookup::NeedsConsent } else { Lookup::NoPhoto };
     }
-    let Ok(search) = res.error_for_status().and_then(|r| r.json::<Search>()) else { return Ok(None) };
-    Ok(photo_url(&search, email).and_then(|url| account::download_avatar(&url)))
+    if let Some(outcome) = by_status(res.status()) {
+        return outcome;
+    }
+    let Ok(search) = res.json::<Search>() else { return Lookup::Transient };
+    let Some(url) = photo_url(&search, email) else { return Lookup::NoPhoto };
+    // The person has a photo: a failed download is retried on the next agenda load.
+    account::download_avatar(&url).map_or(Lookup::Transient, Lookup::Photo)
 }
 
 /// Google's two ways of saying the token lacks a scope: RFC 6750's header and its own error reason.
@@ -135,11 +174,9 @@ pub fn guest_photos(app: tauri::AppHandle, emails: Vec<String>) -> Result<Photos
             });
             let mut known = cache.0.lock().unwrap();
             for (email, outcome) in found {
-                match outcome {
-                    Ok(photo) => {
-                        known.insert(email, photo);
-                    }
-                    Err(()) => needs_consent = true,
+                needs_consent |= outcome == Lookup::NeedsConsent;
+                if let Some(entry) = cache_entry(outcome) {
+                    known.insert(email, entry);
                 }
             }
             if needs_consent {
