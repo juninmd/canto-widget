@@ -58,10 +58,27 @@ pub fn valid_token(state: &AppState, gh: &GithubState, now: i64) -> Result<Zeroi
         if cfg.tokens.refresh_token.is_empty() || cfg.client_id.is_empty() {
             return Err(AppError::Github("a sessão do GitHub expirou; conecte de novo".into()));
         }
-        cfg.tokens = auth::refresh(&cfg.client_id, &cfg.tokens.refresh_token)?;
+        let fresh = auth::refresh(&cfg.client_id, &cfg.tokens.refresh_token)?;
+        if !same_credential(&cfg, state.github_config()?.as_ref()) {
+            return Err(AppError::Github("a conta do GitHub mudou; tente de novo".into()));
+        }
+        cfg.tokens = fresh;
         state.save_github(&cfg)?;
     }
     Ok(Zeroizing::new(cfg.tokens.access_token))
+}
+
+/// A renewed pair only replaces the credential it came from: a disconnect or a new login meanwhile wins.
+fn same_credential(renewed: &GithubConfig, on_disk: Option<&GithubConfig>) -> bool {
+    on_disk.is_some_and(|d| d.tokens.refresh_token == renewed.tokens.refresh_token && d.client_id == renewed.client_id)
+}
+
+/// Under the refresh lock, so a renewal in flight can't write the previous account back over this one.
+fn store_login(state: &AppState, gh: &GithubState, cfg: &GithubConfig) -> Result<()> {
+    let _one_at_a_time = gh.refreshing.lock().unwrap();
+    state.save_github(cfg)?;
+    state.forges.forget(FORGE);
+    Ok(())
 }
 
 #[derive(Serialize)]
@@ -90,14 +107,8 @@ pub async fn github_save_token(app: tauri::AppHandle, token: String) -> Result<S
     run(move || {
         let login = github::user(&token)?;
         let tokens = Tokens { access_token: token.to_string(), ..Default::default() };
-        let state = app.state::<AppState>();
-        state.save_github(&GithubConfig {
-            tokens,
-            login: login.clone(),
-            source: "pat".into(),
-            client_id: String::new(),
-        })?;
-        state.forges.forget(FORGE);
+        let cfg = GithubConfig { tokens, login: login.clone(), source: "pat".into(), client_id: String::new() };
+        store_login(&app.state::<AppState>(), &app.state::<GithubState>(), &cfg)?;
         Ok(login)
     })
     .await
@@ -166,8 +177,7 @@ fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
                         source: "app".into(),
                         client_id: client_id.into(),
                     };
-                    state.forges.forget(FORGE);
-                    state.save_github(&cfg).map(|_| login)
+                    store_login(state, gh, &cfg).map(|_| login)
                 });
                 return end(saved);
             }
@@ -182,16 +192,21 @@ pub fn github_device_cancel(gh: State<'_, GithubState>) {
 }
 
 /// Only forgets the token on this computer; revoking is done on GitHub (Settings → Applications/Tokens).
-#[tauri::command]
-pub fn github_disconnect(state: State<'_, AppState>) -> Result<()> {
+#[tauri::command(async)]
+pub fn github_disconnect(state: State<'_, AppState>, gh: State<'_, GithubState>) -> Result<()> {
+    disconnect(&state, &gh)
+}
+
+fn disconnect(state: &AppState, gh: &GithubState) -> Result<()> {
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
-    state.forges.forget(FORGE);
+    let _one_at_a_time = gh.refreshing.lock().unwrap();
     match std::fs::remove_file(store::github_path(&state.dir)) {
-        Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
-        _ => Ok(()),
+        Err(e) if e.kind() != std::io::ErrorKind::NotFound => return Err(e.into()),
+        _ => state.forges.forget(FORGE),
     }
+    Ok(())
 }
 
 #[cfg(test)]

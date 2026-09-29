@@ -110,3 +110,23 @@ fn a_page_carries_the_total_and_the_quota_headers() {
     assert_eq!(list.total, 512);
     assert_eq!(quota, Some(Quota { remaining: 1999, reset_at: 1_700_000_000_000 }));
 }
+
+#[test]
+fn merged_activity_drops_old_mrs_that_were_only_updated_in_the_window() {
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let base = format!("http://{}", listener.local_addr().unwrap());
+    let mr = |iid: u64, merged: &str| serde_json::json!({"iid": iid, "web_url": format!("{base}/g/p/-/merge_requests/{iid}"), "merged_at": merged});
+    let body = serde_json::json!([mr(1, "2026-09-18T10:00:00.000Z"), mr(2, "2026-08-01T10:00:00.000Z")]).to_string();
+    let reply = format!(
+        "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nX-Total: 2\r\nContent-Length: {}\r\n\r\n{body}",
+        body.len()
+    );
+    std::thread::spawn(move || {
+        let (mut s, _) = listener.accept().unwrap();
+        let mut buf = [0u8; 4096];
+        let _ = s.read(&mut buf).unwrap();
+        s.write_all(reply.as_bytes()).unwrap();
+    });
+    let (list, _) = mrs_since(&account(base), Activity::Merged, &Window::since("2026-09-18T03:00:00+00:00")).unwrap();
+    assert_eq!((list.total, list.items.iter().map(|i| i.number).collect::<Vec<_>>()), (1, vec![1]));
+}

@@ -79,3 +79,45 @@ fn changing_the_password_keeps_the_github_account() {
     assert_eq!(st.github_config().unwrap().unwrap().login, "octocat");
     let _ = std::fs::remove_dir_all(&st.dir);
 }
+
+#[test]
+fn a_renewal_is_saved_only_over_the_credential_it_came_from() {
+    let renewed = cfg(1_000, "ghr_velho");
+    assert!(same_credential(&renewed, Some(&cfg(1_000, "ghr_velho"))));
+    assert!(!same_credential(&renewed, None), "disconnected meanwhile");
+    assert!(!same_credential(&renewed, Some(&cfg(0, ""))), "a PAT was saved meanwhile");
+    assert!(!same_credential(&renewed, Some(&cfg(1_000, "ghr_novo"))), "a new device login meanwhile");
+}
+
+/// Holds the refresh lock like an in-flight renewal and checks `op` only touches the file after it is released.
+fn waits_for_refresh(st: &AppState, op: impl FnOnce(&AppState, &GithubState) -> Result<()> + Send) {
+    let gh = GithubState::default();
+    let before = st.github_config().unwrap();
+    std::thread::scope(|s| {
+        let renewing = gh.refreshing.lock().unwrap();
+        let t = s.spawn(|| op(st, &gh));
+        std::thread::sleep(Duration::from_millis(150));
+        assert_eq!(st.github_config().unwrap(), before, "wrote during the renewal");
+        drop(renewing);
+        t.join().unwrap().unwrap();
+    });
+    assert_ne!(st.github_config().unwrap(), before);
+}
+
+#[test]
+fn disconnect_waits_for_an_in_flight_renewal() {
+    let st = state("desconecta");
+    st.save_github(&cfg(1_000, "ghr_x")).unwrap();
+    waits_for_refresh(&st, disconnect);
+    assert_eq!(st.github_config().unwrap(), None);
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
+#[test]
+fn a_new_login_waits_for_an_in_flight_renewal() {
+    let st = state("novo-login");
+    st.save_github(&cfg(1_000, "ghr_x")).unwrap();
+    waits_for_refresh(&st, |st, gh| store_login(st, gh, &cfg(0, "")));
+    assert_eq!(st.github_config().unwrap(), Some(cfg(0, "")));
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
