@@ -1,0 +1,219 @@
+//! The sampler thread and the commands around it. Off by default: nothing is recorded until the user opts in,
+//! and nothing at all while the vault is locked (the log is sealed, so it could not be saved anyway).
+use std::path::Path;
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Mutex;
+use std::time::Duration;
+
+use serde::{Deserialize, Serialize};
+use tauri::{AppHandle, Manager, State};
+
+use crate::activity::{summarize, Log, Summary, ACTIVITY_AAD, INTERVAL_SECS};
+use crate::activity_os;
+use crate::error::{AppError, Result};
+use crate::model::now_ms;
+use crate::store;
+use crate::vault::AppState;
+
+const PREFS_FILE: &str = "atividade_config.json";
+/// No input for this long counts as away, so the span stops growing.
+const IDLE_LIMIT_SECS: u64 = 120;
+const FLUSH_SECS: i64 = 60;
+/// A window can span a week of workdays, never more than the log keeps.
+const MAX_WINDOW_MS: i64 = 36 * 24 * 3600 * 1000;
+
+#[derive(Serialize, Deserialize)]
+struct Prefs {
+    #[serde(default)]
+    enabled: bool,
+}
+
+/// What the sampler holds between ticks; `None` while locked or disabled, so nothing lingers in RAM.
+pub struct ActivityState {
+    enabled: AtomicBool,
+    log: Mutex<Option<Log>>,
+}
+
+impl ActivityState {
+    pub fn load(dir: &Path) -> Self {
+        let on = store::read_json::<Prefs>(&dir.join(PREFS_FILE)).ok().flatten().is_some_and(|p| p.enabled);
+        Self { enabled: AtomicBool::new(on), log: Mutex::new(None) }
+    }
+
+    fn enabled(&self) -> bool {
+        self.enabled.load(Ordering::Relaxed)
+    }
+
+    fn drop_log(&self) {
+        *self.log.lock().unwrap() = None;
+    }
+
+    /// Runs `f` on the log, reading it from disk the first time after an unlock.
+    fn with_log<T>(&self, state: &AppState, f: impl FnOnce(&mut Log) -> T) -> Result<T> {
+        let mut guard = self.log.lock().unwrap();
+        if guard.is_none() {
+            let path = store::activity_path(&state.dir);
+            // An unreadable file is a lost log, not a reason to stop sampling.
+            *guard = Some(state.sealed::<Log>(&path, ACTIVITY_AAD).ok().flatten().unwrap_or_default());
+        }
+        Ok(f(guard.as_mut().expect("just loaded")))
+    }
+
+    fn flush(&self, state: &AppState) -> Result<()> {
+        let guard = self.log.lock().unwrap();
+        match guard.as_ref() {
+            Some(log) => state.save_sealed(&store::activity_path(&state.dir), ACTIVITY_AAD, log),
+            None => Ok(()),
+        }
+    }
+}
+
+/// One tick: what to record given the OS answers. Pure so the idle rule has a test.
+pub fn sample(foreground: impl FnOnce() -> Option<String>, idle_secs: Option<u64>) -> Option<String> {
+    if idle_secs.is_some_and(|s| s >= IDLE_LIMIT_SECS) {
+        return None;
+    }
+    foreground()
+}
+
+pub fn watch(app: AppHandle) {
+    std::thread::spawn(move || {
+        let mut last_flush = 0;
+        loop {
+            std::thread::sleep(Duration::from_secs(INTERVAL_SECS as u64));
+            let (Some(state), Some(act)) = (app.try_state::<AppState>(), app.try_state::<ActivityState>()) else {
+                continue;
+            };
+            if !act.enabled() || !state.is_unlocked() {
+                act.drop_log();
+                continue;
+            }
+            let now = now_ms() / 1000;
+            let name = sample(activity_os::foreground_app, activity_os::idle_secs());
+            let recorded = act.with_log(&state, |log| log.record(name.as_deref(), now));
+            if recorded.is_ok() && now - last_flush >= FLUSH_SECS {
+                last_flush = now;
+                if let Err(e) = act.flush(&state) {
+                    eprintln!("atividade nao gravou: {e}");
+                }
+            }
+        }
+    });
+}
+
+#[derive(Serialize)]
+pub struct ActivityStatus {
+    /// The OS gave an answer to "which app has focus"; Wayland, for one, does not.
+    pub supported: bool,
+    pub enabled: bool,
+}
+
+#[tauri::command(async)]
+pub fn activity_status(act: State<'_, ActivityState>) -> ActivityStatus {
+    ActivityStatus {
+        supported: cfg!(any(windows, target_os = "macos")) || activity_os::foreground_app().is_some(),
+        enabled: act.enabled(),
+    }
+}
+
+#[tauri::command(async)]
+pub fn activity_set_enabled(state: State<'_, AppState>, act: State<'_, ActivityState>, enabled: bool) -> Result<()> {
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
+    store::write_json_atomic(&state.dir.join(PREFS_FILE), &Prefs { enabled })?;
+    act.enabled.store(enabled, Ordering::Relaxed);
+    if !enabled {
+        act.flush(&state)?;
+        act.drop_log();
+    }
+    Ok(())
+}
+
+pub fn valid_window(from_ms: i64, to_ms: i64) -> Result<()> {
+    if from_ms < to_ms && to_ms - from_ms <= MAX_WINDOW_MS {
+        Ok(())
+    } else {
+        Err(AppError::Config("período inválido".into()))
+    }
+}
+
+#[tauri::command(async)]
+pub fn activity_summary(
+    state: State<'_, AppState>,
+    act: State<'_, ActivityState>,
+    from_ms: i64,
+    to_ms: i64,
+) -> Result<Summary> {
+    valid_window(from_ms, to_ms)?;
+    state.touch();
+    // Reads what the sampler has, or the file when it has not run yet since the unlock.
+    let (from, to) = (from_ms.div_euclid(1000), to_ms.div_euclid(1000));
+    act.with_log(&state, |log| summarize(log, from, to))
+}
+
+/// Deletes every recorded span, in RAM and on disk; sampling continues if it is still on.
+#[tauri::command(async)]
+pub fn activity_clear(state: State<'_, AppState>, act: State<'_, ActivityState>) -> Result<()> {
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
+    state.touch();
+    act.with_log(&state, |log| log.spans.clear())?;
+    match std::fs::remove_file(store::activity_path(&state.dir)) {
+        Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
+        _ => Ok(()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn idle_users_are_not_sampled_and_unknown_idle_counts_as_active() {
+        let app = || Some("Code".to_string());
+        assert_eq!(sample(app, Some(5)).as_deref(), Some("Code"));
+        assert_eq!(sample(app, None).as_deref(), Some("Code"));
+        assert_eq!(sample(|| panic!("no need to ask"), Some(IDLE_LIMIT_SECS)), None);
+    }
+
+    #[test]
+    fn a_window_is_ordered_and_no_longer_than_the_log_keeps() {
+        assert!(valid_window(0, 1000).is_ok());
+        assert!(valid_window(1000, 1000).is_err());
+        assert!(valid_window(0, MAX_WINDOW_MS + 1).is_err());
+    }
+
+    #[test]
+    fn missing_or_old_prefs_mean_off() {
+        let dir = std::env::temp_dir().join(format!("canto-activity-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        assert!(!ActivityState::load(&dir).enabled());
+        std::fs::write(dir.join(PREFS_FILE), "{}").unwrap();
+        assert!(!ActivityState::load(&dir).enabled());
+        std::fs::write(dir.join(PREFS_FILE), r#"{"enabled":true}"#).unwrap();
+        assert!(ActivityState::load(&dir).enabled());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn the_log_survives_a_flush_and_a_reload_and_clear_empties_the_file() {
+        let dir = std::env::temp_dir().join(format!("canto-activity-log-{}-{}", std::process::id(), now_ms()));
+        let _ = std::fs::remove_dir_all(&dir);
+        let state = AppState::new(dir.clone());
+        state.create("senha-mestra").unwrap();
+        let act = ActivityState::load(&dir);
+        act.with_log(&state, |log| log.record(Some("Code"), 1000)).unwrap();
+        act.flush(&state).unwrap();
+        act.drop_log();
+        let spans = act.with_log(&state, |log| log.spans.len()).unwrap();
+        assert_eq!(spans, 1);
+        act.with_log(&state, |log| log.spans.clear()).unwrap();
+        act.flush(&state).unwrap();
+        act.drop_log();
+        assert_eq!(act.with_log(&state, |log| log.spans.len()).unwrap(), 0);
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+}

@@ -84,6 +84,10 @@ pub fn clip_path(dir: &Path) -> PathBuf {
     dir.join("clipboard.json")
 }
 
+pub fn activity_path(dir: &Path) -> PathBuf {
+    dir.join("atividade.json")
+}
+
 pub fn github_path(dir: &Path) -> PathBuf {
     dir.join("github.json")
 }

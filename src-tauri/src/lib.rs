@@ -1,4 +1,7 @@
 pub mod account;
+pub mod activity;
+pub mod activity_os;
+pub mod activity_watch;
 pub mod autolock;
 pub mod autostart;
 pub mod background;
@@ -122,6 +125,7 @@ pub fn run() {
             app.manage(status_alert::StatusAlerts::load(&dir));
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
+            app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
@@ -135,6 +139,7 @@ pub fn run() {
             status_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
+            activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
@@ -177,6 +182,10 @@ pub fn run() {
             priority::task_set_priority,
             focus::task_set_estimate,
             focus::task_add_time,
+            activity_watch::activity_status,
+            activity_watch::activity_set_enabled,
+            activity_watch::activity_summary,
+            activity_watch::activity_clear,
             task_order::tasks_reorder,
             cmd_notes::notes_search,
             cmd_notes::note_save,

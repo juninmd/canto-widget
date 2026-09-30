@@ -73,6 +73,25 @@ fn google_account_and_clipboard_stay_readable() {
 }
 
 #[test]
+fn the_activity_log_stays_readable_and_an_unreadable_one_is_discarded() {
+    use crate::activity::{Log, ACTIVITY_AAD};
+    let st = state("atividade");
+    let mut log = Log::default();
+    log.record(Some("Code"), 1000);
+    st.save_sealed(&store::activity_path(&st.dir), ACTIVITY_AAD, &log).unwrap();
+    st.change_password("senha-velha", "senha-nova").unwrap();
+    st.lock();
+    st.unlock("senha-nova").unwrap();
+    let back: Log = st.sealed(&store::activity_path(&st.dir), ACTIVITY_AAD).unwrap().unwrap();
+    assert_eq!(back, log, "activity log was lost");
+
+    std::fs::write(store::activity_path(&st.dir), b"{\"lixo\":1}").unwrap();
+    st.change_password("senha-nova", "senha-outra").unwrap();
+    assert!(!store::activity_path(&st.dir).exists());
+    cleanup(&st);
+}
+
+#[test]
 fn local_backups_import_with_the_new_password() {
     let st = state("backup");
     crate::backup::daily(&st.dir, "2026-09-01").unwrap();
