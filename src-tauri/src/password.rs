@@ -11,7 +11,7 @@ use crate::crypto::VaultKey;
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
 use crate::note_images::{self, NOTE_IMAGE_AAD};
-use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, GITLAB_AAD, VAULT_AAD};
+use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, GITLAB_AAD, MODELS_AAD, VAULT_AAD};
 use crate::vault::{AppState, MIN_PASSWORD_LEN};
 
 /// Envelope read with the old key and already sealed with the new one, ready to write.
@@ -44,6 +44,7 @@ impl AppState {
             (store::drive_path(&self.dir), DRIVE_AAD, false),
             (store::github_path(&self.dir), GITHUB_AAD, false),
             (store::gitlab_path(&self.dir), GITLAB_AAD, false),
+            (store::models_path(&self.dir), MODELS_AAD, false),
             (store::clip_path(&self.dir), CLIP_AAD, true),
             (store::activity_path(&self.dir), ACTIVITY_AAD, true),
         ] {
@@ -97,6 +98,7 @@ pub(crate) fn finish_interrupted(dir: &Path, vault_salt: &[u8]) -> Result<()> {
         store::drive_path(dir),
         store::github_path(dir),
         store::gitlab_path(dir),
+        store::models_path(dir),
         store::clip_path(dir),
         store::activity_path(dir),
     ];

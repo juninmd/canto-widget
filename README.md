@@ -144,6 +144,13 @@ the **latest published** one side by side and a button to update and restart.
 Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two weeks, plus `.vtt`, `.srt`, `.txt`
 and `.md` transcripts from a local folder, cleaned up and searchable.
 
+🤖 **AI models** (on the tab bar by default, **no API key or account**): LLMs ranked by the
+[Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, read from its public leaderboard page,
+with a score bar, creator, price per 1M tokens and speed, sortable by intelligence, price or speed. It fetches at
+most once every 3 hours, and the opt-in 🔔 notifies you when a
+model **enters the top 10** or **climbs within it** (checked every 6 hours while the vault is unlocked), with
+"new" and "up" badges for a week.
+
 🌙 **Do not disturb:** in Settings or the tray, silence meeting alerts, task reminders, status alerts and every
 system notification for 30 min, 1 h, 2 h, until tomorrow or until you turn it off. A moon in the top bar shows
 when it ends; one click turns it back off. It survives a restart and ends on its own.
@@ -219,6 +226,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Tasks: priority on the row, long titles wrap | Notes list with rendered markdown |
 |---|---|
 | ![Task list where each row shows its priority dot, a long title wraps over several lines and the time sits under the title](docs/prints/app/45-tarefas-prioridade.png) | ![Note cards showing a heading, a checklist, a code block and a numbered list rendered instead of raw markdown](docs/prints/app/46-notas-card-markdown.png) |
+
+| AI models ranked by the Intelligence Index |
+|---|
+| ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
 </details>
 

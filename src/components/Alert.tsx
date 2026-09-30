@@ -6,12 +6,16 @@ import { TASK_PREFIX } from "../lib/reminders";
 import { playAlert } from "../lib/sound";
 
 const SNOOZE_MINUTES = 10;
+/** Same prefix as `STATUS_PREFIX` in `notification.rs`: a watched Status API service got worse. */
+const STATUS_PREFIX = "status:";
 
 type Props = { event: AgendaItem; onClose: () => void; onCompleted?: () => void };
 
 export default function Alert({ event, onClose, onCompleted }: Props) {
   const primary = useRef<HTMLButtonElement>(null);
   const task = event.id.startsWith(TASK_PREFIX) ? event.id.slice(TASK_PREFIX.length) : null;
+  const service = event.id.startsWith(STATUS_PREFIX);
+  const kind = task ? t("alert.taskReminder") : service ? t("alert.serviceIssue") : t("alert.meetingStarting");
 
   const close = useCallback(() => {
     void api.alertClose();
@@ -37,15 +41,15 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
     <div
       role="alertdialog"
       aria-modal="true"
-      aria-label={t("alert.dialogLabel", { kind: task ? t("alert.taskReminder") : t("alert.meetingStarting"), title: event.title })}
+      aria-label={t("alert.dialogLabel", { kind, title: event.title })}
       className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
     >
       <div className="min-h-0 overflow-y-auto">
         <p className="text-[11px] uppercase tracking-widest text-accent">
-          {task ? t("alert.taskReminder") : t("alert.startingNow")}
+          {task || service ? kind : t("alert.startingNow")}
         </p>
         <h1 className="mt-1 line-clamp-2 text-lg font-semibold">{event.title}</h1>
-        <p className="mt-1 text-sm text-muted">{hour(event)}</p>
+        {!service && <p className="mt-1 text-sm text-muted">{hour(event)}</p>}
         {event.location && <p className="mt-1 line-clamp-2 text-xs text-faint">{event.location}</p>}
         {people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
         {event.description && <p className="mt-2 line-clamp-4 whitespace-pre-line text-xs text-faint">{event.description}</p>}
@@ -98,16 +102,18 @@ export default function Alert({ event, onClose, onCompleted }: Props) {
             onClick={() => void api.openLink(event.link)}
             className="flex-1 rounded-lg bg-edge px-3 py-2 text-sm text-fg"
           >
-            {t("alert.openCalendar")}
+            {service ? t("alert.openStatus") : t("alert.openCalendar")}
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => void api.alertSnooze(SNOOZE_MINUTES).then(onClose, close)}
-          className="rounded-lg bg-edge px-3 py-2 text-sm text-fg"
-        >
-          {t("alert.snooze", { minutes: SNOOZE_MINUTES })}
-        </button>
+        {!service && (
+          <button
+            type="button"
+            onClick={() => void api.alertSnooze(SNOOZE_MINUTES).then(onClose, close)}
+            className="rounded-lg bg-edge px-3 py-2 text-sm text-fg"
+          >
+            {t("alert.snooze", { minutes: SNOOZE_MINUTES })}
+          </button>
+        )}
         <button
           type="button"
           onClick={close}

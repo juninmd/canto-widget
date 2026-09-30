@@ -191,6 +191,7 @@ export const app = {
   "tabs.meetings": "Reuniões",
   "tabs.agenda": "Agenda",
   "tabs.status": "Status API",
+  "tabs.models": "Modelos IA",
   "tabs.settings": "Ajustes",
 
   "theme.title": "Aparência",

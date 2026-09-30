@@ -7,6 +7,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Modelos IA** (visível por padrão, **sem chave de API**): ranking de LLMs pelo **Intelligence Index**
+  da [Artificial Analysis](https://artificialanalysis.ai), lido da página pública de leaderboard, com barra proporcional à nota, criador, preço
+  (`$x,xx / 1M tokens`, média 3:1 entrada/saída) e velocidade (`tok/s`). O botão de ordem alterna inteligência →
+  preço (mais barato primeiro) → velocidade (mais rápido primeiro); mostra os 50 primeiros. Não pede conta nem chave. Para
+  não sobrecarregar a página, o Canto busca no máximo uma vez a cada 3 h, mesmo no
+  "atualizar", e diz quando a próxima busca é permitida. O sino 🔔 (desligado por padrão) avisa quando um modelo
+  **entra no top 10** ou **sobe dentro dele**, conferindo a cada 6 h com o cofre aberto, mesmo com a janela
+  escondida; a primeira leitura só registra, sem avisar. Muitas mudanças de uma vez viram um aviso só. Selos "novo" e "subiu" ficam por 7 dias.
 - **Timer de foco por tarefa**: cada tarefa ganha **estimativa** (15, 25, 45, 60 ou 90 min, no painel ⏰) e um
   botão ▶ que aparece ao passar o mouse. Uma barra fixa sob qualquer aba mostra o relógio contra a estimativa, com
   **Pausar** e **Concluir**; a linha da tarefa mostra "gasto/estimado" e fica vermelha ao estourar, e um aviso
@@ -147,6 +155,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   - Apagar o campo "máx. fixados" não salva mais 1.
   - O resumo do dia ignora reuniões recusadas.
   - Ligar dois alertas de status rapidamente não perde o primeiro.
+  - Alerta de Status API agora abre o aviso na janela (com link para a página de status), além da notificação do
+    sistema: antes só havia a notificação, que o modo foco do sistema engolia sem deixar rastro.
 - **Tarefa em janela estreita**: com horário, ↻, subtarefas e PR na mesma linha, o título ficava com ~60 px na
   janela mínima (360 px), uma palavra por linha. Esses selos agora ficam numa linha menor abaixo do título.
 - **Título longo de tarefa** não some mais cortado com reticências: quebra em quantas linhas precisar.

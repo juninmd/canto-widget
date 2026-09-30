@@ -136,3 +136,27 @@ test("the meeting alert brings who organized, the agenda and the attached notes"
   expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://docs.google.com/document/d/abc" });
   expect(document.activeElement).toBe(screen.getByRole("button", { name: "entrar no Meet" }));
 });
+
+test("a Status API alert names the service and opens its status page, without snooze", async () => {
+  const outage: AgendaItem = {
+    id: "status:github",
+    title: "GitHub",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://www.githubstatus.com",
+    description: "Partial System Outage",
+  };
+  await act(async () => {
+    render(<Alert event={outage} onClose={() => {}} />);
+  });
+  expect(screen.getByText("serviço com problema")).toBeTruthy();
+  expect(screen.getByText("Partial System Outage")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByText("abrir página de status"));
+  });
+  expect(calls).toContain("open_link");
+});

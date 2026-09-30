@@ -103,5 +103,7 @@ export const tasks = {
   "alert.joinMeet": "entrar no Meet",
   "alert.openCalendar": "abrir no Calendar",
   "alert.snooze": "adiar {minutes} min",
+  "alert.serviceIssue": "serviço com problema",
+  "alert.openStatus": "abrir página de status",
   "alert.close": "fechar",
 } as const;

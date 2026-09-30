@@ -5,10 +5,18 @@ use crate::calendar::AgendaItem;
 
 /// Same prefix the UI puts on the reminder id (`PREFIXO_TAREFA` in `lembretes.ts`).
 pub const TASK_PREFIX: &str = "task:";
+/// Same prefix as `STATUS_PREFIX` in the UI's `Alert.tsx`.
+pub const STATUS_PREFIX: &str = "status:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
         return (crate::lang::tr("Lembrete de tarefa", "Task reminder"), event.title.clone());
+    }
+    if event.id.starts_with(STATUS_PREFIX) {
+        return (
+            crate::lang::tr("Serviço com problema", "Service issue"),
+            format!("{}: {}", event.title, event.description),
+        );
     }
     let body = match event.location.trim() {
         "" => event.title.clone(),

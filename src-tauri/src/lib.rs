@@ -24,6 +24,7 @@ pub mod cmd_gemini;
 pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
+pub mod cmd_models;
 pub mod cmd_notes;
 pub mod cmd_report;
 pub mod cmd_status;
@@ -55,6 +56,10 @@ pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
 pub mod model;
+pub mod models_alert;
+pub mod models_feed;
+pub mod models_rank;
+pub mod models_state;
 pub mod net;
 pub mod next_meeting;
 pub mod note_images;
@@ -123,6 +128,7 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
+            app.manage(cmd_models::ModelsLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
@@ -137,6 +143,7 @@ pub fn run() {
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
+            models_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
@@ -264,6 +271,8 @@ pub fn run() {
             cmd_status::api_status,
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
+            cmd_models::models_get,
+            cmd_models::models_alerts_set,
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,
             do_not_disturb::dnd_clear,

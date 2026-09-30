@@ -122,6 +122,28 @@ export type StatusItem = { title: string; link: string; published_at: number };
 export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
 export type StatusResult = { id: string; label: string; items: StatusItem[]; error: string | null; live?: StatusLive | null };
 
+/** `price`: USD per 1M tokens (blended 3:1); `speed`: median output tokens/s; null when not measured. */
+export type ModelRow = {
+  id: string;
+  name: string;
+  creator: string;
+  score: number;
+  price: number | null;
+  speed: number | null;
+  rank: number;
+  badge: "new" | "up" | null;
+};
+/** `throttled`: a manual refresh inside the 3 h floor, answered from the cache until `next_fetch_at`. */
+export type ModelsView = {
+  alerts: boolean;
+  models: ModelRow[];
+  total: number;
+  fetched_at: number;
+  next_fetch_at: number;
+  throttled: boolean;
+  error: string | null;
+};
+
 export const api = {
   status: () => invoke<VaultStatus>("vault_status"),
   create: (password: string) => invoke<void>("vault_create", { password }),
@@ -273,6 +295,10 @@ export const api = {
   guestPhotos: (emails: string[]) => invoke<GuestPhotos>("guest_photos", { emails }),
   statusAlertsGet: () => invoke<string[]>("status_alerts_get"),
   statusAlertsSet: (ids: string[]) => invoke<string[]>("status_alerts_set", { ids }),
+
+  /** Artificial Analysis ranking; Rust fetches at most once every 3 h, `force` included. */
+  modelsGet: (force = false) => invoke<ModelsView>("models_get", { force }),
+  modelsAlertsSet: (enabled: boolean) => invoke<boolean>("models_alerts_set", { enabled }),
 
   dndGet: () => invoke<DndState>("dnd_get"),
   /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */
