@@ -9,6 +9,11 @@ export type * from "./forgeTypes";
 export type Repeat = { tipo: "diaria" } | { tipo: "dias_uteis" } | { tipo: "semanal"; dia: number };
 
 export type Subtask = { id: string; title: string; done: boolean };
+/** Unix seconds: the day is cut in the UI, whose timezone is the reliable one. */
+export type ActivitySpan = { app: string; start: number; end: number };
+export type ActivitySummary = { spans: ActivitySpan[]; apps: { app: string; secs: number }[]; total_secs: number };
+export type ActivityStatus = { supported: boolean; enabled: boolean };
+
 export type Priority = "low" | "medium" | "high";
 /** `day`: 1-31, matched exactly. `days`: 0 = Sunday ... 6 = Saturday, same as `Repeat`'s `dia`. */
 export type ExtendedRepeat = { tipo: "monthly"; day: number } | { tipo: "specific_days"; days: number[] };
@@ -144,6 +149,10 @@ export const api = {
   taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
   taskSetEstimate: (id: string, minutes: number | null) => invoke<void>("task_set_estimate", { id, minutes }),
   taskAddTime: (id: string, secs: number) => invoke<void>("task_add_time", { id, secs }),
+  activityStatus: () => invoke<ActivityStatus>("activity_status"),
+  activitySetEnabled: (enabled: boolean) => invoke<void>("activity_set_enabled", { enabled }),
+  activitySummary: (fromMs: number, toMs: number) => invoke<ActivitySummary>("activity_summary", { fromMs, toMs }),
+  activityClear: () => invoke<void>("activity_clear"),
   tasksReorder: (day: string, ids: string[]) => invoke<void>("tasks_reorder", { day, ids }),
   taskSetExtendedRepeat: (id: string, repeat: ExtendedRepeat | null) =>
     invoke<void>("task_set_extended_repeat", { id, repeat }),

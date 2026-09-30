@@ -13,6 +13,7 @@ import UpdateSection from "./UpdateSection";
 import TabsSection from "./TabsSection";
 import RemindersSection from "./RemindersSection";
 import FocusSection from "./FocusSection";
+import ActivitySection from "./ActivitySection";
 import DoNotDisturbSection from "./DoNotDisturbSection";
 import ReviewAlertsSection from "./ReviewAlertsSection";
 import type { Tab } from "./TabBar";
@@ -80,6 +81,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
       <LanguagePicker />
       <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
       <FocusSection />
+      <ActivitySection onError={onError} />
       <RemindersSection lead={reminderLead} onChange={onReminderLead} />
       <DoNotDisturbSection onError={onError} />
       <ReviewAlertsSection onError={onError} />

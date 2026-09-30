@@ -6,8 +6,8 @@ const KEY = "canto.hiddenTabs";
 /** Ajustes can't be hidden: it's the only way back to the other tabs. */
 export const HIDEABLE = TABS.filter((t) => t.id !== "settings");
 
-/** Nine tabs don't fit the default width; GitLab and Status API start hidden, one checkbox away in Ajustes. */
-const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status"];
+/** Ten tabs don't fit the default width; GitLab, Status API and Atividade start hidden, one checkbox away in Ajustes. */
+const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity"];
 
 /** Nothing saved yet means the default; unknown ids (a tab removed in an update) and corrupt data are ignored. */
 export function parseHidden(raw: string | null): Tab[] {

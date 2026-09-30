@@ -27,6 +27,7 @@ import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
 import GitlabTab from "./components/GitlabTab";
 import StatusTab from "./components/StatusTab";
+import ActivityTab from "./components/ActivityTab";
 import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
@@ -338,6 +339,7 @@ function Canto() {
             {tab === "github" && <GithubTab onError={setError} />}
             {tab === "gitlab" && <GitlabTab onError={setError} />}
             {tab === "status" && <StatusTab />}
+            {tab === "activity" && <ActivityTab today={today} onError={setError} />}
             {tab === "settings" && (
               <SettingsTab
                 onError={setError}
