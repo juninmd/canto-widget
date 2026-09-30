@@ -72,6 +72,7 @@ export const tasks = {
   "summary.meetingsTotal": "{time} no total",
   "summary.mergedPrs": "PRs/MRs mergeados",
   "summary.reviewedPrs": "PRs/MRs revisados/aprovados por mim",
+  "summary.closedPrs": "PRs/MRs encerrados sem merge",
   "summary.draft": "rascunho",
   "summary.geminiNotes": "anotações do Gemini: {url}",
   "summary.empty": "Nada registrado hoje.",

@@ -3,6 +3,7 @@ import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import TaskDetails, { TaskBadge, TaskMeta } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
 import { GripIcon } from "./Icons";
+import { FocusButton } from "./FocusControls";
 import { ENTER_CLASS, EXIT_CLASS } from "../lib/motion";
 
 type Editing = { id: string; title: string } | null;
@@ -27,6 +28,7 @@ type Props = {
   onExtendedRepeat: (repeat: ExtendedRepeat | null) => void;
   onLinkPr: (url: string | null) => void;
   onPriority: (priority: Priority | null) => void;
+  onEstimate: (minutes: number | null) => void;
   onSubtasksChange: () => void;
   onError: (m: string) => void;
   dragging: boolean;
@@ -57,6 +59,7 @@ export default function TaskRow({
   onExtendedRepeat,
   onLinkPr,
   onPriority,
+  onEstimate,
   onSubtasksChange,
   onError,
   dragging,
@@ -71,7 +74,7 @@ export default function TaskRow({
         data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
-        className={`group flex items-start gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
+        className={`group relative flex items-start gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
         } ${dragging ? "opacity-50" : ""} ${dropTarget ? "ring-1 ring-accent" : ""}`}
       >
@@ -127,6 +130,7 @@ export default function TaskRow({
             <TaskMeta task={task} />
           </span>
         )}
+        <FocusButton task={task} />
         <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} onPriority={onPriority} />
         <button
           type="button"
@@ -146,6 +150,7 @@ export default function TaskRow({
             onExtendedRepeat={onExtendedRepeat}
             onLinkPr={onLinkPr}
             onPriority={onPriority}
+            onEstimate={onEstimate}
             onClose={onToggleDetails}
           />
           <TaskSubtasks taskId={task.id} subtasks={task.subtasks ?? []} onError={onError} onChange={onSubtasksChange} />

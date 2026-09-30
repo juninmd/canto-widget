@@ -4,6 +4,7 @@ use std::path::{Path, PathBuf};
 use tauri::State;
 use zeroize::Zeroizing;
 
+use crate::activity::ACTIVITY_AAD;
 use crate::backup::{backups_dir, EXTENSION};
 use crate::clipboard::CLIP_AAD;
 use crate::crypto::VaultKey;
@@ -45,11 +46,12 @@ impl AppState {
             (store::gitlab_path(&self.dir), GITLAB_AAD, false),
             (store::models_path(&self.dir), MODELS_AAD, false),
             (store::clip_path(&self.dir), CLIP_AAD, true),
+            (store::activity_path(&self.dir), ACTIVITY_AAD, true),
         ] {
             match reencrypt(&path, aad, &session.key, &key, &salt) {
                 Ok(Some(r)) => batch.push(r),
                 Ok(None) => {}
-                // Discard only unreadable clipboard content; a disk error (antivirus, permission) must not wipe history.
+                // Discard only unreadable clipboard or activity content; a disk error (antivirus, permission) must not wipe history.
                 Err(e) if disposable && !matches!(e, AppError::Io(_)) => discard.push(path),
                 Err(e) => return Err(e),
             }
@@ -98,6 +100,7 @@ pub(crate) fn finish_interrupted(dir: &Path, vault_salt: &[u8]) -> Result<()> {
         store::gitlab_path(dir),
         store::models_path(dir),
         store::clip_path(dir),
+        store::activity_path(dir),
     ];
     for path in peripherals.into_iter().chain(backup_files(dir)).chain(note_images::files(dir)) {
         let next = staged(&path);

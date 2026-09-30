@@ -47,9 +47,11 @@ pub enum Activity {
     Opened,
     Merged,
     Reviewed,
+    /// Own PRs/MRs closed without merging.
+    Closed,
 }
 
-pub const ACTIVITIES: [Activity; 3] = [Activity::Opened, Activity::Merged, Activity::Reviewed];
+pub const ACTIVITIES: [Activity; 4] = [Activity::Opened, Activity::Merged, Activity::Reviewed, Activity::Closed];
 
 /// Interval searched, as RFC 3339 instants built from numbers; `until: None` means "up to now" (the day summary).
 #[derive(Debug, Clone, PartialEq)]

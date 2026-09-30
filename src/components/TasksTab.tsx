@@ -9,6 +9,7 @@ import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
 import { useNewIds, useExit } from "../lib/motion";
 import { mergeOrder, useReorder } from "../lib/useReorder";
+import { focusStore } from "../lib/focus";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -155,6 +156,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             onDragHover={() => reorder.hover(task.id)}
             onMove={(delta) => reorder.step(task.id, delta)}
             onToggleDone={() => {
+              if (!task.done && focusStore.get()?.id === task.id) void focusStore.stop();
               setChecking(task.id);
               void run(() => api.taskToggle(task.id));
             }}
@@ -169,14 +171,19 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
               editEnded.current = true;
               setEditing(null);
             }}
-            onDelete={() =>
-              void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title }))))
-            }
+            onDelete={() => {
+              if (focusStore.get()?.id === task.id) focusStore.discard();
+              void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title }))));
+            }}
             onToggleDetails={() => setDetails(details === task.id ? "" : task.id)}
             onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(task.id, time, repeat))}
             onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(task.id, repeat))}
             onLinkPr={(url) => void run(() => api.taskLinkPr(task.id, url))}
             onPriority={(priority) => void run(() => api.taskSetPriority(task.id, priority))}
+            onEstimate={(minutes) => {
+              focusStore.setEstimate(task.id, minutes);
+              void run(() => api.taskSetEstimate(task.id, minutes));
+            }}
             onSubtasksChange={reload}
             onError={onError}
           />

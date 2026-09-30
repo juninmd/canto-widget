@@ -244,3 +244,13 @@ fn completing_via_reminder_never_reopens_an_already_done_task() {
     assert_eq!(d.tasks[0].updated_at, 5, "timestamp changed with no real change");
     assert!(!complete(&mut d, "inexistente", 7));
 }
+
+#[test]
+fn a_new_instance_keeps_the_estimate_but_starts_with_no_tracked_time() {
+    let mut d = with_series("2026-09-14", Repeat::Daily);
+    d.tasks[0].estimate_min = Some(25);
+    d.tasks[0].tracked_secs = 1500;
+    assert_eq!(materialize(&mut d, "2026-09-15", 10), 1);
+    let new_task = on_day(&d, "2026-09-15")[0];
+    assert_eq!((new_task.estimate_min, new_task.tracked_secs), (Some(25), 0));
+}

@@ -78,7 +78,7 @@ fn a_period_closes_the_range_on_the_same_date_each_activity_filters_on() {
         (param(&o, "created_after"), param(&o, "created_before"), param(&o, "updated_before")),
         (Some("2026-09-01T03:00:00+00:00"), Some("2026-09-28T03:00:00+00:00"), None)
     );
-    for a in [Activity::Merged, Activity::Reviewed] {
+    for a in [Activity::Merged, Activity::Reviewed, Activity::Closed] {
         let r = activity_since(a, "ana", &w);
         assert_eq!(param(&r, "updated_before"), Some("2026-09-28T03:00:00+00:00"), "{a:?}");
     }
@@ -123,4 +123,18 @@ fn a_merge_counts_only_when_it_happened_inside_the_window() {
     assert!(!merged_in(Some("2026-09-26T10:00:00.000Z"), &w));
     assert!(!merged_in(None, &w));
     assert!(merged_in(Some("2030-01-01T00:00:00Z"), &Window::since("2026-09-18T03:00:00+00:00")));
+}
+
+#[test]
+fn closed_asks_for_my_closed_mrs_and_counts_only_the_closing_instant() {
+    let since = "2026-09-18T03:00:00+00:00";
+    let r = activity_since(Activity::Closed, "ana", &Window::since(since));
+    assert_eq!(
+        (param(&r, "scope"), param(&r, "state"), param(&r, "updated_after")),
+        (Some("created_by_me"), Some("closed"), Some(since))
+    );
+    let w = Window::since(since);
+    assert!(closed_in(Some("2026-09-18T10:00:00.000Z"), &w));
+    assert!(!closed_in(Some("2026-08-01T10:00:00.000Z"), &w), "old MR that got a comment today");
+    assert!(!closed_in(None, &w));
 }

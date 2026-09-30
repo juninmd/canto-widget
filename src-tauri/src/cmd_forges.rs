@@ -1,4 +1,4 @@
-//! What spans both forges: the PRs/MRs the user opened, merged or reviewed, for the day summary and period report.
+//! What spans both forges: the PRs/MRs the user opened, merged, reviewed or closed, for the day summary and period report.
 use serde::Serialize;
 use tauri::Manager;
 
@@ -16,6 +16,7 @@ pub struct Opened {
     pub items: Vec<ForgeItem>,
     pub merged: Vec<ForgeItem>,
     pub reviewed: Vec<ForgeItem>,
+    pub closed: Vec<ForgeItem>,
     /// One line per distinct failure; the other forge's items still come.
     pub errors: Vec<String>,
     /// What each forge counted, past the first page the lists carry: a month can outgrow it.
@@ -27,6 +28,7 @@ pub struct Totals {
     pub opened: u64,
     pub merged: u64,
     pub reviewed: u64,
+    pub closed: u64,
 }
 
 /// `since_ms` is local midnight from the UI; anything outside the last two days is refused rather than searched.
@@ -75,6 +77,7 @@ fn combine(results: impl Iterator<Item = (Activity, Result<ForgeList>)>) -> Open
                     Activity::Opened => &mut out.totals.opened,
                     Activity::Merged => &mut out.totals.merged,
                     Activity::Reviewed => &mut out.totals.reviewed,
+                    Activity::Closed => &mut out.totals.closed,
                 } += total;
                 list.items
             }
@@ -90,9 +93,10 @@ fn combine(results: impl Iterator<Item = (Activity, Result<ForgeList>)>) -> Open
             Activity::Opened => out.items.extend(list),
             Activity::Merged => out.merged.extend(list),
             Activity::Reviewed => out.reviewed.extend(list),
+            Activity::Closed => out.closed.extend(list),
         }
     }
-    for items in [&mut out.items, &mut out.merged, &mut out.reviewed] {
+    for items in [&mut out.items, &mut out.merged, &mut out.reviewed, &mut out.closed] {
         items.sort_by(|a, b| a.created_at.cmp(&b.created_at));
     }
     out
@@ -154,10 +158,18 @@ mod tests {
     }
 
     #[test]
+    fn closed_lands_in_its_own_list_and_total() {
+        let one = ForgeList { total: 3, items: vec![item(7, "2026-09-18T12:00:00Z", "", 0)], ..Default::default() };
+        let out = combine([(Activity::Closed, Ok(one))].into_iter());
+        assert_eq!((out.closed[0].number, out.totals.closed), (7, 3));
+        assert!(out.items.is_empty() && out.merged.is_empty());
+    }
+
+    #[test]
     fn totals_count_past_the_first_page_and_add_both_forges() {
         let gh = ForgeList { total: 45, items: vec![item(1, "2026-09-02T12:00:00Z", "", 0)], ..Default::default() };
         let gl = ForgeList { total: 0, items: vec![item(2, "2026-09-03T12:00:00Z", "", 0)], ..Default::default() };
         let out = combine([(Activity::Merged, Ok(gh)), (Activity::Merged, Ok(gl))].into_iter());
-        assert_eq!(out.totals, Totals { opened: 0, merged: 46, reviewed: 0 });
+        assert_eq!(out.totals, Totals { opened: 0, merged: 46, reviewed: 0, closed: 0 });
     }
 }

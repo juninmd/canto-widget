@@ -24,6 +24,17 @@ fn done_tasks_count_on_their_day_inside_the_period_and_open_ones_never() {
 }
 
 #[test]
+fn focus_time_sums_every_task_of_the_period_done_or_not() {
+    let with = |title: &str, day: &str, done: bool, secs: u32| Task { tracked_secs: secs, ..task(title, day, done) };
+    let tasks = [
+        with("antes", "2026-08-31", true, 900),
+        with("feita", "2026-09-21", true, 600),
+        with("aberta", "2026-09-22", false, 300),
+    ];
+    assert_eq!(period(&tasks, &[], "2026-09-21", "2026-09-27", 0, 1).focused_secs, 900);
+}
+
+#[test]
 fn notes_are_created_or_edited_in_the_period_and_the_end_is_exclusive() {
     let notes = [
         note("velha", "", 10, 20),

@@ -44,6 +44,13 @@ test("merged and reviewed PRs/MRs from the forges reach the summary", async () =
   expect(text).toContain("PRs/MRs revisados/aprovados por mim (1)\n- octo/canto#7 Cache local");
 });
 
+test("closed PRs/MRs from the forges reach the summary", async () => {
+  opened = () => Promise.resolve({ items: [], closed: [{ reference: "acme/api!11", title: "Descartado", draft: false }], errors: [] });
+  await mount();
+  const text = screen.getByRole("region", { name: "resumo do dia" }).textContent;
+  expect(text).toContain("PRs/MRs encerrados sem merge (1)\n- acme/api!11 Descartado");
+});
+
 test("a long summary scrolls inside the panel, keeping copy and back in view", async () => {
   await mount();
   // It sits under the period picker in a flex column: it takes the rest of the height, never more.

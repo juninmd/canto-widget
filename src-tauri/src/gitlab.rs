@@ -7,7 +7,7 @@ use crate::error::{AppError, Result};
 use crate::forge::{checks_from_gitlab, merge, valid_repo_path, ChecksStatus, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{Activity, ForgeFilter, Section, Window, PER_PAGE};
-use crate::gitlab_query::{activity_since, merged_in, requests, Request};
+use crate::gitlab_query::{activity_since, closed_in, merged_in, requests, Request};
 use crate::model::now_ms;
 
 pub struct Account {
@@ -30,6 +30,8 @@ struct RawItem {
     updated_at: String,
     #[serde(default)]
     merged_at: Option<String>,
+    #[serde(default)]
+    closed_at: Option<String>,
     #[serde(default)]
     user_notes_count: u64,
     #[serde(default)]
@@ -73,6 +75,7 @@ pub fn mrs_since(acc: &Account, activity: Activity, w: &Window) -> Result<(Forge
     let r = activity_since(activity, &acc.username, w);
     match activity {
         Activity::Merged => fetch_where(acc, &r, |b| merged_in(b.merged_at.as_deref(), w)),
+        Activity::Closed => fetch_where(acc, &r, |b| closed_in(b.closed_at.as_deref(), w)),
         _ => fetch(acc, &r),
     }
 }

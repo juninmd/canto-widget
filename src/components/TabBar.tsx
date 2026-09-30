@@ -1,7 +1,8 @@
 import { useRef } from "react";
 import { t } from "../i18n";
 
-export type Tab = "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "gitlab" | "status" | "models" | "settings";
+export type Tab =
+  | "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "gitlab" | "status" | "models" | "activity" | "settings";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: t("tabs.tasks") },
@@ -13,6 +14,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "gitlab", label: "GitLab" },
   { id: "status", label: t("tabs.status") },
   { id: "models", label: t("tabs.models") },
+  { id: "activity", label: t("tabs.activity") },
   { id: "settings", label: t("tabs.settings") },
 ];
 

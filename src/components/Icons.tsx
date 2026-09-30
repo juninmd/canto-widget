@@ -71,3 +71,15 @@ export const MoonIcon = () => (
     <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
   </svg>
 );
+
+export const PlayIcon = () => (
+  <svg {...base}>
+    <path d="M7 4v16l13-8z" fill="currentColor" />
+  </svg>
+);
+
+export const PauseIcon = () => (
+  <svg {...base}>
+    <path d="M8 5v14M16 5v14" />
+  </svg>
+);

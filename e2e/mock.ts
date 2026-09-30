@@ -20,6 +20,8 @@ export type MockOptions = {
   models?: Record<string, unknown>;
   /** Tabs the saved hidden list already knew about (`canto.knownTabs`), so new tabs aren't auto-hidden. */
   knownTabs?: string[];
+  /** Fixed answers for commands the defaults do not cover, by command name. */
+  fixed?: Record<string, unknown>;
 };
 export type Call = { cmd: string; args: Record<string, unknown> };
 
@@ -48,6 +50,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       github_status: { connected: false, login: "", source: "", device_flow: false },
       drive_status: { configured: false, connected: false, email: "" },
       models_get: o.models ?? { alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
+      ...o.fixed,
     };
     let callbackId = 1;
     const w = window as unknown as Record<string, unknown>;
