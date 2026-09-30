@@ -126,7 +126,6 @@ export type ModelRow = {
 };
 /** `throttled`: a manual refresh inside the 3 h floor, answered from the cache until `next_fetch_at`. */
 export type ModelsView = {
-  connected: boolean;
   alerts: boolean;
   models: ModelRow[];
   total: number;
@@ -284,8 +283,6 @@ export const api = {
 
   /** Artificial Analysis ranking; Rust fetches at most once every 3 h, `force` included. */
   modelsGet: (force = false) => invoke<ModelsView>("models_get", { force }),
-  modelsSetKey: (key: string) => invoke<ModelsView>("models_set_key", { key }),
-  modelsRemoveKey: () => invoke<void>("models_remove_key"),
   modelsAlertsSet: (enabled: boolean) => invoke<boolean>("models_alerts_set", { enabled }),
 
   dndGet: () => invoke<DndState>("dnd_get"),

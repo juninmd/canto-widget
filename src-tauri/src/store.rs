@@ -93,7 +93,7 @@ pub fn gitlab_path(dir: &Path) -> PathBuf {
     dir.join("gitlab.json")
 }
 
-/// Artificial Analysis key plus the last ranking: sealed because the key is a credential.
+/// Alert choice plus the last ranking and top 10 seen.
 pub fn models_path(dir: &Path) -> PathBuf {
     dir.join("modelos_ia.json")
 }

@@ -16,7 +16,6 @@ export const FAKE_MODELS = [
 ].map(([id, name, creator, score, price, speed, badge], i) => ({ id, name, creator, score, price, speed, rank: i + 1, badge }));
 
 export const MODELS_VIEW = {
-  connected: true,
   alerts: true,
   models: FAKE_MODELS,
   total: 187,
@@ -39,9 +38,11 @@ test("the AI models tab ranks models and cycles the sort", async ({ page }) => {
   expect((await calls(page)).find((c) => c.cmd === "models_alerts_set")?.args).toEqual({ enabled: false });
 });
 
-test("the AI models tab starts hidden, even for a saved choice from before it existed", async ({ page }) => {
-  await mockTauri(page, { hiddenTabs: ["gitlab"] });
+test("the AI models tab is on the bar by default, even for a saved choice from before it existed", async ({ page }) => {
+  await mockTauri(page, { hiddenTabs: ["gitlab"], models: MODELS_VIEW });
   await page.goto("/");
   await expect(page.getByRole("tab", { name: "Status API" })).toBeVisible();
-  await expect(page.getByRole("tab", { name: "Modelos IA" })).toHaveCount(0);
+  await page.getByRole("tab", { name: "Modelos IA" }).click();
+  await expect(page.locator("[data-model]").first()).toContainText("Aurora 4");
+  await expect(page.getByLabel(/chave/i)).toHaveCount(0);
 });

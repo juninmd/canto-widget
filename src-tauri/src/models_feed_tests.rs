@@ -1,81 +1,60 @@
 use super::*;
 
-const SAMPLE: &str = r#"{"status":200,"data":[
-  {"id":"m-1","name":"Aurora 4","slug":"aurora-4","model_creator":{"id":"c1","name":"Lumen Labs","slug":"lumen"},
-   "evaluations":{"artificial_analysis_intelligence_index":73.2,"mmlu_pro":0.8},
-   "pricing":{"price_1m_blended_3_to_1":3.44,"price_1m_input_tokens":1.5,"price_1m_output_tokens":9.2},
-   "median_output_tokens_per_second":142.7,"median_time_to_first_token_seconds":0.4},
-  {"id":"m-2","name":"Nimbus Ultra","model_creator":{"name":"Stratos"},
-   "evaluations":{"artificial_analysis_intelligence_index":null},"pricing":{},"median_output_tokens_per_second":null},
-  {"id":"m-3","name":"Orca Think","model_creator":null,"evaluations":{"artificial_analysis_intelligence_index":61},
-   "pricing":null},
-  {"id":"m-4","name":"Sem avaliação"},
-  {"id":"m-5","name":"Brisa Mini","evaluations":{"artificial_analysis_intelligence_index":40.5},
-   "pricing":{"price_1m_blended_3_to_1":0},"median_output_tokens_per_second":0},
-  {"name":"Sem id","evaluations":{"artificial_analysis_intelligence_index":50}},
-  {"id":"m-7","name":"Tipo errado","evaluations":{"artificial_analysis_intelligence_index":"alto"}}
-]}"#;
+/// Wraps a payload the way the page ships it: inside a JSON string literal of a flight chunk, in two pieces.
+fn page(payload: &str) -> String {
+    let (a, b) = payload.split_at(payload.len() / 2);
+    let chunk = |s: &str| format!("<script>self.__next_f.push([1,{}])</script>", serde_json::to_string(s).unwrap());
+    format!("<html>{}{}</html>", chunk(a), chunk(b))
+}
+
+const MODELS: &str = r#"{"props":{"models":[
+  {"slug":"aurora-4","name":"Aurora 4","modelCreatorName":"Lumen Labs","intelligenceIndex":57.25,
+   "price1mInputTokens":2,"price1mOutputTokens":10,"medianOutputTokensPerSecond":142.7},
+  {"slug":"nimbus","name":"Nimbus Ultra","intelligenceIndex":null},
+  {"slug":"orca","name":"Orca Think","modelCreatorName":null,"intelligenceIndex":61,"price1mInputTokens":null},
+  {"slug":"velho","name":"Velho","deprecated":true,"intelligenceIndex":70},
+  {"slug":"brisa","name":"Brisa Mini","intelligenceIndex":40.5,"price1mInputTokens":0,"price1mOutputTokens":0,
+   "medianOutputTokensPerSecond":0},
+  {"name":"Sem slug","intelligenceIndex":50},
+  {"slug":"tipo-errado","name":"Tipo errado","intelligenceIndex":"alto"}
+]}}"#;
 
 #[test]
-fn keeps_only_models_with_an_index_and_reads_every_field() {
-    let models = parse(SAMPLE.as_bytes()).unwrap();
-    let ids: Vec<&str> = models.iter().map(|m| m.id.as_str()).collect();
-    assert_eq!(ids, ["m-1", "m-3", "m-5"]);
-    assert_eq!(
-        models[0],
-        Model {
-            id: "m-1".into(),
-            name: "Aurora 4".into(),
-            creator: "Lumen Labs".into(),
-            score: 73.2,
-            price: Some(3.44),
-            speed: Some(142.7),
-        }
-    );
+fn reads_the_index_price_and_speed_from_the_embedded_list() {
+    let models = parse_page(&page(MODELS)).unwrap();
+    let ids: Vec<_> = models.iter().map(|m| m.id.as_str()).collect();
+    assert_eq!(ids, ["aurora-4", "orca", "brisa"], "deprecated and unscored models are dropped");
+    let a = &models[0];
+    assert_eq!((a.name.as_str(), a.creator.as_str(), a.score), ("Aurora 4", "Lumen Labs", 57.25));
+    assert_eq!((a.price, a.speed), (Some(4.0), Some(142.7)), "blended 3:1 input/output");
 }
 
 #[test]
-fn null_or_missing_nested_objects_leave_the_field_empty() {
-    let models = parse(SAMPLE.as_bytes()).unwrap();
-    let orca = &models[1];
-    assert_eq!((orca.creator.as_str(), orca.price, orca.speed), ("", None, None));
-    assert_eq!(orca.score, 61.0, "an integer index is still a number");
+fn missing_or_zero_measures_leave_the_field_empty() {
+    let models = parse_page(&page(MODELS)).unwrap();
+    assert_eq!((models[1].creator.as_str(), models[1].price, models[1].speed), ("", None, None));
+    assert_eq!((models[2].price, models[2].speed), (None, None), "zero means not measured");
 }
 
 #[test]
-fn zero_price_and_speed_mean_not_measured() {
-    let brisa = &parse(SAMPLE.as_bytes()).unwrap()[2];
-    assert_eq!((brisa.price, brisa.speed), (None, None));
-}
-
-#[test]
-fn a_missing_data_array_is_an_empty_list_and_garbage_is_an_error() {
-    assert_eq!(parse(br#"{"status":200}"#).unwrap(), Vec::<Model>::new());
-    assert!(matches!(parse(b"<html>captcha</html>"), Err(FetchError::Other(_))));
+fn a_page_without_the_model_list_is_an_error_not_an_empty_ranking() {
+    let err = parse_page("<html>outra coisa</html>").unwrap_err();
+    assert_eq!(err, FetchError::Other("a página mudou de formato".into()));
+    let other = page(r#"{"models":[{"slug":"x","name":"sem índice"}]}"#);
+    assert!(parse_page(&other).is_err());
 }
 
 #[test]
 fn a_missing_name_falls_back_to_the_id_and_long_text_is_cut() {
     let long = "x".repeat(500);
-    let json = format!(
-        r#"{{"data":[{{"id":"m-9","model_creator":{{"name":"{long}"}},"evaluations":{{"artificial_analysis_intelligence_index":1}}}}]}}"#
-    );
-    let m = &parse(json.as_bytes()).unwrap()[0];
-    assert_eq!(m.name, "m-9");
-    assert_eq!(m.creator.chars().count(), MAX_TEXT);
+    let body = format!(r#"{{"models":[{{"slug":"m-1","intelligenceIndex":1,"modelCreatorName":"{long}"}}]}}"#);
+    let models = parse_page(&page(&body)).unwrap();
+    assert_eq!(models[0].name, "m-1");
+    assert_eq!(models[0].creator.chars().count(), MAX_TEXT);
 }
 
 #[test]
 fn errors_read_as_pt_br_for_the_ui() {
-    assert_eq!(FetchError::Unauthorized.message(), "chave inválida");
-    assert_eq!(FetchError::RateLimited.message(), "limite diário da API atingido");
-}
-
-#[test]
-fn the_key_is_checked_for_length_and_charset() {
-    assert_eq!(valid_key("  aa_0123456789abcdefXYZ  ").unwrap(), "aa_0123456789abcdefXYZ");
-    assert!(valid_key("curta").is_err());
-    assert!(valid_key(&"a".repeat(129)).is_err());
-    assert!(valid_key("aa_0123456789abcdef\r\nX-Evil: 1").is_err(), "no header injection");
-    assert!(valid_key("aa_0123456789 abcdef").is_err());
+    assert!(FetchError::RateLimited.message().contains("limite"));
+    assert!(FetchError::Network("dns".into()).message().contains("sem resposta"));
 }

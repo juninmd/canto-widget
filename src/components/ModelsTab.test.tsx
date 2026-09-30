@@ -4,14 +4,12 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ModelRow, ModelsView } from "../lib/api";
 
 let view: ModelsView;
-let setKey: (key: string) => Promise<unknown>;
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown>) => {
     calls.push({ cmd, args });
     if (cmd === "models_get") return Promise.resolve(view);
-    if (cmd === "models_set_key") return setKey(String(args.key));
     if (cmd === "models_alerts_set") return Promise.resolve(args.enabled);
     return Promise.resolve(null);
   },
@@ -38,7 +36,7 @@ const models = [
 ];
 
 function connected(extra: Partial<ModelsView> = {}): ModelsView {
-  return { connected: true, alerts: false, models, total: 187, fetched_at: Date.now() - 2 * 3_600_000, next_fetch_at: Date.now() + 3_600_000, throttled: false, error: null, ...extra };
+  return { alerts: false, models, total: 187, fetched_at: Date.now() - 2 * 3_600_000, next_fetch_at: Date.now() + 3_600_000, throttled: false, error: null, ...extra };
 }
 
 async function show() {
@@ -51,7 +49,6 @@ const names = () => [...document.querySelectorAll("[data-model]")].map((li) => l
 beforeEach(() => {
   calls.length = 0;
   view = connected();
-  setKey = () => Promise.resolve(connected());
 });
 afterEach(cleanup);
 
@@ -114,29 +111,8 @@ test("the attribution link opens artificialanalysis.ai", async () => {
   expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://artificialanalysis.ai/" });
 });
 
-test("without a key it explains how to get one and saves the pasted key", async () => {
-  view = { ...connected(), connected: false, models: [], total: 0, fetched_at: 0 };
+test("the tab never asks for a key", async () => {
   await show();
-  expect(screen.getByText(/Crie uma conta grátis/)).toBeTruthy();
-  fireEvent.change(screen.getByLabelText("Chave de API da Artificial Analysis"), { target: { value: "aa_chave_ficticia_0123" } });
-  await act(async () => fireEvent.click(screen.getByRole("button", { name: "salvar" })));
-  expect(calls.find((c) => c.cmd === "models_set_key")?.args).toEqual({ key: "aa_chave_ficticia_0123" });
-  expect(screen.getByText("Aurora 4")).toBeTruthy();
-});
-
-test("a rejected key stays on the form with the error", async () => {
-  view = { ...connected(), connected: false, models: [] };
-  setKey = () => Promise.reject("chave inválida");
-  await show();
-  fireEvent.change(screen.getByLabelText("Chave de API da Artificial Analysis"), { target: { value: "aa_errada_0123456789" } });
-  await act(async () => fireEvent.click(screen.getByRole("button", { name: "salvar" })));
-  expect(screen.getByRole("alert").textContent).toBe("chave inválida");
-});
-
-test("remover chave forgets the key and goes back to the empty state", async () => {
-  await show();
-  view = { ...connected(), connected: false, models: [] };
-  await act(async () => fireEvent.click(screen.getByRole("button", { name: "remover chave" })));
-  expect(calls.some((c) => c.cmd === "models_remove_key")).toBe(true);
-  expect(screen.getByLabelText("Chave de API da Artificial Analysis")).toBeTruthy();
+  expect(screen.queryByLabelText(/chave/i)).toBeNull();
+  expect(screen.queryByRole("button", { name: /chave/ })).toBeNull();
 });

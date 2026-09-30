@@ -260,8 +260,6 @@ pub fn run() {
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
             cmd_models::models_get,
-            cmd_models::models_set_key,
-            cmd_models::models_remove_key,
             cmd_models::models_alerts_set,
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,

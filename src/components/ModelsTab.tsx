@@ -5,12 +5,12 @@ import { timeAgo } from "../lib/time";
 import { LOCALE, t } from "../i18n";
 import { BellIcon } from "./Icons";
 import ModelItem from "./ModelItem";
-import ModelsConnect, { SITE } from "./ModelsConnect";
 import Skeleton from "./Skeleton";
 
+const SITE = "https://artificialanalysis.ai/";
 const LINK = "min-h-6 underline decoration-dotted hover:text-muted";
 
-/** LLMs ranked by Artificial Analysis' Intelligence Index; Rust holds the key and the 3 h fetch floor. */
+/** LLMs ranked by Artificial Analysis' Intelligence Index, read keyless from its public page; Rust holds the 3 h floor. */
 export default function ModelsTab() {
   const [view, setView] = useState<ModelsView | null>(null);
   const [error, setError] = useState("");
@@ -46,20 +46,9 @@ export default function ModelsTab() {
     }
   }
 
-  async function removeKey() {
-    try {
-      await api.modelsRemoveKey();
-      setView(null);
-      await load(false);
-    } catch (e) {
-      setError(errText(e));
-    }
-  }
-
   if (view === null) {
     return error ? <p role="alert" className="text-xs text-danger">{error}</p> : <Skeleton label={t("models.loading")} rows={4} />;
   }
-  if (!view.connected) return <ModelsConnect onConnected={setView} />;
 
   const rows = sortModels(view.models, sort);
   const max = Math.max(0, ...view.models.map((m) => m.score));
@@ -130,9 +119,6 @@ export default function ModelsTab() {
             artificialanalysis.ai
           </button>
         </span>
-        <button type="button" onClick={() => void removeKey()} className={LINK}>
-          {t("models.removeKey")}
-        </button>
       </div>
     </div>
   );

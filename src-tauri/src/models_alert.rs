@@ -1,5 +1,5 @@
 //! Opt-in OS notifications when the AI models top 10 changes. Rung from Rust so a hidden webview still gets
-//! them; needs the vault unlocked (the key is sealed). Off by default: each check spends a scarce API call.
+//! them; needs the vault unlocked (the config is sealed). Off by default.
 use std::time::{Duration, Instant};
 
 use tauri::{AppHandle, Manager};
@@ -18,7 +18,7 @@ const RETRY: Duration = Duration::from_secs(15 * 60);
 
 /// Counted from the last answer the API gave, so a fetch by the tab also pushes the next check back.
 pub fn watch_due(cfg: &ModelsConfig, now: i64) -> bool {
-    cfg.alerts && !cfg.key.is_empty() && (cfg.tried_at == 0 || now - cfg.tried_at >= CHECK_MS || now < cfg.tried_at)
+    cfg.alerts && (cfg.tried_at == 0 || now - cfg.tried_at >= CHECK_MS || now < cfg.tried_at)
 }
 
 pub fn notify(app: &AppHandle, changes: &[Change]) {
@@ -56,22 +56,15 @@ mod tests {
     use super::*;
 
     fn cfg(alerts: bool, tried_at: i64) -> ModelsConfig {
-        let mut c = ModelsConfig::default();
-        c.key = "aa_chave_ficticia_0123".into();
-        c.alerts = alerts;
-        c.tried_at = tried_at;
-        c
+        ModelsConfig { alerts, tried_at, ..Default::default() }
     }
 
     #[test]
-    fn checks_every_6_hours_only_with_alerts_on_and_a_key() {
+    fn checks_every_6_hours_only_with_alerts_on() {
         let t0 = 1_790_000_000_000;
         assert!(!watch_due(&cfg(false, 0), t0), "alerts off by default");
         assert!(watch_due(&cfg(true, 0), t0), "first run seeds right away");
         assert!(!watch_due(&cfg(true, t0), t0 + CHECK_MS - 1));
         assert!(watch_due(&cfg(true, t0), t0 + CHECK_MS));
-        let mut no_key = cfg(true, 0);
-        no_key.key.clear();
-        assert!(!watch_due(&no_key, t0));
     }
 }

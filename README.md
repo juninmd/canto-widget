@@ -144,10 +144,10 @@ the **latest published** one side by side and a button to update and restart.
 Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two weeks, plus `.vtt`, `.srt`, `.txt`
 and `.md` transcripts from a local folder, cleaned up and searchable.
 
-🤖 **AI models** (hidden by default, turn it on in Settings → Visible tabs): LLMs ranked by the
-[Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, with a score bar, creator, price per
-1M tokens and speed, sortable by intelligence, price or speed. Paste a free API key in the tab; it stays sealed in
-the vault. To spare the free quota it fetches at most once every 3 hours, and the opt-in 🔔 notifies you when a
+🤖 **AI models** (on the tab bar by default, **no API key or account**): LLMs ranked by the
+[Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, read from its public leaderboard page,
+with a score bar, creator, price per 1M tokens and speed, sortable by intelligence, price or speed. It fetches at
+most once every 3 hours, and the opt-in 🔔 notifies you when a
 model **enters the top 10** or **climbs within it** (checked every 6 hours while the vault is unlocked), with
 "new" and "up" badges for a week.
 

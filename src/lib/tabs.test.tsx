@@ -12,7 +12,7 @@ test("saved data that isn't a list of known tabs is ignored, and Ajustes can nev
   expect(parseHidden('["settings","sumiu","notes"]')).toEqual(["notes"]);
   expect(parseHidden("{oops")).toEqual([]);
   expect(parseHidden('{"github":true}')).toEqual([]);
-  expect(parseHidden(null)).toEqual(["gitlab", "status", "models"]);
+  expect(parseHidden(null)).toEqual(["gitlab", "status"]);
   expect(parseHidden("[]")).toEqual([]);
 });
 
@@ -21,12 +21,14 @@ test("hidden tabs leave the bar; the order of the rest is kept", () => {
   expect(ids).toEqual(["tasks", "clipboard", "meetings", "agenda", "github", "status", "models", "settings"]);
 });
 
-test("a tab hidden by default also starts hidden for someone who saved a choice before it existed", () => {
-  expect(hideNewTabs(["gitlab"], null)).toEqual(["gitlab", "models"]);
-  expect(hideNewTabs([], "{oops")).toEqual(["models"]);
-  const known = JSON.stringify(["tasks", "notes", "gitlab", "status", "models"]);
+test("a tab hidden by default also starts hidden for someone who saved a choice before it existed; AI models is visible", () => {
+  const before = JSON.stringify(["tasks", "notes", "gitlab"]);
+  expect(hideNewTabs(["gitlab"], before)).toEqual(["gitlab", "status"]);
+  expect(hideNewTabs([], "{oops")).toEqual([]);
+  const known = JSON.stringify(["tasks", "notes", "gitlab", "status"]);
   expect(hideNewTabs(["gitlab"], known)).toEqual(["gitlab"]);
-  expect(hideNewTabs(["models"], null)).toEqual(["models"]);
+  expect(hideNewTabs(["status"], before)).toEqual(["status"]);
+  expect(parseHidden(null)).not.toContain("models");
 });
 
 function Harness({ start }: { start: Tab[] }) {

@@ -1,7 +1,6 @@
-//! Sealed `modelos_ia.json`: the Artificial Analysis key, the last ranking and the top 10 seen, plus the 3 h floor
-//! that keeps the free tier (~10 calls a day) from running out, whoever asks: the tab, "atualizar" or the watcher.
+//! Sealed `modelos_ia.json`: the alert choice, the last ranking and the top 10 seen, plus the 3 h floor that
+//! keeps the public page from being hammered, whoever asks: the tab, "atualizar" or the watcher.
 use serde::{Deserialize, Serialize};
-use zeroize::Zeroize;
 
 use crate::error::Result;
 use crate::models_feed::{FetchError, Model};
@@ -30,7 +29,6 @@ pub struct Badge {
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct ModelsConfig {
-    pub key: String,
     #[serde(default)]
     pub alerts: bool,
     /// Ranked, at most `MAX_LIST`.
@@ -48,12 +46,6 @@ pub struct ModelsConfig {
     pub top: Option<Vec<String>>,
     #[serde(default)]
     pub badges: Vec<Badge>,
-}
-
-impl Drop for ModelsConfig {
-    fn drop(&mut self) {
-        self.key.zeroize();
-    }
 }
 
 impl AppState {
@@ -84,7 +76,6 @@ pub struct Outcome {
     pub changes: Vec<Change>,
     /// Asked to refresh inside the floor: served from the cache instead.
     pub throttled: bool,
-    pub unauthorized: bool,
     pub error: Option<String>,
 }
 
@@ -93,23 +84,21 @@ pub fn refresh(
     cfg: &mut ModelsConfig,
     now: i64,
     force: bool,
-    fetch: impl FnOnce(&str) -> std::result::Result<Vec<Model>, FetchError>,
+    fetch: impl FnOnce() -> std::result::Result<Vec<Model>, FetchError>,
 ) -> Outcome {
     if !due(cfg, now) {
         return Outcome { throttled: force, ..Default::default() };
     }
-    let result = fetch(&cfg.key);
+    let result = fetch();
     if !matches!(result, Err(FetchError::Network(_))) {
         cfg.tried_at = now;
     }
     match result {
         Ok(models) if models.is_empty() => {
-            Outcome { error: Some("nenhum modelo com Intelligence Index na resposta".into()), ..Default::default() }
+            Outcome { error: Some("nenhum modelo com Intelligence Index na página".into()), ..Default::default() }
         }
         Ok(models) => Outcome { changes: apply(cfg, models, now), ..Default::default() },
-        Err(e) => {
-            Outcome { unauthorized: e == FetchError::Unauthorized, error: Some(e.message()), ..Default::default() }
-        }
+        Err(e) => Outcome { error: Some(e.message()), ..Default::default() },
     }
 }
 
@@ -139,7 +128,6 @@ pub struct Row {
 
 #[derive(Debug, Default, Serialize)]
 pub struct ModelsView {
-    pub connected: bool,
     pub alerts: bool,
     pub models: Vec<Row>,
     pub total: usize,
@@ -152,7 +140,6 @@ pub struct ModelsView {
 pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
     let badge = |id: &str| cfg.badges.iter().find(|b| b.id == id && now - b.at < BADGE_MS).map(|b| b.kind);
     ModelsView {
-        connected: !cfg.key.is_empty(),
         alerts: cfg.alerts,
         models: cfg
             .models
