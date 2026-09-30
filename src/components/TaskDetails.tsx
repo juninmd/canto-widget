@@ -6,6 +6,9 @@ import { REPEAT_LABEL } from "../lib/reminders";
 import { nextPriority, PRIORITY_DOT, PRIORITY_LABEL } from "../lib/priority";
 import RepeatControl from "./RepeatControl";
 import { ClockIcon, PullIcon } from "./Icons";
+import { FocusBadge } from "./FocusControls";
+import { ESTIMATES } from "../lib/focus";
+import { useRunning } from "../lib/useFocus";
 
 const PRIORITIES: Priority[] = ["high", "medium", "low"];
 
@@ -20,6 +23,7 @@ export default function TaskDetails({
   onExtendedRepeat,
   onLinkPr,
   onPriority,
+  onEstimate,
   onClose,
 }: {
   task: Task;
@@ -27,6 +31,7 @@ export default function TaskDetails({
   onExtendedRepeat: (repeat: ExtendedRepeat | null) => void;
   onLinkPr: (url: string | null) => void;
   onPriority: (priority: Priority | null) => void;
+  onEstimate: (minutes: number | null) => void;
   onClose: () => void;
 }) {
   const [prUrl, setPrUrl] = useState(task.pr_url ?? "");
@@ -60,6 +65,21 @@ export default function TaskDetails({
             {PRIORITY_LABEL[p]}
           </option>
         ))}
+      </select>
+      <select
+        aria-label={t("focus.estimateOf", { title: task.title })}
+        value={task.estimate_min ?? ""}
+        onChange={(e) => onEstimate(e.target.value ? Number(e.target.value) : null)}
+        className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+      >
+        <option value="">{t("focus.noEstimate")}</option>
+        {[...new Set([...ESTIMATES, ...(task.estimate_min ? [task.estimate_min] : [])])]
+          .sort((a, b) => a - b)
+          .map((m) => (
+            <option key={m} value={m}>
+              {t("focus.minutes", { min: m })}
+            </option>
+          ))}
       </select>
       <label className="flex flex-1 items-center gap-1">
         {t("tasks.prLabel")}
@@ -116,7 +136,9 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
 export function TaskMeta({ task }: { task: Task }) {
   const timed = task.hora || task.repetir || task.extended_repeat;
   const subtasks = task.subtasks && task.subtasks.length > 0;
-  if (!timed && !subtasks && !task.pr_url) return null;
+  const running = useRunning()?.id === task.id;
+  const focused = running || !!task.estimate_min || (task.tracked_secs ?? 0) >= 60;
+  if (!timed && !subtasks && !task.pr_url && !focused) return null;
   return (
     <span className="flex flex-wrap items-center gap-x-2">
       {timed && (
@@ -129,6 +151,7 @@ export function TaskMeta({ task }: { task: Task }) {
           {task.extended_repeat && <span aria-label={t("repeat.repeats", { label: extendedLabel(task.extended_repeat) })}> ↻</span>}
         </span>
       )}
+      {focused && <FocusBadge task={task} />}
       {subtasks && (
         <span className="shrink-0 text-[11px] text-muted" title={t("tasks.subtasks")}>
           {task.subtasks!.filter((s) => s.done).length}/{task.subtasks!.length}

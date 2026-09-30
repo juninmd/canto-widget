@@ -16,6 +16,8 @@ export type MockOptions = {
   notes?: MockNote[];
   /** Sealed note images by id, as the data URLs `note_image_get` returns. */
   images?: Record<string, string>;
+  /** Fixed answers for commands the defaults do not cover, by command name. */
+  fixed?: Record<string, unknown>;
 };
 export type Call = { cmd: string; args: Record<string, unknown> };
 
@@ -42,6 +44,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       // Rust always answers these with an object; null would crash the tabs, not test them.
       github_status: { connected: false, login: "", source: "", device_flow: false },
       drive_status: { configured: false, connected: false, email: "" },
+      ...o.fixed,
     };
     let callbackId = 1;
     const w = window as unknown as Record<string, unknown>;

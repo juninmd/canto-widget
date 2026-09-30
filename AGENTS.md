@@ -37,13 +37,15 @@ and publishes a release after the checks pass.
 ```text
 src/                      React UI (one component per file, tests next to it)
   lib/api.ts              the only place that calls invoke(); IPC types live here
-  lib/                    pure logic (agenda, reminders, shortcuts, summary, theme, motion) + hooks
-  components/             tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, SettingsTab) and sections
+  lib/                    pure logic (agenda, dayPlan, focus, activity, reminders, shortcuts, summary, theme, motion) + hooks
+  components/             tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, ActivityTab, SettingsTab) and sections
 src-tauri/src/
   lib.rs                  plugin setup, tray, background watchers, invoke_handler list
   vault.rs, store.rs, crypto.rs   AppState/session, sealed envelopes, Argon2id + AES-256-GCM
   model.rs                synced vault model (Task, Note, merge / tombstones)
   commands.rs, cmd_*.rs   Tauri commands, grouped by feature
+  focus.rs                per-task estimate and tracked seconds (commands only; the timer itself lives in the UI)
+  activity.rs, activity_os.rs, activity_watch.rs   opt-in focused-app log: pure spans, OS probes, sampler thread
   password.rs             master password change (re-seals every sealed file)
   github.rs, github_auth.rs       GitHub search API and PAT / device-flow auth
   biometric.rs, hello.rs  Windows Hello unlock
@@ -93,6 +95,9 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   `TAURI_SIGNING_PRIVATE_KEY` secret. Changing the pubkey without shipping it first under the old key leaves every
   installed app unable to update. Signed bundles only come from `--config src-tauri/tauri.updater.conf.json`
   (release workflow), so local `tauri build` does not need the key. Never commit a private key.
+- **New sealed files join `password.rs`.** `atividade.json` (AAD `canto.activity.v1`) is re-sealed on a master password
+  change like `clipboard.json`; a sealed file missing from those two lists becomes unreadable after the change.
+  Timers and samplers write with `in_background`/`save_sealed` so they never count as use and auto-lock still fires.
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
 - **Releases are automated and semantic.** `release.yml` versions each first-parent commit on `main` from its

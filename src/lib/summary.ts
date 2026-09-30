@@ -1,6 +1,7 @@
 import type { AgendaItem, ForgeItem, GeminiDoc, Task } from "./api";
 import { hour } from "./agenda";
 import { LOCALE, t } from "../i18n";
+import { minutesOf } from "./focus";
 
 /** Local midnight of a `YYYY-MM-DD` day, in ms. */
 export function dayStart(day: string): number {
@@ -42,7 +43,7 @@ export function duration(minutes: number): string {
   return h === 0 ? `${m} min` : `${h}h${m ? String(m).padStart(2, "0") : ""}`;
 }
 
-export type DayForges = { opened?: ForgeItem[]; merged?: ForgeItem[]; reviewed?: ForgeItem[] };
+export type DayForges = { opened?: ForgeItem[]; merged?: ForgeItem[]; reviewed?: ForgeItem[]; closed?: ForgeItem[] };
 
 const forgeLine = (i: ForgeItem) => `${i.reference} ${i.title}${i.draft ? ` (${t("summary.draft")})` : ""}`;
 
@@ -63,6 +64,15 @@ export function daySummary(
   };
   section(t("summary.done"), done.map((task) => task.title));
   section(t("summary.pending"), open.map((task) => (task.hora ? `${task.title} (${task.hora})` : task.title)));
+  const focused = tasks.filter((task) => minutesOf(task.tracked_secs ?? 0) > 0);
+  if (focused.length > 0) {
+    const total = focused.reduce((sum, task) => sum + (task.tracked_secs ?? 0), 0);
+    lines.push(
+      `${t("focus.summaryHeading")} (${duration(minutesOf(total))})`,
+      ...focused.map((task) => `- ${task.title} — ${duration(minutesOf(task.tracked_secs ?? 0))}`),
+      "",
+    );
+  }
   const attended = agenda.filter((e) => e.response !== "declined");
   const minutes = meetingMinutes(attended);
   const total = minutes > 0 ? ` · ${t("summary.meetingsTotal", { time: duration(minutes) })}` : "";
@@ -70,6 +80,7 @@ export function daySummary(
   section(t("summary.openedPrs"), (forges.opened ?? []).map(forgeLine));
   section(t("summary.mergedPrs"), (forges.merged ?? []).map(forgeLine));
   section(t("summary.reviewedPrs"), (forges.reviewed ?? []).map(forgeLine));
+  section(t("summary.closedPrs"), (forges.closed ?? []).map(forgeLine));
   if (lines.length === 2) lines.push(t("summary.empty"));
   return lines.join("\n").trimEnd();
 }

@@ -54,6 +54,19 @@ test("merged PRs and the ones I reviewed get their own sections", () => {
   expect(text).not.toContain("PRs/MRs abertos");
 });
 
+test("focused time lists the tasks worked on and skips anything under a minute", () => {
+  const task = (title: string, tracked_secs: number): Task => ({ ...t(title, false), tracked_secs });
+  const text = daySummary("2026-09-14", [task("Revisar PR", 45 * 60), task("Café", 59), task("Changelog", 30 * 60)], []);
+  expect(text).toContain("Tempo focado (1h15)\n- Revisar PR — 45 min\n- Changelog — 30 min");
+  expect(text).not.toContain("- Café —");
+});
+
+test("PRs closed without a merge get their own section", () => {
+  const closed = { reference: "acme/api!11", title: "Tentativa descartada", draft: false } as ForgeItem;
+  const text = daySummary("2026-09-14", [], [], { closed: [closed] });
+  expect(text).toContain("PRs/MRs encerrados sem merge (1)\n- acme/api!11 Tentativa descartada");
+});
+
 const at = (h: number, m: number) => new Date(2026, 8, 14, h, m).toISOString();
 const slot = (start: string, end: string, all_day = false): AgendaItem => ({ ...meeting, start, end, all_day });
 
