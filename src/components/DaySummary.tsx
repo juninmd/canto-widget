@@ -20,7 +20,14 @@ export default function DaySummary({
   const [opened, setOpened] = useState<ForgeOpened | null>(null);
   const [geminiDocs, setGeminiDocs] = useState<GeminiDoc[]>([]);
   const text = useMemo(
-    () => daySummary(day, tasks, agenda, { opened: opened?.items, merged: opened?.merged, reviewed: opened?.reviewed }, geminiDocs),
+    () =>
+      daySummary(
+        day,
+        tasks,
+        agenda,
+        { opened: opened?.items, merged: opened?.merged, reviewed: opened?.reviewed, closed: opened?.closed },
+        geminiDocs,
+      ),
     [day, tasks, agenda, opened, geminiDocs],
   );
 

@@ -79,6 +79,7 @@ pub fn materialize(d: &mut VaultData, day: &str, now: i64) -> usize {
             done: false,
             created_at: now,
             updated_at: now,
+            tracked_secs: 0,
             ..t.clone()
         })
         .filter(|t| !d.deleted.contains_key(&t.id))

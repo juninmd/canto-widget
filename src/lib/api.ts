@@ -29,6 +29,10 @@ export type Task = {
   priority?: Priority | null;
   /** Mutually exclusive with `repetir`: monthly or specific-weekdays recurrence. */
   extended_repeat?: ExtendedRepeat | null;
+  /** Planned effort in minutes. */
+  estimate_min?: number | null;
+  /** Seconds spent in focus. */
+  tracked_secs?: number;
 };
 
 export type NoteLink = { kind: "task"; id: string; label: string } | { kind: "event"; id: string; label: string };
@@ -138,6 +142,8 @@ export const api = {
   subtaskToggle: (id: string, subtaskId: string) => invoke<void>("subtask_toggle", { id, subtaskId }),
   subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
   taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
+  taskSetEstimate: (id: string, minutes: number | null) => invoke<void>("task_set_estimate", { id, minutes }),
+  taskAddTime: (id: string, secs: number) => invoke<void>("task_add_time", { id, secs }),
   tasksReorder: (day: string, ids: string[]) => invoke<void>("tasks_reorder", { day, ids }),
   taskSetExtendedRepeat: (id: string, repeat: ExtendedRepeat | null) =>
     invoke<void>("task_set_extended_repeat", { id, repeat }),

@@ -30,6 +30,7 @@ pub mod crypto;
 pub mod do_not_disturb;
 pub mod drive;
 pub mod error;
+pub mod focus;
 pub mod forge;
 pub mod forge_cache;
 pub mod forge_filter;
@@ -174,6 +175,8 @@ pub fn run() {
             subtask::subtask_toggle,
             subtask::subtask_remove,
             priority::task_set_priority,
+            focus::task_set_estimate,
+            focus::task_add_time,
             task_order::tasks_reorder,
             cmd_notes::notes_search,
             cmd_notes::note_save,

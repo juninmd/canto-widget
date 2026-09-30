@@ -38,6 +38,7 @@ pub fn activity_since(activity: Activity, w: &Window) -> String {
         Activity::Opened => format!("is:pr author:@me created:{range}"),
         Activity::Merged => format!("is:pr author:@me merged:{range}"),
         Activity::Reviewed => format!("is:pr reviewed-by:@me -author:@me updated:{range}"),
+        Activity::Closed => format!("is:pr author:@me is:closed is:unmerged closed:{range}"),
     }
 }
 
@@ -94,6 +95,12 @@ mod tests {
         assert_eq!(activity_since(Activity::Merged, &w), format!("is:pr author:@me merged:>={since}"));
         let q = activity_since(Activity::Reviewed, &w);
         assert!(q.contains("reviewed-by:@me") && q.contains("-author:@me") && !q.contains("is:open"), "{q}");
+    }
+
+    #[test]
+    fn closed_looks_at_my_prs_closed_without_a_merge() {
+        let q = activity_since(Activity::Closed, &Window::since("2026-09-18T03:00:00+00:00"));
+        assert_eq!(q, "is:pr author:@me is:closed is:unmerged closed:>=2026-09-18T03:00:00+00:00");
     }
 
     #[test]

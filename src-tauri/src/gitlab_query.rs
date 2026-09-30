@@ -62,6 +62,7 @@ pub fn activity_since(activity: Activity, username: &str, w: &Window) -> Request
     let mut params: Vec<(&'static str, &str)> = match activity {
         Activity::Opened => vec![("scope", "created_by_me"), ("state", "all"), ("created_after", since)],
         Activity::Merged => vec![("scope", "created_by_me"), ("state", "merged"), ("updated_after", since)],
+        Activity::Closed => vec![("scope", "created_by_me"), ("state", "closed"), ("updated_after", since)],
         Activity::Reviewed => vec![
             ("scope", "all"),
             ("state", "all"),
@@ -83,10 +84,19 @@ pub fn activity_since(activity: Activity, username: &str, w: &Window) -> Request
 /// `updated_after` only prefilters merged MRs (any later edit bumps it); the merge instant itself decides.
 /// An unreadable window keeps the item, falling back to the server-side prefilter.
 pub fn merged_in(merged_at: Option<&str>, w: &Window) -> bool {
+    instant_in(merged_at, w)
+}
+
+/// Same rule for closing: a later comment on an old closed MR bumps `updated_at` too.
+pub fn closed_in(closed_at: Option<&str>, w: &Window) -> bool {
+    instant_in(closed_at, w)
+}
+
+fn instant_in(instant: Option<&str>, w: &Window) -> bool {
     let at = |s: &str| time::OffsetDateTime::parse(s, &time::format_description::well_known::Rfc3339).ok();
-    let Some(merged) = merged_at.and_then(at) else { return false };
-    let after_since = at(&w.since).is_none_or(|s| merged >= s);
-    let before_until = w.until.as_deref().and_then(at).is_none_or(|u| merged <= u);
+    let Some(instant) = instant.and_then(at) else { return false };
+    let after_since = at(&w.since).is_none_or(|s| instant >= s);
+    let before_until = w.until.as_deref().and_then(at).is_none_or(|u| instant <= u);
     after_since && before_until
 }
 

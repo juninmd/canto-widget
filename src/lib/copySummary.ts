@@ -15,7 +15,7 @@ export async function copyDaySummary(day: string, agenda: AgendaItem[]): Promise
       day,
       tasks,
       agenda,
-      { opened: opened?.items, merged: opened?.merged, reviewed: opened?.reviewed },
+      { opened: opened?.items, merged: opened?.merged, reviewed: opened?.reviewed, closed: opened?.closed },
       docs ?? [],
     ));
 }

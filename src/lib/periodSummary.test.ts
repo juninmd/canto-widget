@@ -81,6 +81,19 @@ test("a month shows no per-day block, and a list past its bound shows the real t
   expect(text).toContain("### Tarefas concluídas (301)\n- x (02/09)\n- … e mais 300");
 });
 
+test("focused time shows in the overview of a period", () => {
+  const vault: VaultPeriod = { ...none, focused_secs: 130 * 60 };
+  const text = periodSummary("month", periodBounds("month", "2026-09-24"), { vault, agenda: [], forges: null });
+  expect(text).toContain("**Tempo focado:** 2h10");
+});
+
+test("closed PRs/MRs appear in the overview and as their own list", () => {
+  const forges: ForgeOpened = { items: [], closed: [pr(3)], errors: [], totals: { opened: 0, merged: 0, reviewed: 0, closed: 4 } };
+  const text = periodSummary("month", periodBounds("month", "2026-09-24"), { vault: none, agenda: [], forges });
+  expect(text).toContain("**PRs/MRs encerrados sem merge:** 4");
+  expect(text).toContain("### PRs/MRs encerrados sem merge (4)\n- [acme/atlas#3](https://github.com/acme/atlas/pull/3) Mudança 3\n- … e mais 3");
+});
+
 test("an empty period says so instead of an empty report", () => {
   expect(periodSummary("month", periodBounds("month", "2026-09-24"), { vault: none, agenda: [], forges: null })).toContain(
     "Nada registrado no período.",

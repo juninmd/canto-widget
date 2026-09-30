@@ -63,6 +63,12 @@ pub struct Task {
     /// whole task list on an older install. An unrecognized *field* is just ignored instead.
     #[serde(default)]
     pub extended_repeat: Option<ExtendedRepeat>,
+    /// Planned effort in minutes. New field: no legacy vault has it, so plain default is enough.
+    #[serde(default)]
+    pub estimate_min: Option<u32>,
+    /// Seconds spent in focus, added as the timer flushes. New field, same reasoning as `estimate_min`.
+    #[serde(default)]
+    pub tracked_secs: u32,
 }
 
 /// `day` for `Monthly`: 1-31, matched exactly (a 30-day month has no 31st, so it just doesn't fire that month).

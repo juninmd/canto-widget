@@ -24,15 +24,16 @@ export type ForgeOrder = "desc" | "asc";
 export type ForgeFilter = { text: string; kind: ForgeKind; sort: ForgeSort; order: ForgeOrder };
 export type ForgeLists = Record<ForgeSection, ForgeList>;
 /**
- * `items` are the PRs/MRs opened in the period; `merged` and `reviewed` are optional for older mocks.
+ * `items` are the PRs/MRs opened in the period; `merged`, `reviewed` and `closed` are optional for older mocks.
  * `totals` counts past the first page each list carries.
  */
 export type ForgeOpened = {
   items: ForgeItem[];
   merged?: ForgeItem[];
   reviewed?: ForgeItem[];
+  closed?: ForgeItem[];
   errors: string[];
-  totals?: { opened: number; merged: number; reviewed: number };
+  totals?: { opened: number; merged: number; reviewed: number; closed?: number };
 };
 /** Tasks done (by their day) and notes created or edited in a period; lists are bounded, totals are not. */
 export type VaultPeriod = {
@@ -40,5 +41,7 @@ export type VaultPeriod = {
   done_total: number;
   notes: { title: string; created: boolean; at: number }[];
   notes_total: number;
+  /** Seconds of focus on the period's tasks. */
+  focused_secs?: number;
 };
 export type GitlabStatus = { connected: boolean; username: string; base_url: string };

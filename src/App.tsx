@@ -33,6 +33,8 @@ import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import Alert from "./components/Alert";
 import DndIndicator from "./components/DndIndicator";
+import FocusBar from "./components/FocusBar";
+import { focusStore } from "./lib/focus";
 import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
@@ -85,6 +87,14 @@ function Canto() {
   // Completing from the toast changes the task outside the tab: the list needs to reread.
   const [tasksVersion, setTasksVersion] = useState(0);
 
+  // The bar and the rows show the run; saving happens in the store, and a reload picks up the saved time.
+  useEffect(() => {
+    focusStore.setHandlers({
+      onSaved: () => setTasksVersion((v) => v + 1),
+      onError: (e) => setError(t("focus.saveFailed", { error: errText(e) })),
+    });
+  }, [setError]);
+
   useShortcuts(status?.unlocked === true && !alert, (action) => {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
@@ -121,6 +131,7 @@ function Canto() {
   // Rust locks the vault on its own after a period of inactivity; the UI needs to know.
   useEffect(() => {
     const stop = listen<number>("canto://auto-lock", (e) => {
+      focusStore.discard();
       notify({ message: e.payload > 0 ? t("app.autoLocked", { min: e.payload }) : t("app.lockedFromTray") });
       void refresh();
     });
@@ -158,6 +169,7 @@ function Canto() {
   }, []);
 
   async function lock() {
+    await focusStore.stop();
     setHelpOpen(false);
     setSearchOpen(false);
     setPaletteOpen(false);
@@ -336,6 +348,7 @@ function Canto() {
               />
             )}
           </main>
+          <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
         </>
       )}
     </div>

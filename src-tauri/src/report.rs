@@ -31,6 +31,8 @@ pub struct VaultPeriod {
     pub done_total: usize,
     pub notes: Vec<TouchedNote>,
     pub notes_total: usize,
+    /// Seconds of focus on the period's tasks, done or not.
+    pub focused_secs: u64,
 }
 
 /// Local days `YYYY-MM-DD` from the UI, in order and at most a month apart.
@@ -66,6 +68,11 @@ pub fn period(tasks: &[Task], notes: &[Note], from_day: &str, to_day: &str, from
             .take(LIST_MAX)
             .map(|t| DoneTask { title: t.title.clone(), day: t.day.clone() })
             .collect(),
+        focused_secs: tasks
+            .iter()
+            .filter(|t| t.day.as_str() >= from_day && t.day.as_str() <= to_day)
+            .map(|t| u64::from(t.tracked_secs))
+            .sum(),
         notes_total: touched.len(),
         notes: touched.into_iter().take(LIST_MAX).collect(),
     }

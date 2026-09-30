@@ -1,6 +1,7 @@
 import type { AgendaItem, ForgeItem, ForgeOpened, VaultPeriod } from "./api";
 import { LOCALE, t } from "../i18n";
 import { daysBetween, isWorkday, localDayOf, type Bounds } from "./period";
+import { minutesOf } from "./focus";
 import { dayStart, duration, meetingMinutes } from "./summary";
 
 export type PeriodData = { vault: VaultPeriod; agenda: AgendaItem[]; forges: ForgeOpened | null };
@@ -61,7 +62,7 @@ export function periodSummary(period: "week" | "month", bounds: Bounds, data: Pe
   };
   const minutes = meetingMinutes(attended(agenda));
   const meetingsCount = attended(agenda).length;
-  const forgeTotal = (k: "opened" | "merged" | "reviewed", list?: ForgeItem[]) =>
+  const forgeTotal = (k: "opened" | "merged" | "reviewed" | "closed", list?: ForgeItem[]) =>
     Math.max(forges?.totals?.[k] ?? 0, list?.length ?? 0);
   const overview = [
     [t("report.done"), vault.done_total],
@@ -69,12 +70,16 @@ export function periodSummary(period: "week" | "month", bounds: Bounds, data: Pe
     [t("summary.meetings"), meetingsCount, minutes > 0 ? ` (${duration(minutes)})` : ""],
     [t("summary.mergedPrs"), forgeTotal("merged", forges?.merged)],
     [t("summary.reviewedPrs"), forgeTotal("reviewed", forges?.reviewed)],
+    [t("summary.closedPrs"), forgeTotal("closed", forges?.closed)],
   ].filter(([, n]) => Number(n) > 0);
-  if (overview.length === 0 && forgeTotal("opened", forges?.items) === 0) {
+  const focusMin = minutesOf(vault.focused_secs ?? 0);
+  if (overview.length === 0 && focusMin === 0 && forgeTotal("opened", forges?.items) === 0) {
     lines.push(t("report.empty"));
     return lines.join("\n");
   }
-  if (overview.length > 0) lines.push(overview.map(([l, n, x = ""]) => `**${l}:** ${n}${x}`).join(" · "), "");
+  const parts = overview.map(([l, n, x = ""]) => `**${l}:** ${n}${x}`);
+  if (focusMin > 0) parts.push(`**${t("focus.reportLine")}:** ${duration(focusMin)}`);
+  if (parts.length > 0) lines.push(parts.join(" · "), "");
   if (period === "week") {
     const rows = workdayTotals(bounds, data).map((w) =>
       t("report.workdayLine", { day: shortDay(w.day, true), tasks: w.tasks, time: duration(w.minutes) }),
@@ -95,5 +100,6 @@ export function periodSummary(period: "week" | "month", bounds: Bounds, data: Pe
   section(t("summary.openedPrs"), (forges?.items ?? []).map(forgeLine), forgeTotal("opened", forges?.items));
   section(t("summary.mergedPrs"), (forges?.merged ?? []).map(forgeLine), forgeTotal("merged", forges?.merged));
   section(t("summary.reviewedPrs"), (forges?.reviewed ?? []).map(forgeLine), forgeTotal("reviewed", forges?.reviewed));
+  section(t("summary.closedPrs"), (forges?.closed ?? []).map(forgeLine), forgeTotal("closed", forges?.closed));
   return lines.join("\n").trimEnd();
 }

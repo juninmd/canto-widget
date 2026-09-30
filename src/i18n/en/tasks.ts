@@ -74,6 +74,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "summary.meetingsTotal": "{time} total",
   "summary.mergedPrs": "Merged PRs/MRs",
   "summary.reviewedPrs": "PRs/MRs I reviewed/approved",
+  "summary.closedPrs": "PRs/MRs closed without merging",
   "summary.draft": "draft",
   "summary.geminiNotes": "Gemini notes: {url}",
   "summary.empty": "Nothing recorded today.",

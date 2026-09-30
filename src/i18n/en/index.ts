@@ -1,6 +1,7 @@
 import { app } from "./app";
 import { content } from "./content";
+import { focus } from "./focus";
 import { integrations } from "./integrations";
 import { tasks } from "./tasks";
 
-export const en = { ...app, ...tasks, ...content, ...integrations };
+export const en = { ...app, ...tasks, ...focus, ...content, ...integrations };
