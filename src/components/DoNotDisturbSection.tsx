@@ -1,5 +1,5 @@
 import { DND_CHOICES, dndEndLabel, useDoNotDisturb } from "../lib/doNotDisturb";
-import { t } from "../i18n";
+import { t, LOCALE } from "../i18n";
 
 export default function DoNotDisturbSection({ onError }: { onError: (m: string) => void }) {
   const { state, start, stop } = useDoNotDisturb(onError);
@@ -15,7 +15,7 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
           <span className="text-accent" role="status">
             {state.untilMs === null
               ? t("settings.dnd.activeForever")
-              : t("settings.dnd.activeUntil", { time: dndEndLabel(state.untilMs) })}
+              : {t("settings.dnd.activeUntil", { time: new Date(state.untilMs).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" }) })}}
           </span>
           <button
             type="button"
