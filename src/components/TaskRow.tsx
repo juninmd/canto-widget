@@ -74,7 +74,7 @@ export default function TaskRow({
         data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
-        className={`group flex items-start gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
+        className={`group relative flex items-start gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
         } ${dragging ? "opacity-50" : ""} ${dropTarget ? "ring-1 ring-accent" : ""}`}
       >

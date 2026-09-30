@@ -62,7 +62,7 @@ sends a notification, with **snooze 10 min**.
 ### ✅ Tasks that remind you
 
 A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Day summary** ready to paste (tasks, meetings with total time, PRs/MRs opened, merged and reviewed), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday.
 
 </td>
 </tr>
@@ -79,7 +79,7 @@ Today's events come from Google Calendar (read-only). One minute before, the wid
 Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
 it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
 The top line tells you the **next free slot** of at least 15 minutes (declined invites and all-day events don't
-count), and events that overlap get a **conflict** badge naming the other event.
+count), and events that overlap get a **conflict** badge naming the other event. A **List | Day** switch turns the agenda into hour rows where tasks with a time (sized by their estimate) sit next to the meetings, clashes are flagged, and an untimed task books itself into the first free slot with one click.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -221,6 +221,19 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | ![Task list where each row shows its priority dot, a long title wraps over several lines and the time sits under the title](docs/prints/app/45-tarefas-prioridade.png) | ![Note cards showing a heading, a checklist, a code block and a numbered list rendered instead of raw markdown](docs/prints/app/46-notas-card-markdown.png) |
 
 </details>
+
+| Focus timer pinned under every tab | Agenda as a day, tasks beside meetings |
+|---|---|
+| ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda in the Day view: meetings as solid blocks, a task with a time as a dashed block and the untimed tasks above the hours](docs/prints/app/48-agenda-dia.png) |
+
+| Activity tab (off by default) | Summary with focused time and closed PRs/MRs |
+|---|---|
+| ![Activity tab: timeline per application, time by category and the most used applications, marked as 100% local](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
+
+The **Activity** tab starts hidden (turn it on under Settings → visible tabs). It records only the name of the
+focused application while you use the computer, in a sealed local file that never reaches backups or sync, and shows
+a timeline, time by category and the last 7 days. Off until you opt in; Wayland can't report the focused window, so
+it stays unavailable there.
 
 <sub>All screenshots use fictitious data.</sub>
 

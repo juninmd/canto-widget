@@ -4,7 +4,7 @@ import { focusStore, isOver, minutesOf } from "../lib/focus";
 import { useRunning, useTick } from "../lib/useFocus";
 import { PauseIcon, PlayIcon } from "./Icons";
 
-/** Start or pause the timer on a row; only the running one stays visible without hover. */
+/** Start or pause the timer on a row; the row (`relative`, `group`) reveals it on hover or focus. */
 export function FocusButton({ task }: { task: Task }) {
   const mine = useRunning()?.id === task.id;
   if (task.done && !mine) return null;
@@ -20,8 +20,9 @@ export function FocusButton({ task }: { task: Task }) {
       aria-label={label}
       aria-pressed={mine}
       title={label}
-      className={`grid size-6 shrink-0 place-items-center rounded hover:bg-edge ${
-        mine ? "bg-accent text-on-accent hover:bg-accent" : "text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+      // Floats over the row's right edge instead of taking a slot: at the minimum width a fifth button costs the title 30px.
+      className={`absolute right-[6.75rem] top-1 grid size-6 place-items-center rounded bg-panel opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 ${
+        mine ? "text-accent" : "text-faint"
       }`}
     >
       {mine ? <PauseIcon /> : <PlayIcon />}
