@@ -334,7 +334,7 @@ function Canto() {
               <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
             )}
             {tab === "meetings" && <TranscriptsTab onError={setError} />}
-            {tab === "agenda" && <AgendaTab agenda={agenda} onError={setError} />}
+            {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}
             {tab === "gitlab" && <GitlabTab onError={setError} />}
             {tab === "status" && <StatusTab />}
