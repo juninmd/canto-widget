@@ -1,4 +1,5 @@
 import { useEditorState, type Editor } from "@tiptap/react";
+import { useRef } from "react";
 import { MOD_KEY } from "../lib/platform";
 import { t, type MessageKey } from "../i18n";
 
@@ -43,6 +44,7 @@ export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, on
       link: e.isActive("link"),
     }),
   });
+  const savedSelection = useRef<{ from: number; to: number } | null>(null);
   return (
     <div role="toolbar" aria-label={t("notes.toolbar")} className="flex flex-wrap items-center gap-0.5 rounded-lg border border-line bg-ink p-0.5">
       {TOOLS.map((tool) => (
@@ -53,9 +55,17 @@ export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, on
           aria-label={t(tool.label)}
           aria-pressed={!raw && !!state[tool.key]}
           title={tool.keys ? `${t(tool.label)} (${MOD_KEY}+${tool.keys})` : t(tool.label)}
-          // mousedown would move focus out of the editor and lose the selection the command acts on.
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => tool.run(editor)}
+          onMouseDown={(e) => {
+            e.preventDefault();
+            if (editor.view) savedSelection.current = { from: editor.view.state.selection.from, to: editor.view.state.selection.to };
+          }}
+          onClick={() => {
+            if (savedSelection.current && editor.view) {
+              editor.view.dispatch(editor.view.state.tr.setSelection(editor.view.state.doc.resolve(savedSelection.current.from).resolve(savedSelection.current.to)));
+            }
+            tool.run(editor);
+            savedSelection.current = null;
+          }}
           className={`${BTN} ${tool.key === "bold" ? "font-bold" : tool.key === "italic" ? "italic" : tool.key === "code" || tool.key === "codeBlock" ? "font-mono" : ""} ${on(!raw && !!state[tool.key])}`}
         >
           {tool.glyph}
