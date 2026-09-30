@@ -7,6 +7,8 @@ use crate::calendar::AgendaItem;
 pub const TASK_PREFIX: &str = "task:";
 /// Same prefix as `STATUS_PREFIX` in the UI's `Alert.tsx`.
 pub const STATUS_PREFIX: &str = "status:";
+/// Same prefix as `MODEL_PREFIX` in the UI's `alerts.ts`: a model entered or climbed in the AI top 10.
+pub const MODEL_PREFIX: &str = "model:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
@@ -17,6 +19,9 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
             crate::lang::tr("Serviço com problema", "Service issue"),
             format!("{}: {}", event.title, event.description),
         );
+    }
+    if event.id.starts_with(MODEL_PREFIX) {
+        return (crate::lang::tr("Modelo de IA", "AI model"), format!("{}: {}", event.title, event.tag));
     }
     let body = match event.location.trim() {
         "" => event.title.clone(),

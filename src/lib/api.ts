@@ -108,6 +108,8 @@ export type AgendaItem = {
   attachments?: Attachment[];
   response?: Rsvp | "";
   attendees?: Guest[];
+  /** Short state for alerts that aren't calendar events: a Status API indicator or a model's rank. */
+  tag?: string;
 };
 export type Rsvp = "accepted" | "declined" | "tentative" | "needsAction";
 export type Guest = { name: string; email: string; response: Rsvp | ""; organizer: boolean; optional: boolean; me: boolean };
@@ -246,9 +248,9 @@ export const api = {
     invoke<AgendaItem[]>("agenda_today", { timeMin, timeMax }),
   geminiDocs: (timeMin: string, timeMax: string) => invoke<GeminiDoc[]>("gemini_docs", { timeMin, timeMax }),
   alertOpen: (event: AgendaItem) => invoke<void>("alert_open", { event }),
-  alertPayload: () => invoke<AgendaItem | null>("alert_payload"),
-  alertClose: () => invoke<void>("alert_close"),
-  alertSnooze: (minutes: number) => invoke<void>("alert_snooze", { minutes }),
+  alertPayload: () => invoke<AgendaItem[]>("alert_payload"),
+  alertClose: (id: string) => invoke<void>("alert_close", { id }),
+  alertSnooze: (id: string, minutes: number) => invoke<void>("alert_snooze", { id, minutes }),
   openLink: (url: string) => invoke<void>("open_link", { url }),
 
   githubStatus: () => invoke<GithubStatus>("github_status"),

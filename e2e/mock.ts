@@ -53,12 +53,22 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       ...o.fixed,
     };
     let callbackId = 1;
+    const callbacks = new Map<number, (e: unknown) => void>();
+    const listeners = new Map<string, number>();
     const w = window as unknown as Record<string, unknown>;
     w.__E2E_CALLS__ = calls;
+    // Lets a test ring a Rust-side event (like the alert overlay) once the app has subscribed to it.
+    w.__E2E_EMIT__ = (event: string) => {
+      const id = listeners.get(event);
+      if (id !== undefined) callbacks.get(id)?.({ event, id, payload: null });
+    };
     w.__TAURI_EVENT_PLUGIN_INTERNALS__ = { unregisterListener() {} };
     w.__TAURI_INTERNALS__ = {
       metadata: { currentWindow: { label: "main" }, currentWebview: { windowLabel: "main", label: "main" } },
-      transformCallback: () => callbackId++,
+      transformCallback: (cb: (e: unknown) => void) => {
+        callbacks.set(callbackId, cb);
+        return callbackId++;
+      },
       unregisterCallback() {},
       invoke: async (cmd: string, args: Record<string, unknown> = {}) => {
         calls.push({ cmd, args });
@@ -71,6 +81,10 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
           const task = { id: `t${now}`, title: String(args.title), done: false, day: String(args.day), created_at: now, updated_at: now };
           save([...tasks(), task]);
           return task;
+        }
+        if (cmd === "plugin:event|listen") {
+          listeners.set(String(args.event), Number(args.handler));
+          return callbackId;
         }
         if (cmd.startsWith("plugin:")) return null;
         if (/(_list|_search|_reminders|agenda)$/.test(cmd)) return [];

@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aviso de modelo novo no popup**: quando um modelo entra no top 10 da aba Modelos IA (ou sobe nele), o
+  Canto abre o mesmo popup da agenda, com o nome, o provedor e a posição, e um botão para abrir a aba Modelos.
+  Antes era só uma notificação do sistema. Mais de 3 mudanças de uma vez viram um único aviso-resumo.
+
 - **Aba Modelos IA** (visível por padrão, **sem chave de API**): ranking de LLMs pelo **Intelligence Index**
   da [Artificial Analysis](https://artificialanalysis.ai), lido da página pública de leaderboard, com barra proporcional à nota, criador, preço
   (`$x,xx / 1M tokens`, média 3:1 entrada/saída) e velocidade (`tok/s`). O botão de ordem alterna inteligência →
@@ -118,6 +122,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Popup de avisos com tudo que está pendente**: reuniões, tarefas, serviços fora do ar e modelos novos
+  aparecem juntos, como mini cards no topo (o mais grave primeiro), e o card escolhido abre em detalhe:
+  estado e desde quando para um serviço, local, convidados e anexos para uma reunião. O popup deixou de
+  cobrir o widget inteiro: é um cartão no topo, mais baixo. Fechar, adiar ou silenciar afeta só o aviso
+  escolhido (serviços ganharam "silenciar", que para de vigiar aquele serviço).
 - **Dependências atualizadas**: Tauri 2.12 (runtime, wry 0.57, plugins), `feed-rs` 3, `windows` 0.62 (a mesma
   versão do Tauri; `hello.rs` passa a usar `join()` no lugar do `get()` removido), `marked` 18, Vite 8.3.1 e
   Playwright 1.63; o resto do lockfile foi para as últimas versões compatíveis.

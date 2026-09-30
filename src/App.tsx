@@ -65,7 +65,7 @@ function Canto() {
   const openSettings = useCallback(() => changeTab("settings"), [changeTab]);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
-  const [alert, setAlert] = useState<AgendaItem | null>(null);
+  const [alerts, setAlerts] = useState<AgendaItem[]>([]);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
   const noteDraft = useNoteDraft(status?.unlocked === true);
@@ -97,7 +97,7 @@ function Canto() {
     });
   }, [setError]);
 
-  useShortcuts(status?.unlocked === true && !alert, (action) => {
+  useShortcuts(status?.unlocked === true && alerts.length === 0, (action) => {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
     if (action.type === "privacy") return togglePrivacy();
@@ -163,7 +163,7 @@ function Canto() {
   // Rust signals when a meeting is starting; the overlay takes over the screen.
   useEffect(() => {
     const stop = listen("canto://alert", () => {
-      void api.alertPayload().then(setAlert);
+      void api.alertPayload().then(setAlerts);
     });
     return () => {
       void stop.then((f) => f());
@@ -212,7 +212,14 @@ function Canto() {
         fullscreen.active ? "" : "rounded-2xl border border-edge shadow-2xl"
       }`}
     >
-      {alert && <Alert event={alert} onClose={() => setAlert(null)} onCompleted={() => setTasksVersion((v) => v + 1)} />}
+      {alerts.length > 0 && (
+        <Alert
+          events={alerts}
+          onDismiss={(id) => setAlerts((list) => list.filter((e) => e.id !== id))}
+          onCompleted={() => setTasksVersion((v) => v + 1)}
+          onOpenModels={() => changeTab("models")}
+        />
+      )}
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
       {onboardingOpen && status?.unlocked && (
         <Onboarding
