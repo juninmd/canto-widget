@@ -18,7 +18,7 @@ test("saved data that isn't a list of known tabs is ignored, and Ajustes can nev
 
 test("hidden tabs leave the bar; the order of the rest is kept", () => {
   const ids = visibleTabs(["notes", "gitlab"]).map((t) => t.id);
-  expect(ids).toEqual(["tasks", "clipboard", "meetings", "agenda", "github", "status", "models", "activity", "settings"]);
+  expect(ids).toEqual(["tasks", "clipboard", "agenda", "github", "status", "models", "activity", "settings"]);
 });
 
 test("a tab hidden by default also starts hidden for someone who saved a choice before it existed; AI models is visible", () => {
@@ -37,7 +37,7 @@ function Harness({ start }: { start: Tab[] }) {
 }
 
 test("unchecking hides a tab and the last visible one can't be unchecked", () => {
-  render(<Harness start={["notes", "clipboard", "meetings", "agenda", "github", "status", "models", "activity"]} />);
+  render(<Harness start={["notes", "clipboard", "agenda", "github", "status", "models", "activity"]} />);
   const gitlab = screen.getByLabelText("GitLab") as HTMLInputElement;
   const tasks = screen.getByLabelText("Tarefas") as HTMLInputElement;
   expect(tasks.disabled).toBe(false);

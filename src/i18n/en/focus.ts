@@ -24,6 +24,7 @@ export const focus: Record<keyof typeof source, string> = {
   "plan.viewLabel": "agenda view",
   "plan.viewList": "List",
   "plan.viewDay": "Day",
+  "plan.viewMeetings": "Meetings",
   "plan.legend": "dashed block = task with a time",
   "plan.clash": "clashes",
   "plan.taskMin": "{min} min",

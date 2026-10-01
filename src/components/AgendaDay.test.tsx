@@ -58,3 +58,29 @@ test("clicking an open task books it in the first free slot", async () => {
   const call = calls.find((c) => c.cmd === "task_set_schedule");
   expect(call?.args).toEqual({ id: "Escrever changelog", time: "09:45", repeat: null });
 });
+
+test("Reuniões is a sub-view next to Lista and Dia: it swaps the agenda header for the transcripts and is remembered", async () => {
+  render(<AgendaTab agenda={agenda([daily])} today="2026-09-30" now={now} onError={() => {}} />);
+  expect(screen.getByText(/agenda de hoje/)).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Reuniões" }));
+  });
+
+  expect(screen.getByRole("button", { name: "Reuniões" }).getAttribute("aria-pressed")).toBe("true");
+  expect(screen.queryByText(/agenda de hoje/)).toBeNull();
+  expect(screen.queryByText("Daily do time")).toBeNull();
+  expect(screen.getByPlaceholderText(/buscar/i), "the transcripts search is what the sub-view shows").toBeTruthy();
+  expect(localStorage.getItem("canto.agendaView")).toBe("meetings");
+});
+
+test("a saved Reuniões choice reopens on it, and an unknown saved value falls back to the list", () => {
+  localStorage.setItem("canto.agendaView", "meetings");
+  render(<AgendaTab agenda={agenda([daily])} today="2026-09-30" now={now} onError={() => {}} />);
+  expect(screen.getByRole("button", { name: "Reuniões" }).getAttribute("aria-pressed")).toBe("true");
+  cleanup();
+
+  localStorage.setItem("canto.agendaView", "weekly");
+  render(<AgendaTab agenda={agenda([daily])} today="2026-09-30" now={now} onError={() => {}} />);
+  expect(screen.getByRole("button", { name: "Lista" }).getAttribute("aria-pressed")).toBe("true");
+});

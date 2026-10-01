@@ -188,7 +188,6 @@ export const app = {
   "tabs.tasks": "Tarefas",
   "tabs.notes": "Notas",
   "tabs.clipboard": "Clipboard",
-  "tabs.meetings": "Reuniões",
   "tabs.agenda": "Agenda",
   "tabs.status": "Status API",
   "tabs.models": "Modelos IA",

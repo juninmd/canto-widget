@@ -116,3 +116,12 @@ test("the tab never asks for a key", async () => {
   expect(screen.queryByLabelText(/chave/i)).toBeNull();
   expect(screen.queryByRole("button", { name: /chave/ })).toBeNull();
 });
+
+test("clicking a model opens its page on the leaderboard's site", async () => {
+  await show();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /Nimbus Ultra/ }));
+  });
+  const call = calls.find((c) => c.cmd === "open_link");
+  expect(call?.args).toEqual({ url: "https://artificialanalysis.ai/models/n" });
+});

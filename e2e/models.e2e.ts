@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { calls, mockTauri } from "./mock";
 
-const ALL_TABS = ["tasks", "notes", "clipboard", "meetings", "agenda", "github", "gitlab", "status", "models"];
+const ALL_TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "status", "models"];
 
 /** Fictitious models only (public repository). */
 export const FAKE_MODELS = [

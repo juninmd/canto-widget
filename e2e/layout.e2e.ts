@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { mockTauri } from "./mock";
 
 const LONG = "Revisar a proposta comercial do cliente fictício com os novos prazos de entrega e o cronograma de testes";
-const TABS = ["Tarefas", "Notas", "Clipboard", "Reuniões", "Agenda", "GitHub", "Status API", "Ajustes"];
+const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Ajustes"];
 
 /** A task carrying every row badge (time, ↻, subtasks, PR): the widest row the list can get. */
 async function seedBusyTask(page: Page) {

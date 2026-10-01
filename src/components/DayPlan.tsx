@@ -62,10 +62,16 @@ export default function DayPlan({ agenda, tasks, now, onSchedule }: Props) {
             {blocks.map((b) => (
               <div
                 key={`${b.kind}-${b.id}`}
-                className={`absolute inset-x-0.5 overflow-hidden rounded-md border-l-2 px-2 py-0.5 text-xs ${
+                className={`absolute overflow-hidden rounded-md border-l-2 px-2 py-0.5 text-xs ${
                   b.kind === "event" ? "border-sky-400 bg-sky-500/15" : "border border-dashed border-accent border-l-2 bg-panel"
                 } ${b.clash ? "ring-1 ring-danger" : ""}`}
-                style={{ top: px(b.start), height: Math.max(MIN_BLOCK_PX, px(b.end) - px(b.start) - 2) }}
+                style={{
+                  top: px(b.start),
+                  height: Math.max(MIN_BLOCK_PX, px(b.end) - px(b.start) - 2),
+                  left: `calc(${(b.lane / b.lanes) * 100}% + 2px)`,
+                  width: `calc(${100 / b.lanes}% - 4px)`,
+                }}
+                title={`${b.title} ${hhmm(b.start)}–${hhmm(b.end)}`}
               >
                 <span className="block truncate text-fg">{b.title}</span>
                 <span className="block truncate text-[10px] text-muted">

@@ -122,6 +122,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Modelo da lista abre a página dele**: clicar num modelo da aba Modelos IA abre a página do modelo na
+  Artificial Analysis, no navegador.
+- **Dia: eventos que se sobrepõem ficam lado a lado**, dividindo a largura em colunas, em vez de um por cima do
+  outro. Um bloco sem sobreposição continua com a largura inteira.
+- **Popup de aviso volta ao tamanho cheio** (cobre o widget, como antes), mantendo o desenho novo: mini cards
+  no topo, detalhe do aviso escolhido e os botões embaixo.
+- **Reuniões virou uma sub-aba da Agenda**, ao lado de Lista e Dia. A aba própria saiu da barra, que ganha
+  espaço; as notas e transcrições são as mesmas. A escolha da sub-aba fica salva, como a de Lista/Dia. Quem
+  tinha a aba Reuniões escondida não precisa fazer nada: a preferência antiga é ignorada. Os atalhos
+  `Alt+N` das abas depois de Clipboard andam uma posição (Agenda passa de `Alt+5` a `Alt+4`, e assim por diante).
 - **Popup de avisos com tudo que está pendente**: reuniões, tarefas, serviços fora do ar e modelos novos
   aparecem juntos, como mini cards no topo (o mais grave primeiro), e o card escolhido abre em detalhe:
   estado e desde quando para um serviço, local, convidados e anexos para uma reunião. O popup deixou de
