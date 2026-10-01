@@ -18,6 +18,7 @@ export const models = {
   "models.price": "${price} / 1M tokens",
   "models.speed": "{n} tok/s",
   "models.noPrice": "sem preço",
+  "models.openTitle": "abrir {name} na Artificial Analysis",
   "models.scoreTitle": "{score} pontos no Intelligence Index",
   "models.empty": "nenhum modelo com Intelligence Index ainda",
   "models.source": "dados:",

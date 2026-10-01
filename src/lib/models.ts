@@ -40,3 +40,6 @@ export function barWidth(score: number, max: number): number {
   if (max <= 0) return 0;
   return Math.max(2, Math.min(100, (score / max) * 100));
 }
+
+/** The model's page on the leaderboard's site; the id is that site's own slug. */
+export const modelUrl = (id: string) => `https://artificialanalysis.ai/models/${encodeURIComponent(id)}`;

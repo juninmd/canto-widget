@@ -57,3 +57,27 @@ test("time helpers round-trip", () => {
   expect(taskStart("9:05")).toBeNull();
   expect(hhmm(545)).toBe("09:05");
 });
+
+test("overlapping blocks take side-by-side lanes; a block alone keeps the full width", () => {
+  const blocks = dayBlocks(
+    [event("a", at(9), at(10)), event("b", at(9, 30), at(10, 30)), event("sozinha", at(12), at(13))],
+    [task("t", { hora: "09:45", estimate_min: 15 })],
+  );
+  const by = Object.fromEntries(blocks.map((b) => [b.id, [b.lane, b.lanes]]));
+  expect(by.a).toEqual([0, 3]);
+  expect(by.b).toEqual([1, 3]);
+  expect(by.t).toEqual([2, 3]);
+  expect(by.sozinha).toEqual([0, 1]);
+});
+
+test("a freed lane is reused, and a chain of overlaps shares one cluster", () => {
+  const blocks = dayBlocks([event("a", at(9), at(10)), event("b", at(9, 30), at(11)), event("c", at(10), at(10, 30))], []);
+  const by = Object.fromEntries(blocks.map((b) => [b.id, [b.lane, b.lanes]]));
+  // c starts when a ends, so it takes a's lane instead of opening a third one.
+  expect(by).toEqual({ a: [0, 2], b: [1, 2], c: [0, 2] });
+});
+
+test("back-to-back blocks do not share a lane cluster", () => {
+  const blocks = dayBlocks([event("a", at(9), at(10)), event("b", at(10), at(11))], []);
+  expect(blocks.map((b) => [b.lane, b.lanes])).toEqual([[0, 1], [0, 1]]);
+});

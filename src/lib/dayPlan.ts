@@ -13,6 +13,9 @@ export type PlanBlock = {
   end: number;
   kind: "event" | "task";
   clash: boolean;
+  /** Side-by-side slot among the blocks it overlaps; `lanes` is how many share the width. */
+  lane: number;
+  lanes: number;
 };
 
 const minuteOf = (d: Date) => d.getHours() * 60 + d.getMinutes();
@@ -26,7 +29,7 @@ function eventBlocks(agenda: AgendaItem[]): PlanBlock[] {
       if (Number.isNaN(s.getTime()) || Number.isNaN(f.getTime()) || f <= s) return [];
       const start = minuteOf(s);
       const end = f.getDate() === s.getDate() ? minuteOf(f) : DAY_END;
-      return end > start ? [{ id: e.id, title: e.title, start, end, kind: "event" as const, clash: false }] : [];
+      return end > start ? [{ id: e.id, title: e.title, start, end, kind: "event" as const, clash: false, lane: 0, lanes: 1 }] : [];
     });
 }
 
@@ -40,19 +43,44 @@ function taskBlocks(tasks: Task[]): PlanBlock[] {
     const start = task.done || !task.hora ? null : taskStart(task.hora);
     if (start === null) return [];
     const end = Math.min(DAY_END, start + (task.estimate_min ?? DEFAULT_TASK_MIN));
-    return [{ id: task.id, title: task.title, start, end, kind: "task" as const, clash: false }];
+    return [{ id: task.id, title: task.title, start, end, kind: "task" as const, clash: false, lane: 0, lanes: 1 }];
   });
 }
 
 const overlaps = (a: PlanBlock, b: PlanBlock) => a.start < b.end && b.start < a.end;
 
+/** Blocks that overlap (even through a chain) split the width: each takes the first free lane. */
+function withLanes(sorted: PlanBlock[]): PlanBlock[] {
+  const out: PlanBlock[] = [];
+  let cluster: PlanBlock[] = [];
+  let laneEnds: number[] = [];
+  let clusterEnd = -1;
+  const close = () => {
+    cluster.forEach((b) => out.push({ ...b, lanes: laneEnds.length }));
+    cluster = [];
+    laneEnds = [];
+  };
+  for (const b of sorted) {
+    if (b.start >= clusterEnd) close();
+    let lane = laneEnds.findIndex((end) => end <= b.start);
+    if (lane === -1) lane = laneEnds.length;
+    laneEnds[lane] = b.end;
+    cluster.push({ ...b, lane });
+    clusterEnd = cluster.length === 1 ? b.end : Math.max(clusterEnd, b.end);
+  }
+  close();
+  return out;
+}
+
 /** A task clashes with anything else on the day; two events overlapping is the agenda's own conflict badge. */
 export function dayBlocks(agenda: AgendaItem[], tasks: Task[]): PlanBlock[] {
   const all = [...eventBlocks(agenda), ...taskBlocks(tasks)].sort((a, b) => a.start - b.start || a.end - b.end);
-  return all.map((b) => ({
-    ...b,
-    clash: b.kind === "task" && all.some((o) => o.id !== b.id && overlaps(b, o)),
-  }));
+  return withLanes(
+    all.map((b) => ({
+      ...b,
+      clash: b.kind === "task" && all.some((o) => o.id !== b.id && overlaps(b, o)),
+    })),
+  );
 }
 
 /** Open tasks with no time: candidates for a free slot. */

@@ -241,6 +241,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|
 | ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda in the Day view: meetings as solid blocks, a task with a time as a dashed block and the untimed tasks above the hours](docs/prints/app/48-agenda-dia.png) |
 
+| Day view: overlapping events share the width side by side |
+|---|
+| ![Agenda Day view where a daily and a planning meeting that overlap sit in two columns, with a one-to-one under the daily and the lunch and review blocks at full width](docs/prints/app/53-agenda-dia-sobreposicao.png) |
+
 | Meetings as a sub-tab of the Agenda, next to List and Day |
 |---|
 | ![Agenda tab with the List, Day and Meetings sub-tabs, the Meetings one selected: folder, search box and three fictitious transcripts](docs/prints/app/52-agenda-reunioes.png) |

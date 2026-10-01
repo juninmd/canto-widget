@@ -52,7 +52,7 @@ export default function AlertDetail({ event }: { event: AgendaItem }) {
           </>
         )}
       </div>
-      <div className={`grid min-h-0 flex-1 gap-2.5 ${kind === "meeting" ? "grid-cols-[1.25fr_1fr]" : "grid-cols-1"}`}>
+      <div className={`grid min-h-0 flex-1 content-start gap-2.5 ${kind === "meeting" ? "grid-cols-[1.25fr_1fr]" : "grid-cols-1"}`}>
         <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
           {event.description && <p className="line-clamp-4 whitespace-pre-line text-xs text-fg">{event.description}</p>}
           {event.location && <p className="mt-1 line-clamp-2 text-xs text-muted">{event.location}</p>}

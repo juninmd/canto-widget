@@ -20,6 +20,7 @@ export const models: Record<keyof typeof source, string> = {
   "models.price": "${price} / 1M tokens",
   "models.speed": "{n} tok/s",
   "models.noPrice": "no price",
+  "models.openTitle": "open {name} on Artificial Analysis",
   "models.scoreTitle": "{score} points on the Intelligence Index",
   "models.empty": "no model with an Intelligence Index yet",
   "models.source": "data:",

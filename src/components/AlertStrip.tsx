@@ -29,7 +29,7 @@ type Props = { items: AgendaItem[]; selected: string; onSelect: (id: string) => 
 
 export default function AlertStrip({ items, selected, onSelect }: Props) {
   return (
-    <div role="group" aria-label={t("alert.strip")} data-alert-strip className="flex gap-1.5 overflow-x-auto">
+    <div role="group" aria-label={t("alert.strip")} data-alert-strip className="flex gap-1.5 overflow-x-auto p-1">
       {items.map((e) => {
         const tone = TONE[toneOf(e)];
         const on = e.id === selected;

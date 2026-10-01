@@ -69,12 +69,12 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels }: 
   const label = t("alert.dialogLabel", { kind: t(`alert.kind.${kindOf(event)}`), title: event.title });
 
   return (
-    <div className="absolute inset-0 z-50 flex items-start bg-ink/70 p-2 backdrop-blur-[1px]">
+    <div className="absolute inset-0 z-50 flex">
       <div
         role="alertdialog"
         aria-modal="true"
         aria-label={label}
-        className={`flex max-h-[min(440px,100%)] min-h-[300px] w-full flex-col gap-2 overflow-hidden rounded-2xl border-2 bg-panel p-3 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${TONE[toneOf(event)].border}`}
+        className={`flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl border-2 bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${TONE[toneOf(event)].border}`}
       >
         {items.length > 1 && <AlertStrip items={items} selected={event.id} onSelect={setPicked} />}
         <AlertDetail event={event} />
