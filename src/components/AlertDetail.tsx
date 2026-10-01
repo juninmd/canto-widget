@@ -4,11 +4,12 @@ import { hour, people, status as agendaStatus, tally } from "../lib/agenda";
 import { kindOf, levelLabel, toneOf } from "../lib/alerts";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
+import AlertGuests from "./AlertGuests";
 import { TONE } from "./AlertStrip";
 
 function Box({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="min-h-0 overflow-hidden rounded-lg border border-edge bg-ink px-2.5 py-2">
+    <div className="min-h-0 overflow-y-auto rounded-lg border border-edge bg-ink px-2.5 py-2">
       <p className="mb-1 text-[10px] uppercase tracking-widest text-faint">{label}</p>
       {children}
     </div>
@@ -23,7 +24,8 @@ function Chip({ children, tone }: { children: ReactNode; tone?: string }) {
 export default function AlertDetail({ event }: { event: AgendaItem }) {
   const kind = kindOf(event);
   const tone = TONE[toneOf(event)];
-  const guests = tally(event.attendees ?? []);
+  const attendees = event.attendees ?? [];
+  const guests = tally(attendees);
   const soon = agendaStatus(event).label;
 
   return (
@@ -52,20 +54,23 @@ export default function AlertDetail({ event }: { event: AgendaItem }) {
           </>
         )}
       </div>
-      <div className={`grid min-h-0 flex-1 content-start gap-2.5 ${kind === "meeting" ? "grid-cols-[1.25fr_1fr]" : "grid-cols-1"}`}>
+      <div className={`grid min-h-0 flex-1 content-start gap-2.5 ${kind === "meeting" ? "grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)]" : "grid-cols-1 grid-rows-[minmax(0,auto)]"}`}>
         <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
-          {event.description && <p className="line-clamp-4 whitespace-pre-line text-xs text-fg">{event.description}</p>}
-          {event.location && <p className="mt-1 line-clamp-2 text-xs text-muted">{event.location}</p>}
+          {event.description && <p className="whitespace-pre-line break-words text-xs text-fg">{event.description}</p>}
+          {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
           {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
         </Box>
         {kind === "meeting" && (
           <Box label={t("alert.guests")}>
-            {(event.attendees ?? []).length > 0 && (
-              <p className="text-xs text-muted">
-                ✔ {guests.yes} · ? {guests.maybe + guests.pending} · ✖ {guests.no}
-              </p>
+            {attendees.length > 0 && (
+              <>
+                <p className="text-xs text-muted">
+                  ✔ {guests.yes} · ? {guests.maybe + guests.pending} · ✖ {guests.no}
+                </p>
+                <AlertGuests guests={attendees} total={event.guests ?? 0} />
+              </>
             )}
-            {(event.attachments ?? []).slice(0, 2).map((a) => (
+            {(event.attachments ?? []).map((a) => (
               <button
                 key={a.url}
                 type="button"

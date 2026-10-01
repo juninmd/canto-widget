@@ -157,6 +157,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Popup de reunião sem texto cortado**: a descrição aparece inteira (rola dentro da caixa se passar do espaço) e
+  os convidados são listados com a resposta de cada um, em vez de só o resumo e o corte em 4 linhas.
+
 - **Popup de reunião com detalhes e convidados**: o aviso disparado pelo Canto em segundo plano chegava sem
   descrição, organizador e convidados (o cache era reduzido mesmo com o cofre aberto). Agora o evento completo
   é mantido enquanto o cofre está aberto e só é reduzido ao bloquear.
