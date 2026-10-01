@@ -15,7 +15,9 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
           <span className="text-accent" role="status">
             {state.untilMs === null
               ? t("settings.dnd.activeForever")
-              : {t("settings.dnd.activeUntil", { time: new Date(state.untilMs).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" }) })}}
+              : t("settings.dnd.activeUntil", {
+                  time: new Date(state.untilMs).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" }),
+                })}
           </span>
           <button
             type="button"
