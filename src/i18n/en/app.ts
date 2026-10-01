@@ -193,7 +193,6 @@ export const app: Record<keyof typeof source, string> = {
   "tabs.tasks": "Tasks",
   "tabs.notes": "Notes",
   "tabs.clipboard": "Clipboard",
-  "tabs.meetings": "Meetings",
   "tabs.agenda": "Calendar",
   "tabs.status": "API Status",
   "tabs.models": "AI models",

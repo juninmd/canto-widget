@@ -22,6 +22,7 @@ export const focus = {
   "plan.viewLabel": "visão da agenda",
   "plan.viewList": "Lista",
   "plan.viewDay": "Dia",
+  "plan.viewMeetings": "Reuniões",
   "plan.legend": "bloco tracejado = tarefa com horário",
   "plan.clash": "conflita",
   "plan.taskMin": "{min} min",

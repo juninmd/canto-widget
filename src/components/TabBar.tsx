@@ -2,13 +2,12 @@ import { useRef } from "react";
 import { t } from "../i18n";
 
 export type Tab =
-  | "tasks" | "notes" | "clipboard" | "meetings" | "agenda" | "github" | "gitlab" | "status" | "models" | "activity" | "settings";
+  | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "status" | "models" | "activity" | "settings";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: t("tabs.tasks") },
   { id: "notes", label: t("tabs.notes") },
   { id: "clipboard", label: t("tabs.clipboard") },
-  { id: "meetings", label: t("tabs.meetings") },
   { id: "agenda", label: t("tabs.agenda") },
   { id: "github", label: "GitHub" },
   { id: "gitlab", label: "GitLab" },

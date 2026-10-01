@@ -54,7 +54,7 @@ function ctx(over: Partial<PaletteContext> = {}): PaletteContext {
 test("one command per visible tab, with the Alt+N the bar uses", () => {
   const list = buildCommands(ctx());
   expect(list.some((c) => c.id === "tab.gitlab")).toBe(false);
-  expect(list.find((c) => c.id === "tab.github")?.keys).toEqual(["Alt", "6"]);
+  expect(list.find((c) => c.id === "tab.github")?.keys).toEqual(["Alt", "5"]);
 });
 
 test("joining a meeting only shows up when there is one, and opens that one", () => {

@@ -6,9 +6,13 @@ import { conflicts, freeLabel, nextFree } from "../lib/agendaFree";
 import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
 import DayPlan from "./DayPlan";
+import TranscriptsTab from "./TranscriptsTab";
 import { readView, saveView, type AgendaView } from "../lib/agendaView";
 
 const systemNow = () => new Date();
+
+const VIEWS: AgendaView[] = ["list", "day", "meetings"];
+const LABEL = { list: "plan.viewList", day: "plan.viewDay", meetings: "plan.viewMeetings" } as const;
 
 /// Synthetic event so the user can check the pop-up and sound without waiting for a meeting.
 function testEvent(): AgendaItem {
@@ -79,29 +83,8 @@ export default function AgendaTab({
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <div className="flex items-center justify-between text-[11px] text-faint">
-        <span>{t("agenda.header")}</span>
-        <span className="flex gap-3">
-          <button
-            type="button"
-            title={t("agenda.testAlertTitle")}
-            onClick={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
-            className="min-h-6 underline decoration-dotted hover:text-muted"
-          >
-            {t("agenda.testAlert")}
-          </button>
-          <button
-            type="button"
-            onClick={() => void reload()}
-            className="min-h-6 underline decoration-dotted hover:text-muted"
-          >
-            {loading ? "..." : t("agenda.refresh")}
-          </button>
-        </span>
-      </div>
-
       <div role="group" aria-label={t("plan.viewLabel")} className="flex self-start overflow-hidden rounded-lg border border-edge text-xs">
-        {(["list", "day"] as const).map((v) => (
+        {VIEWS.map((v) => (
           <button
             key={v}
             type="button"
@@ -109,18 +92,45 @@ export default function AgendaTab({
             onClick={() => pick(v)}
             className={`min-h-6 px-3 ${view === v ? "bg-edge font-semibold text-accent" : "text-muted hover:text-fg"}`}
           >
-            {t(v === "list" ? "plan.viewList" : "plan.viewDay")}
+            {t(LABEL[v])}
           </button>
         ))}
       </div>
 
-      {items.length > 0 && (
+      {view !== "meetings" && (
+        <div className="flex items-center justify-between text-[11px] text-faint">
+          <span>{t("agenda.header")}</span>
+          <span className="flex gap-3">
+            <button
+              type="button"
+              title={t("agenda.testAlertTitle")}
+              onClick={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
+              className="min-h-6 underline decoration-dotted hover:text-muted"
+            >
+              {t("agenda.testAlert")}
+            </button>
+            <button
+              type="button"
+              onClick={() => void reload()}
+              className="min-h-6 underline decoration-dotted hover:text-muted"
+            >
+              {loading ? "..." : t("agenda.refresh")}
+            </button>
+          </span>
+        </div>
+      )}
+
+      {view !== "meetings" && items.length > 0 && (
         <p role="status" className="rounded-md bg-edge/60 px-2 py-1 text-[11px] font-medium text-muted">
           {freeLabel(nextFree(items, at), at)}
         </p>
       )}
 
-      {view === "day" ? (
+      {view === "meetings" ? (
+        <div className="min-h-0 flex-1">
+          <TranscriptsTab onError={onError} />
+        </div>
+      ) : view === "day" ? (
         <DayPlan agenda={items} tasks={tasks} now={at} onSchedule={schedule} />
       ) : (
         <ul className="flex-1 space-y-2 overflow-y-auto pr-1">

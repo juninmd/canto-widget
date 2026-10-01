@@ -22,7 +22,6 @@ import TasksTab from "./components/TasksTab";
 import NotesTab from "./components/NotesTab";
 import SettingsTab from "./components/SettingsTab";
 import ClipboardTab from "./components/ClipboardTab";
-import TranscriptsTab from "./components/TranscriptsTab";
 import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
 import GitlabTab from "./components/GitlabTab";
@@ -342,7 +341,6 @@ function Canto() {
             {tab === "clipboard" && (
               <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
             )}
-            {tab === "meetings" && <TranscriptsTab onError={setError} />}
             {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} onError={setError} />}
             {tab === "github" && <GithubTab onError={setError} />}
             {tab === "gitlab" && <GitlabTab onError={setError} />}

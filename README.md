@@ -141,8 +141,8 @@ the **latest published** one side by side and a button to update and restart.
 </tr>
 </table>
 
-Also has 🎙️ **Meetings**: Gemini's notes and transcripts from the last two weeks, plus `.vtt`, `.srt`, `.txt`
-and `.md` transcripts from a local folder, cleaned up and searchable.
+Also has 🎙️ **Meetings**, a sub-tab of the Agenda next to List and Day: Gemini's notes and transcripts from
+the last two weeks, plus `.vtt`, `.srt`, `.txt` and `.md` transcripts from a local folder, cleaned up and searchable.
 
 🤖 **AI models** (on the tab bar by default, **no API key or account**): LLMs ranked by the
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, read from its public leaderboard page,
@@ -240,6 +240,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Focus timer pinned under every tab | Agenda as a day, tasks beside meetings |
 |---|---|
 | ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda in the Day view: meetings as solid blocks, a task with a time as a dashed block and the untimed tasks above the hours](docs/prints/app/48-agenda-dia.png) |
+
+| Meetings as a sub-tab of the Agenda, next to List and Day |
+|---|
+| ![Agenda tab with the List, Day and Meetings sub-tabs, the Meetings one selected: folder, search box and three fictitious transcripts](docs/prints/app/52-agenda-reunioes.png) |
 
 | Activity tab (off by default) | Summary with focused time and closed PRs/MRs |
 |---|---|
