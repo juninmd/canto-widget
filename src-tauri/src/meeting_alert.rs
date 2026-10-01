@@ -79,11 +79,15 @@ pub fn slim(e: &AgendaItem) -> AgendaItem {
     }
 }
 
-/// One watcher step. Unlocked, the cache is refreshed when due; locked, it keeps ringing from the events
-/// fetched before the lock. Past events are dropped so the cache only shrinks while locked.
-pub fn step(cache: &mut Vec<AgendaItem>, refresh: Option<Vec<AgendaItem>>, now: i64) -> Vec<AgendaItem> {
+/// One watcher step. Unlocked, the cache is refreshed when due and keeps the full event (the alert shows its
+/// details and guests); locked, it is trimmed to `slim` and keeps ringing from the events fetched before the lock.
+/// Past events are dropped so the cache only shrinks while locked.
+pub fn step(cache: &mut Vec<AgendaItem>, refresh: Option<Vec<AgendaItem>>, locked: bool, now: i64) -> Vec<AgendaItem> {
     if let Some(fresh) = refresh {
-        *cache = fresh.iter().map(slim).collect();
+        *cache = fresh;
+    }
+    if locked {
+        cache.iter_mut().for_each(|e| *e = slim(e));
     }
     cache.retain(|e| start_ms(e).is_some_and(|s| s - now > -LATE_MS));
     due(cache, now).cloned().collect()
@@ -96,7 +100,8 @@ pub fn watch(app: AppHandle) {
         let mut items: Vec<AgendaItem> = Vec::new();
         let mut fetched: Option<Instant> = None;
         loop {
-            let refresh = if !app.state::<AppState>().is_unlocked() {
+            let locked = !app.state::<AppState>().is_unlocked();
+            let refresh = if locked {
                 // Refetch as soon as the vault opens again.
                 fetched = None;
                 None
@@ -107,7 +112,7 @@ pub fn watch(app: AppHandle) {
                 None
             };
             let alerted = app.state::<Alerted>();
-            for event in step(&mut items, refresh, now_ms()) {
+            for event in step(&mut items, refresh, locked, now_ms()) {
                 if alerted.first(&event) {
                     let _ = window::open_alert(&app, event);
                 }
@@ -168,6 +173,19 @@ mod tests {
     }
 
     #[test]
+    fn rings_with_details_and_guests_while_unlocked() {
+        let mut cache = Vec::new();
+        let fetched = vec![AgendaItem {
+            description: "pauta".into(),
+            guests: 3,
+            attendees: vec![Default::default()],
+            ..event("soon", "2026-09-18T03:00:30Z", false)
+        }];
+        let rung = step(&mut cache, Some(fetched), false, NOW);
+        assert_eq!((rung[0].description.as_str(), rung[0].guests, rung[0].attendees.len()), ("pauta", 3, 1));
+    }
+
+    #[test]
     fn keeps_ringing_from_the_cache_while_locked_and_drops_past_events() {
         let mut cache = Vec::new();
         let fetched = vec![
@@ -178,13 +196,17 @@ mod tests {
             },
             event("over", "2026-09-18T02:00:00Z", false),
         ];
-        assert!(step(&mut cache, Some(fetched), NOW).is_empty());
+        assert!(step(&mut cache, Some(fetched), false, NOW).is_empty());
         assert_eq!(cache.len(), 1, "an event that already started long ago is dropped");
+        assert_eq!(cache[0].guests, 9, "unlocked keeps the full event");
+
+        // Locking trims the cache down to what the alert shows.
+        step(&mut cache, None, true, NOW);
         assert!(cache[0].description.is_empty() && cache[0].guests == 0, "only what the alert shows is kept");
 
         // Locked: no refresh, yet the cached meeting still rings at its time.
         let at = NOW + 29 * 60_000 + 30_000;
-        let rung: Vec<_> = step(&mut cache, None, at).into_iter().map(|e| e.id).collect();
+        let rung: Vec<_> = step(&mut cache, None, true, at).into_iter().map(|e| e.id).collect();
         assert_eq!(rung, ["soon"]);
     }
 }

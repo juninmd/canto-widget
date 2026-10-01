@@ -157,6 +157,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Popup de reunião com detalhes e convidados**: o aviso disparado pelo Canto em segundo plano chegava sem
+  descrição, organizador e convidados (o cache era reduzido mesmo com o cofre aberto). Agora o evento completo
+  é mantido enquanto o cofre está aberto e só é reduzido ao bloquear.
+
 - **Revisão de bugs**:
   - `transcript_read` só lê arquivos de transcrição; antes lia qualquer arquivo da pasta escolhida.
   - Uma gravação do cofre que falha não deixa mais a mudança só na memória (ex.: excluir com disco cheio).
