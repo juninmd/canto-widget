@@ -112,6 +112,9 @@ pub fn alert_event(source: &Source, live: &Live) -> AgendaItem {
         id: format!("{STATUS_PREFIX}{}", source.id),
         title: source.label.to_string(),
         description: live.description.clone(),
+        // When it was seen worse, so the overlay can say for how long; `tag` is Statuspage's indicator.
+        start: chrono::Utc::now().to_rfc3339(),
+        tag: live.indicator.clone(),
         link: page_url(source.url),
         ..Default::default()
     }

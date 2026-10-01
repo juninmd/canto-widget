@@ -168,6 +168,7 @@ impl RawEvent {
             attachments: self.attachments.into_iter().filter_map(attachment).collect(),
             response,
             attendees,
+            ..Default::default()
         })
     }
 }

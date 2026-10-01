@@ -20,7 +20,7 @@ mock.module("@tauri-apps/api/core", () => ({
       case "agenda_today":
         return Promise.resolve(agendaItems);
       case "alert_payload":
-        return Promise.resolve({ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" });
+        return Promise.resolve([{ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" }]);
       case "notes_search":
         return Promise.resolve(
           args?.query === "reuniao"

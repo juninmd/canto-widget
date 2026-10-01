@@ -39,6 +39,20 @@ pub fn advance(current: &mut Option<AgendaItem>, pending: &mut VecDeque<AgendaIt
     (dropped, current.is_some())
 }
 
+/// Drops the alert `id` wherever it is; the next waiting alert becomes current when it was the one shown.
+pub fn remove(current: &mut Option<AgendaItem>, pending: &mut VecDeque<AgendaItem>, id: &str) -> Option<AgendaItem> {
+    if current.as_ref().is_some_and(|e| e.id == id) {
+        return advance(current, pending).0;
+    }
+    let at = pending.iter().position(|e| e.id == id)?;
+    pending.remove(at)
+}
+
+/// Everything waiting for the user, in arrival order: the overlay shows them all and lets them pick.
+pub fn all(current: &Option<AgendaItem>, pending: &VecDeque<AgendaItem>) -> Vec<AgendaItem> {
+    current.iter().chain(pending.iter()).cloned().collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -96,5 +110,28 @@ mod tests {
         }
         assert_eq!(pending.len(), MAX_PENDING);
         assert_eq!(pending.front().unwrap().id, "2");
+    }
+
+    #[test]
+    fn removing_by_id_works_on_the_shown_and_the_waiting_alert() {
+        let (mut current, mut pending) = (None, VecDeque::new());
+        for id in ["a", "b", "c"] {
+            push(&mut current, &mut pending, event(id));
+        }
+        assert_eq!(remove(&mut current, &mut pending, "b").unwrap().id, "b");
+        assert_eq!(ids(&pending), ["c"]);
+        assert_eq!(remove(&mut current, &mut pending, "a").unwrap().id, "a");
+        assert_eq!(current.as_ref().unwrap().id, "c");
+        assert!(remove(&mut current, &mut pending, "gone").is_none(), "closing twice is harmless");
+    }
+
+    #[test]
+    fn the_overlay_list_keeps_arrival_order() {
+        let (mut current, mut pending) = (None, VecDeque::new());
+        for id in ["a", "b"] {
+            push(&mut current, &mut pending, event(id));
+        }
+        let listed: Vec<_> = all(&current, &pending).into_iter().map(|e| e.id).collect();
+        assert_eq!(listed, ["a", "b"]);
     }
 }

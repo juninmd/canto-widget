@@ -60,33 +60,26 @@ pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()
     }
     crate::notification::send(app, &event);
     let Some(state) = app.try_state::<crate::vault::AppState>() else { return Ok(()) };
-    let shown = {
+    {
         let mut current = state.alert.lock().unwrap();
-        alert_queue::push(&mut current, &mut queue(app).0.lock().unwrap(), event)
-    };
-    if shown {
-        present_alert(app)?;
+        alert_queue::push(&mut current, &mut queue(app).0.lock().unwrap(), event);
     }
-    Ok(())
+    // Also for an alert that waits: the overlay lists every pending one and needs to learn about it.
+    present_alert(app)
 }
 
-pub fn close_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
-    take_alert(app);
-    Ok(())
+/// Every pending alert, for the overlay to list.
+pub fn alert_list(app: &tauri::AppHandle) -> Vec<AgendaItem> {
+    let Some(state) = app.try_state::<crate::vault::AppState>() else { return Vec::new() };
+    let current = state.alert.lock().unwrap();
+    alert_queue::all(&current, &queue(app).0.lock().unwrap())
 }
 
-/// Dismissing, snoozing or completing the alert on screen brings up the next one waiting; returns the dismissed one.
-pub fn take_alert(app: &tauri::AppHandle) -> Option<AgendaItem> {
+/// Dismissing, snoozing or completing an alert drops just that one; the others stay on the overlay.
+pub fn take_alert(app: &tauri::AppHandle, id: &str) -> Option<AgendaItem> {
     let state = app.try_state::<crate::vault::AppState>()?;
-    let (dropped, next) = {
-        let mut current = state.alert.lock().unwrap();
-        alert_queue::advance(&mut current, &mut queue(app).0.lock().unwrap())
-    };
-    // Best effort: an error here must not fail the dismissal, or the UI would dismiss again and skip the next one.
-    if next {
-        let _ = present_alert(app);
-    }
-    dropped
+    let mut current = state.alert.lock().unwrap();
+    alert_queue::remove(&mut current, &mut queue(app).0.lock().unwrap(), id)
 }
 
 /// Managed on first use so the queue needs no setup in `lib.rs`; a second `manage` is a no-op.

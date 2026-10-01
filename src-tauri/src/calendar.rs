@@ -32,6 +32,9 @@ pub struct AgendaItem {
     pub response: String,
     #[serde(default)]
     pub attendees: Vec<Guest>,
+    /// Short state for alerts that aren't calendar events: a Status API indicator or a model's rank.
+    #[serde(default)]
+    pub tag: String,
 }
 
 /// A person on the guest list; rooms are left out.

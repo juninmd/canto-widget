@@ -231,6 +231,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
+| One alert overlay for everything pending: outages, meetings, tasks and new AI models |
+|---|
+| ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
+
 </details>
 
 | Focus timer pinned under every tab | Agenda as a day, tasks beside meetings |

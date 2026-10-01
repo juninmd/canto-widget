@@ -156,13 +156,13 @@ pub fn alert_open(app: tauri::AppHandle, event: AgendaItem) -> Result<()> {
 }
 
 #[tauri::command]
-pub fn alert_payload(state: State<'_, AppState>) -> Option<AgendaItem> {
-    state.alert.lock().unwrap().clone()
+pub fn alert_payload(app: tauri::AppHandle) -> Vec<AgendaItem> {
+    window::alert_list(&app)
 }
 
 #[tauri::command]
-pub fn alert_close(app: tauri::AppHandle) -> Result<()> {
-    window::close_alert(&app).map_err(|e| AppError::Io(e.to_string()))
+pub fn alert_close(app: tauri::AppHandle, id: String) {
+    window::take_alert(&app, &id);
 }
 
 #[tauri::command]

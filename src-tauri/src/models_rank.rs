@@ -5,7 +5,7 @@ use crate::models_feed::Model;
 
 pub const TOP: usize = 10;
 /// More changes than this at once (a model leaving #1 lifts nine others) become one summary banner.
-const MAX_EACH: usize = 3;
+pub const MAX_EACH: usize = 3;
 
 /// Highest index first; ties by name, then id, so the order never flips between two identical readings.
 pub fn rank(mut models: Vec<Model>) -> Vec<Model> {

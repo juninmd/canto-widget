@@ -1,127 +1,91 @@
-import { t } from "../i18n";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, type AgendaItem } from "../lib/api";
-import { hour, people } from "../lib/agenda";
-import { TASK_PREFIX } from "../lib/reminders";
+import { kindOf, sortAlerts, toneOf } from "../lib/alerts";
 import { playAlert } from "../lib/sound";
+import { t } from "../i18n";
+import AlertActions from "./AlertActions";
+import AlertDetail from "./AlertDetail";
+import AlertStrip, { TONE } from "./AlertStrip";
 
-const SNOOZE_MINUTES = 10;
-/** Same prefix as `STATUS_PREFIX` in `notification.rs`: a watched Status API service got worse. */
-const STATUS_PREFIX = "status:";
+type Props = {
+  events: AgendaItem[];
+  onDismiss: (id: string) => void;
+  onCompleted?: () => void;
+  onOpenModels?: () => void;
+};
 
-type Props = { event: AgendaItem; onClose: () => void; onCompleted?: () => void };
-
-export default function Alert({ event, onClose, onCompleted }: Props) {
+/** Everything pending at once: a strip of mini cards picks which one the card below details. */
+export default function Alert({ events, onDismiss, onCompleted, onOpenModels }: Props) {
   const primary = useRef<HTMLButtonElement>(null);
-  const task = event.id.startsWith(TASK_PREFIX) ? event.id.slice(TASK_PREFIX.length) : null;
-  const service = event.id.startsWith(STATUS_PREFIX);
-  const kind = task ? t("alert.taskReminder") : service ? t("alert.serviceIssue") : t("alert.meetingStarting");
-
-  const close = useCallback(() => {
-    void api.alertClose();
-    onClose();
-  }, [onClose]);
+  const items = useMemo(() => sortAlerts(events), [events]);
+  // Sticky: a worse alert arriving must not swap the card under someone about to act on another one.
+  const [picked, setPicked] = useState(() => items[0]?.id ?? "");
+  const event = items.find((e) => e.id === picked) ?? items[0];
+  const seen = useRef(new Set<string>());
 
   useEffect(() => {
-    void playAlert();
-    // The overlay covers the whole widget: someone arriving via keyboard needs focus
-    // on the primary action and an Esc exit.
-    primary.current?.focus();
-  }, [event.id]);
+    if (event && event.id !== picked) setPicked(event.id);
+  }, [event, picked]);
+
+  // Forgetting it lets the same id ring again (a snooze firing, a service getting worse) with a sound.
+  const hide = useCallback(
+    (id: string) => {
+      seen.current.delete(id);
+      onDismiss(id);
+    },
+    [onDismiss],
+  );
+
+  const dismiss = useCallback(
+    (id: string) => {
+      void api.alertClose(id);
+      hide(id);
+    },
+    [hide],
+  );
+
+  // A sound only for an alert that wasn't on screen yet; the list refreshes whenever another one arrives.
+  useEffect(() => {
+    const fresh = items.some((e) => !seen.current.has(e.id));
+    items.forEach((e) => seen.current.add(e.id));
+    if (fresh) void playAlert();
+  }, [items]);
+
+  // The overlay covers the widget: keyboard users need focus on the primary action and an Esc exit.
+  // Picking from the strip keeps focus there, so a keyboard user isn't pulled away after every choice.
+  useEffect(() => {
+    if (!document.activeElement?.closest("[data-alert-strip]")) primary.current?.focus();
+  }, [event?.id]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape" && event) dismiss(event.id);
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [close]);
+  }, [event, dismiss]);
+
+  if (!event) return null;
+  const label = t("alert.dialogLabel", { kind: t(`alert.kind.${kindOf(event)}`), title: event.title });
 
   return (
-    <div
-      role="alertdialog"
-      aria-modal="true"
-      aria-label={t("alert.dialogLabel", { kind, title: event.title })}
-      className="absolute inset-0 z-50 flex flex-col justify-between rounded-2xl border-2 border-accent bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
-    >
-      <div className="min-h-0 overflow-y-auto">
-        <p className="text-[11px] uppercase tracking-widest text-accent">
-          {task || service ? kind : t("alert.startingNow")}
-        </p>
-        <h1 className="mt-1 line-clamp-2 text-lg font-semibold">{event.title}</h1>
-        {!service && <p className="mt-1 text-sm text-muted">{hour(event)}</p>}
-        {event.location && <p className="mt-1 line-clamp-2 text-xs text-faint">{event.location}</p>}
-        {people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
-        {event.description && <p className="mt-2 line-clamp-4 whitespace-pre-line text-xs text-faint">{event.description}</p>}
-        {(event.attachments ?? []).slice(0, 3).map((a) => (
-          <button
-            key={a.url}
-            type="button"
-            onClick={() => void api.openLink(a.url)}
-            title={a.url}
-            className="mt-1.5 block w-full truncate rounded bg-edge px-2 py-1 text-left text-xs text-fg"
-          >
-            📄 {a.title}
-          </button>
-        ))}
-        {event.meet && (
-          <p className="mt-2 truncate text-xs text-muted" title={event.meet}>
-            {event.meet}
-          </p>
-        )}
-      </div>
-
-      <div className="flex gap-2">
-        {task && (
-          <button
-            ref={primary}
-            type="button"
-            onClick={() => void api.taskComplete(task).then(onCompleted).finally(close)}
-            className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent"
-          >
-            {t("alert.completeTask")}
-          </button>
-        )}
-        {event.meet && (
-          <button
-            ref={primary}
-            type="button"
-            onClick={() => {
-              void api.openLink(event.meet);
-              close();
-            }}
-            className="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent"
-          >
-            {t("alert.joinMeet")}
-          </button>
-        )}
-        {!event.meet && event.link && (
-          <button
-            ref={primary}
-            type="button"
-            onClick={() => void api.openLink(event.link)}
-            className="flex-1 rounded-lg bg-edge px-3 py-2 text-sm text-fg"
-          >
-            {service ? t("alert.openStatus") : t("alert.openCalendar")}
-          </button>
-        )}
-        {!service && (
-          <button
-            type="button"
-            onClick={() => void api.alertSnooze(SNOOZE_MINUTES).then(onClose, close)}
-            className="rounded-lg bg-edge px-3 py-2 text-sm text-fg"
-          >
-            {t("alert.snooze", { minutes: SNOOZE_MINUTES })}
-          </button>
-        )}
-        <button
-          type="button"
-          onClick={close}
-          title="Esc"
-          className="rounded-lg bg-edge px-3 py-2 text-sm text-muted"
-        >
-          {t("alert.close")}
-        </button>
+    <div className="absolute inset-0 z-50 flex items-start bg-ink/70 p-2 backdrop-blur-[1px]">
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-label={label}
+        className={`flex max-h-[min(440px,100%)] min-h-[300px] w-full flex-col gap-2 overflow-hidden rounded-2xl border-2 bg-panel p-3 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${TONE[toneOf(event)].border}`}
+      >
+        {items.length > 1 && <AlertStrip items={items} selected={event.id} onSelect={setPicked} />}
+        <AlertDetail event={event} />
+        <AlertActions
+          ref={primary}
+          event={event}
+          onDismiss={() => dismiss(event.id)}
+          onHide={() => hide(event.id)}
+          onCompleted={onCompleted}
+          onOpenModels={onOpenModels}
+        />
       </div>
     </div>
   );
