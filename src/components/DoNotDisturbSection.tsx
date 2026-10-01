@@ -1,4 +1,4 @@
-import { DND_CHOICES, dndEndLabel, useDoNotDisturb } from "../lib/doNotDisturb";
+import { DND_CHOICES, useDoNotDisturb } from "../lib/doNotDisturb";
 import { t, LOCALE } from "../i18n";
 
 export default function DoNotDisturbSection({ onError }: { onError: (m: string) => void }) {
