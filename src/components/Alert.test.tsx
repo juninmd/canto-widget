@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { AgendaItem } from "../lib/api";
+import type { AgendaItem, Guest } from "../lib/api";
 
 const calls: string[] = [];
 const args: Record<string, unknown>[] = [];
@@ -162,4 +162,20 @@ test("dismissing one alert closes only that id, not the others waiting", async (
 test("a lone alert has no strip to pick from", async () => {
   await show([event]);
   expect(screen.queryByRole("group", { name: "avisos pendentes" })).toBeNull();
+});
+
+test("the meeting alert shows the whole description and every listed guest instead of clipping them", async () => {
+  const long = Array.from({ length: 12 }, (_, i) => `Item ${i + 1} da pauta`).join("\n");
+  const guest = (name: string, response: Guest["response"]): Guest => ({ name, email: `${name}@ex.com`, response, organizer: false, optional: false, me: false });
+  const full: AgendaItem = {
+    ...event,
+    description: long,
+    guests: 7,
+    attendees: [guest("Ana", "accepted"), guest("Bia", "declined"), guest("Caio", "tentative"), guest("Duda", "needsAction")],
+  };
+  await show([full]);
+  const desc = screen.getByText(/Item 12 da pauta/);
+  expect(desc.className).not.toContain("line-clamp");
+  for (const name of ["Ana", "Bia", "Caio", "Duda"]) expect(screen.getByText(name)).toBeTruthy();
+  expect(screen.getByText("+3 não listados")).toBeTruthy();
 });
