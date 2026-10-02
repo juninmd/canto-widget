@@ -160,6 +160,12 @@ pub fn alert_payload(app: tauri::AppHandle) -> Vec<AgendaItem> {
     window::alert_list(&app)
 }
 
+/// The alert window's way to bring the widget up (e.g. "abrir aba Modelos"); an alert alone never does.
+#[tauri::command]
+pub fn main_show(app: tauri::AppHandle) -> Result<()> {
+    window::show(&app).map_err(|e| AppError::Io(e.to_string()))
+}
+
 #[tauri::command]
 pub fn alert_close(app: tauri::AppHandle, id: String) {
     window::take_alert(&app, &id);

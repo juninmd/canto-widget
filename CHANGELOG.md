@@ -5,6 +5,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Popup de aviso em janela própria**: reunião, lembrete de tarefa, instabilidade de serviço e modelo novo agora
+  aparecem numa janela separada no canto da tela. Antes o aviso abria o Canto inteiro por cima, mesmo com ele
+  minimizado; agora o widget continua minimizado e, com o cofre trancado, o popup aparece do mesmo jeito (concluir
+  tarefa pede o cofre aberto; adiar, fechar e entrar na reunião não).
+
 ### Adicionado
 
 - **Aviso de modelo novo no popup**: quando um modelo entra no top 10 da aba Modelos IA (ou sobe nele), o

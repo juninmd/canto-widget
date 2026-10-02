@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MOD_KEY, TOGGLE_LABEL } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
-import { api, errText, type AgendaItem, type VaultStatus } from "./lib/api";
+import { api, errText, type VaultStatus } from "./lib/api";
 import { useAgenda } from "./lib/useAgenda";
 import { useNoteDraft } from "./lib/useNoteDraft";
 import { useUpdateNotice } from "./lib/useUpdateNotice";
@@ -32,13 +32,13 @@ import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
-import Alert from "./components/Alert";
 import DndIndicator from "./components/DndIndicator";
 import FocusBar from "./components/FocusBar";
 import { focusStore } from "./lib/focus";
 import { EyeIcon, EyeOffIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
+import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
 
 export default function App() {
   return (
@@ -64,7 +64,6 @@ function Canto() {
   const openSettings = useCallback(() => changeTab("settings"), [changeTab]);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
-  const [alerts, setAlerts] = useState<AgendaItem[]>([]);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
   const noteDraft = useNoteDraft(status?.unlocked === true);
@@ -96,7 +95,7 @@ function Canto() {
     });
   }, [setError]);
 
-  useShortcuts(status?.unlocked === true && alerts.length === 0, (action) => {
+  useShortcuts(status?.unlocked === true, (action) => {
     if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
     if (action.type === "privacy") return togglePrivacy();
@@ -159,15 +158,15 @@ function Canto() {
     };
   }, [status?.unlocked]);
 
-  // Rust signals when a meeting is starting; the overlay takes over the screen.
+  // The pop-up lives in its own window: what it changes here arrives as events.
   useEffect(() => {
-    const stop = listen("canto://alert", () => {
-      void api.alertPayload().then(setAlerts);
-    });
+    const done = listen(TASKS_CHANGED_EVENT, () => setTasksVersion((v) => v + 1));
+    const open = listen<Tab>(OPEN_TAB_EVENT, (e) => changeTab(e.payload));
     return () => {
-      void stop.then((f) => f());
+      void done.then((f) => f());
+      void open.then((f) => f());
     };
-  }, []);
+  }, [changeTab]);
 
   async function lock() {
     await focusStore.stop();
@@ -211,14 +210,6 @@ function Canto() {
         fullscreen.active ? "" : "rounded-2xl border border-edge shadow-2xl"
       }`}
     >
-      {alerts.length > 0 && (
-        <Alert
-          events={alerts}
-          onDismiss={(id) => setAlerts((list) => list.filter((e) => e.id !== id))}
-          onCompleted={() => setTasksVersion((v) => v + 1)}
-          onOpenModels={() => changeTab("models")}
-        />
-      )}
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
       {onboardingOpen && status?.unlocked && (
         <Onboarding

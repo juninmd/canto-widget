@@ -53,7 +53,10 @@ pub fn show(app: &tauri::AppHandle) -> tauri::Result<()> {
 
 pub const ALERT_EVENT: &str = "canto://alert";
 
-/// An overlay on the window itself avoids depending on creating a webview at runtime, which behaves differently on each platform.
+pub const ALERT_WINDOW: &str = "alert";
+
+/// Rings in its own window (declared in `tauri.conf.json`, so no webview is created at runtime): the widget
+/// stays minimized or locked while the pop-up shows.
 pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()> {
     if crate::do_not_disturb::quiet(app) {
         return Ok(());
@@ -78,8 +81,19 @@ pub fn alert_list(app: &tauri::AppHandle) -> Vec<AgendaItem> {
 /// Dismissing, snoozing or completing an alert drops just that one; the others stay on the overlay.
 pub fn take_alert(app: &tauri::AppHandle, id: &str) -> Option<AgendaItem> {
     let state = app.try_state::<crate::vault::AppState>()?;
-    let mut current = state.alert.lock().unwrap();
-    alert_queue::remove(&mut current, &mut queue(app).0.lock().unwrap(), id)
+    let removed = {
+        let mut current = state.alert.lock().unwrap();
+        let queue = queue(app);
+        let mut pending = queue.0.lock().unwrap();
+        let removed = alert_queue::remove(&mut current, &mut pending, id);
+        (removed, current.is_none())
+    };
+    if removed.1 {
+        if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
+            let _ = win.hide();
+        }
+    }
+    removed.0
 }
 
 /// Managed on first use so the queue needs no setup in `lib.rs`; a second `manage` is a no-op.
@@ -89,11 +103,35 @@ fn queue(app: &tauri::AppHandle) -> tauri::State<'_, alert_queue::AlertQueue> {
 }
 
 fn present_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
-    if let Some(win) = app.get_webview_window("main") {
-        crate::window_state::place(&win)?;
-        win.show()?;
+    if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
+        if !win.is_visible()? {
+            anchor_bottom_right(&win)?;
+            win.show()?;
+        }
         win.set_focus()?;
     }
     app.emit(ALERT_EVENT, ())?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn alert_rings_in_its_own_window_and_never_shows_the_widget() {
+        let src = include_str!("window.rs");
+        let body = &src[src.find("fn present_alert(").unwrap()..src.find("#[cfg(test)]").unwrap()];
+        assert!(body.contains("ALERT_WINDOW"));
+        assert!(!body.contains("\"main\""), "a pop-up must not open the minimized or locked widget");
+    }
+
+    #[test]
+    fn alert_window_is_declared_and_allowed() {
+        let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
+        let windows = conf["app"]["windows"].as_array().unwrap();
+        let alert =
+            windows.iter().find(|w| w["label"] == super::ALERT_WINDOW).expect("alert window in tauri.conf.json");
+        assert_eq!(alert["visible"], false, "hidden until an alert rings");
+        let caps = include_str!("../capabilities/default.json");
+        assert!(caps.contains("\"alert\""), "the pop-up needs the IPC permissions");
+    }
 }
