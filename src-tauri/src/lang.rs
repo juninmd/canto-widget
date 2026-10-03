@@ -25,6 +25,7 @@ pub fn tr(pt: &'static str, en: &'static str) -> &'static str {
 /// Static tray items whose labels must follow the language (the join item is refreshed by `tray_live`).
 pub struct TrayLabels {
     pub toggle: MenuItem<tauri::Wry>,
+    pub mini: MenuItem<tauri::Wry>,
     pub lock: MenuItem<tauri::Wry>,
     pub quit: MenuItem<tauri::Wry>,
 }
@@ -46,6 +47,7 @@ pub fn language_set(app: AppHandle, lang: String) -> Result<()> {
     ENGLISH.store(parse(&lang)?, Ordering::Relaxed);
     if let Some(items) = app.try_state::<TrayLabels>() {
         let _ = items.toggle.set_text(toggle_label());
+        let _ = items.mini.set_text(tr("Modo mini", "Mini mode"));
         let _ = items.lock.set_text(tr("Trancar cofre", "Lock vault"));
         let _ = items.quit.set_text(tr("Sair", "Quit"));
     }

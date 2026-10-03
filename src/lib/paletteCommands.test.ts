@@ -44,6 +44,7 @@ function ctx(over: Partial<PaletteContext> = {}): PaletteContext {
     setSkin: noop,
     togglePrivacy: noop,
     toggleFullscreen: noop,
+    mini: noop,
     copySummary: noop,
     help: noop,
     hide: noop,
@@ -85,4 +86,10 @@ test("other features register actions through the provider array", () => {
   } finally {
     PALETTE_PROVIDERS.pop();
   }
+});
+
+test("the palette can switch to the mini dock", () => {
+  let mini = 0;
+  buildCommands(ctx({ mini: () => mini++ })).find((c) => c.id === "window.mini")?.run();
+  expect(mini).toBe(1);
 });

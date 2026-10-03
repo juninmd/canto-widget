@@ -192,6 +192,14 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
+| Modes: Mini, Hidden, Normal, Maximized | Mini mode: alerts on the screen edge |
+|---|---|
+| ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
+
+| Click an alert in the dock | Maximized: tasks and agenda side by side |
+|---|---|
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left and today's agenda and recent notes on the right](docs/prints/app/65-modo-maximizado.png) |
+
 | Snooze: 1, 5 or 10 min |
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |

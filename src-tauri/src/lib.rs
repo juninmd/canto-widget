@@ -95,6 +95,7 @@ pub mod unlock_log;
 pub mod updater;
 pub mod vault;
 pub mod window;
+pub mod window_mode;
 pub mod window_state;
 
 pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
@@ -256,6 +257,8 @@ pub fn run() {
             window_state::window_config,
             window_state::window_set_always_on_top,
             window_state::window_reset,
+            window_mode::window_mini_set,
+            window_mode::window_mini_resize,
             cmd_github::github_status,
             cmd_github::github_save_token,
             cmd_github::github_device_start,
@@ -311,12 +314,13 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, tray_live::no_meeting_label(), false, None::<&str>)?;
     let dnd_label = do_not_disturb::tray_label(do_not_disturb::current(app));
     let dnd = MenuItem::with_id(app, do_not_disturb::TRAY_ITEM_ID, dnd_label, true, None::<&str>)?;
+    let mini = MenuItem::with_id(app, "mini", lang::tr("Modo mini", "Mini mode"), true, None::<&str>)?;
     let lock = MenuItem::with_id(app, "lock", lang::tr("Trancar cofre", "Lock vault"), true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", lang::tr("Sair", "Quit"), true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &join, &dnd, &lock, &quit])?;
+    let menu = Menu::with_items(app, &[&toggle, &mini, &join, &dnd, &lock, &quit])?;
     app.manage(tray_live::JoinMenuItem(join));
     app.manage(do_not_disturb::DndMenuItem(dnd));
-    app.manage(lang::TrayLabels { toggle, lock, quit });
+    app.manage(lang::TrayLabels { toggle, mini, lock, quit });
 
     TrayIconBuilder::with_id("canto-tray")
         .icon(app.default_window_icon().cloned().unwrap())
@@ -326,6 +330,9 @@ fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
         .on_menu_event(|app, event| match event.id.as_ref() {
             "toggle" => {
                 let _ = window::toggle(app);
+            }
+            "mini" => {
+                let _ = window_mode::toggle_mini(app);
             }
             tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
             do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { MOD_KEY, TOGGLE_LABEL } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
@@ -6,7 +6,8 @@ import { api, errText, type VaultStatus } from "./lib/api";
 import { useAgenda } from "./lib/useAgenda";
 import { useNoteDraft } from "./lib/useNoteDraft";
 import { useUpdateNotice } from "./lib/useUpdateNotice";
-import { useFullscreen } from "./lib/useFullscreen";
+import { useWindowMode } from "./lib/useWindowMode";
+import { useAlertList } from "./lib/useAlertList";
 import { focusShortcut, focusShortcutSoon, useShortcuts } from "./lib/shortcuts";
 import CommandPalette from "./components/CommandPalette";
 import { buildCommands, nextMeeting } from "./lib/paletteCommands";
@@ -36,6 +37,10 @@ import DndIndicator from "./components/DndIndicator";
 import FocusBar from "./components/FocusBar";
 import { focusStore } from "./lib/focus";
 import { ExpandIcon, EyeIcon, EyeOffIcon, HelpIcon, LockIcon, MinimizeIcon, ShrinkIcon } from "./components/Icons";
+import ModeSwitcher from "./components/ModeSwitcher";
+import MiniRail from "./components/MiniRail";
+import FocusedAlert from "./components/FocusedAlert";
+import MaxSide from "./components/MaxSide";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
 import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
@@ -82,8 +87,18 @@ function Canto() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
-  const fullscreen = useFullscreen();
-  const toggleFullscreen = () => void fullscreen.toggle().catch((e) => setError(errText(e)));
+  const { mode, setMode } = useWindowMode();
+  const setModeRef = useRef(setMode);
+  setModeRef.current = setMode;
+  const pickMode = (next: Parameters<typeof setMode>[0]) => void setMode(next).catch((e) => setError(errText(e)));
+  const toggleFullscreen = () => pickMode(mode === "max" ? "normal" : "max");
+  const { alerts, drop } = useAlertList(true);
+  // Set by a click on the dock: the normal window opens with that alert on top.
+  const [focusId, setFocusId] = useState<string | null>(null);
+  const focused = alerts.find((a) => a.id === focusId);
+  useEffect(() => {
+    if (mode === "mini") setFocusId(null);
+  }, [mode]);
   // Completing from the toast changes the task outside the tab: the list needs to reread.
   const [tasksVersion, setTasksVersion] = useState(0);
 
@@ -161,7 +176,11 @@ function Canto() {
   // The pop-up lives in its own window: what it changes here arrives as events.
   useEffect(() => {
     const done = listen(TASKS_CHANGED_EVENT, () => setTasksVersion((v) => v + 1));
-    const open = listen<Tab>(OPEN_TAB_EVENT, (e) => changeTab(e.payload));
+    const open = listen<Tab>(OPEN_TAB_EVENT, (e) => {
+      changeTab(e.payload);
+      // The tab lives in the full window, not in the dock.
+      void setModeRef.current("normal").catch(() => {});
+    });
     return () => {
       void done.then((f) => f());
       void open.then((f) => f());
@@ -202,12 +221,27 @@ function Canto() {
           .catch(() => setError(t("summary.copyFailed", { mod: MOD_KEY }))),
       help: () => setHelpOpen(true),
       hide: () => void getCurrentWindow().hide(),
+      mini: () => pickMode("mini"),
     });
+
+  if (mode === "mini") {
+    return (
+      <MiniRail
+        alerts={alerts}
+        mode={mode}
+        onOpen={(id) => {
+          setFocusId(id);
+          pickMode("normal");
+        }}
+        onMode={pickMode}
+      />
+    );
+  }
 
   return (
     <div
       className={`relative flex h-screen flex-col overflow-hidden bg-panel/95 text-fg backdrop-blur ${
-        fullscreen.active ? "" : "rounded-2xl border border-edge shadow-2xl"
+        mode === "max" ? "" : "rounded-2xl border border-edge shadow-2xl"
       }`}
     >
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
@@ -286,15 +320,16 @@ function Canto() {
               </button>
             </>
           )}
+          <ModeSwitcher mode={mode} onPick={pickMode} />
           <button
             type="button"
             onClick={toggleFullscreen}
-            aria-pressed={fullscreen.active}
-            aria-label={fullscreen.active ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
-            title={fullscreen.active ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
+            aria-pressed={mode === "max"}
+            aria-label={mode === "max" ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
+            title={mode === "max" ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
             className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
           >
-            {fullscreen.active ? <ShrinkIcon /> : <ExpandIcon />}
+            {mode === "max" ? <ShrinkIcon /> : <ExpandIcon />}
           </button>
           <button
             type="button"
@@ -313,50 +348,61 @@ function Canto() {
       ) : !status.unlocked ? (
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
-        <>
-          <TabBar current={tab} onChange={changeTab} tabs={tabs} />
-          <main
-            id={panelId(tab)}
-            key={tab}
-            role="tabpanel"
-            aria-labelledby={`aba-${tab}`}
-            className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
-          >
-            {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
-            {tab === "notes" && (
-              <NotesTab
-                today={today}
-                agenda={agenda.items}
-                privacy={privacy}
-                initialQuery={jumpQuery}
-                querySeq={jumpSeq}
-                onOpenTasks={() => changeTab("tasks")}
-                onOpenAgenda={() => changeTab("agenda")}
-                onError={setError}
-                note={noteDraft}
-              />
-            )}
-            {tab === "clipboard" && (
-              <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
-            )}
-            {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} onError={setError} />}
-            {tab === "github" && <GithubTab onError={setError} />}
-            {tab === "gitlab" && <GitlabTab onError={setError} />}
-            {tab === "status" && <StatusTab />}
-            {tab === "models" && <ModelsTab />}
-            {tab === "activity" && <ActivityTab today={today} onError={setError} />}
-            {tab === "settings" && (
-              <SettingsTab
-                onError={setError}
-                hiddenTabs={hiddenTabs}
-                onHiddenTabs={setHiddenTabs}
-                reminderLead={reminderLead}
-                onReminderLead={setReminderLead}
-              />
-            )}
-          </main>
-          <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
-        </>
+        <div className="flex min-h-0 flex-1">
+          <div className={`flex min-h-0 min-w-0 flex-col ${mode === "max" ? "w-[26rem] shrink-0" : "flex-1"}`}>
+              <TabBar current={tab} onChange={changeTab} tabs={tabs} />
+              {focused && (
+                <FocusedAlert
+                  event={focused}
+                  onGone={drop}
+                  onCompleted={() => setTasksVersion((v) => v + 1)}
+                  onOpenModels={() => changeTab("models")}
+                />
+              )}
+              <main
+                id={panelId(tab)}
+                key={tab}
+                role="tabpanel"
+                aria-labelledby={`aba-${tab}`}
+                className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
+              >
+                {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
+                {tab === "notes" && (
+                  <NotesTab
+                    today={today}
+                    agenda={agenda.items}
+                    privacy={privacy}
+                    initialQuery={jumpQuery}
+                    querySeq={jumpSeq}
+                    onOpenTasks={() => changeTab("tasks")}
+                    onOpenAgenda={() => changeTab("agenda")}
+                    onError={setError}
+                    note={noteDraft}
+                  />
+                )}
+                {tab === "clipboard" && (
+                  <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
+                )}
+                {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} onError={setError} />}
+                {tab === "github" && <GithubTab onError={setError} />}
+                {tab === "gitlab" && <GitlabTab onError={setError} />}
+                {tab === "status" && <StatusTab />}
+                {tab === "models" && <ModelsTab />}
+                {tab === "activity" && <ActivityTab today={today} onError={setError} />}
+                {tab === "settings" && (
+                  <SettingsTab
+                    onError={setError}
+                    hiddenTabs={hiddenTabs}
+                    onHiddenTabs={setHiddenTabs}
+                    reminderLead={reminderLead}
+                    onReminderLead={setReminderLead}
+                  />
+                )}
+              </main>
+              <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
+          </div>
+          {mode === "max" && <MaxSide agenda={agenda.items} privacy={privacy} version={tasksVersion} />}
+        </div>
       )}
     </div>
   );

@@ -16,6 +16,21 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Quatro modos para o widget**: um ícone novo no topo (ao lado do olho) abre o menu **Mini, Escondido, Normal e
+  Maximizado**. O mesmo menu aparece no ícone do trilho do modo mini e na paleta de comandos ("Modo mini"), e o
+  modo mini também liga e desliga pelo menu da bandeja. O Escondido é o `–` de sempre (volta pelo atalho global ou
+  pela bandeja) e o Maximizado é a tela cheia, agora com a **agenda de hoje e as notas recentes** numa segunda
+  coluna ao lado da lista de tarefas.
+- **Modo mini**: a janela encolhe para um trilho colado na borda direita da tela, centralizado na vertical, com um
+  traço colorido por aviso pendente (reunião, lembrete de tarefa, PR, menção, serviço com problema, modelo novo). Ao
+  passar o mouse o trilho mostra os ícones; sobre um aviso, o texto. Um aviso novo aparece por um instante e o
+  trilho volta a ser só traços. Clicar num aviso abre o Canto normal já com ele no topo, com as mesmas ações do
+  pop-up (entrar no Meet, adiar, concluir, fechar). No modo mini o aviso não abre mais o pop-up por cima da tela; a
+  notificação do sistema continua. O modo é lembrado entre as aberturas e a posição e o tamanho da janela normal
+  ficam intactos.
+- **Animações do trilho**: os traços entram em cascata com uma mola leve, o menu de modos surge com o mesmo
+  movimento da janela de aviso, e só tamanho e posição passam do alvo; com movimento reduzido sobra apenas o fade.
+
 - **Avisos dos seus PRs no GitHub**: um pop-up quando o **CI de um PR seu falha** e outro quando um **PR seu fica
   sem nenhuma revisão** por 24, 48 ou 72 h (48 por padrão, contados desde a abertura; rascunhos não contam). O aviso
   de CI avisa uma vez por falha (e de novo se ele voltar a falhar depois de passar) e **lista os jobs que quebraram**,

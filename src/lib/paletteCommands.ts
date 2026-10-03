@@ -22,6 +22,7 @@ export type PaletteContext = {
   copySummary: () => void;
   help: () => void;
   hide: () => void;
+  mini: () => void;
 };
 
 /** The next meeting with a call link that hasn't ended yet; all-day events have no call to join. */
@@ -71,6 +72,7 @@ export function buildCommands(ctx: PaletteContext): PaletteCommand[] {
     },
     { id: "fullscreen.toggle", title: t("palette.fullscreen"), keys: ["F11"], run: ctx.toggleFullscreen },
     { id: "help.open", title: t("palette.help"), keys: ["?"], run: ctx.help },
+    { id: "window.mini", title: t("palette.mini"), keywords: [t("palette.keywords.mini")], run: ctx.mini },
     { id: "window.hide", title: t("palette.hide"), run: ctx.hide },
     { id: "vault.lock", title: t("palette.lock"), keys: ["Alt", "L"], run: ctx.lock },
   ];

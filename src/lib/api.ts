@@ -66,7 +66,7 @@ export type DndState = { active: boolean; untilMs: number | null };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
-export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean };
+export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean; mini: boolean };
 
 /// User's local day as YYYY-MM-DD. Lives in the frontend because the Rust
 /// process's timezone isn't reliable on multithreaded Linux.
@@ -212,6 +212,8 @@ export const api = {
   windowConfig: () => invoke<WindowConfig>("window_config"),
   windowSetAlwaysOnTop: (enabled: boolean) => invoke<void>("window_set_always_on_top", { enabled }),
   windowReset: () => invoke<void>("window_reset"),
+  windowMiniSet: (enabled: boolean) => invoke<void>("window_mini_set", { enabled }),
+  windowMiniResize: (width: number, height: number) => invoke<void>("window_mini_resize", { width, height }),
 
   autostartStatus: () => invoke<boolean>("autostart_status"),
   autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),
