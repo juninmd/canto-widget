@@ -7,6 +7,19 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Aviso não tira mais o jogo da tela cheia**: com um app em tela cheia na frente (um jogo, um vídeo, uma
+  apresentação), o Canto não abre mais o pop-up nem manda a notificação do sistema, que podiam minimizar o jogo.
+  Os avisos ficam esperando e o pop-up aparece quando você sai da tela cheia; no modo mini eles entram no trilho
+  como sempre. O Windows informa a tela cheia (o mesmo sinal que ele usa para segurar as próprias notificações), então
+  vale também para jogos em janela sem borda. Em Ajustes → "Jogos e tela cheia" dá para desligar. No macOS e no Linux
+  nada muda por enquanto. Além disso, a janela do pop-up deixou de pedir o foco do teclado para si quando não o tem.
+- **Abas não são mais cortadas**: as que não cabem na largura da janela vão para um botão **mais ▾** com a lista
+  (e o Alt+N de cada uma), em vez de sumirem sob a borda com o texto pela metade. A aba aberta fica sempre na barra,
+  as setas, Home e End alcançam também as que estão no menu, e com a janela larga, em tela cheia ou na densidade
+  compacta o botão nem aparece.
+- **Menu de modos do trilho cabe na janela**: com poucos avisos o menu abria ancorado no botão, e a metade de baixo
+  caía fora da janela do mini e era cortada. Agora ele fica fixo no canto superior esquerdo da janela, ao lado dos
+  ícones, e a janela cresce o bastante (340 × 300) para mostrar as quatro opções inteiras.
 - **Popup não rouba mais o foco**: o aviso aparece sem ativar a janela, então não tira o foco de quem está jogando
   em tela cheia ou digitando em outro app. Os botões continuam funcionando com o mouse.
 - **Popup de aviso em janela própria**: reunião, lembrete de tarefa, instabilidade de serviço e modelo novo agora
@@ -16,11 +29,18 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Notificações no modo Maximizado**: a coluna da direita lista os avisos pendentes como cartões, com as mesmas
+  ações do pop-up (entrar no Meet, abrir PR, concluir, adiar, silenciar, fechar) e "dispensar todas", e mostra abaixo
+  **o que foi resolvido hoje** (entrou no Meet, adiado, fechado, tarefa concluída…) com a hora. O registro vem do
+  Rust (ações no pop-up também contam), fica só na memória, sem ir para o disco, e recomeça a cada abertura do app.
+  Substitui a agenda e as notas recentes, que já têm abas próprias.
+- **Divisória arrastável no Maximizado**: arraste a barra entre a lista de tarefas e as notificações (as setas movem
+  16 px, com Shift 64 px; Home e End vão aos limites; duplo clique ou Enter restaura). A lista nunca fica abaixo de
+  360 px nem a coluna da direita abaixo de 300 px, e a largura fica lembrada nesta máquina.
 - **Quatro modos para o widget**: um ícone novo no topo (ao lado do olho) abre o menu **Mini, Escondido, Normal e
   Maximizado**. O mesmo menu aparece no ícone do trilho do modo mini e na paleta de comandos ("Modo mini"), e o
   modo mini também liga e desliga pelo menu da bandeja. O Escondido é o `–` de sempre (volta pelo atalho global ou
-  pela bandeja) e o Maximizado é a tela cheia, agora com a **agenda de hoje e as notas recentes** numa segunda
-  coluna ao lado da lista de tarefas.
+  pela bandeja) e o Maximizado é a tela cheia, agora com uma **coluna de notificações** ao lado da lista de tarefas.
 - **Modo mini**: a janela encolhe para um trilho colado na borda direita da tela, centralizado na vertical, com um
   traço colorido por aviso pendente (reunião, lembrete de tarefa, PR, menção, serviço com problema, modelo novo). Ao
   passar o mouse o trilho mostra os ícones; sobre um aviso, o texto. Um aviso novo aparece por um instante e o

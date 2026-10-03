@@ -67,7 +67,16 @@ pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()
         let mut current = state.alert.lock().unwrap();
         alert_queue::push(&mut current, &mut queue(app).0.lock().unwrap(), event);
     }
-    // In mini mode the dock lists it: a pop-up would cover the edge strip the user chose to live with.
+    // A full-screen app in front (a game) must keep the foreground: the pop-up rings when it leaves.
+    if crate::fullscreen_guard::hold(app) {
+        return app.emit(ALERT_EVENT, ());
+    }
+    present_pending(app)
+}
+
+/// Brings the pending alerts to the user: in mini mode the dock lists them (a pop-up would cover the edge strip
+/// the user chose to live with), otherwise the pop-up window shows.
+pub fn present_pending(app: &tauri::AppHandle) -> tauri::Result<()> {
     if crate::window_mode::mini_active(app) {
         return app.emit(ALERT_EVENT, ());
     }

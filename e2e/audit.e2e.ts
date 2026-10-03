@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { mockTauri } from "./mock";
+import { goTab, mockTauri } from "./mock";
 
 const now = Date.now();
 const d = new Date();
@@ -82,7 +82,7 @@ for (const density of ["compacta", "padrao"]) {
         },
       });
       await page.goto("/");
-      await page.getByRole("tab", { name: tab }).click();
+      await goTab(page, tab);
       await page.waitForTimeout(500);
       expect(await smallTargets(page)).toEqual([]);
     });

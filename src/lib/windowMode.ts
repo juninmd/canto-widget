@@ -12,13 +12,14 @@ export function modeOf(mini: boolean, fullscreen: boolean): Exclude<Mode, "hidde
 /** How much of the dock the window shows: only the bars, the icons, one label, or the mode menu. */
 export type MiniView = "bars" | "icons" | "label" | "menu";
 
-const WIDTH: Record<MiniView, number> = { bars: 24, icons: 56, label: 300, menu: 300 };
+/** The menu view fits the 256 px menu beside the 56 px icon column. */
+const WIDTH: Record<MiniView, number> = { bars: 24, icons: 56, label: 300, menu: 340 };
 const BUTTON = 28;
 const ITEM = 40;
 const GAP = 8;
 const PAD = 12;
-/** Room for the four options of the mode menu, which opens beside the buttons. */
-const MENU_HEIGHT = 250;
+/** The menu sits in the top-left corner of the window, so its whole height must fit even with one alert. */
+const MENU_HEIGHT = 300;
 
 /** Window size for the dock: one row per alert (at least the empty handle) under the mode button. */
 export function miniSize(view: MiniView, alerts: number): { width: number; height: number } {

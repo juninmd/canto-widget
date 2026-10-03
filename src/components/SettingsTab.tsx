@@ -17,6 +17,7 @@ import ActivitySection from "./ActivitySection";
 import DoNotDisturbSection from "./DoNotDisturbSection";
 import MyPrAlertsSection from "./MyPrAlertsSection";
 import ReviewAlertsSection from "./ReviewAlertsSection";
+import FullscreenHoldSection from "./FullscreenHoldSection";
 import type { Tab } from "./TabBar";
 import type { LeadMinutes } from "../lib/reminderLead";
 import { t } from "../i18n";
@@ -85,6 +86,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
       <ActivitySection onError={onError} />
       <RemindersSection lead={reminderLead} onChange={onReminderLead} />
       <DoNotDisturbSection onError={onError} />
+      <FullscreenHoldSection onError={onError} />
       <ReviewAlertsSection onError={onError} />
       <MyPrAlertsSection onError={onError} />
       <SecuritySection onError={onError} />

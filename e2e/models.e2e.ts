@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { calls, mockTauri } from "./mock";
+import { calls, goTab, mockTauri } from "./mock";
 
 const ALL_TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "status", "models"];
 
@@ -28,7 +28,7 @@ export const MODELS_VIEW = {
 test("the AI models tab ranks models and cycles the sort", async ({ page }) => {
   await mockTauri(page, { hiddenTabs: ["gitlab", "status"], knownTabs: ALL_TABS, models: MODELS_VIEW });
   await page.goto("/");
-  await page.getByRole("tab", { name: "Modelos IA" }).click();
+  await goTab(page, "Modelos IA");
   await expect(page.getByText("Intelligence Index · 187 modelos")).toBeVisible();
   await expect(page.locator("[data-model]").first()).toContainText("Aurora 4");
   await expect(page.getByText("$3,44 / 1M tokens")).toBeVisible();
@@ -39,10 +39,12 @@ test("the AI models tab ranks models and cycles the sort", async ({ page }) => {
 });
 
 test("the AI models tab is on the bar by default, even for a saved choice from before it existed", async ({ page }) => {
+  // Wide enough for every tab: the narrow window sends the last ones to the "mais" menu (tabs.e2e.ts).
+  await page.setViewportSize({ width: 1100, height: 700 });
   await mockTauri(page, { hiddenTabs: ["gitlab"], models: MODELS_VIEW });
   await page.goto("/");
   await expect(page.getByRole("tab", { name: "Status API" })).toBeVisible();
-  await page.getByRole("tab", { name: "Modelos IA" }).click();
+  await goTab(page, "Modelos IA");
   await expect(page.locator("[data-model]").first()).toContainText("Aurora 4");
   await expect(page.getByLabel(/chave/i)).toHaveCount(0);
 });

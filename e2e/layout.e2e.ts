@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { mockTauri } from "./mock";
+import { goTab, mockTauri } from "./mock";
 
 const LONG = "Revisar a proposta comercial do cliente fictício com os novos prazos de entrega e o cronograma de testes";
 const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Ajustes"];
@@ -38,7 +38,7 @@ for (const [width, height] of [[360, 440], [1920, 1080]]) {
     await page.goto("/");
     await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
     for (const name of TABS) {
-      await page.getByRole("tab", { name, exact: true }).click();
+      await goTab(page, name);
       await expect(page.getByRole("tab", { name, exact: true })).toHaveAttribute("aria-selected", "true");
       const overflow = await page.evaluate(() => {
         const de = document.documentElement;

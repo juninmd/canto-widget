@@ -20,6 +20,7 @@ test("each view asks for the width it shows", () => {
 });
 
 test("the menu view is always tall enough for its four options", () => {
-  expect(miniSize("menu", 0).height).toBeGreaterThanOrEqual(250);
+  expect(miniSize("menu", 0).height).toBeGreaterThanOrEqual(300);
+  expect(miniSize("menu", 0).width, "256 px menu beside the 56 px icon column").toBeGreaterThanOrEqual(256 + 56);
   expect(miniSize("menu", 9).height).toBe(miniSize("bars", 9).height);
 });

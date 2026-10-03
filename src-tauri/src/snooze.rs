@@ -28,6 +28,7 @@ pub fn still_due(event: &AgendaItem, data: Option<&VaultData>) -> bool {
 pub fn alert_snooze(app: tauri::AppHandle, id: String, minutes: u64) -> Result<()> {
     let wait = delay(minutes)?;
     let event = crate::window::take_alert(&app, &id).ok_or_else(|| AppError::Config("nenhum aviso aberto".into()))?;
+    crate::alert_log::record(&app, event.clone(), crate::alert_log::Outcome::Snoozed);
     std::thread::spawn(move || {
         std::thread::sleep(wait);
         let state = app.state::<AppState>();

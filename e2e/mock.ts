@@ -52,6 +52,8 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       models_get: o.models ?? { alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
       ...o.fixed,
     };
+    let pending = Array.isArray(fixed.alert_payload) ? [...(fixed.alert_payload as { id: string }[])] : null;
+    const resolved: { item: unknown; outcome: string; at: number }[] = [];
     let callbackId = 1;
     const callbacks = new Map<number, (e: unknown) => void>();
     const listeners = new Map<string, number>();
@@ -72,6 +74,15 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       unregisterCallback() {},
       invoke: async (cmd: string, args: Record<string, unknown> = {}) => {
         calls.push({ cmd, args });
+        // Rust drops a closed alert and logs it; a static answer would bring it straight back on the next read.
+        if (cmd === "alert_close" && pending) {
+          const gone = pending.find((e) => e.id === args.id);
+          pending = pending.filter((e) => e.id !== args.id);
+          if (gone) resolved.unshift({ item: gone, outcome: String(args.outcome ?? "closed"), at: Date.now() });
+          return null;
+        }
+        if (cmd === "alert_payload" && pending) return pending;
+        if (cmd === "alert_log") return resolved;
         if (cmd in fixed) return fixed[cmd];
         if (cmd === "note_image_get") return o.images?.[String(args.id)] ?? Promise.reject("imagem indisponível");
         if (cmd === "note_image_save") return "e2e0";
@@ -92,6 +103,14 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       },
     };
   }, opts);
+}
+
+/** Opens a tab by name: straight from the bar, or from the "mais" menu when the window is too narrow for it. */
+export async function goTab(page: Page, name: string) {
+  const tab = page.getByRole("tab", { name, exact: true });
+  if ((await tab.count()) > 0) return tab.click();
+  await page.getByRole("button", { name: /^mais/ }).click();
+  await page.getByRole("menuitem", { name: new RegExp(`^${name}`) }).click();
 }
 
 export async function calls(page: Page): Promise<Call[]> {

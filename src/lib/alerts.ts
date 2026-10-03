@@ -1,4 +1,4 @@
-import type { AgendaItem } from "./api";
+import type { AgendaItem, AlertOutcome, ResolvedAlert } from "./api";
 import { minutesUntil } from "./agenda";
 import { TASK_PREFIX } from "./reminders";
 import { t } from "../i18n";
@@ -67,4 +67,15 @@ export function levelLabel(tag: string | undefined): string {
     default:
       return t("alert.level.minor");
   }
+}
+
+/** "entrou no Meet", "adiado"…: the main action is named after what the alert was about. */
+export function outcomeLabel(item: AgendaItem, outcome: AlertOutcome): string {
+  return outcome === "done" ? t(`alert.outcome.${kindOf(item)}`) : t(`alert.outcome.${outcome}`);
+}
+
+/** The log keeps a few days of a long-running widget; the column only shows what happened since local midnight. */
+export function resolvedToday(list: readonly ResolvedAlert[], now = new Date()): ResolvedAlert[] {
+  const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  return list.filter((r) => r.at >= midnight);
 }

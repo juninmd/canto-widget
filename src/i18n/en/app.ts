@@ -27,15 +27,11 @@ export const app: Record<keyof typeof source, string> = {
   "app.mode.normal": "Normal",
   "app.mode.normal.hint": "the window in the corner",
   "app.mode.max": "Maximized",
-  "app.mode.max.hint": "list and agenda side by side",
+  "app.mode.max.hint": "list and notifications",
   "app.mini.label": "pending alerts",
   "app.mini.empty": "no pending alerts",
   "app.mini.open": "open {title}",
   "app.focus.label": "alert in focus",
-  "max.agenda": "today's agenda",
-  "max.agendaEmpty": "no events today",
-  "max.notes": "recent notes",
-  "max.notesEmpty": "no notes yet",
   "app.unexpectedError": "unexpected error",
 
   "lock.title.locked": "Vault locked",
@@ -126,6 +122,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.reminders.onTime": "on time",
   "settings.reminders.before": "{min} min before",
 
+  "settings.fullscreenHold.title": "Games and full screen",
+  "settings.fullscreenHold.label": "wait for full screen to end before alerting",
+  "settings.fullscreenHold.hint":
+    "A pop-up or a notification over a full-screen game can minimize it. With this on, alerts wait and show when you leave. Windows only.",
   "settings.reviewAlerts.title": "GitHub reviews",
   "settings.reviewAlerts.label": "notify me when my review is requested",
   "settings.reviewAlerts.hint": "OS notification for each new request, checked every 5 min while the vault is open.",
@@ -219,6 +219,8 @@ export const app: Record<keyof typeof source, string> = {
   "palette.keywords.theme": "theme appearance color",
 
   "tabs.label": "widget sections",
+  "tabs.more": "more",
+  "tabs.moreTitle": "more tabs ({n})",
   "tabs.tasks": "Tasks",
   "tabs.notes": "Notes",
   "tabs.clipboard": "Clipboard",

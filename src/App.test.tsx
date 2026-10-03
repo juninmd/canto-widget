@@ -390,8 +390,7 @@ test("a tab requested by the pop-up brings the dock back to the normal window", 
   expect(calls.some((c) => c.cmd === "window_mini_set" && c.args?.enabled === false)).toBe(true);
 });
 
-test("maximized shows the agenda beside the task list", async () => {
-  agendaItems = [meetingIn(60)];
+test("maximized shows the notifications beside the task list, with a divider to resize them", async () => {
   render(<App />);
   await settle();
   fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
@@ -400,8 +399,23 @@ test("maximized shows the agenda beside the task list", async () => {
   });
   await settle();
   expect(fullscreenOn).toBe(true);
-  expect(screen.getByText("agenda de hoje")).toBeDefined();
-  expect(screen.getAllByText("Daily").length).toBeGreaterThan(0);
+  const column = screen.getByRole("complementary", { name: "notificações" });
+  expect(column.textContent).toContain("pagar boleto");
+  expect(screen.getByRole("separator", { name: "largura da lista de tarefas" })).toBeDefined();
+  expect(screen.queryByText("agenda de hoje"), "the agenda already has its own tab").toBeNull();
+});
+
+test("closing a card in the notifications column tells Rust and reads the log again", async () => {
+  fullscreenOn = true;
+  render(<App />);
+  await settle();
+  const before = calls.filter((c) => c.cmd === "alert_log").length;
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  });
+  await settle();
+  expect(calls.find((c) => c.cmd === "alert_close")?.args?.id).toBe("task:t1");
+  expect(calls.filter((c) => c.cmd === "alert_log").length, "the resolved list would stay stale").toBeGreaterThan(before);
 });
 
 test("hidden from the mode icon hides the window like the minus button", async () => {

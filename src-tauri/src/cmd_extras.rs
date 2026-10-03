@@ -181,8 +181,10 @@ pub fn main_show(app: tauri::AppHandle) -> Result<()> {
 }
 
 #[tauri::command]
-pub fn alert_close(app: tauri::AppHandle, id: String) {
-    window::take_alert(&app, &id);
+pub fn alert_close(app: tauri::AppHandle, id: String, outcome: Option<crate::alert_log::Outcome>) {
+    if let Some(item) = window::take_alert(&app, &id) {
+        crate::alert_log::record(&app, item, outcome.unwrap_or(crate::alert_log::Outcome::Closed));
+    }
 }
 
 #[tauri::command]

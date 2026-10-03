@@ -25,15 +25,11 @@ export const app = {
   "app.mode.normal": "Normal",
   "app.mode.normal.hint": "a janela no canto da tela",
   "app.mode.max": "Maximizado",
-  "app.mode.max.hint": "lista e agenda lado a lado",
+  "app.mode.max.hint": "lista e notificações",
   "app.mini.label": "avisos pendentes",
   "app.mini.empty": "nenhum aviso pendente",
   "app.mini.open": "abrir {title}",
   "app.focus.label": "aviso em foco",
-  "max.agenda": "agenda de hoje",
-  "max.agendaEmpty": "nenhum evento hoje",
-  "max.notes": "notas recentes",
-  "max.notesEmpty": "nenhuma nota ainda",
   "app.unexpectedError": "erro inesperado",
 
   "lock.title.locked": "Cofre trancado",
@@ -121,6 +117,10 @@ export const app = {
   "settings.reminders.onTime": "na hora",
   "settings.reminders.before": "{min} min antes",
 
+  "settings.fullscreenHold.title": "Jogos e tela cheia",
+  "settings.fullscreenHold.label": "esperar a tela cheia acabar para avisar",
+  "settings.fullscreenHold.hint":
+    "Um pop-up ou uma notificação sobre um jogo em tela cheia pode minimizá-lo. Com isto ligado, os avisos esperam e aparecem quando você sair. Só no Windows.",
   "settings.reviewAlerts.title": "Revisões no GitHub",
   "settings.reviewAlerts.label": "avisar quando pedirem minha revisão",
   "settings.reviewAlerts.hint": "Notificação do sistema para cada pedido novo, conferido a cada 5 min enquanto o cofre está aberto.",
@@ -214,6 +214,8 @@ export const app = {
   "palette.keywords.theme": "tema aparência cor",
 
   "tabs.label": "seções do widget",
+  "tabs.more": "mais",
+  "tabs.moreTitle": "mais abas ({n})",
   "tabs.tasks": "Tarefas",
   "tabs.notes": "Notas",
   "tabs.clipboard": "Clipboard",

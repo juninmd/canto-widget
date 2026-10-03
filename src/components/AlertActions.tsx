@@ -1,5 +1,5 @@
 import { forwardRef } from "react";
-import { api, type AgendaItem } from "../lib/api";
+import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
 import { kindOf, STATUS_PREFIX } from "../lib/alerts";
 import { TASK_PREFIX } from "../lib/reminders";
 import { t } from "../i18n";
@@ -7,7 +7,7 @@ import SnoozeButton from "./SnoozeButton";
 
 type Props = {
   event: AgendaItem;
-  onDismiss: () => void;
+  onDismiss: (outcome?: AlertOutcome) => void;
   /** Leaves the overlay without telling Rust, for when Rust already dropped the alert (a snooze). */
   onHide: () => void;
   onCompleted?: () => void;
@@ -24,13 +24,13 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
 ) {
   const kind = kindOf(event);
   const open = (url: string) => () => void api.openLink(url);
-  const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, onDismiss);
+  const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, () => onDismiss());
   const mute = async () => {
     try {
       const watched = await api.statusAlertsGet();
       await api.statusAlertsSet(watched.filter((id) => id !== event.id.slice(STATUS_PREFIX.length)));
     } finally {
-      onDismiss();
+      onDismiss("muted");
     }
   };
 
@@ -40,7 +40,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
         <button
           ref={primary}
           type="button"
-          onClick={() => void api.taskComplete(event.id.slice(TASK_PREFIX.length)).then(onCompleted).finally(onDismiss)}
+          onClick={() => void api.taskComplete(event.id.slice(TASK_PREFIX.length)).then(onCompleted).finally(() => onDismiss("done"))}
           className={PRIMARY}
         >
           {t("alert.completeTask")}
@@ -52,7 +52,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           type="button"
           onClick={() => {
             open(event.link)();
-            onDismiss();
+            onDismiss("done");
           }}
           className={PRIMARY}
         >
@@ -65,7 +65,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           type="button"
           onClick={() => {
             void api.openLink(event.meet);
-            onDismiss();
+            onDismiss("done");
           }}
           className={PRIMARY}
         >
@@ -83,7 +83,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           type="button"
           onClick={() => {
             onOpenModels();
-            onDismiss();
+            onDismiss("done");
           }}
           className={PRIMARY}
         >
@@ -106,7 +106,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
         </button>
       )}
       {(kind === "meeting" || kind === "task") && <SnoozeButton onSnooze={snooze} />}
-      <button type="button" onClick={onDismiss} title="Esc" className="rounded-lg bg-edge px-3 py-2 text-sm text-muted">
+      <button type="button" onClick={() => onDismiss()} title="Esc" className="rounded-lg bg-edge px-3 py-2 text-sm text-muted">
         {t("alert.close")}
       </button>
     </div>
