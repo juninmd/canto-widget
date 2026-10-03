@@ -5,6 +5,7 @@ import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import { REPEAT_LABEL } from "../lib/reminders";
 import { nextPriority, PRIORITY_DOT, PRIORITY_LABEL } from "../lib/priority";
 import RepeatControl from "./RepeatControl";
+import { CHIP } from "./chip";
 import { ClockIcon, PullIcon } from "./Icons";
 import { FocusBadge } from "./FocusControls";
 import { ESTIMATES } from "../lib/focus";
@@ -113,8 +114,7 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
         onClick={() => onPriority(nextPriority(task.priority))}
         aria-label={t("priority.cycle", { title: task.title, label })}
         title={t("priority.cycle", { title: task.title, label })}
-        // Unset stays out of the way like the other row actions; a set priority is always shown.
-        className={`grid size-6 shrink-0 place-items-center rounded hover:bg-edge ${task.priority ? "" : "opacity-0 focus-visible:opacity-100 group-hover:opacity-100"}`}
+        className="grid size-6 shrink-0 place-items-center rounded-md hover:bg-hover"
       >
         <span className={`size-2 rounded-full ${task.priority ? PRIORITY_DOT[task.priority] : "border border-faint"}`} />
       </button>
@@ -122,7 +122,7 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 aria-expanded:opacity-100"
+        className="grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-fg aria-expanded:text-accent"
         aria-label={t("tasks.scheduleOf", { title: task.title })}
         title={t("tasks.schedule")}
       >
@@ -140,10 +140,10 @@ export function TaskMeta({ task }: { task: Task }) {
   const focused = running || !!task.estimate_min || (task.tracked_secs ?? 0) >= 60;
   if (!timed && !subtasks && !task.pr_url && !focused) return null;
   return (
-    <span className="flex flex-wrap items-center gap-x-2">
+    <span className="mt-1 flex flex-wrap items-center gap-1">
       {timed && (
         <span
-          className="shrink-0 text-[11px] text-muted"
+          className={`${CHIP} tabular-nums`}
           title={task.repetir ? REPEAT_LABEL[task.repetir.tipo] : task.extended_repeat ? extendedLabel(task.extended_repeat) : undefined}
         >
           {task.hora}
@@ -153,7 +153,7 @@ export function TaskMeta({ task }: { task: Task }) {
       )}
       {focused && <FocusBadge task={task} />}
       {subtasks && (
-        <span className="shrink-0 text-[11px] text-muted" title={t("tasks.subtasks")}>
+        <span className={`${CHIP} tabular-nums`} title={t("tasks.subtasks")}>
           {task.subtasks!.filter((s) => s.done).length}/{task.subtasks!.length}
         </span>
       )}

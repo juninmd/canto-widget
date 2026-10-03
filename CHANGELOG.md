@@ -153,6 +153,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Visual da base (fase 1 do redesenho)**: cabeçalho com ícones de contorno (ajuda, trancar, privacidade, tela
+  cheia e minimizar) e alvos de 28 px; abas com sublinhado na cor de destaque, bordas esmaecidas que avisam que há
+  mais abas e a aba ativa sempre à vista; aba Tarefas com campo de nova tarefa com ícone e botão de destaque, barra de
+  progresso do dia, caixa de marcar redonda, barra de prioridade na lateral, metadados em pílulas e ações que
+  flutuam só ao passar o mouse (o título passa a ocupar a linha toda). Superfícies e foco novos derivados da skin,
+  então valem para as cinco skins.
+
 - **Modelo da lista abre a página dele**: clicar num modelo da aba Modelos IA abre a página do modelo na
   Artificial Analysis, no navegador.
 - **Dia: eventos que se sobrepõem ficam lado a lado**, dividindo a largura em colunas, em vez de um por cima do

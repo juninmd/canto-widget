@@ -10,6 +10,7 @@ import { useLatestRequest } from "../lib/useLatestRequest";
 import { useNewIds, useExit } from "../lib/motion";
 import { mergeOrder, useReorder } from "../lib/useReorder";
 import { focusStore } from "../lib/focus";
+import { PlusIcon } from "./Icons";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -118,15 +119,24 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   return (
     <div className="flex h-full flex-col gap-2">
       <form onSubmit={add} className="flex gap-2">
-        <input
-          value={title}
-          data-shortcut="new"
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder={t("tasks.addPlaceholder")}
-          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
-        />
-        <button type="submit" aria-label={t("tasks.add")} className="rounded-lg bg-edge px-3 text-sm text-fg">
-          +
+        <div className="relative flex-1">
+          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+            <PlusIcon />
+          </span>
+          <input
+            value={title}
+            data-shortcut="new"
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t("tasks.addPlaceholder")}
+            className="w-full rounded-xl border border-edge bg-ink py-2 pl-9 pr-3 text-sm text-fg shadow-[inset_0_1px_2px_rgb(0_0_0/0.25)] outline-none placeholder:text-faint focus:border-accent"
+          />
+        </div>
+        <button
+          type="submit"
+          aria-label={t("tasks.add")}
+          className="grid w-10 place-items-center rounded-xl bg-accent text-on-accent shadow-[var(--shadow-raised)] hover:brightness-110"
+        >
+          <PlusIcon />
         </button>
       </form>
 
@@ -139,7 +149,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         onCarryOver={() => void run(() => api.carryOver(today))}
       />
 
-      <ul className={`flex-1 space-y-1 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
+      <ul className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
         {visible.map((task) => (
           <TaskRow
             key={task.id}

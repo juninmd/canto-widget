@@ -86,6 +86,10 @@
   --color-danger: var(--color-danger);
   --color-ok: var(--color-ok);
   --color-warn: var(--color-warn);
+  /* Superficies derivadas da skin: nenhuma skin precisa redefinir estes. */
+  --color-raised: color-mix(in oklab, var(--color-panel) 93%, var(--color-fg));
+  --color-hover: color-mix(in oklab, var(--color-fg) 7%, transparent);
+  --shadow-raised: 0 1px 0 color-mix(in oklab, var(--color-fg) 7%, transparent) inset, 0 2px 8px rgb(0 0 0 / 0.22);
 }
 
 /*
@@ -181,6 +185,40 @@ body,
 input:focus-visible,
 textarea:focus-visible {
   outline-offset: -1px;
+}
+
+/* Caixa de marcar redonda: continua um <input type=checkbox>, entao teclado e leitor de tela seguem iguais. */
+.canto-check {
+  appearance: none;
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  cursor: pointer;
+  border: 2px solid var(--color-line);
+  border-radius: 9999px;
+  background: transparent;
+  transition:
+    background-color 120ms var(--ease-entrar),
+    border-color 120ms var(--ease-entrar);
+}
+.canto-check:hover {
+  border-color: var(--color-accent);
+}
+.canto-check:checked {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+}
+.canto-check:checked::after {
+  content: "";
+  width: 0.3rem;
+  height: 0.55rem;
+  margin-top: -0.1rem;
+  border: solid var(--color-on-accent);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
 input,

@@ -35,7 +35,7 @@ import TabBar, { panelId, type Tab } from "./components/TabBar";
 import DndIndicator from "./components/DndIndicator";
 import FocusBar from "./components/FocusBar";
 import { focusStore } from "./lib/focus";
-import { EyeIcon, EyeOffIcon } from "./components/Icons";
+import { ExpandIcon, EyeIcon, EyeOffIcon, HelpIcon, LockIcon, MinimizeIcon, ShrinkIcon } from "./components/Icons";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
 import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
@@ -246,12 +246,13 @@ function Canto() {
       )}
       <header
         data-tauri-drag-region
-        className="flex items-center justify-between border-b border-edge px-3 py-2"
+        className="flex items-center justify-between border-b border-edge px-3 py-1.5"
       >
-        <span data-tauri-drag-region className="text-xs font-semibold tracking-wide text-muted">
+        <span data-tauri-drag-region className="flex items-center gap-2 text-xs font-semibold tracking-wide text-fg">
+          <span aria-hidden="true" className="size-2 rounded-full bg-accent shadow-[0_0_10px_var(--color-accent)]" />
           {t("app.name")}
         </span>
-        <div className="flex items-center gap-2 text-[11px] text-muted">
+        <div className="flex items-center gap-0.5 text-[11px] text-muted">
           <DndIndicator onError={setError} />
           {status?.unlocked && (
             <>
@@ -260,11 +261,17 @@ function Canto() {
                 onClick={() => setHelpOpen(true)}
                 aria-label={t("app.shortcuts")}
                 title={t("app.shortcuts.title")}
-                className="grid size-6 place-items-center rounded hover:text-fg"
+                className="grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg"
               >
-                ?
+                <HelpIcon />
               </button>
-              <button type="button" onClick={lock} title={t("app.lock.title")} className="min-h-6 rounded px-1.5 hover:text-fg">
+              <button
+                type="button"
+                onClick={lock}
+                title={t("app.lock.title")}
+                className="inline-flex h-7 items-center gap-1.5 rounded-lg px-2 hover:bg-hover hover:text-fg"
+              >
+                <LockIcon />
                 {t("app.lock")}
               </button>
               <button
@@ -273,7 +280,7 @@ function Canto() {
                 aria-pressed={privacy}
                 aria-label={privacy ? t("app.privacy.disable") : t("app.privacy.enable")}
                 title={privacy ? t("app.privacy.onTitle") : t("app.privacy.offTitle")}
-                className={`grid size-6 place-items-center rounded hover:text-fg ${privacy ? "text-accent" : ""}`}
+                className={`grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg ${privacy ? "text-accent" : ""}`}
               >
                 {privacy ? <EyeOffIcon /> : <EyeIcon />}
               </button>
@@ -285,18 +292,18 @@ function Canto() {
             aria-pressed={fullscreen.active}
             aria-label={fullscreen.active ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
             title={fullscreen.active ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
-            className="grid size-6 place-items-center rounded hover:text-fg"
+            className="grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg"
           >
-            {fullscreen.active ? "⤡" : "⤢"}
+            {fullscreen.active ? <ShrinkIcon /> : <ExpandIcon />}
           </button>
           <button
             type="button"
             onClick={() => void getCurrentWindow().hide()}
-            className="grid size-6 place-items-center rounded hover:text-fg"
+            className="grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg"
             title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
             aria-label={t("app.hide")}
           >
-            —
+            <MinimizeIcon />
           </button>
         </div>
       </header>
