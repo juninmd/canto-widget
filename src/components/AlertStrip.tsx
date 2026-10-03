@@ -7,7 +7,7 @@ import { t } from "../i18n";
 export const TONE: Record<Tone, { dot: string; text: string; card: string; ring: string; border: string }> = {
   danger: { dot: "bg-danger", text: "text-danger", card: "border-danger/50 bg-danger/10", ring: "ring-danger", border: "border-danger" },
   warn: { dot: "bg-warn", text: "text-warn", card: "border-warn/50 bg-warn/10", ring: "ring-warn", border: "border-warn" },
-  accent: { dot: "bg-accent", text: "text-accent", card: "border-accent/40 bg-ink", ring: "ring-accent", border: "border-accent" },
+  accent: { dot: "bg-accent", text: "text-accent-text", card: "border-accent/40 bg-ink", ring: "ring-accent", border: "border-accent" },
   muted: { dot: "bg-muted", text: "text-muted", card: "border-line/60 bg-ink", ring: "ring-muted", border: "border-muted" },
 };
 

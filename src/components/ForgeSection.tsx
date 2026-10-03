@@ -30,20 +30,21 @@ export default function ForgeSection({ title, section, forge, list, login, filte
   const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
   return (
     <section aria-label={title}>
-      <h3 className="mb-1 text-xs font-semibold text-fg">
-        {title} <span className="font-normal text-faint">({list.total})</span>
+      <h3 className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-fg">
+        {title}
+        <span className="rounded-full bg-edge px-1.5 text-[10px] font-medium tabular-nums text-muted">{list.total}</span>
       </h3>
       {radar && hidden.length > 0 && (
         <button
           type="button"
           onClick={() => setShowSnoozed(!showSnoozed)}
-          className="mb-1 min-h-6 text-[11px] text-muted underline decoration-dotted hover:text-fg"
+          className="mb-1 min-h-[24px] text-[11px] text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
         >
           {showSnoozed ? t("forge.snoozedHide") : t("forge.snoozedShow", { n: hidden.length })}
         </button>
       )}
       {list.items.length === 0 ? (
-        <p className="px-2 py-1 text-[11px] text-faint">{filtered ? t("forge.emptyFiltered") : t("forge.empty")}</p>
+        <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{filtered ? t("forge.emptyFiltered") : t("forge.empty")}</p>
       ) : (
         <ul className="space-y-1.5">
           {shown.map((it) => (
@@ -64,7 +65,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
           type="button"
           onClick={onMore}
           disabled={loadingMore}
-          className="mt-1.5 min-h-7 w-full rounded-lg bg-edge text-[11px] text-muted hover:text-fg disabled:opacity-60"
+          className="canto-hit mt-1.5 min-h-7 w-full rounded-xl bg-edge text-[11px] text-muted hover:bg-active hover:text-fg active:bg-active disabled:opacity-60"
         >
           {loadingMore ? t("forge.loadingMore") : t("forge.showMore", { n: rest })}
         </button>
@@ -97,9 +98,9 @@ function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
         type="button"
         onClick={() => void api.openLink(item.url)}
         title={item.url}
-        className="flex w-full gap-2 rounded-lg border border-edge bg-ink/60 p-2 text-left hover:border-line"
+        className="flex w-full gap-2.5 rounded-xl border border-edge bg-ink/60 p-2.5 text-left transition-colors hover:border-line hover:bg-ink"
       >
-        <span className={`mt-0.5 shrink-0 ${item.draft ? "text-faint" : "text-accent"}`} aria-label={kind} role="img">
+        <span className={`mt-0.5 shrink-0 ${item.draft ? "text-faint" : "text-accent-text"}`} aria-label={kind} role="img">
           {item.is_pr ? <PullIcon /> : <IssueIcon />}
         </span>
         <span className="min-w-0 flex-1">
@@ -130,13 +131,13 @@ function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
               type="button"
               onClick={onSnooze}
               aria-label={t("forge.snoozeOf", { title: item.title })}
-              className="text-muted underline decoration-dotted hover:text-fg"
+              className="text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
             >
               {t("forge.snooze")}
             </button>
           )}
           {checks === null ? (
-            <button type="button" onClick={() => void loadChecks()} className="text-muted underline decoration-dotted hover:text-fg">
+            <button type="button" onClick={() => void loadChecks()} className="text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
               {t("forge.checks.show")}
             </button>
           ) : (
@@ -151,7 +152,7 @@ function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
 function ChecksBadge({ status }: { status: ChecksStatus | "loading" }) {
   const map: Record<ChecksStatus | "loading", { label: string; className: string }> = {
     loading: { label: t("forge.checks.loading"), className: "text-faint" },
-    success: { label: t("forge.checks.success"), className: "text-accent" },
+    success: { label: t("forge.checks.success"), className: "text-accent-text" },
     failure: { label: t("forge.checks.failure"), className: "text-danger" },
     running: { label: t("forge.checks.running"), className: "text-muted" },
     none: { label: t("forge.checks.none"), className: "text-faint" },
@@ -161,7 +162,7 @@ function ChecksBadge({ status }: { status: ChecksStatus | "loading" }) {
 }
 
 const PILL: Record<ChecksStatus, { glyph: string; label: MessageKey; className: string }> = {
-  success: { glyph: "✓", label: "forge.checks.success", className: "text-accent" },
+  success: { glyph: "✓", label: "forge.checks.success", className: "text-accent-text" },
   failure: { glyph: "✗", label: "forge.checks.failure", className: "text-danger" },
   running: { glyph: "●", label: "forge.checks.running", className: "text-muted" },
   none: { glyph: "○", label: "forge.checks.none", className: "text-faint" },

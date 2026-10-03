@@ -75,6 +75,13 @@ export default function TaskRow({
         data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
+        // Renaming also works from the keyboard: F2 on anything inside the row, as in file managers.
+        onKeyDown={(e) => {
+          if (e.key === "F2" && editing?.id !== task.id) {
+            e.preventDefault();
+            onStartEdit();
+          }
+        }}
         className={`group relative flex items-start gap-3 rounded-xl py-2 pl-7 pr-2.5 hover:bg-hover focus-within:bg-hover ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
         } ${dragging ? "opacity-50" : ""} ${dropTarget ? "ring-1 ring-accent" : ""}`}

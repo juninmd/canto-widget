@@ -45,7 +45,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
       {/* Credentials are a one-time step: once the account is connected, they collapse (progressive disclosure). */}
       {/* Build with an embedded client: a custom credential becomes a collapsed, advanced option. */}
       <details open={!status.connected && !status.embedded}>
-        <summary className="min-h-6 cursor-pointer text-[11px] text-muted hover:text-fg">
+        <summary className="min-h-[24px] cursor-pointer text-[11px] text-muted hover:text-fg">
           {status.embedded ? t("google.ownCredentials") : t("google.oauthCredentials", { saved: status.configured ? t("google.oauthSaved") : "" })}
         </summary>
         <div className="mt-2 flex flex-col gap-2 motion-safe:animate-aba">
@@ -55,7 +55,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
             value={clientId}
             onChange={(e) => setClientId(e.target.value)}
             placeholder="xxxx.apps.googleusercontent.com"
-            className="rounded-lg border border-line bg-ink px-3 py-1.5 text-xs text-fg outline-none focus:border-accent"
+            className="canto-field px-3 py-1.5 text-xs"
           />
           <label htmlFor="google-client-secret" className="text-[11px] text-muted">{t("google.clientSecretLabel")}</label>
           <input
@@ -63,7 +63,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
             type="password"
             value={clientSecret}
             onChange={(e) => setClientSecret(e.target.value)}
-            className="rounded-lg border border-line bg-ink px-3 py-1.5 text-xs text-fg outline-none focus:border-accent"
+            className="canto-field px-3 py-1.5 text-xs"
           />
           <button
             type="button"
@@ -102,7 +102,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
       >
         {busy === "conn" ? t("google.waitingBrowser") : status.connected ? t("google.switchAccount") : t("google.signIn")}
       </button>
-      {info && <p className="text-[11px] text-accent">{info}</p>}
+      {info && <p className="text-[11px] text-accent-text">{info}</p>}
     </section>
   );
 }

@@ -71,7 +71,7 @@ export default function StatusTab() {
             type="button"
             onClick={() => void load(true)}
             disabled={loading}
-            className="min-h-6 underline decoration-dotted hover:text-muted"
+            className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
           >
             {loading ? "..." : t("status.refresh")}
           </button>

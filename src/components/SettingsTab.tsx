@@ -60,19 +60,19 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
   }
 
   return (
-    <div className="flex h-full flex-col gap-4 overflow-y-auto pr-1 text-sm">
+    <div className="flex h-full flex-col gap-3 overflow-y-auto pr-1 text-sm [&>fieldset]:rounded-xl [&>fieldset]:border [&>fieldset]:border-edge [&>fieldset]:bg-ink/40 [&>fieldset]:p-3 [&>section]:rounded-xl [&>section]:border [&>section]:border-edge [&>section]:bg-ink/40 [&>section]:p-3 [&_legend]:float-left [&_legend]:mb-1.5 [&_legend]:w-full [&_legend]:p-0 [&_legend+*]:clear-both">
       <section className="flex flex-col gap-2">
         <p className="text-xs text-muted">
           {t("settings.shortcutHint.before")} <span className="text-muted">{TOGGLE_LABEL}</span> {t("settings.shortcutHint.middle")}{" "}
           <kbd className="rounded border border-line px-1 text-[11px]">?</kbd> {t("settings.shortcutHint.after")}
         </p>
-        <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
+        <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
           <input
             type="checkbox"
             checked={autostart}
             disabled={busy}
             onChange={(e) => void toggle(e.target.checked)}
-            className="size-4 accent-[var(--color-accent)]"
+            className="canto-box"
           />
           {t("settings.autostart")}
         </label>

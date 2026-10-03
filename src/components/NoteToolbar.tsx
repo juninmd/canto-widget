@@ -32,7 +32,7 @@ const TOOLS: Tool[] = [
 ];
 
 const BTN = "grid h-7 min-w-7 place-items-center rounded px-1 text-xs disabled:opacity-40";
-const on = (pressed: boolean) => (pressed ? "bg-edge text-accent" : "text-muted hover:bg-edge hover:text-fg");
+const on = (pressed: boolean) => (pressed ? "bg-edge text-accent-text" : "text-muted hover:bg-edge hover:text-fg");
 
 /** Compact formatting bar sized for the ~420px widget; every button mirrors a shortcut or markdown input rule. */
 export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, onLink, onAttach }: Props) {

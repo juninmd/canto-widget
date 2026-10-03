@@ -539,3 +539,18 @@ test("a long title wraps instead of being cut off", async () => {
   expect(title.className).not.toContain("truncate");
   expect(title.className).toContain("break-words");
 });
+
+test("F2 on the task's checkbox starts renaming, so the keyboard needs no double-click", async () => {
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await Promise.resolve();
+  });
+  await act(async () => {
+    fireEvent.keyDown(screen.getByRole("checkbox", { name: "comprar leite" }), { key: "F2" });
+  });
+  expect((screen.getByDisplayValue("comprar leite") as HTMLInputElement).value).toBe("comprar leite");
+});

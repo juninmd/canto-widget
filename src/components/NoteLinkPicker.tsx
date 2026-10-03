@@ -18,7 +18,7 @@ export default function NoteLinkPicker({ tasks, agenda, onPick, onClose }: Props
     >
       <div className="flex items-center justify-between text-muted">
         <span>{t("notes.linkPickerTitle")}</span>
-        <button type="button" onClick={onClose} className="min-h-6 px-1 hover:text-fg">
+        <button type="button" onClick={onClose} className="min-h-[24px] px-1 hover:text-fg">
           {t("notes.linkPickerClose")}
         </button>
       </div>

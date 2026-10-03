@@ -67,7 +67,7 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
       <h3 className="text-xs font-semibold text-fg">{t("settings.security.title")}</h3>
       <ChangePassword onChanged={() => void reload()} />
       {autolock !== null && (
-        <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
+        <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
           {t("settings.security.autolock")}
           <select
             value={autolock}
@@ -84,13 +84,13 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
       )}
       {bio?.available && (
         <>
-          <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
+          <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
             <input
               type="checkbox"
               checked={bio.enabled}
               disabled={busy}
               onChange={(e) => void toggle(e.target.checked)}
-              className="size-4 accent-[var(--color-accent)]"
+              className="canto-box"
             />
             {t("settings.security.biometric", { name: bio.name })}
           </label>

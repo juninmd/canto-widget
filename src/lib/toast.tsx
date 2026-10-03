@@ -96,7 +96,7 @@ function ToastItem({ toast, close, durationMs }: { toast: ActiveToast; close: (i
             toast.action!.run();
             dismiss();
           }}
-          className="min-h-6 shrink-0 rounded px-2 font-semibold text-accent hover:bg-edge"
+          className="min-h-[24px] shrink-0 rounded px-2 font-semibold text-accent-text hover:bg-edge"
         >
           {toast.action.label}
         </button>

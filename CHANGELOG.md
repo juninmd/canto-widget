@@ -153,18 +153,21 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
-- **Visual do app (fases 1 e 2 do redesenho)**: cabeçalho com ícones de contorno e alvos de 28 px; abas com
-  sublinhado na cor de destaque, bordas esmaecidas que avisam que há mais abas e a aba ativa sempre à vista; campos
-  de busca e de nova tarefa com ícone e a mesma profundidade em todas as abas; cartões do Clipboard e da Agenda mais
-  arredondados, com estado de hover; seletor Lista/Dia/Reuniões em segmentos. Na aba Tarefas: barra de progresso do
-  dia, caixa de marcar redonda, barra de prioridade na lateral, metadados em pílulas e ações que flutuam sobre a
-  linha (o título ocupa a linha toda). Listas vazias ganham um ícone. Superfícies, hover e pressionado são derivados
-  da skin, então valem para as cinco skins.
+- **Visual do app (redesenho completo)**: cabeçalho com ícones de contorno; abas com sublinhado na cor de
+  destaque, bordas esmaecidas que avisam que há mais abas e a aba ativa sempre à vista; campos de busca, de filtro e
+  de nova tarefa/nota com ícone e a mesma profundidade em todas as abas; cartões de Notas, Clipboard, Agenda e
+  GitHub/GitLab com o mesmo arredondamento e estado de hover; seletor Lista/Dia/Reuniões e filtros em segmentos;
+  contagem das listas do GitHub em pílula; Ajustes em cartões, com caixas de marcar quadradas no estilo do app.
+  Na aba Tarefas: barra de progresso do dia, caixa de marcar redonda, barra de prioridade na lateral, metadados em
+  pílulas e ações que flutuam sobre a linha (o título ocupa a linha toda). Listas vazias ganham um ícone.
+  Superfícies, hover e pressionado são derivados da skin, então valem para as cinco skins.
 - **Acessibilidade do novo visual**: todo botão, aba e seletor tem ao menos 24 px mesmo na densidade compacta (WCAG
-  2.5.8); a caixa de marcar de cada tarefa agora tem nome (o título) e área de 24 px; as ações da linha também
-  aparecem em telas sem mouse; a alça de arrastar não colide mais com a caixa; o anel de foco da aba não é mais
-  cortado; no modo de alto contraste do Windows a aba ativa, a marca, a barra de progresso e a prioridade continuam
-  visíveis; "mais contraste" do sistema sobe o texto e as linhas fracos.
+  2.5.8, verificado em todas as abas por um teste); a caixa de marcar de cada tarefa agora tem nome (o título) e
+  área de 24 px; F2 renomeia a tarefa em foco; as ações da linha também aparecem em telas sem mouse; a alça de
+  arrastar não colide mais com a caixa; o anel de foco da aba não é mais cortado; no modo de alto contraste do Windows
+  a aba ativa, a marca, a barra de progresso e a prioridade continuam visíveis; "mais contraste" do sistema sobe o
+  texto e as linhas fracos. Um teste confere o contraste dos tokens de cada skin (texto 4,5:1, bordas e destaque
+  3:1); o texto de destaque do Hueco Mundo, que estava em 4,1:1, ganhou um tom mais claro.
 - **Modelo da lista abre a página dele**: clicar num modelo da aba Modelos IA abre a página do modelo na
   Artificial Analysis, no navegador.
 - **Dia: eventos que se sobrepõem ficam lado a lado**, dividindo a largura em colunas, em vez de um por cima do

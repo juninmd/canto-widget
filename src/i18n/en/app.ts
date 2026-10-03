@@ -164,6 +164,7 @@ export const app: Record<keyof typeof source, string> = {
   "shortcuts.help": "open or close this help",
   "shortcuts.new": "new task or new card",
   "shortcuts.lock": "lock the vault",
+  "shortcuts.rename": "rename the focused task",
   "shortcuts.privacy": "turn privacy mode on or off (blurs clipboard and notes)",
   "shortcuts.toggle": "show or hide the widget, from any app",
   "shortcuts.fullscreen": "enter or exit full screen",

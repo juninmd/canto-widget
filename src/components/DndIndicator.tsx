@@ -13,7 +13,7 @@ export default function DndIndicator({ onError }: { onError: (m: string) => void
       onClick={() => void stop()}
       aria-label={t("app.dnd.turnOff")}
       title={end === null ? t("app.dnd.titleForever") : t("app.dnd.title", { time: end })}
-      className="flex min-h-6 items-center gap-1 rounded px-1.5 text-accent hover:text-fg"
+      className="flex min-h-[24px] items-center gap-1 rounded px-1.5 text-accent-text hover:text-fg"
     >
       <MoonIcon />
       {end !== null && <span>{t("app.dnd.until", { time: end })}</span>}

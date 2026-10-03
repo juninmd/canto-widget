@@ -12,7 +12,7 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
       <p className="text-xs text-muted">{t("settings.dnd.hint")}</p>
       {state.active ? (
         <div className="flex min-h-7 items-center gap-2 text-xs">
-          <span className="text-accent" role="status">
+          <span className="text-accent-text" role="status">
             {state.untilMs === null
               ? t("settings.dnd.activeForever")
               : t("settings.dnd.activeUntil", {

@@ -86,7 +86,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("search.placeholder")}
         aria-label={t("search.label")}
-        className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+        className="canto-field px-3 py-1.5 text-sm"
       />
 
       <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
@@ -148,7 +148,7 @@ function Group({
       <button
         type="button"
         onClick={onOpen}
-        className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-faint hover:text-accent"
+        className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-faint hover:text-accent-text"
       >
         {title} →
       </button>

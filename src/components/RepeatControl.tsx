@@ -19,7 +19,7 @@ function kindOf(task: Task): Kind {
   return (task.repetir?.tipo as Kind | undefined) ?? "";
 }
 
-const fieldClass = "rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent";
+const fieldClass = "canto-field !rounded-md px-1 py-0.5";
 
 type Props = { task: Task; onLegacy: (repeat: Repeat | null) => void; onExtended: (repeat: ExtendedRepeat | null) => void };
 

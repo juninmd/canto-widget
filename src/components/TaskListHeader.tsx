@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function TaskListHeader({ done, total, priorityFilter, onPriorityFilter, onSummary, onCarryOver }: Props) {
-  const ghost = "canto-hit min-h-6 whitespace-nowrap rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
+  const ghost = "canto-hit min-h-[24px] whitespace-nowrap rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-3 text-[11px] text-muted">

@@ -26,7 +26,7 @@ type Props = {
   onCancel: () => void;
 };
 
-const FIELD = "rounded-lg border border-line bg-ink text-sm text-fg outline-none focus-within:border-accent focus:border-accent";
+const FIELD = "canto-field text-sm focus-within:border-accent";
 
 export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onCancel }: Props) {
   const [raw, setRaw] = useState(false);
@@ -177,7 +177,7 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
         value={draft.tags}
         onChange={(e) => change({ ...latest.current, tags: e.target.value })}
         placeholder={t("notes.tagsPlaceholder")}
-        className="rounded-lg border border-line bg-ink px-3 py-1.5 text-xs text-muted outline-none focus:border-accent"
+        className="canto-field px-3 py-1.5 text-xs !text-muted"
       />
       <NoteLinkRow link={draft.link} tasks={tasks} agenda={agenda} onLink={(link) => change({ ...latest.current, link })} />
       <div className="flex gap-2">

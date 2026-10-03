@@ -141,3 +141,10 @@ export const SearchIcon = () => (
     <path d="m20 20-3.5-3.5" />
   </svg>
 );
+
+export const NoteIcon = () => (
+  <svg {...base}>
+    <path d="M6 3h9l4 4v14H6z" />
+    <path d="M14 3v5h5M9 13h7M9 17h5" />
+  </svg>
+);

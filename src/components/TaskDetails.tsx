@@ -50,7 +50,7 @@ export default function TaskDetails({
           aria-label={t("tasks.reminderTime", { title: task.title })}
           value={task.hora ?? ""}
           onChange={(e) => onChange(e.target.value || null, repeat)}
-          className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+          className="canto-field !rounded-md px-1 py-0.5"
         />
       </label>
       <RepeatControl task={task} onLegacy={(r) => onChange(task.hora ?? null, r)} onExtended={onExtendedRepeat} />
@@ -58,7 +58,7 @@ export default function TaskDetails({
         aria-label={t("tasks.priorityOf", { title: task.title })}
         value={task.priority ?? ""}
         onChange={(e) => onPriority((e.target.value || null) as Priority | null)}
-        className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+        className="canto-field !rounded-md px-1 py-0.5"
       >
         <option value="">{t("priority.none")}</option>
         {PRIORITIES.map((p) => (
@@ -71,7 +71,7 @@ export default function TaskDetails({
         aria-label={t("focus.estimateOf", { title: task.title })}
         value={task.estimate_min ?? ""}
         onChange={(e) => onEstimate(e.target.value ? Number(e.target.value) : null)}
-        className="rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+        className="canto-field !rounded-md px-1 py-0.5"
       >
         <option value="">{t("focus.noEstimate")}</option>
         {[...new Set([...ESTIMATES, ...(task.estimate_min ? [task.estimate_min] : [])])]
@@ -92,10 +92,10 @@ export default function TaskDetails({
           onChange={(e) => setPrUrl(e.target.value)}
           onBlur={() => prUrl.trim() !== (task.pr_url ?? "") && onLinkPr(prUrl.trim() || null)}
           onKeyDown={(e) => e.key === "Enter" && onLinkPr(prUrl.trim() || null)}
-          className="min-w-0 flex-1 rounded border border-line bg-ink px-1 py-0.5 text-fg outline-none focus:border-accent"
+          className="min-w-0 flex-1 canto-field !rounded-md px-1 py-0.5"
         />
       </label>
-      <button type="button" onClick={onClose} className="ml-auto min-h-6 px-1 hover:text-fg">
+      <button type="button" onClick={onClose} className="ml-auto min-h-[24px] px-1 hover:text-fg">
         {t("tasks.close")}
       </button>
     </div>
@@ -122,7 +122,7 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-fg active:bg-active aria-expanded:text-accent"
+        className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-fg active:bg-active aria-expanded:text-accent-text"
         aria-label={t("tasks.scheduleOf", { title: task.title })}
         title={t("tasks.schedule")}
       >

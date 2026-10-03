@@ -74,7 +74,8 @@ test("connected shows all four lists with totals and opens the item in the brows
   for (const t of ["Revisão pedida a mim", "Atribuídos a mim", "PRs que eu abri", "Issues que eu abri"]) {
     expect(screen.getByRole("region", { name: t })).toBeTruthy();
   }
-  expect(screen.getByText("(3)")).toBeTruthy();
+  const region = screen.getByRole("region", { name: "Revisão pedida a mim" });
+  expect(region.querySelector("h3")?.textContent).toBe("Revisão pedida a mim3");
   expect(screen.getByText("octo/canto#42")).toBeTruthy();
   expect(screen.getByText("rascunho")).toBeTruthy();
   await act(async () => {

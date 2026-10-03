@@ -90,7 +90,7 @@ export default function AgendaTab({
             type="button"
             aria-pressed={view === v}
             onClick={() => pick(v)}
-            className={`canto-hit min-h-7 rounded-lg px-3 transition-colors ${view === v ? "bg-raised font-semibold text-accent shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
+            className={`canto-hit min-h-7 rounded-lg px-3 transition-colors ${view === v ? "bg-raised font-semibold text-accent-text shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
           >
             {t(LABEL[v])}
           </button>
@@ -105,14 +105,14 @@ export default function AgendaTab({
               type="button"
               title={t("agenda.testAlertTitle")}
               onClick={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
-              className="canto-hit min-h-6 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
+              className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
             >
               {t("agenda.testAlert")}
             </button>
             <button
               type="button"
               onClick={() => void reload()}
-              className="canto-hit min-h-6 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
+              className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
             >
               {loading ? "..." : t("agenda.refresh")}
             </button>

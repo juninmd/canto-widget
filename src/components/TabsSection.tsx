@@ -16,13 +16,13 @@ export default function TabsSection({ hidden, onChange }: Props) {
           // At least one tab besides Ajustes stays, or the widget turns into a settings screen.
           const last = on && shown === 1;
           return (
-            <label key={tab.id} className="flex min-h-6 items-center gap-2 text-xs text-muted">
+            <label key={tab.id} className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
               <input
                 type="checkbox"
                 checked={on}
                 disabled={last}
                 onChange={(e) => onChange(e.target.checked ? hidden.filter((h) => h !== tab.id) : [...hidden, tab.id])}
-                className="size-4 accent-[var(--color-accent)]"
+                className="canto-box"
               />
               {tab.label}
             </label>

@@ -306,7 +306,7 @@ test("an unsaved note draft survives switching to another tab and back", async (
   };
   await toNotes();
   await act(async () => {
-    fireEvent.click(screen.getByText("+"));
+    fireEvent.click(screen.getByRole("button", { name: "novo card" }));
   });
   await settle();
   fireEvent.change(screen.getByPlaceholderText("título"), { target: { value: "rascunho fictício" } });

@@ -14,14 +14,14 @@ export default function ModelItem({ row, max }: { row: ModelRow; max: number }) 
         title={t("models.openTitle", { name: row.name })}
         className="flex w-full items-start gap-2 rounded-lg px-1.5 py-1.5 text-left hover:bg-edge/40"
       >
-        <span className={`w-7 shrink-0 pt-px text-right text-[11px] tabular-nums ${top ? "font-bold text-accent" : "text-faint"}`}>
+        <span className={`w-7 shrink-0 pt-px text-right text-[11px] tabular-nums ${top ? "font-bold text-accent-text" : "text-faint"}`}>
           #{row.rank}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex min-w-0 items-center gap-1.5">
             <span className="truncate text-xs font-semibold text-fg">{row.name}</span>
             {row.badge && (
-              <span className="shrink-0 rounded-full bg-accent/15 px-1.5 text-[9px] font-semibold tracking-wide text-accent uppercase">
+              <span className="shrink-0 rounded-full bg-accent/15 px-1.5 text-[9px] font-semibold tracking-wide text-accent-text uppercase">
                 {t(`models.badge.${row.badge}`)}
               </span>
             )}

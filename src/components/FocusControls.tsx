@@ -21,7 +21,7 @@ export function FocusButton({ task }: { task: Task }) {
       aria-label={label}
       aria-pressed={mine}
       title={label}
-      className={`canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active ${mine ? "text-accent" : "text-faint"}`}
+      className={`canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active ${mine ? "text-accent-text" : "text-faint"}`}
     >
       {mine ? <PauseIcon /> : <PlayIcon />}
     </button>
@@ -39,7 +39,7 @@ export function FocusBadge({ task }: { task: Task }) {
   const spent = minutesOf(secs);
   return (
     <span
-      className={`${CHIP} tabular-nums ${over ? "!text-danger" : mine ? "!text-accent" : ""}`}
+      className={`${CHIP} tabular-nums ${over ? "!text-danger" : mine ? "!text-accent-text" : ""}`}
       title={over ? t("focus.over") : undefined}
     >
       {est ? t("focus.tracked", { spent, est }) : t("focus.trackedOnly", { spent })}

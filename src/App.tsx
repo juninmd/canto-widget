@@ -280,7 +280,7 @@ function Canto() {
                 aria-pressed={privacy}
                 aria-label={privacy ? t("app.privacy.disable") : t("app.privacy.enable")}
                 title={privacy ? t("app.privacy.onTitle") : t("app.privacy.offTitle")}
-                className={`canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active ${privacy ? "text-accent" : ""}`}
+                className={`canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active ${privacy ? "text-accent-text" : ""}`}
               >
                 {privacy ? <EyeOffIcon /> : <EyeIcon />}
               </button>

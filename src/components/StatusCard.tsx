@@ -71,7 +71,7 @@ export default function StatusCard({ result, open, watched, onToggle, onWatch }:
         aria-label={bellLabel}
         title={bellLabel}
         className={`absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-md hover:bg-edge disabled:opacity-30 disabled:hover:bg-transparent ${
-          watched ? "text-accent" : "text-faint hover:text-fg"
+          watched ? "text-accent-text" : "text-faint hover:text-fg"
         }`}
       >
         <BellIcon on={watched} />

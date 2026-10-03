@@ -75,7 +75,7 @@ export default function Lock({ exists, onOpen }: Props) {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder={t("lock.password")}
-        className="rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+        className="canto-field px-3 py-2 text-sm"
       />
       {!exists && (
         <input
@@ -84,15 +84,15 @@ export default function Lock({ exists, onOpen }: Props) {
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           placeholder={t("lock.confirm")}
-          className="rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent"
+          className="canto-field px-3 py-2 text-sm"
         />
       )}
-      <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
+      <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
         <input
           type="checkbox"
           checked={showPassword}
           onChange={(e) => setShowPassword(e.target.checked)}
-          className="size-4 accent-[var(--color-accent)]"
+          className="canto-box"
         />
         {t("lock.showPassword")}
         {!exists && <span className="ml-auto text-faint">{t("lock.minLength")}</span>}

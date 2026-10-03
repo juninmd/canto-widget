@@ -72,7 +72,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
             </ul>
           )}
           {e.link && (
-            <button type="button" onClick={() => void api.openLink(e.link)} className="min-h-6 underline decoration-dotted hover:text-fg">
+            <button type="button" onClick={() => void api.openLink(e.link)} className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
               {t("agenda.openInCalendar")}
             </button>
           )}

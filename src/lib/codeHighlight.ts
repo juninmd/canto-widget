@@ -55,7 +55,7 @@ const CLASSES = {
   comment: "text-faint italic",
   string: "text-danger",
   number: "text-danger",
-  keyword: "font-semibold text-accent",
+  keyword: "font-semibold text-accent-text",
 } as const;
 
 function grammarFor(lang: string): Grammar | undefined {

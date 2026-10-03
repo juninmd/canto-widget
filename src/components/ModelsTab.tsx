@@ -8,7 +8,7 @@ import ModelItem from "./ModelItem";
 import Skeleton from "./Skeleton";
 
 const SITE = "https://artificialanalysis.ai/";
-const LINK = "min-h-6 underline decoration-dotted hover:text-muted";
+const LINK = "canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
 
 /** LLMs ranked by Artificial Analysis' Intelligence Index, read keyless from its public page; Rust holds the 3 h floor. */
 export default function ModelsTab() {
@@ -75,7 +75,7 @@ export default function ModelsTab() {
           type="button"
           onClick={() => setSort(nextSort(sort))}
           aria-label={t("models.sortLabel", { sort: sortName })}
-          className="min-h-6 rounded-md bg-edge px-2 text-fg hover:bg-edge/70"
+          className="min-h-[24px] rounded-md bg-edge px-2 text-fg hover:bg-edge/70"
         >
           ↕ {sortName}
         </button>
@@ -85,7 +85,7 @@ export default function ModelsTab() {
           aria-pressed={view.alerts}
           aria-label={bell}
           title={bell}
-          className={`grid size-6 place-items-center rounded-md hover:bg-edge ${view.alerts ? "text-accent" : "text-faint hover:text-fg"}`}
+          className={`grid size-6 place-items-center rounded-md hover:bg-edge ${view.alerts ? "text-accent-text" : "text-faint hover:text-fg"}`}
         >
           <BellIcon on={view.alerts} />
         </button>

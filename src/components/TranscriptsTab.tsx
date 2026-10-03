@@ -56,7 +56,7 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
       <div className="flex h-full flex-col gap-2">
         <div className="flex items-center justify-between gap-2">
           <p className="truncate text-sm font-medium text-fg">{open.name}</p>
-          <button type="button" onClick={() => setOpen(null)} className="min-h-6 px-1 text-xs text-muted hover:text-fg">
+          <button type="button" onClick={() => setOpen(null)} className="min-h-[24px] px-1 text-xs text-muted hover:text-fg">
             {t("transcripts.back")}
           </button>
         </div>
@@ -87,7 +87,7 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
             autoFocus
             value={dir}
             onChange={(e) => setDir(e.target.value)}
-            className="flex-1 rounded-lg border border-line bg-ink px-2 py-1 text-[11px] text-fg outline-none focus:border-accent"
+            className="flex-1 canto-field px-2 py-1 text-[11px]"
           />
           <button type="submit" className="rounded-lg bg-accent px-2 text-[11px] font-semibold text-on-accent">
             {t("transcripts.saveDir")}
@@ -98,7 +98,7 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
           type="button"
           onClick={() => setEditingDir(true)}
           title={t("transcripts.changeDirTitle")}
-          className="min-h-6 truncate text-left text-[11px] text-faint hover:text-muted"
+          className="min-h-[24px] truncate text-left text-[11px] text-faint hover:text-muted"
         >
           {t("transcripts.folder", { dir: dir || t("transcripts.folderUnset") })}
         </button>
@@ -109,7 +109,7 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
         data-shortcut="search"
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("transcripts.searchPlaceholder")}
-        className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+        className="canto-field px-3 py-1.5 text-sm"
       />
 
       <div className="flex-1 overflow-y-auto pr-1">
