@@ -4,8 +4,9 @@ use std::collections::{HashMap, HashSet};
 
 use time::format_description::well_known::Rfc3339;
 
-use crate::calendar::AgendaItem;
+use crate::calendar::{AgendaItem, Attachment};
 use crate::forge::{ChecksStatus, ForgeItem};
+use crate::github_failures::FailedJob;
 use crate::notification::PR_PREFIX;
 
 /// More stalled PRs than this at once become one summary instead of a stack of pop-ups.
@@ -67,9 +68,25 @@ fn base(item: &ForgeItem, kind: &str, tag: &str) -> AgendaItem {
     }
 }
 
-pub fn ci_event(item: &ForgeItem, en: bool) -> AgendaItem {
-    let text = if en { "The checks failed on this pull request." } else { "O CI falhou neste pull request." };
-    AgendaItem { description: text.into(), ..base(item, "ci", "ci") }
+/// "build · Run tests": the job and, when GitHub says so, the step that broke.
+fn job_label(j: &FailedJob) -> String {
+    match &j.step {
+        Some(step) => format!("{} · {step}", j.name),
+        None => j.name.clone(),
+    }
+}
+
+/// The failed jobs ride along as `attachments`, so the pop-up can list them and open each one.
+pub fn ci_event(item: &ForgeItem, jobs: &[FailedJob], en: bool) -> AgendaItem {
+    let text = match (jobs.len(), en) {
+        (0, true) => "The checks failed on this pull request.".to_string(),
+        (0, false) => "O CI falhou neste pull request.".to_string(),
+        (n, true) => format!("{n} failed: {}.", jobs.iter().map(|j| j.name.as_str()).collect::<Vec<_>>().join(", ")),
+        (n, false) => format!("{n} falhou: {}.", jobs.iter().map(|j| j.name.as_str()).collect::<Vec<_>>().join(", ")),
+    };
+    let attachments =
+        jobs.iter().map(|j| Attachment { title: job_label(j), url: j.url.clone(), mime: String::new() }).collect();
+    AgendaItem { description: text, attachments, ..base(item, "ci", "ci") }
 }
 
 /// One alert per PR, or a single summary when many are stalled at once.

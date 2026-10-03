@@ -208,3 +208,57 @@ test("a red CI ranks above a stalled PR, and both above a meeting", async () => 
   expect(texts[1]).toContain("sem revisão");
   expect(texts[2]).toContain("Daily");
 });
+
+test("a failing CI lists the jobs that broke, each opening its own page", async () => {
+  await show([
+    {
+      ...failingCi,
+      description: "2 falhou: build, lint.",
+      attachments: [
+        { title: "build · Run tests", url: "https://github.com/acme/atlas/runs/1", mime: "" },
+        { title: "ci/legado", url: "", mime: "" },
+      ],
+    },
+  ]);
+  expect(screen.getByText("✖ ci/legado").tagName).toBe("P");
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "✖ build · Run tests" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/runs/1" });
+});
+
+const mentionedOnGitlab: AgendaItem = {
+  ...base,
+  start: "",
+  id: "mention:gitlab:42",
+  title: "Falha no deploy de produção",
+  organizer: "acme/atlas",
+  link: "https://git.example.com/acme/atlas/-/issues/9",
+  description: "@ana: @voce consegue olhar isso hoje?",
+  tag: "gitlab",
+};
+
+test("a mention says where it happened, shows what was said and opens the thread", async () => {
+  await show([mentionedOnGitlab]);
+  expect(screen.getAllByText("você foi mencionado").length).toBeGreaterThan(0);
+  expect(screen.getByText("GitLab")).toBeTruthy();
+  expect(screen.getByText("acme/atlas")).toBeTruthy();
+  expect(screen.getByText("@ana: @voce consegue olhar isso hoje?")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://git.example.com/acme/atlas/-/issues/9" });
+});
+
+test("a GitHub mention is tagged GitHub in the strip and the summary has no open button", async () => {
+  const gh: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:acme/atlas#3", tag: "github" };
+  const summary: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:summary", link: "", title: "5 menções novas" };
+  await show([gh, summary]);
+  expect(screen.getAllByText("mencionou você").length).toBe(2);
+  expect(screen.getByText("GitHub")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(cards()[1]);
+  });
+  expect(screen.queryByRole("button", { name: "abrir" })).toBeNull();
+});

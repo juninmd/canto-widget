@@ -5,6 +5,7 @@ import { kindOf, levelLabel, toneOf } from "../lib/alerts";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import AlertGuests from "./AlertGuests";
+import AlertJobs from "./AlertJobs";
 import AlertPrep from "./AlertPrep";
 import { TONE } from "./AlertStrip";
 
@@ -54,6 +55,12 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             {event.tag === "stalled" && event.start && <Chip>{timeAgo(event.start)}</Chip>}
           </>
         )}
+        {kind === "mention" && (
+          <>
+            <Chip tone={tone.text}>{event.tag === "gitlab" ? "GitLab" : "GitHub"}</Chip>
+            {event.organizer && <Chip>{event.organizer}</Chip>}
+          </>
+        )}
         {(kind === "meeting" || kind === "task") && (
           <>
             <Chip tone={tone.text}>{hour(event)}</Chip>
@@ -68,6 +75,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
           {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
           {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
           {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}
+          {kind === "pr" && <AlertJobs jobs={event.attachments ?? []} />}
         </Box>
         {kind === "meeting" && (
           <Box label={t("alert.guests")}>

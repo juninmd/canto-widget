@@ -43,6 +43,7 @@ pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
 pub mod github_checks;
+pub mod github_failures;
 pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
@@ -56,6 +57,7 @@ pub mod hello_mac;
 pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
+pub mod mention_alerts;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
@@ -151,6 +153,7 @@ pub fn run() {
             do_not_disturb::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
             my_pr_alerts::watch(app.handle().clone());
+            mention_alerts::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]

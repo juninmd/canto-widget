@@ -1,5 +1,6 @@
 use super::*;
 use crate::forge::{ChecksStatus, ForgeItem};
+use crate::github_failures::FailedJob;
 
 const NOW: i64 = 1_789_700_400_000; // 2026-09-18T03:00:00Z
 
@@ -94,10 +95,30 @@ fn a_status_that_did_not_answer_keeps_its_last_value_and_closed_prs_are_forgotte
 
 #[test]
 fn a_ci_alert_names_the_pr_and_opens_it() {
-    let e = ci_event(&pr(12, "2026-09-10T00:00:00Z", false), false);
+    let e = ci_event(&pr(12, "2026-09-10T00:00:00Z", false), &[], false);
     assert_eq!((e.id.as_str(), e.tag.as_str(), e.title.as_str()), ("pr:ci:o/r#12", "ci", "item 12"));
     assert_eq!((e.organizer.as_str(), e.link.as_str()), ("o/r#12", "https://github.com/o/r/issues/12"));
     assert_eq!(e.description, "O CI falhou neste pull request.");
+    assert!(e.attachments.is_empty());
+}
+
+#[test]
+fn a_ci_alert_lists_the_failed_jobs_and_the_step_that_broke() {
+    let job = |id, name: &str, step: Option<&str>| FailedJob {
+        id,
+        name: name.into(),
+        url: format!("https://github.com/o/r/runs/{id}"),
+        step: step.map(String::from),
+    };
+    let jobs = [job(1, "build", Some("Run tests")), job(2, "lint", None)];
+    let e = ci_event(&pr(12, "2026-09-10T00:00:00Z", false), &jobs, false);
+    assert_eq!(e.description, "2 falhou: build, lint.");
+    let shown: Vec<(&str, &str)> = e.attachments.iter().map(|a| (a.title.as_str(), a.url.as_str())).collect();
+    assert_eq!(
+        shown,
+        [("build · Run tests", "https://github.com/o/r/runs/1"), ("lint", "https://github.com/o/r/runs/2")]
+    );
+    assert_eq!(ci_event(&pr(1, "", false), &jobs[1..], true).description, "1 failed: lint.");
 }
 
 #[test]
@@ -105,9 +126,9 @@ fn the_switches_default_on_at_48_hours_and_survive_a_restart() {
     let dir = std::env::temp_dir().join(format!("canto-my-pr-alerts-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let _ = std::fs::remove_file(dir.join(FILE));
-    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: true, stalled: true, stalled_hours: 48 });
-    MyPrAlerts::load(&dir).set(Config { ci: false, stalled: true, stalled_hours: 24 }).unwrap();
-    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, stalled: true, stalled_hours: 24 });
+    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: true, stalled: true, stalled_hours: 48, mentions: true });
+    MyPrAlerts::load(&dir).set(Config { ci: false, stalled: true, stalled_hours: 24, mentions: false }).unwrap();
+    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, stalled: true, stalled_hours: 24, mentions: false });
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -116,9 +137,15 @@ fn an_absurd_wait_is_clamped_and_a_file_missing_fields_keeps_the_defaults() {
     let dir = std::env::temp_dir().join(format!("canto-my-pr-alerts-clamp-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let alerts = MyPrAlerts::load(&dir);
-    assert_eq!(alerts.set(Config { ci: true, stalled: true, stalled_hours: 0 }).unwrap().stalled_hours, 1);
-    assert_eq!(alerts.set(Config { ci: true, stalled: true, stalled_hours: 99_999 }).unwrap().stalled_hours, 336);
+    assert_eq!(
+        alerts.set(Config { ci: true, stalled: true, stalled_hours: 0, mentions: true }).unwrap().stalled_hours,
+        1
+    );
+    assert_eq!(
+        alerts.set(Config { ci: true, stalled: true, stalled_hours: 99_999, mentions: true }).unwrap().stalled_hours,
+        336
+    );
     std::fs::write(dir.join(FILE), r#"{"ci":false}"#).unwrap();
-    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, stalled: true, stalled_hours: 48 });
+    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, stalled: true, stalled_hours: 48, mentions: true });
     let _ = std::fs::remove_dir_all(&dir);
 }

@@ -15,6 +15,7 @@ use crate::error::Result;
 use crate::forge::{self, ChecksStatus};
 use crate::forge_filter::{ForgeFilter, Kind, Order, Section, Sort};
 use crate::github_checks::{self, GithubChecks, PrRef};
+use crate::github_failures;
 use crate::model::now_ms;
 use crate::my_pr_events::{advance_stalled, ci_event, newly_failing, remember, stalled, stalled_events};
 use crate::vault::AppState;
@@ -32,6 +33,9 @@ pub struct Config {
     pub stalled: bool,
     #[serde(default = "default_hours")]
     pub stalled_hours: u32,
+    /// Pop-up when someone @-mentions the user on GitHub or GitLab (`mention_alerts.rs` reads it).
+    #[serde(default = "on")]
+    pub mentions: bool,
 }
 
 fn on() -> bool {
@@ -44,7 +48,7 @@ fn default_hours() -> u32 {
 
 impl Default for Config {
     fn default() -> Self {
-        Self { ci: true, stalled: true, stalled_hours: default_hours() }
+        Self { ci: true, stalled: true, stalled_hours: default_hours(), mentions: true }
     }
 }
 
@@ -108,7 +112,8 @@ fn check_ci(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, mem: &m
         found.into_iter().map(|c| (format!("{}#{}", c.repo, c.number), c.status)).collect();
     let failing = newly_failing(mem.ci.as_ref(), &now);
     for item in list.items.iter().filter(|i| failing.contains(&i.reference)) {
-        let _ = crate::window::open_alert(app, ci_event(item, crate::lang::english()));
+        let jobs = github_failures::fetch(cred, &item.repo, item.number).unwrap_or_default();
+        let _ = crate::window::open_alert(app, ci_event(item, &jobs, crate::lang::english()));
     }
     let listed: HashSet<&str> = list.items.iter().map(|i| i.reference.as_str()).collect();
     mem.ci = Some(remember(mem.ci.as_ref(), now, &listed));

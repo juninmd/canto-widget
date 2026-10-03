@@ -54,7 +54,7 @@ export type Note = {
 };
 
 /** Pop-ups about the user's own PRs: red CI, and no review for `stalled_hours`. */
-export type MyPrAlerts = { ci: boolean; stalled: boolean; stalled_hours: number };
+export type MyPrAlerts = { ci: boolean; stalled: boolean; stalled_hours: number; mentions: boolean };
 
 export type ClipMode = "json_pretty" | "json_compact" | "one_line" | "upper" | "lower";
 

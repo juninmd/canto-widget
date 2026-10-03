@@ -200,9 +200,9 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|
 | ![Hovering a text clip offers one line, UPPERCASE and lowercase](docs/prints/app/29-clipboard-transformar.png) | ![The meeting alert lists earlier notes with the same title and offers to create today's note](docs/prints/app/07-aviso-reuniao.png) |
 
-| Alerts about my own PRs | Their switches in Settings |
-|---|---|
-| ![Pop-up with a pull request whose CI failed and another one waiting for a review](docs/prints/app/55-aviso-meus-prs.png) | ![Settings: alert when the CI of one of my PRs fails, or when one has no review for 24, 48 or 72 hours](docs/prints/app/56-ajustes-meus-prs.png) |
+| CI failed, with the broken jobs | Someone mentioned me | Their switches in Settings |
+|---|---|---|
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
 | Password changed, one file pending | Day summary |
 |---|---|

@@ -16,12 +16,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
-- **Avisos dos seus PRs no GitHub**: um pop-up quando o **CI de um PR seu falha** (avisa uma vez por falha, e de
-  novo se ele voltar a falhar depois de passar) e outro quando um **PR seu fica sem nenhuma revisão** por 24, 48 ou
-  72 h (48 por padrão, contados desde a abertura; rascunhos não contam). Mais de 3 PRs sem revisão de uma vez viram
-  um aviso só. O botão "abrir PR" leva ao PR. Conferido a cada 5 min com o cofre aberto, mesmo com a janela escondida;
-  a primeira leitura só registra o CI, sem avisar de falhas antigas. Cada um liga e desliga em Ajustes → Meus PRs no
-  GitHub.
+- **Avisos dos seus PRs no GitHub**: um pop-up quando o **CI de um PR seu falha** e outro quando um **PR seu fica
+  sem nenhuma revisão** por 24, 48 ou 72 h (48 por padrão, contados desde a abertura; rascunhos não contam). O aviso
+  de CI avisa uma vez por falha (e de novo se ele voltar a falhar depois de passar) e **lista os jobs que quebraram**,
+  com o passo que falhou quando o GitHub Actions informa, e cada job abre a própria página. Mais de 3 PRs sem revisão
+  de uma vez viram um aviso só. Conferido a cada 5 min com o cofre aberto, mesmo com a janela escondida; a primeira
+  leitura só registra o CI, sem avisar de falhas antigas.
+- **Aviso de menção no GitHub e no GitLab**: um pop-up quando alguém te marca (@usuário), com o texto da menção no
+  GitLab e o link da conversa. No GitHub vale a menção direta ao seu usuário em issues e PRs abertos de outras
+  pessoas (menção a time não entra); no GitLab, o to-do de menção pendente. A primeira leitura só registra, e mais de
+  3 de uma vez viram um aviso só. Cada aviso liga e desliga em Ajustes → Avisos do GitHub e do GitLab.
 - **Adiar por 1, 5 ou 10 minutos**: o aviso de reunião e o lembrete de tarefa trazem os três botões de adiar numa
   linha própria, em vez de só "adiar 10 min". O aviso volta a tocar quando o prazo escolhido passa.
 - **Copiar o clipe reescrito**: ao passar o mouse num item do clipboard aparecem as reescritas que cabem no tipo:

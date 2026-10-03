@@ -112,10 +112,12 @@ export const app: Record<keyof typeof source, string> = {
   "settings.reviewAlerts.label": "notify me when my review is requested",
   "settings.reviewAlerts.hint": "OS notification for each new request, checked every 5 min while the vault is open.",
 
-  "settings.myPrAlerts.title": "My GitHub PRs",
+  "settings.myPrAlerts.title": "GitHub and GitLab alerts",
   "settings.myPrAlerts.ci": "tell me when the CI of one of my PRs fails",
   "settings.myPrAlerts.stalled": "tell me when one of my PRs has no review for",
   "settings.myPrAlerts.hours": "{h} h",
+  "settings.myPrAlerts.mentions": "tell me when someone mentions me",
+  "settings.myPrAlerts.mentionsHint": "A pop-up with the link to the conversation. On GitHub it is a direct @username mention (not a team one); on GitLab, the pending mention to-do.",
   "settings.myPrAlerts.hint": "A pop-up for each case, checked every 5 min while the vault is open. Draft PRs do not count.",
 
   "settings.security.title": "Security",

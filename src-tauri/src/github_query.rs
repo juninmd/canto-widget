@@ -8,6 +8,7 @@ fn qualifiers(section: Section) -> (Option<&'static str>, Option<&'static str>) 
         Section::Assigned => (Some("assignee:@me"), Some("assignee:@me")),
         Section::MyPrs => (None, Some("author:@me")),
         Section::MyIssues => (Some("author:@me"), None),
+        Section::Mentioned => (Some("mentions:@me -author:@me"), Some("mentions:@me -author:@me")),
     }
 }
 
@@ -80,6 +81,18 @@ mod tests {
     fn free_text_is_appended_flattened() {
         let q = queries(Section::MyPrs, &filter("  repo:acme/atlas\n\tcsv  ", Kind::All));
         assert_eq!(q, vec!["is:open is:pr archived:false author:@me repo:acme/atlas csv"]);
+    }
+
+    #[test]
+    fn mentions_search_issues_and_prs_that_mention_me_but_not_my_own() {
+        let q = queries(Section::Mentioned, &ForgeFilter::default());
+        assert_eq!(
+            q,
+            vec![
+                "is:open is:issue archived:false mentions:@me -author:@me",
+                "is:open is:pr archived:false mentions:@me -author:@me",
+            ]
+        );
     }
 
     #[test]

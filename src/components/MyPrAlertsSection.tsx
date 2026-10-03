@@ -54,6 +54,17 @@ export default function MyPrAlertsSection({ onError }: { onError: (m: string) =>
         </select>
       </label>
       <p className="text-[11px] text-faint">{t("settings.myPrAlerts.hint")}</p>
+      <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
+        <input
+          type="checkbox"
+          checked={cfg?.mentions ?? false}
+          disabled={!cfg}
+          onChange={(e) => void change({ mentions: e.target.checked })}
+          className={box}
+        />
+        {t("settings.myPrAlerts.mentions")}
+      </label>
+      <p className="text-[11px] text-faint">{t("settings.myPrAlerts.mentionsHint")}</p>
     </fieldset>
   );
 }

@@ -8,14 +8,17 @@ export const STATUS_PREFIX = "status:";
 export const MODEL_PREFIX = "model:";
 /** Same prefix as `PR_PREFIX` in `notification.rs`: one of the user's own PRs has red CI or waits for a review. */
 export const PR_PREFIX = "pr:";
+/** Same prefix as `MENTION_PREFIX` in `notification.rs`: someone @-mentioned the user on GitHub or GitLab. */
+export const MENTION_PREFIX = "mention:";
 
-export type AlertKind = "status" | "model" | "pr" | "task" | "meeting";
+export type AlertKind = "status" | "model" | "pr" | "mention" | "task" | "meeting";
 export type Tone = "danger" | "warn" | "accent" | "muted";
 
 export function kindOf(e: AgendaItem): AlertKind {
   if (e.id.startsWith(STATUS_PREFIX)) return "status";
   if (e.id.startsWith(MODEL_PREFIX)) return "model";
   if (e.id.startsWith(PR_PREFIX)) return "pr";
+  if (e.id.startsWith(MENTION_PREFIX)) return "mention";
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
 }
 

@@ -11,6 +11,8 @@ pub const STATUS_PREFIX: &str = "status:";
 pub const MODEL_PREFIX: &str = "model:";
 /// Same prefix as `PR_PREFIX` in the UI's `alerts.ts`: one of the user's own PRs has red CI or no review for too long.
 pub const PR_PREFIX: &str = "pr:";
+/// Same prefix as `MENTION_PREFIX` in the UI's `alerts.ts`: someone @-mentioned the user on GitHub or GitLab.
+pub const MENTION_PREFIX: &str = "mention:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
@@ -24,6 +26,10 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
     }
     if event.id.starts_with(MODEL_PREFIX) {
         return (crate::lang::tr("Modelo de IA", "AI model"), format!("{}: {}", event.title, event.tag));
+    }
+    if event.id.starts_with(MENTION_PREFIX) {
+        let body = format!("{} {}", event.organizer, event.title).trim().to_string();
+        return (crate::lang::tr("Você foi mencionado", "You were mentioned"), body);
     }
     if event.id.starts_with(PR_PREFIX) {
         let title = match event.tag.as_str() {

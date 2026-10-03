@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
-let saved = { ci: true, stalled: true, stalled_hours: 48 };
+let saved = { ci: true, stalled: true, stalled_hours: 48, mentions: true };
 const calls: { cmd: string; args: { config?: typeof saved } }[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -16,7 +16,7 @@ mock.module("@tauri-apps/api/core", () => ({
 const { default: MyPrAlertsSection } = await import("./MyPrAlertsSection");
 
 beforeEach(() => {
-  saved = { ci: true, stalled: true, stalled_hours: 48 };
+  saved = { ci: true, stalled: true, stalled_hours: 48, mentions: true };
   calls.length = 0;
 });
 afterEach(cleanup);
@@ -35,7 +35,7 @@ test("shows what Rust saved and turning the CI alert off sends the whole config"
   await act(async () => {
     fireEvent.click(ci);
   });
-  expect(sent()).toEqual([{ ci: false, stalled: true, stalled_hours: 48 }]);
+  expect(sent()).toEqual([{ ci: false, stalled: true, stalled_hours: 48, mentions: true }]);
   expect(ci.checked).toBe(false);
 });
 
@@ -46,7 +46,7 @@ test("the waiting limit offers 24, 48 and 72 hours and is disabled with the aler
   await act(async () => {
     fireEvent.change(hours, { target: { value: "72" } });
   });
-  expect(sent()).toEqual([{ ci: true, stalled: true, stalled_hours: 72 }]);
+  expect(sent()).toEqual([{ ci: true, stalled: true, stalled_hours: 72, mentions: true }]);
   await act(async () => {
     fireEvent.click(screen.getByLabelText(/avisar quando um PR meu ficar sem revisão/, { selector: "input[type=checkbox]" }));
   });
@@ -54,7 +54,17 @@ test("the waiting limit offers 24, 48 and 72 hours and is disabled with the aler
 });
 
 test("a limit saved by hand outside the list still shows up as chosen", async () => {
-  saved = { ci: true, stalled: true, stalled_hours: 36 };
+  saved = { ci: true, stalled: true, stalled_hours: 36, mentions: true };
   await show();
   expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("36");
+});
+
+test("the mention alert is its own switch and leaves the other settings as they were", async () => {
+  await show();
+  const box = screen.getByLabelText("avisar quando alguém me marcar") as HTMLInputElement;
+  expect(box.checked).toBe(true);
+  await act(async () => {
+    fireEvent.click(box);
+  });
+  expect(sent()).toEqual([{ ci: true, stalled: true, stalled_hours: 48, mentions: false }]);
 });
