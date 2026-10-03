@@ -16,6 +16,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Copiar o clipe reescrito**: ao passar o mouse num item do clipboard aparecem as reescritas que cabem no tipo:
+  JSON formatado ou compacto (as chaves mantêm a ordem), texto em uma linha, MAIÚSCULAS e minúsculas. A reescrita
+  vai para a área de transferência e o histórico continua como estava; cópias cortadas pelo limite não são
+  reescritas. Link, cor, e-mail e telefone seguem copiados como estão.
+- **Preparo no aviso de reunião**: o aviso lista até 3 notas anteriores com o mesmo título da reunião e traz
+  "criar nota da reunião", que cria uma nota com horário, convidados e a pauta do convite e leva à aba Notas. Com o
+  cofre trancado essa parte não aparece.
 - **Radar de revisão**: em "Revisão pedida a mim" o pedido mais antigo vem primeiro, a espera aparece em horas até 48 h e fica vermelha quando passa de 48 h. "adiar 4 h" esconde o item, com um contador para trazê-lo de volta; o adiamento fica nesta máquina, fora do cofre.
 - **Aviso de modelo novo no popup**: quando um modelo entra no top 10 da aba Modelos IA (ou sobe nele), o
   Canto abre o mesmo popup da agenda, com o nome, o provedor e a posição, e um botão para abrir a aba Modelos.

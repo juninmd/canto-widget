@@ -5,6 +5,7 @@ import { kindOf, levelLabel, toneOf } from "../lib/alerts";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import AlertGuests from "./AlertGuests";
+import AlertPrep from "./AlertPrep";
 import { TONE } from "./AlertStrip";
 
 function Box({ label, children }: { label: string; children: ReactNode }) {
@@ -21,7 +22,7 @@ function Chip({ children, tone }: { children: ReactNode; tone?: string }) {
 }
 
 /** What the selected alert says, laid out for a wide, short card: heading, chips, then up to two boxes. */
-export default function AlertDetail({ event }: { event: AgendaItem }) {
+export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem; onOpenNotes?: () => void }) {
   const kind = kindOf(event);
   const tone = TONE[toneOf(event)];
   const attendees = event.attendees ?? [];
@@ -59,6 +60,7 @@ export default function AlertDetail({ event }: { event: AgendaItem }) {
           {event.description && <p className="whitespace-pre-line break-words text-xs text-fg">{event.description}</p>}
           {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
           {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
+          {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}
         </Box>
         {kind === "meeting" && (
           <Box label={t("alert.guests")}>

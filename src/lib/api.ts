@@ -53,6 +53,8 @@ export type Note = {
   link?: NoteLink | null;
 };
 
+export type ClipMode = "json_pretty" | "json_compact" | "one_line" | "upper" | "lower";
+
 export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
@@ -234,6 +236,8 @@ export const api = {
 
   clipList: (query: string) => invoke<ClipList>("clip_list", { query }),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
+  /** Copies the item rewritten by `mode` (see `clipTransforms`); the history entry stays as it was. */
+  clipCopyAs: (id: string, mode: ClipMode) => invoke<void>("clip_copy_as", { id, mode }),
   clipPin: (id: string) => invoke<void>("clip_pin", { id }),
   clipDelete: (id: string) => invoke<string | null>("clip_delete", { id }),
   clipClear: () => invoke<string | null>("clip_clear"),

@@ -42,6 +42,20 @@ pub fn clip_copy(app: tauri::AppHandle, state: State<'_, AppState>, id: String) 
     app.clipboard().write_text(item.text.clone()).map_err(|e| AppError::Io(e.to_string()))
 }
 
+/// Copies the item rewritten by `mode`; the stored history entry stays as it was.
+#[tauri::command(async)]
+pub fn clip_copy_as(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+    id: String,
+    mode: crate::clip_transform::Mode,
+) -> Result<()> {
+    let hist = state.clip_load()?;
+    let item = hist.items.iter().find(|i| i.id == id).ok_or(AppError::NotFound)?;
+    let text = crate::clip_transform::apply(&item.text, mode)?;
+    app.clipboard().write_text(text).map_err(|e| AppError::Io(e.to_string()))
+}
+
 #[tauri::command(async)]
 pub fn clip_pin(state: State<'_, AppState>, id: String) -> Result<()> {
     state.clip_update(|hist| Ok((hist.toggle_pin(&id)?, true)))

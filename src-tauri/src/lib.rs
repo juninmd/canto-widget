@@ -13,6 +13,7 @@ pub mod calendar;
 pub mod calendar_event;
 pub mod checks_cache;
 pub mod clip_os;
+pub mod clip_transform;
 pub mod clip_watch;
 pub mod clipboard;
 pub mod cmd_backup;
@@ -211,6 +212,7 @@ pub fn run() {
             cmd_drive::drive_connect,
             cmd_extras::clip_list,
             cmd_extras::clip_copy,
+            cmd_extras::clip_copy_as,
             cmd_extras::clip_pin,
             cmd_extras::clip_delete,
             cmd_extras::clip_clear,

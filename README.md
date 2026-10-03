@@ -105,7 +105,8 @@ backups. Handles thousands of notes: the list is paged and search covers all of 
 
 ### 📋 Clipboard that never forgets (or leaks)
 
-Encrypted history with search and pin; recognizes links, colors and code. A giant copy (a 100 MB log) doesn't
+Encrypted history with search and pin; recognizes links, colors and code. Hover an item to **copy it rewritten**:
+JSON formatted or compact, text on one line, UPPERCASE or lowercase (the history entry stays as it was). A giant copy (a 100 MB log) doesn't
 freeze anything: it keeps the start and warns you. On Windows, it skips whatever password managers mark as
 sensitive.
 
@@ -194,6 +195,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
+
+| Copy a clip rewritten | Meeting alert with prep |
+|---|---|
+| ![Hovering a text clip offers one line, UPPERCASE and lowercase](docs/prints/app/29-clipboard-transformar.png) | ![The meeting alert lists earlier notes with the same title and offers to create today's note](docs/prints/app/07-aviso-reuniao.png) |
 
 | Password changed, one file pending | Day summary |
 |---|---|

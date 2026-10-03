@@ -1,4 +1,5 @@
 import { LOCALE, t } from "../i18n";
+import type { ClipMode } from "./api";
 
 export type ClipKind = "link" | "color" | "json" | "email" | "phone" | "code" | "text";
 
@@ -56,3 +57,13 @@ export function compactCount(n: number): string {
 }
 
 export const sizeLabel = (chars: number) => t("clipboard.chars", { n: compactCount(chars) });
+
+/** Rewrites that make sense for the item's kind: links, colors, e-mails and phones are copied as they are. */
+export function clipTransforms(kind: ClipKind, preview: string): ClipMode[] {
+  if (kind === "json") return ["json_pretty", "json_compact"];
+  if (kind === "text" || kind === "code") {
+    const modes: ClipMode[] = ["upper", "lower"];
+    return preview.includes("\n") ? ["one_line", ...modes] : modes;
+  }
+  return [];
+}

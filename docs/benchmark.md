@@ -109,6 +109,7 @@ a interface; as notas chegam em páginas de 50 com **mostrar mais**; um card ace
 |---|---|
 | Quick add em linguagem natural | Horário no título: `Daily às 9h30`, `às 14h ligar para o banco`, `Deploy 18:00`. "2h" sozinho continua no título (é duração). |
 | Adiar lembrete | **adiar 10 min** no aviso de reunião e no lembrete de tarefa; tarefa concluída ou apagada no intervalo não toca de novo. |
+| Colar como texto puro / converter formato | Atalho que limpa a formatação da área de transferência e, no histórico, **copiar como**: JSON formatado ou compacto, uma linha, MAIÚSCULAS e minúsculas. |
 | Excluir apps sensíveis do clipboard | No Windows, conteúdo marcado com `ExcludeClipboardContentFromMonitorProcessing` ou `Clipboard Viewer Ignore` não é lido. |
 
 As demais seguem abertas como ideias para próximas versões.

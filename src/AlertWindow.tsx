@@ -27,6 +27,10 @@ export default function AlertWindow() {
           void emit(OPEN_TAB_EVENT, "models");
           void api.mainShow();
         }}
+        onOpenNotes={() => {
+          void emit(OPEN_TAB_EVENT, "notes");
+          void api.mainShow();
+        }}
       />
     </div>
   );
