@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Aviso não tira mais o jogo da tela cheia**: com um app em tela cheia na frente (um jogo, um vídeo, uma
+  apresentação), o Canto não abre mais o pop-up nem manda a notificação do sistema, que podiam minimizar o jogo.
+  Os avisos ficam esperando e o pop-up aparece quando você sai da tela cheia; no modo mini eles entram no trilho
+  como sempre. O Windows informa a tela cheia (o mesmo sinal que ele usa para segurar as próprias notificações), então
+  vale também para jogos em janela sem borda. Em Ajustes → "Jogos e tela cheia" dá para desligar. No macOS e no Linux
+  nada muda por enquanto. Além disso, a janela do pop-up deixou de pedir o foco do teclado para si quando não o tem.
 - **Abas não são mais cortadas**: as que não cabem na largura da janela vão para um botão **mais ▾** com a lista
   (e o Alt+N de cada uma), em vez de sumirem sob a borda com o texto pela metade. A aba aberta fica sempre na barra,
   as setas, Home e End alcançam também as que estão no menu, e com a janela larga, em tela cheia ou na densidade

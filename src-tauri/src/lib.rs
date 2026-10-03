@@ -40,6 +40,7 @@ pub mod focus;
 pub mod forge;
 pub mod forge_cache;
 pub mod forge_filter;
+pub mod fullscreen_guard;
 pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
@@ -142,6 +143,7 @@ pub fn run() {
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(alert_log::AlertLog::default());
+            app.manage(fullscreen_guard::FullscreenHold::load(&dir));
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
@@ -154,6 +156,7 @@ pub fn run() {
             status_alert::watch(app.handle().clone());
             models_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
+            fullscreen_guard::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
             my_pr_alerts::watch(app.handle().clone());
             mention_alerts::watch(app.handle().clone());
@@ -237,6 +240,8 @@ pub fn run() {
             cmd_extras::alert_payload,
             cmd_extras::alert_close,
             alert_log::alert_log,
+            fullscreen_guard::fullscreen_hold_get,
+            fullscreen_guard::fullscreen_hold_set,
             cmd_extras::main_show,
             snooze::alert_snooze,
             cmd_extras::open_link,

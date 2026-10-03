@@ -298,3 +298,14 @@ test("silencing a service tells Rust it was muted", async () => {
   });
   expect(args[calls.indexOf("alert_close")]).toEqual({ id: "status:github", outcome: "muted" });
 });
+
+test("a pop-up window that has no focus never asks for it: that would pull the game in front out of full screen", async () => {
+  const original = document.hasFocus;
+  document.hasFocus = () => false;
+  try {
+    await show([event]);
+    expect(document.activeElement?.tagName, "the page took keyboard focus in a window the user is not using").toBe("BODY");
+  } finally {
+    document.hasFocus = original;
+  }
+});

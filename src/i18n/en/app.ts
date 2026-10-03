@@ -122,6 +122,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.reminders.onTime": "on time",
   "settings.reminders.before": "{min} min before",
 
+  "settings.fullscreenHold.title": "Games and full screen",
+  "settings.fullscreenHold.label": "wait for full screen to end before alerting",
+  "settings.fullscreenHold.hint":
+    "A pop-up or a notification over a full-screen game can minimize it. With this on, alerts wait and show when you leave. Windows only.",
   "settings.reviewAlerts.title": "GitHub reviews",
   "settings.reviewAlerts.label": "notify me when my review is requested",
   "settings.reviewAlerts.hint": "OS notification for each new request, checked every 5 min while the vault is open.",

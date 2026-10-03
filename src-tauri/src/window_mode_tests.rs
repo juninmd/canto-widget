@@ -43,6 +43,8 @@ fn mini_geometry_never_overwrites_the_saved_normal_one() {
 #[test]
 fn an_alert_in_mini_mode_goes_to_the_dock_instead_of_the_pop_up() {
     let src = include_str!("window.rs");
-    let body = &src[src.find("pub fn open_alert(").unwrap()..src.find("/// Every pending alert").unwrap()];
+    let body = &src[src.find("pub fn present_pending(").unwrap()..src.find("/// Every pending alert").unwrap()];
     assert!(body.contains("mini_active"), "the pop-up would cover the dock the user chose");
+    let open = &src[src.find("pub fn open_alert(").unwrap()..src.find("pub fn present_pending(").unwrap()];
+    assert!(open.contains("present_pending(app)"), "open_alert must go through the dock check");
 }

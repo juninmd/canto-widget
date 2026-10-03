@@ -117,6 +117,10 @@ export const app = {
   "settings.reminders.onTime": "na hora",
   "settings.reminders.before": "{min} min antes",
 
+  "settings.fullscreenHold.title": "Jogos e tela cheia",
+  "settings.fullscreenHold.label": "esperar a tela cheia acabar para avisar",
+  "settings.fullscreenHold.hint":
+    "Um pop-up ou uma notificação sobre um jogo em tela cheia pode minimizá-lo. Com isto ligado, os avisos esperam e aparecem quando você sair. Só no Windows.",
   "settings.reviewAlerts.title": "Revisões no GitHub",
   "settings.reviewAlerts.label": "avisar quando pedirem minha revisão",
   "settings.reviewAlerts.hint": "Notificação do sistema para cada pedido novo, conferido a cada 5 min enquanto o cofre está aberto.",

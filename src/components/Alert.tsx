@@ -54,8 +54,10 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
 
   // The overlay covers the widget: keyboard users need focus on the primary action and an Esc exit.
   // Picking from the strip keeps focus there, so a keyboard user isn't pulled away after every choice.
+  // Only inside a window that already has focus: the pop-up never takes it, and asking for it from the page
+  // would pull the foreground away from the game in front.
   useEffect(() => {
-    if (!document.activeElement?.closest("[data-alert-strip]")) primary.current?.focus();
+    if (document.hasFocus() && !document.activeElement?.closest("[data-alert-strip]")) primary.current?.focus();
   }, [event?.id]);
 
   useEffect(() => {

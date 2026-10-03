@@ -208,6 +208,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![On a narrow window the last tabs go to a more menu instead of being cut; the open tab always stays on the bar](docs/prints/app/66-abas-mais.png) |
 
+| Games and full screen: alerts wait until you leave |
+|---|
+| ![Settings with the Games and full screen option: wait for full screen to end before alerting, so a pop-up or toast never minimizes a game](docs/prints/app/68-ajustes-tela-cheia.png) |
+
 | Snooze: 1, 5 or 10 min |
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |

@@ -203,6 +203,8 @@ Atalho global escondendo e trazendo o widget de volta:
   ícones e o texto, clique para abrir o Canto já nesse aviso), **Escondido** (só na bandeja), **Normal** e
   **Maximizado**. O Mini é lembrado entre as aberturas e não mexe na posição e no tamanho salvos da janela normal.
   Com o Mini ligado os avisos aparecem no trilho em vez do pop-up; a notificação do sistema continua.
+- **Jogos em tela cheia**: com um app em tela cheia na frente (Windows), o Canto segura o pop-up e a notificação do
+  sistema para não tirar o jogo da tela cheia, e avisa quando você sai. Desligue em **Ajustes → Jogos e tela cheia**.
 - Posição e tamanho ficam em `janela.json`. Se o monitor sumir ou a janela não couber mais, ela volta ao canto.
   Em **ajustes**: "sempre na frente das outras janelas" e "voltar ao canto e ao tamanho original".
 - Fechar apenas esconde. Ícone na bandeja: mostrar/esconder, **entrar na próxima reunião com Meet** (atualiza

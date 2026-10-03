@@ -284,6 +284,8 @@ export const api = {
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
+  fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
+  fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
   reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
   myPrAlertsGet: () => invoke<MyPrAlerts>("my_pr_alerts_get"),

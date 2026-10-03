@@ -56,6 +56,10 @@ pub fn notify_os(app: &tauri::AppHandle, title: &str, body: &str) {
     if crate::do_not_disturb::quiet(app) {
         return;
     }
+    // A toast over a full-screen game can minimize it; the pop-up rings once the game is gone.
+    if crate::fullscreen_guard::holding(app) {
+        return;
+    }
     if let Err(e) = app.notification().builder().title(title).body(body).show() {
         eprintln!("notificacao do sistema falhou: {e}");
     }
