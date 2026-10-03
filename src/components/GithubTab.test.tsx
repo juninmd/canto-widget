@@ -279,3 +279,32 @@ test("a failed filter change keeps the previous filter as the applied one", asyn
   expect(screen.getByRole("button", { name: "issues" }).getAttribute("aria-pressed")).toBe("false");
   expect(screen.getByText("Revisar o cofre")).toBeTruthy();
 });
+
+const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
+const reviewItems = [
+  { ...item, url: "https://github.com/octo/canto/pull/1", title: "Recente", created_at: hoursAgo(3), updated_at: hoursAgo(1) },
+  { ...item, url: "https://github.com/octo/canto/pull/2", title: "Antigo", created_at: hoursAgo(52), updated_at: hoursAgo(50) },
+];
+
+test("review requests list the longest wait first and flag the ones past the 48 h SLA", async () => {
+  localStorage.clear();
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ review_requested: { total: 2, items: reviewItems } }));
+  await mount();
+  const titles = screen.getAllByText(/^(Recente|Antigo)$/).map((n) => n.textContent);
+  expect(titles).toEqual(["Antigo", "Recente"]);
+  expect(screen.getByText(/aguardando há 2 d/).className).toContain("text-danger");
+  expect(screen.getByText(/aguardando há 3 h/).className).not.toContain("text-danger");
+});
+
+test("snoozing a review request hides it for 4 h, keeps a counter and can bring it back", async () => {
+  localStorage.clear();
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ review_requested: { total: 2, items: reviewItems } }));
+  await mount();
+  fireEvent.click(screen.getByRole("button", { name: "adiar Antigo por 4 horas" }));
+  expect(screen.queryByText("Antigo")).toBeNull();
+  fireEvent.click(screen.getByText("1 adiados"));
+  expect(screen.getByText("Antigo")).toBeTruthy();
+  expect(Object.keys(JSON.parse(localStorage.getItem("canto.reviewSnooze") ?? "{}"))).toEqual([reviewItems[1].url]);
+});
