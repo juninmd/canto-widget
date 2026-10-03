@@ -42,9 +42,10 @@ fn outcomes_travel_as_lowercase_words() {
 #[test]
 fn closing_and_snoozing_both_leave_a_trace() {
     let close = include_str!("cmd_extras.rs");
+    // "\n}" and not "\n}\n": a Windows checkout has CRLF line endings.
     let body = &close[close.find("pub fn alert_close(").unwrap()..];
     assert!(
-        body[..body.find("\n}\n").unwrap()].contains("alert_log::record"),
+        body[..body.find("\n}").unwrap()].contains("alert_log::record"),
         "a closed alert would vanish from the log"
     );
     let snooze = include_str!("snooze.rs");
