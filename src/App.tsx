@@ -261,7 +261,7 @@ function Canto() {
                 onClick={() => setHelpOpen(true)}
                 aria-label={t("app.shortcuts")}
                 title={t("app.shortcuts.title")}
-                className="grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg"
+                className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
               >
                 <HelpIcon />
               </button>
@@ -269,7 +269,7 @@ function Canto() {
                 type="button"
                 onClick={lock}
                 title={t("app.lock.title")}
-                className="inline-flex h-7 items-center gap-1.5 rounded-lg px-2 hover:bg-hover hover:text-fg"
+                className="canto-hit inline-flex h-7 items-center gap-1.5 rounded-lg px-2 hover:bg-hover hover:text-fg active:bg-active"
               >
                 <LockIcon />
                 {t("app.lock")}
@@ -280,7 +280,7 @@ function Canto() {
                 aria-pressed={privacy}
                 aria-label={privacy ? t("app.privacy.disable") : t("app.privacy.enable")}
                 title={privacy ? t("app.privacy.onTitle") : t("app.privacy.offTitle")}
-                className={`grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg ${privacy ? "text-accent" : ""}`}
+                className={`canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active ${privacy ? "text-accent" : ""}`}
               >
                 {privacy ? <EyeOffIcon /> : <EyeIcon />}
               </button>
@@ -292,14 +292,14 @@ function Canto() {
             aria-pressed={fullscreen.active}
             aria-label={fullscreen.active ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
             title={fullscreen.active ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
-            className="grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg"
+            className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
           >
             {fullscreen.active ? <ShrinkIcon /> : <ExpandIcon />}
           </button>
           <button
             type="button"
             onClick={() => void getCurrentWindow().hide()}
-            className="grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg"
+            className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
             title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
             aria-label={t("app.hide")}
           >

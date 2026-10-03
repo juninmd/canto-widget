@@ -83,14 +83,14 @@ export default function AgendaTab({
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <div role="group" aria-label={t("plan.viewLabel")} className="flex self-start overflow-hidden rounded-lg border border-edge text-xs">
+      <div role="group" aria-label={t("plan.viewLabel")} className="flex gap-0.5 self-start rounded-xl border border-edge bg-ink/60 p-0.5 text-xs">
         {VIEWS.map((v) => (
           <button
             key={v}
             type="button"
             aria-pressed={view === v}
             onClick={() => pick(v)}
-            className={`min-h-6 px-3 ${view === v ? "bg-edge font-semibold text-accent" : "text-muted hover:text-fg"}`}
+            className={`canto-hit min-h-7 rounded-lg px-3 transition-colors ${view === v ? "bg-raised font-semibold text-accent shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
           >
             {t(LABEL[v])}
           </button>
@@ -100,19 +100,19 @@ export default function AgendaTab({
       {view !== "meetings" && (
         <div className="flex items-center justify-between text-[11px] text-faint">
           <span>{t("agenda.header")}</span>
-          <span className="flex gap-3">
+          <span className="flex gap-0.5">
             <button
               type="button"
               title={t("agenda.testAlertTitle")}
               onClick={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
-              className="min-h-6 underline decoration-dotted hover:text-muted"
+              className="canto-hit min-h-6 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
             >
               {t("agenda.testAlert")}
             </button>
             <button
               type="button"
               onClick={() => void reload()}
-              className="min-h-6 underline decoration-dotted hover:text-muted"
+              className="canto-hit min-h-6 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
             >
               {loading ? "..." : t("agenda.refresh")}
             </button>

@@ -23,11 +23,11 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
   const kind = clipKind(i.preview);
   const codeLines = i.preview.replace(/\s+$/, "").split("\n");
   const copyTitle = i.truncated ? t("clipboard.copyTruncatedTitle", { size: sizeLabel(i.kept) }) : t("clipboard.copyAgainTitle");
-  const actionBtn = "grid size-6 place-items-center rounded hover:text-fg";
+  const actionBtn = "canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active";
   const mask = privacy ? "blur-sm select-none" : "";
 
   return (
-    <li className={`group rounded-lg border bg-ink/60 p-2 ${i.pinned ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
+    <li className={`group rounded-xl border bg-ink/60 p-2.5 transition-colors hover:bg-ink ${i.pinned ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
       <button type="button" className="w-full text-left" title={copyTitle} onClick={onCopy}>
         {kind === "color" ? (
           <span className="flex items-center gap-2">

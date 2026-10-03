@@ -114,7 +114,7 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
         onClick={() => onPriority(nextPriority(task.priority))}
         aria-label={t("priority.cycle", { title: task.title, label })}
         title={t("priority.cycle", { title: task.title, label })}
-        className="grid size-6 shrink-0 place-items-center rounded-md hover:bg-hover"
+        className="canto-hit grid size-6 shrink-0 place-items-center rounded-md hover:bg-hover active:bg-active"
       >
         <span className={`size-2 rounded-full ${task.priority ? PRIORITY_DOT[task.priority] : "border border-faint"}`} />
       </button>
@@ -122,7 +122,7 @@ export function TaskBadge({ task, open, onToggle, onPriority }: BadgeProps) {
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className="grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-fg aria-expanded:text-accent"
+        className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-fg active:bg-active aria-expanded:text-accent"
         aria-label={t("tasks.scheduleOf", { title: task.title })}
         title={t("tasks.schedule")}
       >
@@ -161,7 +161,7 @@ export function TaskMeta({ task }: { task: Task }) {
         <button
           type="button"
           onClick={() => void api.openLink(task.pr_url!)}
-          className="grid size-5 shrink-0 place-items-center rounded text-faint hover:text-fg"
+          className="canto-hit grid size-5 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-fg active:bg-active"
           aria-label={t("tasks.openPrOf", { title: task.title })}
           title={t("tasks.openPr")}
         >

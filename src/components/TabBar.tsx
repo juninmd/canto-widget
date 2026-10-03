@@ -52,7 +52,7 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
       aria-label={t("tabs.label")}
       onKeyDown={onKeyDown}
       // The faded edges say there is more to scroll to; the scrollbar stays out of the way.
-      className="flex shrink-0 gap-0.5 overflow-x-auto px-3 pt-1.5 text-xs [mask-image:linear-gradient(to_right,transparent,black_0.75rem,black_calc(100%-1.75rem),transparent)] [scrollbar-width:none]"
+      className="flex shrink-0 gap-0.5 overflow-x-auto px-3 pb-1 pt-1.5 text-xs [mask-image:linear-gradient(to_right,transparent,black_0.75rem,black_calc(100%-1.75rem),transparent)] [scrollbar-width:none]"
     >
       {tabs.map((tab, i) => (
         <button
@@ -69,7 +69,7 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
           tabIndex={current === tab.id ? 0 : -1}
           onClick={() => onChange(tab.id)}
           title={`Alt+${i + 1}`}
-          className={`relative min-h-8 shrink-0 rounded-lg px-2 transition-colors after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:transition-[background-color] ${
+          className={`relative canto-hit min-h-8 shrink-0 rounded-lg px-2 transition-colors active:bg-active after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:transition-[background-color] ${
             current === tab.id
               ? "font-semibold text-fg after:bg-accent"
               : "text-muted after:bg-transparent hover:bg-hover hover:text-fg"

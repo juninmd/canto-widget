@@ -89,6 +89,8 @@
   /* Superficies derivadas da skin: nenhuma skin precisa redefinir estes. */
   --color-raised: color-mix(in oklab, var(--color-panel) 93%, var(--color-fg));
   --color-hover: color-mix(in oklab, var(--color-fg) 7%, transparent);
+  /* Pressed e selecionado: um degrau acima do hover, como os passos 4 e 5 da escala do Radix. */
+  --color-active: color-mix(in oklab, var(--color-fg) 13%, transparent);
   --shadow-raised: 0 1px 0 color-mix(in oklab, var(--color-fg) 7%, transparent) inset, 0 2px 8px rgb(0 0 0 / 0.22);
 }
 
@@ -187,6 +189,42 @@ textarea:focus-visible {
   outline-offset: -1px;
 }
 
+/* WCAG 2.5.8: alvo de ao menos 24 px. Em px de proposito: a densidade compacta escala o rem e encolheria o alvo. */
+.canto-hit {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+/* Campo de texto: mesma forma e profundidade em todas as abas. */
+.canto-field {
+  border: 1px solid var(--color-edge);
+  border-radius: 0.75rem;
+  background: var(--color-ink);
+  color: var(--color-fg);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+  outline: none;
+}
+.canto-field::placeholder {
+  color: var(--color-faint);
+}
+.canto-field:hover {
+  border-color: var(--color-line);
+}
+.canto-field:focus {
+  border-color: var(--color-accent);
+}
+
+/* Texto sem linhas viuvas e titulos equilibrados (CSS Text 4). */
+p,
+li {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
 /* Caixa de marcar redonda: continua um <input type=checkbox>, entao teclado e leitor de tela seguem iguais. */
 .canto-check {
   appearance: none;
@@ -233,4 +271,55 @@ textarea {
 ::-webkit-scrollbar-thumb {
   background: var(--color-edge);
   border-radius: 9999px;
+}
+
+/* Contraste maior pedido ao sistema: texto e linhas fracos sobem um degrau, sem trocar de skin. */
+@media (prefers-contrast: more) {
+  :root,
+  :root[data-skin] {
+    --color-faint: var(--color-muted);
+    --color-line: var(--color-muted);
+  }
+}
+
+/*
+ * Modo de alto contraste do Windows (forced-colors): o sistema troca todas as cores e descarta fundos e sombras.
+ * O que so existia como fundo (marca, sublinhado da aba, barra, trilho de prioridade) ganha forma e cor de sistema.
+ */
+@media (forced-colors: active) {
+  .canto-check:checked {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+  }
+  .canto-check:checked::after {
+    border-color: HighlightText;
+  }
+  /* A fundo que some vira borda: o botao ganha contorno e a aba ativa, um filete de Highlight. */
+  button {
+    border: 1px solid ButtonText;
+  }
+  [role="tab"] {
+    border-color: transparent;
+  }
+  [role="tab"]::after {
+    display: none;
+  }
+  [role="tab"][aria-selected="true"] {
+    border-bottom: 2px solid Highlight;
+  }
+  .canto-field::placeholder {
+    color: GrayText;
+  }
+  [role="progressbar"] {
+    border: 1px solid CanvasText;
+  }
+  [role="progressbar"] > div,
+  .canto-rail {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .canto-raised {
+    border: 1px solid CanvasText;
+  }
 }

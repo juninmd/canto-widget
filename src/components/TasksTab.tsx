@@ -10,7 +10,8 @@ import { useLatestRequest } from "../lib/useLatestRequest";
 import { useNewIds, useExit } from "../lib/motion";
 import { mergeOrder, useReorder } from "../lib/useReorder";
 import { focusStore } from "../lib/focus";
-import { PlusIcon } from "./Icons";
+import EmptyState from "./EmptyState";
+import { ChecklistIcon, PlusIcon } from "./Icons";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -128,7 +129,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             data-shortcut="new"
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("tasks.addPlaceholder")}
-            className="w-full rounded-xl border border-edge bg-ink py-2 pl-9 pr-3 text-sm text-fg shadow-[inset_0_1px_2px_rgb(0_0_0/0.25)] outline-none placeholder:text-faint focus:border-accent"
+            className="canto-field w-full py-2 pl-9 pr-3 text-sm"
           />
         </div>
         <button
@@ -199,10 +200,10 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           />
         ))}
         {tasks.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">{t("tasks.empty")}</li>
+          <EmptyState icon={<ChecklistIcon />}>{t("tasks.empty")}</EmptyState>
         )}
         {tasks.length > 0 && visible.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">{t("tasks.emptyPriority")}</li>
+          <EmptyState icon={<ChecklistIcon />}>{t("tasks.emptyPriority")}</EmptyState>
         )}
       </ul>
     </div>

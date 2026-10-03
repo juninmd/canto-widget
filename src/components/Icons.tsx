@@ -121,3 +121,23 @@ export const MinimizeIcon = () => (
     <path d="M5 12h14" />
   </svg>
 );
+
+export const ChecklistIcon = () => (
+  <svg {...base}>
+    <path d="m4 7 2 2 3-4M4 17l2 2 3-4M13 8h7M13 18h7" />
+  </svg>
+);
+
+export const ClipboardIcon = () => (
+  <svg {...base}>
+    <rect x="6" y="4" width="12" height="17" rx="2" />
+    <path d="M9 4h6v3H9z" />
+  </svg>
+);
+
+export const SearchIcon = () => (
+  <svg {...base}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </svg>
+);

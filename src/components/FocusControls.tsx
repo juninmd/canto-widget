@@ -21,7 +21,7 @@ export function FocusButton({ task }: { task: Task }) {
       aria-label={label}
       aria-pressed={mine}
       title={label}
-      className={`grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg ${mine ? "text-accent" : "text-faint"}`}
+      className={`canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active ${mine ? "text-accent" : "text-faint"}`}
     >
       {mine ? <PauseIcon /> : <PlayIcon />}
     </button>

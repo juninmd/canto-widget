@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default function TaskListHeader({ done, total, priorityFilter, onPriorityFilter, onSummary, onCarryOver }: Props) {
-  const ghost = "min-h-6 whitespace-nowrap rounded-md px-1.5 hover:bg-hover hover:text-fg";
+  const ghost = "canto-hit min-h-6 whitespace-nowrap rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center gap-3 text-[11px] text-muted">
@@ -46,7 +46,7 @@ export default function TaskListHeader({ done, total, priorityFilter, onPriority
           aria-label={t("priority.filter")}
           value={priorityFilter}
           onChange={(e) => onPriorityFilter(e.target.value as Priority | "")}
-          className="rounded-md border border-edge bg-ink px-1.5 py-0.5 text-[11px] text-muted outline-none focus:border-accent"
+          className="canto-hit rounded-md border border-edge bg-ink px-1.5 py-0.5 text-[11px] text-muted outline-none focus:border-accent"
         >
           <option value="">{t("priority.all")}</option>
           {PRIORITIES.map((p) => (
