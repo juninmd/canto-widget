@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Popup não rouba mais o foco**: o aviso aparece sem ativar a janela, então não tira o foco de quem está jogando
+  em tela cheia ou digitando em outro app. Os botões continuam funcionando com o mouse.
 - **Popup de aviso em janela própria**: reunião, lembrete de tarefa, instabilidade de serviço e modelo novo agora
   aparecem numa janela separada no canto da tela. Antes o aviso abria o Canto inteiro por cima, mesmo com ele
   minimizado; agora o widget continua minimizado e, com o cofre trancado, o popup aparece do mesmo jeito (concluir

@@ -108,7 +108,6 @@ fn present_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
             anchor_bottom_right(&win)?;
             win.show()?;
         }
-        win.set_focus()?;
     }
     app.emit(ALERT_EVENT, ())?;
     Ok(())
@@ -122,6 +121,16 @@ mod tests {
         let body = &src[src.find("fn present_alert(").unwrap()..src.find("#[cfg(test)]").unwrap()];
         assert!(body.contains("ALERT_WINDOW"));
         assert!(!body.contains("\"main\""), "a pop-up must not open the minimized or locked widget");
+    }
+
+    #[test]
+    fn alert_never_steals_focus_from_a_fullscreen_game() {
+        let src = include_str!("window.rs");
+        let body = &src[src.find("fn present_alert(").unwrap()..src.find("#[cfg(test)]").unwrap()];
+        assert!(!body.contains("set_focus"), "a pop-up must not take focus from the app in use");
+        let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
+        let alert = conf["app"]["windows"].as_array().unwrap().iter().find(|w| w["label"] == super::ALERT_WINDOW);
+        assert_eq!(alert.unwrap()["focusable"], false, "the pop-up window must not be activated when shown");
     }
 
     #[test]
