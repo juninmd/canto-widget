@@ -87,6 +87,8 @@ nunca mostra de novo.
   inteira até 1.000 eventos.
 - **Abas visíveis** — em **Ajustes → Abas visíveis**, desmarque as abas que você não usa. Os dados continuam no
   cofre, e `Alt+1`, `Alt+2`… seguem a ordem das abas que ficaram. Ajustes nunca some.
+  Em janela estreita, as abas que não cabem vão para o botão **mais ▾** (a aba aberta fica sempre na barra), em vez
+  de serem cortadas.
 
 | Horário e repetição | Resumo do dia | Lembrete |
 |---|---|---|
@@ -194,7 +196,8 @@ Atalho global escondendo e trazendo o widget de volta:
   um compositor ativo.
 - **Tela cheia** pelo botão ⤢ do topo ou `F11`. Em tela cheia a posição e o tamanho do canto não são
   sobrescritos: ao sair, o widget volta ao que era. É o modo **Maximizado**: a lista de tarefas ganha, ao lado, a
-  agenda de hoje e as notas recentes.
+  coluna de **notificações** (avisos pendentes com suas ações e o que foi resolvido hoje), separada por uma
+  divisória que você arrasta ou move com as setas.
 - **Modos** pelo ícone de painel no topo (ao lado do olho), pela paleta (`Ctrl+Shift+P`) ou pelo menu da bandeja:
   **Mini** (só um trilho na borda direita da tela, com um traço por aviso pendente; passe o mouse para ver os
   ícones e o texto, clique para abrir o Canto já nesse aviso), **Escondido** (só na bandeja), **Normal** e

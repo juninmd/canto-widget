@@ -116,6 +116,9 @@ export type AgendaItem = {
   /** Short state for alerts that aren't calendar events: a Status API indicator or a model's rank. */
   tag?: string;
 };
+/** What was done with an alert: the main action, snoozed, closed or (a service) muted. */
+export type AlertOutcome = "done" | "snoozed" | "closed" | "muted";
+export type ResolvedAlert = { item: AgendaItem; outcome: AlertOutcome; at: number };
 export type Rsvp = "accepted" | "declined" | "tentative" | "needsAction";
 export type Guest = { name: string; email: string; response: Rsvp | ""; organizer: boolean; optional: boolean; me: boolean };
 export type Attachment = { title: string; url: string; mime: string };
@@ -258,7 +261,9 @@ export const api = {
   geminiDocs: (timeMin: string, timeMax: string) => invoke<GeminiDoc[]>("gemini_docs", { timeMin, timeMax }),
   alertOpen: (event: AgendaItem) => invoke<void>("alert_open", { event }),
   alertPayload: () => invoke<AgendaItem[]>("alert_payload"),
-  alertClose: (id: string) => invoke<void>("alert_close", { id }),
+  /** No outcome means plain "closed"; Rust records it for the notifications column. */
+  alertClose: (id: string, outcome?: AlertOutcome) => invoke<void>("alert_close", { id, outcome }),
+  alertLog: () => invoke<ResolvedAlert[]>("alert_log"),
   mainShow: () => invoke<void>("main_show"),
   alertSnooze: (id: string, minutes: number) => invoke<void>("alert_snooze", { id, minutes }),
   openLink: (url: string) => invoke<void>("open_link", { url }),

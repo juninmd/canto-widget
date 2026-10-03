@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { calls, mockTauri } from "./mock";
+import { calls, goTab, mockTauri } from "./mock";
 
 test.beforeEach(({ page }) => {
   page.on("pageerror", (e) => {
@@ -8,6 +8,7 @@ test.beforeEach(({ page }) => {
 });
 
 test("an unlocked vault shows the tab bar", async ({ page }) => {
+  await page.setViewportSize({ width: 1100, height: 700 });
   await mockTauri(page);
   await page.goto("/");
   const bar = page.getByRole("tablist");
@@ -79,7 +80,7 @@ test("the Status API tab lists the services from api_status", async ({ page }) =
     ],
   });
   await page.goto("/");
-  await page.getByRole("tab", { name: "Status API" }).click();
+  await goTab(page, "Status API");
   await expect(page.getByText("1 com problema · 1 operacionais")).toBeVisible();
   await expect(page.getByText("Serviço Exemplo")).toBeVisible();
   await expect(page.getByText("Outro Serviço")).toBeVisible();

@@ -2,6 +2,7 @@ pub mod account;
 pub mod activity;
 pub mod activity_os;
 pub mod activity_watch;
+pub mod alert_log;
 pub mod autolock;
 pub mod autostart;
 pub mod background;
@@ -140,6 +141,7 @@ pub fn run() {
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
+            app.manage(alert_log::AlertLog::default());
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
@@ -234,6 +236,7 @@ pub fn run() {
             cmd_extras::alert_open,
             cmd_extras::alert_payload,
             cmd_extras::alert_close,
+            alert_log::alert_log,
             cmd_extras::main_show,
             snooze::alert_snooze,
             cmd_extras::open_link,

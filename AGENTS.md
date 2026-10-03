@@ -38,7 +38,7 @@ and publishes a release after the checks pass.
 src/                      React UI (one component per file, tests next to it)
   lib/api.ts              the only place that calls invoke(); IPC types live here
   lib/                    pure logic (agenda, dayPlan, focus, activity, reminders, shortcuts, summary, theme, motion) + hooks
-  components/             MiniRail (dock), ModeSwitcher (mode menu), FocusedAlert, MaxSide; tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, ActivityTab, SettingsTab) and sections
+  components/             MiniRail (dock), ModeSwitcher (mode menu), AlertCard/FocusedAlert, NotificationsColumn + Splitter (maximized mode), TabBar (overflow into a "mais" menu via lib/fitTabs); tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, ActivityTab, SettingsTab) and sections
 src-tauri/src/
   lib.rs                  plugin setup, tray, background watchers, invoke_handler list
   vault.rs, store.rs, crypto.rs   AppState/session, sealed envelopes, Argon2id + AES-256-GCM
@@ -53,6 +53,7 @@ src-tauri/src/
   clipboard.rs, clip_os.rs        clipboard history (size caps, previews), OS change counter and secret skip list
   window.rs, window_state.rs      corner anchoring, saved position, fullscreen
   window_mode.rs                  mini mode: the window shrinks into a right-edge dock (geometry, tray toggle, `window_mini_*`)
+  alert_log.rs                    in-memory log of what became of each alert today (never on disk)
   meeting_alert.rs, task_reminder.rs   meeting alerts and task reminders rung from Rust (hidden webviews sleep)
   status_feed.rs, status_live.rs, status_alert.rs   Status API feeds, live Statuspage state, opt-in outage alerts
 src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)

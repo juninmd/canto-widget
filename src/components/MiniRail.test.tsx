@@ -88,8 +88,8 @@ test("opening the mode menu makes room for it", () => {
   render(<MiniRail alerts={[daily]} mode="mini" onOpen={() => {}} onMode={() => {}} />);
   fireEvent.pointerEnter(rail());
   fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
-  expect(last().width).toBe(300);
-  expect(last().height).toBeGreaterThanOrEqual(250);
+  expect(last().width).toBe(340);
+  expect(last().height).toBeGreaterThanOrEqual(300);
 });
 
 test("with nothing pending the dock is a single quiet handle that still switches mode", () => {
@@ -107,4 +107,15 @@ test("each row has a 24 px target even while it draws a 6 px bar", () => {
   const row = screen.getByRole("button", { name: "abrir Daily" });
   expect(row.className).toContain("canto-hit");
   expect(row.className).toContain("w-6");
+});
+
+test("the mode menu is pinned inside the dock window so its options are never cut", () => {
+  render(<MiniRail alerts={[daily]} mode="mini" onOpen={() => {}} onMode={() => {}} />);
+  fireEvent.pointerEnter(rail());
+  fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
+  const menu = screen.getByRole("menu");
+  expect(menu.className, "anchored to the button, half of it fell outside a window centered on one alert").toContain("fixed");
+  expect(menu.className).toContain("left-2");
+  expect(menu.className).toContain("top-2");
+  expect(menu.className).not.toContain("absolute");
 });

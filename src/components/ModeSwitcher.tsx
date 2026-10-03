@@ -21,14 +21,14 @@ const HINT: Record<Mode, () => string> = {
 type Props = {
   mode: Mode;
   onPick: (mode: Mode) => void;
-  /** Where the menu sits relative to the button; the header opens it below, the dock beside. */
+  /** Position classes (the base has none): the header opens it below the button, the dock pins it inside its window. */
   menuClassName?: string;
   buttonClassName?: string;
   onOpenChange?: (open: boolean) => void;
 };
 
 /** The icon that swaps between mini, hidden, normal and maximized, with its menu. */
-export default function ModeSwitcher({ mode, onPick, menuClassName = "right-0 top-full mt-1", buttonClassName = "", onOpenChange }: Props) {
+export default function ModeSwitcher({ mode, onPick, menuClassName = "absolute right-0 top-full mt-1", buttonClassName = "", onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -88,7 +88,7 @@ export default function ModeSwitcher({ mode, onPick, menuClassName = "right-0 to
           id={menuId}
           role="menu"
           aria-label={t("app.mode.title")}
-          className={`absolute z-40 w-64 rounded-xl border border-edge bg-panel p-1.5 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${menuClassName}`}
+          className={`z-40 w-64 rounded-xl border border-edge bg-panel p-1.5 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${menuClassName}`}
         >
           <p className="px-2 pb-1 pt-1 text-[10px] uppercase tracking-widest text-faint">{t("app.mode.title")}</p>
           {MODES.map((m) => {

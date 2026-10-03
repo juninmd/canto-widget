@@ -40,7 +40,9 @@ import { ExpandIcon, EyeIcon, EyeOffIcon, HelpIcon, LockIcon, MinimizeIcon, Shri
 import ModeSwitcher from "./components/ModeSwitcher";
 import MiniRail from "./components/MiniRail";
 import FocusedAlert from "./components/FocusedAlert";
-import MaxSide from "./components/MaxSide";
+import NotificationsColumn from "./components/NotificationsColumn";
+import Splitter from "./components/Splitter";
+import { clampLeft, useSplitLeft, useWidth } from "./lib/split";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
 import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
@@ -92,7 +94,11 @@ function Canto() {
   setModeRef.current = setMode;
   const pickMode = (next: Parameters<typeof setMode>[0]) => void setMode(next).catch((e) => setError(errText(e)));
   const toggleFullscreen = () => pickMode(mode === "max" ? "normal" : "max");
-  const { alerts, drop } = useAlertList(true);
+  const { alerts, log, drop, refresh: refreshAlerts } = useAlertList(true);
+  const split = useSplitLeft();
+  const [body, setBody] = useState<HTMLDivElement | null>(null);
+  const bodyWidth = useWidth(body);
+  const leftPx = bodyWidth > 0 ? clampLeft(split.left, bodyWidth) : split.left;
   // Set by a click on the dock: the normal window opens with that alert on top.
   const [focusId, setFocusId] = useState<string | null>(null);
   const focused = alerts.find((a) => a.id === focusId);
@@ -348,13 +354,17 @@ function Canto() {
       ) : !status.unlocked ? (
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
-        <div className="flex min-h-0 flex-1">
-          <div className={`flex min-h-0 min-w-0 flex-col ${mode === "max" ? "w-[26rem] shrink-0" : "flex-1"}`}>
+        <div ref={setBody} className="flex min-h-0 flex-1">
+          <div
+            className={`flex min-h-0 min-w-0 flex-col ${mode === "max" ? "shrink-0" : "flex-1"}`}
+            style={mode === "max" ? { width: leftPx } : undefined}
+          >
               <TabBar current={tab} onChange={changeTab} tabs={tabs} />
               {focused && (
                 <FocusedAlert
                   event={focused}
                   onGone={drop}
+                  onSettled={refreshAlerts}
                   onCompleted={() => setTasksVersion((v) => v + 1)}
                   onOpenModels={() => changeTab("models")}
                 />
@@ -401,7 +411,19 @@ function Canto() {
               </main>
               <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
           </div>
-          {mode === "max" && <MaxSide agenda={agenda.items} privacy={privacy} version={tasksVersion} />}
+          {mode === "max" && (
+            <>
+              <Splitter left={leftPx} total={bodyWidth} onChange={split.setLeft} onCommit={split.commit} />
+              <NotificationsColumn
+                alerts={alerts}
+                log={log}
+                onGone={drop}
+                onRefresh={refreshAlerts}
+                onCompleted={() => setTasksVersion((v) => v + 1)}
+                onOpenModels={() => changeTab("models")}
+              />
+            </>
+          )}
         </div>
       )}
     </div>

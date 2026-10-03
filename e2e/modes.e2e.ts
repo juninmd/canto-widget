@@ -81,3 +81,67 @@ test("the dock's mode icon switches back to the normal window", async ({ page })
   await page.getByRole("menuitemradio", { name: /Normal/ }).click();
   expect((await calls(page)).some((c) => c.cmd === "window_mini_set" && c.args.enabled === false)).toBe(true);
 });
+
+test("the mode menu in the dock sits inside the window's corner, away from the icons", async ({ page }) => {
+  await mockTauri(page, { fixed: { window_config: config(true), alert_payload: [alerts()[0]] } });
+  await page.goto("/");
+  await page.getByRole("group", { name: "avisos pendentes" }).hover();
+  await page.getByRole("button", { name: "trocar modo do canto" }).click();
+  const menu = (await page.getByRole("menu").boundingBox())!;
+  expect(menu.x).toBeGreaterThanOrEqual(8);
+  expect(menu.y).toBeGreaterThanOrEqual(8);
+  const icon = (await page.getByRole("button", { name: /^abrir PR/ }).boundingBox())!;
+  expect(menu.x + menu.width, "the menu would cover the alert icons").toBeLessThanOrEqual(icon.x + 1);
+});
+
+test.describe("maximized", () => {
+  test.use({ viewport: { width: 1180, height: 700 } });
+
+  async function maximize(page: Page, pending = alerts()) {
+    await mockTauri(page, { fixed: { window_config: config(false), alert_payload: pending } });
+    await page.goto("/");
+    await page.getByRole("button", { name: "tela cheia" }).click();
+    return page.getByRole("complementary", { name: "notificações" });
+  }
+
+  test("the right column lists the pending alerts with their actions", async ({ page }) => {
+    const column = await maximize(page);
+    await expect(column.getByRole("list", { name: "avisos pendentes" }).getByRole("listitem")).toHaveCount(3);
+    await expect(column.getByRole("button", { name: "entrar no Meet" })).toBeVisible();
+    await column.getByRole("button", { name: "fechar" }).first().click();
+    await expect(column.getByRole("list", { name: "avisos pendentes" }).getByRole("listitem")).toHaveCount(2);
+    expect((await calls(page)).filter((c) => c.cmd === "alert_close")).toHaveLength(1);
+    await expect(column.getByText("resolvidas hoje")).toBeVisible();
+    await expect(column.getByRole("listitem").filter({ hasText: "fechado" })).toHaveCount(1);
+  });
+
+  test("dragging the divider resizes the task list and the width survives a reload", async ({ page }) => {
+    await maximize(page);
+    const bar = page.getByRole("separator", { name: "largura da lista de tarefas" });
+    const start = Number(await bar.getAttribute("aria-valuenow"));
+    const box = (await bar.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + 200);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width / 2 + 120, box.y + 200, { steps: 6 });
+    await page.mouse.up();
+    expect(Number(await bar.getAttribute("aria-valuenow"))).toBe(start + 120);
+    await page.reload();
+    await page.getByRole("button", { name: "tela cheia" }).click();
+    await expect(page.getByRole("separator", { name: "largura da lista de tarefas" })).toHaveAttribute("aria-valuenow", String(start + 120));
+  });
+
+  test("the divider answers the keyboard and never squeezes a column below its minimum", async ({ page }) => {
+    await maximize(page);
+    const bar = page.getByRole("separator", { name: "largura da lista de tarefas" });
+    await bar.focus();
+    await page.keyboard.press("Home");
+    await expect(bar).toHaveAttribute("aria-valuenow", "360");
+    await page.keyboard.press("ArrowLeft");
+    await expect(bar).toHaveAttribute("aria-valuenow", "360");
+    await page.keyboard.press("End");
+    const right = (await page.getByRole("complementary", { name: "notificações" }).boundingBox())!;
+    expect(right.width).toBeGreaterThanOrEqual(298);
+    await page.keyboard.press("Enter");
+    await expect(bar).toHaveAttribute("aria-valuenow", "416");
+  });
+});

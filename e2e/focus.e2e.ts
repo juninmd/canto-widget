@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { mockTauri } from "./mock";
+import { goTab, mockTauri } from "./mock";
 
 const today = () => {
   const d = new Date();
@@ -20,7 +20,7 @@ test("starting a task pins the timer bar under every tab and pausing saves the t
   await page.getByLabel("iniciar foco em Revisar PR").click();
   const bar = page.getByRole("region", { name: "tarefa em foco" });
   await expect(bar).toContainText("Revisar PR");
-  await page.getByRole("tab", { name: "Agenda" }).click();
+  await goTab(page, "Agenda");
   await expect(bar).toBeVisible();
   await bar.getByRole("button", { name: "Pausar" }).click();
   await expect(bar).toBeHidden();
@@ -33,7 +33,7 @@ test("the agenda day view lists the tasks that have a time", async ({ page }) =>
   }, today());
   await mockTauri(page);
   await page.goto("/");
-  await page.getByRole("tab", { name: "Agenda" }).click();
+  await goTab(page, "Agenda");
   await page.getByRole("button", { name: "Dia" }).click();
   await expect(page.getByText("Escrever changelog")).toBeVisible();
 });

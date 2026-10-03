@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { api, type AgendaItem } from "../lib/api";
+import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
 import { kindOf, sortAlerts, toneOf } from "../lib/alerts";
 import { playAlert } from "../lib/sound";
 import { t } from "../i18n";
@@ -38,8 +38,8 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
   );
 
   const dismiss = useCallback(
-    (id: string) => {
-      void api.alertClose(id);
+    (id: string, outcome?: AlertOutcome) => {
+      void api.alertClose(id, outcome);
       hide(id);
     },
     [hide],
@@ -82,7 +82,7 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
         <AlertActions
           ref={primary}
           event={event}
-          onDismiss={() => dismiss(event.id)}
+          onDismiss={(outcome) => dismiss(event.id, outcome)}
           onHide={() => hide(event.id)}
           onCompleted={onCompleted}
           onOpenModels={onOpenModels}

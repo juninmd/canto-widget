@@ -392,3 +392,10 @@ textarea {
     border: 1px solid CanvasText;
   }
 }
+
+/* Durante o arrasto da divisoria o cursor nao pode piscar ao passar por cima de outros elementos. */
+body.canto-resizing,
+body.canto-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}

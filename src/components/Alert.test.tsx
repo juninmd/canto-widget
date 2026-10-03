@@ -279,3 +279,22 @@ test("Esc closes the dropdown first and only a second Esc dismisses the alert", 
   });
   expect(closed).toEqual(["e1"]);
 });
+
+test("the main action records its outcome, a plain close and a mute record theirs", async () => {
+  const { toEvent } = await import("../lib/reminders");
+  const reminder = toEvent({ id: "t9", title: "tomar remédio", done: false, day: "2026-09-14", created_at: 1, updated_at: 1, hora: "08:30" });
+  await show([reminder]);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "concluir tarefa" }));
+  });
+  expect(args[calls.indexOf("alert_close")]).toEqual({ id: "task:t9", outcome: "done" });
+});
+
+test("silencing a service tells Rust it was muted", async () => {
+  watched = ["github"];
+  await show([outage]);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "silenciar" }));
+  });
+  expect(args[calls.indexOf("alert_close")]).toEqual({ id: "status:github", outcome: "muted" });
+});

@@ -83,7 +83,7 @@ export default function MiniRail({ alerts, mode, onOpen, onMode }: Props) {
           onPick={onMode}
           onOpenChange={setMenu}
           buttonClassName="rounded-full border border-edge bg-panel/95 text-muted backdrop-blur"
-          menuClassName="right-9 top-0"
+          menuClassName="fixed left-2 top-2"
         />
       </div>
       {alerts.length === 0 && (
