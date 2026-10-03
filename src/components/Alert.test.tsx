@@ -216,3 +216,18 @@ test("with the vault locked the meeting alert shows no note prep at all", async 
   expect(screen.queryByRole("button", { name: /criar nota da reunião/ })).toBeNull();
   vaultLocked = false;
 });
+
+test("a meeting can be snoozed for 1, 5 or 10 minutes, each sending its own delay to Rust", async () => {
+  for (const minutes of [1, 5, 10]) {
+    calls.length = 0;
+    args.length = 0;
+    const closed: string[] = [];
+    const view = await show([event], { onDismiss: (id) => closed.push(id) });
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: `adiar ${minutes} min` }));
+    });
+    expect(args[calls.indexOf("alert_snooze")]).toEqual({ id: "e1", minutes });
+    expect(closed).toEqual(["e1"]);
+    view.unmount();
+  }
+});

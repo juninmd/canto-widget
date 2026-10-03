@@ -16,6 +16,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Adiar por 1, 5 ou 10 minutos**: o aviso de reunião e o lembrete de tarefa trazem os três botões de adiar numa
+  linha própria, em vez de só "adiar 10 min". O aviso volta a tocar quando o prazo escolhido passa.
 - **Copiar o clipe reescrito**: ao passar o mouse num item do clipboard aparecem as reescritas que cabem no tipo:
   JSON formatado ou compacto (as chaves mantêm a ordem), texto em uma linha, MAIÚSCULAS e minúsculas. A reescrita
   vai para a área de transferência e o histórico continua como estava; cópias cortadas pelo limite não são
