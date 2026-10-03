@@ -26,8 +26,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   GitLab e o link da conversa. No GitHub vale a menção direta ao seu usuário em issues e PRs abertos de outras
   pessoas (menção a time não entra); no GitLab, o to-do de menção pendente. A primeira leitura só registra, e mais de
   3 de uma vez viram um aviso só. Cada aviso liga e desliga em Ajustes → Avisos do GitHub e do GitLab.
-- **Adiar por 1, 5 ou 10 minutos**: o aviso de reunião e o lembrete de tarefa trazem os três botões de adiar numa
-  linha própria, em vez de só "adiar 10 min". O aviso volta a tocar quando o prazo escolhido passa.
+- **Adiar por 1, 5 ou 10 minutos**: o aviso de reunião e o lembrete de tarefa trocam o "adiar 10 min" por um botão
+  dividido: o principal adia pelo último valor escolhido (10 min no começo) e a seta à direita abre a lista de 1, 5
+  e 10 min; escolher um valor já adia e vira o valor do botão principal nesta máquina. Esc fecha a lista antes de
+  fechar o aviso. O aviso volta a tocar quando o prazo passa.
 - **Copiar o clipe reescrito**: ao passar o mouse num item do clipboard aparecem as reescritas que cabem no tipo:
   JSON formatado ou compacto (as chaves mantêm a ordem), texto em uma linha, MAIÚSCULAS e minúsculas. A reescrita
   vai para a área de transferência e o histórico continua como estava; cópias cortadas pelo limite não são
