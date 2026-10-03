@@ -67,6 +67,10 @@ pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()
         let mut current = state.alert.lock().unwrap();
         alert_queue::push(&mut current, &mut queue(app).0.lock().unwrap(), event);
     }
+    // In mini mode the dock lists it: a pop-up would cover the edge strip the user chose to live with.
+    if crate::window_mode::mini_active(app) {
+        return app.emit(ALERT_EVENT, ());
+    }
     // Also for an alert that waits: the overlay lists every pending one and needs to learn about it.
     present_alert(app)
 }

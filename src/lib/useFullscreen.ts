@@ -15,12 +15,12 @@ export function useFullscreen() {
     };
   }, []);
 
-  const toggle = useCallback(async () => {
-    const win = getCurrentWindow();
-    const next = !(await win.isFullscreen());
-    await win.setFullscreen(next);
+  const set = useCallback(async (next: boolean) => {
+    await getCurrentWindow().setFullscreen(next);
     setActive(next);
   }, []);
 
-  return { active, toggle };
+  const toggle = useCallback(async () => set(!(await getCurrentWindow().isFullscreen())), [set]);
+
+  return { active, toggle, set };
 }

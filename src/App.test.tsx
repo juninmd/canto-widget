@@ -6,6 +6,7 @@ type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
 let agendaItems: unknown[] = [];
 let vaultStatus = { exists: true, unlocked: true };
+let miniOn = false;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
@@ -19,6 +20,11 @@ mock.module("@tauri-apps/api/core", () => ({
         return Promise.resolve(null);
       case "agenda_today":
         return Promise.resolve(agendaItems);
+      case "window_config":
+        return Promise.resolve({ position: null, size: null, always_on_top: true, mini: miniOn });
+      case "window_mini_set":
+        miniOn = args?.enabled === true;
+        return Promise.resolve(null);
       case "alert_payload":
         return Promise.resolve([{ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" }]);
       case "notes_search":
@@ -40,9 +46,13 @@ mock.module("@tauri-apps/api/core", () => ({
   },
 }));
 let fullscreenOn = false;
+let hidden = false;
 mock.module("@tauri-apps/api/window", () => ({
   getCurrentWindow: () => ({
-    hide: () => Promise.resolve(),
+    hide: () => {
+      hidden = true;
+      return Promise.resolve();
+    },
     isFullscreen: () => Promise.resolve(fullscreenOn),
     setFullscreen: (v: boolean) => {
       fullscreenOn = v;
@@ -89,6 +99,9 @@ beforeEach(() => {
   calls.length = 0;
   agendaItems = [];
   vaultStatus = { exists: true, unlocked: true };
+  miniOn = false;
+  fullscreenOn = false;
+  hidden = false;
   localStorage.clear();
   // Before render: the alert clock is created when App mounts.
   jest.useFakeTimers();
@@ -211,7 +224,9 @@ test("completing from the pop-up window updates the open list", async () => {
 test("the widget never renders the alert: the pop-up has its own window", async () => {
   render(<App />);
   await settle();
-  expect(listeners["canto://alert"]).toBeUndefined();
+  // The widget only listens to feed the mini dock; a ringing alert never opens a dialog over it.
+  await act(async () => listeners["canto://alert"]());
+  await settle();
   expect(screen.queryByRole("alertdialog")).toBeNull();
 });
 
@@ -317,4 +332,84 @@ test("an unsaved note draft survives switching to another tab and back", async (
   expect(screen.getByRole("tab", { name: "Tarefas" }).getAttribute("aria-selected")).toBe("true");
   await toNotes();
   expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("rascunho fictício");
+});
+
+test("the mode icon lists the four modes and marks the current one", async () => {
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
+  const items = screen.getAllByRole("menuitemradio");
+  expect(items.map((i) => i.querySelector("span.block")?.textContent)).toEqual(["Mini", "Escondido", "Normal", "Maximizado"]);
+  expect(items.filter((i) => i.getAttribute("aria-checked") === "true")).toHaveLength(1);
+  expect(items[2].getAttribute("aria-checked")).toBe("true");
+});
+
+test("picking Mini shrinks the window to the dock and Rust leaves fullscreen on its own", async () => {
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
+  await act(async () => {
+    fireEvent.click(screen.getAllByRole("menuitemradio")[0]);
+  });
+  await settle();
+  expect(calls.some((c) => c.cmd === "window_mini_set" && c.args?.enabled === true)).toBe(true);
+  expect(screen.getByRole("group", { name: "avisos pendentes" })).toBeDefined();
+  expect(screen.queryByRole("tablist")).toBeNull();
+  expect(localStorage.getItem("canto.mini"), "a restart would flash the whole UI in a 24 px window").toBe("1");
+});
+
+test("clicking an alert in the dock opens the normal window with that alert on top", async () => {
+  miniOn = true;
+  render(<App />);
+  await settle();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir pagar boleto" }));
+  });
+  await settle();
+  expect(calls.some((c) => c.cmd === "window_mini_set" && c.args?.enabled === false)).toBe(true);
+  const focus = screen.getByRole("region", { name: "aviso em foco" });
+  expect(focus.textContent).toContain("pagar boleto");
+  expect(screen.getByRole("tablist")).toBeDefined();
+});
+
+test("the dock keeps asking Rust for the window size it needs", async () => {
+  miniOn = true;
+  render(<App />);
+  await settle();
+  const resize = calls.filter((c) => c.cmd === "window_mini_resize");
+  expect(resize.length).toBeGreaterThan(0);
+  expect(resize[0].args).toEqual({ width: 24, height: 100 });
+});
+
+test("a tab requested by the pop-up brings the dock back to the normal window", async () => {
+  miniOn = true;
+  render(<App />);
+  await settle();
+  await act(async () => listeners["canto://open-tab"]({ payload: "settings" }));
+  await settle();
+  expect(calls.some((c) => c.cmd === "window_mini_set" && c.args?.enabled === false)).toBe(true);
+});
+
+test("maximized shows the agenda beside the task list", async () => {
+  agendaItems = [meetingIn(60)];
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
+  await act(async () => {
+    fireEvent.click(screen.getAllByRole("menuitemradio")[3]);
+  });
+  await settle();
+  expect(fullscreenOn).toBe(true);
+  expect(screen.getByText("agenda de hoje")).toBeDefined();
+  expect(screen.getAllByText("Daily").length).toBeGreaterThan(0);
+});
+
+test("hidden from the mode icon hides the window like the minus button", async () => {
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
+  await act(async () => {
+    fireEvent.click(screen.getAllByRole("menuitemradio")[1]);
+  });
+  expect(hidden).toBe(true);
 });

@@ -21,6 +21,9 @@ pub struct WindowConfig {
     pub size: Option<(f64, f64)>,
     #[serde(default = "yes", alias = "sempre_no_topo")]
     pub always_on_top: bool,
+    /// Mini mode survives a restart; the saved position and size stay those of the normal window.
+    #[serde(default)]
+    pub mini: bool,
 }
 
 fn yes() -> bool {
@@ -29,7 +32,7 @@ fn yes() -> bool {
 
 impl Default for WindowConfig {
     fn default() -> Self {
-        Self { position: None, size: None, always_on_top: true }
+        Self { position: None, size: None, always_on_top: true, mini: false }
     }
 }
 
@@ -109,6 +112,10 @@ pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
         return crate::window::anchor_bottom_right(win);
     };
     let cfg = window_state.cfg();
+    if cfg.mini {
+        return crate::window_mode::place_mini(win, crate::window_mode::MINI_DEFAULT);
+    }
+    crate::window_mode::restore_limits(win)?;
     let size = cfg.size.unwrap_or((DEFAULT_WIDTH, DEFAULT_HEIGHT));
     win.set_size(LogicalSize::new(size.0, size.1))?;
     match cfg.position.filter(|&p| fits(p, size, &areas(win))) {
@@ -122,7 +129,7 @@ pub fn record(win: &tauri::Window) {
         return;
     };
     // Fullscreen size isn't a user preference: saving it would make the widget reopen giant.
-    if win.is_fullscreen().unwrap_or(false) {
+    if window_state.cfg().mini || win.is_fullscreen().unwrap_or(false) {
         return;
     }
     let (Ok(pos), Ok(size)) = (win.outer_position(), win.inner_size()) else {
@@ -197,6 +204,14 @@ mod tests {
         let cfg: WindowConfig = serde_json::from_str("{}").unwrap();
         assert_eq!(cfg, WindowConfig::default());
         assert!(cfg.always_on_top);
+    }
+
+    #[test]
+    fn mini_mode_is_off_in_old_files_and_survives_a_round_trip() {
+        assert!(!serde_json::from_str::<WindowConfig>(r#"{"posicao":[1.0,2.0]}"#).unwrap().mini);
+        let cfg = WindowConfig { mini: true, ..WindowConfig::default() };
+        let back: WindowConfig = serde_json::from_str(&serde_json::to_string(&cfg).unwrap()).unwrap();
+        assert!(back.mini);
     }
 
     #[test]

@@ -118,6 +118,8 @@
   --animate-baixar: canto-baixar 150ms var(--ease-sair) forwards;
   --animate-marcar: canto-marcar 150ms var(--ease-entrar);
   --animate-fade: canto-fade 100ms linear backwards;
+  /* Mola leve: so tamanho e posicao passam do alvo, nunca fade ou saida. */
+  --animate-borda: canto-borda 420ms cubic-bezier(0.3, 1.2, 0.5, 1) backwards;
 
   @keyframes canto-entrar {
     from {
@@ -152,6 +154,12 @@
   @keyframes canto-marcar {
     50% {
       transform: scale(1.15);
+    }
+  }
+  @keyframes canto-borda {
+    from {
+      opacity: 0;
+      transform: translateX(28px);
     }
   }
   @keyframes canto-fade {

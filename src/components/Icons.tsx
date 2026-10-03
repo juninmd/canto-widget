@@ -148,3 +148,37 @@ export const NoteIcon = () => (
     <path d="M14 3v5h5M9 13h7M9 17h5" />
   </svg>
 );
+
+export const LayoutIcon = () => (
+  <svg {...base}>
+    <rect x="3" y="4" width="18" height="16" rx="3" />
+    <path d="M14 4v16" />
+  </svg>
+);
+
+export const DockIcon = () => (
+  <svg {...base}>
+    <rect x="3" y="4" width="18" height="16" rx="3" opacity="0.4" />
+    <path d="M21 8v8" strokeWidth={3.5} />
+  </svg>
+);
+
+export const WindowIcon = () => (
+  <svg {...base}>
+    <rect x="5" y="3" width="14" height="18" rx="3" />
+    <path d="M5 8h14" />
+  </svg>
+);
+
+export const SplitIcon = () => (
+  <svg {...base}>
+    <rect x="3" y="4" width="18" height="16" rx="3" />
+    <path d="M12 4v16" />
+  </svg>
+);
+
+export const CheckIcon = () => (
+  <svg {...base}>
+    <path d="m5 12.5 4.5 4.5L19 7.5" />
+  </svg>
+);
