@@ -200,6 +200,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|
 | ![Hovering a text clip offers one line, UPPERCASE and lowercase](docs/prints/app/29-clipboard-transformar.png) | ![The meeting alert lists earlier notes with the same title and offers to create today's note](docs/prints/app/07-aviso-reuniao.png) |
 
+| Alerts about my own PRs | Their switches in Settings |
+|---|---|
+| ![Pop-up with a pull request whose CI failed and another one waiting for a review](docs/prints/app/55-aviso-meus-prs.png) | ![Settings: alert when the CI of one of my PRs fails, or when one has no review for 24, 48 or 72 hours](docs/prints/app/56-ajustes-meus-prs.png) |
+
 | Password changed, one file pending | Day summary |
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |

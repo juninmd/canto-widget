@@ -107,6 +107,12 @@ export const app = {
   "settings.reviewAlerts.label": "avisar quando pedirem minha revisão",
   "settings.reviewAlerts.hint": "Notificação do sistema para cada pedido novo, conferido a cada 5 min enquanto o cofre está aberto.",
 
+  "settings.myPrAlerts.title": "Meus PRs no GitHub",
+  "settings.myPrAlerts.ci": "avisar quando o CI de um PR meu falhar",
+  "settings.myPrAlerts.stalled": "avisar quando um PR meu ficar sem revisão por",
+  "settings.myPrAlerts.hours": "{h} h",
+  "settings.myPrAlerts.hint": "Pop-up para cada caso, conferido a cada 5 min enquanto o cofre está aberto. PRs em rascunho não contam.",
+
   "settings.security.title": "Segurança",
   "settings.security.autolock": "trancar sozinho após",
   "settings.security.autolockOption": "{min} min sem uso",

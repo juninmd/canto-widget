@@ -61,6 +61,8 @@ pub mod models_alert;
 pub mod models_feed;
 pub mod models_rank;
 pub mod models_state;
+pub mod my_pr_alerts;
+pub mod my_pr_events;
 pub mod net;
 pub mod next_meeting;
 pub mod note_images;
@@ -132,6 +134,7 @@ pub fn run() {
             app.manage(cmd_models::ModelsLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
+            app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
@@ -147,6 +150,7 @@ pub fn run() {
             models_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
+            my_pr_alerts::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
@@ -261,6 +265,8 @@ pub fn run() {
             cmd_github_lists::github_prs_checks,
             review_alert::review_alerts_get,
             review_alert::review_alerts_set,
+            my_pr_alerts::my_pr_alerts_get,
+            my_pr_alerts::my_pr_alerts_set,
             cmd_gitlab::gitlab_status,
             cmd_gitlab::gitlab_connect,
             cmd_gitlab::gitlab_disconnect,

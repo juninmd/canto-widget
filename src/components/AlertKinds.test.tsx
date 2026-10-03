@@ -162,3 +162,49 @@ test("an alert that rings again after leaving the overlay sounds again", async (
   });
   expect(rang, "the closed alert ringing again must not be silent").toBe(3);
 });
+
+const failingCi: AgendaItem = {
+  ...base,
+  start: "",
+  id: "pr:ci:acme/atlas#12",
+  title: "Corrige o parser de CSV",
+  organizer: "acme/atlas#12",
+  link: "https://github.com/acme/atlas/pull/12",
+  description: "O CI falhou neste pull request.",
+  tag: "ci",
+};
+
+const waiting: AgendaItem = {
+  ...failingCi,
+  id: "pr:stalled:acme/atlas#12",
+  start: new Date(Date.now() - 50 * 3_600_000).toISOString(),
+  description: "Sem revisão há 50 h.",
+  tag: "stalled",
+};
+
+test("a failing CI names the PR, opens it and has no snooze", async () => {
+  await show([failingCi]);
+  expect(screen.getAllByText("pull request").length).toBeGreaterThan(0);
+  expect(screen.getByText("CI falhou")).toBeTruthy();
+  expect(screen.getByText("acme/atlas#12")).toBeTruthy();
+  expect(screen.getByText("O CI falhou neste pull request.")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir PR" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/pull/12" });
+});
+
+test("a PR without a review says for how long it has waited", async () => {
+  await show([waiting]);
+  expect(screen.getByText("sem revisão")).toBeTruthy();
+  expect(screen.getByText("há 2 d")).toBeTruthy();
+});
+
+test("a red CI ranks above a stalled PR, and both above a meeting", async () => {
+  await show([meeting, waiting, failingCi]);
+  const texts = cards().map((c) => c.textContent ?? "");
+  expect(texts[0]).toContain("CI falhou");
+  expect(texts[1]).toContain("sem revisão");
+  expect(texts[2]).toContain("Daily");
+});

@@ -16,6 +16,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Avisos dos seus PRs no GitHub**: um pop-up quando o **CI de um PR seu falha** (avisa uma vez por falha, e de
+  novo se ele voltar a falhar depois de passar) e outro quando um **PR seu fica sem nenhuma revisão** por 24, 48 ou
+  72 h (48 por padrão, contados desde a abertura; rascunhos não contam). Mais de 3 PRs sem revisão de uma vez viram
+  um aviso só. O botão "abrir PR" leva ao PR. Conferido a cada 5 min com o cofre aberto, mesmo com a janela escondida;
+  a primeira leitura só registra o CI, sem avisar de falhas antigas. Cada um liga e desliga em Ajustes → Meus PRs no
+  GitHub.
 - **Adiar por 1, 5 ou 10 minutos**: o aviso de reunião e o lembrete de tarefa trazem os três botões de adiar numa
   linha própria, em vez de só "adiar 10 min". O aviso volta a tocar quando o prazo escolhido passa.
 - **Copiar o clipe reescrito**: ao passar o mouse num item do clipboard aparecem as reescritas que cabem no tipo:

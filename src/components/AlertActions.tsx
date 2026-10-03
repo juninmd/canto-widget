@@ -64,6 +64,19 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
             {t("alert.completeTask")}
           </button>
         )}
+        {kind === "pr" && event.link && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() => {
+              open(event.link)();
+              onDismiss();
+            }}
+            className={PRIMARY}
+          >
+            {t("alert.openPr")}
+          </button>
+        )}
         {kind === "meeting" && event.meet && (
           <button
             ref={primary}

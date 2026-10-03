@@ -112,6 +112,12 @@ export const app: Record<keyof typeof source, string> = {
   "settings.reviewAlerts.label": "notify me when my review is requested",
   "settings.reviewAlerts.hint": "OS notification for each new request, checked every 5 min while the vault is open.",
 
+  "settings.myPrAlerts.title": "My GitHub PRs",
+  "settings.myPrAlerts.ci": "tell me when the CI of one of my PRs fails",
+  "settings.myPrAlerts.stalled": "tell me when one of my PRs has no review for",
+  "settings.myPrAlerts.hours": "{h} h",
+  "settings.myPrAlerts.hint": "A pop-up for each case, checked every 5 min while the vault is open. Draft PRs do not count.",
+
   "settings.security.title": "Security",
   "settings.security.autolock": "lock automatically after",
   "settings.security.autolockOption": "{min} min idle",

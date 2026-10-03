@@ -53,6 +53,9 @@ export type Note = {
   link?: NoteLink | null;
 };
 
+/** Pop-ups about the user's own PRs: red CI, and no review for `stalled_hours`. */
+export type MyPrAlerts = { ci: boolean; stalled: boolean; stalled_hours: number };
+
 export type ClipMode = "json_pretty" | "json_compact" | "one_line" | "upper" | "lower";
 
 export type NotesPage = { total: number; items: Note[] };
@@ -276,6 +279,8 @@ export const api = {
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
   reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
+  myPrAlertsGet: () => invoke<MyPrAlerts>("my_pr_alerts_get"),
+  myPrAlertsSet: (config: MyPrAlerts) => invoke<MyPrAlerts>("my_pr_alerts_set", { config }),
 
   gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
   /** Validates address and token against the instance; returns the username. */

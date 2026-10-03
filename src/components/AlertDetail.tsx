@@ -47,6 +47,13 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             {event.organizer && <Chip>{event.organizer}</Chip>}
           </>
         )}
+        {kind === "pr" && (
+          <>
+            <Chip tone={tone.text}>{t(event.tag === "ci" ? "alert.pr.ci" : "alert.pr.stalled")}</Chip>
+            {event.organizer && <Chip>{event.organizer}</Chip>}
+            {event.tag === "stalled" && event.start && <Chip>{timeAgo(event.start)}</Chip>}
+          </>
+        )}
         {(kind === "meeting" || kind === "task") && (
           <>
             <Chip tone={tone.text}>{hour(event)}</Chip>

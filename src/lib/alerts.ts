@@ -6,13 +6,16 @@ import { t } from "../i18n";
 /** Same prefixes as `STATUS_PREFIX` and `MODEL_PREFIX` in `notification.rs`. */
 export const STATUS_PREFIX = "status:";
 export const MODEL_PREFIX = "model:";
+/** Same prefix as `PR_PREFIX` in `notification.rs`: one of the user's own PRs has red CI or waits for a review. */
+export const PR_PREFIX = "pr:";
 
-export type AlertKind = "status" | "model" | "task" | "meeting";
+export type AlertKind = "status" | "model" | "pr" | "task" | "meeting";
 export type Tone = "danger" | "warn" | "accent" | "muted";
 
 export function kindOf(e: AgendaItem): AlertKind {
   if (e.id.startsWith(STATUS_PREFIX)) return "status";
   if (e.id.startsWith(MODEL_PREFIX)) return "model";
+  if (e.id.startsWith(PR_PREFIX)) return "pr";
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
 }
 
@@ -24,6 +27,8 @@ export function toneOf(e: AgendaItem): Tone {
       return e.tag === "maintenance" ? "muted" : "warn";
     case "model":
       return "muted";
+    case "pr":
+      return e.tag === "ci" ? "danger" : "warn";
     default:
       return "accent";
   }
