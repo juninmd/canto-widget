@@ -2,7 +2,7 @@ import { useState } from "react";
 import { api, errText } from "../lib/api";
 import { t } from "../i18n";
 
-const FIELD = "rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent";
+const FIELD = "canto-field px-3 py-2 text-sm";
 
 /** GitLab.com or a self-hosted instance: address plus a personal token with `read_api`. */
 export default function GitlabConnect({ onConnected }: { onConnected: () => void }) {
@@ -58,7 +58,7 @@ export default function GitlabConnect({ onConnected }: { onConnected: () => void
       <p className="text-[11px] text-faint">
         {t("gitlab.scopeHint")} <em>read_api</em>.{" "}
         {/^https:\/\//.test(baseUrl.trim()) && (
-          <button type="button" onClick={() => void api.openLink(tokenPage).catch(() => {})} className="underline decoration-dotted hover:text-muted">
+          <button type="button" onClick={() => void api.openLink(tokenPage).catch(() => {})} className="canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
             {t("gitlab.createToken")}
           </button>
         )}

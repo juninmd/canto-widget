@@ -83,3 +83,68 @@ export const PauseIcon = () => (
     <path d="M8 5v14M16 5v14" />
   </svg>
 );
+
+export const PlusIcon = () => (
+  <svg {...base}>
+    <path d="M12 5v14M5 12h14" />
+  </svg>
+);
+
+export const HelpIcon = () => (
+  <svg {...base}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2.2-2.5 3.9M12 17.2v.1" />
+  </svg>
+);
+
+export const LockIcon = () => (
+  <svg {...base}>
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+  </svg>
+);
+
+export const ExpandIcon = () => (
+  <svg {...base}>
+    <path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" />
+  </svg>
+);
+
+export const ShrinkIcon = () => (
+  <svg {...base}>
+    <path d="M20 10h-6V4M4 14h6v6M14 10l7-7M3 21l7-7" />
+  </svg>
+);
+
+export const MinimizeIcon = () => (
+  <svg {...base}>
+    <path d="M5 12h14" />
+  </svg>
+);
+
+export const ChecklistIcon = () => (
+  <svg {...base}>
+    <path d="m4 7 2 2 3-4M4 17l2 2 3-4M13 8h7M13 18h7" />
+  </svg>
+);
+
+export const ClipboardIcon = () => (
+  <svg {...base}>
+    <rect x="6" y="4" width="12" height="17" rx="2" />
+    <path d="M9 4h6v3H9z" />
+  </svg>
+);
+
+export const SearchIcon = () => (
+  <svg {...base}>
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </svg>
+);
+
+export const NoteIcon = () => (
+  <svg {...base}>
+    <path d="M6 3h9l4 4v14H6z" />
+    <path d="M14 3v5h5M9 13h7M9 17h5" />
+  </svg>
+);

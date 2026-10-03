@@ -28,11 +28,11 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDiscon
             type="button"
             onClick={() => void gh.load(gh.filter, true, true)}
             disabled={gh.loading}
-            className="min-h-6 underline decoration-dotted hover:text-muted"
+            className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
           >
             {gh.loading ? "..." : t("forge.refresh")}
           </button>
-          <button type="button" onClick={onDisconnect} className="min-h-6 underline decoration-dotted hover:text-muted">
+          <button type="button" onClick={onDisconnect} className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
             {t("forge.disconnect")}
           </button>
         </span>

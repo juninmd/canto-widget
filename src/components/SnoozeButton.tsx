@@ -50,7 +50,7 @@ export default function SnoozeButton({ onSnooze }: { onSnooze: (minutes: number)
               role="menuitem"
               onClick={() => pick(m)}
               aria-label={t("alert.snooze", { minutes: m })}
-              className={`px-4 py-2 text-left text-sm hover:bg-edge ${m === minutes ? "font-semibold text-accent" : "text-fg"}`}
+              className={`px-4 py-2 text-left text-sm hover:bg-edge ${m === minutes ? "font-semibold text-accent-text" : "text-fg"}`}
             >
               {t("alert.snoozeOption", { minutes: m })}
             </button>

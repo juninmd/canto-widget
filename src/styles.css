@@ -8,6 +8,7 @@
   --color-panel: #111826;
   --color-edge: #1f2a3c;
   --color-accent: #4ade80;
+  --color-accent-text: #4ade80;
   --color-on-accent: #071206;
   --color-fg: #e2e8f0;
   --color-muted: #94a3b8;
@@ -24,6 +25,8 @@
   --color-panel: #0e0e11;
   --color-edge: #2c2c33;
   --color-accent: #e11d48;
+  /* O vermelho da marca no texto pequeno ficava em 4,1:1 sobre o painel; este chega a 5,8:1. */
+  --color-accent-text: #f6506d;
   --color-on-accent: #ffffff;
   --color-fg: #ede9e0;
   --color-muted: #a8a29e;
@@ -41,6 +44,7 @@
   --color-panel: #ffffff;
   --color-edge: #e2e8f0;
   --color-accent: #15803d;
+  --color-accent-text: #15803d;
   --color-on-accent: #ffffff;
   --color-fg: #0f172a;
   --color-muted: #475569;
@@ -55,6 +59,7 @@
   --color-panel: #282a36;
   --color-edge: #44475a;
   --color-accent: #bd93f9;
+  --color-accent-text: #bd93f9;
   --color-on-accent: #21222c;
   --color-fg: #f8f8f2;
   --color-muted: #b6b8c8;
@@ -78,6 +83,7 @@
   --color-panel: var(--color-panel);
   --color-edge: var(--color-edge);
   --color-accent: var(--color-accent);
+  --color-accent-text: var(--color-accent-text);
   --color-on-accent: var(--color-on-accent);
   --color-fg: var(--color-fg);
   --color-muted: var(--color-muted);
@@ -86,6 +92,12 @@
   --color-danger: var(--color-danger);
   --color-ok: var(--color-ok);
   --color-warn: var(--color-warn);
+  /* Superficies derivadas da skin: nenhuma skin precisa redefinir estes. */
+  --color-raised: color-mix(in oklab, var(--color-panel) 93%, var(--color-fg));
+  --color-hover: color-mix(in oklab, var(--color-fg) 7%, transparent);
+  /* Pressed e selecionado: um degrau acima do hover, como os passos 4 e 5 da escala do Radix. */
+  --color-active: color-mix(in oklab, var(--color-fg) 13%, transparent);
+  --shadow-raised: 0 1px 0 color-mix(in oklab, var(--color-fg) 7%, transparent) inset, 0 2px 8px rgb(0 0 0 / 0.22);
 }
 
 /*
@@ -183,6 +195,129 @@ textarea:focus-visible {
   outline-offset: -1px;
 }
 
+/* WCAG 2.5.8 em todo o app: nenhum botao, seletor ou aba abaixo de 24 px, nem na densidade compacta (que escala o rem). */
+@layer base {
+  button,
+  select,
+  summary,
+  [role="tab"] {
+    min-width: 24px;
+    min-height: 24px;
+  }
+}
+
+@layer components {
+  /* WCAG 2.5.8: alvo de ao menos 24 px. Em px de proposito: a densidade compacta escala o rem e encolheria o alvo. */
+  .canto-hit {
+    min-width: 24px;
+    min-height: 24px;
+  }
+
+  /* Campo de texto: mesma forma e profundidade em todas as abas. */
+  .canto-field {
+    border: 1px solid var(--color-edge);
+    border-radius: 0.75rem;
+    background: var(--color-ink);
+    color: var(--color-fg);
+    box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.25);
+    outline: none;
+  }
+  .canto-field::placeholder {
+    color: var(--color-faint);
+  }
+  .canto-field:hover {
+    border-color: var(--color-line);
+  }
+  .canto-field:focus {
+    border-color: var(--color-accent);
+  }
+}
+
+/* Texto sem linhas viuvas e titulos equilibrados (CSS Text 4). */
+p,
+li {
+  text-wrap: pretty;
+}
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+@layer components {
+  /* Caixa de marcar redonda: continua um <input type=checkbox>, entao teclado e leitor de tela seguem iguais. */
+  .canto-check {
+    appearance: none;
+    display: grid;
+    place-content: center;
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    cursor: pointer;
+    border: 2px solid var(--color-line);
+    border-radius: 9999px;
+    background: transparent;
+    transition:
+      background-color 120ms var(--ease-entrar),
+      border-color 120ms var(--ease-entrar);
+  }
+  .canto-check:hover {
+    border-color: var(--color-accent);
+  }
+  .canto-check:checked {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+  .canto-check:checked::after {
+    content: "";
+    width: 0.3rem;
+    height: 0.55rem;
+    margin-top: -0.1rem;
+    border: solid var(--color-on-accent);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+
+  /* Caixa quadrada das opcoes de Ajustes: mesma familia da redonda, com a marca e o foco iguais. */
+  .canto-box {
+    appearance: none;
+    display: grid;
+    place-content: center;
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0;
+    cursor: pointer;
+    border: 2px solid var(--color-line);
+    border-radius: 0.3rem;
+    background: transparent;
+    transition:
+      background-color 120ms var(--ease-entrar),
+      border-color 120ms var(--ease-entrar);
+  }
+  .canto-box:hover {
+    border-color: var(--color-accent);
+  }
+  .canto-box:checked {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+  .canto-box:checked::after {
+    content: "";
+    width: 0.28rem;
+    height: 0.5rem;
+    margin-top: -0.08rem;
+    border: solid var(--color-on-accent);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .canto-box:disabled {
+    cursor: default;
+    opacity: 0.5;
+  }
+}
+
 input,
 textarea {
   -webkit-user-select: text;
@@ -195,4 +330,57 @@ textarea {
 ::-webkit-scrollbar-thumb {
   background: var(--color-edge);
   border-radius: 9999px;
+}
+
+/* Contraste maior pedido ao sistema: texto e linhas fracos sobem um degrau, sem trocar de skin. */
+@media (prefers-contrast: more) {
+  :root,
+  :root[data-skin] {
+    --color-faint: var(--color-muted);
+    --color-line: var(--color-muted);
+  }
+}
+
+/*
+ * Modo de alto contraste do Windows (forced-colors): o sistema troca todas as cores e descarta fundos e sombras.
+ * O que so existia como fundo (marca, sublinhado da aba, barra, trilho de prioridade) ganha forma e cor de sistema.
+ */
+@media (forced-colors: active) {
+  .canto-check:checked,
+  .canto-box:checked {
+    forced-color-adjust: none;
+    background: Highlight;
+    border-color: Highlight;
+  }
+  .canto-check:checked::after,
+  .canto-box:checked::after {
+    border-color: HighlightText;
+  }
+  /* A fundo que some vira borda: o botao ganha contorno e a aba ativa, um filete de Highlight. */
+  button {
+    border: 1px solid ButtonText;
+  }
+  [role="tab"] {
+    border-color: transparent;
+  }
+  [role="tab"]::after {
+    display: none;
+  }
+  [role="tab"][aria-selected="true"] {
+    border-bottom: 2px solid Highlight;
+  }
+  .canto-field::placeholder {
+    color: GrayText;
+  }
+  [role="progressbar"] {
+    border: 1px solid CanvasText;
+  }
+  [role="progressbar"] > div,
+  .canto-rail {
+    forced-color-adjust: none;
+    background: Highlight;
+  }
+  .canto-raised {
+    border: 1px solid CanvasText;
+  }
 }

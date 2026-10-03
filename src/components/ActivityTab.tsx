@@ -57,7 +57,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
         <p className="text-sm font-semibold text-fg">{t("activity.off")}</p>
         <p className="max-w-xs text-xs text-muted">{t("activity.offBody")}</p>
         <p className="max-w-xs text-[11px] text-faint">{t("activity.privacyHint")}</p>
-        <button type="button" onClick={() => void enable()} className="min-h-8 rounded-lg border border-accent px-4 text-xs text-accent hover:bg-accent hover:text-on-accent">
+        <button type="button" onClick={() => void enable()} className="min-h-8 rounded-lg border border-accent px-4 text-xs text-accent-text hover:bg-accent hover:text-on-accent">
           {t("activity.enable")}
         </button>
       </div>
@@ -69,12 +69,12 @@ export default function ActivityTab({ today, onError }: { today: string; onError
     <div className="flex h-full flex-col gap-3 overflow-y-auto pr-1">
       <div className="flex items-center justify-between gap-2 text-[11px] text-faint">
         <span className="flex items-center gap-2">
-          <span className="rounded-full border border-accent px-1.5 text-accent" title={t("activity.privacyHint")}>
+          <span className="rounded-full border border-accent px-1.5 text-accent-text" title={t("activity.privacyHint")}>
             {t("activity.privacy")}
           </span>
           {t("activity.total", { time: secsLabel(data.today.total_secs) })}
         </span>
-        <button type="button" onClick={() => void load()} className="min-h-6 underline decoration-dotted hover:text-muted">
+        <button type="button" onClick={() => void load()} className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
           {t("activity.refresh")}
         </button>
       </div>
@@ -85,7 +85,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
             type="button"
             aria-pressed={period === p}
             onClick={() => setPeriod(p)}
-            className={`min-h-6 px-3 ${period === p ? "bg-edge font-semibold text-accent" : "text-muted hover:text-fg"}`}
+            className={`min-h-[24px] px-3 ${period === p ? "bg-edge font-semibold text-accent-text" : "text-muted hover:text-fg"}`}
           >
             {t(p === "today" ? "activity.today" : "activity.week")}
           </button>

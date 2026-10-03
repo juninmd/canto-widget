@@ -6,7 +6,7 @@ export const tasks = {
   "tasks.emptyPriority": "nenhuma tarefa com essa prioridade",
   "tasks.dragLabel": "arrastar {title} para reordenar",
   "tasks.dragHint": "arraste ou use ↑/↓ para reordenar",
-  "tasks.renameHint": "{title}\n(clique duas vezes para renomear)",
+  "tasks.renameHint": "{title}\n(clique duas vezes ou F2 para renomear)",
   "tasks.delete": "excluir {title}",
   "tasks.remindAt": "lembrar às",
   "tasks.reminderTime": "horário do lembrete de {title}",

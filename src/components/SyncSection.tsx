@@ -102,7 +102,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
           </>
         )}
       </div>
-      {info && <p className="text-[11px] text-accent">{info}</p>}
+      {info && <p className="text-[11px] text-accent-text">{info}</p>}
     </section>
   );
 }

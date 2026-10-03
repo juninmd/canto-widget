@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, errText, type DeviceCode } from "../lib/api";
 import { t } from "../i18n";
 
-const FIELD = "rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent";
+const FIELD = "canto-field px-3 py-2 text-sm";
 const TOKEN_URL = "https://github.com/settings/personal-access-tokens/new";
 
 /** Two doors: personal token always; device flow only when the build ships a GitHub App. */
@@ -66,7 +66,7 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
         <button type="button" onClick={() => void api.openLink(deviceCode.url)} className="min-h-7 rounded-lg bg-edge px-3 text-fg">
           {t("github.openUrl", { url: deviceCode.url.replace("https://", "") })}
         </button>
-        <button type="button" onClick={() => void api.githubDeviceCancel()} className="min-h-6 self-center underline decoration-dotted">
+        <button type="button" onClick={() => void api.githubDeviceCancel()} className="canto-hit min-h-[24px] self-center rounded-md px-1.5 hover:bg-hover active:bg-active">
           {t("github.cancel")}
         </button>
       </div>
@@ -96,7 +96,7 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
         />
         <p className="text-[11px] text-faint">
           {t("github.tokenHint")} <em>Read-only</em>.{" "}
-          <button type="button" onClick={() => void api.openLink(TOKEN_URL)} className="underline decoration-dotted hover:text-muted">
+          <button type="button" onClick={() => void api.openLink(TOKEN_URL)} className="canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
             {t("github.createToken")}
           </button>
         </p>

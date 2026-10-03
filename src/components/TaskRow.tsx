@@ -5,6 +5,7 @@ import TaskSubtasks from "./TaskSubtasks";
 import { GripIcon } from "./Icons";
 import { FocusButton } from "./FocusControls";
 import { ENTER_CLASS, EXIT_CLASS } from "../lib/motion";
+import { PRIORITY_DOT } from "../lib/priority";
 
 type Editing = { id: string; title: string } | null;
 
@@ -74,10 +75,20 @@ export default function TaskRow({
         data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
-        className={`group relative flex items-start gap-2 rounded-lg px-2 py-1 hover:bg-edge/50 ${isNew ? ENTER_CLASS : ""} ${
+        // Renaming also works from the keyboard: F2 on anything inside the row, as in file managers.
+        onKeyDown={(e) => {
+          if (e.key === "F2" && editing?.id !== task.id) {
+            e.preventDefault();
+            onStartEdit();
+          }
+        }}
+        className={`group relative flex items-start gap-3 rounded-xl py-2 pl-7 pr-2.5 hover:bg-hover focus-within:bg-hover ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
         } ${dragging ? "opacity-50" : ""} ${dropTarget ? "ring-1 ring-accent" : ""}`}
       >
+        {task.priority && (
+          <span aria-hidden="true" className={`canto-rail absolute inset-y-2.5 left-0 w-0.5 rounded-full ${PRIORITY_DOT[task.priority]}`} />
+        )}
         {draggable && (
           <button
             type="button"
@@ -94,18 +105,22 @@ export default function TaskRow({
             }}
             aria-label={t("tasks.dragLabel", { title: task.title })}
             title={t("tasks.dragHint")}
-            className="mt-0.5 grid size-4 shrink-0 cursor-grab touch-none place-items-center text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+            className="canto-hit absolute left-0 top-2 grid size-6 cursor-grab touch-none place-items-center text-faint opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
           >
             <GripIcon />
           </button>
         )}
-        <input
-          type="checkbox"
-          checked={task.done}
-          onChange={onToggleDone}
-          onAnimationEnd={onCheckAnimationEnd}
-          className={`mt-0.5 size-4 shrink-0 accent-[var(--color-accent)] ${checking ? "motion-safe:animate-marcar" : ""}`}
-        />
+        {/* The label is the 24 px target (WCAG 2.5.8) around the 20 px circle; the title names the checkbox for screen readers. */}
+        <label className="canto-hit -m-[2px] mt-0 grid size-[24px] shrink-0 cursor-pointer place-items-center">
+          <input
+            type="checkbox"
+            checked={task.done}
+            aria-label={task.title}
+            onChange={onToggleDone}
+            onAnimationEnd={onCheckAnimationEnd}
+            className={`canto-check ${checking ? "motion-safe:animate-marcar" : ""}`}
+          />
+        </label>
         {editing?.id === task.id ? (
           <input
             autoFocus
@@ -121,7 +136,7 @@ export default function TaskRow({
         ) : (
           <span className="flex min-w-0 flex-1 flex-col">
             <span
-              className={`whitespace-pre-wrap break-words text-sm ${task.done ? "text-faint line-through" : "text-fg"}`}
+              className={`whitespace-pre-wrap break-words text-sm leading-snug ${task.done ? "text-faint line-through" : "text-fg"}`}
               title={t("tasks.renameHint", { title: task.title })}
               onDoubleClick={onStartEdit}
             >
@@ -130,17 +145,23 @@ export default function TaskRow({
             <TaskMeta task={task} />
           </span>
         )}
-        <FocusButton task={task} />
-        <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} onPriority={onPriority} />
-        <button
-          type="button"
-          onClick={onDelete}
-          // Also visible on focus: hover-only would leave the keyboard user unable to find it.
-          className="grid size-6 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
-          aria-label={t("tasks.delete", { title: task.title })}
+        {/* Floats over the right edge, so the title keeps the whole line until the pointer or focus arrives. */}
+        <span
+          className={`canto-raised absolute right-1.5 top-1.5 flex items-center rounded-lg bg-raised p-0.5 shadow-[var(--shadow-raised)] focus-within:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100 ${
+            detailsOpen ? "opacity-100" : "opacity-0"
+          }`}
         >
-          ×
-        </button>
+          <FocusButton task={task} />
+          <TaskBadge task={task} open={detailsOpen} onToggle={onToggleDetails} onPriority={onPriority} />
+          <button
+            type="button"
+            onClick={onDelete}
+            className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-danger active:bg-active"
+            aria-label={t("tasks.delete", { title: task.title })}
+          >
+            ×
+          </button>
+        </span>
       </li>
       {detailsOpen && (
         <li className="flex flex-col gap-1">

@@ -3,7 +3,7 @@ import { api, errText } from "../lib/api";
 import { useToast } from "../lib/toast";
 import { t } from "../i18n";
 
-const FIELD = "rounded-lg border border-line bg-ink px-3 py-2 text-sm text-fg outline-none focus:border-accent";
+const FIELD = "canto-field px-3 py-2 text-sm";
 
 /** Collapsed by default: it's a rare action and shouldn't compete for attention with the rest of settings. */
 export default function ChangePassword({ onChanged }: { onChanged: () => void }) {
@@ -58,8 +58,8 @@ export default function ChangePassword({ onChanged }: { onChanged: () => void })
       <input autoFocus type={inputType} aria-label={t("settings.password.current")} placeholder={t("settings.password.current")} value={current} onChange={(e) => setCurrent(e.target.value)} className={FIELD} />
       <input type={inputType} aria-label={t("settings.password.new")} placeholder={t("settings.password.new")} value={next} onChange={(e) => setNext(e.target.value)} className={FIELD} />
       <input type={inputType} aria-label={t("settings.password.confirm")} placeholder={t("settings.password.confirm")} value={confirm} onChange={(e) => setConfirm(e.target.value)} className={FIELD} />
-      <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
-        <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} className="size-4 accent-[var(--color-accent)]" />
+      <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
+        <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} className="canto-box" />
         {t("settings.password.show")}
         <span className="ml-auto text-faint">{t("lock.minLength")}</span>
       </label>

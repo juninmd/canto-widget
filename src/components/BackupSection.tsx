@@ -55,7 +55,7 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
         </button>
       </div>
       <p className="text-[11px] text-faint">{t("settings.backup.auto")}</p>
-      {info && <p className="break-all text-[11px] text-accent">{info}</p>}
+      {info && <p className="break-all text-[11px] text-accent-text">{info}</p>}
     </section>
   );
 }

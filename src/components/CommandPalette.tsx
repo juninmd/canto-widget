@@ -74,7 +74,7 @@ export default function CommandPalette({ commands, onRun, onClose }: Props) {
           setActive(0);
         }}
         placeholder={t("palette.placeholder")}
-        className="rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
+        className="canto-field px-3 py-1.5 text-sm"
       />
       <ul
         ref={list}

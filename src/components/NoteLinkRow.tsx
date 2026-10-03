@@ -27,14 +27,14 @@ export default function NoteLinkRow({ link, tasks, agenda, onLink }: Props) {
         <span className="min-w-0 flex-1 truncate">
           {link.kind === "task" ? "✓" : "📅"} {link.label}
         </span>
-        <button type="button" onClick={() => onLink(null)} className="min-h-6 px-1 hover:text-danger">
+        <button type="button" onClick={() => onLink(null)} className="min-h-[24px] px-1 hover:text-danger">
           {t("notes.unlink")}
         </button>
       </div>
     );
   }
   return (
-    <button type="button" onClick={() => setPicking(true)} className="min-h-6 self-start text-xs text-muted underline decoration-dotted hover:text-fg">
+    <button type="button" onClick={() => setPicking(true)} className="min-h-[24px] self-start text-xs text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
       {t("notes.link")}
     </button>
   );

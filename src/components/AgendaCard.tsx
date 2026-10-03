@@ -21,7 +21,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
   );
 
   return (
-    <li className={`rounded-lg border p-2 ${now ? "border-accent bg-accent/10" : "border-edge bg-ink/60"}`}>
+    <li className={`rounded-xl border p-3 transition-colors ${now ? "border-accent bg-accent/10" : "border-edge bg-ink/60 hover:border-line hover:bg-ink"}`}>
       <button
         type="button"
         onClick={onToggle}
@@ -72,7 +72,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
             </ul>
           )}
           {e.link && (
-            <button type="button" onClick={() => void api.openLink(e.link)} className="min-h-6 underline decoration-dotted hover:text-fg">
+            <button type="button" onClick={() => void api.openLink(e.link)} className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
               {t("agenda.openInCalendar")}
             </button>
           )}

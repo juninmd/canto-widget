@@ -9,7 +9,7 @@ function Keys({ keys }: { keys: string[] }) {
       {keys.map((k, i) => (
         <span key={k} className="flex items-center gap-1" aria-hidden="true">
           {i > 0 && <span className="text-[11px] text-faint">+</span>}
-          <kbd className="inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-b-2 border-line bg-ink px-1.5 font-sans text-[11px] leading-none text-fg">
+          <kbd className="inline-flex h-6 min-w-[24px] items-center justify-center rounded-md border border-b-2 border-line bg-ink px-1.5 font-sans text-[11px] leading-none text-fg">
             {k}
           </kbd>
         </span>

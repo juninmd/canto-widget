@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { ForgeFilter, ForgeSort } from "../lib/api";
 import { kinds, sorts, type Forge } from "../lib/forge";
 import { t } from "../i18n";
+import { SearchIcon } from "./Icons";
 
 type Props = { forge: Forge; filter: ForgeFilter; onApply: (f: ForgeFilter) => void };
 
@@ -20,16 +21,21 @@ export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
         }}
         className="flex gap-1.5"
       >
-        <input
-          type="search"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          maxLength={120}
-          aria-label={t("forge.filterLabel")}
-          placeholder={forge === "github" ? t("forge.filterPlaceholderGithub") : t("forge.filterPlaceholderGitlab")}
-          className="min-w-0 flex-1 rounded-lg border border-edge bg-ink px-2 py-1 text-xs text-fg placeholder:text-faint"
-        />
-        <button type="submit" className="rounded-lg bg-edge px-2.5 text-xs text-fg">
+        <div className="relative min-w-0 flex-1">
+          <span aria-hidden="true" className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-faint">
+            <SearchIcon />
+          </span>
+          <input
+            type="search"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={120}
+            aria-label={t("forge.filterLabel")}
+            placeholder={forge === "github" ? t("forge.filterPlaceholderGithub") : t("forge.filterPlaceholderGitlab")}
+            className="canto-field w-full py-1.5 pl-8 pr-2.5 text-xs"
+          />
+        </div>
+        <button type="submit" className="canto-hit rounded-xl bg-edge px-3 text-xs text-fg hover:bg-active active:bg-active">
           {t("forge.filter")}
         </button>
       </form>
@@ -41,7 +47,7 @@ export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
               type="button"
               aria-pressed={filter.kind === kind}
               onClick={() => apply({ kind })}
-              className={`min-h-6 rounded-full px-2.5 ${filter.kind === kind ? "bg-accent font-semibold text-on-accent" : "bg-edge text-muted hover:text-fg"}`}
+              className={`canto-hit min-h-[24px] rounded-full px-3 ${filter.kind === kind ? "bg-accent font-semibold text-on-accent" : "bg-edge text-muted hover:bg-active hover:text-fg active:bg-active"}`}
             >
               {label}
             </button>
@@ -52,7 +58,7 @@ export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
           <select
             value={filter.sort}
             onChange={(e) => apply({ sort: e.target.value as ForgeSort })}
-            className="min-h-6 rounded-lg border border-edge bg-ink px-1 text-fg"
+            className="canto-field canto-hit min-h-[24px] !rounded-lg px-1.5"
           >
             {sorts(forge).map(({ sort, label }) => (
               <option key={sort} value={sort}>
@@ -66,7 +72,7 @@ export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
           onClick={() => apply({ order: filter.order === "desc" ? "asc" : "desc" })}
           aria-label={filter.order === "desc" ? t("forge.orderDescLabel") : t("forge.orderAscLabel")}
           title={filter.order === "desc" ? t("forge.orderDescTitle") : t("forge.orderAscTitle")}
-          className="grid min-h-6 min-w-6 place-items-center rounded-lg bg-edge text-muted hover:text-fg"
+          className="canto-hit grid min-h-[24px] min-w-[24px] place-items-center rounded-lg bg-edge text-muted hover:bg-active hover:text-fg active:bg-active"
         >
           {filter.order === "desc" ? "↓" : "↑"}
         </button>

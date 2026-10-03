@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { t } from "../i18n";
 
 export type Tab =
@@ -26,6 +26,11 @@ type Props = { current: Tab; onChange: (t: Tab) => void; tabs?: typeof TABS };
 export default function TabBar({ current, onChange, tabs = TABS }: Props) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
 
+  // Ten tabs never fit: the one in use scrolls into view instead of hiding past the edge.
+  useEffect(() => {
+    refs.current[current]?.scrollIntoView?.({ block: "nearest", inline: "nearest" });
+  }, [current]);
+
   function onKeyDown(e: React.KeyboardEvent) {
     const i = tabs.findIndex((tab) => tab.id === current);
     const target = {
@@ -46,7 +51,8 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
       role="tablist"
       aria-label={t("tabs.label")}
       onKeyDown={onKeyDown}
-      className="flex shrink-0 gap-0.5 overflow-x-auto px-3 pt-2 text-xs"
+      // The faded edges say there is more to scroll to; the scrollbar stays out of the way.
+      className="flex shrink-0 gap-0.5 overflow-x-auto px-3 pb-1 pt-1.5 text-xs [mask-image:linear-gradient(to_right,transparent,black_0.75rem,black_calc(100%-1.75rem),transparent)] [scrollbar-width:none]"
     >
       {tabs.map((tab, i) => (
         <button
@@ -63,8 +69,10 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
           tabIndex={current === tab.id ? 0 : -1}
           onClick={() => onChange(tab.id)}
           title={`Alt+${i + 1}`}
-          className={`min-h-7 shrink-0 rounded-lg px-1.5 ${
-            current === tab.id ? "bg-edge font-semibold text-fg" : "text-muted hover:text-fg"
+          className={`relative canto-hit min-h-8 shrink-0 rounded-lg px-2 transition-colors active:bg-active after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:transition-[background-color] ${
+            current === tab.id
+              ? "font-semibold text-fg after:bg-accent"
+              : "text-muted after:bg-transparent hover:bg-hover hover:text-fg"
           }`}
         >
           {tab.label}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, UPDATE_PROGRESS_EVENT, type UpdateInfo, type UpdateProgress } from "../lib/api";
 import { t } from "../i18n";
+import { plainNotes } from "../lib/releaseNotes";
 
 const brDate = (iso: string) => iso.split("-").reverse().join("/");
 
@@ -75,7 +76,7 @@ export default function UpdateSection() {
       {info && !info.available && !error && <p className="text-[11px] text-faint">{t("update.upToDate")}</p>}
       {info?.available && (
         <div className="flex flex-col gap-2 rounded-lg border border-accent/60 p-2">
-          {info.notes && <p className="line-clamp-4 whitespace-pre-line text-[11px] text-muted">{info.notes}</p>}
+          {info.notes && <p className="line-clamp-8 whitespace-pre-line text-[11px] text-muted">{plainNotes(info.notes)}</p>}
           <button
             type="button"
             onClick={() => void install()}

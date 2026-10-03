@@ -23,11 +23,11 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
   const kind = clipKind(i.preview);
   const codeLines = i.preview.replace(/\s+$/, "").split("\n");
   const copyTitle = i.truncated ? t("clipboard.copyTruncatedTitle", { size: sizeLabel(i.kept) }) : t("clipboard.copyAgainTitle");
-  const actionBtn = "grid size-6 place-items-center rounded hover:text-fg";
+  const actionBtn = "canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active";
   const mask = privacy ? "blur-sm select-none" : "";
 
   return (
-    <li className={`group rounded-lg border bg-ink/60 p-2 ${i.pinned ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
+    <li className={`group rounded-xl border bg-ink/60 p-2.5 transition-colors hover:bg-ink ${i.pinned ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
       <button type="button" className="w-full text-left" title={copyTitle} onClick={onCopy}>
         {kind === "color" ? (
           <span className="flex items-center gap-2">
@@ -40,7 +40,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
             {codeLines.length > CODE_LINES && <span className="block text-faint">…</span>}
           </pre>
         ) : (
-          <p className={`line-clamp-3 whitespace-pre-wrap text-xs ${mask} ${kind === "link" ? "break-all text-accent" : "break-words text-fg"}`}>
+          <p className={`line-clamp-3 whitespace-pre-wrap text-xs ${mask} ${kind === "link" ? "break-all text-accent-text" : "break-words text-fg"}`}>
             {i.preview}
           </p>
         )}
@@ -54,7 +54,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
       <div className="mt-1 flex items-center gap-2 text-[11px] text-faint">
         <span className="rounded bg-edge px-1.5 text-muted">{KIND_LABEL[kind]}</span>
         {copied ? (
-          <span role="status" className="font-medium text-accent">
+          <span role="status" className="font-medium text-accent-text">
             {t("clipboard.copied")}
           </span>
         ) : (
@@ -68,7 +68,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
             aria-pressed={i.pinned}
             aria-label={i.pinned ? t("clipboard.unpinLabel") : t("clipboard.pinLabel")}
             title={i.pinned ? t("clipboard.unpinTitle") : t("clipboard.pinTitle")}
-            className={`${actionBtn} ${i.pinned ? "text-accent" : ""}`}
+            className={`${actionBtn} ${i.pinned ? "text-accent-text" : ""}`}
           >
             <PinIcon filled={i.pinned} />
           </button>

@@ -8,7 +8,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "tasks.emptyPriority": "no tasks with this priority",
   "tasks.dragLabel": "drag {title} to reorder",
   "tasks.dragHint": "drag or use ↑/↓ to reorder",
-  "tasks.renameHint": "{title}\n(double-click to rename)",
+  "tasks.renameHint": "{title}\n(double-click or F2 to rename)",
   "tasks.delete": "delete {title}",
   "tasks.remindAt": "remind at",
   "tasks.reminderTime": "reminder time for {title}",

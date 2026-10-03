@@ -30,7 +30,7 @@ function inline(tokens: Token[] | undefined, query: string, key: string): ReactN
       case "codespan":
         return <code key={k} className="rounded bg-edge px-0.5 font-mono">{highlight((tok as Tokens.Codespan).text, query)}</code>;
       case "link":
-        return <span key={k} className="text-accent underline decoration-dotted">{inline((tok as Tokens.Link).tokens, query, k)}</span>;
+        return <span key={k} className="text-accent-text underline decoration-dotted">{inline((tok as Tokens.Link).tokens, query, k)}</span>;
       case "image":
         return null;
       case "br":

@@ -7,6 +7,8 @@ import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { clipKind, KIND_LABEL, type ClipKind } from "../lib/clip";
 import { t } from "../i18n";
 import ClipCard from "./ClipCard";
+import EmptyState from "./EmptyState";
+import { ClipboardIcon, SearchIcon } from "./Icons";
 
 const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
 
@@ -88,19 +90,24 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
         {t("clipboard.historyNote")} <span className="text-muted">{t("clipboard.historyNoteEmphasis")}</span>.
       </p>
       <div className="flex gap-2">
-        <input
-          value={query}
-          data-shortcut="search"
-          aria-label={t("clipboard.searchLabel")}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("clipboard.searchPlaceholder")}
-          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
-        />
+        <div className="relative flex-1">
+          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+            <SearchIcon />
+          </span>
+          <input
+            value={query}
+            data-shortcut="search"
+            aria-label={t("clipboard.searchLabel")}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("clipboard.searchPlaceholder")}
+            className="canto-field w-full py-2 pl-9 pr-3 text-sm"
+          />
+        </div>
         <button
           type="button"
           onClick={() => run(async () => undoable(await api.clipClear(), t("clipboard.cleared")))}
           title={t("clipboard.clearTitle")}
-          className="rounded-lg bg-edge px-3 text-xs text-fg"
+          className="canto-hit rounded-xl bg-edge px-3 text-xs text-fg hover:bg-active active:bg-active"
         >
           {t("clipboard.clear")}
         </button>
@@ -110,7 +117,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
           value={kindFilter}
           onChange={(e) => setKindFilter(e.target.value as ClipKind | "all")}
           aria-label={t("clipboard.kindFilterLabel")}
-          className="rounded-lg border border-line bg-ink px-2 py-1 text-fg outline-none focus:border-accent"
+          className="canto-field px-2 py-1"
         >
           {KIND_OPTIONS.map((k) => (
             <option key={k} value={k}>
@@ -132,7 +139,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
               void reload();
             }}
             aria-label={t("clipboard.maxPinnedLabel")}
-            className="w-14 rounded border border-line bg-ink px-1.5 py-0.5 text-fg outline-none focus:border-accent"
+            className="canto-field w-14 !rounded-md px-1.5 py-0.5"
           />
         </label>
       </div>
@@ -166,9 +173,9 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
           />
         ))}
         {visible.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">
+          <EmptyState icon={query || kindFilter !== "all" ? <SearchIcon /> : <ClipboardIcon />}>
             {query || kindFilter !== "all" ? t("clipboard.emptySearch") : t("clipboard.empty")}
-          </li>
+          </EmptyState>
         )}
       </ul>
     </div>

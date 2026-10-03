@@ -6,6 +6,8 @@ import { useLatestRequest } from "../lib/useLatestRequest";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { t } from "../i18n";
 import NoteCard from "./NoteCard";
+import EmptyState from "./EmptyState";
+import { NoteIcon, PlusIcon, SearchIcon } from "./Icons";
 import { useNoteDraft, type NoteDraft } from "../lib/useNoteDraft";
 import type { Draft } from "./NoteEditor";
 
@@ -134,23 +136,28 @@ ${lim}`);
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex gap-2">
-        <input
-          type="search"
-          value={query}
-          data-shortcut="search"
-          aria-label={t("notes.searchLabel")}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder={t("notes.searchPlaceholder")}
-          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
-        />
+        <div className="relative flex-1">
+          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+            <SearchIcon />
+          </span>
+          <input
+            type="search"
+            value={query}
+            data-shortcut="search"
+            aria-label={t("notes.searchLabel")}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("notes.searchPlaceholder")}
+            className="canto-field w-full py-2 pl-9 pr-3 text-sm"
+          />
+        </div>
         <button
           type="button"
           onClick={() => open()}
           aria-label={t("notes.newLabel")}
           data-shortcut="new"
-          className="rounded-lg bg-edge px-3 text-sm text-fg"
+          className="grid w-10 place-items-center rounded-xl bg-accent text-on-accent shadow-[var(--shadow-raised)] hover:brightness-110"
         >
-          +
+          <PlusIcon />
         </button>
       </div>
 
@@ -181,16 +188,14 @@ ${lim}`);
                 setLimit(limit + PAGE);
                 void reload(query, limit + PAGE);
               }}
-              className="w-full rounded-lg bg-edge px-3 py-1.5 text-xs text-muted hover:text-fg"
+              className="canto-hit w-full rounded-xl bg-edge px-3 py-1.5 text-xs text-muted hover:bg-active hover:text-fg active:bg-active"
             >
               {t("notes.showMore", { n: total - notes.length })}
             </button>
           </li>
         )}
         {notes.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">
-            {query ? t("notes.emptySearch") : t("notes.empty")}
-          </li>
+          <EmptyState icon={query ? <SearchIcon /> : <NoteIcon />}>{query ? t("notes.emptySearch") : t("notes.empty")}</EmptyState>
         )}
       </ul>
     </div>

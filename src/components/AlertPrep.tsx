@@ -38,7 +38,7 @@ export default function AlertPrep({ event, onOpenNotes }: { event: AgendaItem; o
         </button>
       ))}
       {made ? (
-        <button type="button" onClick={onOpenNotes} className={`${LINK} text-accent`}>
+        <button type="button" onClick={onOpenNotes} className={`${LINK} text-accent-text`}>
           ✓ {t("alert.prep.created", { title: made.title })}
         </button>
       ) : (

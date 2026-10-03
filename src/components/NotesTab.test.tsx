@@ -36,7 +36,7 @@ async function openEditor() {
     await new Promise((ready) => setTimeout(ready, 250));
   });
   await act(async () => {
-    fireEvent.click(screen.getByText("+"));
+    fireEvent.click(screen.getByRole("button", { name: "novo card" }));
   });
   return screen.getByPlaceholderText("título");
 }
@@ -83,7 +83,7 @@ test("Esc cancels the editor and discards the draft", async () => {
   expect(calls.some((c) => c.cmd === "note_save")).toBe(false);
   // Back to the list, and reopening the editor brings a clean field.
   await act(async () => {
-    fireEvent.click(screen.getByText("+"));
+    fireEvent.click(screen.getByRole("button", { name: "novo card" }));
   });
   expect((screen.getByPlaceholderText("título") as HTMLInputElement).value).toBe("");
 });

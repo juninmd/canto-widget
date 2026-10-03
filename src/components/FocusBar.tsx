@@ -42,16 +42,16 @@ export default function FocusBar({ onDone, onError }: { onDone: () => void; onEr
         </div>
       )}
       <div className="flex items-center gap-2 px-3 py-1.5 text-xs">
-        <span className="shrink-0 rounded-full border border-accent px-1.5 text-[10px] text-accent">{t("focus.badge")}</span>
+        <span className="shrink-0 rounded-full border border-accent px-1.5 text-[10px] text-accent-text">{t("focus.badge")}</span>
         <span className="min-w-0 flex-1 truncate text-fg">{run.title}</span>
-        <span className={`shrink-0 font-mono tabular-nums ${over ? "text-danger" : "text-accent"}`} role="timer">
+        <span className={`shrink-0 font-mono tabular-nums ${over ? "text-danger" : "text-accent-text"}`} role="timer">
           {clock(secs)}
           {run.estimateMin ? ` / ${run.estimateMin} min` : ""}
         </span>
-        <button type="button" onClick={() => void focusStore.stop()} className="min-h-6 shrink-0 rounded border border-line px-2 hover:text-fg">
+        <button type="button" onClick={() => void focusStore.stop()} className="min-h-[24px] shrink-0 rounded border border-line px-2 hover:text-fg">
           {t("focus.pauseButton")}
         </button>
-        <button type="button" onClick={() => void finish()} className="min-h-6 shrink-0 rounded border border-line px-2 hover:text-fg">
+        <button type="button" onClick={() => void finish()} className="min-h-[24px] shrink-0 rounded border border-line px-2 hover:text-fg">
           {t("focus.doneButton")}
         </button>
       </div>

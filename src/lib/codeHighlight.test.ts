@@ -7,7 +7,7 @@ function spans(code: string, lang: string) {
 
 test("keywords, strings, numbers and comments each get their own color", () => {
   const out = spans('const n = 42; // total\nlet s = "oi";', "ts");
-  expect(out).toContainEqual({ text: "const", cls: "font-semibold text-accent" });
+  expect(out).toContainEqual({ text: "const", cls: "font-semibold text-accent-text" });
   expect(out).toContainEqual({ text: "42", cls: "text-danger" });
   expect(out).toContainEqual({ text: "// total", cls: "text-faint italic" });
   expect(out).toContainEqual({ text: '"oi"', cls: "text-danger" });

@@ -40,7 +40,7 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
               checked={s.done}
               aria-label={s.title}
               onChange={() => void run(() => api.subtaskToggle(taskId, s.id))}
-              className="size-3.5 shrink-0 accent-[var(--color-accent)]"
+              className="canto-box"
             />
             <span className={`flex-1 truncate ${s.done ? "text-faint line-through" : "text-fg"}`}>{s.title}</span>
             <button
@@ -60,7 +60,7 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t("tasks.subtaskNew")}
           aria-label={t("tasks.subtaskNew")}
-          className="flex-1 rounded border border-line bg-ink px-1.5 py-0.5 text-fg outline-none focus:border-accent"
+          className="flex-1 canto-field !rounded-md px-1.5 py-0.5"
         />
         <button type="submit" aria-label={t("tasks.subtaskAdd")} className="rounded bg-edge px-2 text-fg">
           +

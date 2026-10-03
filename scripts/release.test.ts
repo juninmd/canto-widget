@@ -108,11 +108,68 @@ test("refuses to reuse a semantic version whose tag points to another commit", (
     .toThrow("outro commit");
 });
 
-test("uses the merged pull request title for Portuguese release notes", () => {
-  const notes = releaseNotes("Merge pull request #24 from feature\n\nfeat: aba Status [API]", {
-    sha: a, tag: "v0.4.0", version: "0.4.0", previousTag: "v0.3.1",
-  }, "juninmd/canto-widget");
-  expect(notes).toContain("feat: aba Status \\[API\\]");
+const repo = "juninmd/canto-widget";
+const candidate = { sha: a, tag: "v0.4.0", version: "0.4.0", previousTag: "v0.3.1" };
+
+test("a merged pull request title becomes a release note under the right heading, without the merge line", () => {
+  const notes = releaseNotes("Merge pull request #24 from feature\n\nfeat: aba Status [API]", candidate, repo);
+  expect(notes.startsWith("✨ 1 novidade\n")).toBe(true);
+  expect(notes).toContain("## ✨ Novidades");
+  expect(notes).toContain("Aba Status \\[API\\] ([#24](https://github.com/juninmd/canto-widget/pull/24))");
   expect(notes).toContain("/compare/v0.3.1...v0.4.0");
   expect(notes).not.toContain("Merge pull request");
+});
+
+test("the notes group the commits of a merged pull request by type and leave out docs, tests and chores", () => {
+  const details = [
+    { sha: b, subject: "feat(alert): snooze for 1, 5 or 10 minutes" },
+    { sha: c, subject: "fix(agenda): keep ringing while locked" },
+    { sha: d, subject: "docs: update README" },
+    { sha: a, subject: "test: cover the snooze" },
+    { sha: b, subject: "feat(alert): snooze for 1, 5 or 10 minutes" },
+    { sha: c, subject: "perf: batch the vault writes" },
+  ];
+  const notes = releaseNotes("Merge pull request #7 from x\n\nfeat: alerts that wait", candidate, repo, details);
+  expect(notes.split("\n")[0]).toBe("✨ 1 novidade · 🐛 1 correção · ⚡ 1 ganho de desempenho");
+  expect(notes).toContain("> Alerts that wait ([#7](https://github.com/juninmd/canto-widget/pull/7))");
+  expect(notes.indexOf("## ✨ Novidades")).toBeLessThan(notes.indexOf("## 🐛 Correções"));
+  expect(notes.indexOf("## 🐛 Correções")).toBeLessThan(notes.indexOf("## ⚡ Desempenho"));
+  expect(notes).toContain(`- **alert** · Snooze for 1, 5 or 10 minutes ([\`${b.slice(0, 7)}\`](https://github.com/juninmd/canto-widget/commit/${b}))`);
+  expect(notes).not.toContain("README");
+  expect(notes).not.toContain("cover the snooze");
+  expect(notes.match(/Snooze for 1, 5 or 10 minutes/g)).toHaveLength(1);
+});
+
+test("a squash commit lists its parts from the bullets in the body", () => {
+  const message = "feat: alerts that wait (#9)\n\n* feat(alert): snooze menu\n\nbody text\n\n* fix: ring twice\n\nCo-authored-by: A <a@x>";
+  const notes = releaseNotes(message, candidate, repo);
+  expect(notes).toContain("✨ 1 novidade · 🐛 1 correção");
+  expect(notes).toContain("**alert** · Snooze menu ([#9](https://github.com/juninmd/canto-widget/pull/9))");
+  expect(notes).toContain("Ring twice");
+});
+
+test("a breaking change gets its own warning heading first", () => {
+  const notes = releaseNotes("feat(api)!: replace the vault format", candidate, repo);
+  expect(notes.split("\n")[0]).toBe("⚠️ 1 mudança incompatível");
+  expect(notes.indexOf("## ⚠️ Mudanças incompatíveis")).toBeLessThan(notes.indexOf("## ⬇️ Baixar"));
+});
+
+test("a title that is not a Conventional Commit still produces a note, with Markdown escaped", () => {
+  const notes = releaseNotes("Atualiza *tudo* <b>agora</b>", candidate, repo);
+  expect(notes).toContain("Atualiza \\*tudo\\* \\<b\\>agora\\</b\\>");
+});
+
+test("the download table points at files that the release workflow really publishes", () => {
+  const version = "0.4.0";
+  const published = new Set(assets(version));
+  const notes = releaseNotes("fix: x", candidate, repo);
+  const links = [...notes.matchAll(/releases\/download\/v0\.4\.0\/([^)]+)\)/g)].map((m) => m[1]);
+  expect(links).toHaveLength(7);
+  for (const name of links.filter((n) => !n.endsWith(".dmg"))) expect(published.has(name), name).toBe(true);
+  expect(links.filter((n) => n.endsWith(".dmg"))).toEqual([`Canto_${version}_aarch64.dmg`, `Canto_${version}_x64.dmg`]);
+});
+
+test("the notes are the same every time, because the updater manifest must match the release body", () => {
+  const message = "feat: alerts (#3)\n\n* fix: one\n* feat: two";
+  expect(releaseNotes(message, candidate, repo)).toBe(releaseNotes(message, candidate, repo));
 });

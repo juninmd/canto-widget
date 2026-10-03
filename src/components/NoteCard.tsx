@@ -21,9 +21,9 @@ type Props = {
 
 export default function NoteCard({ note: n, className, query, privacy, onOpen, onPin, onDelete, onTag, onOpenLink, onExport }: Props) {
   const mask = privacy ? "blur-sm select-none" : "";
-  const actionBtn = "grid size-6 shrink-0 place-items-center rounded focus-visible:opacity-100 group-hover:opacity-100";
+  const actionBtn = "canto-hit grid size-6 shrink-0 place-items-center rounded-md hover:bg-hover active:bg-active focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100";
   return (
-    <li className={`group rounded-lg border bg-ink/60 p-2 ${n.fixada ? "border-accent/60" : "border-edge"} ${className}`}>
+    <li className={`group rounded-xl border bg-ink/60 p-3 transition-colors hover:bg-ink ${n.fixada ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
       <div className="flex items-start justify-between gap-2">
         <button type="button" className="min-w-0 flex-1 text-left" onClick={onOpen}>
           <p className={`truncate text-sm font-medium text-fg ${mask}`}>{highlight(n.title, query)}</p>
@@ -37,7 +37,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
           aria-label={n.fixada ? t("notes.unpinLabel", { title: n.title }) : t("notes.pinLabel", { title: n.title })}
           title={n.fixada ? t("notes.unpinTitle") : t("notes.pinTitle")}
           // Pinned always stays visible: the pin is the sign for why the card is on top.
-          className={`${actionBtn} ${n.fixada ? "text-accent" : "text-faint opacity-0 hover:text-fg"}`}
+          className={`${actionBtn} ${n.fixada ? "text-accent-text" : "text-faint opacity-0 hover:text-fg"}`}
         >
           <PinIcon filled={!!n.fixada} />
         </button>
@@ -60,7 +60,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
               type="button"
               onClick={() => onOpenLink(n.link!.kind)}
               title={n.link.kind === "task" ? t("notes.goToTasks") : t("notes.goToAgenda")}
-              className="min-h-6 max-w-full truncate rounded bg-edge px-1.5 text-[11px] text-muted hover:text-fg"
+              className="canto-hit min-h-[24px] max-w-full truncate rounded-md bg-edge px-1.5 text-[11px] text-muted hover:bg-active hover:text-fg"
             >
               {n.link.kind === "task" ? "✓" : "📅"} {n.link.label}
             </button>
@@ -71,7 +71,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
               type="button"
               onClick={() => onTag(tag)}
               title={t("notes.filterByTag", { tag })}
-              className="min-h-6 rounded bg-edge px-1.5 text-[11px] text-muted hover:text-fg"
+              className="canto-hit min-h-[24px] rounded-md bg-edge px-1.5 text-[11px] text-muted hover:bg-active hover:text-fg"
             >
               #{tag}
             </button>

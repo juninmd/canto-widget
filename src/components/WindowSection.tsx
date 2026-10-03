@@ -35,12 +35,12 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
   return (
     <section className="flex flex-col gap-2">
       <h3 className="text-xs font-semibold text-fg">{t("settings.window.title")}</h3>
-      <label className="flex min-h-6 items-center gap-2 text-xs text-muted">
+      <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
         <input
           type="checkbox"
           checked={onTop}
           onChange={(e) => void act(() => api.windowSetAlwaysOnTop(e.target.checked))}
-          className="size-4 accent-[var(--color-accent)]"
+          className="canto-box"
         />
         {t("settings.window.alwaysOnTop")}
       </label>

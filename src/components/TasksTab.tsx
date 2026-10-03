@@ -10,6 +10,8 @@ import { useLatestRequest } from "../lib/useLatestRequest";
 import { useNewIds, useExit } from "../lib/motion";
 import { mergeOrder, useReorder } from "../lib/useReorder";
 import { focusStore } from "../lib/focus";
+import EmptyState from "./EmptyState";
+import { ChecklistIcon, PlusIcon } from "./Icons";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -118,15 +120,24 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   return (
     <div className="flex h-full flex-col gap-2">
       <form onSubmit={add} className="flex gap-2">
-        <input
-          value={title}
-          data-shortcut="new"
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder={t("tasks.addPlaceholder")}
-          className="flex-1 rounded-lg border border-line bg-ink px-3 py-1.5 text-sm text-fg outline-none focus:border-accent"
-        />
-        <button type="submit" aria-label={t("tasks.add")} className="rounded-lg bg-edge px-3 text-sm text-fg">
-          +
+        <div className="relative flex-1">
+          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+            <PlusIcon />
+          </span>
+          <input
+            value={title}
+            data-shortcut="new"
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder={t("tasks.addPlaceholder")}
+            className="canto-field w-full py-2 pl-9 pr-3 text-sm"
+          />
+        </div>
+        <button
+          type="submit"
+          aria-label={t("tasks.add")}
+          className="grid w-10 place-items-center rounded-xl bg-accent text-on-accent shadow-[var(--shadow-raised)] hover:brightness-110"
+        >
+          <PlusIcon />
         </button>
       </form>
 
@@ -139,7 +150,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         onCarryOver={() => void run(() => api.carryOver(today))}
       />
 
-      <ul className={`flex-1 space-y-1 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
+      <ul className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
         {visible.map((task) => (
           <TaskRow
             key={task.id}
@@ -189,10 +200,10 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           />
         ))}
         {tasks.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">{t("tasks.empty")}</li>
+          <EmptyState icon={<ChecklistIcon />}>{t("tasks.empty")}</EmptyState>
         )}
         {tasks.length > 0 && visible.length === 0 && (
-          <li className="px-2 py-6 text-center text-xs text-faint">{t("tasks.emptyPriority")}</li>
+          <EmptyState icon={<ChecklistIcon />}>{t("tasks.emptyPriority")}</EmptyState>
         )}
       </ul>
     </div>

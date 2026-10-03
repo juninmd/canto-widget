@@ -10,6 +10,8 @@ import {
 } from "./release-manifest";
 
 export { createReleaseManifest, hasRequiredAssets, verifyReleaseManifest } from "./release-manifest";
+export { releaseNotes, type Detail } from "./release-notes";
+import { releaseNotes, type Detail } from "./release-notes";
 
 export type Candidate = { sha: string; tag: string; version: string; previousTag: string };
 export type Commit = { sha: string; message: string };
@@ -69,16 +71,6 @@ export function planReleases(
   return candidates;
 }
 
-export function releaseNotes(message: string, candidate: Candidate, repository: string): string {
-  if (!/^[\w.-]+\/[\w.-]+$/.test(repository)) throw new Error("Repositório inválido");
-  const title = commitTitle(message);
-  if (!title) throw new Error("Commit sem título");
-  const markdownSpecials = new Set("\\`*_{}[]()<>#+.!|");
-  const safeTitle = Array.from(title.slice(0, 240), (char) => (markdownSpecials.has(char) ? `\\${char}` : char)).join("");
-  const root = `https://github.com/${repository}`;
-  return `## Alterações\n\n- ${safeTitle} ([${candidate.sha.slice(0, 7)}](${root}/commit/${candidate.sha}))\n\n[Comparar com ${candidate.previousTag}](${root}/compare/${candidate.previousTag}...${candidate.tag})\n`;
-}
-
 function run(command: string, args: string[]): string {
   return execFileSync(command, args, { encoding: "utf8" }).trim();
 }
@@ -126,11 +118,22 @@ function plan(): void {
   console.log(JSON.stringify(pending));
 }
 
+/** A merged pull request brings its own commits: they make a richer list than the merge commit's title. */
+function mergedCommits(sha: string): Detail[] {
+  const parents = run("git", ["rev-list", "--parents", "-n", "1", sha]).split(" ").slice(1);
+  if (parents.length !== 2) return [];
+  const rows = run("git", ["log", "--reverse", "--format=%H%x09%s", "--max-count=60", `${parents[0]}..${parents[1]}`]);
+  return (rows ? rows.split("\n") : []).map((row) => {
+    const [commit, ...subject] = row.split("\t");
+    return { sha: commit, subject: subject.join("\t") };
+  });
+}
+
 function notes(): void {
   const [tag, sha, previousTag, path] = process.argv.slice(3);
   if (!tag || !sha || !previousTag || !path || !/^v\d+\.\d+\.\d+$/.test(tag)) throw new Error("Argumentos inválidos");
   const repository = process.env.GITHUB_REPOSITORY ?? run("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
-  writeFileSync(path, releaseNotes(run("git", ["log", "-1", "--format=%B", sha]), { sha, tag, version: tag.slice(1), previousTag }, repository));
+  writeFileSync(path, releaseNotes(run("git", ["log", "-1", "--format=%B", sha]), { sha, tag, version: tag.slice(1), previousTag }, repository, mergedCommits(sha)));
 }
 
 function manifest(): void {

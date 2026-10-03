@@ -3,8 +3,9 @@ import type { Task } from "../lib/api";
 import { focusStore, isOver, minutesOf } from "../lib/focus";
 import { useRunning, useTick } from "../lib/useFocus";
 import { PauseIcon, PlayIcon } from "./Icons";
+import { CHIP } from "./chip";
 
-/** Start or pause the timer on a row; the row (`relative`, `group`) reveals it on hover or focus. */
+/** Start or pause the timer on a row; the row's action bar reveals it on hover or focus. */
 export function FocusButton({ task }: { task: Task }) {
   const mine = useRunning()?.id === task.id;
   if (task.done && !mine) return null;
@@ -20,10 +21,7 @@ export function FocusButton({ task }: { task: Task }) {
       aria-label={label}
       aria-pressed={mine}
       title={label}
-      // Floats over the row's right edge instead of taking a slot: at the minimum width a fifth button costs the title 30px.
-      className={`absolute right-[6.75rem] top-1 grid size-6 place-items-center rounded bg-panel opacity-0 hover:text-fg focus-visible:opacity-100 group-hover:opacity-100 ${
-        mine ? "text-accent" : "text-faint"
-      }`}
+      className={`canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active ${mine ? "text-accent-text" : "text-faint"}`}
     >
       {mine ? <PauseIcon /> : <PlayIcon />}
     </button>
@@ -41,7 +39,7 @@ export function FocusBadge({ task }: { task: Task }) {
   const spent = minutesOf(secs);
   return (
     <span
-      className={`shrink-0 text-[11px] ${over ? "text-danger" : mine ? "text-accent" : "text-muted"}`}
+      className={`${CHIP} tabular-nums ${over ? "!text-danger" : mine ? "!text-accent-text" : ""}`}
       title={over ? t("focus.over") : undefined}
     >
       {est ? t("focus.tracked", { spent, est }) : t("focus.trackedOnly", { spent })}

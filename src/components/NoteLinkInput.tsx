@@ -55,15 +55,15 @@ export default function NoteLinkInput({ editor, onClose }: { editor: Editor; onC
             onClose();
           }
         }}
-        className="min-w-0 flex-1 rounded border border-line bg-ink px-2 py-1 text-fg outline-none focus:border-accent"
+        className="min-w-0 flex-1 canto-field !rounded-md px-2 py-1"
       />
-      <button type="button" onClick={apply} className="min-h-6 rounded bg-edge px-2 text-fg">
+      <button type="button" onClick={apply} className="min-h-[24px] rounded bg-edge px-2 text-fg">
         {t("notes.linkApply")}
       </button>
       {current && (
         <>
           {isHttpUrl(current) && (
-            <button type="button" onClick={() => void api.openLink(current)} className="min-h-6 px-1 text-muted underline decoration-dotted hover:text-fg">
+            <button type="button" onClick={() => void api.openLink(current)} className="min-h-[24px] px-1 text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
               {t("notes.linkOpen")}
             </button>
           )}
@@ -73,7 +73,7 @@ export default function NoteLinkInput({ editor, onClose }: { editor: Editor; onC
               editor.chain().focus().extendMarkRange("link").unsetLink().run();
               onClose();
             }}
-            className="min-h-6 px-1 text-muted hover:text-danger"
+            className="min-h-[24px] px-1 text-muted hover:text-danger"
           >
             {t("notes.linkRemove")}
           </button>
