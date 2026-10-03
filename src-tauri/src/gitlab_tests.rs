@@ -130,3 +130,32 @@ fn merged_activity_drops_old_mrs_that_were_only_updated_in_the_window() {
     let (list, _) = mrs_since(&account(base), Activity::Merged, &Window::since("2026-09-18T03:00:00+00:00")).unwrap();
     assert_eq!((list.total, list.items.iter().map(|i| i.number).collect::<Vec<_>>()), (1, vec![1]));
 }
+
+#[test]
+fn only_mention_todos_on_the_configured_instance_become_mentions() {
+    let raw: Vec<RawTodo> = serde_json::from_str(
+        r#"[
+        {"id":1,"action_name":"mentioned","target_url":"https://git.example.com/a/b/-/issues/3","body":"@voce veja",
+         "author":{"username":"ana"},"target":{"title":"Falha no deploy"},"project":{"path_with_namespace":"a/b"}},
+        {"id":2,"action_name":"assigned","target_url":"https://git.example.com/a/b/-/issues/4","body":"x"},
+        {"id":3,"action_name":"directly_addressed","target_url":"https://git.example.com/a/b/-/merge_requests/5","body":"@voce ok?"},
+        {"id":4,"action_name":"mentioned","target_url":"https://evil.example.org/a/b/-/issues/6","body":"x"},
+        {"id":5,"action_name":"build_failed","target_url":"https://git.example.com/a/b/-/pipelines/9","body":"x"}
+    ]"#,
+    )
+    .unwrap();
+    let found = mentions_in(raw, "https://git.example.com");
+    assert_eq!(found.iter().map(|m| m.id).collect::<Vec<_>>(), [1, 3]);
+    assert_eq!(
+        found[0],
+        Mention {
+            id: 1,
+            title: "Falha no deploy".into(),
+            url: "https://git.example.com/a/b/-/issues/3".into(),
+            author: "ana".into(),
+            body: "@voce veja".into(),
+            project: "a/b".into(),
+        }
+    );
+    assert!(found[1].author.is_empty() && found[1].title.is_empty(), "missing fields default to empty");
+}

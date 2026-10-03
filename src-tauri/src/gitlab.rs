@@ -103,6 +103,74 @@ pub fn mr_checks(acc: &Account, project: &str, iid: u64) -> Result<ChecksStatus>
     Ok(checks_from_gitlab(detail.head_pipeline.as_ref().map(|p| p.status.as_str())))
 }
 
+/// A to-do GitLab raised because someone mentioned the user.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Mention {
+    pub id: u64,
+    pub title: String,
+    pub url: String,
+    pub author: String,
+    pub body: String,
+    /// `group/project`, for the alert's heading.
+    pub project: String,
+}
+
+#[derive(Deserialize)]
+struct RawTodo {
+    id: u64,
+    #[serde(default)]
+    action_name: String,
+    #[serde(default)]
+    target_url: String,
+    #[serde(default)]
+    body: String,
+    #[serde(default)]
+    author: Option<User>,
+    #[serde(default)]
+    target: Option<TodoTarget>,
+    #[serde(default)]
+    project: Option<TodoProject>,
+}
+
+#[derive(Deserialize)]
+struct TodoTarget {
+    #[serde(default)]
+    title: String,
+}
+
+#[derive(Deserialize)]
+struct TodoProject {
+    #[serde(default)]
+    path_with_namespace: String,
+}
+
+/// "Mentioned" and "directly addressed" are the to-dos GitLab creates for an @-mention. Pending ones only, newest
+/// first; a link outside the configured instance is dropped like in the lists.
+pub fn mentions(acc: &Account) -> Result<Vec<Mention>> {
+    let url = url::Url::parse_with_params(
+        &format!("{}/api/v4/todos", acc.base),
+        [("state", "pending"), ("per_page", "50"), ("page", "1")],
+    )
+    .map_err(|e| AppError::Gitlab(e.to_string()))?;
+    let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
+    Ok(mentions_in(response(res)?, &acc.base))
+}
+
+fn mentions_in(raw: Vec<RawTodo>, base: &str) -> Vec<Mention> {
+    raw.into_iter()
+        .filter(|t| matches!(t.action_name.as_str(), "mentioned" | "directly_addressed"))
+        .filter(|t| t.target_url.starts_with(&format!("{base}/")))
+        .map(|t| Mention {
+            id: t.id,
+            title: t.target.map(|x| x.title).unwrap_or_default(),
+            url: t.target_url,
+            author: t.author.map(|u| u.username).unwrap_or_default(),
+            body: t.body,
+            project: t.project.map(|p| p.path_with_namespace).unwrap_or_default(),
+        })
+        .collect()
+}
+
 fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
     fetch_where(acc, r, |_| true)
 }

@@ -105,7 +105,8 @@ backups. Handles thousands of notes: the list is paged and search covers all of 
 
 ### 📋 Clipboard that never forgets (or leaks)
 
-Encrypted history with search and pin; recognizes links, colors and code. A giant copy (a 100 MB log) doesn't
+Encrypted history with search and pin; recognizes links, colors and code. Hover an item to **copy it rewritten**:
+JSON formatted or compact, text on one line, UPPERCASE or lowercase (the history entry stays as it was). A giant copy (a 100 MB log) doesn't
 freeze anything: it keeps the start and warns you. On Windows, it skips whatever password managers mark as
 sensitive.
 
@@ -191,9 +192,21 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
+| Snooze: 1, 5 or 10 min |
+|---|
+| ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
+
 | Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
+
+| Copy a clip rewritten | Meeting alert with prep |
+|---|---|
+| ![Hovering a text clip offers one line, UPPERCASE and lowercase](docs/prints/app/29-clipboard-transformar.png) | ![The meeting alert lists earlier notes with the same title and offers to create today's note](docs/prints/app/07-aviso-reuniao.png) |
+
+| CI failed, with the broken jobs | Someone mentioned me | Their switches in Settings |
+|---|---|---|
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
 | Password changed, one file pending | Day summary |
 |---|---|

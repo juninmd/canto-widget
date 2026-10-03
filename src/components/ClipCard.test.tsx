@@ -16,7 +16,7 @@ const item = (over: Partial<ClipItem>): ClipItem => ({
   ...over,
 });
 
-function show(i: ClipItem, extra: { copied?: boolean; privacy?: boolean; onCopy?: () => void } = {}) {
+function show(i: ClipItem, extra: { copied?: boolean; privacy?: boolean; onCopy?: () => void; onCopyAs?: (m: string) => void } = {}) {
   return render(
     <ul>
       <ClipCard
@@ -25,6 +25,7 @@ function show(i: ClipItem, extra: { copied?: boolean; privacy?: boolean; onCopy?
         privacy={!!extra.privacy}
         className=""
         onCopy={extra.onCopy ?? (() => {})}
+        onCopyAs={extra.onCopyAs ?? (() => {})}
         onPin={() => {}}
         onDelete={() => {}}
       />
@@ -77,4 +78,29 @@ test("privacy mode blurs the text but the card and its actions stay usable", () 
   expect(screen.getByText("conteúdo sensível").className).toContain("blur-sm");
   fireEvent.click(screen.getByTitle("clique para copiar de novo"));
   expect(copied).toBe(1);
+});
+
+test("a JSON item offers to be copied formatted or compact, and the click says which", () => {
+  const modes: string[] = [];
+  show(item({ preview: '{"a":1}', chars: 7, kept: 7 }), { onCopyAs: (m) => modes.push(m) });
+  fireEvent.click(screen.getByRole("button", { name: "JSON formatado" }));
+  fireEvent.click(screen.getByRole("button", { name: "JSON compacto" }));
+  expect(modes).toEqual(["json_pretty", "json_compact"]);
+});
+
+test("links get no rewrites and a cut-off copy is never rewritten", () => {
+  show(item({ preview: "https://example.com", chars: 19, kept: 19 }));
+  expect(screen.queryByRole("group", { name: "copiar como" })).toBeNull();
+  cleanup();
+  show(item({ preview: "texto longo", chars: 900, kept: 400, truncated: true }));
+  expect(screen.queryByRole("group", { name: "copiar como" })).toBeNull();
+});
+
+test("multi-line text can be flattened, a single line cannot", () => {
+  show(item({ preview: "um\ndois", chars: 7, kept: 7 }));
+  expect(screen.getByRole("button", { name: "em uma linha" })).toBeDefined();
+  cleanup();
+  show(item({ preview: "um dois", chars: 7, kept: 7 }));
+  expect(screen.queryByRole("button", { name: "em uma linha" })).toBeNull();
+  expect(screen.getByRole("button", { name: "MAIÚSCULAS" })).toBeDefined();
 });

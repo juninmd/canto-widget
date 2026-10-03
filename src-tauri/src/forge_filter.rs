@@ -39,6 +39,8 @@ pub enum Section {
     Assigned,
     MyPrs,
     MyIssues,
+    /// Threads where someone @-mentioned the user; only the alert watcher asks for it, never the tab.
+    Mentioned,
 }
 
 /// What the day summary and the period report ask each forge about the user's own activity.

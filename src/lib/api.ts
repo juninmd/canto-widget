@@ -53,6 +53,11 @@ export type Note = {
   link?: NoteLink | null;
 };
 
+/** Pop-ups about the user's own PRs: red CI, and no review for `stalled_hours`. */
+export type MyPrAlerts = { ci: boolean; stalled: boolean; stalled_hours: number; mentions: boolean };
+
+export type ClipMode = "json_pretty" | "json_compact" | "one_line" | "upper" | "lower";
+
 export type NotesPage = { total: number; items: Note[] };
 
 export type VaultStatus = { exists: boolean; unlocked: boolean };
@@ -234,6 +239,8 @@ export const api = {
 
   clipList: (query: string) => invoke<ClipList>("clip_list", { query }),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
+  /** Copies the item rewritten by `mode` (see `clipTransforms`); the history entry stays as it was. */
+  clipCopyAs: (id: string, mode: ClipMode) => invoke<void>("clip_copy_as", { id, mode }),
   clipPin: (id: string) => invoke<void>("clip_pin", { id }),
   clipDelete: (id: string) => invoke<string | null>("clip_delete", { id }),
   clipClear: () => invoke<string | null>("clip_clear"),
@@ -272,6 +279,8 @@ export const api = {
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
   reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
+  myPrAlertsGet: () => invoke<MyPrAlerts>("my_pr_alerts_get"),
+  myPrAlertsSet: (config: MyPrAlerts) => invoke<MyPrAlerts>("my_pr_alerts_set", { config }),
 
   gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
   /** Validates address and token against the instance; returns the username. */

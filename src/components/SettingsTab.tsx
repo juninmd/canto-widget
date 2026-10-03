@@ -15,6 +15,7 @@ import RemindersSection from "./RemindersSection";
 import FocusSection from "./FocusSection";
 import ActivitySection from "./ActivitySection";
 import DoNotDisturbSection from "./DoNotDisturbSection";
+import MyPrAlertsSection from "./MyPrAlertsSection";
 import ReviewAlertsSection from "./ReviewAlertsSection";
 import type { Tab } from "./TabBar";
 import type { LeadMinutes } from "../lib/reminderLead";
@@ -85,6 +86,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
       <RemindersSection lead={reminderLead} onChange={onReminderLead} />
       <DoNotDisturbSection onError={onError} />
       <ReviewAlertsSection onError={onError} />
+      <MyPrAlertsSection onError={onError} />
       <SecuritySection onError={onError} />
       <WindowSection onError={onError} />
       <BackupSection onError={onError} />

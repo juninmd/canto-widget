@@ -152,6 +152,13 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
                 setTimeout(() => setCopied(""), 1200);
               })
             }
+            onCopyAs={(mode) =>
+              run(async () => {
+                await api.clipCopyAs(i.id, mode);
+                setCopied(i.id);
+                setTimeout(() => setCopied(""), 1200);
+              })
+            }
             onPin={() => run(() => api.clipPin(i.id))}
             onDelete={() =>
               void leave(i.id, () => run(async () => undoable(await api.clipDelete(i.id), t("clipboard.itemDeleted"))))

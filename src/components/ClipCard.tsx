@@ -1,7 +1,8 @@
-import type { ClipItem } from "../lib/api";
-import { clipKind, compactCount, KIND_LABEL, sizeLabel } from "../lib/clip";
+import type { ClipItem, ClipMode } from "../lib/api";
+import { clipKind, clipTransforms, compactCount, KIND_LABEL, sizeLabel } from "../lib/clip";
 import { timeAgo } from "../lib/time";
 import { LOCALE, t } from "../i18n";
+import ClipTransforms from "./ClipTransforms";
 import { PinIcon } from "./Icons";
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
   className: string;
   privacy: boolean;
   onCopy: () => void;
+  onCopyAs: (mode: ClipMode) => void;
   onPin: () => void;
   onDelete: () => void;
 };
@@ -17,7 +19,7 @@ type Props = {
 const SHOW_SIZE_FROM = 280;
 const CODE_LINES = 4;
 
-export default function ClipCard({ item: i, copied, className, privacy, onCopy, onPin, onDelete }: Props) {
+export default function ClipCard({ item: i, copied, className, privacy, onCopy, onCopyAs, onPin, onDelete }: Props) {
   const kind = clipKind(i.preview);
   const codeLines = i.preview.replace(/\s+$/, "").split("\n");
   const copyTitle = i.truncated ? t("clipboard.copyTruncatedTitle", { size: sizeLabel(i.kept) }) : t("clipboard.copyAgainTitle");
@@ -48,6 +50,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
           {t("clipboard.truncatedNote", { size: sizeLabel(i.chars), kept: compactCount(i.kept) })}
         </p>
       )}
+      {!i.truncated && <ClipTransforms modes={clipTransforms(kind, i.preview)} onPick={onCopyAs} />}
       <div className="mt-1 flex items-center gap-2 text-[11px] text-faint">
         <span className="rounded bg-edge px-1.5 text-muted">{KIND_LABEL[kind]}</span>
         {copied ? (

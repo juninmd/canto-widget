@@ -13,6 +13,7 @@ pub mod calendar;
 pub mod calendar_event;
 pub mod checks_cache;
 pub mod clip_os;
+pub mod clip_transform;
 pub mod clip_watch;
 pub mod clipboard;
 pub mod cmd_backup;
@@ -42,6 +43,7 @@ pub mod gemini_docs;
 pub mod github;
 pub mod github_auth;
 pub mod github_checks;
+pub mod github_failures;
 pub mod github_query;
 pub mod gitlab;
 pub mod gitlab_query;
@@ -55,11 +57,14 @@ pub mod hello_mac;
 pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
+pub mod mention_alerts;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
 pub mod models_rank;
 pub mod models_state;
+pub mod my_pr_alerts;
+pub mod my_pr_events;
 pub mod net;
 pub mod next_meeting;
 pub mod note_images;
@@ -131,6 +136,7 @@ pub fn run() {
             app.manage(cmd_models::ModelsLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
+            app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(task_reminder::ReminderLead::default());
@@ -146,6 +152,8 @@ pub fn run() {
             models_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
+            my_pr_alerts::watch(app.handle().clone());
+            mention_alerts::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
@@ -211,6 +219,7 @@ pub fn run() {
             cmd_drive::drive_connect,
             cmd_extras::clip_list,
             cmd_extras::clip_copy,
+            cmd_extras::clip_copy_as,
             cmd_extras::clip_pin,
             cmd_extras::clip_delete,
             cmd_extras::clip_clear,
@@ -259,6 +268,8 @@ pub fn run() {
             cmd_github_lists::github_prs_checks,
             review_alert::review_alerts_get,
             review_alert::review_alerts_set,
+            my_pr_alerts::my_pr_alerts_get,
+            my_pr_alerts::my_pr_alerts_set,
             cmd_gitlab::gitlab_status,
             cmd_gitlab::gitlab_connect,
             cmd_gitlab::gitlab_disconnect,

@@ -18,6 +18,10 @@ export function summary(e: AgendaItem): string {
       return [levelLabel(e.tag), e.start ? timeAgo(e.start) : ""].filter(Boolean).join(" · ");
     case "model":
       return t("alert.modelNew");
+    case "pr":
+      return t(e.tag === "ci" ? "alert.pr.ci" : "alert.pr.stalled");
+    case "mention":
+      return t("alert.mentioned");
     case "task":
       return t("alert.taskReminder");
     default:

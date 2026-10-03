@@ -12,10 +12,11 @@ type Props = {
   onDismiss: (id: string) => void;
   onCompleted?: () => void;
   onOpenModels?: () => void;
+  onOpenNotes?: () => void;
 };
 
 /** Everything pending at once: a strip of mini cards picks which one the card below details. */
-export default function Alert({ events, onDismiss, onCompleted, onOpenModels }: Props) {
+export default function Alert({ events, onDismiss, onCompleted, onOpenModels, onOpenNotes }: Props) {
   const primary = useRef<HTMLButtonElement>(null);
   const items = useMemo(() => sortAlerts(events), [events]);
   // Sticky: a worse alert arriving must not swap the card under someone about to act on another one.
@@ -77,7 +78,7 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels }: 
         className={`flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl border-2 bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${TONE[toneOf(event)].border}`}
       >
         {items.length > 1 && <AlertStrip items={items} selected={event.id} onSelect={setPicked} />}
-        <AlertDetail event={event} />
+        <AlertDetail event={event} onOpenNotes={onOpenNotes} />
         <AlertActions
           ref={primary}
           event={event}

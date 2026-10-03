@@ -6,6 +6,8 @@ import type { AgendaItem, Guest } from "../lib/api";
 const calls: string[] = [];
 const args: Record<string, unknown>[] = [];
 let watched: string[] = [];
+let vaultLocked = false;
+let notesPage: { total: number; items: unknown[] } = { total: 0, items: [] };
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, a?: Record<string, unknown>) => {
@@ -13,6 +15,8 @@ mock.module("@tauri-apps/api/core", () => ({
     args.push(a ?? {});
     if (cmd === "status_alerts_get") return Promise.resolve(watched);
     if (cmd === "status_alerts_set") return Promise.resolve((a as { ids: string[] }).ids);
+    if (cmd === "notes_search") return vaultLocked ? Promise.reject("cofre trancado") : Promise.resolve(notesPage);
+    if (cmd === "note_save") return Promise.resolve({ id: "n-new", ...(a as object) });
     return Promise.resolve(null);
   },
 }));
@@ -57,6 +61,8 @@ beforeEach(() => {
   calls.length = 0;
   args.length = 0;
   watched = [];
+  vaultLocked = false;
+  notesPage = { total: 0, items: [] };
 });
 
 afterEach(cleanup);
@@ -178,4 +184,98 @@ test("the meeting alert shows the whole description and every listed guest inste
   expect(desc.className).not.toContain("line-clamp");
   for (const name of ["Ana", "Bia", "Caio", "Duda"]) expect(screen.getByText(name)).toBeTruthy();
   expect(screen.getByText("+3 não listados")).toBeTruthy();
+});
+
+test("a meeting alert lists earlier notes with the same title and starts today's note in one click", async () => {
+  vaultLocked = false;
+  notesPage = {
+    total: 2,
+    items: [
+      { id: "n1", title: "Daily · 02/09", body: "", tags: [], created_at: 0, updated_at: 0 },
+      { id: "n2", title: "Compras", body: "falei da Daily ontem", tags: [], created_at: 0, updated_at: 0 },
+    ],
+  };
+  await show([{ ...event, attendees: [{ name: "Ana", email: "a@ex.com", response: "accepted", organizer: false, optional: false, me: false }], description: "Pauta do dia" }]);
+  expect(await screen.findByText("📝 Daily · 02/09")).toBeTruthy();
+  expect(screen.queryByText(/Compras/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /criar nota da reunião/ }));
+  });
+  const saved = args[calls.lastIndexOf("note_save")] as { title: string; body: string; tags: string[] };
+  expect(saved.title.startsWith("Daily · ")).toBe(true);
+  expect(saved.body).toContain("## Convidados\n\n- Ana");
+  expect(saved.body).toContain("## Pauta\n\nPauta do dia");
+  expect(saved.tags).toEqual(["reunião"]);
+  expect(await screen.findByText(/nota criada: Daily · /)).toBeTruthy();
+});
+
+test("with the vault locked the meeting alert shows no note prep at all", async () => {
+  vaultLocked = true;
+  await show([event]);
+  await act(async () => {});
+  expect(screen.queryByRole("button", { name: /criar nota da reunião/ })).toBeNull();
+  vaultLocked = false;
+});
+
+test("the snooze button defaults to 10 minutes and its dropdown picks 1 or 5, snoozing at once", async () => {
+  for (const minutes of [1, 5]) {
+    localStorage.clear();
+    calls.length = 0;
+    args.length = 0;
+    const closed: string[] = [];
+    const view = await show([event], { onDismiss: (id) => closed.push(id) });
+    expect(screen.queryByRole("menu")).toBeNull();
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "escolher quanto tempo adiar" }));
+    });
+    const items = screen.getAllByRole("menuitem").map((i) => i.textContent);
+    expect(items).toEqual(["1 min", "5 min", "10 min"]);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("menuitem", { name: `adiar ${minutes} min` }));
+    });
+    expect(args[calls.indexOf("alert_snooze")]).toEqual({ id: "e1", minutes });
+    expect(closed).toEqual(["e1"]);
+    expect(screen.queryByRole("menu")).toBeNull();
+    view.unmount();
+  }
+});
+
+test("the last value picked becomes the main button the next time", async () => {
+  localStorage.clear();
+  let view = await show([event]);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "escolher quanto tempo adiar" }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("menuitem", { name: "adiar 5 min" }));
+  });
+  view.unmount();
+  calls.length = 0;
+  args.length = 0;
+  view = await show([event]);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "adiar 5 min" }));
+  });
+  expect(args[calls.indexOf("alert_snooze")]).toEqual({ id: "e1", minutes: 5 });
+  localStorage.clear();
+});
+
+test("Esc closes the dropdown first and only a second Esc dismisses the alert", async () => {
+  localStorage.clear();
+  const closed: string[] = [];
+  await show([event], { onDismiss: (id) => closed.push(id) });
+  const chevron = screen.getByRole("button", { name: "escolher quanto tempo adiar" });
+  await act(async () => {
+    fireEvent.click(chevron);
+  });
+  expect(chevron.getAttribute("aria-expanded")).toBe("true");
+  await act(async () => {
+    fireEvent.keyDown(screen.getAllByRole("menuitem")[0], { key: "Escape" });
+  });
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(closed).toEqual([]);
+  await act(async () => {
+    fireEvent.keyDown(window, { key: "Escape" });
+  });
+  expect(closed).toEqual(["e1"]);
 });

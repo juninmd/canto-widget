@@ -3,8 +3,7 @@ import { api, type AgendaItem } from "../lib/api";
 import { kindOf, STATUS_PREFIX } from "../lib/alerts";
 import { TASK_PREFIX } from "../lib/reminders";
 import { t } from "../i18n";
-
-const SNOOZE_MINUTES = 10;
+import SnoozeButton from "./SnoozeButton";
 
 type Props = {
   event: AgendaItem;
@@ -15,7 +14,7 @@ type Props = {
   onOpenModels?: () => void;
 };
 
-const PRIMARY = "flex-[1.6] rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent";
+const PRIMARY = "min-w-24 flex-[1.6] rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent";
 const SECONDARY = "flex-1 rounded-lg bg-edge px-3 py-2 text-sm text-fg";
 
 /** Buttons change with the kind of alert: only calendar events and tasks can be snoozed, only services muted. */
@@ -25,7 +24,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
 ) {
   const kind = kindOf(event);
   const open = (url: string) => () => void api.openLink(url);
-  const snooze = () => void api.alertSnooze(event.id, SNOOZE_MINUTES).then(onHide, onDismiss);
+  const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, onDismiss);
   const mute = async () => {
     try {
       const watched = await api.statusAlertsGet();
@@ -45,6 +44,19 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           className={PRIMARY}
         >
           {t("alert.completeTask")}
+        </button>
+      )}
+      {(kind === "pr" || kind === "mention") && event.link && (
+        <button
+          ref={primary}
+          type="button"
+          onClick={() => {
+            open(event.link)();
+            onDismiss();
+          }}
+          className={PRIMARY}
+        >
+          {t(kind === "pr" ? "alert.openPr" : "alert.openMention")}
         </button>
       )}
       {kind === "meeting" && event.meet && (
@@ -93,11 +105,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.silence")}
         </button>
       )}
-      {(kind === "meeting" || kind === "task") && (
-        <button type="button" onClick={snooze} className={SECONDARY}>
-          {t("alert.snooze", { minutes: SNOOZE_MINUTES })}
-        </button>
-      )}
+      {(kind === "meeting" || kind === "task") && <SnoozeButton onSnooze={snooze} />}
       <button type="button" onClick={onDismiss} title="Esc" className="rounded-lg bg-edge px-3 py-2 text-sm text-muted">
         {t("alert.close")}
       </button>

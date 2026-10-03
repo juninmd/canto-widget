@@ -162,7 +162,7 @@ fn account(app: &tauri::AppHandle) -> Result<Account> {
     Ok(to_account(&cfg))
 }
 
-fn to_account(c: &GitlabConfig) -> Account {
+pub(crate) fn to_account(c: &GitlabConfig) -> Account {
     Account { base: c.base_url.clone(), token: Zeroizing::new(c.token.clone()), username: c.username.clone() }
 }
 

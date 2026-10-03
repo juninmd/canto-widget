@@ -162,3 +162,103 @@ test("an alert that rings again after leaving the overlay sounds again", async (
   });
   expect(rang, "the closed alert ringing again must not be silent").toBe(3);
 });
+
+const failingCi: AgendaItem = {
+  ...base,
+  start: "",
+  id: "pr:ci:acme/atlas#12",
+  title: "Corrige o parser de CSV",
+  organizer: "acme/atlas#12",
+  link: "https://github.com/acme/atlas/pull/12",
+  description: "O CI falhou neste pull request.",
+  tag: "ci",
+};
+
+const waiting: AgendaItem = {
+  ...failingCi,
+  id: "pr:stalled:acme/atlas#12",
+  start: new Date(Date.now() - 50 * 3_600_000).toISOString(),
+  description: "Sem revisão há 50 h.",
+  tag: "stalled",
+};
+
+test("a failing CI names the PR, opens it and has no snooze", async () => {
+  await show([failingCi]);
+  expect(screen.getAllByText("pull request").length).toBeGreaterThan(0);
+  expect(screen.getByText("CI falhou")).toBeTruthy();
+  expect(screen.getByText("acme/atlas#12")).toBeTruthy();
+  expect(screen.getByText("O CI falhou neste pull request.")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir PR" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/pull/12" });
+});
+
+test("a PR without a review says for how long it has waited", async () => {
+  await show([waiting]);
+  expect(screen.getByText("sem revisão")).toBeTruthy();
+  expect(screen.getByText("há 2 d")).toBeTruthy();
+});
+
+test("a red CI ranks above a stalled PR, and both above a meeting", async () => {
+  await show([meeting, waiting, failingCi]);
+  const texts = cards().map((c) => c.textContent ?? "");
+  expect(texts[0]).toContain("CI falhou");
+  expect(texts[1]).toContain("sem revisão");
+  expect(texts[2]).toContain("Daily");
+});
+
+test("a failing CI lists the jobs that broke, each opening its own page", async () => {
+  await show([
+    {
+      ...failingCi,
+      description: "2 falhou: build, lint.",
+      attachments: [
+        { title: "build · Run tests", url: "https://github.com/acme/atlas/runs/1", mime: "" },
+        { title: "ci/legado", url: "", mime: "" },
+      ],
+    },
+  ]);
+  expect(screen.getByText("✖ ci/legado").tagName).toBe("P");
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "✖ build · Run tests" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/runs/1" });
+});
+
+const mentionedOnGitlab: AgendaItem = {
+  ...base,
+  start: "",
+  id: "mention:gitlab:42",
+  title: "Falha no deploy de produção",
+  organizer: "acme/atlas",
+  link: "https://git.example.com/acme/atlas/-/issues/9",
+  description: "@ana: @voce consegue olhar isso hoje?",
+  tag: "gitlab",
+};
+
+test("a mention says where it happened, shows what was said and opens the thread", async () => {
+  await show([mentionedOnGitlab]);
+  expect(screen.getAllByText("você foi mencionado").length).toBeGreaterThan(0);
+  expect(screen.getByText("GitLab")).toBeTruthy();
+  expect(screen.getByText("acme/atlas")).toBeTruthy();
+  expect(screen.getByText("@ana: @voce consegue olhar isso hoje?")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://git.example.com/acme/atlas/-/issues/9" });
+});
+
+test("a GitHub mention is tagged GitHub in the strip and the summary has no open button", async () => {
+  const gh: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:acme/atlas#3", tag: "github" };
+  const summary: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:summary", link: "", title: "5 menções novas" };
+  await show([gh, summary]);
+  expect(screen.getAllByText("mencionou você").length).toBe(2);
+  expect(screen.getByText("GitHub")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(cards()[1]);
+  });
+  expect(screen.queryByRole("button", { name: "abrir" })).toBeNull();
+});
