@@ -46,6 +46,17 @@ test("shows the installed and the newest published version side by side", async 
   expect(screen.getByText("Correções no clipboard")).toBeDefined();
 });
 
+test("the release notes show as plain sentences: the card has no Markdown to render", async () => {
+  check = () =>
+    Promise.resolve({
+      ...newer,
+      notes: "✨ 1 novidade\n\n## ✨ Novidades\n\n- **alert** · Adiar em botão único ([#61](https://github.com/o/r/pull/61))\n\n## ⬇️ Baixar\n\n| a | b |",
+    });
+  await show();
+  const card = screen.getByText(/Adiar em botão único/);
+  expect(card.textContent).toBe("✨ 1 novidade\n✨ Novidades\n• alert · Adiar em botão único (#61)");
+});
+
 test("up to date still names the published version and offers no install", async () => {
   check = () => Promise.resolve({ ...newer, current: "0.2.0", available: false, notes: "", date: null });
   await show();

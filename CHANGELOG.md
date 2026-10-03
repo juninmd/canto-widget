@@ -153,6 +153,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Notas de cada release mais bonitas**: o texto de cada versão publicada no GitHub agora abre com um resumo ("✨ 5
+  novidades · 🐛 1 correção"), separa as mudanças por tipo (novidades, correções, desempenho, melhorias internas e,
+  quando há, mudanças incompatíveis), usa os commits do pull request como itens, com link para cada um, traz uma
+  tabela de instaladores por sistema (Windows, macOS Apple Silicon e Intel, Linux) e o link para comparar com a
+  versão anterior. Docs, testes e tarefas de manutenção ficam de fora. O cartão de atualização do app mostra o mesmo
+  texto sem símbolos de Markdown, em até 8 linhas, sem a tabela de instaladores.
 - **Visual do app (redesenho completo)**: cabeçalho com ícones de contorno; abas com sublinhado na cor de
   destaque, bordas esmaecidas que avisam que há mais abas e a aba ativa sempre à vista; campos de busca, de filtro e
   de nova tarefa/nota com ícone e a mesma profundidade em todas as abas; cartões de Notas, Clipboard, Agenda e
