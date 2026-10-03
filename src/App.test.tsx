@@ -51,9 +51,11 @@ mock.module("@tauri-apps/api/window", () => ({
     onResized: () => Promise.resolve(() => {}),
   }),
 }));
-const listeners: Record<string, () => void> = {};
+const listeners: Record<string, (e?: unknown) => void> = {};
 mock.module("@tauri-apps/api/event", () => ({
-  listen: (event: string, cb: () => void) => {
+  // Mocks are process-wide: AlertWindow imports `emit` from the same module.
+  emit: () => Promise.resolve(),
+  listen: (event: string, cb: (e?: unknown) => void) => {
     listeners[event] = cb;
     return Promise.resolve(() => {});
   },
@@ -196,17 +198,28 @@ test("Tab inside the shortcuts help does not escape the modal", async () => {
   expect(document.activeElement).toBe(closeButton);
 });
 
-test("completing from the task alert updates the open list", async () => {
+test("completing from the pop-up window updates the open list", async () => {
   render(<App />);
   await settle();
   const reads = () => calls.filter((c) => c.cmd === "tasks_for_day").length;
   const before = reads();
-  await act(async () => listeners["canto://alert"]());
+  await act(async () => listeners["canto://tasks-changed"]());
   await settle();
-  fireEvent.click(screen.getByRole("button", { name: "concluir tarefa" }));
-  await settle();
-  expect(calls.some((c) => c.cmd === "task_complete")).toBe(true);
   expect(reads(), "the tab would keep showing the task as open").toBeGreaterThan(before);
+});
+
+test("the widget never renders the alert: the pop-up has its own window", async () => {
+  render(<App />);
+  await settle();
+  expect(listeners["canto://alert"]).toBeUndefined();
+  expect(screen.queryByRole("alertdialog")).toBeNull();
+});
+
+test("the pop-up asks the widget to open a tab", async () => {
+  render(<App />);
+  await settle();
+  await act(async () => listeners["canto://open-tab"]({ payload: "settings" }));
+  expect(document.getElementById("aba-settings")?.getAttribute("aria-selected")).toBe("true");
 });
 
 test("Ctrl+K opens the global search; picking a note result jumps to Notes with the query seeded", async () => {

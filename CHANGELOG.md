@@ -5,6 +5,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Popup não rouba mais o foco**: o aviso aparece sem ativar a janela, então não tira o foco de quem está jogando
+  em tela cheia ou digitando em outro app. Os botões continuam funcionando com o mouse.
+- **Popup de aviso em janela própria**: reunião, lembrete de tarefa, instabilidade de serviço e modelo novo agora
+  aparecem numa janela separada no canto da tela. Antes o aviso abria o Canto inteiro por cima, mesmo com ele
+  minimizado; agora o widget continua minimizado e, com o cofre trancado, o popup aparece do mesmo jeito (concluir
+  tarefa pede o cofre aberto; adiar, fechar e entrar na reunião não).
+
 ### Adicionado
 
 - **Radar de revisão**: em "Revisão pedida a mim" o pedido mais antigo vem primeiro, a espera aparece em horas até 48 h e fica vermelha quando passa de 48 h. "adiar 4 h" esconde o item, com um contador para trazê-lo de volta; o adiamento fica nesta máquina, fora do cofre.

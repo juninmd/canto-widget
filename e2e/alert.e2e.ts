@@ -39,10 +39,10 @@ export function fakeAlerts(now = Date.now()) {
   ];
 }
 
+// The pop-up is its own window (`?alert`): it needs no unlocked vault and never shows the widget.
 async function ring(page: Page) {
-  await page.goto("/");
-  await expect(page.getByRole("tablist").first()).toBeVisible();
-  await page.evaluate(() => (window as unknown as { __E2E_EMIT__: (e: string) => void }).__E2E_EMIT__("canto://alert"));
+  await page.goto("/?alert");
+  await expect(page.getByRole("alertdialog")).toBeVisible();
 }
 
 test("pending alerts show as mini cards, worst first, and a click details another kind", async ({ page }) => {

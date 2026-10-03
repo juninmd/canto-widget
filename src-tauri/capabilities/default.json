@@ -1,9 +1,10 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissoes minimas: apenas a janela principal; URLs e clipboard passam pelos comandos em Rust",
+  "description": "Permissoes minimas: apenas a janela principal e a janela de avisos; URLs e clipboard passam pelos comandos em Rust",
   "windows": [
-    "main"
+    "main",
+    "alert"
   ],
   "permissions": [
     "core:default",

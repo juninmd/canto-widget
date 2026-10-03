@@ -14,6 +14,8 @@ mock.module("@tauri-apps/api/core", () => ({
   },
 }));
 mock.module("@tauri-apps/api/event", () => ({
+  // Mocks are process-wide: AlertWindow imports `emit` from the same module.
+  emit: () => Promise.resolve(),
   listen: (_event: string, cb: (e: { payload: unknown }) => void) => {
     progress = cb;
     return Promise.resolve(() => {});

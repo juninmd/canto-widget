@@ -224,6 +224,7 @@ pub fn run() {
             cmd_extras::alert_open,
             cmd_extras::alert_payload,
             cmd_extras::alert_close,
+            cmd_extras::main_show,
             snooze::alert_snooze,
             cmd_extras::open_link,
             autostart::autostart_status,

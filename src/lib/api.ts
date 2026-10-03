@@ -250,6 +250,7 @@ export const api = {
   alertOpen: (event: AgendaItem) => invoke<void>("alert_open", { event }),
   alertPayload: () => invoke<AgendaItem[]>("alert_payload"),
   alertClose: (id: string) => invoke<void>("alert_close", { id }),
+  mainShow: () => invoke<void>("main_show"),
   alertSnooze: (id: string, minutes: number) => invoke<void>("alert_snooze", { id, minutes }),
   openLink: (url: string) => invoke<void>("open_link", { url }),
 
