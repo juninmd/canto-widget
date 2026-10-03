@@ -245,6 +245,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![Agenda Day view where a daily and a planning meeting that overlap sit in two columns, with a one-to-one under the daily and the lunch and review blocks at full width](docs/prints/app/53-agenda-dia-sobreposicao.png) |
 
+| Review radar: oldest request first, overdue in red, snooze |
+|---|
+| ![GitHub tab where review requests are listed oldest first, the one past 48 hours in red, each with a snooze 4 h link](docs/prints/app/54-radar-de-revisao.png) |
+
 | Meetings as a sub-tab of the Agenda, next to List and Day |
 |---|
 | ![Agenda tab with the List, Day and Meetings sub-tabs, the Meetings one selected: folder, search box and three fictitious transcripts](docs/prints/app/52-agenda-reunioes.png) |

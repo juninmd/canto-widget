@@ -3,6 +3,7 @@ import { api, type ChecksStatus, type ForgeItem, type ForgeList, type ForgeSecti
 import type { Forge } from "../lib/forge";
 import { checkKey, type CiMap } from "../lib/forgeChecks";
 import { daysSince, timeAgo } from "../lib/time";
+import { loadSnoozes, oldestFirst, overdue, snoozeUntil, waitHours, waitLabel } from "../lib/reviewRadar";
 import { t, type MessageKey } from "../i18n";
 import { IssueIcon, PullIcon } from "./Icons";
 
@@ -21,17 +22,40 @@ type Props = {
 
 export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci }: Props) {
   const rest = list.total - list.items.length;
+  const radar = section === "review_requested";
+  const [snoozed, setSnoozed] = useState(loadSnoozes);
+  const [showSnoozed, setShowSnoozed] = useState(false);
+  const ordered = radar ? oldestFirst(list.items) : list.items;
+  const hidden = radar ? ordered.filter((i) => snoozed[i.url] > Date.now()) : [];
+  const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
   return (
     <section aria-label={title}>
       <h3 className="mb-1 text-xs font-semibold text-fg">
         {title} <span className="font-normal text-faint">({list.total})</span>
       </h3>
+      {radar && hidden.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowSnoozed(!showSnoozed)}
+          className="mb-1 min-h-6 text-[11px] text-muted underline decoration-dotted hover:text-fg"
+        >
+          {showSnoozed ? t("forge.snoozedHide") : t("forge.snoozedShow", { n: hidden.length })}
+        </button>
+      )}
       {list.items.length === 0 ? (
         <p className="px-2 py-1 text-[11px] text-faint">{filtered ? t("forge.emptyFiltered") : t("forge.empty")}</p>
       ) : (
         <ul className="space-y-1.5">
-          {list.items.map((it) => (
-            <Row key={it.url} item={it} login={login} forge={forge} waiting={section === "review_requested"} ci={ci?.[checkKey(it.repo, it.number)]} />
+          {shown.map((it) => (
+            <Row
+              key={it.url}
+              item={it}
+              login={login}
+              forge={forge}
+              waiting={radar}
+              ci={ci?.[checkKey(it.repo, it.number)]}
+              onSnooze={radar ? () => setSnoozed(snoozeUntil(it.url)) : undefined}
+            />
           ))}
         </ul>
       )}
@@ -50,11 +74,11 @@ export default function ForgeSection({ title, section, forge, list, login, filte
 }
 
 const STALE_DAYS = 7;
-type RowProps = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus };
-function Row({ item, login, forge, waiting, ci }: RowProps) {
+type RowProps = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; onSnooze?: () => void };
+function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
-  const wait = waiting && item.is_pr ? daysSince(item.created_at) : null;
+  const wait = waiting && item.is_pr ? waitHours(item) : null;
   // Review requests already show "aguardando"; elsewhere a PR/MR nobody touched for a week is flagged.
   const idle = !waiting && item.is_pr ? daysSince(item.updated_at) : null;
 
@@ -86,7 +110,9 @@ function Row({ item, login, forge, waiting, ci }: RowProps) {
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
             {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
             {wait !== null && (
-              <span className={`shrink-0 ${wait >= 3 ? "text-danger" : "text-faint"}`}>{t("forge.item.waiting", { wait: wait <= 0 ? t("forge.item.waitLessThanDay") : t("forge.item.waitDays", { n: wait }) })}</span>
+              <span className={`shrink-0 ${overdue(wait) ? "text-danger" : "text-faint"}`} title={overdue(wait) ? t("forge.item.overdueTitle") : undefined}>
+                {t("forge.item.waiting", { wait: waitLabel(wait) })}
+              </span>
             )}
             {idle !== null && idle >= STALE_DAYS && (
               <span className="shrink-0 text-danger" title={t("forge.item.staleTitle", { n: idle })}>
@@ -99,6 +125,16 @@ function Row({ item, login, forge, waiting, ci }: RowProps) {
       </button>
       {item.is_pr && !ci && (
         <div className="mt-1 flex items-center gap-2 pl-7 text-[11px]">
+          {onSnooze && (
+            <button
+              type="button"
+              onClick={onSnooze}
+              aria-label={t("forge.snoozeOf", { title: item.title })}
+              className="text-muted underline decoration-dotted hover:text-fg"
+            >
+              {t("forge.snooze")}
+            </button>
+          )}
           {checks === null ? (
             <button type="button" onClick={() => void loadChecks()} className="text-muted underline decoration-dotted hover:text-fg">
               {t("forge.checks.show")}
