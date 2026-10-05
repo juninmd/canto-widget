@@ -37,7 +37,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
       if (!st.enabled) return;
       const days = [0, 1, 2, 3, 4, 5, 6].map((i) => start - i * DAY_MS);
       const [todaySummary, ...rest] = await Promise.all(days.map((d) => api.activitySummary(d, d + DAY_MS)));
-      setData({ week: [todaySummary, ...rest].map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans })) });
+      setData({ week: [todaySummary, ...rest].map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs })) });
     } catch (e) {
       onError(errText(e));
     }
@@ -95,7 +95,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
   const all = period === "today" ? shownDay.apps : weekApps;
   const shown = withoutHidden(all, hidden);
   const weekDays = data.week.filter((d) => sumOf(d.apps) > 0).length;
-  const caption = period === "today" ? t("activity.total", { time: secsLabel(sumOf(shown)) }) : t("activity.weekAvg", { time: secsLabel(sumOf(shown) / Math.max(1, weekDays)) });
+  const caption = period === "today" ? (shownDay.idleSecs > 0 ? t("activity.totalIdle", { time: secsLabel(sumOf(shown)), idle: secsLabel(shownDay.idleSecs) }) : t("activity.total", { time: secsLabel(sumOf(shown)) })) : t("activity.weekAvg", { time: secsLabel(sumOf(shown) / Math.max(1, weekDays)) });
   const dayLabel = sel === 0 ? t("activity.today") : sel === 1 ? t("activity.yesterday") : new Date(shownDay.day).toLocaleDateString(LOCALE, { weekday: "short", day: "2-digit", month: "2-digit" });
 
   async function copy() {
@@ -154,7 +154,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
           {shown.length === 0 ? (
             <p className="px-2 py-4 text-center text-xs text-faint">{t("activity.noneSelected")}</p>
           ) : period === "today" ? (
-            <TodayView spans={withoutHidden(shownDay.spans, hidden)} apps={shown} yesterdaySpans={before ? withoutHidden(before.spans, hidden) : []} dayStartMs={start - sel * DAY_MS} nowSec={sel === 0 ? Math.floor(Date.now() / 1000) : null} onRecategorize={recategorize} />
+            <TodayView spans={withoutHidden(shownDay.spans, hidden)} idle={shownDay.idle} apps={shown} yesterdaySpans={before ? withoutHidden(before.spans, hidden) : []} dayStartMs={start - sel * DAY_MS} nowSec={sel === 0 ? Math.floor(Date.now() / 1000) : null} onRecategorize={recategorize} />
           ) : (
             <WeekView days={data.week.map((d) => ({ ...d, apps: withoutHidden(d.apps, hidden), spans: withoutHidden(d.spans, hidden) }))} />
           )}

@@ -304,7 +304,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 The **Activity** tab starts hidden (turn it on under Settings → visible tabs). It records only the name of the
 focused application while you use the computer, in a sealed local file that never reaches backups or sync, and shows
-a summary against yesterday with category filters, a timeline with a "now" marker, the most used applications, the longest focus stretch, a daily code-focus goal with its streak, day-by-day navigation, a copyable summary, editable categories per application, and the last 7 days with their average and an hour heat map. Off until you opt in; Wayland can't report the focused window, so
+a summary against yesterday with category filters, a timeline with a "now" marker and the idle stretches (no keyboard or mouse for 2 minutes), the most used applications, the longest focus stretch, a daily code-focus goal with its streak, day-by-day navigation, a copyable summary, editable categories per application, and the last 7 days with their average and an hour heat map. Off until you opt in; Wayland can't report the focused window, so
 it stays unavailable there.
 
 <sub>All screenshots use fictitious data.</sub>

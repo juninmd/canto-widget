@@ -68,12 +68,20 @@ impl ActivityState {
     }
 }
 
+/// What one tick saw.
+#[derive(Debug, PartialEq)]
+pub enum Sample {
+    App(String),
+    Idle,
+    Unknown,
+}
+
 /// One tick: what to record given the OS answers. Pure so the idle rule has a test.
-pub fn sample(foreground: impl FnOnce() -> Option<String>, idle_secs: Option<u64>) -> Option<String> {
+pub fn sample(foreground: impl FnOnce() -> Option<String>, idle_secs: Option<u64>) -> Sample {
     if idle_secs.is_some_and(|s| s >= IDLE_LIMIT_SECS) {
-        return None;
+        return Sample::Idle;
     }
-    foreground()
+    foreground().map_or(Sample::Unknown, Sample::App)
 }
 
 pub fn watch(app: AppHandle) {
@@ -89,8 +97,12 @@ pub fn watch(app: AppHandle) {
                 continue;
             }
             let now = now_ms() / 1000;
-            let name = sample(activity_os::foreground_app, activity_os::idle_secs());
-            let recorded = act.with_log(&state, |log| log.record(name.as_deref(), now));
+            let seen = sample(activity_os::foreground_app, activity_os::idle_secs());
+            let recorded = act.with_log(&state, |log| match seen {
+                Sample::App(name) => log.record(Some(&name), now),
+                Sample::Idle => log.record_idle(now),
+                Sample::Unknown => {}
+            });
             if recorded.is_ok() && now - last_flush >= FLUSH_SECS {
                 last_flush = now;
                 if let Err(e) = act.flush(&state) {
@@ -159,7 +171,7 @@ pub fn activity_clear(state: State<'_, AppState>, act: State<'_, ActivityState>)
         return Err(AppError::Locked);
     }
     state.touch();
-    act.with_log(&state, |log| log.spans.clear())?;
+    act.with_log(&state, Log::clear)?;
     match std::fs::remove_file(store::activity_path(&state.dir)) {
         Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
         _ => Ok(()),
@@ -173,9 +185,10 @@ mod tests {
     #[test]
     fn idle_users_are_not_sampled_and_unknown_idle_counts_as_active() {
         let app = || Some("Code".to_string());
-        assert_eq!(sample(app, Some(5)).as_deref(), Some("Code"));
-        assert_eq!(sample(app, None).as_deref(), Some("Code"));
-        assert_eq!(sample(|| panic!("no need to ask"), Some(IDLE_LIMIT_SECS)), None);
+        assert_eq!(sample(app, Some(5)), Sample::App("Code".into()));
+        assert_eq!(sample(app, None), Sample::App("Code".into()));
+        assert_eq!(sample(|| panic!("no need to ask"), Some(IDLE_LIMIT_SECS)), Sample::Idle);
+        assert_eq!(sample(|| None, Some(5)), Sample::Unknown);
     }
 
     #[test]

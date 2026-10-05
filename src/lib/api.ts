@@ -11,7 +11,15 @@ export type Repeat = { tipo: "diaria" } | { tipo: "dias_uteis" } | { tipo: "sema
 export type Subtask = { id: string; title: string; done: boolean };
 /** Unix seconds: the day is cut in the UI, whose timezone is the reliable one. */
 export type ActivitySpan = { app: string; start: number; end: number };
-export type ActivitySummary = { spans: ActivitySpan[]; apps: { app: string; secs: number }[]; total_secs: number };
+export type ActivityAway = { start: number; end: number };
+export type ActivitySummary = {
+  spans: ActivitySpan[];
+  apps: { app: string; secs: number }[];
+  total_secs: number;
+  /** Stretches with the computer on and no keyboard or mouse input. */
+  idle: ActivityAway[];
+  idle_secs: number;
+};
 export type ActivityStatus = { supported: boolean; enabled: boolean };
 
 export type Priority = "low" | "medium" | "high";
