@@ -1,7 +1,8 @@
 import { expect, mock, test } from "bun:test";
 
 mock.module("@tauri-apps/api/core", () => ({ invoke: () => Promise.resolve(null) }));
-const { barBox, byCategory, categoryOf, hourRange, secsLabel, timelineRows } = await import("./activity");
+const { barBox, byCategory, categoryOf, focusStats, hourRange, secsLabel, timelineRows, weekStats, withoutHidden } = await import("./activity");
+import type { Category } from "./activity";
 
 test("applications land in a category by name, and a call app counts as a meeting before a chat", () => {
   expect(categoryOf("Code")).toBe("code");
@@ -53,4 +54,23 @@ test("timeline rows follow the ranking and carry only their own spans", () => {
   const rows = timelineRows(spans, [{ app: "Code", secs: 9 }, { app: "Slack", secs: 1 }], 1);
   expect(rows).toHaveLength(1);
   expect(rows[0].spans).toEqual([spans[0]]);
+});
+
+test("hidden categories drop their apps and spans", () => {
+  const apps = [{ app: "Code", secs: 1 }, { app: "Slack", secs: 2 }];
+  expect(withoutHidden(apps, new Set<Category>(["chat"]))).toEqual([apps[0]]);
+  expect(withoutHidden(apps, new Set())).toBe(apps);
+});
+
+test("focus stats merge touching spans of one app and count every change of app", () => {
+  const s = (app: string, a: number, b: number) => ({ app, start: a, end: b });
+  const out = focusStats([s("Code", 0, 600), s("Code", 630, 1200), s("Slack", 1200, 1300), s("Code", 1300, 1400)]);
+  expect(out.longest).toEqual({ app: "Code", start: 0, secs: 1200 });
+  expect(out.switches).toBe(2);
+  expect(focusStats([]).switches).toBe(0);
+});
+
+test("week stats average only the days with records and point at the busiest", () => {
+  expect(weekStats([100, 0, 300])).toEqual({ average: 200, best: 2 });
+  expect(weekStats([0, 0])).toEqual({ average: 0, best: -1 });
 });

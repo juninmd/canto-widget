@@ -5,6 +5,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Aba Atividade renovada**: o topo mostra o total, a diferença para ontem, a divisão por categoria e chips que
+  escondem uma categoria (os totais, a linha do tempo e a semana se recalculam). A linha do tempo marca o "agora" e
+  mostra o horário de cada trecho ao passar o mouse; os aplicativos ganham a cor da categoria e a parte do dia; o
+  novo bloco "Dia em foco" traz o maior período sem trocar de app e quantas trocas houve; a semana ganha a média e
+  o dia mais ativo.
+
 ### Corrigido
 
 - **Aviso não tira mais o jogo da tela cheia**: com um app em tela cheia na frente (um jogo, um vídeo, uma

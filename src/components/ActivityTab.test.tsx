@@ -65,9 +65,22 @@ test("turning it on loads the day: total, categories and the most used apps", as
   for (let i = 0; i < 3; i++) await act(async () => {});
   expect(calls.some((c) => c.cmd === "activity_set_enabled" && c.args?.enabled === true)).toBe(true);
   expect(screen.getByText("Tempo ativo: 2h30")).toBeTruthy();
-  expect(screen.getByText("Código")).toBeTruthy();
-  expect(screen.getByText("Comunicação")).toBeTruthy();
+  expect(screen.getByRole("button", { name: /Código/ })).toBeTruthy();
+  expect(screen.getByRole("button", { name: /Comunicação/ })).toBeTruthy();
+  expect(screen.getByText("Maior bloco sem trocar de app")).toBeTruthy();
   expect(screen.getAllByText("Code").length).toBeGreaterThan(0);
+});
+
+test("hiding a category takes its time out of the total", async () => {
+  status = { supported: true, enabled: true };
+  await mount();
+  expect(screen.getAllByText("2h30").length).toBeGreaterThan(0);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /Código/ }));
+  });
+  expect(screen.getByRole("button", { name: /Código/ }).getAttribute("aria-pressed")).toBe("false");
+  expect(screen.getAllByText("30 min").length).toBeGreaterThan(0);
+  expect(screen.queryByText("2h30")).toBeNull();
 });
 
 test("the week view lists seven days, one summary call each", async () => {

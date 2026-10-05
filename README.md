@@ -296,11 +296,11 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Activity tab (off by default) | Summary with focused time and closed PRs/MRs |
 |---|---|
-| ![Activity tab: timeline per application, time by category and the most used applications, marked as 100% local](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
+| ![Activity tab: total against yesterday, category chips that filter, timeline per application, most used applications and the day in focus, marked as 100% local](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
 
 The **Activity** tab starts hidden (turn it on under Settings → visible tabs). It records only the name of the
 focused application while you use the computer, in a sealed local file that never reaches backups or sync, and shows
-a timeline, time by category and the last 7 days. Off until you opt in; Wayland can't report the focused window, so
+a summary against yesterday with category filters, a timeline with a "now" marker, the most used applications, the longest focus stretch and the last 7 days with their average. Off until you opt in; Wayland can't report the focused window, so
 it stays unavailable there.
 
 <sub>All screenshots use fictitious data.</sub>
