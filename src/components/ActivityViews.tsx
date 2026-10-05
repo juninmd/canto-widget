@@ -1,8 +1,9 @@
 import { t } from "../i18n";
-import { appName, barBox, byCategory, categoryOf, CATEGORY_COLOR, focusStats, hourRange, secsLabel, timelineRows, weekStats, type Category } from "../lib/activity";
+import { barBox, byCategory, categoryOf, CATEGORY_COLOR, focusStats, hourRange, secsLabel, timelineRows, weekStats } from "../lib/activity";
 import type { ActivitySpan } from "../lib/api";
 import ActivityApps from "./ActivityApps";
 import ActivityHeat from "./ActivityHeat";
+import type { Category } from "../lib/activity";
 
 type Apps = { app: string; secs: number }[];
 export type Day = { day: number; apps: Apps; spans: ActivitySpan[] };
@@ -24,17 +25,19 @@ export function TodayView({ spans, apps, yesterdaySpans, dayStartMs, nowSec, onR
   const showNow = nowSec !== null && nowSec >= daySec + range[0] * 3600 && nowSec <= daySec + range[1] * 3600;
   const stats = focusStats(spans);
   const ticks = [range[0], Math.round((range[0] * 2 + range[1]) / 3), Math.round((range[0] + range[1] * 2) / 3), range[1]];
+  const top = apps.slice(0, 6);
+
   return (
     <>
       <section className="flex flex-col gap-1.5" aria-label={t("activity.timeline")}>
         <h3 className={H3}>{t("activity.timeline")}</h3>
         {timelineRows(spans, apps).map((r) => (
           <div key={r.app} className="grid grid-cols-[4.5rem_1fr] items-center gap-2 text-[11px]">
-            <span className="truncate text-muted" title={r.app}>{appName(r.app)}</span>
+            <span className="truncate text-muted" title={r.app}>{r.app}</span>
             <span className="relative h-3.5 overflow-hidden rounded bg-edge">
               {r.spans.map((s) => {
                 const box = barBox(s, daySec, range);
-                return <span key={s.start} title={`${appName(r.app)} ${clock(s.start)}–${clock(s.end)} (${secsLabel(s.end - s.start)})`} className={`absolute inset-y-0 min-w-[2px] ${CATEGORY_COLOR[categoryOf(s.app)]}`} style={{ left: `${box.left}%`, width: `${box.width}%` }} />;
+                return <span key={s.start} title={`${r.app} ${clock(s.start)}–${clock(s.end)} (${secsLabel(s.end - s.start)})`} className={`absolute inset-y-0 min-w-[2px] ${CATEGORY_COLOR[categoryOf(s.app)]}`} style={{ left: `${box.left}%`, width: `${box.width}%` }} />;
               })}
               {showNow && <span title={t("activity.now")} className="absolute inset-y-0 w-0.5 bg-fg opacity-70" style={{ left: `${now}%` }} />}
             </span>
@@ -50,7 +53,7 @@ export function TodayView({ spans, apps, yesterdaySpans, dayStartMs, nowSec, onR
       <section className="flex flex-col gap-1.5">
         <h3 className={H3}>{t("activity.focusDay")}</h3>
         <div className="grid grid-cols-2 gap-2">
-          <Stat label={t("activity.longest")} value={secsLabel(stats.longest.secs)} sub={`${appName(stats.longest.app)} · ${clock(stats.longest.start)}`} />
+          <Stat label={t("activity.longest")} value={secsLabel(stats.longest.secs)} sub={`${r.app} · ${clock(stats.longest.start)}`} />
           <Stat label={t("activity.switches")} value={String(stats.switches)} sub={yesterdaySpans.length ? t("activity.yesterdaySwitches", { n: focusStats(yesterdaySpans).switches }) : ""} />
         </div>
       </section>
@@ -74,7 +77,6 @@ export function WeekView({ days }: { days: Day[] }) {
   const { average, best } = weekStats(totals);
   const label = (ms: number) => new Date(ms).toLocaleDateString(undefined, { weekday: "short", day: "2-digit", month: "2-digit" });
   return (
-    <>
     <section className="flex flex-col gap-2" aria-label={t("activity.weekDays")}>
       <h3 className={H3}>{t("activity.weekDays")}</h3>
       <ul className="relative flex flex-col gap-2">
@@ -96,7 +98,5 @@ export function WeekView({ days }: { days: Day[] }) {
       <p className="text-[11px] text-faint">{t("activity.avgHint")}</p>
       {best >= 0 && <p className="text-xs text-muted">{t("activity.bestDay", { day: label(days[best].day), time: secsLabel(totals[best]), avg: secsLabel(average) })}</p>}
     </section>
-    <ActivityHeat days={days} />
-    </>
   );
 }
