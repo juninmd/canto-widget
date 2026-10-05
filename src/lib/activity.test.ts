@@ -1,7 +1,7 @@
 import { expect, mock, test } from "bun:test";
 
 mock.module("@tauri-apps/api/core", () => ({ invoke: () => Promise.resolve(null) }));
-const { barBox, byCategory, categoryOf, focusStats, hourRange, secsLabel, timelineRows, weekStats, withoutHidden } = await import("./activity");
+const { appName, barBox, byCategory, categoryOf, focusStats, hourlyHeat, peakWindow, setCategoryOverrides, streak, hourRange, secsLabel, timelineRows, weekStats, withoutHidden } = await import("./activity");
 import type { Category } from "./activity";
 
 test("applications land in a category by name, and a call app counts as a meeting before a chat", () => {
@@ -73,4 +73,41 @@ test("focus stats merge touching spans of one app and count every change of app"
 test("week stats average only the days with records and point at the busiest", () => {
   expect(weekStats([100, 0, 300])).toEqual({ average: 200, best: 2 });
   expect(weekStats([0, 0])).toEqual({ average: 0, best: -1 });
+});
+
+test("a category the user picked wins over the name rules", () => {
+  setCategoryOverrides({ Figma: "docs" });
+  expect(categoryOf("Figma")).toBe("docs");
+  expect(categoryOf("Code")).toBe("code");
+  setCategoryOverrides({});
+  expect(categoryOf("Figma")).toBe("other");
+});
+
+test("process names turn into readable app names", () => {
+  expect(appName("WindowsTerminal.exe")).toBe("Windows Terminal");
+  expect(appName("msedge")).toBe("Edge");
+  expect(appName("Code")).toBe("Code");
+});
+
+test("hourly heat splits a span across the hours it touches", () => {
+  const h = hourlyHeat([{ app: "a", start: 9.5 * 3600, end: 10.25 * 3600 }], 0);
+  expect(h[9]).toBe(1800);
+  expect(h[10]).toBe(900);
+  expect(h.reduce((a, b) => a + b, 0)).toBe(2700);
+});
+
+test("the peak is the two busiest hours in a row across the days", () => {
+  const row = new Array<number>(24).fill(0);
+  row[10] = 3000;
+  row[11] = 3600;
+  row[15] = 4000;
+  expect(peakWindow([row])).toEqual([10, 12]);
+  expect(peakWindow([new Array<number>(24).fill(0)])).toBeNull();
+});
+
+test("the streak counts days on goal and lets an unfinished today wait", () => {
+  expect(streak([4, 4, 4, 1], 4)).toBe(3);
+  expect(streak([1, 4, 4, 1], 4)).toBe(2);
+  expect(streak([4, 1, 4], 4)).toBe(1);
+  expect(streak([4, 4], 0)).toBe(0);
 });

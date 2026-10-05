@@ -12,8 +12,22 @@ const RULES: [Category, RegExp][] = [
   ["web", /chrome|firefox|safari|msedge|edge|brave|opera|vivaldi|\barc\b|chromium|\bzen\b/i],
 ];
 
+/** The user's own choices win over the name rules; the tab loads them once and on every change. */
+let overrides: Record<string, Category> = {};
+export const setCategoryOverrides = (next: Record<string, Category>) => {
+  overrides = next;
+};
+
 export function categoryOf(app: string): Category {
-  return RULES.find(([, re]) => re.test(app))?.[0] ?? "other";
+  return overrides[app] ?? RULES.find(([, re]) => re.test(app))?.[0] ?? "other";
+}
+
+const NAMES: Record<string, string> = { msedge: "Edge", winword: "Word", excel: "Excel", powerpnt: "PowerPoint", devenv: "Visual Studio", "ms-teams": "Teams" };
+
+/** Process names read better as words: "WindowsTerminal.exe" becomes "Windows Terminal". */
+export function appName(app: string): string {
+  const base = app.replace(/\.exe$/i, "");
+  return NAMES[base.toLowerCase()] ?? base.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
 export const CATEGORY_COLOR: Record<Category, string> = {
@@ -86,4 +100,39 @@ export function weekStats(totals: number[]) {
   const used = totals.filter((s) => s > 0);
   const average = used.length ? used.reduce((a, b) => a + b, 0) / used.length : 0;
   return { average, best: used.length ? totals.indexOf(Math.max(...totals)) : -1 };
+}
+
+export const CATEGORIES = ["code", "meet", "docs", "chat", "web", "other"] as const satisfies readonly Category[];
+
+/** Active seconds in each hour of the day (index 0-23), counting only the part of a span inside that hour. */
+export function hourlyHeat(spans: ActivitySpan[], dayStartSec: number): number[] {
+  const out = new Array<number>(24).fill(0);
+  for (const s of spans) {
+    for (let h = 0; h < 24; h++) {
+      const from = dayStartSec + h * 3600;
+      out[h] += Math.max(0, Math.min(from + 3600, s.end) - Math.max(from, s.start));
+    }
+  }
+  return out;
+}
+
+/** The two consecutive hours with the most activity across the days, or null with no records. */
+export function peakWindow(rows: number[][]): [number, number] | null {
+  const sum = new Array<number>(24).fill(0);
+  for (const r of rows) r.forEach((v, h) => (sum[h] += v));
+  let best = 0;
+  let at = -1;
+  for (let h = 0; h < 23; h++) {
+    if (sum[h] + sum[h + 1] > best) [best, at] = [sum[h] + sum[h + 1], h];
+  }
+  return at < 0 ? null : [at, at + 2];
+}
+
+/** Days in a row, newest first, that reached the goal; a today still short of it does not break the run. */
+export function streak(secsNewestFirst: number[], goalSecs: number): number {
+  if (goalSecs <= 0) return 0;
+  let i = (secsNewestFirst[0] ?? 0) >= goalSecs ? 0 : 1;
+  let n = 0;
+  while (i < secsNewestFirst.length && secsNewestFirst[i] >= goalSecs) [n, i] = [n + 1, i + 1];
+  return n;
 }
