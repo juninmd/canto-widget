@@ -56,3 +56,34 @@ export function barBox(span: ActivitySpan, dayStartSec: number, [from, to]: [num
 export function timelineRows(spans: ActivitySpan[], apps: AppTotal[], limit = 5) {
   return apps.slice(0, limit).map((a) => ({ app: a.app, secs: a.secs, spans: spans.filter((s) => s.app === a.app) }));
 }
+
+/** Spans and totals left once the hidden categories are taken out. */
+export function withoutHidden<T extends { app: string }>(items: T[], hidden: ReadonlySet<Category>): T[] {
+  return hidden.size === 0 ? items : items.filter((i) => !hidden.has(categoryOf(i.app)));
+}
+
+const SAME_BLOCK_GAP_SECS = 60;
+
+/** The longest stretch in one app (touching spans merge) and how many times the focus changed app. */
+export function focusStats(spans: ActivitySpan[]) {
+  const sorted = [...spans].sort((a, b) => a.start - b.start);
+  let best = { app: "", start: 0, secs: 0 };
+  let run = { app: "", start: 0, end: 0 };
+  let switches = 0;
+  for (const s of sorted) {
+    if (run.app === s.app && s.start - run.end <= SAME_BLOCK_GAP_SECS) run.end = s.end;
+    else {
+      if (run.app) switches++;
+      run = { app: s.app, start: s.start, end: s.end };
+    }
+    if (run.end - run.start > best.secs) best = { app: run.app, start: run.start, secs: run.end - run.start };
+  }
+  return { longest: best, switches };
+}
+
+/** Average over the days that have records, and the index of the busiest one. */
+export function weekStats(totals: number[]) {
+  const used = totals.filter((s) => s > 0);
+  const average = used.length ? used.reduce((a, b) => a + b, 0) / used.length : 0;
+  return { average, best: used.length ? totals.indexOf(Math.max(...totals)) : -1 };
+}
