@@ -57,53 +57,56 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-test("tracking is off until the user asks, and says what it keeps", async () => {
+async function turnOn() {
+  status = { supported: true, enabled: true };
   await mount();
-  expect(screen.getByText("Coleta desligada")).toBeTruthy();
-  expect(screen.getByText(/Nunca o título da janela/)).toBeTruthy();
+}
+const click = async (el: HTMLElement) => {
+  await act(async () => {
+    fireEvent.click(el);
+  });
+};
+const menuItem = async (name: string) => {
+  await click(screen.getByRole("button", { name: "Mais ações" }));
+  await click(screen.getByRole("menuitem", { name }));
+};
+
+test("tracking is off until the user asks, and says what it keeps and what it never does", async () => {
+  await mount();
+  expect(screen.getByText("Veja para onde o tempo vai")).toBeTruthy();
+  expect(screen.getByText(/título de janela, texto ou capturas/)).toBeTruthy();
+  expect(screen.getByText(/nome do aplicativo em foco e o tempo por tarefa/)).toBeTruthy();
   expect(calls.some((c) => c.cmd === "activity_summary")).toBe(false);
 });
 
-test("turning it on loads the day: total, categories and the most used apps", async () => {
+test("turning it on loads the day: the total in the donut, the legend, the idle time and the timeline", async () => {
   await mount();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "Ativar coleta" }));
-  });
+  await click(screen.getByRole("button", { name: "Ativar coleta" }));
   for (let i = 0; i < 3; i++) await act(async () => {});
   expect(calls.some((c) => c.cmd === "activity_set_enabled" && c.args?.enabled === true)).toBe(true);
-  expect(screen.getByText("Ativo: 2h30 · parado: 30 min")).toBeTruthy();
-  expect(screen.getByText("Parado")).toBeTruthy();
+  expect(screen.getAllByText("2h30").length).toBeGreaterThan(0);
   expect(screen.getByRole("button", { name: /Código/ })).toBeTruthy();
   expect(screen.getByRole("button", { name: /Comunicação/ })).toBeTruthy();
-  expect(screen.getByText("Maior bloco sem trocar de app")).toBeTruthy();
-  expect(screen.getAllByText("Code").length).toBeGreaterThan(0);
+  expect(screen.getByText("Parado 30 min")).toBeTruthy();
+  expect(screen.getByRole("region", { name: "Linha do tempo" })).toBeTruthy();
+  expect(screen.getByText("Maior bloco")).toBeTruthy();
+  expect(screen.getByText("Hora de pico")).toBeTruthy();
 });
 
-test("hiding a category takes its time out of the total", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
-  expect(screen.getAllByText("2h30").length).toBeGreaterThan(0);
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: /Código/ }));
-  });
-  expect(screen.getByRole("button", { name: /Código/ }).getAttribute("aria-pressed")).toBe("false");
-  expect(screen.getAllByText("30 min").length).toBeGreaterThan(0);
-  expect(screen.queryByText("2h30")).toBeNull();
-});
-
-test("the week view lists seven days, one summary call each", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "7 dias" }));
-  });
+test("the week view is a column chart of seven days, one summary call each, plus the hour heat map", async () => {
+  await turnOn();
+  await click(screen.getByRole("button", { name: "Semana" }));
   expect(calls.filter((c) => c.cmd === "activity_summary")).toHaveLength(7);
-  expect(screen.getAllByRole("listitem").length).toBeGreaterThanOrEqual(7);
+  expect(screen.getByRole("img", { name: "Tempo ativo por dia, últimos 7 dias" })).toBeTruthy();
+  expect(screen.getByText("Quando você rende mais")).toBeTruthy();
+  expect(screen.getByText(/Seu pico: 9h às 11h/)).toBeTruthy();
+  expect(screen.getByText("Média por dia")).toBeTruthy();
 });
 
 test("a system that cannot tell the focused window says so instead of offering to track", async () => {
   status = { supported: false, enabled: false };
   await mount();
+  expect(screen.getByText("Sem suporte neste sistema")).toBeTruthy();
   expect(screen.getByText(/Wayland/)).toBeTruthy();
   expect(screen.queryByRole("button", { name: "Ativar coleta" })).toBeNull();
 });
@@ -128,79 +131,93 @@ test("settings can turn tracking off and delete the history", async () => {
   expect(calls.some((c) => c.cmd === "activity_clear")).toBe(true);
 });
 
+test("hiding a category in the legend takes its time out of the total, and hiding all of them says so", async () => {
+  await turnOn();
+  const code = screen.getByRole("button", { name: /Código/ });
+  await click(code);
+  expect(screen.getByRole("button", { name: /Código/ }).getAttribute("aria-pressed")).toBe("false");
+  expect(screen.getAllByText("30 min").length).toBeGreaterThan(0);
+  expect(screen.queryByText("2h30")).toBeNull();
+  await click(screen.getByRole("button", { name: /Comunicação/ }));
+  expect(screen.getByText(/Nenhuma categoria marcada/)).toBeTruthy();
+});
+
 test("the previous day is one tap away, and an empty day says so", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
+  await turnOn();
   expect((screen.getByRole("button", { name: "Próximo dia" }) as HTMLButtonElement).disabled).toBe(true);
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "Dia anterior" }));
-  });
+  await click(screen.getByRole("button", { name: "Dia anterior" }));
   expect(screen.getByText("Ontem")).toBeTruthy();
-  expect(screen.getByText(/Ainda sem registros/)).toBeTruthy();
+  expect(screen.getByText("Ainda sem registros")).toBeTruthy();
 });
 
-test("the goal bar compares code time with the chosen goal", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
+test("the goal compares code time with the chosen goal, and the choice is remembered", async () => {
+  await turnOn();
   expect(screen.getByText(/2h de 4h/)).toBeTruthy();
-  await act(async () => {
-    fireEvent.change(screen.getByLabelText("Meta diária de foco em código"), { target: { value: "120" } });
-  });
-  expect(screen.getByText(/Meta cumprida/)).toBeTruthy();
+  expect(screen.getByText("faltam 2h")).toBeTruthy();
+  await click(screen.getByRole("button", { name: "Ajustar" }));
+  await click(screen.getByRole("button", { name: "2h" }));
+  expect(screen.getByText("Meta cumprida")).toBeTruthy();
   expect(localStorage.getItem("canto.activity.goalMin")).toBe("120");
+  await click(screen.getByRole("button", { name: "sem meta" }));
+  expect(screen.getByText(/Sem meta definida/)).toBeTruthy();
 });
 
-test("moving an app to another category is remembered and moves its time", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
+test("the menu opens the goal editor and closes on Escape", async () => {
+  await turnOn();
+  await click(screen.getByRole("button", { name: "Mais ações" }));
+  expect(screen.getByRole("menu")).toBeTruthy();
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: /^Code/ }));
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
   });
-  await act(async () => {
-    fireEvent.change(screen.getByLabelText(/Code conta como/), { target: { value: "docs" } });
-  });
+  expect(screen.queryByRole("menu")).toBeNull();
+  await menuItem("Ajustar meta de foco");
+  expect(screen.getByRole("group", { name: "Meta diária" })).toBeTruthy();
+});
+
+test("moving an app to another category is remembered and moves its time in the legend", async () => {
+  await turnOn();
+  await click(screen.getByRole("button", { name: /^Code/ }));
+  expect(screen.getByRole("group", { name: "Code conta como" })).toBeTruthy();
+  await click(screen.getByRole("button", { name: /Documentos/ }));
+  expect(JSON.parse(localStorage.getItem("canto.activity.categories")!)).toEqual({ Code: "docs" });
+  await click(screen.getByRole("button", { name: /^Code/ }));
+  expect(screen.queryByRole("group", { name: "Code conta como" })).toBeNull();
   expect(screen.getByRole("button", { name: /Documentos/ })).toBeTruthy();
   expect(screen.queryByRole("button", { name: /Código/ })).toBeNull();
-  expect(JSON.parse(localStorage.getItem("canto.activity.categories")!)).toEqual({ Code: "docs" });
 });
 
-test("the day can be copied as text", async () => {
-  status = { supported: true, enabled: true };
-  let copied = "";
-  Object.defineProperty(navigator, "clipboard", { value: { writeText: (x: string) => ((copied = x), Promise.resolve()) }, configurable: true });
-  await mount();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "Copiar resumo" }));
-  });
-  expect(copied).toContain("Hoje: 2h30 ativo");
-  expect(copied).toContain("- Código: 2h");
-});
-
-test("the week view adds the hour heat map", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "7 dias" }));
-  });
-  expect(screen.getByText("Quando você rende mais")).toBeTruthy();
-  expect(screen.getByText(/Seu pico: 9h às 11h/)).toBeTruthy();
-});
-
-test("the day lists the focus timer's time per task, and a removed task still shows its time", async () => {
-  status = { supported: true, enabled: true };
-  await mount();
-  expect(screen.getByText("Tempo por tarefa")).toBeTruthy();
+test("the lists switch to the tasks the focus timer ran on, and a removed task keeps its time", async () => {
+  await turnOn();
+  await click(screen.getByRole("button", { name: "Tarefas" }));
   expect(screen.getByText("Revisar PR do cofre")).toBeTruthy();
   expect(screen.getByText("Tarefa removida")).toBeTruthy();
+  expect(screen.getByText("Tempo do cronômetro de foco.")).toBeTruthy();
 });
 
-test("the copied summary names the tasks", async () => {
-  status = { supported: true, enabled: true };
+test("the day can be copied as text from the menu, tasks included, and the menu confirms it", async () => {
+  await turnOn();
   let copied = "";
   Object.defineProperty(navigator, "clipboard", { value: { writeText: (x: string) => ((copied = x), Promise.resolve()) }, configurable: true });
-  await mount();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "Copiar resumo" }));
-  });
+  await menuItem("Copiar resumo do dia");
+  expect(copied).toContain("Hoje: 2h30 ativo");
+  expect(copied).toContain("- Código: 2h");
   expect(copied).toContain("Tarefas: Revisar PR do cofre 1h, Tarefa removida 10 min");
+  expect(await screen.findByText("Resumo copiado")).toBeTruthy();
+  expect(screen.queryByRole("menu")).toBeNull();
+});
+
+test("the week menu has no day-only actions", async () => {
+  await turnOn();
+  await click(screen.getByRole("button", { name: "Semana" }));
+  await click(screen.getByRole("button", { name: "Mais ações" }));
+  expect(screen.getByRole("menuitem", { name: "Atualizar agora" })).toBeTruthy();
+  expect(screen.queryByRole("menuitem", { name: "Copiar resumo do dia" })).toBeNull();
+  expect(screen.queryByRole("menuitem", { name: "Ajustar meta de foco" })).toBeNull();
+});
+
+test("refresh asks Rust for the week again", async () => {
+  await turnOn();
+  const before = calls.filter((c) => c.cmd === "activity_summary").length;
+  await menuItem("Atualizar agora");
+  expect(calls.filter((c) => c.cmd === "activity_summary").length).toBe(before + 7);
 });

@@ -17,6 +17,12 @@
   --color-danger: #fb7185;
   --color-ok: #4ade80;
   --color-warn: #fbbf24;
+  --color-cat-games: #fb7185;
+  --color-cat-meet: #38bdf8;
+  --color-cat-docs: #fbbf24;
+  --color-cat-chat: #a78bfa;
+  --color-cat-web: #2dd4bf;
+  --color-cat-other: #64748b;
 }
 
 /* Hueco Mundo: areia branca sob a lua, céu morto e o vermelho dos Espadas. */
@@ -35,6 +41,12 @@
   --color-danger: #f87171;
   --color-ok: #86efac;
   --color-warn: #fbbf24;
+  --color-cat-games: #fb923c;
+  --color-cat-meet: #7dd3fc;
+  --color-cat-docs: #fcd34d;
+  --color-cat-chat: #c4b5fd;
+  --color-cat-web: #5eead4;
+  --color-cat-other: #78716c;
 }
 
 /* Drácula: paleta oficial dracula-theme.com */
@@ -53,6 +65,12 @@
   --color-danger: #be123c;
   --color-ok: #15803d;
   --color-warn: #b45309;
+  --color-cat-games: #e11d48;
+  --color-cat-meet: #0369a1;
+  --color-cat-docs: #b45309;
+  --color-cat-chat: #6d28d9;
+  --color-cat-web: #0f766e;
+  --color-cat-other: #7b8595;
 }
 :root[data-skin="dracula"] {
   --color-ink: #21222c;
@@ -68,6 +86,12 @@
   --color-danger: #ff5555;
   --color-ok: #50fa7b;
   --color-warn: #f1fa8c;
+  --color-cat-games: #ff5555;
+  --color-cat-meet: #8be9fd;
+  --color-cat-docs: #ffb86c;
+  --color-cat-chat: #ff79c6;
+  --color-cat-web: #50fa7b;
+  --color-cat-other: #6272a4;
 }
 
 /* Tailwind's spacing and text sizes are all rem: scaling the root font-size zooms everything at once. */
@@ -92,6 +116,12 @@
   --color-danger: var(--color-danger);
   --color-ok: var(--color-ok);
   --color-warn: var(--color-warn);
+  --color-cat-games: var(--color-cat-games);
+  --color-cat-meet: var(--color-cat-meet);
+  --color-cat-docs: var(--color-cat-docs);
+  --color-cat-chat: var(--color-cat-chat);
+  --color-cat-web: var(--color-cat-web);
+  --color-cat-other: var(--color-cat-other);
   /* Superficies derivadas da skin: nenhuma skin precisa redefinir estes. */
   --color-raised: color-mix(in oklab, var(--color-panel) 93%, var(--color-fg));
   --color-hover: color-mix(in oklab, var(--color-fg) 7%, transparent);

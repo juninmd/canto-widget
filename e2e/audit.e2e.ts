@@ -88,3 +88,32 @@ for (const density of ["compacta", "padrao"]) {
     });
   }
 }
+
+const activitySummary = {
+  spans: [{ app: "Code", start: Date.now() / 1000 - 7200, end: Date.now() / 1000 - 3600 }, { app: "Slack", start: Date.now() / 1000 - 3600, end: Date.now() / 1000 - 3000 }],
+  apps: [{ app: "Code", secs: 3600 }, { app: "Slack", secs: 600 }],
+  total_secs: 4200,
+  idle: [],
+  idle_secs: 0,
+  focus: [{ task: "t1", title: "Revisar o PR do filtro de relatórios", secs: 1200 }],
+};
+
+for (const density of ["compacta", "padrao"]) {
+  for (const enabled of [true, false]) {
+    test(`Atividade ${enabled ? "com dados" : "desligada"}: every button is at least 24 px in the ${density} density`, async ({ page }) => {
+      await page.addInitScript((d) => localStorage.setItem("canto.densidade", d), density);
+      await mockTauri(page, { hiddenTabs: [], fixed: { activity_status: { supported: true, enabled }, activity_summary: activitySummary } });
+      await page.goto("/");
+      await goTab(page, "Atividade");
+      await page.waitForTimeout(500);
+      expect(await smallTargets(page)).toEqual([]);
+      if (enabled) {
+        await page.getByRole("button", { name: "Semana" }).click();
+        await page.waitForTimeout(200);
+        expect(await smallTargets(page)).toEqual([]);
+        await page.getByRole("button", { name: "Mais ações" }).click();
+        expect(await smallTargets(page)).toEqual([]);
+      }
+    });
+  }
+}
