@@ -1,18 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { api, errText, todayLocal, type AgendaItem, type Task } from "../lib/api";
 import { t } from "../i18n";
-import AgendaCard from "./AgendaCard";
+import AgendaHero from "./AgendaHero";
+import AgendaRail from "./AgendaRail";
+import AgendaRibbon from "./AgendaRibbon";
+import AgendaTray from "./AgendaTray";
 import { conflicts, freeLabel, nextFree } from "../lib/agendaFree";
+import { minuteOf } from "../lib/agendaRail";
+import { dayBlocks, unscheduled } from "../lib/dayPlan";
 import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
-import DayPlan from "./DayPlan";
 import TranscriptsTab from "./TranscriptsTab";
 import { readView, saveView, type AgendaView } from "../lib/agendaView";
 
 const systemNow = () => new Date();
 
-const VIEWS: AgendaView[] = ["list", "day", "meetings"];
-const LABEL = { list: "plan.viewList", day: "plan.viewDay", meetings: "plan.viewMeetings" } as const;
+const VIEWS: AgendaView[] = ["today", "meetings"];
+const LABEL = { today: "agenda.view.today", meetings: "plan.viewMeetings" } as const;
 
 /// Synthetic event so the user can check the pop-up and sound without waiting for a meeting.
 function testEvent(): AgendaItem {
@@ -53,21 +57,22 @@ export default function AgendaTab({
     return () => clearInterval(tick);
   }, [now]);
   const clashes = useMemo(() => conflicts(items), [items]);
+  const allDay = items.filter((e) => e.all_day);
   const [view, setView] = useState<AgendaView>(readView);
   const [tasks, setTasks] = useState<Task[]>([]);
+  const hasDay = items.length > 0 || tasks.some((k) => !k.done && k.hora);
   const [reloadTasks, setReloadTasks] = useState(0);
   const pick = (v: AgendaView) => {
     setView(v);
     saveView(v);
   };
 
-  // The day view is the only one that needs tasks, so the list view never reads the vault for them.
   useEffect(() => {
-    if (view !== "day") return;
+    if (view !== "today") return;
     let live = true;
     api
       .tasksForDay(today)
-      .then((list) => live && setTasks(list))
+      .then((list) => live && setTasks(list ?? []))
       .catch((e) => live && onError(errText(e)));
     return () => {
       live = false;
@@ -120,7 +125,7 @@ export default function AgendaTab({
         </div>
       )}
 
-      {view !== "meetings" && items.length > 0 && (
+      {view === "today" && items.length > 0 && (
         <p role="status" className="rounded-md bg-edge/60 px-2 py-1 text-[11px] font-medium text-muted">
           {freeLabel(nextFree(items, at), at)}
         </p>
@@ -130,24 +135,28 @@ export default function AgendaTab({
         <div className="min-h-0 flex-1">
           <TranscriptsTab onError={onError} />
         </div>
-      ) : view === "day" ? (
-        <DayPlan agenda={items} tasks={tasks} now={at} onSchedule={schedule} />
       ) : (
-        <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
-          {items.map((e) => (
-            <AgendaCard key={e.id} event={e} conflicts={clashes.get(e.id)} open={open === e.id} onToggle={() => setOpen(open === e.id ? null : e.id)} />
-          ))}
-          {items.length === 0 && loading && !error && (
-            <li>
-              <Skeleton label={t("agenda.loading")} />
-            </li>
+        <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+          {hasDay && (
+            <>
+              <AgendaHero items={items} now={at} clashes={clashes} onDetails={setOpen} />
+              <AgendaRibbon items={items} tasks={tasks} now={at} />
+              {allDay.length > 0 && (
+                <ul className="flex flex-wrap gap-1.5">
+                  {allDay.map((e) => (
+                    <li key={e.id} className="rounded-full bg-hover px-2.5 py-0.5 text-[11px] text-muted">
+                      {e.title} · {t("agenda.allDay")}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <AgendaRail items={items} tasks={tasks} now={at} clashes={clashes} open={open} onToggle={(id) => setOpen(open === id ? null : id)} onSchedule={schedule} />
+            </>
           )}
-          {items.length === 0 && !loading && (
-            <li className="px-2 py-6 text-center text-xs text-faint">
-              {error || t("agenda.empty")}
-            </li>
-          )}
-        </ul>
+          {!hasDay && loading && !error && <Skeleton label={t("agenda.loading")} />}
+          {!hasDay && !loading && <p className="px-2 py-6 text-center text-xs text-faint">{error || t("agenda.empty")}</p>}
+          <AgendaTray tasks={unscheduled(tasks)} blocks={dayBlocks(items, tasks)} nowMin={minuteOf(at)} onSchedule={schedule} />
+        </div>
       )}
     </div>
   );

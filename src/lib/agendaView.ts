@@ -1,11 +1,8 @@
 const KEY = "canto.agendaView";
 
-export type AgendaView = "list" | "day" | "meetings";
+export type AgendaView = "today" | "meetings";
 
-/** The list stays the default: it is what the agenda always was. */
-export const readView = (): AgendaView => {
-  const saved = localStorage.getItem(KEY);
-  return saved === "day" || saved === "meetings" ? saved : "list";
-};
+/** The old list and day views merged into one; whoever had either saved lands on it. */
+export const readView = (): AgendaView => (localStorage.getItem(KEY) === "meetings" ? "meetings" : "today");
 
 export const saveView = (view: AgendaView) => localStorage.setItem(KEY, view);

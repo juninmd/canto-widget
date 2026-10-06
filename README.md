@@ -79,7 +79,7 @@ Today's events come from Google Calendar (read-only). One minute before, the wid
 Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
 it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
 The top line tells you the **next free slot** of at least 15 minutes (declined invites and all-day events don't
-count), and events that overlap get a **conflict** badge naming the other event. A **List | Day** switch turns the agenda into hour rows where tasks with a time (sized by their estimate) sit next to the meetings, clashes are flagged, and an untimed task books itself into the first free slot with one click.
+count), and events that overlap get a **conflict** badge naming the other event. The **Today** view leads with the meeting in progress (time left, join button, clash warning) or the next one, then **the day in one line** (meetings, tasks and free time across the working hours, with meeting time, free time and conflicts counted) and one timeline where meetings, tasks with a time and the free gaps are rows of their own: a gap offers to fit an untimed task, and what is already over folds away.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -280,11 +280,11 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Focus timer pinned under every tab | Agenda as a day, tasks beside meetings |
 |---|---|
-| ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda in the Day view: meetings as solid blocks, a task with a time as a dashed block and the untimed tasks above the hours](docs/prints/app/48-agenda-dia.png) |
+| ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda Today view: the meeting in progress with time left and a conflict warning, then the day in one line with meeting time, free time and conflicts](docs/prints/app/54-agenda-hoje.png) |
 
 | Day view: overlapping events share the width side by side |
 |---|
-| ![Agenda Day view where a daily and a planning meeting that overlap sit in two columns, with a one-to-one under the daily and the lunch and review blocks at full width](docs/prints/app/53-agenda-dia-sobreposicao.png) |
+| ![Agenda timeline: meetings, a task with a time and the free gaps as rows, each gap offering to fit an untimed task](docs/prints/app/55-agenda-linha.png) |
 
 | Review radar: oldest request first, overdue in red, snooze |
 |---|
@@ -292,7 +292,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Meetings as a sub-tab of the Agenda, next to List and Day |
 |---|
-| ![Agenda tab with the List, Day and Meetings sub-tabs, the Meetings one selected: folder, search box and three fictitious transcripts](docs/prints/app/52-agenda-reunioes.png) |
+| ![Agenda tab with the Today and Meetings sub-tabs, the Meetings one selected: folder, search box and three fictitious transcripts](docs/prints/app/52-agenda-reunioes.png) |
 
 | Activity tab (off by default) | Summary with focused time and closed PRs/MRs |
 |---|---|
