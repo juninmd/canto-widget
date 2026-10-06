@@ -21,7 +21,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
   );
 
   return (
-    <li className={`rounded-xl border p-3 transition-colors ${now ? "border-accent bg-accent/10" : "border-edge bg-ink/60 hover:border-line hover:bg-ink"}`}>
+    <div className={`rounded-xl border p-3 transition-colors ${now ? "border-accent bg-accent/10" : "border-edge bg-ink/60 hover:border-line hover:bg-ink"}`}>
       <button
         type="button"
         onClick={onToggle}
@@ -88,6 +88,6 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
           {t("agenda.joinMeet")}
         </button>
       )}
-    </li>
+    </div>
   );
 }

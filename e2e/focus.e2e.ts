@@ -26,7 +26,7 @@ test("starting a task pins the timer bar under every tab and pausing saves the t
   await expect(bar).toBeHidden();
 });
 
-test("the agenda day view lists the tasks that have a time", async ({ page }) => {
+test("the agenda lists the tasks that have a time", async ({ page }) => {
   await page.addInitScript((day: string) => {
     if (!sessionStorage.getItem("e2e.tasks"))
       sessionStorage.setItem("e2e.tasks", JSON.stringify([{ id: "b", title: "Escrever changelog", done: false, day, created_at: 1, updated_at: 1, hora: "11:00" }]));
@@ -34,6 +34,5 @@ test("the agenda day view lists the tasks that have a time", async ({ page }) =>
   await mockTauri(page);
   await page.goto("/");
   await goTab(page, "Agenda");
-  await page.getByRole("button", { name: "Dia" }).click();
   await expect(page.getByText("Escrever changelog")).toBeVisible();
 });

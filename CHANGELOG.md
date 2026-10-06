@@ -5,6 +5,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Agenda redesenhada**: as visões Lista e Dia viram uma só, **Hoje** (a escolha anterior cai nela). No topo, um
+  cartão com a reunião em andamento (tempo que falta, andamento, aviso de conflito e **entrar no Meet**) ou a
+  próxima; abaixo, **o dia em uma linha** (reuniões, tarefas e tempo livre ao longo do expediente, com o tempo em
+  reuniões, o tempo livre e os conflitos contados) e uma linha do tempo única em que reuniões, tarefas com horário e
+  janelas livres são linhas próprias. Uma janela livre oferece encaixar uma tarefa sem horário, o que já passou fica
+  recolhido e a linha vermelha marca o agora. Reuniões e os detalhes de cada evento seguem como antes.
+
 ### Adicionado
 
 - **Atividade mostra o tempo por tarefa**: o dia ganha o bloco **Tempo por tarefa**, com quanto o cronômetro de foco
