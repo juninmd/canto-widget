@@ -1,18 +1,20 @@
 import { t } from "../i18n";
 import { appName, barBox, byCategory, categoryOf, CATEGORY_COLOR, focusStats, hourRange, secsLabel, timelineRows, weekStats, type Category } from "../lib/activity";
-import type { ActivityAway, ActivitySpan } from "../lib/api";
+import type { ActivityAway, ActivityFocus, ActivitySpan } from "../lib/api";
 import ActivityApps from "./ActivityApps";
 import ActivityHeat from "./ActivityHeat";
+import ActivityTasks from "./ActivityTasks";
 
 type Apps = { app: string; secs: number }[];
-export type Day = { day: number; apps: Apps; spans: ActivitySpan[]; idle: ActivityAway[]; idleSecs: number };
+export type Day = { day: number; apps: Apps; spans: ActivitySpan[]; idle: ActivityAway[]; idleSecs: number; focus: ActivityFocus[] };
 
 const H3 = "text-[11px] font-semibold uppercase tracking-wide text-muted";
 const clock = (sec: number) => new Date(sec * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 
-export function TodayView({ spans, idle, apps, yesterdaySpans, dayStartMs, nowSec, onRecategorize }: {
+export function TodayView({ spans, idle, focus, apps, yesterdaySpans, dayStartMs, nowSec, onRecategorize }: {
   spans: ActivitySpan[];
   idle: ActivityAway[];
+  focus: ActivityFocus[];
   apps: Apps;
   yesterdaySpans: ActivitySpan[];
   dayStartMs: number;
@@ -58,6 +60,7 @@ export function TodayView({ spans, idle, apps, yesterdaySpans, dayStartMs, nowSe
         </div>
         {showNow && <p className="text-[10px] text-faint">{t("activity.nowHint")}</p>}
       </section>
+      <ActivityTasks focus={focus} />
       <ActivityApps apps={apps} onRecategorize={onRecategorize} />
       <section className="flex flex-col gap-1.5">
         <h3 className={H3}>{t("activity.focusDay")}</h3>

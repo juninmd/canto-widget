@@ -12,6 +12,8 @@ export type Subtask = { id: string; title: string; done: boolean };
 /** Unix seconds: the day is cut in the UI, whose timezone is the reliable one. */
 export type ActivitySpan = { app: string; start: number; end: number };
 export type ActivityAway = { start: number; end: number };
+/** Focus-timer time on one task; `title` is null once the task is gone. */
+export type ActivityFocus = { task: string; title: string | null; secs: number };
 export type ActivitySummary = {
   spans: ActivitySpan[];
   apps: { app: string; secs: number }[];
@@ -19,6 +21,7 @@ export type ActivitySummary = {
   /** Stretches with the computer on and no keyboard or mouse input. */
   idle: ActivityAway[];
   idle_secs: number;
+  focus: ActivityFocus[];
 };
 export type ActivityStatus = { supported: boolean; enabled: boolean };
 
