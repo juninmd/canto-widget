@@ -19,10 +19,20 @@ pub struct Span {
     pub end: i64,
 }
 
+/// A stretch with the computer on and Canto running but no keyboard or mouse input.
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub struct Away {
+    pub start: i64,
+    pub end: i64,
+}
+
 #[derive(Debug, Default, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Log {
     #[serde(default)]
     pub spans: Vec<Span>,
+    /// Older logs have no such key; they load with none.
+    #[serde(default)]
+    pub idle: Vec<Away>,
 }
 
 impl Log {
@@ -39,11 +49,30 @@ impl Log {
         self.prune(now);
     }
 
+    /// Adds one idle sample taken at `now`; the user was away, which is not the same as a gap in the log.
+    pub fn record_idle(&mut self, now: i64) {
+        let from = now - INTERVAL_SECS;
+        match self.idle.last_mut() {
+            Some(last) if from - last.end <= GAP_SECS - INTERVAL_SECS => last.end = last.end.max(now),
+            _ => self.idle.push(Away { start: from, end: now }),
+        }
+        self.prune(now);
+    }
+
+    pub fn clear(&mut self) {
+        self.spans.clear();
+        self.idle.clear();
+    }
+
     fn prune(&mut self, now: i64) {
         let oldest = now - RETENTION_SECS;
         self.spans.retain(|s| s.end >= oldest);
+        self.idle.retain(|a| a.end >= oldest);
         if self.spans.len() > MAX_SPANS {
             self.spans.drain(0..self.spans.len() - MAX_SPANS);
+        }
+        if self.idle.len() > MAX_SPANS {
+            self.idle.drain(0..self.idle.len() - MAX_SPANS);
         }
     }
 }
@@ -66,6 +95,9 @@ pub struct Summary {
     /// Time per application, most used first.
     pub apps: Vec<AppTotal>,
     pub total_secs: i64,
+    /// Away stretches clipped to the window, oldest first.
+    pub idle: Vec<Away>,
+    pub idle_secs: i64,
 }
 
 /// Bounds the answer to the webview; the newest spans win, since they are the ones the timeline shows.
@@ -91,7 +123,14 @@ pub fn summarize(log: &Log, from: i64, to: i64) -> Summary {
     if spans.len() > SPANS_MAX {
         spans.drain(0..spans.len() - SPANS_MAX);
     }
-    Summary { spans, apps: totals, total_secs }
+    let idle: Vec<Away> = log
+        .idle
+        .iter()
+        .filter(|a| a.end > from && a.start < to)
+        .map(|a| Away { start: a.start.max(from), end: a.end.min(to) })
+        .collect();
+    let idle_secs = idle.iter().map(|a| a.end - a.start).sum();
+    Summary { spans, apps: totals, total_secs, idle: idle.into_iter().rev().take(SPANS_MAX).rev().collect(), idle_secs }
 }
 
 #[cfg(test)]

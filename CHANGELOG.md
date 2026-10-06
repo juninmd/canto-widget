@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Atividade separa o tempo parado**: quando você fica sem teclado e mouse por 2 minutos com o Canto aberto, esse
+  trecho passa a aparecer como **Parado** na linha do tempo e no resumo do dia, em vez de virar um buraco que
+  poderia ser computador desligado ou cofre trancado. O tempo ativo continua o mesmo; só o que é novo é registrado,
+  e logs antigos continuam abrindo. No Linux a ociosidade depende do `xprintidle`.
 - **Aba Atividade renovada**: o topo mostra o total, a diferença para ontem, a divisão por categoria e chips que
   escondem uma categoria (os totais, a linha do tempo e a semana se recalculam). A linha do tempo marca o "agora" e
   mostra o horário de cada trecho ao passar o mouse; os aplicativos ganham a cor da categoria e a parte do dia; o

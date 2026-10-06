@@ -45,13 +45,14 @@ fn the_app_name_is_one_trimmed_bounded_line() {
 
 #[test]
 fn old_spans_are_dropped_and_the_log_has_a_ceiling() {
-    let mut log = Log { spans: vec![Span { app: "Velho".into(), start: 0, end: 10 }] };
+    let mut log = Log { spans: vec![Span { app: "Velho".into(), start: 0, end: 10 }], ..Default::default() };
     log.record(Some("Code"), RETENTION_SECS + 100);
     assert_eq!(spans(&log), vec![("Code", RETENTION_SECS + 95, RETENTION_SECS + 100)]);
     let mut big = Log {
         spans: (0..MAX_SPANS as i64 + 5)
             .map(|i| Span { app: format!("a{i}"), start: i * 10, end: i * 10 + 5 })
             .collect(),
+        ..Default::default()
     };
     big.record(Some("novo"), MAX_SPANS as i64 * 10 + 100);
     assert_eq!(big.spans.len(), MAX_SPANS);
@@ -67,6 +68,7 @@ fn a_summary_clips_spans_to_the_window_and_ranks_apps_by_time() {
             Span { app: "Code".into(), start: 200, end: 260 },
             Span { app: "Fora".into(), start: 500, end: 600 },
         ],
+        ..Default::default()
     };
     let s = summarize(&log, 50, 250);
     assert_eq!(s.spans.len(), 3);
@@ -85,9 +87,41 @@ fn an_old_log_file_with_no_spans_key_still_loads() {
 fn a_summary_keeps_the_newest_spans_when_it_has_to_cut() {
     let log = Log {
         spans: (0..SPANS_MAX as i64 + 3).map(|i| Span { app: "Code".into(), start: i * 10, end: i * 10 + 5 }).collect(),
+        ..Default::default()
     };
     let s = summarize(&log, 0, i64::MAX / 2);
     assert_eq!(s.spans.len(), SPANS_MAX);
     assert_eq!(s.spans.last().unwrap().start, (SPANS_MAX as i64 + 2) * 10);
     assert_eq!(s.total_secs, (SPANS_MAX as i64 + 3) * 5, "totals count what was cut too");
+}
+
+#[test]
+fn idle_samples_grow_one_away_stretch_and_a_gap_starts_another() {
+    let mut log = Log::default();
+    for now in [1005, 1010, 1015] {
+        log.record_idle(now);
+    }
+    log.record_idle(1100);
+    assert_eq!(log.idle, vec![Away { start: 1000, end: 1015 }, Away { start: 1095, end: 1100 }]);
+    assert!(log.spans.is_empty(), "idle never counts as an application");
+}
+
+#[test]
+fn a_summary_clips_the_away_time_and_a_log_without_the_key_has_none() {
+    let log = Log { idle: vec![Away { start: 0, end: 100 }, Away { start: 300, end: 400 }], ..Default::default() };
+    let s = summarize(&log, 50, 350);
+    assert_eq!(s.idle, vec![Away { start: 50, end: 100 }, Away { start: 300, end: 350 }]);
+    assert_eq!(s.idle_secs, 100);
+    let old: Log = serde_json::from_str(r#"{"spans":[{"app":"Code","start":1,"end":2}]}"#).unwrap();
+    assert_eq!((old.spans.len(), old.idle.len()), (1, 0));
+}
+
+#[test]
+fn old_away_time_is_dropped_and_clear_forgets_both() {
+    let mut log = Log { idle: vec![Away { start: 0, end: 10 }], ..Default::default() };
+    log.record_idle(RETENTION_SECS + 100);
+    assert_eq!(log.idle, vec![Away { start: RETENTION_SECS + 95, end: RETENTION_SECS + 100 }]);
+    log.record(Some("Code"), RETENTION_SECS + 105);
+    log.clear();
+    assert!(log.spans.is_empty() && log.idle.is_empty());
 }
