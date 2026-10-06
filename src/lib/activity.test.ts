@@ -13,6 +13,11 @@ test("applications land in a category by name, and a call app counts as a meetin
   expect(categoryOf("firefox")).toBe("web");
   expect(categoryOf("Notion")).toBe("docs");
   expect(categoryOf("Calculadora")).toBe("other");
+  expect(categoryOf("cs2")).toBe("games");
+  expect(categoryOf("steamwebhelper")).toBe("games");
+  expect(categoryOf("VALORANT-Win64-Shipping")).toBe("games");
+  expect(categoryOf("fullscreen")).toBe("games");
+  expect(categoryOf("Discord")).toBe("meet");
 });
 
 test("time per category adds the applications up, biggest first, and skips empty ones", () => {
@@ -87,6 +92,7 @@ test("process names turn into readable app names", () => {
   expect(appName("WindowsTerminal.exe")).toBe("Windows Terminal");
   expect(appName("msedge")).toBe("Edge");
   expect(appName("Code")).toBe("Code");
+  expect(appName("fullscreen")).toBe("App em tela cheia");
 });
 
 test("hourly heat splits a span across the hours it touches", () => {

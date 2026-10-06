@@ -51,6 +51,9 @@ pub fn idle_secs() -> Option<u64> {
 mod imp {
     use windows::core::PWSTR;
     use windows::Win32::Foundation::CloseHandle;
+    use windows::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W, TH32CS_SNAPPROCESS,
+    };
     use windows::Win32::System::SystemInformation::GetTickCount;
     use windows::Win32::System::Threading::{
         OpenProcess, QueryFullProcessImageNameW, PROCESS_NAME_WIN32, PROCESS_QUERY_LIMITED_INFORMATION,
@@ -70,13 +73,40 @@ mod imp {
             if pid == 0 {
                 return None;
             }
-            let process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid).ok()?;
-            let mut buf = [0u16; 520];
-            let mut len = buf.len() as u32;
-            let queried = QueryFullProcessImageNameW(process, PROCESS_NAME_WIN32, PWSTR(buf.as_mut_ptr()), &mut len);
-            let _ = CloseHandle(process);
-            queried.ok()?;
-            super::exe_stem(&String::from_utf16_lossy(&buf[..len as usize]))
+            // Games under an anti-cheat driver refuse the handle; the process list still names them.
+            query_path(pid).and_then(|p| super::exe_stem(&p)).or_else(|| name_from_snapshot(pid))
+        }
+    }
+
+    unsafe fn query_path(pid: u32) -> Option<String> {
+        let process = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, false, pid).ok()?;
+        let mut buf = [0u16; 520];
+        let mut len = buf.len() as u32;
+        let queried = QueryFullProcessImageNameW(process, PROCESS_NAME_WIN32, PWSTR(buf.as_mut_ptr()), &mut len);
+        let _ = CloseHandle(process);
+        queried.ok()?;
+        Some(String::from_utf16_lossy(&buf[..len as usize]))
+    }
+
+    /// The executable name from the process list, which needs no access to the process itself.
+    fn name_from_snapshot(pid: u32) -> Option<String> {
+        // SAFETY: the snapshot handle is closed before returning and `entry` is sized as the API requires.
+        unsafe {
+            let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0).ok()?;
+            let mut entry =
+                PROCESSENTRY32W { dwSize: std::mem::size_of::<PROCESSENTRY32W>() as u32, ..Default::default() };
+            let mut name = None;
+            let mut more = Process32FirstW(snapshot, &mut entry).is_ok();
+            while more {
+                if entry.th32ProcessID == pid {
+                    let len = entry.szExeFile.iter().position(|&c| c == 0).unwrap_or(entry.szExeFile.len());
+                    name = super::exe_stem(&String::from_utf16_lossy(&entry.szExeFile[..len]));
+                    break;
+                }
+                more = Process32NextW(snapshot, &mut entry).is_ok();
+            }
+            let _ = CloseHandle(snapshot);
+            name
         }
     }
 
