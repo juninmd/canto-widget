@@ -11,17 +11,17 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@tauri-apps/api": "^2.12.0",
-    "@tiptap/core": "^3.31.3",
-    "@tiptap/extension-hard-break": "^3.31.3",
-    "@tiptap/extension-link": "^3.31.3",
-    "@tiptap/extension-list": "^3.31.3",
-    "@tiptap/extensions": "^3.31.3",
-    "@tiptap/markdown": "^3.31.3",
-    "@tiptap/pm": "^3.31.3",
-    "@tiptap/react": "^3.31.3",
-    "@tiptap/starter-kit": "^3.31.3",
-    "marked": "^18.0.14",
+    "@tauri-apps/api": "^2.12.1",
+    "@tiptap/core": "^3.31.4",
+    "@tiptap/extension-hard-break": "^3.31.4",
+    "@tiptap/extension-link": "^3.31.4",
+    "@tiptap/extension-list": "^3.31.4",
+    "@tiptap/extensions": "^3.31.4",
+    "@tiptap/markdown": "^3.31.4",
+    "@tiptap/pm": "^3.31.4",
+    "@tiptap/react": "^3.31.4",
+    "@tiptap/starter-kit": "^3.31.4",
+    "marked": "^18.1.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },
@@ -29,15 +29,15 @@
     "@happy-dom/global-registrator": "^20.14.5",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "^4.3.3",
-    "@tauri-apps/cli": "^2.12.0",
+    "@tauri-apps/cli": "^2.12.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/bun": "^1.4.2",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.1",
+    "@vitejs/plugin-react": "^6.1.2",
     "tailwindcss": "^4.3.3",
     "typescript": "^7.0.2",
-    "vite": "^8.3.1"
+    "vite": "^8.3.2"
   }
 }
