@@ -5,56 +5,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
-### Corrigido
-
-- **Atividade passa a registrar jogos como o CS2**: no Windows, jogos com anti-cheat recusam a consulta ao processo e
-  o Canto não achava o nome do app em foco, então o tempo de jogo sumia. Agora o nome vem da lista de processos, e
-  se nem assim for possível o tempo entra como "App em tela cheia". Os jogos ganham a categoria **Jogos** (CS2,
-  Valorant, Steam, League of Legends e outros), que também pode ser atribuída a qualquer app tocando nele.
-
-### Alterado
-
-- **Atividade separa o tempo parado**: quando você fica sem teclado e mouse por 2 minutos com o Canto aberto, esse
-  trecho passa a aparecer como **Parado** na linha do tempo e no resumo do dia, em vez de virar um buraco que
-  poderia ser computador desligado ou cofre trancado. O tempo ativo continua o mesmo; só o que é novo é registrado,
-  e logs antigos continuam abrindo. No Linux a ociosidade depende do `xprintidle`.
-- **Aba Atividade renovada**: o topo mostra o total, a diferença para ontem, a divisão por categoria e chips que
-  escondem uma categoria (os totais, a linha do tempo e a semana se recalculam). A linha do tempo marca o "agora" e
-  mostra o horário de cada trecho ao passar o mouse; os aplicativos ganham a cor da categoria e a parte do dia; o
-  novo bloco "Dia em foco" traz o maior período sem trocar de app e quantas trocas houve; a semana ganha a média e
-  o dia mais ativo.
-- **Atividade: navegar, meta e mapa de calor**: setas ‹ › passam pelos últimos 7 dias; uma meta diária de foco em
-  código (ajustável, 4h por padrão) mostra o progresso e quantos dias seguidos foi cumprida; a semana ganha um mapa
-  de calor por hora com o seu pico; tocar num aplicativo deixa mudar a categoria dele (fica guardado neste
-  computador); nomes como `WindowsTerminal` e `msedge` aparecem legíveis; e **Copiar resumo** leva o dia em texto.
-- **Dependências atualizadas**: Tauri 2.12.1 e os plugins (autostart 2.7, opener 2.7, single-instance 2.5.2,
-  updater 2.13.1 e outros), TipTap 3.31.4, `marked` 18.1, Vite 8.3.2 e o resto dos lockfiles (front e back) para as
-  últimas versões compatíveis. Isso também tira o `source-map-js` vulnerável (GHSA-68fv-2mgg-jv7q) que fazia o
-  `bun audit` falhar no CI.
-
-### Corrigido
-
-- **Aviso não tira mais o jogo da tela cheia**: com um app em tela cheia na frente (um jogo, um vídeo, uma
-  apresentação), o Canto não abre mais o pop-up nem manda a notificação do sistema, que podiam minimizar o jogo.
-  Os avisos ficam esperando e o pop-up aparece quando você sai da tela cheia; no modo mini eles entram no trilho
-  como sempre. O Windows informa a tela cheia (o mesmo sinal que ele usa para segurar as próprias notificações), então
-  vale também para jogos em janela sem borda. Em Ajustes → "Jogos e tela cheia" dá para desligar. No macOS e no Linux
-  nada muda por enquanto. Além disso, a janela do pop-up deixou de pedir o foco do teclado para si quando não o tem.
-- **Abas não são mais cortadas**: as que não cabem na largura da janela vão para um botão **mais ▾** com a lista
-  (e o Alt+N de cada uma), em vez de sumirem sob a borda com o texto pela metade. A aba aberta fica sempre na barra,
-  as setas, Home e End alcançam também as que estão no menu, e com a janela larga, em tela cheia ou na densidade
-  compacta o botão nem aparece.
-- **Menu de modos do trilho cabe na janela**: com poucos avisos o menu abria ancorado no botão, e a metade de baixo
-  caía fora da janela do mini e era cortada. Agora ele fica fixo no canto superior esquerdo da janela, ao lado dos
-  ícones, e a janela cresce o bastante (340 × 300) para mostrar as quatro opções inteiras.
-- **Popup não rouba mais o foco**: o aviso aparece sem ativar a janela, então não tira o foco de quem está jogando
-  em tela cheia ou digitando em outro app. Os botões continuam funcionando com o mouse.
-- **Popup de aviso em janela própria**: reunião, lembrete de tarefa, instabilidade de serviço e modelo novo agora
-  aparecem numa janela separada no canto da tela. Antes o aviso abria o Canto inteiro por cima, mesmo com ele
-  minimizado; agora o widget continua minimizado e, com o cofre trancado, o popup aparece do mesmo jeito (concluir
-  tarefa pede o cofre aberto; adiar, fechar e entrar na reunião não).
-
 ### Adicionado
+
+- **Atividade mostra o tempo por tarefa**: o dia ganha o bloco **Tempo por tarefa**, com quanto o cronômetro de foco
+  correu em cada tarefa naquele dia (tarefas apagadas aparecem como "Tarefa removida" e **Copiar resumo** leva a
+  lista). O tempo só é registrado com a coleta de atividade ligada, fica no mesmo arquivo cifrado e local (35 dias,
+  fora do backup e da sincronização) e guarda só o identificador da tarefa; **Apagar histórico** também o limpa. O
+  total que cada tarefa já tinha continua igual.
+
 
 - **Notificações no modo Maximizado**: a coluna da direita lista os avisos pendentes como cartões, com as mesmas
   ações do pop-up (entrar no Meet, abrir PR, concluir, adiar, silenciar, fechar) e "dispensar todas", e mostra abaixo
@@ -215,6 +173,25 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Atividade separa o tempo parado**: quando você fica sem teclado e mouse por 2 minutos com o Canto aberto, esse
+  trecho passa a aparecer como **Parado** na linha do tempo e no resumo do dia, em vez de virar um buraco que
+  poderia ser computador desligado ou cofre trancado. O tempo ativo continua o mesmo; só o que é novo é registrado,
+  e logs antigos continuam abrindo. No Linux a ociosidade depende do `xprintidle`.
+- **Aba Atividade renovada**: o topo mostra o total, a diferença para ontem, a divisão por categoria e chips que
+  escondem uma categoria (os totais, a linha do tempo e a semana se recalculam). A linha do tempo marca o "agora" e
+  mostra o horário de cada trecho ao passar o mouse; os aplicativos ganham a cor da categoria e a parte do dia; o
+  novo bloco "Dia em foco" traz o maior período sem trocar de app e quantas trocas houve; a semana ganha a média e
+  o dia mais ativo.
+- **Atividade: navegar, meta e mapa de calor**: setas ‹ › passam pelos últimos 7 dias; uma meta diária de foco em
+  código (ajustável, 4h por padrão) mostra o progresso e quantos dias seguidos foi cumprida; a semana ganha um mapa
+  de calor por hora com o seu pico; tocar num aplicativo deixa mudar a categoria dele (fica guardado neste
+  computador); nomes como `WindowsTerminal` e `msedge` aparecem legíveis; e **Copiar resumo** leva o dia em texto.
+- **Dependências atualizadas**: Tauri 2.12.1 e os plugins (autostart 2.7, opener 2.7, single-instance 2.5.2,
+  updater 2.13.1 e outros), TipTap 3.31.4, `marked` 18.1, Vite 8.3.2 e o resto dos lockfiles (front e back) para as
+  últimas versões compatíveis. Isso também tira o `source-map-js` vulnerável (GHSA-68fv-2mgg-jv7q) que fazia o
+  `bun audit` falhar no CI.
+
+
 - **Notas de cada release mais bonitas**: o texto de cada versão publicada no GitHub agora abre com um resumo ("✨ 5
   novidades · 🐛 1 correção"), separa as mudanças por tipo (novidades, correções, desempenho, melhorias internas e,
   quando há, mudanças incompatíveis), usa os commits do pull request como itens, com link para cada um, traz uma
@@ -270,6 +247,33 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   incidentes no fim) e os que tiveram incidente nas últimas 24 h ganham destaque em vermelho, com ponto pulsante.
 
 ### Corrigido
+
+- **Atividade passa a registrar jogos como o CS2**: no Windows, jogos com anti-cheat recusam a consulta ao processo e
+  o Canto não achava o nome do app em foco, então o tempo de jogo sumia. Agora o nome vem da lista de processos, e
+  se nem assim for possível o tempo entra como "App em tela cheia". Os jogos ganham a categoria **Jogos** (CS2,
+  Valorant, Steam, League of Legends e outros), que também pode ser atribuída a qualquer app tocando nele.
+
+
+- **Aviso não tira mais o jogo da tela cheia**: com um app em tela cheia na frente (um jogo, um vídeo, uma
+  apresentação), o Canto não abre mais o pop-up nem manda a notificação do sistema, que podiam minimizar o jogo.
+  Os avisos ficam esperando e o pop-up aparece quando você sai da tela cheia; no modo mini eles entram no trilho
+  como sempre. O Windows informa a tela cheia (o mesmo sinal que ele usa para segurar as próprias notificações), então
+  vale também para jogos em janela sem borda. Em Ajustes → "Jogos e tela cheia" dá para desligar. No macOS e no Linux
+  nada muda por enquanto. Além disso, a janela do pop-up deixou de pedir o foco do teclado para si quando não o tem.
+- **Abas não são mais cortadas**: as que não cabem na largura da janela vão para um botão **mais ▾** com a lista
+  (e o Alt+N de cada uma), em vez de sumirem sob a borda com o texto pela metade. A aba aberta fica sempre na barra,
+  as setas, Home e End alcançam também as que estão no menu, e com a janela larga, em tela cheia ou na densidade
+  compacta o botão nem aparece.
+- **Menu de modos do trilho cabe na janela**: com poucos avisos o menu abria ancorado no botão, e a metade de baixo
+  caía fora da janela do mini e era cortada. Agora ele fica fixo no canto superior esquerdo da janela, ao lado dos
+  ícones, e a janela cresce o bastante (340 × 300) para mostrar as quatro opções inteiras.
+- **Popup não rouba mais o foco**: o aviso aparece sem ativar a janela, então não tira o foco de quem está jogando
+  em tela cheia ou digitando em outro app. Os botões continuam funcionando com o mouse.
+- **Popup de aviso em janela própria**: reunião, lembrete de tarefa, instabilidade de serviço e modelo novo agora
+  aparecem numa janela separada no canto da tela. Antes o aviso abria o Canto inteiro por cima, mesmo com ele
+  minimizado; agora o widget continua minimizado e, com o cofre trancado, o popup aparece do mesmo jeito (concluir
+  tarefa pede o cofre aberto; adiar, fechar e entrar na reunião não).
+
 
 - **Popup de reunião sem texto cortado**: a descrição aparece inteira (rola dentro da caixa se passar do espaço) e
   os convidados são listados com a resposta de cada um, em vez de só o resumo e o corte em 4 linhas.

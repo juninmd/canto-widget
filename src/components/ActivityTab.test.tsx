@@ -17,8 +17,12 @@ const summary = {
   total_secs: 9000,
   idle: [{ start: day + 11.5 * 3600, end: day + 12 * 3600 }],
   idle_secs: 1800,
+  focus: [
+    { task: "t1", title: "Revisar PR do cofre", secs: 3600 },
+    { task: "gone", title: null, secs: 600 },
+  ],
 };
-const empty = { spans: [], apps: [], total_secs: 0, idle: [], idle_secs: 0 };
+const empty = { spans: [], apps: [], total_secs: 0, idle: [], idle_secs: 0, focus: [] };
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
@@ -180,4 +184,23 @@ test("the week view adds the hour heat map", async () => {
   });
   expect(screen.getByText("Quando você rende mais")).toBeTruthy();
   expect(screen.getByText(/Seu pico: 9h às 11h/)).toBeTruthy();
+});
+
+test("the day lists the focus timer's time per task, and a removed task still shows its time", async () => {
+  status = { supported: true, enabled: true };
+  await mount();
+  expect(screen.getByText("Tempo por tarefa")).toBeTruthy();
+  expect(screen.getByText("Revisar PR do cofre")).toBeTruthy();
+  expect(screen.getByText("Tarefa removida")).toBeTruthy();
+});
+
+test("the copied summary names the tasks", async () => {
+  status = { supported: true, enabled: true };
+  let copied = "";
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: (x: string) => ((copied = x), Promise.resolve()) }, configurable: true });
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Copiar resumo" }));
+  });
+  expect(copied).toContain("Tarefas: Revisar PR do cofre 1h, Tarefa removida 10 min");
 });

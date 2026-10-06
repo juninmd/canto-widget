@@ -1,6 +1,7 @@
 //! Per-task focus: the planned effort and the seconds the timer has added so far.
 use tauri::State;
 
+use crate::activity_watch::ActivityState;
 use crate::error::{AppError, Result};
 use crate::model::{next_version, now_ms};
 use crate::vault::AppState;
@@ -38,15 +39,19 @@ pub fn task_set_estimate(state: State<'_, AppState>, id: String, minutes: Option
 
 /// A task deleted while its timer ran simply has nowhere to add the time.
 #[tauri::command(async)]
-pub fn task_add_time(state: State<'_, AppState>, id: String, secs: u32) -> Result<()> {
+pub fn task_add_time(state: State<'_, AppState>, act: State<'_, ActivityState>, id: String, secs: u32) -> Result<()> {
     add_tracked(0, secs)?;
     // Background on purpose: a timer left running must not keep the vault from auto-locking.
-    state.in_background(|d| {
-        let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) else { return ((), false) };
+    let found = state.in_background(|d| {
+        let Some(t) = d.tasks.iter_mut().find(|t| t.id == id) else { return (false, false) };
         t.tracked_secs = add_tracked(t.tracked_secs, secs).unwrap_or(t.tracked_secs);
         t.updated_at = next_version(t.updated_at, now_ms());
-        ((), true)
-    })
+        (true, true)
+    })?;
+    if found {
+        act.record_focus(&state, &id, secs, now_ms() / 1000);
+    }
+    Ok(())
 }
 
 #[cfg(test)]

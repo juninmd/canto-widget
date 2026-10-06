@@ -37,7 +37,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
       if (!st.enabled) return;
       const days = [0, 1, 2, 3, 4, 5, 6].map((i) => start - i * DAY_MS);
       const [todaySummary, ...rest] = await Promise.all(days.map((d) => api.activitySummary(d, d + DAY_MS)));
-      setData({ week: [todaySummary, ...rest].map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs })) });
+      setData({ week: [todaySummary, ...rest].map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs, focus: s.focus })) });
     } catch (e) {
       onError(errText(e));
     }
@@ -100,7 +100,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
 
   async function copy() {
     try {
-      await navigator.clipboard.writeText(activityText(dayLabel, shown));
+      await navigator.clipboard.writeText(activityText(dayLabel, shown, shownDay.focus));
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {
@@ -154,7 +154,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
           {shown.length === 0 ? (
             <p className="px-2 py-4 text-center text-xs text-faint">{t("activity.noneSelected")}</p>
           ) : period === "today" ? (
-            <TodayView spans={withoutHidden(shownDay.spans, hidden)} idle={shownDay.idle} apps={shown} yesterdaySpans={before ? withoutHidden(before.spans, hidden) : []} dayStartMs={start - sel * DAY_MS} nowSec={sel === 0 ? Math.floor(Date.now() / 1000) : null} onRecategorize={recategorize} />
+            <TodayView spans={withoutHidden(shownDay.spans, hidden)} idle={shownDay.idle} focus={shownDay.focus} apps={shown} yesterdaySpans={before ? withoutHidden(before.spans, hidden) : []} dayStartMs={start - sel * DAY_MS} nowSec={sel === 0 ? Math.floor(Date.now() / 1000) : null} onRecategorize={recategorize} />
           ) : (
             <WeekView days={data.week.map((d) => ({ ...d, apps: withoutHidden(d.apps, hidden), spans: withoutHidden(d.spans, hidden) }))} />
           )}

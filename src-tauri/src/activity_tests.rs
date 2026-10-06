@@ -125,3 +125,52 @@ fn old_away_time_is_dropped_and_clear_forgets_both() {
     log.clear();
     assert!(log.spans.is_empty() && log.idle.is_empty());
 }
+
+#[test]
+fn focus_flushes_of_one_task_grow_a_stretch_and_another_task_or_a_long_gap_starts_a_new_one() {
+    let mut log = Log::default();
+    log.record_focus("a", 60, 1060);
+    log.record_focus("a", 60, 1121);
+    log.record_focus("b", 30, 1151);
+    log.record_focus("b", 30, 1500);
+    let spans: Vec<_> = log.focus.iter().map(|f| (f.task.as_str(), f.start, f.end)).collect();
+    assert_eq!(spans, vec![("a", 1000, 1121), ("b", 1121, 1151), ("b", 1470, 1500)]);
+    assert!(log.spans.is_empty() && log.idle.is_empty(), "task time never counts as an application");
+}
+
+#[test]
+fn focus_ignores_empty_input_keeps_only_the_id_and_forgets_old_time() {
+    let mut log = Log::default();
+    log.record_focus("", 60, 1000);
+    log.record_focus("a", 0, 1000);
+    assert!(log.focus.is_empty());
+    log.record_focus(&"x".repeat(300), 60, 1000);
+    assert_eq!(log.focus[0].task.chars().count(), TASK_ID_CHARS);
+    log.record_focus("a", 60, RETENTION_SECS + 2000);
+    assert_eq!(log.focus.len(), 1, "the old stretch fell out of the retention window");
+    log.clear();
+    assert!(log.focus.is_empty());
+}
+
+#[test]
+fn a_summary_adds_focus_per_task_inside_the_window_most_first_and_old_logs_have_none() {
+    let log = Log {
+        focus: vec![
+            FocusSpan { task: "a".into(), start: 0, end: 100 },
+            FocusSpan { task: "b".into(), start: 100, end: 400 },
+            FocusSpan { task: "a".into(), start: 500, end: 560 },
+            FocusSpan { task: "fora".into(), start: 900, end: 950 },
+        ],
+        ..Default::default()
+    };
+    let s = summarize(&log, 50, 530);
+    assert_eq!(
+        s.focus,
+        vec![
+            FocusTotal { task: "b".into(), title: None, secs: 300 },
+            FocusTotal { task: "a".into(), title: None, secs: 80 },
+        ]
+    );
+    let old: Log = serde_json::from_str(r#"{"spans":[],"idle":[]}"#).unwrap();
+    assert!(old.focus.is_empty());
+}
