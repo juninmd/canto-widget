@@ -27,6 +27,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   código (ajustável, 4h por padrão) mostra o progresso e quantos dias seguidos foi cumprida; a semana ganha um mapa
   de calor por hora com o seu pico; tocar num aplicativo deixa mudar a categoria dele (fica guardado neste
   computador); nomes como `WindowsTerminal` e `msedge` aparecem legíveis; e **Copiar resumo** leva o dia em texto.
+- **Dependências atualizadas**: Tauri 2.12.1 e os plugins (autostart 2.7, opener 2.7, single-instance 2.5.2,
+  updater 2.13.1 e outros), TipTap 3.31.4, `marked` 18.1, Vite 8.3.2 e o resto dos lockfiles (front e back) para as
+  últimas versões compatíveis. Isso também tira o `source-map-js` vulnerável (GHSA-68fv-2mgg-jv7q) que fazia o
+  `bun audit` falhar no CI.
 
 ### Corrigido
 
