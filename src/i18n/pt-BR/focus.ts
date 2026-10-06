@@ -84,6 +84,8 @@ export const focus = {
   "activity.empty": "Ainda sem registros. Use o computador um pouco e volte.",
   "activity.refresh": "atualizar",
   "activity.loading": "carregando atividade",
+  "activity.cat.games": "Jogos",
+  "activity.fullscreenApp": "App em tela cheia",
   "activity.cat.code": "Código",
   "activity.cat.meet": "Reuniões",
   "activity.cat.docs": "Documentos",

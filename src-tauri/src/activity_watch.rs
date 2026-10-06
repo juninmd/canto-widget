@@ -11,6 +11,7 @@ use tauri::{AppHandle, Manager, State};
 use crate::activity::{summarize, Log, Summary, ACTIVITY_AAD, INTERVAL_SECS};
 use crate::activity_os;
 use crate::error::{AppError, Result};
+use crate::fullscreen_guard;
 use crate::model::now_ms;
 use crate::store;
 use crate::vault::AppState;
@@ -84,6 +85,14 @@ pub fn sample(foreground: impl FnOnce() -> Option<String>, idle_secs: Option<u64
     foreground().map_or(Sample::Unknown, Sample::App)
 }
 
+/// What a full-screen app is recorded as when its process cannot be named at all (some anti-cheat drivers).
+pub const FULLSCREEN_APP: &str = "fullscreen";
+
+/// An unnamed foreground app that Windows says is running full screen still counts, under a generic name.
+pub fn or_fullscreen(name: Option<String>, notification_state: Option<i32>) -> Option<String> {
+    name.or_else(|| fullscreen_guard::busy(notification_state).then(|| FULLSCREEN_APP.to_string()))
+}
+
 pub fn watch(app: AppHandle) {
     std::thread::spawn(move || {
         let mut last_flush = 0;
@@ -97,7 +106,9 @@ pub fn watch(app: AppHandle) {
                 continue;
             }
             let now = now_ms() / 1000;
-            let seen = sample(activity_os::foreground_app, activity_os::idle_secs());
+            let foreground =
+                || or_fullscreen(activity_os::foreground_app(), fullscreen_guard::user_notification_state());
+            let seen = sample(foreground, activity_os::idle_secs());
             let recorded = act.with_log(&state, |log| match seen {
                 Sample::App(name) => log.record(Some(&name), now),
                 Sample::Idle => log.record_idle(now),
@@ -189,6 +200,15 @@ mod tests {
         assert_eq!(sample(app, None), Sample::App("Code".into()));
         assert_eq!(sample(|| panic!("no need to ask"), Some(IDLE_LIMIT_SECS)), Sample::Idle);
         assert_eq!(sample(|| None, Some(5)), Sample::Unknown);
+    }
+
+    #[test]
+    fn an_unnamed_full_screen_app_is_recorded_generically_and_a_named_one_keeps_its_name() {
+        assert_eq!(or_fullscreen(Some("cs2".into()), Some(3)).as_deref(), Some("cs2"));
+        assert_eq!(or_fullscreen(None, Some(3)).as_deref(), Some(FULLSCREEN_APP));
+        assert_eq!(or_fullscreen(None, Some(2)).as_deref(), Some(FULLSCREEN_APP));
+        assert_eq!(or_fullscreen(None, Some(5)), None);
+        assert_eq!(or_fullscreen(None, None), None);
     }
 
     #[test]

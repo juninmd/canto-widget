@@ -86,6 +86,8 @@ export const focus: Record<keyof typeof source, string> = {
   "activity.empty": "Nothing recorded yet. Use the computer a little and come back.",
   "activity.refresh": "refresh",
   "activity.loading": "loading activity",
+  "activity.cat.games": "Games",
+  "activity.fullscreenApp": "Full-screen app",
   "activity.cat.code": "Code",
   "activity.cat.meet": "Meetings",
   "activity.cat.docs": "Documents",

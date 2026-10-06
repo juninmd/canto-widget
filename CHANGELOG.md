@@ -5,6 +5,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Atividade passa a registrar jogos como o CS2**: no Windows, jogos com anti-cheat recusam a consulta ao processo e
+  o Canto não achava o nome do app em foco, então o tempo de jogo sumia. Agora o nome vem da lista de processos, e
+  se nem assim for possível o tempo entra como "App em tela cheia". Os jogos ganham a categoria **Jogos** (CS2,
+  Valorant, Steam, League of Legends e outros), que também pode ser atribuída a qualquer app tocando nele.
+
 ### Alterado
 
 - **Atividade separa o tempo parado**: quando você fica sem teclado e mouse por 2 minutos com o Canto aberto, esse

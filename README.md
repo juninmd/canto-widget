@@ -296,7 +296,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Activity tab (off by default) | Summary with focused time and closed PRs/MRs |
 |---|---|
-| ![Activity tab: day navigation, total against the day before, category chips that filter, daily goal, timeline per application, most used applications and the day in focus, marked as 100% local](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
+| ![Activity tab: day navigation, total against the day before, category chips that filter (including Games), daily goal, timeline per application, most used applications and the day in focus, marked as 100% local](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
 
 | Activity tab, last 7 days |
 |---|

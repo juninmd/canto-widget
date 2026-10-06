@@ -1,10 +1,12 @@
 import type { ActivitySpan } from "./api";
+import { t } from "../i18n";
 import { duration } from "./summary";
 
-export type Category = "code" | "meet" | "docs" | "chat" | "web" | "other";
+export type Category = "games" | "code" | "meet" | "docs" | "chat" | "web" | "other";
 
 /** First match wins, so a call app is a meeting before it is a chat. Names are process or window-class names. */
 const RULES: [Category, RegExp][] = [
+  ["games", /^fullscreen$|\bcs2\b|\bcsgo\b|valorant|leagueclient|league of legends|\bdota2\b|fortnite|steam|epicgames|battle\.?net|overwatch|\bapex\b|r5apex|rainbowsix|\bgta|rocketleague|eldenring|cyberpunk|\bwow\b|hearthstone|genshin|roblox|riotclient|\bgame\b/i],
   ["meet", /zoom|teams|meet|webex|skype|discord|jitsi|gotomeeting/i],
   ["chat", /slack|whatsapp|telegram|signal|outlook|thunderbird|mail|messages|element|mattermost|wechat/i],
   ["code", /code|studio|\bidea\b|pycharm|webstorm|goland|rider|clion|cursor|\bzed\b|\bvim\b|emacs|sublime|terminal|iterm|powershell|\bcmd\b|alacritty|kitty|wezterm|konsole|xterm|warp|postman|insomnia|docker|sourcetree|github/i],
@@ -26,11 +28,13 @@ const NAMES: Record<string, string> = { msedge: "Edge", winword: "Word", excel: 
 
 /** Process names read better as words: "WindowsTerminal.exe" becomes "Windows Terminal". */
 export function appName(app: string): string {
+  if (app === "fullscreen") return t("activity.fullscreenApp");
   const base = app.replace(/\.exe$/i, "");
   return NAMES[base.toLowerCase()] ?? base.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
 export const CATEGORY_COLOR: Record<Category, string> = {
+  games: "bg-rose-400",
   code: "bg-accent",
   meet: "bg-sky-400",
   docs: "bg-amber-400",
@@ -102,7 +106,7 @@ export function weekStats(totals: number[]) {
   return { average, best: used.length ? totals.indexOf(Math.max(...totals)) : -1 };
 }
 
-export const CATEGORIES = ["code", "meet", "docs", "chat", "web", "other"] as const satisfies readonly Category[];
+export const CATEGORIES = ["games", "code", "meet", "docs", "chat", "web", "other"] as const satisfies readonly Category[];
 
 /** Active seconds in each hour of the day (index 0-23), counting only the part of a span inside that hour. */
 export function hourlyHeat(spans: ActivitySpan[], dayStartSec: number): number[] {
