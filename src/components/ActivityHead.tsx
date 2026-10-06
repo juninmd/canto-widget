@@ -36,7 +36,7 @@ export default function ActivityHead({ all, shown, hidden, onToggle, reference, 
               <span key={c.category} className={CATEGORY_COLOR[c.category]} title={`${catLabel(c.category)} ${secsLabel(c.secs)}`} style={{ width: `${(c.secs / total) * 100}%` }} />
             ))}
           </div>
-          <span className="truncate text-[11px] text-faint">{caption}</span>
+          <span className="text-[11px] leading-tight text-faint">{caption}</span>
         </div>
       </div>
       <div role="group" aria-label={t("activity.filterLabel")} className="flex flex-wrap gap-1.5">

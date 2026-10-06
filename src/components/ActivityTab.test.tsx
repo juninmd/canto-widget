@@ -15,8 +15,10 @@ const summary = {
     { app: "Slack", secs: 1800 },
   ],
   total_secs: 9000,
+  idle: [{ start: day + 11.5 * 3600, end: day + 12 * 3600 }],
+  idle_secs: 1800,
 };
-const empty = { spans: [], apps: [], total_secs: 0 };
+const empty = { spans: [], apps: [], total_secs: 0, idle: [], idle_secs: 0 };
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
@@ -65,7 +67,8 @@ test("turning it on loads the day: total, categories and the most used apps", as
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
   expect(calls.some((c) => c.cmd === "activity_set_enabled" && c.args?.enabled === true)).toBe(true);
-  expect(screen.getByText("Tempo ativo: 2h30")).toBeTruthy();
+  expect(screen.getByText("Ativo: 2h30 · parado: 30 min")).toBeTruthy();
+  expect(screen.getByText("Parado")).toBeTruthy();
   expect(screen.getByRole("button", { name: /Código/ })).toBeTruthy();
   expect(screen.getByRole("button", { name: /Comunicação/ })).toBeTruthy();
   expect(screen.getByText("Maior bloco sem trocar de app")).toBeTruthy();

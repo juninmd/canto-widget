@@ -1,17 +1,18 @@
 import { t } from "../i18n";
 import { appName, barBox, byCategory, categoryOf, CATEGORY_COLOR, focusStats, hourRange, secsLabel, timelineRows, weekStats, type Category } from "../lib/activity";
-import type { ActivitySpan } from "../lib/api";
+import type { ActivityAway, ActivitySpan } from "../lib/api";
 import ActivityApps from "./ActivityApps";
 import ActivityHeat from "./ActivityHeat";
 
 type Apps = { app: string; secs: number }[];
-export type Day = { day: number; apps: Apps; spans: ActivitySpan[] };
+export type Day = { day: number; apps: Apps; spans: ActivitySpan[]; idle: ActivityAway[]; idleSecs: number };
 
 const H3 = "text-[11px] font-semibold uppercase tracking-wide text-muted";
 const clock = (sec: number) => new Date(sec * 1000).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 
-export function TodayView({ spans, apps, yesterdaySpans, dayStartMs, nowSec, onRecategorize }: {
+export function TodayView({ spans, idle, apps, yesterdaySpans, dayStartMs, nowSec, onRecategorize }: {
   spans: ActivitySpan[];
+  idle: ActivityAway[];
   apps: Apps;
   yesterdaySpans: ActivitySpan[];
   dayStartMs: number;
@@ -40,6 +41,17 @@ export function TodayView({ spans, apps, yesterdaySpans, dayStartMs, nowSec, onR
             </span>
           </div>
         ))}
+        {idle.length > 0 && (
+          <div className="grid grid-cols-[4.5rem_1fr] items-center gap-2 text-[11px]">
+            <span className="truncate text-muted">{t("activity.idle")}</span>
+            <span className="relative h-3.5 overflow-hidden rounded bg-edge">
+              {idle.map((a) => {
+                const box = barBox({ app: "", ...a }, daySec, range);
+                return <span key={a.start} title={`${t("activity.idleHint")} ${clock(a.start)}–${clock(a.end)} (${secsLabel(a.end - a.start)})`} className="absolute inset-y-0 min-w-[2px] border border-dashed border-faint bg-hover" style={{ left: `${box.left}%`, width: `${box.width}%` }} />;
+              })}
+            </span>
+          </div>
+        )}
         <div className="grid grid-cols-[4.5rem_1fr] gap-2 text-[10px] text-faint">
           <span />
           <span className="flex justify-between font-mono tabular-nums">{ticks.map((h) => <span key={h}>{h}h</span>)}</span>
