@@ -16,8 +16,8 @@ test("starting a task pins the timer bar under every tab and pausing saves the t
   }, today());
   await mockTauri(page);
   await page.goto("/");
-  await page.getByText("Revisar PR").hover();
-  await page.getByLabel("iniciar foco em Revisar PR").click();
+  await page.getByText("Revisar PR").last().hover();
+  await page.getByLabel("iniciar foco em Revisar PR").last().click();
   const bar = page.getByRole("region", { name: "tarefa em foco" });
   await expect(bar).toContainText("Revisar PR");
   await goTab(page, "Agenda");

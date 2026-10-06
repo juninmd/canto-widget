@@ -23,7 +23,7 @@ test("at the minimum window size a long task title keeps most of the row", async
   await seedBusyTask(page);
   await mockTauri(page, { hiddenTabs: ["gitlab"] });
   await page.goto("/");
-  const title = page.getByText(LONG);
+  const title = page.getByText(LONG).last();
   await expect(title).toBeVisible();
   const box = (await title.boundingBox())!;
   // The row is ~330 px; badges on the right used to squeeze the title into ~60 px, one word per line.

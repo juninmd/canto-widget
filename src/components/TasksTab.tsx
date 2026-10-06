@@ -1,9 +1,12 @@
 import { t } from "../i18n";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
 import SummaryPanel from "./SummaryPanel";
 import TaskRow from "./TaskRow";
+import TaskNow from "./TaskNow";
+import { pickNow } from "../lib/nowTask";
+import { useRunning } from "../lib/useFocus";
 import TaskListHeader from "./TaskListHeader";
 import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
@@ -94,8 +97,12 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     await run(() => api.taskRename(target.id, target.title));
   }
 
+  const runningId = useRunning()?.id ?? null;
+  const now = pickNow(tasks, runningId);
   const done = tasks.filter((task) => task.done).length;
   const visible = priorityFilter ? tasks.filter((task) => task.priority === priorityFilter) : tasks;
+  const firstDone = visible.find((task) => task.done)?.id;
+  const firstOpen = visible.find((task) => !task.done)?.id;
 
   // A filtered view reorders its own rows; hidden tasks keep their slots in the day's order.
   const reorder = useReorder(
@@ -141,6 +148,8 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         </button>
       </form>
 
+      {now && !priorityFilter && <TaskNow task={now} />}
+
       <TaskListHeader
         done={done}
         total={tasks.length}
@@ -152,8 +161,13 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
 
       <ul className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
         {visible.map((task) => (
+          <Fragment key={task.id}>
+            {(task.id === firstOpen || task.id === firstDone) && (
+              <li aria-hidden="true" className="px-1 pb-0.5 pt-1.5 text-[11px] uppercase tracking-wider text-faint">
+                {t(task.done ? "tasks.group.done" : "tasks.group.open", { n: visible.filter((x) => x.done === task.done).length })}
+              </li>
+            )}
           <TaskRow
-            key={task.id}
             task={task}
             isNew={isNew(task.id)}
             isLeaving={leaving.has(task.id)}
@@ -198,6 +212,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             onSubtasksChange={reload}
             onError={onError}
           />
+          </Fragment>
         ))}
         {tasks.length === 0 && (
           <EmptyState icon={<ChecklistIcon />}>{t("tasks.empty")}</EmptyState>
