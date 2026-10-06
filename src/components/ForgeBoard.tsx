@@ -5,6 +5,7 @@ import { timeAgo } from "../lib/time";
 import { LOCALE, t } from "../i18n";
 import ForgeFilterBar from "./ForgeFilterBar";
 import ForgeSection from "./ForgeSection";
+import ForgeSummary from "./ForgeSummary";
 import Skeleton from "./Skeleton";
 
 type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; onDisconnect: () => void };
@@ -37,6 +38,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDiscon
           </button>
         </span>
       </div>
+      {lists && <ForgeSummary forge={forge} lists={lists} ci={ci} />}
       <ForgeFilterBar forge={forge} filter={gh.filter} onApply={(f) => void gh.load(f, false)} />
       {fresh?.limitedUntil && (
         <p role="status" className="text-[11px] text-muted">

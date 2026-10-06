@@ -23,11 +23,11 @@ test("adding a task calls task_add and the task survives a reload", async ({ pag
   await page.goto("/");
   await page.getByPlaceholder("nova tarefa (ex.: Daily às 9h30 !alta)").fill("Revisar relatório fictício");
   await page.getByRole("button", { name: "adicionar tarefa" }).click();
-  await expect(page.getByText("Revisar relatório fictício")).toBeVisible();
+  await expect(page.getByText("Revisar relatório fictício").last()).toBeVisible();
   const added = (await calls(page)).find((c) => c.cmd === "task_add");
   expect(added?.args.title).toBe("Revisar relatório fictício");
   await page.reload();
-  await expect(page.getByText("Revisar relatório fictício")).toBeVisible();
+  await expect(page.getByText("Revisar relatório fictício").last()).toBeVisible();
 });
 
 test("Alt+2 and a click switch tabs", async ({ page }) => {

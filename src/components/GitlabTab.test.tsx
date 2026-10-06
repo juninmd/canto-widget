@@ -94,3 +94,12 @@ test("GitLab doesn't offer sorting by comments, which its API can't do", async (
   expect(options).toEqual(["updated", "created"]);
   expect(screen.getByRole("button", { name: "MRs" })).toBeTruthy();
 });
+
+test("shows the summary strip without a CI tile", async () => {
+  responses.gitlab_status = () => Promise.resolve({ connected: true, username: "bia", base_url: "https://gitlab.acme.io" });
+  responses.gitlab_lists = () =>
+    Promise.resolve({ review_requested: { total: 2, items: [mr] }, assigned: empty, my_prs: empty, my_issues: empty });
+  await mount();
+  expect(screen.getByText("revisões")).toBeDefined();
+  expect(screen.queryByText("CI falhou")).toBeNull();
+});

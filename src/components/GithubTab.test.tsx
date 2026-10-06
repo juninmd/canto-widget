@@ -309,3 +309,14 @@ test("snoozing a review request hides it for 4 h, keeps a counter and can bring 
   expect(screen.getByText("Antigo")).toBeTruthy();
   expect(Object.keys(JSON.parse(localStorage.getItem("canto.reviewSnooze") ?? "{}"))).toEqual([reviewItems[1].url]);
 });
+
+test("the summary strip counts reviews owed and my PRs whose CI failed", async () => {
+  responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "app", device_flow: true });
+  responses.github_lists = () =>
+    Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: { total: 3, items: [] }, my_issues: empty });
+  responses.github_prs_checks = () => Promise.resolve([{ repo: item.repo, number: item.number, status: "failure" }]);
+  await mount();
+  const strip = screen.getByRole("group", { name: "resumo" });
+  expect(strip.textContent).toContain("3revisões");
+  expect(strip.textContent).toContain("1CI falhou");
+});

@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
@@ -71,6 +71,9 @@ mock.module("@tauri-apps/api/core", () => ({
 const { default: TasksTab } = await import("./TasksTab");
 const { ToastProvider } = await import("../lib/toast");
 
+/** The "now" card repeats the first open title; the row comes after it. */
+const rowText = (text: string) => screen.getAllByText(text).at(-1)!;
+
 async function openEditing() {
   render(
     <ToastProvider>
@@ -80,7 +83,7 @@ async function openEditing() {
   await act(async () => {
     await Promise.resolve();
   });
-  const target = screen.getByText("comprar leite");
+  const target = rowText("comprar leite");
   await act(async () => {
     fireEvent.doubleClick(target);
   });
@@ -124,7 +127,7 @@ test("Esc discards the edit even with the unmount's blur", async () => {
   });
 
   expect(calls.some((c) => c.cmd === "task_rename")).toBe(false);
-  expect(screen.getByText("comprar leite")).toBeDefined();
+  expect(rowText("comprar leite")).toBeDefined();
 });
 
 test("renaming works again after an Esc", async () => {
@@ -134,7 +137,7 @@ test("renaming works again after an Esc", async () => {
     fireEvent.blur(input);
   });
 
-  const second = screen.getByText("comprar leite");
+  const second = rowText("comprar leite");
   await act(async () => {
     fireEvent.doubleClick(second);
   });
@@ -313,21 +316,21 @@ test("setting a priority saves it and shows a dot with its label", async () => {
 test("filtering by priority hides tasks that don't match", async () => {
   extraTask = { ...baseTask, id: "t3", title: "pagar conta", priority: "low" };
   await mount();
-  expect(screen.getByText("pagar conta")).toBeTruthy();
+  expect(rowText("pagar conta")).toBeTruthy();
 
   const filter = screen.getByLabelText("filtrar por prioridade");
   await act(async () => {
     fireEvent.change(filter, { target: { value: "low" } });
   });
   expect(screen.queryByText("comprar leite")).toBeNull();
-  expect(screen.getByText("pagar conta")).toBeTruthy();
+  expect(rowText("pagar conta")).toBeTruthy();
 });
 
 test("dragging a task's grip onto another reorders them", async () => {
   extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
   await mount();
   const grip = screen.getByLabelText("arrastar comprar leite para reordenar");
-  const targetRow = screen.getByText("pagar conta").closest("li")!;
+  const targetRow = rowText("pagar conta").closest("li")!;
   await act(async () => {
     fireEvent.pointerDown(grip, { button: 0 });
   });
@@ -342,7 +345,7 @@ test("Escape cancels a drag without reordering", async () => {
   extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
   await mount();
   const grip = screen.getByLabelText("arrastar comprar leite para reordenar");
-  const targetRow = screen.getByText("pagar conta").closest("li")!;
+  const targetRow = rowText("pagar conta").closest("li")!;
   await act(async () => {
     fireEvent.pointerDown(grip, { button: 0 });
   });
@@ -501,7 +504,7 @@ test("at midnight a slow reply for yesterday never replaces today's list", async
     await wait(500);
   });
   expect(calls.filter((c) => c.cmd === "tasks_for_day").map((c) => c.args?.day)).toEqual(["2026-09-09", "2026-09-10"]);
-  expect(screen.getByText("tarefa de 2026-09-10")).toBeTruthy();
+  expect(rowText("tarefa de 2026-09-10")).toBeTruthy();
   expect(screen.queryByText("tarefa de 2026-09-09")).toBeNull();
 });
 
@@ -535,7 +538,7 @@ test("the row's priority button cycles none, high, medium, low and back to none"
 test("a long title wraps instead of being cut off", async () => {
   task = { ...baseTask, title: "revisar o contrato do fornecedor fictício e mandar as observações para o jurídico até sexta" };
   await mount();
-  const title = screen.getByText(task.title);
+  const title = rowText(task.title);
   expect(title.className).not.toContain("truncate");
   expect(title.className).toContain("break-words");
 });
@@ -553,4 +556,23 @@ test("F2 on the task's checkbox starts renaming, so the keyboard needs no double
     fireEvent.keyDown(screen.getByRole("checkbox", { name: "comprar leite" }), { key: "F2" });
   });
   expect((screen.getByDisplayValue("comprar leite") as HTMLInputElement).value).toBe("comprar leite");
+});
+
+test("the now card offers to start the first open task and groups the rest", async () => {
+  extraTasks = [{ ...baseTask, id: "t9", title: "feita ontem", done: true }];
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await Promise.resolve();
+  });
+
+  const card = screen.getByRole("region", { name: "tarefa da vez" });
+  expect(card.textContent).toContain("próxima");
+  expect(card.textContent).toContain("comprar leite");
+  expect(within(card).getByRole("button", { name: "iniciar foco em comprar leite" })).toBeDefined();
+  expect(screen.getByText("pendentes · 1")).toBeDefined();
+  expect(screen.getByText("concluídas · 1")).toBeDefined();
 });

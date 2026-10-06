@@ -278,6 +278,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 </details>
 
+| Tasks: the current task with timer and grouped list | GitHub: summary strip above the lists | GitLab: same strip, without the CI tile |
+|---|---|---|
+| ![Tasks tab with a card for the next task, its timer and estimate, and the list split into pending and done](docs/prints/app/72-tarefas-agora.png) | ![GitHub tab with reviews, my PRs, failed CI and my issues counted above the lists](docs/prints/app/73-github-resumo.png) | ![GitLab tab with the same summary strip, without CI](docs/prints/app/74-gitlab-resumo.png) |
+
 | Focus timer pinned under every tab | Agenda as a day, tasks beside meetings |
 |---|---|
 | ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda Today view: the meeting in progress with time left and a conflict warning, then the day in one line with meeting time, free time and conflicts](docs/prints/app/54-agenda-hoje.png) |

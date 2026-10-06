@@ -28,7 +28,7 @@ test("every button and tab on the Tasks tab is at least 24 px, also in the compa
   });
   await mockTauri(page);
   await page.goto("/");
-  await page.getByText("Revisar o PR").hover();
+  await page.getByText("Revisar o PR").last().hover();
   expect(await smallTargets(page)).toEqual([]);
 });
 
