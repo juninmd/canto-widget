@@ -173,6 +173,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Aba Atividade redesenhada**: o resumo do dia virou um anel por categoria com o total no centro e uma legenda que
+  esconde categorias, seguido da meta de foco com a sequência em bolinhas, três destaques (maior bloco, trocas de app e
+  hora de pico) e uma linha do tempo em que o dia inteiro, o tempo parado e os apps mais usados dividem o mesmo eixo de
+  horas. Aplicativos e Tarefas ficam em abas no mesmo bloco, a semana virou colunas por categoria com a média e uma
+  bolinha por dia na meta, e o menu ⋯ guarda copiar resumo, atualizar e ajustar a meta. Em janela larga (maximizada) a
+  aba passa a duas colunas. Cada tema tem as próprias cores de categoria, com contraste conferido por teste, e a tela
+  de coleta desligada diz o que é guardado e o que nunca é antes de pedir para ligar. Na semana a legenda não filtra:
+  ela só vale no dia.
 - **Atividade separa o tempo parado**: quando você fica sem teclado e mouse por 2 minutos com o Canto aberto, esse
   trecho passa a aparecer como **Parado** na linha do tempo e no resumo do dia, em vez de virar um buraco que
   poderia ser computador desligado ou cofre trancado. O tempo ativo continua o mesmo; só o que é novo é registrado,

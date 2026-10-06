@@ -33,14 +33,26 @@ export function appName(app: string): string {
   return NAMES[base.toLowerCase()] ?? base.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
+/** Per-skin tokens (styles.css), so a category keeps its contrast on every skin; code follows the accent. */
 export const CATEGORY_COLOR: Record<Category, string> = {
-  games: "bg-rose-400",
+  games: "bg-cat-games",
   code: "bg-accent",
-  meet: "bg-sky-400",
-  docs: "bg-amber-400",
-  chat: "bg-violet-400",
-  web: "bg-teal-400",
-  other: "bg-line",
+  meet: "bg-cat-meet",
+  docs: "bg-cat-docs",
+  chat: "bg-cat-chat",
+  web: "bg-cat-web",
+  other: "bg-cat-other",
+};
+
+/** The same colors as CSS values, for SVG strokes and fills. */
+export const CATEGORY_VAR: Record<Category, string> = {
+  games: "var(--color-cat-games)",
+  code: "var(--color-accent)",
+  meet: "var(--color-cat-meet)",
+  docs: "var(--color-cat-docs)",
+  chat: "var(--color-cat-chat)",
+  web: "var(--color-cat-web)",
+  other: "var(--color-cat-other)",
 };
 
 type AppTotal = { app: string; secs: number };

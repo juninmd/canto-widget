@@ -182,3 +182,29 @@ export const CheckIcon = () => (
     <path d="m5 12.5 4.5 4.5L19 7.5" />
   </svg>
 );
+
+export const ChevronIcon = ({ dir }: { dir: "left" | "right" }) => (
+  <svg {...base}>
+    <path d={dir === "left" ? "m15 18-6-6 6-6" : "m9 18 6-6-6-6"} />
+  </svg>
+);
+
+export const MoreIcon = () => (
+  <svg {...base} fill="currentColor" stroke="none">
+    <circle cx="5" cy="12" r="1.7" />
+    <circle cx="12" cy="12" r="1.7" />
+    <circle cx="19" cy="12" r="1.7" />
+  </svg>
+);
+
+export const PulseIcon = ({ size = 14 }: { size?: number }) => (
+  <svg {...base} width={size} height={size}>
+    <path d="M3 12h4l2.2-6 4 12 2.3-6H21" />
+  </svg>
+);
+
+export const CrossIcon = () => (
+  <svg {...base}>
+    <path d="M6 6l12 12M18 6 6 18" />
+  </svg>
+);

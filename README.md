@@ -296,16 +296,26 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Activity tab (off by default) | Summary with focused time and closed PRs/MRs |
 |---|---|
-| ![Activity tab: day navigation, time per task, total against the day before, category chips that filter (including Games), daily goal, timeline per application, most used applications and the day in focus, marked as 100% local](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
+| ![Activity tab redesigned: a donut by category with the total inside and a legend that filters, the daily code-focus goal with its streak dots, three highlights, a timeline on one time axis and the lists of applications and tasks, marked as local-only](docs/prints/app/49-atividade.png) | ![Day summary listing focused time per task and the PRs/MRs opened, merged, reviewed and closed without merging](docs/prints/app/50-resumo-encerrados.png) |
 
-| Activity tab, last 7 days |
-|---|
-| ![Activity tab on the 7 days view: stacked bars per day with the average line and the hour heat map](docs/prints/app/69-atividade-semana.png) |
+| Activity tab, last 7 days | Activity tab, turned off | Activity tab on a wide window |
+|---|---|---|
+| ![Activity tab on the week view: stacked columns per day with the average line and a dot under each day that met the goal, then the hour heat map](docs/prints/app/69-atividade-semana.png) | ![Activity tab turned off: what is kept and what never is, then the button to turn tracking on](docs/prints/app/70-atividade-desligada.png) | ![Activity tab on a wide window: summary and goal on the left, timeline and lists on the right](docs/prints/app/71-atividade-janela-larga.png) |
 
 The **Activity** tab starts hidden (turn it on under Settings → visible tabs). It records only the name of the
-focused application while you use the computer, in a sealed local file that never reaches backups or sync, and shows
-a summary against yesterday with category filters, a timeline with a "now" marker and the idle stretches (no keyboard or mouse for 2 minutes), the most used applications, the focus timer's time per task, the longest focus stretch, a daily code-focus goal with its streak, day-by-day navigation, a copyable summary, editable categories per application, and the last 7 days with their average and an hour heat map. Off until you opt in; Wayland can't report the focused window, so
-it stays unavailable there.
+focused application while you use the computer, in a sealed local file that never reaches backups or sync (Wayland
+can't report the focused window, so it stays unavailable there). Off until you opt in, and the first screen says what
+is kept and what never is.
+
+- **Day**: a donut by category with the total inside, whose legend hides a category, the change against the day
+  before and the idle time (no keyboard or mouse for 2 minutes). Below it, a daily code-focus goal with its streak and
+  one dot per day, three highlights (longest stretch in one app, app switches, peak hour), a timeline where the whole
+  day, the idle stretches and the busiest apps share one time axis with a "now" marker, and a list of applications
+  (tap one to change its category) or of the tasks the focus timer ran on.
+- **Week**: stacked columns per day with the average line and a dot under each day that met the goal, an hour heat map
+  with your peak, and the same lists for the whole week.
+- **Layout and skins**: one column in the default window, two once it is wide (maximized); every skin has its own
+  category colors, checked for contrast. The menu next to the day copies it as text.
 
 <sub>All screenshots use fictitious data.</sub>
 

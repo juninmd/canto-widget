@@ -51,3 +51,17 @@ test("borders of controls and the accent reach 3:1 against the panel (WCAG 1.4.1
     expect(ratio(t.accent, t.panel), `${skin}: accent on panel`).toBeGreaterThanOrEqual(3);
   }
 });
+
+const CATS = ["cat-games", "cat-meet", "cat-docs", "cat-chat", "cat-web", "cat-other"];
+
+test("every skin ships the activity category colors", () => {
+  for (const [skin, t] of Object.entries(skins)) {
+    for (const k of CATS) expect(t[k], `${skin}: ${k}`).toMatch(/^#[0-9a-f]{6}$/i);
+  }
+});
+
+test("the activity category colors reach 3:1 against the panel they are drawn on (WCAG 1.4.11)", () => {
+  for (const [skin, t] of Object.entries(skins)) {
+    for (const k of CATS) expect(ratio(t[k], t.panel), `${skin}: ${k} on panel`).toBeGreaterThanOrEqual(3);
+  }
+});
