@@ -45,6 +45,7 @@ async function mount() {
 }
 
 beforeEach(() => {
+  localStorage.clear();
   calls.length = 0;
   status = { supported: true, enabled: false };
 });
@@ -118,4 +119,62 @@ test("settings can turn tracking off and delete the history", async () => {
     fireEvent.click(screen.getByText("Apagar histórico"));
   });
   expect(calls.some((c) => c.cmd === "activity_clear")).toBe(true);
+});
+
+test("the previous day is one tap away, and an empty day says so", async () => {
+  status = { supported: true, enabled: true };
+  await mount();
+  expect((screen.getByRole("button", { name: "Próximo dia" }) as HTMLButtonElement).disabled).toBe(true);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Dia anterior" }));
+  });
+  expect(screen.getByText("Ontem")).toBeTruthy();
+  expect(screen.getByText(/Ainda sem registros/)).toBeTruthy();
+});
+
+test("the goal bar compares code time with the chosen goal", async () => {
+  status = { supported: true, enabled: true };
+  await mount();
+  expect(screen.getByText(/2h de 4h/)).toBeTruthy();
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("Meta diária de foco em código"), { target: { value: "120" } });
+  });
+  expect(screen.getByText(/Meta cumprida/)).toBeTruthy();
+  expect(localStorage.getItem("canto.activity.goalMin")).toBe("120");
+});
+
+test("moving an app to another category is remembered and moves its time", async () => {
+  status = { supported: true, enabled: true };
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /^Code/ }));
+  });
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText(/Code conta como/), { target: { value: "docs" } });
+  });
+  expect(screen.getByRole("button", { name: /Documentos/ })).toBeTruthy();
+  expect(screen.queryByRole("button", { name: /Código/ })).toBeNull();
+  expect(JSON.parse(localStorage.getItem("canto.activity.categories")!)).toEqual({ Code: "docs" });
+});
+
+test("the day can be copied as text", async () => {
+  status = { supported: true, enabled: true };
+  let copied = "";
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: (x: string) => ((copied = x), Promise.resolve()) }, configurable: true });
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Copiar resumo" }));
+  });
+  expect(copied).toContain("Hoje: 2h30 ativo");
+  expect(copied).toContain("- Código: 2h");
+});
+
+test("the week view adds the hour heat map", async () => {
+  status = { supported: true, enabled: true };
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "7 dias" }));
+  });
+  expect(screen.getByText("Quando você rende mais")).toBeTruthy();
+  expect(screen.getByText(/Seu pico: 9h às 11h/)).toBeTruthy();
 });

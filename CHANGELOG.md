@@ -12,6 +12,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   mostra o horário de cada trecho ao passar o mouse; os aplicativos ganham a cor da categoria e a parte do dia; o
   novo bloco "Dia em foco" traz o maior período sem trocar de app e quantas trocas houve; a semana ganha a média e
   o dia mais ativo.
+- **Atividade: navegar, meta e mapa de calor**: setas ‹ › passam pelos últimos 7 dias; uma meta diária de foco em
+  código (ajustável, 4h por padrão) mostra o progresso e quantos dias seguidos foi cumprida; a semana ganha um mapa
+  de calor por hora com o seu pico; tocar num aplicativo deixa mudar a categoria dele (fica guardado neste
+  computador); nomes como `WindowsTerminal` e `msedge` aparecem legíveis; e **Copiar resumo** leva o dia em texto.
 
 ### Corrigido
 
