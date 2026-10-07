@@ -278,6 +278,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 </details>
 
+| Agenda of any day: previous and next arrows, a date picker and a back-to-today button |
+|---|
+| ![Agenda tab on tomorrow with the day stepper, the first meeting and the day in one line](docs/prints/app/75-agenda-dia.png) |
+
 | Tasks: the current task with timer and grouped list | GitHub: summary strip above the lists | GitLab: same strip, without the CI tile |
 |---|---|---|
 | ![Tasks tab with a card for the next task, its timer and estimate, and the list split into pending and done](docs/prints/app/72-tarefas-agora.png) | ![GitHub tab with reviews, my PRs, failed CI and my issues counted above the lists](docs/prints/app/73-github-resumo.png) | ![GitLab tab with the same summary strip, without CI](docs/prints/app/74-gitlab-resumo.png) |

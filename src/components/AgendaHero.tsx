@@ -4,10 +4,10 @@ import { hour, status } from "../lib/agenda";
 import { heroOf } from "../lib/agendaRail";
 import { t } from "../i18n";
 
-type Props = { items: AgendaItem[]; now: Date; clashes: Map<string, string[]>; onDetails: (id: string) => void };
+type Props = { items: AgendaItem[]; now: Date; /** False on other days: "in 1h30" would be measured from a made-up clock. */ relative?: boolean; clashes: Map<string, string[]>; onDetails: (id: string) => void };
 
 /** The one thing to look at: the meeting in progress, else the next one, else how the day went. */
-export default function AgendaHero({ items, now, clashes, onDetails }: Props) {
+export default function AgendaHero({ items, now, relative = true, clashes, onDetails }: Props) {
   const hero = heroOf(items, now);
   if (!hero) return null;
   if (hero.kind === "done") {
@@ -26,7 +26,7 @@ export default function AgendaHero({ items, now, clashes, onDetails }: Props) {
     <section aria-label={live ? t("agenda.hero.now") : t("agenda.hero.next")} className={`rounded-2xl border p-3 ${live ? "border-accent bg-accent/10" : "border-edge bg-ink/60"}`}>
       <p className={`flex justify-between gap-2 text-[11px] font-semibold uppercase tracking-wide ${live ? "text-accent-text" : "text-muted"}`}>
         <span>{live ? t("agenda.hero.now") : t("agenda.hero.next")}</span>
-        <span>{live ? t("agenda.hero.endsIn", { duration: duration(hero.left) }) : status(e, now).label}</span>
+        <span>{live ? t("agenda.hero.endsIn", { duration: duration(hero.left) }) : relative ? status(e, now).label : ""}</span>
       </p>
       <h2 className="mt-1 text-base font-semibold leading-tight text-fg">{e.title}</h2>
       <p className="flex flex-wrap gap-x-2 text-xs text-muted">
