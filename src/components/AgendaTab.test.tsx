@@ -5,10 +5,16 @@ import type { AgendaItem } from "../lib/api";
 import type { Agenda } from "../lib/useAgenda";
 
 const opened: string[] = [];
+const windows: string[] = [];
+let dayItems: unknown[] = [];
 const photoCalls: string[][] = [];
 let photos: unknown = null;
 mock.module("@tauri-apps/api/core", () => ({
-  invoke: (cmd: string, a?: { url?: string; emails?: string[] }) => {
+  invoke: (cmd: string, a?: { url?: string; emails?: string[]; timeMin?: string }) => {
+    if (cmd === "agenda_today") {
+      windows.push(a?.timeMin ?? "");
+      return Promise.resolve(dayItems);
+    }
     if (cmd === "open_link" && a?.url) opened.push(a.url);
     if (cmd === "guest_photos") {
       photoCalls.push(a?.emails ?? []);
@@ -50,6 +56,8 @@ function agenda(over: Partial<Agenda>): Agenda {
 
 beforeEach(() => {
   opened.length = 0;
+  windows.length = 0;
+  dayItems = [];
   photoCalls.length = 0;
   photos = null;
 });
@@ -156,4 +164,30 @@ test("the top line shows the next free time and overlapping cards carry a confli
   expect(daily.textContent).toContain("conflito: conflita com: 1:1 com Ana");
   expect(daily.querySelector('[title="conflita com: 1:1 com Ana"]')).toBeTruthy();
   expect(screen.getByRole("button", { name: /^Revisão/ }).textContent).not.toContain("conflito");
+});
+
+test("stepping back loads yesterday's events and hides the live-only bits", async () => {
+  dayItems = [planning];
+  render(<AgendaTab agenda={agenda({})} today="2026-09-18" onError={() => {}} />);
+  expect(screen.getByText("Hoje", { selector: "[aria-live]" })).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Dia anterior" }));
+  });
+  expect(screen.getByText("Ontem")).toBeTruthy();
+  expect(new Date(windows[0]).getDate()).toBe(17);
+  expect(screen.getByRole("button", { name: /Planejamento da sprint/ })).toBeTruthy();
+  expect(screen.queryByLabelText("agora")).toBeNull();
+});
+
+test("any date can be picked and 'hoje' returns to the live agenda", async () => {
+  render(<AgendaTab agenda={agenda({ items: [planning] })} today="2026-09-18" onError={() => {}} />);
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("Escolher o dia da agenda"), { target: { value: "2026-10-05" } });
+  });
+  expect(new Date(windows[0]).getMonth()).toBe(9);
+  expect(screen.getByText("nenhum evento neste dia.")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "hoje" }));
+  });
+  expect(screen.getByRole("button", { name: /Planejamento da sprint/ })).toBeTruthy();
 });

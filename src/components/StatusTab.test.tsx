@@ -162,3 +162,14 @@ test("watched services come back checked from Rust", async () => {
   await show();
   expect(screen.getByRole("button", { name: "parar de avisar sobre GitHub" }).getAttribute("aria-pressed")).toBe("true");
 });
+
+test("the sub-tabs switch between the public services and the user's own endpoints", async () => {
+  await show();
+  expect(screen.getByRole("tab", { name: "serviços" }).getAttribute("aria-selected")).toBe("true");
+  await act(async () => {
+    fireEvent.click(screen.getByRole("tab", { name: "meus endpoints" }));
+  });
+  expect(calls.some((c) => c.cmd === "health_list")).toBe(true);
+  expect(screen.getByRole("tab", { name: "meus endpoints" }).getAttribute("aria-selected")).toBe("true");
+  expect(screen.queryByText("Claude")).toBeNull();
+});

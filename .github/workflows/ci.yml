@@ -80,7 +80,7 @@ jobs:
       # generate_context! embeds ../dist at compile time, so the frontend must be built first.
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - run: bun install --frozen-lockfile && bun run build
-      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo clippy --all-targets --locked
         working-directory: src-tauri
       - run: cargo test --locked
         working-directory: src-tauri

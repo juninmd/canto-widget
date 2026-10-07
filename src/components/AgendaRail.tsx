@@ -10,6 +10,8 @@ type Props = {
   items: AgendaItem[];
   tasks: Task[];
   now: Date;
+  /** False on other days: there is no "now" line to draw. */
+  live?: boolean;
   clashes: Map<string, string[]>;
   open: string | null;
   onToggle: (id: string) => void;
@@ -29,7 +31,7 @@ function Row({ tone, dot, children }: { tone?: string; dot?: string; children: R
 }
 
 /** Reuniões, tarefas com horário e janelas livres numa linha só; o que já passou fica recolhido. */
-export default function AgendaRail({ items, tasks, now, clashes, open, onToggle, onSchedule }: Props) {
+export default function AgendaRail({ items, tasks, now, live = true, clashes, open, onToggle, onSchedule }: Props) {
   const { past, upcoming } = railEntries(items, tasks, now);
   const [showPast, setShowPast] = useState<boolean | null>(null);
   // Nothing left to look at: the finished meetings are the whole answer, so they start open.
@@ -37,7 +39,7 @@ export default function AgendaRail({ items, tasks, now, clashes, open, onToggle,
   const at = minuteOf(now);
   const blocks = dayBlocks(items, tasks);
   const pending = unscheduled(tasks);
-  const lineAt = upcoming.some((e) => e.kind !== "gap" && e.start <= at) ? -1 : upcoming.findIndex((e) => e.start > at);
+  const lineAt = !live || upcoming.some((e) => e.kind !== "gap" && e.start <= at) ? -1 : upcoming.findIndex((e) => e.start > at);
 
   const entry = (e: RailEntry, ended: boolean) => {
     if (e.kind === "event") {

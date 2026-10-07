@@ -92,6 +92,29 @@ fn the_activity_log_stays_readable_and_an_unreadable_one_is_discarded() {
 }
 
 #[test]
+fn the_endpoint_list_stays_readable_after_a_password_change() {
+    use crate::health::{Endpoint, Target, AAD};
+    let st = state("saude");
+    let list = vec![Endpoint {
+        id: "e1".into(),
+        name: "API".into(),
+        target: Target::Tcp { host: "db.interno".into(), port: 5432 },
+        every_secs: 60,
+        limit_ms: 500,
+        alert_down: true,
+        alert_slow: false,
+        alert_cert: false,
+    }];
+    st.save_sealed(&store::health_path(&st.dir), AAD, &list).unwrap();
+    st.change_password("senha-velha", "senha-nova").unwrap();
+    st.lock();
+    st.unlock("senha-nova").unwrap();
+    let back: Vec<Endpoint> = st.sealed(&store::health_path(&st.dir), AAD).unwrap().unwrap();
+    assert_eq!(back, list, "endpoints were lost");
+    cleanup(&st);
+}
+
+#[test]
 fn local_backups_import_with_the_new_password() {
     let st = state("backup");
     crate::backup::daily(&st.dir, "2026-09-01").unwrap();

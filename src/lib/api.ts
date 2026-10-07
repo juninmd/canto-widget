@@ -1,8 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "./forgeTypes";
+import type { HealthEndpoint, HealthView } from "./healthTypes";
 import { t } from "../i18n";
 
 export type * from "./forgeTypes";
+export type * from "./healthTypes";
 
 // wire keys mirror the synced vault format (frozen across app versions)
 /** `dia` of `semanal`: 0 = Sunday ... 6 = Saturday. */
@@ -301,6 +303,12 @@ export const api = {
   reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
   myPrAlertsGet: () => invoke<MyPrAlerts>("my_pr_alerts_get"),
   myPrAlertsSet: (config: MyPrAlerts) => invoke<MyPrAlerts>("my_pr_alerts_set", { config }),
+
+  healthList: () => invoke<HealthView[]>("health_list"),
+  /** Empty `id` adds; a known one updates. Returns the whole list. */
+  healthSave: (endpoint: HealthEndpoint) => invoke<HealthView[]>("health_save", { endpoint }),
+  healthRemove: (id: string) => invoke<HealthView[]>("health_remove", { id }),
+  healthCheckNow: (id: string) => invoke<HealthView[]>("health_check_now", { id }),
 
   gitlabStatus: () => invoke<GitlabStatus>("gitlab_status"),
   /** Validates address and token against the instance; returns the username. */
