@@ -22,6 +22,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Meus endpoints na aba Status API**: uma subaba ao lado de **serviços** para acompanhar o que é seu. Cada endpoint é
+  um **endereço** (http ou https), um **DNS + certificado** (mede a resolução do nome e lê a validade do certificado que o
+  servidor apresenta na porta) ou um **TCP + porta**. Os blocos da grade mostram a latência atual e as últimas leituras;
+  ao clicar, o bloco ocupa a linha inteira com o **gráfico de latência** (limite tracejado, quedas sombreadas), mediana,
+  p95, pico, disponibilidade e os ajustes (intervalo de 30 s, 1 min ou 5 min, limite de latência e os avisos).
+  Chegam avisos quando o endpoint **cai** (2 falhas seguidas), quando a **latência passa do limite** (2 leituras seguidas)
+  e quando o **certificado vence em 14 dias** ou já venceu; cada um avisa uma vez e volta a avisar só depois de
+  recuperar. A lista fica cifrada no cofre (também na troca da senha mestra) e as verificações só rodam com o cofre
+  aberto; as leituras ficam na memória e recomeçam a cada abertura.
+
 - **Agenda de qualquer dia**: setas de dia anterior e próximo, um seletor de data e o botão **hoje** na aba Agenda,
   como na Atividade. Ontem, amanhã ou outra data mostram as reuniões, o dia em uma linha e as tarefas com horário
   daquele dia; sem a linha do agora nem o aviso de próximo horário livre. Os avisos de reunião seguem só no dia de hoje.

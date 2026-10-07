@@ -26,6 +26,7 @@ pub mod cmd_gemini;
 pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
+pub mod cmd_health;
 pub mod cmd_models;
 pub mod cmd_notes;
 pub mod cmd_report;
@@ -52,6 +53,10 @@ pub mod gitlab_query;
 pub mod global_shortcuts;
 pub mod google_token;
 pub mod guest_photos;
+pub mod health;
+pub mod health_cert;
+pub mod health_probe;
+pub mod health_watch;
 #[cfg(windows)]
 pub mod hello;
 #[cfg(target_os = "macos")]
@@ -136,6 +141,7 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
+            app.manage(health_watch::HealthState::default());
             app.manage(cmd_models::ModelsLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
@@ -154,6 +160,7 @@ pub fn run() {
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
+            health_watch::watch(app.handle().clone());
             models_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
             fullscreen_guard::watch(app.handle().clone());
@@ -292,6 +299,10 @@ pub fn run() {
             cmd_report::report_agenda,
             cmd_report::report_vault,
             cmd_status::api_status,
+            cmd_health::health_list,
+            cmd_health::health_save,
+            cmd_health::health_remove,
+            cmd_health::health_check_now,
             status_alert::status_alerts_get,
             status_alert::status_alerts_set,
             cmd_models::models_get,
