@@ -130,6 +130,10 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - The Rust process timezone is unreliable on multithreaded Linux: "today" is computed in the UI (`todayLocal`)
   and passed to commands.
 - GitHub device-flow refresh tokens are single-use: renewals are serialized by a mutex.
+- **Never green a red CI by dropping a gate.** `-D warnings` stays on every clippy run (`ci.yml` and
+  `release-commit.yml`; `scripts/workflows.test.ts` pins it). Releases are verified oldest first, each at its own
+  tree, so a commit that fails `release-commit.yml`'s `verify` blocks every later release and a fix landing after it
+  never gets a turn: lint the PR before it merges.
 
 ## Definition of done
 
