@@ -133,7 +133,8 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - **Never green a red CI by dropping a gate.** `-D warnings` stays on every clippy run (`ci.yml` and
   `release-commit.yml`; `scripts/workflows.test.ts` pins it). Releases are verified oldest first, each at its own
   tree, so a commit that fails `release-commit.yml`'s `verify` blocks every later release and a fix landing after it
-  never gets a turn: lint the PR before it merges.
+  never gets a turn: lint the PR before it merges. The one waiver today (`clippy::unnecessary_map_or` for 50491a0,
+  which can't be edited) goes away with a `ci:` commit once v0.25.0 is published.
 
 ## Definition of done
 
