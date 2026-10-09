@@ -63,6 +63,9 @@ jobs:
         platform: [ubuntu-22.04, windows-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     timeout-minutes: 40
+    env:
+      # Line tables keep test backtraces readable; the full debuginfo only bloats the cache (the repo has 10 GiB for all).
+      CARGO_PROFILE_DEV_DEBUG: line-tables-only
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -75,9 +78,12 @@ jobs:
       - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
         with:
           components: clippy
+      # Same key and env as the release verify, so one debug cache per OS serves both; only main writes it.
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: src-tauri -> target
+          shared-key: debug
+          save-if: ${{ github.ref == 'refs/heads/main' }}
       # generate_context! embeds ../dist at compile time, so the frontend must be built first.
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - run: bun install --frozen-lockfile && bun run build

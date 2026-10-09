@@ -22,6 +22,8 @@ jobs:
     timeout-minutes: 60
     permissions:
       contents: read
+    env:
+      CARGO_PROFILE_DEV_DEBUG: line-tables-only
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -37,6 +39,7 @@ jobs:
       - uses: Swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6 # v2.9.2
         with:
           workspaces: src-tauri -> target
+          shared-key: debug
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - run: bun install --frozen-lockfile --ignore-scripts
       - run: bun run lint
@@ -47,8 +50,8 @@ jobs:
       - run: cargo test --locked
         working-directory: src-tauri
 
+  # Runs beside verify: only publicar waits for it, so the installers no longer queue behind the checks.
   prepare:
-    needs: verify
     runs-on: ubuntu-24.04
     permissions:
       contents: write

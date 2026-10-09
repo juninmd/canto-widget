@@ -25,3 +25,22 @@ test("a resumed draft is retargeted to the commit being released", () => {
   const edit = text.split(/\r?\n/).find((line) => line.includes("gh release edit") && line.includes("--notes-file"));
   expect(edit).toContain('--target "$RELEASE_SHA"');
 });
+
+function workflowText(workflow: string): string {
+  return readFileSync(new URL(`../.github/workflows/${workflow}`, import.meta.url), "utf8");
+}
+
+// prepare and the installers run beside verify to shorten a release; this gate is what still keeps a red commit unpublished.
+test("a release is published only after verify passed", () => {
+  const needs = /\n  publicar:\s*\n\s*needs:\s*\[([^\]]*)\]/.exec(workflowText("release-commit.yml"))?.[1] ?? "";
+  expect(needs.split(",").map((name) => name.trim())).toContain("verify");
+});
+
+// Two near-identical debug caches of 1.3 GB each pushed the release caches out of the repo's 10 GiB; keep one.
+test("the CI rust job and the release verify share one debug cache key and env", () => {
+  for (const workflow of ["ci.yml", "release-commit.yml"]) {
+    const text = workflowText(workflow);
+    expect(text).toMatch(/shared-key: debug\r?\n/);
+    expect(text).toMatch(/CARGO_PROFILE_DEV_DEBUG: line-tables-only\r?\n/);
+  }
+});
