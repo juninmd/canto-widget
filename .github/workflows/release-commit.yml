@@ -42,8 +42,7 @@ jobs:
       - run: bun run lint
       - run: bun test
       - run: bun run build
-      # 50491a0 reached main with a map_or that Rust 1.99 flags and history can't be edited: waive that lint for that commit only.
-      - run: cargo clippy --all-targets --locked -- -D warnings ${{ inputs.sha == '50491a00449c2b98dd9c49d211e7e65573edef41' && '-A clippy::unnecessary_map_or' || '' }}
+      - run: cargo clippy --all-targets --locked -- -D warnings
         working-directory: src-tauri
       - run: cargo test --locked
         working-directory: src-tauri
@@ -79,7 +78,7 @@ jobs:
           set -euo pipefail
           if gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft > release-state.txt 2> release-error.txt; then
             test "$(cat release-state.txt)" = true
-            gh release edit "$RELEASE_TAG" --title "Canto $RELEASE_TAG" --notes-file release-notes.md
+            gh release edit "$RELEASE_TAG" --target "$RELEASE_SHA" --title "Canto $RELEASE_TAG" --notes-file release-notes.md
           else
             gh release create "$RELEASE_TAG" --target "$RELEASE_SHA" --draft --title "Canto $RELEASE_TAG" --notes-file release-notes.md
           fi
