@@ -1,4 +1,3 @@
-import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
@@ -11,10 +10,11 @@ import {
 
 export { createReleaseManifest, hasRequiredAssets, verifyReleaseManifest } from "./release-manifest";
 export { releaseNotes, type Detail } from "./release-notes";
-import { releaseNotes, type Detail } from "./release-notes";
+import { foldedDetails, mergedCommits, readCommits, run } from "./release-git";
+import { releaseNotes } from "./release-notes";
 
 export type Candidate = { sha: string; tag: string; version: string; previousTag: string };
-export type Commit = { sha: string; message: string };
+export type Commit = { sha: string; message: string; taggable?: boolean };
 export type ReleaseState = { draft: boolean; assets: string[] };
 export type ReleaseBump = "major" | "minor" | "patch";
 
@@ -42,6 +42,14 @@ export function bumpVersion(version: string, bump: ReleaseBump): string {
   return `${major}.${minor}.${patch + 1}`;
 }
 
+const BUMP_RANK: Record<ReleaseBump, number> = { patch: 1, minor: 2, major: 3 };
+
+/** A folded range releases with the strongest bump any of its commits asked for. */
+function strongestBump(left: ReleaseBump | undefined, right: ReleaseBump | undefined): ReleaseBump | undefined {
+  if (!left || !right) return left ?? right;
+  return BUMP_RANK[right] > BUMP_RANK[left] ? right : left;
+}
+
 export function planReleases(
   commits: Commit[],
   tags: ReadonlyMap<string, string>,
@@ -51,16 +59,19 @@ export function planReleases(
   let version = previousTag.replace(/^v/, "");
   let priorTag = previousTag;
   const candidates: Candidate[] = [];
+  let pending: ReleaseBump | undefined;
   for (const commit of commits) {
     if (!/^[0-9a-f]{40}$/.test(commit.sha)) throw new Error(`Commit inválido: ${commit.sha}`);
-    const bump = releaseBump(commit.message);
-    if (!bump) continue;
-    version = bumpVersion(version, bump);
+    pending = strongestBump(pending, releaseBump(commit.message));
+    if (!pending || commit.taggable === false) continue;
+    version = bumpVersion(version, pending);
+    pending = undefined;
     const tag = `v${version}`;
     const taggedSha = tags.get(tag);
     if (taggedSha && taggedSha !== commit.sha) throw new Error(`${tag} já aponta para outro commit`);
-    if (releases.has(tag) && !taggedSha) throw new Error(`${tag} tem release sem tag local`);
     const release = releases.get(tag);
+    // A draft gets its tag only when published, so just a published release can be missing one.
+    if (release && !release.draft && !taggedSha) throw new Error(`${tag} tem release sem tag local`);
     if (release && !release.draft) {
       if (!hasRequiredAssets(release.assets, version)) throw new Error(`${tag} foi publicada sem os instaladores completos`);
     } else {
@@ -69,10 +80,6 @@ export function planReleases(
     priorTag = tag;
   }
   return candidates;
-}
-
-function run(command: string, args: string[]): string {
-  return execFileSync(command, args, { encoding: "utf8" }).trim();
 }
 
 function compareVersions(left: string, right: string): number {
@@ -109,7 +116,7 @@ function plan(): void {
   const previousRelease = releases.get(previousTag)!;
   if (!hasRequiredAssets(previousRelease.assets, previousTag.slice(1))) throw new Error(`${previousTag} foi publicada sem os instaladores completos`);
   const history = run("git", ["rev-list", "--first-parent", "--reverse", `${previousTag}..origin/main`]);
-  const commits = (history ? history.split("\n") : []).map((sha) => ({ sha, message: run("git", ["log", "-1", "--format=%B", sha]) }));
+  const commits = readCommits(history ? history.split("\n") : [], "origin/main");
   const pending = planReleases(commits, tags, releases, previousTag);
   if (process.env.GITHUB_OUTPUT) {
     appendFileSync(process.env.GITHUB_OUTPUT, `candidate=${JSON.stringify(pending[0] ?? {})}\n`);
@@ -118,22 +125,18 @@ function plan(): void {
   console.log(JSON.stringify(pending));
 }
 
-/** A merged pull request brings its own commits: they make a richer list than the merge commit's title. */
-function mergedCommits(sha: string): Detail[] {
-  const parents = run("git", ["rev-list", "--parents", "-n", "1", sha]).split(" ").slice(1);
-  if (parents.length !== 2) return [];
-  const rows = run("git", ["log", "--reverse", "--format=%H%x09%s", "--max-count=60", `${parents[0]}..${parents[1]}`]);
-  return (rows ? rows.split("\n") : []).map((row) => {
-    const [commit, ...subject] = row.split("\t");
-    return { sha: commit, subject: subject.join("\t") };
-  });
+export function notesFor(tag: string, sha: string, previousTag: string, repository: string, cwd?: string): string {
+  const folded = foldedDetails(previousTag, sha, cwd);
+  const candidate = { sha, tag, version: tag.slice(1), previousTag, folded: folded.length > 0 };
+  const details = folded.length > 0 ? folded : mergedCommits(sha, cwd);
+  return releaseNotes(run("git", ["log", "-1", "--format=%B", sha], cwd), candidate, repository, details);
 }
 
 function notes(): void {
   const [tag, sha, previousTag, path] = process.argv.slice(3);
   if (!tag || !sha || !previousTag || !path || !/^v\d+\.\d+\.\d+$/.test(tag)) throw new Error("Argumentos inválidos");
   const repository = process.env.GITHUB_REPOSITORY ?? run("gh", ["repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner"]);
-  writeFileSync(path, releaseNotes(run("git", ["log", "-1", "--format=%B", sha]), { sha, tag, version: tag.slice(1), previousTag }, repository, mergedCommits(sha)));
+  writeFileSync(path, notesFor(tag, sha, previousTag, repository));
 }
 
 function manifest(): void {

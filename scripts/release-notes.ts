@@ -1,5 +1,5 @@
 /** Release notes in pt-BR: grouped by Conventional Commit type, with a download table and the compare link. */
-export type NoteCandidate = { sha: string; tag: string; version: string; previousTag: string };
+export type NoteCandidate = { sha: string; tag: string; version: string; previousTag: string; folded?: boolean };
 export type Detail = { sha: string; subject: string };
 type Entry = { type: string; scope: string; subject: string; breaking: boolean; sha?: string };
 
@@ -108,8 +108,8 @@ export function releaseNotes(message: string, candidate: NoteCandidate, reposito
     if (!list) return [];
     return [`## ${g.heading}\n\n${list.map((e) => `- ${sentence(e)} (${link(e)})`).join("\n")}`];
   });
-  // The title of a merged pull request sums up its commits listed below.
-  const headline = entries.length > 1 || details.length > 0 ? parseEntry(title) : undefined;
+  // The title of a merged pull request sums up its commits listed below; a folded range has no such title.
+  const headline = (entries.length > 1 || details.length > 0) && !candidate.folded ? parseEntry(title) : undefined;
   const intro = headline ? `> ${sentence(headline)}${pull ? ` ([#${pull}](${root}/pull/${pull}))` : ""}` : "";
   const compare = `${root}/compare/${candidate.previousTag}...${candidate.tag}`;
   return [

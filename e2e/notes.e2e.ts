@@ -33,10 +33,13 @@ async function nextFrames(page: Page) {
   await page.evaluate(() => new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(() => done(null)))));
 }
 
-/** End right after a toolbar click is sometimes dropped at automation speed; retry until the caret sits at the line end. */
+/** A toolbar click refocuses the editor on a later frame and may restore the old selection over an End pressed before it; retry until the caret holds at the line end. */
 async function caretToLineEnd(page: Page) {
+  await nextFrames(page);
   await expect(async () => {
     await page.keyboard.press("End");
+    // Judge the caret only once settled: ProseMirror reads the DOM one later, and Enter acts on its selection.
+    await nextFrames(page);
     const atEnd = await page.evaluate(() => {
       const s = getSelection();
       return !!s?.focusNode && s.isCollapsed && s.focusOffset === (s.focusNode.textContent?.length ?? -1);
@@ -50,7 +53,11 @@ test("formatting with the bar and markdown shortcuts saves the expected markdown
   await editor.click();
   await page.keyboard.press("End");
   await page.keyboard.press("Shift+Home");
+  // A toolbar click acts on ProseMirror's selection; without this it still sees the caret and bold becomes a stored mark.
+  await nextFrames(page);
   await page.getByRole("button", { name: "lista de tarefas" }).click();
+  // The click refocuses the editor on the next frame and restores its selection; a second command before that sees a stale one.
+  await nextFrames(page);
   await page.getByRole("button", { name: "negrito" }).click();
   await expect(page.getByRole("button", { name: "negrito" })).toHaveAttribute("aria-pressed", "true");
   await caretToLineEnd(page);

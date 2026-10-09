@@ -133,8 +133,15 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - **Never green a red CI by dropping a gate.** `-D warnings` stays on every clippy run (`ci.yml` and
   `release-commit.yml`; `scripts/workflows.test.ts` pins it). Releases are verified oldest first, each at its own
   tree, so a commit that fails `release-commit.yml`'s `verify` blocks every later release and a fix landing after it
-  never gets a turn: lint the PR before it merges. The one waiver today (`clippy::unnecessary_map_or` for 50491a0,
-  which can't be edited) goes away with a `ci:` commit once v0.25.0 is published.
+  never gets a turn: lint the PR before it merges. No lint is waived anywhere.
+- **A commit the release token cannot tag is folded into the next release.** `GITHUB_TOKEN` has no `workflows` scope:
+  GitHub answers 403 to the draft and the tag of any commit whose `.github/workflows` differs from the tip of every
+  branch (measured: a branch tip counts, a tag does not). `scripts/release.ts plan` therefore only cuts a commit whose
+  workflows equal the tip of `main`'s (or that has none); every unreleased commit before a later workflow change is
+  folded into the next one that qualifies (the tip always does), with the strongest bump of the range, and the notes
+  list the whole range. `prepare` re-targets a resumed draft to that commit. A workflow change merged while a release
+  builds makes that run fail at publish; the next run re-plans, folds and retargets. Do not "fix" a 403 with a PAT that
+  has `workflows` scope.
 
 ## Definition of done
 
