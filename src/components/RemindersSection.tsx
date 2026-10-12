@@ -1,5 +1,6 @@
 import { LEAD_OPTIONS, type LeadMinutes } from "../lib/reminderLead";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 type Props = { lead: LeadMinutes; onChange: (lead: LeadMinutes) => void };
 
@@ -7,8 +8,7 @@ const LABEL = (m: number) => (m === 0 ? t("settings.reminders.onTime") : t("sett
 
 export default function RemindersSection({ lead, onChange }: Props) {
   return (
-    <fieldset className="flex flex-col gap-1.5">
-      <legend className="mb-1 text-xs font-semibold text-fg">{t("settings.reminders.title")}</legend>
+    <SettingsSection title={t("settings.reminders.title")}>
       <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
         {t("settings.reminders.lead")}
         <select
@@ -23,6 +23,6 @@ export default function RemindersSection({ lead, onChange }: Props) {
           ))}
         </select>
       </label>
-    </fieldset>
+    </SettingsSection>
   );
 }

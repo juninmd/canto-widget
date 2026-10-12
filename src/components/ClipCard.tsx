@@ -3,7 +3,8 @@ import { clipKind, clipTransforms, compactCount, KIND_LABEL, sizeLabel } from ".
 import { timeAgo } from "../lib/time";
 import { LOCALE, t } from "../i18n";
 import ClipTransforms from "./ClipTransforms";
-import { PinIcon } from "./Icons";
+import { useState } from "react";
+import { CrossIcon, MoreIcon, PinIcon } from "./Icons";
 
 type Props = {
   item: ClipItem;
@@ -24,6 +25,8 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
   const codeLines = i.preview.replace(/\s+$/, "").split("\n");
   const copyTitle = i.truncated ? t("clipboard.copyTruncatedTitle", { size: sizeLabel(i.kept) }) : t("clipboard.copyAgainTitle");
   const actionBtn = "canto-hit grid size-6 place-items-center rounded-md hover:bg-hover hover:text-fg active:bg-active";
+  const [asOpen, setAsOpen] = useState(false);
+  const modes = i.truncated ? [] : clipTransforms(kind, i.preview);
   const mask = privacy ? "blur-sm select-none" : "";
 
   return (
@@ -31,7 +34,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
       <button type="button" className="w-full text-left" title={copyTitle} onClick={onCopy}>
         {kind === "color" ? (
           <span className="flex items-center gap-2">
-            <span className="size-5 shrink-0 rounded border border-line" style={{ background: i.preview.trim() }} aria-hidden />
+            <span className={`size-5 shrink-0 rounded border border-line ${mask}`} style={{ background: i.preview.trim() }} aria-hidden />
             <span className={`font-mono text-xs text-fg ${mask}`}>{i.preview.trim()}</span>
           </span>
         ) : kind === "code" || kind === "json" ? (
@@ -50,7 +53,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
           {t("clipboard.truncatedNote", { size: sizeLabel(i.chars), kept: compactCount(i.kept) })}
         </p>
       )}
-      {!i.truncated && <ClipTransforms modes={clipTransforms(kind, i.preview)} onPick={onCopyAs} />}
+      {asOpen && <ClipTransforms modes={modes} onPick={onCopyAs} />}
       <div className="mt-1 flex items-center gap-2 text-[11px] text-faint">
         <span className="rounded bg-edge px-1.5 text-muted">{KIND_LABEL[kind]}</span>
         {copied ? (
@@ -62,6 +65,18 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
         )}
         {i.chars >= SHOW_SIZE_FROM && !i.truncated && <span>· {sizeLabel(i.chars)}</span>}
         <span className="ml-auto flex gap-1">
+          {modes.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setAsOpen(!asOpen)}
+              aria-expanded={asOpen}
+              aria-label={t("clipboard.as.label")}
+              title={t("clipboard.as.title")}
+              className={`${actionBtn} ${asOpen ? "text-accent-text" : ""}`}
+            >
+              <MoreIcon />
+            </button>
+          )}
           <button
             type="button"
             onClick={onPin}
@@ -73,7 +88,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
             <PinIcon filled={i.pinned} />
           </button>
           <button type="button" onClick={onDelete} aria-label={t("clipboard.deleteLabel")} title={t("clipboard.deleteTitle")} className={`${actionBtn} hover:text-danger`}>
-            ×
+            <CrossIcon />
           </button>
         </span>
       </div>

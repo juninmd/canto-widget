@@ -1,5 +1,6 @@
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
 import { t } from "../i18n";
+import NoteLinkKind from "./NoteLinkKind";
 
 type Props = { tasks: Task[]; agenda: AgendaItem[]; onPick: (link: NoteLink) => void; onClose: () => void };
 
@@ -31,7 +32,8 @@ export default function NoteLinkPicker({ tasks, agenda, onPick, onClose }: Props
               onClick={() => onPick({ kind: "task", id: task.id, label: task.title })}
               className="w-full truncate rounded px-1.5 py-1 text-left text-fg hover:bg-edge"
             >
-              ✓ {task.title}
+              <NoteLinkKind kind="task" />
+              {task.title}
             </button>
           </li>
         ))}
@@ -42,7 +44,8 @@ export default function NoteLinkPicker({ tasks, agenda, onPick, onClose }: Props
               onClick={() => onPick({ kind: "event", id: e.id, label: e.title })}
               className="w-full truncate rounded px-1.5 py-1 text-left text-fg hover:bg-edge"
             >
-              📅 {e.title}
+              <NoteLinkKind kind="event" />
+              {e.title}
             </button>
           </li>
         ))}

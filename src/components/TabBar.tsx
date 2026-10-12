@@ -1,6 +1,8 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fitTabs } from "../lib/fitTabs";
+import { useAltHeld } from "../lib/useAltHeld";
 import { t } from "../i18n";
+import TabMore, { TabBadge } from "./TabMore";
 
 export type Tab =
   | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "status" | "models" | "activity" | "settings";
@@ -22,19 +24,24 @@ export const panelId = (tab: Tab) => `panel-${tab}`;
 const tabId = (tab: Tab) => `aba-${tab}`;
 
 /** WAI-ARIA APG tabs pattern: one Tab stop, arrows/Home/End switch tabs. */
-type Props = { current: Tab; onChange: (t: Tab) => void; tabs?: typeof TABS };
+type Props = {
+  current: Tab;
+  onChange: (t: Tab) => void;
+  tabs?: typeof TABS;
+  /** Pending items per tab (e.g. review requests); a tab without an entry or with 0 shows no badge. */
+  attention?: Partial<Record<Tab, number>>;
+};
 
 const TAB = "relative canto-hit min-h-8 shrink-0 rounded-lg px-2 transition-colors active:bg-active after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:transition-[background-color]";
 
 /** Tabs that don't fit go to a "mais" menu instead of being cut: the open tab always stays on the bar. */
-export default function TabBar({ current, onChange, tabs = TABS }: Props) {
+export default function TabBar({ current, onChange, tabs = TABS, attention = {} }: Props) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
   const row = useRef<HTMLDivElement>(null);
   const ruler = useRef<HTMLDivElement>(null);
   const focusCurrent = useRef(false);
   const [shown, setShown] = useState<number[]>(() => tabs.map((_, i) => i));
-  const [open, setOpen] = useState(false);
-  const menuId = useId();
+  const alt = useAltHeld();
   const active = Math.max(0, tabs.findIndex((tab) => tab.id === current));
 
   // Measures every tab (bold, the widest case) in a hidden copy of the bar, so the choice doesn't depend on which tab is open.
@@ -65,15 +72,6 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
     el.focus();
   }, [current, shown]);
 
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: PointerEvent) => {
-      if (!(e.target as Element).closest?.("[data-more]")) setOpen(false);
-    };
-    document.addEventListener("pointerdown", away);
-    return () => document.removeEventListener("pointerdown", away);
-  }, [open]);
-
   function onKeyDown(e: React.KeyboardEvent) {
     const i = tabs.findIndex((tab) => tab.id === current);
     const target = {
@@ -88,6 +86,7 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
     onChange(tabs[target].id);
   }
 
+  const count = (id: Tab) => attention[id] ?? 0;
   const hidden = tabs.map((tab, i) => ({ tab, i })).filter(({ i }) => !shown.includes(i));
 
   return (
@@ -110,6 +109,7 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
               tabIndex={current === tab.id ? 0 : -1}
               onClick={() => onChange(tab.id)}
               title={`Alt+${i + 1}`}
+              aria-keyshortcuts={i < 9 ? `Alt+${i + 1}` : undefined}
               className={`${TAB} ${
                 current === tab.id
                   ? "font-semibold text-fg after:bg-accent"
@@ -117,73 +117,34 @@ export default function TabBar({ current, onChange, tabs = TABS }: Props) {
               }`}
             >
               {tab.label}
+              <TabBadge n={count(tab.id)} />
+              {alt && i < 9 && (
+                <span aria-hidden="true" className="absolute -top-0.5 right-0 rounded bg-edge px-1 text-[9px] leading-3 text-fg">
+                  {i + 1}
+                </span>
+              )}
             </button>
           );
         })}
       </nav>
-      {hidden.length > 0 && (
-        <div data-more className="relative shrink-0">
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-haspopup="menu"
-            aria-expanded={open}
-            aria-controls={open ? menuId : undefined}
-            title={t("tabs.moreTitle", { n: hidden.length })}
-            className="canto-hit inline-flex min-h-8 items-center gap-1 rounded-lg px-2 text-muted transition-colors hover:bg-hover hover:text-fg active:bg-active aria-expanded:bg-active aria-expanded:text-fg"
-          >
-            {t("tabs.more")}
-            <span aria-hidden="true" className="text-[9px]">
-              ▾
-            </span>
-          </button>
-          {open && (
-            <div
-              id={menuId}
-              role="menu"
-              aria-label={t("tabs.moreTitle", { n: hidden.length })}
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  e.stopPropagation();
-                  setOpen(false);
-                }
-              }}
-              className="absolute right-0 top-full z-40 mt-1 w-44 rounded-xl border border-edge bg-panel p-1.5 shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade"
-            >
-              {hidden.map(({ tab, i }) => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="menuitem"
-                  onClick={() => {
-                    setOpen(false);
-                    onChange(tab.id);
-                  }}
-                  className="canto-hit flex min-h-8 w-full items-center justify-between gap-2 rounded-lg px-2 text-left text-xs text-fg hover:bg-hover active:bg-active"
-                >
-                  {tab.label}
-                  <span className="text-[10px] text-faint">Alt+{i + 1}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-      {/* Invisible copy of the bar: the only way to know each tab's width before deciding which ones fit. */}
-      <div ref={ruler} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0 -z-10 flex gap-0.5 whitespace-nowrap px-3">
-        {tabs.map((tab) => (
+      {hidden.length > 0 && <TabMore hidden={hidden} attention={attention} onPick={onChange} />}
+      {/* Invisible copy of the bar, the only way to know each tab's width before deciding which fit; clipped so its width cannot scroll the window. */}
+      <div aria-hidden="true" className="pointer-events-none invisible absolute inset-x-0 top-0 -z-10 overflow-hidden">
+        <div ref={ruler} className="flex w-max gap-0.5 whitespace-nowrap px-3">
+          {tabs.map((tab) => (
+            <span
+              key={tab.id}
+              data-ruler
+              data-label={count(tab.id) > 0 ? `${tab.label} ${count(tab.id)}` : tab.label}
+              className={`${TAB} inline-flex items-center font-semibold before:content-[attr(data-label)]`}
+            />
+          ))}
           <span
-            key={tab.id}
             data-ruler
-            data-label={tab.label}
-            className={`${TAB} inline-flex items-center font-semibold before:content-[attr(data-label)]`}
+            data-label={`${t("tabs.more")} ▾`}
+            className="canto-hit inline-flex min-h-8 items-center px-2 before:content-[attr(data-label)]"
           />
-        ))}
-        <span
-          data-ruler
-          data-label={`${t("tabs.more")} ▾`}
-          className="canto-hit inline-flex min-h-8 items-center px-2 before:content-[attr(data-label)]"
-        />
+        </div>
       </div>
     </div>
   );

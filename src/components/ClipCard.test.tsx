@@ -83,6 +83,7 @@ test("privacy mode blurs the text but the card and its actions stay usable", () 
 test("a JSON item offers to be copied formatted or compact, and the click says which", () => {
   const modes: string[] = [];
   show(item({ preview: '{"a":1}', chars: 7, kept: 7 }), { onCopyAs: (m) => modes.push(m) });
+  fireEvent.click(screen.getByRole("button", { name: "copiar como" }));
   fireEvent.click(screen.getByRole("button", { name: "JSON formatado" }));
   fireEvent.click(screen.getByRole("button", { name: "JSON compacto" }));
   expect(modes).toEqual(["json_pretty", "json_compact"]);
@@ -98,9 +99,26 @@ test("links get no rewrites and a cut-off copy is never rewritten", () => {
 
 test("multi-line text can be flattened, a single line cannot", () => {
   show(item({ preview: "um\ndois", chars: 7, kept: 7 }));
+  fireEvent.click(screen.getByRole("button", { name: "copiar como" }));
   expect(screen.getByRole("button", { name: "em uma linha" })).toBeDefined();
   cleanup();
   show(item({ preview: "um dois", chars: 7, kept: 7 }));
+  fireEvent.click(screen.getByRole("button", { name: "copiar como" }));
   expect(screen.queryByRole("button", { name: "em uma linha" })).toBeNull();
   expect(screen.getByRole("button", { name: "MAIÚSCULAS" })).toBeDefined();
+});
+
+test("the rewrite options stay out of the card until its button opens them, so the height never jumps on hover", () => {
+  show(item({ preview: '{"a":1}', chars: 7, kept: 7 }));
+  const toggle = screen.getByRole("button", { name: "copiar como" });
+  expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  expect(screen.queryByRole("group", { name: "copiar como" })).toBeNull();
+  fireEvent.click(toggle);
+  expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  expect(screen.getByRole("group", { name: "copiar como" })).toBeDefined();
+});
+
+test("privacy mode also blurs a color swatch", () => {
+  const { container } = show(item({ preview: "#ff0000" }), { privacy: true });
+  expect(container.querySelector("[style]")!.className).toContain("blur-sm");
 });

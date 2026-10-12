@@ -1,16 +1,14 @@
 import { useState } from "react";
 import { applySkin, loadSkin, SKINS, type SkinId } from "../lib/theme";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 /** Lives in Settings: name visible next to the swatch, instead of loose dots in the header. */
 export default function SkinPicker() {
   const [skin, setSkin] = useState<SkinId>(loadSkin);
 
   return (
-    <section className="flex flex-col gap-2">
-      <h3 id="appearance-title" className="text-xs font-semibold text-fg">
-        {t("theme.title")}
-      </h3>
+    <SettingsSection id="appearance-title" title={t("theme.title")}>
       <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-labelledby="appearance-title">
         {SKINS.map((s) => (
           <button
@@ -31,6 +29,6 @@ export default function SkinPicker() {
           </button>
         ))}
       </div>
-    </section>
+    </SettingsSection>
   );
 }

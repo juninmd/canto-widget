@@ -1,19 +1,27 @@
 import { afterEach, beforeEach, expect, jest, mock, test } from "bun:test";
 import { act } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
 let agendaItems: unknown[] = [];
 let vaultStatus = { exists: true, unlocked: true };
 let miniOn = false;
+let statusFailures = 0;
+let lockFails = false;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
     switch (cmd) {
       case "vault_status":
+        if (statusFailures > 0) {
+          statusFailures--;
+          return Promise.reject("cofre ilegível");
+        }
         return Promise.resolve(vaultStatus);
+      case "vault_lock":
+        return lockFails ? Promise.reject("falha ao trancar") : Promise.resolve(null);
       case "vault_create":
       case "vault_unlock":
         vaultStatus = { exists: true, unlocked: true };
@@ -100,6 +108,8 @@ beforeEach(() => {
   agendaItems = [];
   vaultStatus = { exists: true, unlocked: true };
   miniOn = false;
+  statusFailures = 0;
+  lockFails = false;
   fullscreenOn = false;
   hidden = false;
   localStorage.clear();
@@ -426,4 +436,103 @@ test("hidden from the mode icon hides the window like the minus button", async (
     fireEvent.click(screen.getAllByRole("menuitemradio")[1]);
   });
   expect(hidden).toBe(true);
+});
+
+test("a lock that fails says so, keeps the tabs and rereads the real vault state", async () => {
+  lockFails = true;
+  render(<App />);
+  await settle();
+  const before = calls.filter((c) => c.cmd === "vault_status").length;
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "trancar" }));
+  });
+  await settle();
+  expect(screen.getByText("Não foi possível trancar o cofre. falha ao trancar")).toBeTruthy();
+  expect(calls.filter((c) => c.cmd === "vault_status").length, "the screen may disagree with Rust").toBeGreaterThan(before);
+  expect(screen.getByRole("tablist")).toBeTruthy();
+});
+
+test("while the vault state loads there is a skeleton; if it fails, a banner with retry instead of a blank body", async () => {
+  statusFailures = 1;
+  render(<App />);
+  expect(screen.getByRole("status", { name: "abrindo o cofre…" })).toBeTruthy();
+  await settle();
+  expect(screen.getByText("Não foi possível carregar. cofre ilegível")).toBeTruthy();
+  expect(screen.queryByRole("tablist")).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
+  });
+  await settle();
+  expect(screen.queryByText(/Não foi possível carregar/)).toBeNull();
+  expect(screen.getByRole("tablist")).toBeTruthy();
+});
+
+test("offline shows a chip in the header, and coming back rereads the agenda and tells the tabs to refresh", async () => {
+  const set = (value: boolean) => Object.defineProperty(navigator, "onLine", { configurable: true, value });
+  set(false);
+  const refreshes: unknown[] = [];
+  const on = (e: Event) => refreshes.push((e as CustomEvent).detail);
+  window.addEventListener("canto:refresh", on);
+  try {
+    render(<App />);
+    await settle();
+    expect(screen.getByText("sem conexão")).toBeTruthy();
+    const before = calls.filter((c) => c.cmd === "agenda_today").length;
+    set(true);
+    await act(async () => {
+      window.dispatchEvent(new Event("online"));
+    });
+    await settle();
+    expect(screen.queryByText("sem conexão")).toBeNull();
+    expect(calls.filter((c) => c.cmd === "agenda_today").length).toBeGreaterThan(before);
+    expect(refreshes).toHaveLength(1);
+  } finally {
+    window.removeEventListener("canto:refresh", on);
+    set(true);
+  }
+});
+
+test("a pending alert puts a bell in the header that opens it in the focus banner", async () => {
+  render(<App />);
+  await settle();
+  expect(screen.queryByRole("region", { name: "aviso em foco" })).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
+  });
+  expect(within(screen.getByRole("region", { name: "aviso em foco" })).getByText("pagar boleto")).toBeTruthy();
+});
+
+test("Ctrl+, opens settings, and the palette can open settings and refresh the current tab", async () => {
+  const refreshes: unknown[] = [];
+  const on = (e: Event) => refreshes.push((e as CustomEvent).detail);
+  window.addEventListener("canto:refresh", on);
+  try {
+    render(<App />);
+    await settle();
+    await act(async () => {
+      fireEvent.keyDown(window, { key: ",", code: "Comma", ctrlKey: true });
+    });
+    expect(screen.getByRole("tab", { name: "Ajustes" }).getAttribute("aria-selected")).toBe("true");
+
+    await act(async () => {
+      fireEvent.keyDown(window, { key: "P", code: "KeyP", ctrlKey: true, shiftKey: true });
+    });
+    fireEvent.change(screen.getByRole("combobox", { name: "paleta de comandos" }), { target: { value: "atualizar aba" } });
+    await act(async () => {
+      fireEvent.keyDown(screen.getByRole("combobox", { name: "paleta de comandos" }), { key: "Enter" });
+      jest.advanceTimersByTime(10);
+    });
+    expect(refreshes).toEqual([{ tab: "settings" }]);
+  } finally {
+    window.removeEventListener("canto:refresh", on);
+  }
+});
+
+test("the header lock keeps its name when the label gives way on a narrow window", async () => {
+  render(<App />);
+  await settle();
+  const lock = screen.getByRole("button", { name: "trancar" });
+  expect(lock.getAttribute("aria-label")).toBe("trancar");
+  expect(lock.querySelector("span")?.className).toContain("hidden @[24rem]:inline");
+  expect(screen.getByRole("banner").className).toContain("@container");
 });

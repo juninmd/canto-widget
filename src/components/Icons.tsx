@@ -208,3 +208,24 @@ export const CrossIcon = () => (
     <path d="M6 6l12 12M18 6 6 18" />
   </svg>
 );
+
+export const LinkIcon = () => (
+  <svg {...base}>
+    <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" />
+  </svg>
+);
+
+export const ImageIcon = () => (
+  <svg {...base}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <circle cx="9" cy="10" r="1.6" />
+    <path d="m21 16-5-5-9 9" />
+  </svg>
+);
+
+export const CalendarIcon = () => (
+  <svg {...base}>
+    <rect x="3.5" y="5" width="17" height="15" rx="2" />
+    <path d="M3.5 10h17M8 3v4M16 3v4" />
+  </svg>
+);

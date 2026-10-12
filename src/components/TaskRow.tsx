@@ -2,10 +2,13 @@ import { t } from "../i18n";
 import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import TaskDetails, { TaskBadge, TaskMeta } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
-import { GripIcon } from "./Icons";
+import { CrossIcon, GripIcon } from "./Icons";
 import { FocusButton } from "./FocusControls";
 import { ENTER_CLASS, EXIT_CLASS } from "../lib/motion";
 import { PRIORITY_DOT } from "../lib/priority";
+
+const MAX_TITLE = 300;
+const TEXT_FIELDS = new Set(["INPUT", "TEXTAREA", "SELECT"]);
 
 type Editing = { id: string; title: string } | null;
 
@@ -75,11 +78,17 @@ export default function TaskRow({
         data-reorder-id={draggable ? task.id : undefined}
         onPointerEnter={draggable ? onDragHover : undefined}
         onPointerMove={draggable ? onDragHover : undefined}
-        // Renaming also works from the keyboard: F2 on anything inside the row, as in file managers.
+        // Renaming and deleting also work from the keyboard, as in file managers: F2 renames, Delete removes (with undo).
         onKeyDown={(e) => {
           if (e.key === "F2" && editing?.id !== task.id) {
             e.preventDefault();
             onStartEdit();
+          }
+          const el = e.target as HTMLElement;
+          const typing = TEXT_FIELDS.has(el.tagName) && (el as HTMLInputElement).type !== "checkbox";
+          if ((e.key === "Delete" || e.key === "Backspace") && !typing && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            e.preventDefault();
+            onDelete();
           }
         }}
         className={`group relative flex items-start gap-3 rounded-xl py-2 pl-7 pr-2.5 hover:bg-hover focus-within:bg-hover ${isNew ? ENTER_CLASS : ""} ${
@@ -125,6 +134,8 @@ export default function TaskRow({
           <input
             autoFocus
             value={editing.title}
+            maxLength={MAX_TITLE}
+            aria-label={t("tasks.renameLabel", { title: task.title })}
             onChange={(e) => onEditChange(e.target.value)}
             onBlur={onEditCommit}
             onKeyDown={(e) => {
@@ -134,7 +145,7 @@ export default function TaskRow({
             className="flex-1 rounded border border-accent bg-ink px-1 py-0.5 text-sm text-fg outline-none"
           />
         ) : (
-          <span className="flex min-w-0 flex-1 flex-col">
+          <span className="flex min-w-0 flex-1 flex-col pr-20">
             <span
               className={`whitespace-pre-wrap break-words text-sm leading-snug ${task.done ? "text-faint line-through" : "text-fg"}`}
               title={t("tasks.renameHint", { title: task.title })}
@@ -145,7 +156,7 @@ export default function TaskRow({
             <TaskMeta task={task} />
           </span>
         )}
-        {/* Floats over the right edge, so the title keeps the whole line until the pointer or focus arrives. */}
+        {/* Floats over the right edge; the title reserves that strip (pr-20) so long text never runs under it. */}
         <span
           className={`canto-raised absolute right-1.5 top-1.5 flex items-center rounded-lg bg-raised p-0.5 shadow-[var(--shadow-raised)] focus-within:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100 ${
             detailsOpen ? "opacity-100" : "opacity-0"
@@ -159,7 +170,7 @@ export default function TaskRow({
             className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:bg-hover hover:text-danger active:bg-active"
             aria-label={t("tasks.delete", { title: task.title })}
           >
-            ×
+            <CrossIcon />
           </button>
         </span>
       </li>

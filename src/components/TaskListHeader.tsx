@@ -11,9 +11,10 @@ type Props = {
   onPriorityFilter: (p: Priority | "") => void;
   onSummary: () => void;
   onCarryOver: () => void;
+  onClearDone: () => void;
 };
 
-export default function TaskListHeader({ done, total, priorityFilter, onPriorityFilter, onSummary, onCarryOver }: Props) {
+export default function TaskListHeader({ done, total, priorityFilter, onPriorityFilter, onSummary, onCarryOver, onClearDone }: Props) {
   const ghost = "canto-hit min-h-[24px] whitespace-nowrap rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
   return (
     <div className="flex flex-col gap-1">
@@ -41,6 +42,11 @@ export default function TaskListHeader({ done, total, priorityFilter, onPriority
           <button type="button" onClick={onCarryOver} title={t("tasks.carryOverHint")} className={ghost}>
             {t("tasks.carryOver")}
           </button>
+          {done > 0 && (
+            <button type="button" onClick={onClearDone} title={t("tasks.clearDoneHint")} className={ghost}>
+              {t("tasks.clearDone")}
+            </button>
+          )}
         </span>
         <select
           aria-label={t("priority.filter")}

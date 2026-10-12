@@ -1,6 +1,7 @@
 import type { Tab } from "./TabBar";
 import { HIDEABLE } from "../lib/tabs";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 type Props = { hidden: Tab[]; onChange: (hidden: Tab[]) => void };
 
@@ -8,8 +9,7 @@ type Props = { hidden: Tab[]; onChange: (hidden: Tab[]) => void };
 export default function TabsSection({ hidden, onChange }: Props) {
   const shown = HIDEABLE.filter((t) => !hidden.includes(t.id)).length;
   return (
-    <fieldset className="flex flex-col gap-1.5">
-      <legend className="mb-1 text-xs font-semibold text-fg">{t("settings.tabs.title")}</legend>
+    <SettingsSection title={t("settings.tabs.title")}>
       <div className="grid grid-cols-2 gap-1">
         {HIDEABLE.map((tab) => {
           const on = !hidden.includes(tab.id);
@@ -30,6 +30,6 @@ export default function TabsSection({ hidden, onChange }: Props) {
         })}
       </div>
       <p className="text-[11px] text-faint">{t("settings.tabs.hint")}</p>
-    </fieldset>
+    </SettingsSection>
   );
 }

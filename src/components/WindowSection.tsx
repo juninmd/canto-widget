@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { api, errText } from "../lib/api";
+import { api } from "../lib/api";
+import { useSectionError } from "../lib/useSectionError";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 export default function WindowSection({ onError }: { onError: (m: string) => void }) {
   const [onTop, setOnTop] = useState(true);
   const [moved, setMoved] = useState(false);
+  const { error, fail, clear } = useSectionError(onError);
 
   async function reload() {
     try {
@@ -13,7 +16,7 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
       setOnTop(cfg.always_on_top);
       setMoved(!!cfg.position || !!cfg.size);
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     }
   }
 
@@ -23,18 +26,18 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
   }, []);
 
   async function act(fn: () => Promise<unknown>) {
+    clear();
     try {
       await fn();
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     } finally {
       await reload();
     }
   }
 
   return (
-    <section className="flex flex-col gap-2">
-      <h3 className="text-xs font-semibold text-fg">{t("settings.window.title")}</h3>
+    <SettingsSection title={t("settings.window.title")} error={error}>
       <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
         <input
           type="checkbox"
@@ -44,18 +47,16 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
         />
         {t("settings.window.alwaysOnTop")}
       </label>
-      <p className="text-[11px] text-faint">
-        {t("settings.window.hint")}
-      </p>
+      <p className="text-[11px] text-faint">{t("settings.window.hint")}</p>
       {moved && (
         <button
           type="button"
           onClick={() => void act(api.windowReset)}
-          className="self-start rounded-lg bg-edge px-3 py-1.5 text-xs text-fg"
+          className="canto-hit min-h-[24px] self-start rounded-lg bg-edge px-3 py-1.5 text-xs text-fg"
         >
           {t("settings.window.reset")}
         </button>
       )}
-    </section>
+    </SettingsSection>
   );
 }

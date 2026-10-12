@@ -13,6 +13,7 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { default: GitlabTab } = await import("./GitlabTab");
+const { clearForgeCache } = await import("../lib/forgeCache");
 
 const empty = { total: 0, items: [] };
 const mr = {
@@ -35,6 +36,7 @@ async function mount() {
 }
 
 beforeEach(() => {
+  clearForgeCache();
   calls = [];
   responses = {};
 });
@@ -102,4 +104,25 @@ test("shows the summary strip without a CI tile", async () => {
   await mount();
   expect(screen.getByText("revisões")).toBeDefined();
   expect(screen.queryByText("CI falhou")).toBeNull();
+});
+
+test("a failed status check is an alert with a retry; the lists cached for GitLab come back at once, apart from GitHub's", async () => {
+  responses.gitlab_status = () => Promise.reject("instância fora do ar");
+  const first = render(<GitlabTab onError={() => {}} />);
+  for (let i = 0; i < 5; i++) await act(async () => {});
+  expect(screen.getByRole("alert").textContent).toContain("instância fora do ar");
+  responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
+  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
+  });
+  for (let i = 0; i < 5; i++) await act(async () => {});
+  expect(screen.getByText("acme/api!12")).toBeTruthy();
+  first.unmount();
+
+  responses.gitlab_status = () => new Promise(() => {});
+  responses.gitlab_lists = () => new Promise(() => {});
+  await mount();
+  expect(screen.getByText("acme/api!12")).toBeTruthy();
+  expect(screen.getByLabelText("Filtrar issues e PRs").getAttribute("data-shortcut")).toBe("search");
 });

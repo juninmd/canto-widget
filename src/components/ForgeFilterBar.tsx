@@ -9,6 +9,8 @@ type Props = { forge: Forge; filter: ForgeFilter; onApply: (f: ForgeFilter) => v
 /** Text only searches on Enter: on GitHub each search costs up to 6 of the 30 search calls per minute. */
 export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
   const [text, setText] = useState(filter.text);
+  const [focused, setFocused] = useState(false);
+  const hint = focused || text.trim() !== filter.text;
   const apply = (patch: Partial<ForgeFilter>) => onApply({ ...filter, text: text.trim(), ...patch });
 
   return (
@@ -30,6 +32,10 @@ export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
             value={text}
             onChange={(e) => setText(e.target.value)}
             maxLength={120}
+            data-shortcut="search"
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            aria-describedby={hint ? "forge-filter-hint" : undefined}
             aria-label={t("forge.filterLabel")}
             placeholder={forge === "github" ? t("forge.filterPlaceholderGithub") : t("forge.filterPlaceholderGitlab")}
             className="canto-field w-full py-1.5 pl-8 pr-2.5 text-xs"
@@ -39,6 +45,11 @@ export default function ForgeFilterBar({ forge, filter, onApply }: Props) {
           {t("forge.filter")}
         </button>
       </form>
+      {hint && (
+        <p id="forge-filter-hint" className="-mt-0.5 px-1 text-[10.5px] text-faint">
+          {t("forge.filterHint")}
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-1 text-[11px]">
         <div role="group" aria-label={t("forge.kindGroup")} className="flex gap-1">
           {kinds(forge).map(({ kind, label }) => (

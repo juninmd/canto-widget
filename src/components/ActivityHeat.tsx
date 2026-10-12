@@ -1,5 +1,5 @@
 import { LOCALE, t } from "../i18n";
-import { hourlyHeat, peakWindow } from "../lib/activity";
+import { hourlyHeat, peakWindow, secsLabel } from "../lib/activity";
 import type { Day } from "../lib/activityView";
 
 /** Hours of the day against the last days: the darker the cell, the more active time in that hour. */
@@ -19,7 +19,7 @@ export default function ActivityHeat({ days }: { days: Day[] }) {
         {t("activity.heat")}
         <span className="text-[10.5px] font-normal normal-case tracking-normal text-faint">{t("activity.heatHint")}</span>
       </h3>
-      <div className="grid gap-[3px] text-[10px] text-faint" style={{ gridTemplateColumns: `2.2rem repeat(${cols.length}, minmax(0, 1fr))` }}>
+      <div aria-hidden="true" className="grid gap-[3px] text-[10px] text-faint" style={{ gridTemplateColumns: `2.2rem repeat(${cols.length}, minmax(0, 1fr))` }}>
         <span />
         {cols.map((h) => (
           <span key={h} className="text-center font-mono tabular-nums">{h % 2 === 0 ? h : ""}</span>
@@ -33,6 +33,26 @@ export default function ActivityHeat({ days }: { days: Day[] }) {
           </div>
         ))}
       </div>
+      <table aria-label={t("activity.heat")} className="sr-only">
+        <thead>
+          <tr>
+            <td />
+            {cols.map((h) => (
+              <th key={h} scope="col">{h}h</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.day}>
+              <th scope="row">{name(r.day)}</th>
+              {cols.map((h) => (
+                <td key={h}>{r.hours[h] ? secsLabel(r.hours[h]) : "–"}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
       {peak && <p className="mt-2.5 text-[11px] text-faint">{t("activity.peak", { from: peak[0], to: peak[1] })}</p>}
     </section>
   );

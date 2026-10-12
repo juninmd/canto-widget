@@ -6,11 +6,16 @@ const PHOTO = "data:image/png;base64,iVBORw0KGgo=";
 const connected = { configured: true, embedded: true, connected: true, email: "ana@exemplo.com", name: "Ana Souza", avatar: PHOTO };
 let status: Record<string, unknown> = connected;
 const calls: string[] = [];
+let release: (() => void) | null = null;
+let fail = false;
+let hold = false;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
     calls.push(cmd);
     if (cmd === "drive_disconnect") status = { configured: true, embedded: true, connected: false, email: "", name: "", avatar: "" };
+    if (cmd === "drive_status" && fail) return Promise.reject("sem rede");
+    if (cmd === "drive_status" && release === null && hold) return new Promise((r) => (release = () => r(status)));
     return Promise.resolve(cmd === "drive_status" ? status : null);
   },
 }));
@@ -28,6 +33,9 @@ afterEach(() => {
   cleanup();
   status = connected;
   calls.length = 0;
+  release = null;
+  fail = false;
+  hold = false;
 });
 
 test("connected account shows photo, name and email", async () => {
@@ -54,4 +62,27 @@ test("a photo that isn't an image data: URL doesn't become an <img>; shows the i
   expect(document.querySelector("img")).toBeNull();
   expect(screen.getByText("A")).toBeTruthy();
   expect(screen.getByText("ana@exemplo.com")).toBeTruthy();
+});
+
+test("until the status answers there is a skeleton, never a 'não configurado' flash", async () => {
+  hold = true;
+  render(<GoogleSection onError={() => {}} />);
+  expect(screen.getByRole("status", { name: "lendo a conta do Google" })).toBeTruthy();
+  expect(screen.queryByText("não configurado")).toBeNull();
+  await act(async () => {
+    release!();
+  });
+  expect(screen.queryByRole("status", { name: "lendo a conta do Google" })).toBeNull();
+  expect(screen.getByText("Ana Souza")).toBeTruthy();
+});
+
+test("a failed status read shows an alert with retry instead of spinning", async () => {
+  fail = true;
+  await mount();
+  expect(screen.getByRole("alert").textContent).toContain("sem rede");
+  fail = false;
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
+  });
+  expect(screen.getByText("Ana Souza")).toBeTruthy();
 });

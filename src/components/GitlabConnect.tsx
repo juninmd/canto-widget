@@ -63,7 +63,7 @@ export default function GitlabConnect({ onConnected }: { onConnected: () => void
           </button>
         )}
       </p>
-      <button type="submit" disabled={busy || !token.trim() || !baseUrl.trim()} className="min-h-7 self-start rounded-lg bg-edge px-3 text-fg disabled:opacity-40">
+      <button type="submit" disabled={busy || !token.trim() || !baseUrl.trim()} className="canto-hit min-h-7 self-start rounded-lg bg-edge px-3 text-fg disabled:opacity-40">
         {busy ? t("gitlab.checking") : t("gitlab.connect")}
       </button>
       {error && (

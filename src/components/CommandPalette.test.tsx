@@ -87,3 +87,13 @@ test("clicking an option runs it", () => {
   fireEvent.click(screen.getByRole("option", { name: /Trancar/ }));
   expect(ran).toEqual(["lock"]);
 });
+
+test("aria-expanded follows the results, and the empty message sits in a live region", () => {
+  render(<Host />);
+  const input = openPalette();
+  expect(input.getAttribute("aria-expanded")).toBe("true");
+  expect(screen.getByRole("status").textContent).toBe("");
+  fireEvent.change(input, { target: { value: "xyz" } });
+  expect(input.getAttribute("aria-expanded")).toBe("false");
+  expect(screen.getByRole("status").textContent).toBe("nenhuma ação com esse nome");
+});

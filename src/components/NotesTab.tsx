@@ -7,6 +7,9 @@ import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { t } from "../i18n";
 import NoteCard from "./NoteCard";
 import EmptyState from "./EmptyState";
+import Skeleton from "./Skeleton";
+import NoteFilterChip from "./NoteFilterChip";
+import { useAnnouncement } from "../lib/useAnnouncement";
 import { NoteIcon, PlusIcon, SearchIcon } from "./Icons";
 import { useNoteDraft, type NoteDraft } from "../lib/useNoteDraft";
 import type { Draft } from "./NoteEditor";
@@ -38,10 +41,10 @@ export default function NotesTab({ today, agenda = [], privacy, initialQuery, qu
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);
   const own = useNoteDraft();
-  const { draft, editing, setDraft, open, close } = note ?? own;
+  const { draft, original, editing, setDraft, open, close } = note ?? own;
   const [tasks, setTasks] = useState<Task[]>([]);
 
-  const [announcement, setAnnouncement] = useState("");
+  const [announcement, setAnnouncement] = useAnnouncement();
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const { leaving, leave } = useExit();
   const { bump, isLatest } = useLatestRequest();
@@ -128,7 +131,7 @@ ${lim}`);
   if (editing) {
     return (
       <Suspense fallback={<p className="px-2 py-6 text-center text-xs text-faint">{t("notes.editorLoading")}</p>}>
-        <NoteEditor draft={draft} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={close} />
+        <NoteEditor draft={draft} original={original} tasks={tasks} agenda={agenda} onChange={setDraft} onSave={save} onCancel={close} />
       </Suspense>
     );
   }
@@ -161,7 +164,12 @@ ${lim}`);
         </button>
       </div>
 
-      <p role="status" className="sr-only">
+      <NoteFilterChip query={query} total={total} onClear={() => setQuery("")} />
+      <p
+        role="status"
+        title={announcement}
+        className={announcement ? "truncate rounded-md bg-edge px-2 py-1 text-[11px] text-fg" : "sr-only"}
+      >
         {announcement}
       </p>
       <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
@@ -194,7 +202,12 @@ ${lim}`);
             </button>
           </li>
         )}
-        {notes.length === 0 && (
+        {notes.length === 0 && loadedFor === null && (
+          <li>
+            <Skeleton label={t("notes.loading")} />
+          </li>
+        )}
+        {notes.length === 0 && loadedFor !== null && (
           <EmptyState icon={query ? <SearchIcon /> : <NoteIcon />}>{query ? t("notes.emptySearch") : t("notes.empty")}</EmptyState>
         )}
       </ul>

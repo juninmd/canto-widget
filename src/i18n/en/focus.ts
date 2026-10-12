@@ -62,6 +62,8 @@ export const focus: Record<keyof typeof source, string> = {
   "activity.copyFailed": "Could not copy. Select the text and use {mod}+C.",
   "activity.refreshNow": "Refresh now",
   "activity.goalMenu": "Adjust focus goal",
+  "activity.goalChip": "goal {goal}",
+  "activity.goalChipSet": "set goal",
   "activity.chartLabel": "Time by category",
   "activity.activeWord": "active",
   "activity.legendLabel": "categories",

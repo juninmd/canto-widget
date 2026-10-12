@@ -46,6 +46,7 @@ function ctx(over: Partial<PaletteContext> = {}): PaletteContext {
     toggleFullscreen: noop,
     mini: noop,
     copySummary: noop,
+    refreshTab: noop,
     help: noop,
     hide: noop,
     ...over,
@@ -92,4 +93,21 @@ test("the palette can switch to the mini dock", () => {
   let mini = 0;
   buildCommands(ctx({ mini: () => mini++ })).find((c) => c.id === "window.mini")?.run();
   expect(mini).toBe(1);
+});
+
+test("settings opens from the palette with its Ctrl+, hint", () => {
+  let went = "";
+  const open = buildCommands(ctx({ goTab: (id) => (went = id) })).find((c) => c.id === "settings.open")!;
+  expect(open.title).toBe("Abrir ajustes");
+  expect(open.keys?.at(-1)).toBe(",");
+  void open.run();
+  expect(went).toBe("settings");
+});
+
+test("the palette can refresh the current tab", () => {
+  let refreshed = 0;
+  const refresh = buildCommands(ctx({ refreshTab: () => refreshed++ })).find((c) => c.id === "tab.refresh")!;
+  expect(refresh.title).toBe("Atualizar aba atual");
+  void refresh.run();
+  expect(refreshed).toBe(1);
 });

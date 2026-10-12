@@ -77,7 +77,12 @@ export default function MiniRail({ alerts, mode, onOpen, onMode }: Props) {
       onPointerLeave={exit}
       className="flex h-screen flex-col items-end justify-center gap-2 overflow-hidden py-3"
     >
-      <div className={`mr-1.5 transition-opacity duration-150 ${expanded ? "opacity-100" : "opacity-0"}`}>
+      {/* Focus expands the dock like the pointer does: the switcher is invisible while it is collapsed. */}
+      <div
+        onFocus={() => enter(null)}
+        onBlur={exit}
+        className={`mr-1.5 transition-opacity duration-150 ${expanded ? "opacity-100" : "opacity-0"}`}
+      >
         <ModeSwitcher
           mode={mode}
           onPick={onMode}

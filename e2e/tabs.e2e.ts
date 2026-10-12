@@ -44,6 +44,16 @@ test("a tab picked from the menu takes a place on the bar and stays selected", a
   expect(await clipped(page)).toEqual([]);
 });
 
+test("picking a tab from the menu does not scroll the window sideways", async ({ page }) => {
+  await page.setViewportSize({ width: 420, height: 580 });
+  await mockTauri(page);
+  await page.goto("/");
+  await page.waitForTimeout(600);
+  await goTab(page, "Ajustes");
+  const scrolled = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>("*")].filter((el) => el.scrollLeft > 0).length);
+  expect(scrolled).toBe(0);
+});
+
 test("the longer English names don't cut either", async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 580 });
   await mockTauri(page, { language: "en" });
