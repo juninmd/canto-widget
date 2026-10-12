@@ -24,10 +24,10 @@ fn a_mention_is_a_whole_word_in_any_case() {
 #[test]
 fn the_newest_text_that_mentions_the_user_names_the_sender() {
     let texts = vec![text("@voce veja", "ana"), text("sem menção", "bia"), text("de novo @voce", "caio")];
-    let (author, body) = pick(texts, "voce").expect("a sender");
+    let (author, body) = pick(texts, &["voce".to_string()]).expect("a sender");
     assert_eq!((author.login.as_str(), body.as_str()), ("caio", "de novo @voce"));
-    assert!(pick(vec![text("nada", "ana")], "voce").is_none());
-    assert!(pick(vec![Text { body: Some("@voce".into()), user: None }], "voce").is_none());
+    assert!(pick(vec![text("nada", "ana")], &["voce".to_string()]).is_none());
+    assert!(pick(vec![Text { body: Some("@voce".into()), user: None }], &["voce".to_string()]).is_none());
 }
 
 #[test]
@@ -96,4 +96,17 @@ fn avatars_are_downloaded_once_and_untrusted_or_failed_ones_are_dropped() {
     assert_eq!(avatars, ["data:image/png;base64,AA==", "data:image/png;base64,AA==", "", ""]);
     assert_eq!(calls.get(), 2, "one for the repeated URL, one for the failing one; the untrusted never leaves");
     assert_eq!(cache.len(), 1, "a failure is not remembered");
+}
+
+#[test]
+fn a_team_handle_counts_like_the_login_and_the_earliest_one_centres_the_preview() {
+    let names = vec!["voce".to_string(), "acme/backend".to_string()];
+    assert!(first_mention("oi @acme/backend, olhem", &names).is_some());
+    assert!(first_mention("oi @acme/backend-legacy", &names).is_none(), "another team is not this one");
+    assert!(first_mention("mande a@acme/backend", &names).is_none());
+    let texts = vec![text("@voce veja", "ana"), text("@acme/backend precisamos disso", "bia"), text("nada", "caio")];
+    let (author, body) = pick(texts, &names).expect("a sender");
+    assert_eq!((author.login.as_str(), body.as_str()), ("bia", "@acme/backend precisamos disso"));
+    let long = format!("{} @acme/backend revisem {}", "a".repeat(300), "z".repeat(300));
+    assert!(excerpt_any(&long, &names, 100).contains("@acme/backend revisem"));
 }

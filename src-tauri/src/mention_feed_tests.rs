@@ -31,6 +31,7 @@ fn a_github_row_carries_the_thread_and_who_said_what_when_the_comment_was_found(
 
 fn todo(id: u64, body: &str) -> Mention {
     Mention {
+        action: "mentioned".into(),
         id,
         title: "Falha no deploy".into(),
         url: format!("https://git.example.com/acme/atlas/-/merge_requests/{id}"),
@@ -66,4 +67,16 @@ fn photos_are_downloaded_only_from_trusted_hosts_and_never_leave_as_urls() {
     rows[0].sender.as_mut().unwrap().avatar = "https://evil.example.org/a.png".into();
     gitlab_photos(&mut rows, "https://git.example.com");
     assert_eq!(rows[0].sender.as_ref().unwrap().avatar, "", "an untrusted host is dropped without a request");
+}
+
+#[test]
+fn a_thread_that_mentions_me_and_my_team_is_listed_once() {
+    let list = |ns: &[u64]| ForgeList {
+        total: ns.len() as u64,
+        items: ns.iter().map(|n| thread(*n, true)).collect(),
+        ..Default::default()
+    };
+    let both = with_teams(list(&[1, 2]), list(&[2, 3]));
+    assert_eq!((both.total, both.items.iter().map(|i| i.number).collect::<Vec<_>>()), (3, vec![1, 2, 3]));
+    assert_eq!(with_teams(list(&[1]), list(&[])).items.len(), 1);
 }

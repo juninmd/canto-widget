@@ -109,7 +109,7 @@ export const integrations = {
   "forge.mentions.loading": "buscando menções",
   "forge.mentions.empty": "ninguém mencionou você em threads abertos",
   "forge.mentions.emptyGitlab": "nenhuma menção pendente: o GitLab lista só os to-dos ainda não concluídos",
-  "forge.mentions.note": "menções diretas ao seu @usuário em threads abertos (menção a time não entra)",
+  "forge.mentions.note": "menções diretas ao seu @usuário em threads abertos (a de times só com a opção ligada nos Ajustes)",
   "forge.mentions.noteGitlab": "to-dos de menção pendentes no GitLab",
   "forge.mentions.noPreview": "o comentário com a menção não foi encontrado; abra o link para ler",
   "forge.mentions.by": "{name} mencionou você",

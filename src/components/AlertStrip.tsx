@@ -1,6 +1,6 @@
 import type { AgendaItem } from "../lib/api";
 import { status as agendaStatus } from "../lib/agenda";
-import { kindOf, levelLabel, senderName, toneOf, type Tone } from "../lib/alerts";
+import { kindOf, levelLabel, prLabel, senderName, toneOf, type Tone } from "../lib/alerts";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import Avatar from "./Avatar";
@@ -20,7 +20,7 @@ export function summary(e: AgendaItem): string {
     case "model":
       return t("alert.modelNew");
     case "pr":
-      return t(e.tag === "ci" ? "alert.pr.ci" : "alert.pr.stalled");
+      return prLabel(e.tag);
     case "mention":
       return e.sender ? t("alert.mentionedBy", { name: senderName(e) }) : t("alert.mentioned");
     case "task":

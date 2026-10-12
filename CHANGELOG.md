@@ -29,6 +29,18 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Mais avisos do seu trabalho no GitHub e no GitLab**, cada um com a sua chave nos Ajustes: PR/MR **aprovado** ou com
+  **mudanças pedidas** (no GitHub com a foto, o nome e o texto de quem revisou; no GitLab só o pedido de mudanças, que é
+  o que a lista informa), PR/MR **pronto para merge** ou com **conflito**, **comentário novo** no seu PR/MR (com a
+  prévia no GitHub), algo **atribuído a você** (issue, PR ou MR de outra pessoa), **revisão pedida no GitLab** (como
+  no GitHub, uma notificação do sistema) e **pipeline que falhou** em MR seu no GitLab (o aviso de CI). Uma aprovação que
+  também deixou o PR pronto vira um aviso só, e mais de três novidades de uma vez viram um resumo. A primeira
+  leitura de cada tipo só registra, e a checagem segue a cada 5 min com o cofre aberto.
+- **Respostas e menções a times, opcionais**: avisa quando respondem numa conversa em que você comentou (GitHub; fica
+  desligado, é o aviso mais barulhento; se a resposta já cita você, vale só o aviso de menção) e, com a opção ligada,
+  inclui no aviso e na subaba de menções os threads que citam um time seu (GitHub, precisa do escopo `read:org` no
+  token; no GitLab a menção a um grupo já chega como menção).
+
 - **Subaba de menções no GitHub e no GitLab**: ao lado de "PRs e issues" (ou "MRs e issues"), a subaba **menções** lista
   onde você foi marcado: a foto, o nome e o @usuário de quem escreveu, uma prévia do texto (uma linha, recortada em
   volta do seu @usuário) e o link que abre a conversa no navegador. No GitHub entram as menções diretas ao seu usuário

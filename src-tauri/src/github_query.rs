@@ -9,7 +9,25 @@ fn qualifiers(section: Section) -> (Option<&'static str>, Option<&'static str>) 
         Section::MyPrs => (None, Some("author:@me")),
         Section::MyIssues => (Some("author:@me"), None),
         Section::Mentioned => (Some("mentions:@me -author:@me"), Some("mentions:@me -author:@me")),
+        // Someone else's PR the user commented on, or any issue (own ones included: no other alert covers them).
+        Section::Participating => (Some("commenter:@me"), Some("commenter:@me -author:@me")),
+        Section::TeamMentioned => (None, None),
     }
+}
+
+/// Team handles (`org/slug`) as search qualifiers: one query per team and item type, never the user's own threads.
+pub fn team_queries(teams: &[String], filter: &ForgeFilter) -> Vec<String> {
+    let text = filter.text();
+    let mut out = Vec::new();
+    for team in teams {
+        for (kind, is) in [(Kind::Issue, "issue"), (Kind::Pr, "pr")] {
+            if filter.wants(kind) {
+                let base = format!("is:open is:{is} archived:false team:{team} -author:@me");
+                out.push(if text.is_empty() { base } else { format!("{base} {text}") });
+            }
+        }
+    }
+    out
 }
 
 /// One query per item type, since the search requires an explicit `is:issue` or `is:pr`.
@@ -81,6 +99,24 @@ mod tests {
     fn free_text_is_appended_flattened() {
         let q = queries(Section::MyPrs, &filter("  repo:acme/atlas\n\tcsv  ", Kind::All));
         assert_eq!(q, vec!["is:open is:pr archived:false author:@me repo:acme/atlas csv"]);
+    }
+
+    #[test]
+    fn team_mentions_search_each_team_for_issues_and_prs_but_never_my_own_threads() {
+        let teams = vec!["acme/backend".to_string(), "acme/ops".to_string()];
+        let q = team_queries(&teams, &ForgeFilter::default());
+        assert_eq!(q.len(), 4);
+        assert_eq!(q[0], "is:open is:issue archived:false team:acme/backend -author:@me");
+        assert_eq!(q[3], "is:open is:pr archived:false team:acme/ops -author:@me");
+        assert_eq!(team_queries(&teams, &filter("csv", Kind::Pr)).len(), 2);
+        assert!(team_queries(&[], &ForgeFilter::default()).is_empty());
+    }
+
+    #[test]
+    fn participating_looks_for_threads_i_commented_on_and_skips_prs_i_opened() {
+        let q = queries(Section::Participating, &ForgeFilter::default());
+        assert!(q[0].contains("is:issue") && q[0].contains("commenter:@me") && !q[0].contains("-author"), "{q:?}");
+        assert!(q[1].contains("is:pr") && q[1].contains("commenter:@me -author:@me"), "{q:?}");
     }
 
     #[test]

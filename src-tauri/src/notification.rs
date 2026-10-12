@@ -32,11 +32,29 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
         return (crate::lang::tr("Você foi mencionado", "You were mentioned"), body);
     }
     if event.id.starts_with(PR_PREFIX) {
+        let tr = crate::lang::tr;
         let title = match event.tag.as_str() {
-            "ci" => crate::lang::tr("CI falhou", "CI failed"),
-            _ => crate::lang::tr("PR sem revisão", "PR without a review"),
+            "ci" => tr("CI falhou", "CI failed"),
+            "approved" => tr("PR aprovado", "PR approved"),
+            "changes" => tr("Mudanças pedidas", "Changes requested"),
+            "ready" => tr("Pronto para merge", "Ready to merge"),
+            "conflict" => tr("Conflito no PR", "PR conflict"),
+            "comment" => tr("Novo comentário", "New comment"),
+            "assigned" => tr("Atribuído a você", "Assigned to you"),
+            "reply" => tr("Resposta na conversa", "Reply in a thread"),
+            "updates" => tr("Novidades nos seus PRs", "Updates on your PRs"),
+            _ => tr("PR sem revisão", "PR without a review"),
         };
-        return (title, format!("{} {}", event.organizer, event.title).trim().to_string());
+        let head = format!("{} {}", event.organizer, event.title).trim().to_string();
+        // What someone said is the point of these; for CI and "no review" the title already tells it.
+        let says = matches!(event.tag.as_str(), "approved" | "changes" | "ready" | "comment" | "reply" | "updates");
+        let detail = event.description.split_whitespace().collect::<Vec<_>>().join(" ");
+        let body = if says && !detail.is_empty() {
+            format!("{head}\n{}", detail.chars().take(140).collect::<String>()).trim().to_string()
+        } else {
+            head
+        };
+        return (title, body);
     }
     let body = match event.location.trim() {
         "" => event.title.clone(),
@@ -105,5 +123,32 @@ mod tests {
         };
         assert_eq!(content(&pr("ci")), ("CI falhou", "acme/atlas#12 Corrige o parser".into()));
         assert_eq!(content(&pr("stalled")).0, "PR sem revisão");
+    }
+
+    #[test]
+    fn the_newer_own_work_alerts_carry_what_was_said() {
+        let pr = |tag: &str, description: &str| AgendaItem {
+            id: format!("pr:{tag}:acme/atlas#12"),
+            title: "Corrige o parser".into(),
+            organizer: "acme/atlas#12".into(),
+            tag: tag.into(),
+            description: description.into(),
+            ..Default::default()
+        };
+        assert_eq!(
+            content(&pr("comment", "@ana: pode\n revisar?")),
+            ("Novo comentário", "acme/atlas#12 Corrige o parser\n@ana: pode revisar?".into())
+        );
+        assert_eq!(content(&pr("approved", "")).0, "PR aprovado");
+        assert_eq!(content(&pr("changes", "x")).0, "Mudanças pedidas");
+        assert_eq!(content(&pr("ready", "x")).0, "Pronto para merge");
+        assert_eq!(content(&pr("conflict", "x")).0, "Conflito no PR");
+        assert_eq!(content(&pr("reply", "x")).0, "Resposta na conversa");
+        assert_eq!(
+            content(&pr("assigned", "Este PR foi atribuído a você")),
+            ("Atribuído a você", "acme/atlas#12 Corrige o parser".into()),
+            "an assignment says it in the title"
+        );
+        assert_eq!(content(&pr("updates", "a\nb")).0, "Novidades nos seus PRs");
     }
 }

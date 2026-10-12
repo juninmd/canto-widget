@@ -18,7 +18,7 @@ pub struct Account {
 }
 
 #[derive(Deserialize)]
-struct RawItem {
+pub(crate) struct RawItem {
     iid: u64,
     #[serde(default)]
     title: String,
@@ -33,16 +33,21 @@ struct RawItem {
     #[serde(default)]
     closed_at: Option<String>,
     #[serde(default)]
-    user_notes_count: u64,
+    pub(crate) user_notes_count: u64,
     #[serde(default)]
-    draft: bool,
+    pub(crate) draft: bool,
     /// Pre-16.0 instances only send this one.
     #[serde(default)]
-    work_in_progress: bool,
+    pub(crate) work_in_progress: bool,
     #[serde(default)]
     references: Option<References>,
     #[serde(default)]
     author: Option<User>,
+    #[serde(default)]
+    pub(crate) has_conflicts: bool,
+    /// `mergeable`, `ci_must_pass`, `requested_changes`...: GitLab 15.6 and later.
+    #[serde(default)]
+    pub(crate) detailed_merge_status: String,
 }
 
 #[derive(Deserialize)]
@@ -51,12 +56,12 @@ struct References {
 }
 
 #[derive(Deserialize)]
-struct User {
-    username: String,
+pub(crate) struct User {
+    pub username: String,
     #[serde(default)]
-    name: String,
+    pub name: String,
     #[serde(default)]
-    avatar_url: Option<String>,
+    pub avatar_url: Option<String>,
 }
 
 pub fn user(base: &str, token: &str) -> Result<String> {
@@ -107,86 +112,6 @@ pub fn mr_checks(acc: &Account, project: &str, iid: u64) -> Result<ChecksStatus>
     Ok(checks_from_gitlab(detail.head_pipeline.as_ref().map(|p| p.status.as_str())))
 }
 
-/// A to-do GitLab raised because someone mentioned the user.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Mention {
-    pub id: u64,
-    pub title: String,
-    pub url: String,
-    pub author: String,
-    pub author_name: String,
-    pub avatar_url: String,
-    pub body: String,
-    /// `group/project`, for the alert's heading.
-    pub project: String,
-    pub at: String,
-    pub is_pr: bool,
-}
-
-#[derive(Deserialize)]
-struct RawTodo {
-    id: u64,
-    #[serde(default)]
-    action_name: String,
-    #[serde(default)]
-    target_url: String,
-    #[serde(default)]
-    body: String,
-    #[serde(default)]
-    created_at: String,
-    #[serde(default)]
-    target_type: String,
-    #[serde(default)]
-    author: Option<User>,
-    #[serde(default)]
-    target: Option<TodoTarget>,
-    #[serde(default)]
-    project: Option<TodoProject>,
-}
-
-#[derive(Deserialize)]
-struct TodoTarget {
-    #[serde(default)]
-    title: String,
-}
-
-#[derive(Deserialize)]
-struct TodoProject {
-    #[serde(default)]
-    path_with_namespace: String,
-}
-
-/// "Mentioned" and "directly addressed" are the to-dos GitLab creates for an @-mention. Pending ones only, newest
-/// first; a link outside the configured instance is dropped like in the lists.
-pub fn mentions(acc: &Account) -> Result<Vec<Mention>> {
-    let url = url::Url::parse_with_params(
-        &format!("{}/api/v4/todos", acc.base),
-        [("state", "pending"), ("per_page", "50"), ("page", "1")],
-    )
-    .map_err(|e| AppError::Gitlab(e.to_string()))?;
-    let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
-    Ok(mentions_in(response(res)?, &acc.base))
-}
-
-fn mentions_in(raw: Vec<RawTodo>, base: &str) -> Vec<Mention> {
-    raw.into_iter()
-        .filter(|t| matches!(t.action_name.as_str(), "mentioned" | "directly_addressed"))
-        .filter(|t| t.target_url.starts_with(&format!("{base}/")))
-        .map(|t| Mention {
-            id: t.id,
-            at: t.created_at,
-            is_pr: t.target_type == "MergeRequest",
-            author_name: t.author.as_ref().map(|u| u.name.clone()).unwrap_or_default(),
-            avatar_url: t.author.as_ref().and_then(|u| u.avatar_url.clone()).unwrap_or_default(),
-            title: t.target.map(|x| x.title).unwrap_or_default(),
-            url: t.target_url,
-            author: t.author.map(|u| u.username).unwrap_or_default(),
-            body: t.body,
-            project: t.project.map(|p| p.path_with_namespace).unwrap_or_default(),
-        })
-        .collect()
-}
-
 fn fetch(acc: &Account, r: &Request) -> Result<(ForgeList, Option<Quota>)> {
     fetch_where(acc, r, |_| true)
 }
@@ -215,7 +140,7 @@ fn keep_only(raw: Vec<RawItem>, total: Option<u64>, keep: impl Fn(&RawItem) -> b
 }
 
 /// Redirects are refused: the token must only ever reach the address the user typed.
-fn client() -> Result<reqwest::blocking::Client> {
+pub(crate) fn client() -> Result<reqwest::blocking::Client> {
     crate::net::client_builder()
         .user_agent("canto-widget")
         .redirect(reqwest::redirect::Policy::none())
@@ -224,11 +149,11 @@ fn client() -> Result<reqwest::blocking::Client> {
         .map_err(network)
 }
 
-fn network(e: reqwest::Error) -> AppError {
+pub(crate) fn network(e: reqwest::Error) -> AppError {
     AppError::Gitlab(format!("sem resposta do GitLab: {e}"))
 }
 
-fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
+pub(crate) fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
     let status = res.status().as_u16();
     let now = now_ms();
     let spent = Quota::from_headers(res.headers(), status, "ratelimit-remaining", "ratelimit-reset", now)
@@ -256,7 +181,7 @@ fn convert(base: &str, r: &Request, raw: Vec<RawItem>, total: Option<u64>, has_n
 }
 
 /// A link outside the configured instance is dropped: the UI opens this URL in the browser.
-fn item(base: &str, is_mr: bool, b: RawItem) -> Option<ForgeItem> {
+pub(crate) fn item(base: &str, is_mr: bool, b: RawItem) -> Option<ForgeItem> {
     if !b.web_url.starts_with(&format!("{base}/")) {
         return None;
     }

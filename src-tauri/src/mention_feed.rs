@@ -6,8 +6,8 @@ use serde::Serialize;
 
 use crate::account;
 use crate::calendar::Sender;
-use crate::forge::ForgeItem;
-use crate::gitlab::Mention;
+use crate::forge::{ForgeItem, ForgeList};
+use crate::gitlab_todos::Mention;
 use crate::mention_sender::{self, excerpt, trusted_github_avatar, trusted_gitlab_avatar, Mentioned};
 
 const PREVIEW_CHARS: usize = 280;
@@ -70,9 +70,19 @@ pub fn gitlab_rows(mentions: &[Mention], login: &str) -> Vec<MentionRow> {
         .collect()
 }
 
+/// The threads that mention the user and the ones that mention a team of theirs, each listed once.
+pub fn with_teams(mut direct: ForgeList, teams: ForgeList) -> ForgeList {
+    let seen: std::collections::HashSet<String> = direct.items.iter().map(|i| i.url.clone()).collect();
+    let fresh: Vec<ForgeItem> = teams.items.into_iter().filter(|i| !seen.contains(&i.url)).collect();
+    direct.total += fresh.len() as u64;
+    direct.items.extend(fresh);
+    direct
+}
+
 /// The comment behind each thread, looked up in parallel; a thread unchanged since the last lookup costs nothing.
-pub fn github_found(token: &str, login: &str, items: &[ForgeItem]) -> HashMap<String, Mentioned> {
-    let key = |i: &ForgeItem| format!("{}|{}", i.reference, i.updated_at);
+pub fn github_found(token: &str, names: &[String], items: &[ForgeItem]) -> HashMap<String, Mentioned> {
+    // The names are part of the key: switching team mentions on must not reuse a lookup made without them.
+    let key = |i: &ForgeItem| format!("{}|{}|{}", i.reference, i.updated_at, names.len());
     let todo: Vec<&ForgeItem> = {
         let cache = FOUND.lock().unwrap_or_else(|e| e.into_inner());
         items.iter().filter(|i| !cache.contains_key(&key(i))).collect()
@@ -85,7 +95,7 @@ pub fn github_found(token: &str, login: &str, items: &[ForgeItem]) -> HashMap<St
                 s.spawn(move || {
                     chunk
                         .iter()
-                        .filter_map(|i| Some((key(i), mention_sender::github_mention(token, i, login, PREVIEW_CHARS)?)))
+                        .filter_map(|i| Some((key(i), mention_sender::github_mention(token, i, names, PREVIEW_CHARS)?)))
                         .collect::<Vec<_>>()
                 })
             })

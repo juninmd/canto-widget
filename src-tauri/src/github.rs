@@ -6,7 +6,7 @@ use crate::error::{AppError, Result};
 use crate::forge::{merge, ForgeItem, ForgeList};
 use crate::forge_cache::{rate_limited, Quota};
 use crate::forge_filter::{self as filter, Activity, ForgeFilter, Section, Sort, Window, PER_PAGE};
-use crate::github_query::{activity_since, queries};
+use crate::github_query::{activity_since, queries, team_queries};
 use crate::model::now_ms;
 
 pub(crate) const API: &str = "https://api.github.com";
@@ -50,7 +50,11 @@ pub struct GithubUser {
 /// One page of a section plus the search quota left; "assigned" pages issues and PRs side by side, so a page may bring up to 60.
 pub fn section(token: &str, section: Section, page: u32, f: &ForgeFilter) -> Result<(ForgeList, Option<Quota>)> {
     let (mut out, mut quota) = (ForgeList::default(), None);
-    for q in queries(section, f) {
+    let found = match section {
+        Section::TeamMentioned => team_queries(&crate::github_teams::lookup(token), f),
+        _ => queries(section, f),
+    };
+    for q in found {
         let (list, left) = search(token, &q, filter::page(page), f)?;
         out = merge(out, list, f);
         quota = left.or(quota);

@@ -13,7 +13,7 @@ use crate::cmd_github_lists::Github;
 use crate::cmd_gitlab::to_account;
 use crate::forge::{self, ForgeItem};
 use crate::forge_filter::{ForgeFilter, Kind, Order, Section, Sort};
-use crate::gitlab::{self, Mention};
+use crate::gitlab_todos::{self, Mention};
 use crate::mention_sender::{self, trusted_github_avatar, trusted_gitlab_avatar, Mentioned};
 use crate::model::now_ms;
 use crate::my_pr_alerts::MyPrAlerts;
@@ -124,7 +124,7 @@ struct Memory {
     avatars: HashMap<String, String>,
 }
 
-fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory) {
+fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory, team_mentions: bool) {
     let login = match state.github_config() {
         Ok(Some(c)) if !c.tokens.access_token.is_empty() => c.login,
         Ok(_) => return mem.github = None,
@@ -133,9 +133,16 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory) {
     // No `touch()`: a background read must not keep the vault from auto-locking.
     let Ok(cred) = valid_token(state, &app.state::<GithubState>(), now_ms()) else { return };
     let filter = ForgeFilter { text: String::new(), kind: Kind::All, sort: Sort::Updated, order: Order::Desc };
-    let Ok(list) = forge::list_page::<Github>(&state.forges, &cred, Section::Mentioned, 1, &filter, false) else {
+    let Ok(mut list) = forge::list_page::<Github>(&state.forges, &cred, Section::Mentioned, 1, &filter, false) else {
         return;
     };
+    let mut names = vec![login.clone()];
+    if team_mentions {
+        if let Ok(teams) = forge::list_page::<Github>(&state.forges, &cred, Section::TeamMentioned, 1, &filter, false) {
+            list = crate::mention_feed::with_teams(list, teams);
+            names.extend(crate::github_teams::lookup(&cred));
+        }
+    }
     let seen = mem.github.as_ref().filter(|(l, _)| *l == login).map(|(_, s)| s);
     let (fresh, next) = review_alert::advance(seen, &list);
     // A summary carries no avatars, so the lookups (up to three calls each) only run for the individual alerts.
@@ -144,7 +151,7 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory) {
     } else {
         fresh
             .iter()
-            .filter_map(|i| Some((i.reference.clone(), mention_sender::github_mention(&cred, i, &login, BODY_CHARS)?)))
+            .filter_map(|i| Some((i.reference.clone(), mention_sender::github_mention(&cred, i, &names, BODY_CHARS)?)))
             .collect()
     };
     let mut events = github_events(&fresh, &found, crate::lang::english());
@@ -167,7 +174,7 @@ fn check_gitlab(app: &AppHandle, state: &AppState, mem: &mut Memory) {
         Err(_) => return,
     };
     let who = format!("{}|{}", cfg.base_url, cfg.username);
-    let Ok(mentions) = gitlab::mentions(&to_account(&cfg)) else { return };
+    let Ok(mentions) = gitlab_todos::mentions(&to_account(&cfg)) else { return };
     let seen = mem.gitlab.as_ref().filter(|(w, _)| *w == who).map(|(_, s)| s);
     let (fresh, next) = advance_gitlab(seen, &mentions);
     let mut events = gitlab_events(&fresh, crate::lang::english());
@@ -191,7 +198,8 @@ pub fn watch(app: AppHandle) {
         loop {
             std::thread::sleep(POLL);
             let state = app.state::<AppState>();
-            if !app.state::<MyPrAlerts>().get().mentions {
+            let cfg = app.state::<MyPrAlerts>().get();
+            if !cfg.mentions {
                 mem = Memory::default();
                 continue;
             }
@@ -200,7 +208,7 @@ pub fn watch(app: AppHandle) {
                 continue;
             }
             last = Some(Instant::now());
-            check_github(&app, &state, &mut mem);
+            check_github(&app, &state, &mut mem, cfg.team_mentions);
             check_gitlab(&app, &state, &mut mem);
         }
     });

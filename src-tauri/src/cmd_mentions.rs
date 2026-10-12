@@ -8,9 +8,11 @@ use crate::cmd_gitlab::to_account;
 use crate::error::{AppError, Result};
 use crate::forge::{self, ForgeItem};
 use crate::forge_filter::{ForgeFilter, Section};
-use crate::gitlab;
+use crate::github_teams;
+use crate::gitlab_todos;
 use crate::mention_feed::{self, MentionRow};
 use crate::model::now_ms;
+use crate::my_pr_alerts::MyPrAlerts;
 use crate::vault::AppState;
 
 /// Open threads that mention the user's @login directly (a team mention does not match), newest first.
@@ -23,15 +25,21 @@ pub async fn github_mentions(app: tauri::AppHandle, force: Option<bool>) -> Resu
         let login = login.ok_or_else(|| AppError::Github("conecte sua conta do GitHub".into()))?;
         let cred = valid_token(&state, &app.state::<GithubState>(), now_ms())?;
         let filter = ForgeFilter::default();
-        let list =
-            forge::list_page::<Github>(&state.forges, &cred, Section::Mentioned, 1, &filter, force.unwrap_or(false))?;
-        Ok(rows(&list.items, &cred, &login))
+        let force = force.unwrap_or(false);
+        let mut list = forge::list_page::<Github>(&state.forges, &cred, Section::Mentioned, 1, &filter, force)?;
+        let mut names = vec![login];
+        if app.state::<MyPrAlerts>().get().team_mentions {
+            let teams = forge::list_page::<Github>(&state.forges, &cred, Section::TeamMentioned, 1, &filter, force)?;
+            list = mention_feed::with_teams(list, teams);
+            names.extend(github_teams::lookup(&cred));
+        }
+        Ok(rows(&list.items, &cred, &names))
     })
     .await
 }
 
-fn rows(items: &[ForgeItem], token: &str, login: &str) -> Vec<MentionRow> {
-    let found = mention_feed::github_found(token, login, items);
+fn rows(items: &[ForgeItem], token: &str, names: &[String]) -> Vec<MentionRow> {
+    let found = mention_feed::github_found(token, names, items);
     let mut rows = mention_feed::github_rows(items, &found);
     mention_feed::github_photos(&mut rows);
     rows
@@ -45,7 +53,7 @@ pub async fn gitlab_mentions(app: tauri::AppHandle) -> Result<Vec<MentionRow>> {
         state.touch();
         let cfg = state.gitlab_config()?.ok_or_else(|| AppError::Gitlab("conecte sua conta do GitLab".into()))?;
         let acc = to_account(&cfg);
-        let mut rows = mention_feed::gitlab_rows(&gitlab::mentions(&acc)?, &cfg.username);
+        let mut rows = mention_feed::gitlab_rows(&gitlab_todos::mentions(&acc)?, &cfg.username);
         mention_feed::gitlab_photos(&mut rows, &cfg.base_url);
         Ok(rows)
     })

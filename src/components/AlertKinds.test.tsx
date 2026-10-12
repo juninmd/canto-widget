@@ -290,3 +290,30 @@ test("a sender without a photo falls back to initials and one without a name sho
   await show([{ ...mentionedOnGitlab, sender: { name: "", login: "ana", avatar: "" } }]);
   expect(document.querySelector("[data-sender]")!.textContent).toContain("ana");
 });
+
+const approved: AgendaItem = {
+  ...failingCi,
+  id: "pr:approved:acme/atlas#12",
+  description: "Marina Souza aprovou este PR.\nótimo trabalho",
+  tag: "approved",
+  sender: { name: "Marina Souza", login: "marina", avatar: "data:image/png;base64,iVBORw0KGgo=" },
+};
+
+test("an approval names who approved, with their photo, and still opens the PR", async () => {
+  await show([approved]);
+  expect(screen.getByText("aprovado")).toBeTruthy();
+  const who = document.querySelector("[data-sender]") as HTMLElement;
+  expect(who.textContent).toContain("Marina Souza");
+  expect(who.textContent).toContain("@marina");
+  expect(who.querySelector("img")?.getAttribute("src")).toMatch(/^data:image\/png/);
+  expect(screen.getByText(/ótimo trabalho/)).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir PR" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/pull/12" });
+});
+
+test("a conflict outranks an approval in the pending list", async () => {
+  await show([approved, { ...failingCi, id: "pr:conflict:acme/atlas#13", tag: "conflict", title: "Outro PR" }]);
+  expect(cards()[0].textContent).toContain("Outro PR");
+});

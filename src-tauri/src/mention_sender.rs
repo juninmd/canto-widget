@@ -7,7 +7,7 @@ use serde::Deserialize;
 use crate::calendar::Sender;
 use crate::forge::ForgeItem;
 use crate::github::{client, network, response, API};
-use crate::gitlab::Mention;
+use crate::gitlab_todos::Mention;
 
 /// Remembered per avatar URL so a repeated author costs no download; bounded so it cannot grow for ever.
 const CACHE_MAX: usize = 64;
@@ -17,18 +17,18 @@ const LOOKBACK_MINUTES: i64 = 60;
 const CONTEXT_BEFORE: usize = 60;
 
 #[derive(Deserialize)]
-struct Author {
-    login: String,
+pub(crate) struct Author {
+    pub login: String,
     #[serde(default)]
-    avatar_url: String,
+    pub avatar_url: String,
 }
 
 #[derive(Deserialize)]
-struct Text {
+pub(crate) struct Text {
     #[serde(default)]
-    body: Option<String>,
+    pub body: Option<String>,
     #[serde(default)]
-    user: Option<Author>,
+    pub user: Option<Author>,
 }
 
 #[derive(Deserialize)]
@@ -61,38 +61,49 @@ pub fn mentions_login(body: &str, login: &str) -> bool {
     mention_at(body, login).is_some()
 }
 
+/// The user's `login` and the `org/team` handles that also reach them; the earliest one in the text counts.
+fn first_mention(body: &str, names: &[String]) -> Option<usize> {
+    names.iter().filter_map(|n| mention_at(body, n)).min()
+}
+
 /// One line of at most `max` characters; a longer text keeps the stretch around the mention, with "…" for what was cut.
 pub fn excerpt(body: &str, login: &str, max: usize) -> String {
+    excerpt_any(body, &[login.to_string()], max)
+}
+
+pub fn excerpt_any(body: &str, names: &[String], max: usize) -> String {
     let flat = body.split_whitespace().collect::<Vec<_>>().join(" ");
     let chars: Vec<char> = flat.chars().collect();
     if chars.len() <= max {
         return flat;
     }
-    let at = mention_at(&flat, login).map_or(0, |b| flat[..b].chars().count());
+    let at = first_mention(&flat, names).map_or(0, |b| flat[..b].chars().count());
     let start = at.saturating_sub(CONTEXT_BEFORE).min(chars.len() - max);
     let end = start + max;
     let text: String = chars[start..end].iter().collect();
     format!("{}{text}{}", if start > 0 { "…" } else { "" }, if end < chars.len() { "…" } else { "" })
 }
 
-/// The newest text that mentions `login`.
-fn pick(texts: Vec<Text>, login: &str) -> Option<(Author, String)> {
-    let text = texts.into_iter().rev().find(|t| t.body.as_deref().is_some_and(|b| mentions_login(b, login)))?;
+/// The newest text that mentions one of `names`.
+fn pick(texts: Vec<Text>, names: &[String]) -> Option<(Author, String)> {
+    let text =
+        texts.into_iter().rev().find(|t| t.body.as_deref().is_some_and(|b| first_mention(b, names).is_some()))?;
     Some((text.user?, text.body.unwrap_or_default()))
 }
 
-fn since(updated_at: &str) -> Option<String> {
+pub(crate) fn since(updated_at: &str) -> Option<String> {
     let t = chrono::DateTime::parse_from_rfc3339(updated_at).ok()?;
     Some((t - chrono::Duration::minutes(LOOKBACK_MINUTES)).to_rfc3339_opts(chrono::SecondsFormat::Secs, true))
 }
 
-fn get<T: for<'de> Deserialize<'de>>(token: &str, path: &str, params: &[(&str, &str)]) -> Option<T> {
+pub(crate) fn get<T: for<'de> Deserialize<'de>>(token: &str, path: &str, params: &[(&str, &str)]) -> Option<T> {
     let url = url::Url::parse_with_params(&format!("{API}{path}"), params).ok()?;
     response(client().ok()?.get(url).bearer_auth(token).send().map_err(network).ok()?).ok()
 }
 
-/// Comments first (newest mention wins); the thread's own text only when no comment mentions the user.
-pub fn github_mention(token: &str, item: &ForgeItem, login: &str, max: usize) -> Option<Mentioned> {
+/// Comments first (newest mention wins); the thread's own text only when no comment mentions the user. `names` is
+/// the user's login followed by their team handles when team mentions are on.
+pub fn github_mention(token: &str, item: &ForgeItem, names: &[String], max: usize) -> Option<Mentioned> {
     let base = format!("/repos/{}/issues/{}", item.repo, item.number);
     let mut params = vec![("per_page", "100")];
     let from = since(&item.updated_at);
@@ -100,10 +111,10 @@ pub fn github_mention(token: &str, item: &ForgeItem, login: &str, max: usize) ->
         params.push(("since", f));
     }
     let comments: Vec<Text> = get(token, &format!("{base}/comments"), &params).unwrap_or_default();
-    let (author, body) = pick(comments, login).or_else(|| pick(vec![get(token, &base, &[])?], login))?;
+    let (author, body) = pick(comments, names).or_else(|| pick(vec![get(token, &base, &[])?], names))?;
     let name = get::<Profile>(token, &format!("/users/{}", author.login), &[]).and_then(|p| p.name).unwrap_or_default();
     let sender = Sender { name, login: author.login, avatar: author.avatar_url };
-    Some(Mentioned { sender, excerpt: excerpt(&body, login, max) })
+    Some(Mentioned { sender, excerpt: excerpt_any(&body, names, max) })
 }
 
 /// GitHub's CDN for profile pictures (`avatars.githubusercontent.com`, `avatars0`…).
