@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { AgendaItem } from "./api";
-import { outcomeLabel, prLabel, resolvedToday, sortAlerts, toneOf } from "./alerts";
+import { kindOf, outcomeLabel, prLabel, resolvedToday, sortAlerts, toneOf } from "./alerts";
 
 const item = (id: string): AgendaItem => ({ id, title: id, start: "", end: "", all_day: false, location: "", meet: "", link: "" });
 
@@ -43,4 +43,13 @@ test("own-work alerts are named by their tag and good news is calmer than a red 
   expect(["approved", "ready", "comment", "reply", "assigned", "updates"].map((t) => toneOf(pr(t)))).toEqual(Array(6).fill("accent"));
   const order = sortAlerts([pr("approved"), pr("changes"), pr("conflict")]).map((e) => e.tag);
   expect(order).toEqual(["conflict", "changes", "approved"]);
+});
+
+test("the morning summary is its own calm kind, ranked after a red CI and named when dismissed", () => {
+  const digest: AgendaItem = { ...item("digest:morning:2026-10-12"), tag: "digest" };
+  expect(kindOf(digest)).toBe("digest");
+  expect(toneOf(digest)).toBe("accent");
+  expect(outcomeLabel(digest, "done")).toBe("resumo visto");
+  const ci: AgendaItem = { ...item("pr:ci:o/r#1"), tag: "ci" };
+  expect(sortAlerts([digest, ci]).map((e) => e.id)).toEqual(["pr:ci:o/r#1", "digest:morning:2026-10-12"]);
 });

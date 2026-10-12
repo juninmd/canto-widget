@@ -2,7 +2,7 @@ export type GroupId = "appearance" | "notifications" | "privacy" | "data" | "app
 
 export type SectionId =
   | "skin" | "density" | "language" | "tabs"
-  | "reminders" | "dnd" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
+  | "reminders" | "digest" | "dnd" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
   | "activity" | "focus" | "security"
   | "google" | "backup" | "sync"
   | "window" | "autostart" | "shortcuts" | "update";
@@ -12,7 +12,7 @@ type Group = { id: GroupId; sections: SectionId[]; sensitive: SectionId[] };
 /** Password, backup and sync sit apart in each group, under "Zona sensível". */
 export const GROUPS: Group[] = [
   { id: "appearance", sections: ["skin", "density", "language", "tabs"], sensitive: [] },
-  { id: "notifications", sections: ["reminders", "dnd", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
+  { id: "notifications", sections: ["reminders", "digest", "dnd", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
   { id: "privacy", sections: ["activity", "focus"], sensitive: ["security"] },
   { id: "data", sections: ["google"], sensitive: ["backup", "sync"] },
   { id: "app", sections: ["window", "autostart", "shortcuts", "update"], sensitive: [] },
@@ -25,6 +25,7 @@ const KEYWORDS: Record<SectionId, string> = {
   language: "idioma língua português inglês language english",
   tabs: "abas esconder ocultar tabs hide",
   reminders: "lembrete lembretes antecedência reminders lead",
+  digest: "resumo do dia manhã bom dia reuniões tarefas revisões menções digest summary morning",
   dnd: "não perturbe silêncio silenciar foco do not disturb silence mute",
   fullscreen: "tela cheia jogo jogos segurar avisos fullscreen game hold",
   reviewAlerts: "revisão review pull request pr github avisos alertas alerts",

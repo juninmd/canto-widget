@@ -78,6 +78,7 @@ pub mod models_alert;
 pub mod models_feed;
 pub mod models_rank;
 pub mod models_state;
+pub mod morning_digest;
 pub mod my_pr_alerts;
 pub mod my_pr_events;
 pub mod net;
@@ -160,6 +161,7 @@ pub fn run() {
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
             app.manage(mentions_state::MentionsUnread::default());
+            app.manage(morning_digest::MorningDigest::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(alert_log::AlertLog::default());
@@ -182,6 +184,7 @@ pub fn run() {
             my_pr_alerts::watch(app.handle().clone());
             mention_alerts::watch(app.handle().clone());
             own_work_alerts::watch(app.handle().clone());
+            morning_digest::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
@@ -302,6 +305,8 @@ pub fn run() {
             mentions_state::mention_mute_thread,
             mentions_state::mention_mute_author,
             mentions_state::mentions_unread,
+            morning_digest::morning_digest_get,
+            morning_digest::morning_digest_set,
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
             cmd_github_lists::github_prs_checks,

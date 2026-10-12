@@ -153,3 +153,27 @@ test("an approved PR names who approved it, with their photo, and a conflict ran
   await expect(alert).toContainText("Boa, o teste de aspas cobre o caso do lote.");
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
 });
+
+test("the morning summary lists what is waiting and only offers to close", async ({ page }) => {
+  const digest = {
+    id: "digest:morning:2026-10-12",
+    title: "Resumo do dia",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "",
+    description: "3 reuniões, a primeira às 10:30\n2 tarefas abertas\n2 revisões pedidas\n4 menções não lidas",
+    tag: "digest",
+  };
+  await mockTauri(page, { fixed: { alert_payload: [digest] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert).toContainText("3 reuniões, a primeira às 10:30");
+  await expect(alert).toContainText("4 menções não lidas");
+  await expect(alert.getByRole("button", { name: "fechar" })).toBeVisible();
+  await expect(alert.getByRole("button", { name: /adiar/ })).toHaveCount(0);
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});

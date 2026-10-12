@@ -67,6 +67,8 @@ export type Note = {
 };
 
 /** Pop-ups about the user's own PRs: red CI, and no review for `stalled_hours`. */
+/** The morning summary: off by default, at a local hour, on working days unless asked otherwise. */
+export type MorningDigest = { enabled: boolean; hour: number; weekdays_only: boolean };
 export type MyPrAlerts = {
   ci: boolean;
   stalled: boolean;
@@ -341,6 +343,8 @@ export const api = {
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
   reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
+  morningDigestGet: () => invoke<MorningDigest>("morning_digest_get"),
+  morningDigestSet: (config: MorningDigest) => invoke<MorningDigest>("morning_digest_set", { config }),
   myPrAlertsGet: () => invoke<MyPrAlerts>("my_pr_alerts_get"),
   myPrAlertsSet: (config: MyPrAlerts) => invoke<MyPrAlerts>("my_pr_alerts_set", { config }),
 

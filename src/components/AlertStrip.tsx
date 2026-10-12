@@ -23,6 +23,8 @@ export function summary(e: AgendaItem): string {
       return prLabel(e.tag);
     case "mention":
       return e.sender ? t("alert.mentionedBy", { name: senderName(e) }) : t("alert.mentioned");
+    case "digest":
+      return t("alert.digestSummary");
     case "task":
       return t("alert.taskReminder");
     default:

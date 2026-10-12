@@ -4,7 +4,7 @@ import { GROUPS, parseOpenGroups, sectionMatches } from "./settingsGroups";
 test("every section lives in exactly one group", () => {
   const all = GROUPS.flatMap((g) => [...g.sections, ...g.sensitive]);
   expect(new Set(all).size).toBe(all.length);
-  expect(all.length).toBe(19);
+  expect(all.length).toBe(20);
 });
 
 test("search ignores accents and case and needs every word", () => {

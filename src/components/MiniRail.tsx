@@ -14,6 +14,7 @@ const ICON: Record<AlertKind, () => React.JSX.Element> = {
   status: () => <BellIcon on={false} />,
   model: () => <BellIcon on={false} />,
   mention: NoteIcon,
+  digest: ChecklistIcon,
 };
 const BAR: Record<Tone, string> = { danger: "bg-danger", warn: "bg-warn", accent: "bg-accent", muted: "bg-muted" };
 const TINT: Record<Tone, string> = {
