@@ -146,6 +146,12 @@ export const app: Record<keyof typeof source, string> = {
   "settings.reviewAlerts.label": "notify me when my review is requested",
   "settings.reviewAlerts.hint": "OS notification for each new request, checked every 5 min while the vault is open.",
 
+  "settings.digest.title": "Day summary",
+  "settings.digest.enabled": "tell me the day summary",
+  "settings.digest.at": "from",
+  "settings.digest.hourOption": "{h}:00",
+  "settings.digest.weekdays": "working days only",
+  "settings.digest.hint": "One alert with the meetings, open tasks, review requests and unread mentions. Anything at zero is left out, and a day with nothing does not alert. It holds for 4 h after the hour: opening Canto in the afternoon does not bring the morning summary.",
   "settings.myPrAlerts.title": "GitHub and GitLab alerts",
   "settings.myPrAlerts.ci": "tell me when the CI of one of my PRs fails",
   "settings.myPrAlerts.stalled": "tell me when one of my PRs has no review for",

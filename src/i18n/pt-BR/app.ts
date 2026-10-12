@@ -141,6 +141,12 @@ export const app = {
   "settings.reviewAlerts.label": "avisar quando pedirem minha revisão",
   "settings.reviewAlerts.hint": "Notificação do sistema para cada pedido novo, conferido a cada 5 min enquanto o cofre está aberto.",
 
+  "settings.digest.title": "Resumo do dia",
+  "settings.digest.enabled": "avisar com o resumo do dia",
+  "settings.digest.at": "a partir das",
+  "settings.digest.hourOption": "{h} h",
+  "settings.digest.weekdays": "só em dias úteis",
+  "settings.digest.hint": "Um aviso só, com as reuniões, as tarefas abertas, as revisões pedidas e as menções não lidas. Fica de fora o que for zero, e um dia sem nada não avisa. Vale até 4 h depois do horário: abrir o Canto à tarde não traz o resumo da manhã.",
   "settings.myPrAlerts.title": "Avisos do GitHub e do GitLab",
   "settings.myPrAlerts.ci": "avisar quando o CI de um PR meu falhar",
   "settings.myPrAlerts.stalled": "avisar quando um PR meu ficar sem revisão por",

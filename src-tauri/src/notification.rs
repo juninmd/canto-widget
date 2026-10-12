@@ -13,6 +13,8 @@ pub const MODEL_PREFIX: &str = "model:";
 pub const PR_PREFIX: &str = "pr:";
 /// Same prefix as `MENTION_PREFIX` in the UI's `alerts.ts`: someone @-mentioned the user on GitHub or GitLab.
 pub const MENTION_PREFIX: &str = "mention:";
+/// Same prefix as `DIGEST_PREFIX` in the UI's `alerts.ts`: the morning summary of the day.
+pub const DIGEST_PREFIX: &str = "digest:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
@@ -26,6 +28,10 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
     }
     if event.id.starts_with(MODEL_PREFIX) {
         return (crate::lang::tr("Modelo de IA", "AI model"), format!("{}: {}", event.title, event.tag));
+    }
+    if event.id.starts_with(DIGEST_PREFIX) {
+        let lines = event.description.lines().collect::<Vec<_>>().join(" · ");
+        return (crate::lang::tr("Resumo do dia", "Day summary"), lines);
     }
     if event.id.starts_with(MENTION_PREFIX) {
         let body = format!("{} {}", event.organizer, event.title).trim().to_string();
@@ -123,6 +129,17 @@ mod tests {
         };
         assert_eq!(content(&pr("ci")), ("CI falhou", "acme/atlas#12 Corrige o parser".into()));
         assert_eq!(content(&pr("stalled")).0, "PR sem revisão");
+    }
+
+    #[test]
+    fn the_morning_summary_reads_as_one_line() {
+        let digest = AgendaItem {
+            id: "digest:morning:2026-10-12".into(),
+            title: "Resumo do dia".into(),
+            description: "3 reuniões\n2 tarefas abertas".into(),
+            ..Default::default()
+        };
+        assert_eq!(content(&digest), ("Resumo do dia", "3 reuniões · 2 tarefas abertas".into()));
     }
 
     #[test]

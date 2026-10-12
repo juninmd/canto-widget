@@ -10,8 +10,10 @@ export const MODEL_PREFIX = "model:";
 export const PR_PREFIX = "pr:";
 /** Same prefix as `MENTION_PREFIX` in `notification.rs`: someone @-mentioned the user on GitHub or GitLab. */
 export const MENTION_PREFIX = "mention:";
+/** Same prefix as `DIGEST_PREFIX` in `notification.rs`: the morning summary of the day. */
+export const DIGEST_PREFIX = "digest:";
 
-export type AlertKind = "status" | "model" | "pr" | "mention" | "task" | "meeting";
+export type AlertKind = "status" | "model" | "pr" | "mention" | "digest" | "task" | "meeting";
 export type Tone = "danger" | "warn" | "accent" | "muted";
 
 export function kindOf(e: AgendaItem): AlertKind {
@@ -19,6 +21,7 @@ export function kindOf(e: AgendaItem): AlertKind {
   if (e.id.startsWith(MODEL_PREFIX)) return "model";
   if (e.id.startsWith(PR_PREFIX)) return "pr";
   if (e.id.startsWith(MENTION_PREFIX)) return "mention";
+  if (e.id.startsWith(DIGEST_PREFIX)) return "digest";
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
 }
 

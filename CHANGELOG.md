@@ -29,6 +29,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Resumo do dia**, nos Ajustes (desligado por padrão): um aviso só por manhã com quantas reuniões você tem (e a hora da
+  primeira que ainda vem), as tarefas abertas, as revisões pedidas e as menções não lidas. O que for zero fica de fora e
+  um dia sem nada não avisa. Você escolhe a hora (das 6 às 12 h) e se vale só em dias úteis; o aviso vale até 4 h depois
+  do horário, então abrir o Canto à tarde não traz o resumo da manhã, e um reinício no mesmo dia não repete. Dispara do
+  Rust (webview escondido não acorda) e respeita o "não perturbe".
+
 - **Menções lidas, não lidas e silenciadas**: a subaba **menções** marca com um ponto o que você ainda não leu, abrir uma
   menção a marca como lida (também dá para marcar e desmarcar à mão, ou "marcar todas como lidas"), e dá para
   **silenciar uma conversa** ou **uma pessoa** (some da lista e do aviso; "silenciadas (n)" mostra de novo para

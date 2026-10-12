@@ -14,6 +14,7 @@ import RemindersSection from "./RemindersSection";
 import FocusSection from "./FocusSection";
 import ActivitySection from "./ActivitySection";
 import DoNotDisturbSection from "./DoNotDisturbSection";
+import DigestSection from "./DigestSection";
 import MyPrAlertsSection from "./MyPrAlertsSection";
 import ReviewAlertsSection from "./ReviewAlertsSection";
 import FullscreenHoldSection from "./FullscreenHoldSection";
@@ -45,6 +46,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
     language: <LanguagePicker />,
     tabs: <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />,
     reminders: <RemindersSection lead={reminderLead} onChange={onReminderLead} />,
+    digest: <DigestSection onError={onError} />,
     dnd: <DoNotDisturbSection onError={onError} />,
     fullscreen: <FullscreenHoldSection onError={onError} />,
     reviewAlerts: <ReviewAlertsSection onError={onError} />,

@@ -317,3 +317,20 @@ test("a conflict outranks an approval in the pending list", async () => {
   await show([approved, { ...failingCi, id: "pr:conflict:acme/atlas#13", tag: "conflict", title: "Outro PR" }]);
   expect(cards()[0].textContent).toContain("Outro PR");
 });
+
+test("the day summary lists what is waiting, has no action but closing and says what it is", async () => {
+  const digest: AgendaItem = {
+    ...base,
+    start: "",
+    id: "digest:morning:2026-10-12",
+    title: "Resumo do dia",
+    description: "3 reuniões, a primeira às 10:30\n2 tarefas abertas\n1 revisão pedida",
+    tag: "digest",
+  };
+  await show([digest]);
+  expect(screen.getAllByText("resumo do dia").length).toBeGreaterThan(0);
+  expect(screen.getByText(/3 reuniões, a primeira às 10:30/)).toBeTruthy();
+  expect(screen.getByText(/1 revisão pedida/)).toBeTruthy();
+  expect(screen.getByRole("button", { name: "fechar" })).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+});

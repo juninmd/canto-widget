@@ -37,3 +37,24 @@ test("settings list every own-work alert as a switch", async ({ page }) => {
   await expect(section.getByLabel("avisar quando responderem em uma conversa em que comentei (GitHub)")).not.toBeChecked();
   if (process.env.SHOT) await section.screenshot({ path: process.env.SHOT });
 });
+
+test("the day summary is a setting with an hour and a working-days switch, off until asked for", async ({ page }) => {
+  await mockTauri(page, {
+    fixed: {
+      morning_digest_get: { enabled: true, hour: 9, weekdays_only: true },
+      my_pr_alerts_get: config,
+      review_alerts_get: true,
+      activity_status: { supported: false, enabled: false },
+      biometric_status: { available: false, enabled: false, name: "" },
+    },
+  });
+  await page.setViewportSize({ width: 420, height: 900 });
+  await page.goto("/");
+  await goTab(page, "Ajustes");
+  await page.getByRole("searchbox").fill("resumo");
+  const section = page.getByRole("group", { name: "Resumo do dia" });
+  await expect(section.getByLabel("avisar com o resumo do dia")).toBeChecked();
+  await expect(section.getByLabel("a partir das")).toHaveValue("9");
+  await expect(section.getByLabel("só em dias úteis")).toBeChecked();
+  if (process.env.SHOT) await section.screenshot({ path: process.env.SHOT });
+});
