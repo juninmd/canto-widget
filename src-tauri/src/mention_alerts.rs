@@ -14,7 +14,9 @@ use crate::cmd_gitlab::to_account;
 use crate::forge::{self, ForgeItem};
 use crate::forge_filter::{ForgeFilter, Kind, Order, Section, Sort};
 use crate::gitlab_todos::{self, Mention};
+use crate::mention_feed;
 use crate::mention_sender::{self, trusted_github_avatar, trusted_gitlab_avatar, Mentioned};
+use crate::mentions_state::{self, Light, MentionsUnread, Saved, GITHUB, GITLAB};
 use crate::model::now_ms;
 use crate::my_pr_alerts::MyPrAlerts;
 use crate::notification::MENTION_PREFIX;
@@ -127,7 +129,10 @@ struct Memory {
 fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory, team_mentions: bool) {
     let login = match state.github_config() {
         Ok(Some(c)) if !c.tokens.access_token.is_empty() => c.login,
-        Ok(_) => return mem.github = None,
+        Ok(_) => {
+            app.state::<MentionsUnread>().clear(GITHUB, &Saved::default());
+            return mem.github = None;
+        }
         Err(_) => return,
     };
     // No `touch()`: a background read must not keep the vault from auto-locking.
@@ -143,8 +148,13 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory, team_mentio
             names.extend(crate::github_teams::lookup(&cred));
         }
     }
+    let saved = mentions_state::load(state).unwrap_or_default();
+    let known = mention_feed::github_known(&list.items, names.len());
+    app.state::<MentionsUnread>().set(GITHUB, mention_feed::github_lights(&list.items, &known), &saved);
     let seen = mem.github.as_ref().filter(|(l, _)| *l == login).map(|(_, s)| s);
     let (fresh, next) = review_alert::advance(seen, &list);
+    // A muted thread never rings; a muted person's mention is dropped once the comment's author is known.
+    let mut fresh: Vec<&ForgeItem> = fresh.into_iter().filter(|i| !saved.is_muted(&i.url, "")).collect();
     // A summary carries no avatars, so the lookups (up to three calls each) only run for the individual alerts.
     let found: HashMap<String, Mentioned> = if fresh.len() > MAX_EACH {
         HashMap::new()
@@ -154,6 +164,7 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory, team_mentio
             .filter_map(|i| Some((i.reference.clone(), mention_sender::github_mention(&cred, i, &names, BODY_CHARS)?)))
             .collect()
     };
+    fresh.retain(|i| !saved.is_muted(&i.url, found.get(&i.reference).map_or("", |m| m.sender.login.as_str())));
     let mut events = github_events(&fresh, &found, crate::lang::english());
     mention_sender::resolve_avatars(
         events.iter_mut().filter_map(|e| e.sender.as_mut()),
@@ -170,13 +181,23 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory, team_mentio
 fn check_gitlab(app: &AppHandle, state: &AppState, mem: &mut Memory) {
     let cfg = match state.gitlab_config() {
         Ok(Some(c)) if !c.token.is_empty() => c,
-        Ok(_) => return mem.gitlab = None,
+        Ok(_) => {
+            app.state::<MentionsUnread>().clear(GITLAB, &Saved::default());
+            return mem.gitlab = None;
+        }
         Err(_) => return,
     };
     let who = format!("{}|{}", cfg.base_url, cfg.username);
     let Ok(mentions) = gitlab_todos::mentions(&to_account(&cfg)) else { return };
+    let saved = mentions_state::load(state).unwrap_or_default();
+    let lights = mentions
+        .iter()
+        .map(|m| Light { id: format!("gitlab:{}", m.id), url: m.url.clone(), login: m.author.clone() })
+        .collect();
+    app.state::<MentionsUnread>().set(GITLAB, lights, &saved);
     let seen = mem.gitlab.as_ref().filter(|(w, _)| *w == who).map(|(_, s)| s);
     let (fresh, next) = advance_gitlab(seen, &mentions);
+    let fresh: Vec<&Mention> = fresh.into_iter().filter(|m| !saved.is_muted(&m.url, &m.author)).collect();
     let mut events = gitlab_events(&fresh, crate::lang::english());
     let base = cfg.base_url.clone();
     mention_sender::resolve_avatars(

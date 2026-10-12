@@ -72,6 +72,7 @@ pub mod meeting_alert;
 pub mod mention_alerts;
 pub mod mention_feed;
 pub mod mention_sender;
+pub mod mentions_state;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
@@ -158,6 +159,7 @@ pub fn run() {
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
+            app.manage(mentions_state::MentionsUnread::default());
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(alert_log::AlertLog::default());
@@ -296,6 +298,10 @@ pub fn run() {
             cmd_github_lists::github_lists,
             cmd_mentions::github_mentions,
             cmd_mentions::gitlab_mentions,
+            mentions_state::mention_read,
+            mentions_state::mention_mute_thread,
+            mentions_state::mention_mute_author,
+            mentions_state::mentions_unread,
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
             cmd_github_lists::github_prs_checks,

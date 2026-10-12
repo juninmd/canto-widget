@@ -258,7 +258,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Mentions subtab (GitHub and GitLab) |
 |---|
-| ![GitHub tab, mentions subtab: each row shows the author's photo, name and @login, a preview of the text that mentions me and the thread's link](docs/prints/app/81-aba-mencoes.png) |
+| ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
 | Password changed, one file pending | Day summary |
 |---|---|

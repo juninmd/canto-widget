@@ -19,6 +19,7 @@ fn mention(id: u64, body: &str) -> Mention {
         project: "acme/atlas".into(),
         at: String::new(),
         is_pr: false,
+        done: false,
     }
 }
 

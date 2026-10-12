@@ -29,6 +29,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Menções lidas, não lidas e silenciadas**: a subaba **menções** marca com um ponto o que você ainda não leu, abrir uma
+  menção a marca como lida (também dá para marcar e desmarcar à mão, ou "marcar todas como lidas"), e dá para
+  **silenciar uma conversa** ou **uma pessoa** (some da lista e do aviso; "silenciadas (n)" mostra de novo para
+  reativar). O número de não lidas aparece no nome da subaba (`menções · 3`) e entra na contagem do ícone da barra de
+  tarefas, junto com as revisões pedidas e as tarefas. O estado fica no cofre (selado com a senha mestra, porque cita
+  repositórios e pessoas) e acompanha a troca da senha.
+- **Filtro, prévia expandida e concluídas nas menções**: um campo filtra por texto, repositório ou autor (sem
+  diferenciar maiúsculas nem acentos), "só não lidas" estreita a lista, a prévia abre inteira em "ver mais" (até 1000
+  caracteres; o aviso continua com o trecho curto), e no GitLab "incluir concluídas" traz também os to-dos já feitos.
+  Se o limite de requisições do GitHub segura a lista, a subaba diz até quando mostra a última cópia.
+
 - **Mais avisos do seu trabalho no GitHub e no GitLab**, cada um com a sua chave nos Ajustes: PR/MR **aprovado** ou com
   **mudanças pedidas** (no GitHub com a foto, o nome e o texto de quem revisou; no GitLab só o pedido de mudanças, que é
   o que a lista informa), PR/MR **pronto para merge** ou com **conflito**, **comentário novo** no seu PR/MR (com a
