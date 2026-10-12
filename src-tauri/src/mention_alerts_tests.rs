@@ -12,6 +12,8 @@ fn mention(id: u64, body: &str) -> Mention {
         title: format!("Falha no deploy {id}"),
         url: format!("https://git.example.com/acme/atlas/-/issues/{id}"),
         author: "ana".into(),
+        author_name: "Ana Pires".into(),
+        avatar_url: "https://git.example.com/uploads/ana.png".into(),
         body: body.into(),
         project: "acme/atlas".into(),
     }
@@ -21,11 +23,11 @@ fn mention(id: u64, body: &str) -> Mention {
 fn a_github_mention_names_the_thread_and_opens_it() {
     let list = gh(&[7]);
     let fresh: Vec<&ForgeItem> = list.items.iter().collect();
-    let [e] = &github_events(&fresh, false)[..] else { panic!("one alert") };
+    let [e] = &github_events(&fresh, &HashMap::new(), false)[..] else { panic!("one alert") };
     assert_eq!((e.id.as_str(), e.tag.as_str(), e.organizer.as_str()), ("mention:github:o/r#7", "github", "o/r#7"));
     assert_eq!((e.title.as_str(), e.link.as_str()), ("item 7", "https://github.com/o/r/issues/7"));
     assert_eq!(e.description, "Você foi mencionado em o/r#7.");
-    assert_eq!(github_events(&fresh, true)[0].description, "You were mentioned in o/r#7.");
+    assert_eq!(github_events(&fresh, &HashMap::new(), true)[0].description, "You were mentioned in o/r#7.");
 }
 
 #[test]
@@ -84,5 +86,34 @@ fn a_burst_becomes_one_summary_per_forge() {
     assert!(e.link.is_empty());
     let list = gh(&[1, 2, 3, 4]);
     let items: Vec<&ForgeItem> = list.items.iter().collect();
-    assert_eq!(github_events(&items, false)[0].id, "mention:github:summary");
+    assert_eq!(github_events(&items, &HashMap::new(), false)[0].id, "mention:github:summary");
+}
+
+#[test]
+fn a_github_alert_carries_the_sender_found_for_its_thread() {
+    let list = gh(&[7, 8]);
+    let fresh: Vec<&ForgeItem> = list.items.iter().collect();
+    let ana = Sender { name: "Ana Pires".into(), login: "ana".into(), avatar: String::new() };
+    let senders = HashMap::from([("o/r#7".to_string(), ana.clone())]);
+    let events = github_events(&fresh, &senders, false);
+    assert_eq!((events[0].sender.as_ref(), events[1].sender.as_ref()), (Some(&ana), None), "no lookup, no face");
+}
+
+#[test]
+fn a_gitlab_alert_names_and_pictures_its_author_and_the_summary_names_each_one() {
+    let m = mention(5, "oi");
+    let [e] = &gitlab_events(&[&m], false)[..] else { panic!("one alert") };
+    let s = e.sender.as_ref().expect("sender");
+    assert_eq!((s.name.as_str(), s.login.as_str()), ("Ana Pires", "ana"));
+    assert_eq!(s.avatar, "https://git.example.com/uploads/ana.png", "still a URL until the avatar is resolved");
+
+    let ms: Vec<Mention> = (1..=4).map(|i| mention(i, "")).collect();
+    let all: Vec<&Mention> = ms.iter().collect();
+    let [sum] = &gitlab_events(&all, false)[..] else { panic!("one summary") };
+    assert!(sum.sender.is_none());
+    assert!(sum.description.lines().all(|l| l.starts_with("Ana Pires · acme/atlas ")), "{}", sum.description);
+
+    let mut anonymous = mention(6, "x");
+    anonymous.author.clear();
+    assert!(gitlab_events(&[&anonymous], false)[0].sender.is_none());
 }

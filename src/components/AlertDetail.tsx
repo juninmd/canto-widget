@@ -7,6 +7,7 @@ import { t } from "../i18n";
 import AlertGuests from "./AlertGuests";
 import AlertJobs from "./AlertJobs";
 import AlertPrep from "./AlertPrep";
+import SenderLine from "./SenderLine";
 import { TONE } from "./AlertStrip";
 
 function Box({ label, children }: { label: string; children: ReactNode }) {
@@ -34,6 +35,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
     <>
       <p className={`text-[11px] uppercase tracking-widest ${tone.text}`}>{t(`alert.kind.${kind}`)}</p>
       <h1 className="line-clamp-2 text-xl font-semibold leading-tight">{event.title}</h1>
+      {kind === "mention" && event.sender && <SenderLine sender={event.sender} />}
       <div className="flex flex-wrap gap-1.5">
         {kind === "status" && (
           <>

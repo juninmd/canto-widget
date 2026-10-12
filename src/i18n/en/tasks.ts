@@ -156,6 +156,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "alert.openPr": "open PR",
   "alert.kind.mention": "you were mentioned",
   "alert.mentioned": "mentioned you",
+  "alert.mentionedBy": "{name} mentioned you",
   "alert.openMention": "open",
   "alert.since": "since {time}",
   "alert.level.minor": "degraded",

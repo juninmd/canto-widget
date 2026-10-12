@@ -136,7 +136,7 @@ fn only_mention_todos_on_the_configured_instance_become_mentions() {
     let raw: Vec<RawTodo> = serde_json::from_str(
         r#"[
         {"id":1,"action_name":"mentioned","target_url":"https://git.example.com/a/b/-/issues/3","body":"@voce veja",
-         "author":{"username":"ana"},"target":{"title":"Falha no deploy"},"project":{"path_with_namespace":"a/b"}},
+         "author":{"username":"ana","name":"Ana Pires","avatar_url":"https://git.example.com/uploads/ana.png"},"target":{"title":"Falha no deploy"},"project":{"path_with_namespace":"a/b"}},
         {"id":2,"action_name":"assigned","target_url":"https://git.example.com/a/b/-/issues/4","body":"x"},
         {"id":3,"action_name":"directly_addressed","target_url":"https://git.example.com/a/b/-/merge_requests/5","body":"@voce ok?"},
         {"id":4,"action_name":"mentioned","target_url":"https://evil.example.org/a/b/-/issues/6","body":"x"},
@@ -153,6 +153,8 @@ fn only_mention_todos_on_the_configured_instance_become_mentions() {
             title: "Falha no deploy".into(),
             url: "https://git.example.com/a/b/-/issues/3".into(),
             author: "ana".into(),
+            author_name: "Ana Pires".into(),
+            avatar_url: "https://git.example.com/uploads/ana.png".into(),
             body: "@voce veja".into(),
             project: "a/b".into(),
         }

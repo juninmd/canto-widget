@@ -262,3 +262,31 @@ test("a GitHub mention is tagged GitHub in the strip and the summary has no open
   });
   expect(screen.queryByRole("button", { name: "abrir" })).toBeNull();
 });
+
+const ana = { name: "Ana Pires", login: "ana", avatar: "data:image/png;base64,AA==" };
+
+test("a mention shows who wrote it: photo, name and login in the pop-up and the name in the strip", async () => {
+  const gh: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:acme/atlas#3", tag: "github", sender: ana };
+  await show([mentionedOnGitlab, gh]);
+  expect(screen.getAllByText("você foi mencionado").length).toBeGreaterThan(0);
+  expect(screen.getByText("Ana Pires mencionou você")).toBeTruthy();
+  expect(screen.getByText("mencionou você")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(cards()[1]);
+  });
+  const who = document.querySelector("[data-sender]")!;
+  expect(who.textContent).toContain("Ana Pires");
+  expect(who.textContent).toContain("@ana");
+  expect(who.querySelector("img")?.getAttribute("src")).toBe("data:image/png;base64,AA==");
+});
+
+test("a sender without a photo falls back to initials and one without a name shows the login", async () => {
+  const noPhoto: AgendaItem = { ...mentionedOnGitlab, sender: { ...ana, avatar: "" } };
+  await show([noPhoto]);
+  const who = document.querySelector("[data-sender]")!;
+  expect(who.querySelector("img")).toBeNull();
+  expect(who.textContent).toContain("AP");
+  cleanup();
+  await show([{ ...mentionedOnGitlab, sender: { name: "", login: "ana", avatar: "" } }]);
+  expect(document.querySelector("[data-sender]")!.textContent).toContain("ana");
+});

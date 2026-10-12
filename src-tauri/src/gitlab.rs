@@ -53,6 +53,10 @@ struct References {
 #[derive(Deserialize)]
 struct User {
     username: String,
+    #[serde(default)]
+    name: String,
+    #[serde(default)]
+    avatar_url: Option<String>,
 }
 
 pub fn user(base: &str, token: &str) -> Result<String> {
@@ -110,6 +114,8 @@ pub struct Mention {
     pub title: String,
     pub url: String,
     pub author: String,
+    pub author_name: String,
+    pub avatar_url: String,
     pub body: String,
     /// `group/project`, for the alert's heading.
     pub project: String,
@@ -162,6 +168,8 @@ fn mentions_in(raw: Vec<RawTodo>, base: &str) -> Vec<Mention> {
         .filter(|t| t.target_url.starts_with(&format!("{base}/")))
         .map(|t| Mention {
             id: t.id,
+            author_name: t.author.as_ref().map(|u| u.name.clone()).unwrap_or_default(),
+            avatar_url: t.author.as_ref().and_then(|u| u.avatar_url.clone()).unwrap_or_default(),
             title: t.target.map(|x| x.title).unwrap_or_default(),
             url: t.target_url,
             author: t.author.map(|u| u.username).unwrap_or_default(),
