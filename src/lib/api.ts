@@ -132,6 +132,17 @@ export type AgendaItem = {
   sender?: Sender | null;
 };
 export type Sender = { name: string; login: string; avatar: string };
+/** One thread that mentions the user; `sender` and `preview` stay empty when the comment could not be found. */
+export type MentionRow = {
+  id: string;
+  title: string;
+  reference: string;
+  url: string;
+  is_pr: boolean;
+  at: string;
+  sender: Sender | null;
+  preview: string;
+};
 /** What was done with an alert: the main action, snoozed, closed or (a service) muted. */
 export type AlertOutcome = "done" | "snoozed" | "closed" | "muted";
 export type ResolvedAlert = { item: AgendaItem; outcome: AlertOutcome; at: number };
@@ -297,6 +308,7 @@ export const api = {
   githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("github_section", { section, page, filter }),
   /** Fallback click for a PR the batch left out; shares the batch's cache. */
+  githubMentions: (force = false) => invoke<MentionRow[]>("github_mentions", { force }),
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
@@ -321,6 +333,7 @@ export const api = {
   gitlabSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("gitlab_section", { section, page, filter }),
   /** One call per click, not per list row: never fetched for a whole page at once. */
+  gitlabMentions: () => invoke<MentionRow[]>("gitlab_mentions"),
   gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),

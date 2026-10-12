@@ -252,6 +252,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
+| Mentions subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, mentions subtab: each row shows the author's photo, name and @login, a preview of the text that mentions me and the thread's link](docs/prints/app/81-aba-mencoes.png) |
+
 | Password changed, one file pending | Day summary |
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |

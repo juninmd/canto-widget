@@ -39,7 +39,7 @@ pub enum Section {
     Assigned,
     MyPrs,
     MyIssues,
-    /// Threads where someone @-mentioned the user; only the alert watcher asks for it, never the tab.
+    /// Threads where someone @-mentioned the user; the alert watcher and the mentions subtab ask for it, never the lists.
     Mentioned,
 }
 

@@ -119,6 +119,8 @@ pub struct Mention {
     pub body: String,
     /// `group/project`, for the alert's heading.
     pub project: String,
+    pub at: String,
+    pub is_pr: bool,
 }
 
 #[derive(Deserialize)]
@@ -130,6 +132,10 @@ struct RawTodo {
     target_url: String,
     #[serde(default)]
     body: String,
+    #[serde(default)]
+    created_at: String,
+    #[serde(default)]
+    target_type: String,
     #[serde(default)]
     author: Option<User>,
     #[serde(default)]
@@ -168,6 +174,8 @@ fn mentions_in(raw: Vec<RawTodo>, base: &str) -> Vec<Mention> {
         .filter(|t| t.target_url.starts_with(&format!("{base}/")))
         .map(|t| Mention {
             id: t.id,
+            at: t.created_at,
+            is_pr: t.target_type == "MergeRequest",
             author_name: t.author.as_ref().map(|u| u.name.clone()).unwrap_or_default(),
             avatar_url: t.author.as_ref().and_then(|u| u.avatar_url.clone()).unwrap_or_default(),
             title: t.target.map(|x| x.title).unwrap_or_default(),

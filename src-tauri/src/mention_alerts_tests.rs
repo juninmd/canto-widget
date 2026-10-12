@@ -16,6 +16,8 @@ fn mention(id: u64, body: &str) -> Mention {
         avatar_url: "https://git.example.com/uploads/ana.png".into(),
         body: body.into(),
         project: "acme/atlas".into(),
+        at: String::new(),
+        is_pr: false,
     }
 }
 

@@ -27,6 +27,7 @@ pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_health;
+pub mod cmd_mentions;
 pub mod cmd_models;
 pub mod cmd_notes;
 pub mod cmd_report;
@@ -65,6 +66,7 @@ pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
 pub mod mention_alerts;
+pub mod mention_feed;
 pub mod mention_sender;
 pub mod model;
 pub mod models_alert;
@@ -282,6 +284,8 @@ pub fn run() {
             cmd_github::github_device_cancel,
             cmd_github::github_disconnect,
             cmd_github_lists::github_lists,
+            cmd_mentions::github_mentions,
+            cmd_mentions::gitlab_mentions,
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
             cmd_github_lists::github_prs_checks,
