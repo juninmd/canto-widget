@@ -164,3 +164,14 @@ test("the device code is announced, can be copied, and cancelling swallows a fai
   });
   expect(count("github_device_cancel")).toBe(1);
 });
+
+test("the palette's refresh request forces a fresh trip to GitHub", async () => {
+  const { requestRefresh } = await import("../lib/refreshEvent");
+  responses.github_status = () => Promise.resolve(connected);
+  responses.github_lists = () => Promise.resolve(lists);
+  render(<GithubTab onError={() => {}} />);
+  await settle();
+  await act(async () => requestRefresh("github"));
+  await settle();
+  expect(calls.filter((c) => c.cmd === "github_lists").at(-1)?.args).toMatchObject({ force: true });
+});

@@ -178,3 +178,16 @@ test("booking a task from the tray confirms it with a message", async () => {
   });
   expect(said).toEqual(["Escrever changelog agendada às 09:00"]);
 });
+
+test("the palette's refresh request reloads the agenda and the tasks, but not when aimed at another tab", async () => {
+  const { requestRefresh } = await import("../lib/refreshEvent");
+  let reloads = 0;
+  render(<AgendaTab agenda={agenda({ items: [meeting], reload: () => ((reloads += 1), Promise.resolve()) })} today={TODAY} onError={() => {}} />);
+  await settle();
+  const before = count("tasks_for_day");
+  await act(async () => requestRefresh("notes"));
+  expect(reloads).toBe(0);
+  await act(async () => requestRefresh("agenda"));
+  expect(reloads).toBe(1);
+  expect(count("tasks_for_day")).toBe(before + 1);
+});

@@ -129,3 +129,12 @@ test("a visible goal chip names the goal and opens the editor", async () => {
   });
   expect(screen.getByRole("group", { name: "Meta diária" })).toBeTruthy();
 });
+
+test("the palette's refresh request reloads the week", async () => {
+  const { requestRefresh } = await import("../lib/refreshEvent");
+  await mount();
+  const before = calls.filter((c) => c === "activity_summary").length;
+  await act(async () => requestRefresh("activity"));
+  await settle();
+  expect(calls.filter((c) => c === "activity_summary").length).toBe(before + 7);
+});

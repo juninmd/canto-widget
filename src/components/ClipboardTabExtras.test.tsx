@@ -98,11 +98,8 @@ test("the poll stops while the window is hidden and resumes when it is back", as
     await show(2800);
     expect(listCalls()).toBe(0);
     Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
-    await act(async () => {
-      document.dispatchEvent(new Event("visibilitychange"));
-      await new Promise((r) => setTimeout(r, 250));
-    });
-    console.log("DBG", document.hidden, listCalls(), calls.length);
+    await act(async () => void document.dispatchEvent(new Event("visibilitychange")));
+    await act(async () => void (await new Promise((r) => setTimeout(r, 250))));
     expect(listCalls()).toBeGreaterThan(0);
   } finally {
     delete (document as unknown as Record<string, unknown>).hidden;

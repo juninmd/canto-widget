@@ -96,6 +96,7 @@ export default function NoteEditor({ draft, original, tasks, agenda, onChange, o
   }
 
   function cancel() {
+    if (!original) return discardNow();
     // The body is emitted on a short delay: flush so a just-typed note still counts as unsaved.
     const body = raw ? latest.current.body : flush();
     if (changed({ ...latest.current, body })) setConfirmingDiscard(true);
