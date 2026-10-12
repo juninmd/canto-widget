@@ -72,3 +72,27 @@ test("dismissing one alert leaves the others and tells Rust which one", async ({
   const close = (await calls(page)).find((c) => c.cmd === "alert_close");
   expect(close?.args).toEqual({ id: "status:exemplo" });
 });
+
+test("a mention names the person who wrote it, with their photo", async ({ page }) => {
+  const mention = {
+    id: "mention:gitlab:42",
+    title: "Falha no deploy de produção",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://git.example.com/acme/atlas/-/issues/9",
+    organizer: "acme/atlas",
+    description: "@marina: @voce consegue olhar o retry do lote?",
+    tag: "gitlab",
+    sender: { name: "Marina Souza", login: "marina", avatar: "data:image/png;base64,iVBORw0KGgo=" },
+  };
+  await mockTauri(page, { fixed: { alert_payload: [mention] } });
+  await ring(page);
+
+  const who = page.getByRole("alertdialog").locator("[data-sender]");
+  await expect(who).toContainText("Marina Souza");
+  await expect(who).toContainText("@marina");
+  await expect(who.locator("img")).toHaveAttribute("src", /^data:image\/png/);
+});

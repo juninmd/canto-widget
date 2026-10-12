@@ -79,3 +79,8 @@ export function resolvedToday(list: readonly ResolvedAlert[], now = new Date()):
   const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   return list.filter((r) => r.at >= midnight);
 }
+
+/** The name to show for whoever triggered an alert: the full name, else the login; empty when unknown. */
+export function senderName(e: AgendaItem): string {
+  return e.sender?.name || e.sender?.login || "";
+}

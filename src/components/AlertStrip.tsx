@@ -1,8 +1,9 @@
 import type { AgendaItem } from "../lib/api";
 import { status as agendaStatus } from "../lib/agenda";
-import { kindOf, levelLabel, toneOf, type Tone } from "../lib/alerts";
+import { kindOf, levelLabel, senderName, toneOf, type Tone } from "../lib/alerts";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
+import Avatar from "./Avatar";
 
 export const TONE: Record<Tone, { dot: string; text: string; card: string; ring: string; border: string }> = {
   danger: { dot: "bg-danger", text: "text-danger", card: "border-danger/50 bg-danger/10", ring: "ring-danger", border: "border-danger" },
@@ -21,7 +22,7 @@ export function summary(e: AgendaItem): string {
     case "pr":
       return t(e.tag === "ci" ? "alert.pr.ci" : "alert.pr.stalled");
     case "mention":
-      return t("alert.mentioned");
+      return e.sender ? t("alert.mentionedBy", { name: senderName(e) }) : t("alert.mentioned");
     case "task":
       return t("alert.taskReminder");
     default:
@@ -46,7 +47,11 @@ export default function AlertStrip({ items, selected, onSelect }: Props) {
             className={`min-w-28 flex-1 rounded-lg border px-2 py-1 text-left ${tone.card} ${on ? `ring-2 ring-offset-1 ring-offset-panel ${tone.ring}` : "opacity-80 hover:opacity-100"}`}
           >
             <span className="flex items-center gap-1.5">
-              <span aria-hidden="true" className={`size-1.5 shrink-0 rounded-full ${tone.dot}`} />
+              {e.sender ? (
+                <Avatar name={senderName(e)} email={e.sender.login} photo={e.sender.avatar} />
+              ) : (
+                <span aria-hidden="true" className={`size-1.5 shrink-0 rounded-full ${tone.dot}`} />
+              )}
               <span className="truncate text-xs font-semibold text-fg">{e.title}</span>
             </span>
             <span className="block truncate text-[10.5px] text-muted">{summary(e)}</span>

@@ -128,7 +128,10 @@ export type AgendaItem = {
   attendees?: Guest[];
   /** Short state for alerts that aren't calendar events: a Status API indicator or a model's rank. */
   tag?: string;
+  /** Who mentioned the user (GitHub/GitLab); `avatar` is a `data:` URL or empty. */
+  sender?: Sender | null;
 };
+export type Sender = { name: string; login: string; avatar: string };
 /** What was done with an alert: the main action, snoozed, closed or (a service) muted. */
 export type AlertOutcome = "done" | "snoozed" | "closed" | "muted";
 export type ResolvedAlert = { item: AgendaItem; outcome: AlertOutcome; at: number };

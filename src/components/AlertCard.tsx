@@ -2,6 +2,7 @@ import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
 import { kindOf, toneOf } from "../lib/alerts";
 import { t } from "../i18n";
 import AlertActions from "./AlertActions";
+import SenderLine from "./SenderLine";
 import { summary, TONE } from "./AlertStrip";
 
 type Props = {
@@ -30,7 +31,7 @@ export default function AlertCard({ event, onGone, onCompleted, onOpenModels, on
       <div className="min-w-0">
         <p className={`text-[11px] uppercase tracking-widest ${tone.text}`}>{kind}</p>
         <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-fg">{event.title}</h2>
-        {note !== kind && <p className="text-[11px] text-muted">{note}</p>}
+        {event.sender ? <SenderLine sender={event.sender} /> : note !== kind && <p className="text-[11px] text-muted">{note}</p>}
       </div>
       <AlertActions
         event={event}

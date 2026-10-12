@@ -154,6 +154,7 @@ export const tasks = {
   "alert.openPr": "abrir PR",
   "alert.kind.mention": "você foi mencionado",
   "alert.mentioned": "mencionou você",
+  "alert.mentionedBy": "{name} mencionou você",
   "alert.openMention": "abrir",
   "alert.since": "desde {time}",
   "alert.level.minor": "degradado",

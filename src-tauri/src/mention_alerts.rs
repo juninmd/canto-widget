@@ -1,18 +1,20 @@
 //! Pop-up when someone @-mentions the user on GitHub or GitLab. GitHub: the search for open threads that mention
 //! the user (a direct @username; team mentions don't match). GitLab: the user's pending "mentioned" to-dos. Both
 //! only with the account connected and the vault open; the first reading of each only seeds.
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::time::{Duration, Instant};
 
 use tauri::{AppHandle, Manager};
 
-use crate::calendar::AgendaItem;
+use crate::account;
+use crate::calendar::{AgendaItem, Sender};
 use crate::cmd_github::{valid_token, GithubState};
 use crate::cmd_github_lists::Github;
 use crate::cmd_gitlab::to_account;
 use crate::forge::{self, ForgeItem};
 use crate::forge_filter::{ForgeFilter, Kind, Order, Section, Sort};
 use crate::gitlab::{self, Mention};
+use crate::mention_sender::{self, trusted_github_avatar, trusted_gitlab_avatar};
 use crate::model::now_ms;
 use crate::my_pr_alerts::MyPrAlerts;
 use crate::notification::MENTION_PREFIX;
@@ -43,9 +45,16 @@ fn summary(forge: &str, count: usize, lines: Vec<String>, en: bool) -> AgendaIte
     }
 }
 
-pub fn github_events(fresh: &[&ForgeItem], en: bool) -> Vec<AgendaItem> {
+fn who(s: Option<&Sender>) -> String {
+    s.map(|s| if s.name.is_empty() { s.login.as_str() } else { s.name.as_str() })
+        .map_or(String::new(), |n| format!("{n} · "))
+}
+
+/// `senders` is keyed by the item's reference; a missing one leaves the alert without a name, as before.
+pub fn github_events(fresh: &[&ForgeItem], senders: &HashMap<String, Sender>, en: bool) -> Vec<AgendaItem> {
     if fresh.len() > MAX_EACH {
-        let lines = fresh.iter().map(|i| format!("{} {}", i.reference, i.title)).collect();
+        let lines =
+            fresh.iter().map(|i| format!("{}{} {}", who(senders.get(&i.reference)), i.reference, i.title)).collect();
         return vec![summary("github", fresh.len(), lines, en)];
     }
     fresh
@@ -61,6 +70,7 @@ pub fn github_events(fresh: &[&ForgeItem], en: bool) -> Vec<AgendaItem> {
             },
             link: i.url.clone(),
             tag: "github".into(),
+            sender: senders.get(&i.reference).cloned(),
             ..Default::default()
         })
         .collect()
@@ -68,7 +78,10 @@ pub fn github_events(fresh: &[&ForgeItem], en: bool) -> Vec<AgendaItem> {
 
 pub fn gitlab_events(fresh: &[&Mention], en: bool) -> Vec<AgendaItem> {
     if fresh.len() > MAX_EACH {
-        let lines = fresh.iter().map(|m| format!("{} {}", m.project, m.title)).collect();
+        let lines = fresh
+            .iter()
+            .map(|m| format!("{}{} {}", who(mention_sender::gitlab_sender(m).as_ref()), m.project, m.title))
+            .collect();
         return vec![summary("gitlab", fresh.len(), lines, en)];
     }
     fresh
@@ -87,6 +100,7 @@ pub fn gitlab_events(fresh: &[&Mention], en: bool) -> Vec<AgendaItem> {
                 },
                 link: m.url.clone(),
                 tag: "gitlab".into(),
+                sender: mention_sender::gitlab_sender(m),
                 ..Default::default()
             }
         })
@@ -97,6 +111,8 @@ pub fn gitlab_events(fresh: &[&Mention], en: bool) -> Vec<AgendaItem> {
 struct Memory {
     github: Option<(String, HashSet<String>)>,
     gitlab: Option<(String, HashSet<u64>)>,
+    /// Avatar URL -> `data:` URL, in RAM only.
+    avatars: HashMap<String, String>,
 }
 
 fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory) {
@@ -113,7 +129,18 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory) {
     };
     let seen = mem.github.as_ref().filter(|(l, _)| *l == login).map(|(_, s)| s);
     let (fresh, next) = review_alert::advance(seen, &list);
-    for event in github_events(&fresh, crate::lang::english()) {
+    // A summary carries no avatars, so the lookups (up to three calls each) only run for the individual alerts.
+    let senders: HashMap<String, Sender> = if fresh.len() > MAX_EACH {
+        HashMap::new()
+    } else {
+        fresh
+            .iter()
+            .filter_map(|i| Some((i.reference.clone(), mention_sender::github_sender(&cred, i, &login)?)))
+            .collect()
+    };
+    let mut events = github_events(&fresh, &senders, crate::lang::english());
+    mention_sender::resolve_avatars(&mut events, &mut mem.avatars, trusted_github_avatar, account::download_image);
+    for event in events {
         let _ = crate::window::open_alert(app, event);
     }
     mem.github = Some((login, next));
@@ -129,7 +156,15 @@ fn check_gitlab(app: &AppHandle, state: &AppState, mem: &mut Memory) {
     let Ok(mentions) = gitlab::mentions(&to_account(&cfg)) else { return };
     let seen = mem.gitlab.as_ref().filter(|(w, _)| *w == who).map(|(_, s)| s);
     let (fresh, next) = advance_gitlab(seen, &mentions);
-    for event in gitlab_events(&fresh, crate::lang::english()) {
+    let mut events = gitlab_events(&fresh, crate::lang::english());
+    let base = cfg.base_url.clone();
+    mention_sender::resolve_avatars(
+        &mut events,
+        &mut mem.avatars,
+        |u| trusted_gitlab_avatar(u, &base),
+        account::download_image,
+    );
+    for event in events {
         let _ = crate::window::open_alert(app, event);
     }
     mem.gitlab = Some((who, next));

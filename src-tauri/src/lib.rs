@@ -65,6 +65,7 @@ pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
 pub mod mention_alerts;
+pub mod mention_sender;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
