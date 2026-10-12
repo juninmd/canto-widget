@@ -85,13 +85,13 @@ fn avatars_are_downloaded_once_and_untrusted_or_failed_ones_are_dropped() {
     };
     let trusted = |u: &str| u.starts_with("https://ok.test/");
     let mut cache = HashMap::new();
-    let mut events = vec![
+    let mut events = [
         alert("https://ok.test/a"),
         alert("https://ok.test/a"),
         alert("https://evil.test/a"),
         alert("https://ok.test/broken"),
     ];
-    resolve_avatars(&mut events, &mut cache, trusted, download);
+    resolve_avatars(events.iter_mut().filter_map(|e| e.sender.as_mut()), &mut cache, trusted, download);
     let avatars: Vec<&str> = events.iter().map(|e| e.sender.as_ref().unwrap().avatar.as_str()).collect();
     assert_eq!(avatars, ["data:image/png;base64,AA==", "data:image/png;base64,AA==", "", ""]);
     assert_eq!(calls.get(), 2, "one for the repeated URL, one for the failing one; the untrusted never leaves");

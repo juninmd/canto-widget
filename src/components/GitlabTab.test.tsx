@@ -126,3 +126,34 @@ test("a failed status check is an alert with a retry; the lists cached for GitLa
   expect(screen.getByText("acme/api!12")).toBeTruthy();
   expect(screen.getByLabelText("Filtrar issues e PRs").getAttribute("data-shortcut")).toBe("search");
 });
+
+test("the GitLab mentions subtab lists the pending to-dos with their author and text", async () => {
+  responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
+  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.gitlab_mentions = () =>
+    Promise.resolve([
+      {
+        id: "gitlab:5",
+        title: "Falha no deploy",
+        reference: "acme/atlas",
+        url: "https://gitlab.acme.io/acme/atlas/-/merge_requests/5",
+        is_pr: true,
+        at: new Date().toISOString(),
+        sender: { name: "Bia Lima", login: "bia", avatar: "" },
+        preview: "@ana pode revisar antes da release?",
+      },
+    ]);
+  await mount();
+  expect(screen.getByRole("tab", { name: "MRs e issues" })).toBeTruthy();
+  expect(calls.some((c) => c.cmd === "gitlab_mentions")).toBe(false);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("tab", { name: "menções" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  expect(calls.find((c) => c.cmd === "gitlab_mentions")?.args).toBeUndefined();
+  expect(screen.getByText("Bia Lima")).toBeTruthy();
+  expect(screen.getByText("@bia")).toBeTruthy();
+  expect(screen.getByText("@ana pode revisar antes da release?")).toBeTruthy();
+  expect(screen.getByText("acme/atlas")).toBeTruthy();
+  expect(screen.getByText("BL", { exact: false })).toBeTruthy();
+});

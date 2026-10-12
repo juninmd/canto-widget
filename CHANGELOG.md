@@ -29,6 +29,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Subaba de menções no GitHub e no GitLab**: ao lado de "PRs e issues" (ou "MRs e issues"), a subaba **menções** lista
+  onde você foi marcado: a foto, o nome e o @usuário de quem escreveu, uma prévia do texto (uma linha, recortada em
+  volta do seu @usuário) e o link que abre a conversa no navegador. No GitHub entram as menções diretas ao seu usuário
+  em issues e PRs abertos (menção a time não entra); no GitLab, os to-dos de menção ainda pendentes. A lista só é
+  buscada na primeira vez que a subaba abre, e "atualizar" no topo recarrega a subaba que está aberta. Se o Canto não
+  achar o comentário no GitHub, a linha mostra a conversa sem autor nem prévia.
+
 - **Estados de carregamento, erro e conexão em todas as abas**: Tarefas, Notas, Clipboard e Ajustes mostram o esqueleto
   antes da primeira carga, em vez de piscar o vazio. Agenda, GitHub/GitLab e Atividade mantêm os dados antigos sob um
   aviso com **tentar de novo** quando a atualização falha, mostram **atualizado às HH:MM** e param de consultar com a

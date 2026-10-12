@@ -148,7 +148,12 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory) {
             .collect()
     };
     let mut events = github_events(&fresh, &found, crate::lang::english());
-    mention_sender::resolve_avatars(&mut events, &mut mem.avatars, trusted_github_avatar, account::download_image);
+    mention_sender::resolve_avatars(
+        events.iter_mut().filter_map(|e| e.sender.as_mut()),
+        &mut mem.avatars,
+        trusted_github_avatar,
+        account::download_image,
+    );
     for event in events {
         let _ = crate::window::open_alert(app, event);
     }
@@ -168,7 +173,7 @@ fn check_gitlab(app: &AppHandle, state: &AppState, mem: &mut Memory) {
     let mut events = gitlab_events(&fresh, crate::lang::english());
     let base = cfg.base_url.clone();
     mention_sender::resolve_avatars(
-        &mut events,
+        events.iter_mut().filter_map(|e| e.sender.as_mut()),
         &mut mem.avatars,
         |u| trusted_gitlab_avatar(u, &base),
         account::download_image,

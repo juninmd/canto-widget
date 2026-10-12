@@ -132,13 +132,13 @@ pub fn gitlab_sender(m: &Mention) -> Option<Sender> {
 }
 
 /// Turns each sender's avatar URL into a `data:` URL (or nothing); `download` is only called for trusted URLs.
-pub fn resolve_avatars(
-    events: &mut [crate::calendar::AgendaItem],
+pub fn resolve_avatars<'a>(
+    senders: impl IntoIterator<Item = &'a mut Sender>,
     cache: &mut HashMap<String, String>,
     trusted: impl Fn(&str) -> bool,
     download: impl Fn(&str) -> Option<String>,
 ) {
-    for s in events.iter_mut().filter_map(|e| e.sender.as_mut()) {
+    for s in senders {
         let url = std::mem::take(&mut s.avatar);
         if !trusted(&url) {
             continue;
