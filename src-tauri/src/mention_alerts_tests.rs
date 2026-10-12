@@ -8,6 +8,7 @@ fn gh(numbers: &[u64]) -> ForgeList {
 
 fn mention(id: u64, body: &str) -> Mention {
     Mention {
+        action: "mentioned".into(),
         id,
         title: format!("Falha no deploy {id}"),
         url: format!("https://git.example.com/acme/atlas/-/issues/{id}"),

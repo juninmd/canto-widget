@@ -49,8 +49,12 @@ pub mod github_auth;
 pub mod github_checks;
 pub mod github_failures;
 pub mod github_query;
+pub mod github_teams;
+pub mod github_thread;
 pub mod gitlab;
 pub mod gitlab_query;
+pub mod gitlab_todos;
+pub mod gitlab_work;
 pub mod global_shortcuts;
 pub mod google_token;
 pub mod guest_photos;
@@ -80,9 +84,13 @@ pub mod next_meeting;
 pub mod note_images;
 pub mod notification;
 pub mod oauth;
+pub mod own_work_alerts;
+pub mod own_work_github;
+pub mod own_work_gitlab;
 pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
+pub mod pr_state;
 pub mod priority;
 pub mod report;
 pub mod review_alert;
@@ -107,6 +115,7 @@ pub mod vault;
 pub mod window;
 pub mod window_mode;
 pub mod window_state;
+pub mod work_events;
 
 pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
 
@@ -170,6 +179,7 @@ pub fn run() {
             review_alert::watch(app.handle().clone());
             my_pr_alerts::watch(app.handle().clone());
             mention_alerts::watch(app.handle().clone());
+            own_work_alerts::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]

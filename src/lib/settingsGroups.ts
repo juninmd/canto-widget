@@ -28,7 +28,7 @@ const KEYWORDS: Record<SectionId, string> = {
   dnd: "não perturbe silêncio silenciar foco do not disturb silence mute",
   fullscreen: "tela cheia jogo jogos segurar avisos fullscreen game hold",
   reviewAlerts: "revisão review pull request pr github avisos alertas alerts",
-  myPrAlerts: "meus prs pr ci falha parado menção github avisos alertas alerts mentions stalled",
+  myPrAlerts: "meus prs pr mr ci falha parado menção github gitlab avisos alertas alerts mentions stalled aprovado aprovação merge conflito comentário atribuído resposta time times approved conflict assigned replies team",
   activity: "atividade apps aplicativos histórico limpar activity history clear",
   focus: "foco estimativa tempo cronômetro focus estimate timer",
   security: "segurança senha mestra bloqueio automático biometria hello touch id security password lock biometric",

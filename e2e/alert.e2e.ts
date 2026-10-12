@@ -121,3 +121,35 @@ test("a GitHub mention previews the text that mentions you", async ({ page }) =>
   await expect(alert.locator("[data-sender]")).toContainText("Marina Souza");
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
 });
+
+test("an approved PR names who approved it, with their photo, and a conflict ranks above it", async ({ page }) => {
+  const base = { start: "", end: "", all_day: false, location: "", meet: "", link: "" };
+  const approved = {
+    ...base,
+    id: "pr:approved:acme/atlas#128",
+    title: "Corrige o parser de CSV com aspas",
+    organizer: "acme/atlas#128",
+    link: "https://github.com/acme/atlas/pull/128",
+    description: "Marina Souza aprovou este PR.\nBoa, o teste de aspas cobre o caso do lote.",
+    tag: "approved",
+    sender: { name: "Marina Souza", login: "marina", avatar: "" },
+  };
+  const conflict = {
+    ...base,
+    id: "pr:conflict:acme/atlas#131",
+    title: "Cache de relatórios por período",
+    organizer: "acme/atlas#131",
+    link: "https://github.com/acme/atlas/pull/131",
+    description: "Conflito com a branch base; atualize este PR para poder fazer merge.",
+    tag: "conflict",
+  };
+  await mockTauri(page, { fixed: { alert_payload: [approved, conflict] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert.getByRole("heading", { level: 1 })).toHaveText("Cache de relatórios por período");
+  await alert.getByRole("button", { name: /Corrige o parser/ }).click();
+  await expect(alert.locator("[data-sender]")).toContainText("Marina Souza");
+  await expect(alert).toContainText("Boa, o teste de aspas cobre o caso do lote.");
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});

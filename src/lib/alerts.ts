@@ -1,7 +1,7 @@
 import type { AgendaItem, AlertOutcome, ResolvedAlert } from "./api";
 import { minutesUntil } from "./agenda";
 import { TASK_PREFIX } from "./reminders";
-import { t } from "../i18n";
+import { t, type MessageKey } from "../i18n";
 
 /** Same prefixes as `STATUS_PREFIX` and `MODEL_PREFIX` in `notification.rs`. */
 export const STATUS_PREFIX = "status:";
@@ -22,6 +22,26 @@ export function kindOf(e: AgendaItem): AlertKind {
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
 }
 
+/** Red CI and a conflict are the loud ones; good news and plain activity are calm. */
+const PR_TONE: Record<string, Tone> = {
+  ci: "danger",
+  conflict: "danger",
+  stalled: "warn",
+  changes: "warn",
+  approved: "accent",
+  ready: "accent",
+  comment: "accent",
+  reply: "accent",
+  assigned: "accent",
+  updates: "accent",
+};
+
+/** The one-line name of an own-work alert: its tag, or "sem revisão" for the first kind that had none. */
+export function prLabel(tag: string | undefined): string {
+  const known = ["ci", "stalled", "approved", "changes", "ready", "conflict", "comment", "reply", "assigned", "updates"];
+  return t(`alert.pr.${known.includes(tag ?? "") ? tag : "stalled"}` as MessageKey);
+}
+
 /** Statuspage's indicator decides how loud a service alert is; everything else keeps one tone per kind. */
 export function toneOf(e: AgendaItem): Tone {
   switch (kindOf(e)) {
@@ -31,7 +51,7 @@ export function toneOf(e: AgendaItem): Tone {
     case "model":
       return "muted";
     case "pr":
-      return e.tag === "ci" ? "danger" : "warn";
+      return PR_TONE[e.tag ?? ""] ?? "warn";
     default:
       return "accent";
   }

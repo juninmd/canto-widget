@@ -41,6 +41,10 @@ pub enum Section {
     MyIssues,
     /// Threads where someone @-mentioned the user; the alert watcher and the mentions subtab ask for it, never the lists.
     Mentioned,
+    /// Open threads where the user commented (GitHub); only the reply watcher asks for it.
+    Participating,
+    /// Threads that mention one of the user's teams (GitHub); only asked for when the user opts in.
+    TeamMentioned,
 }
 
 /// What the day summary and the period report ask each forge about the user's own activity.

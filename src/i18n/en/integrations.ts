@@ -111,7 +111,7 @@ export const integrations: Record<keyof typeof source, string> = {
   "forge.mentions.loading": "looking for mentions",
   "forge.mentions.empty": "nobody mentioned you in an open thread",
   "forge.mentions.emptyGitlab": "no pending mentions: GitLab only lists the to-dos not done yet",
-  "forge.mentions.note": "direct mentions of your @username in open threads (team mentions don't match)",
+  "forge.mentions.note": "direct mentions of your @username in open threads (team ones only with the option on in Settings)",
   "forge.mentions.noteGitlab": "pending mention to-dos on GitLab",
   "forge.mentions.noPreview": "the comment that mentions you was not found; open the link to read it",
   "forge.mentions.by": "{name} mentioned you",
