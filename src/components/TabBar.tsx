@@ -128,21 +128,23 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
         })}
       </nav>
       {hidden.length > 0 && <TabMore hidden={hidden} attention={attention} onPick={onChange} />}
-      {/* Invisible copy of the bar: the only way to know each tab's width before deciding which ones fit. */}
-      <div ref={ruler} aria-hidden="true" className="pointer-events-none invisible absolute left-0 top-0 -z-10 flex gap-0.5 whitespace-nowrap px-3">
-        {tabs.map((tab) => (
+      {/* Invisible copy of the bar, the only way to know each tab's width before deciding which fit; clipped so its width cannot scroll the window. */}
+      <div aria-hidden="true" className="pointer-events-none invisible absolute inset-x-0 top-0 -z-10 overflow-hidden">
+        <div ref={ruler} className="flex w-max gap-0.5 whitespace-nowrap px-3">
+          {tabs.map((tab) => (
+            <span
+              key={tab.id}
+              data-ruler
+              data-label={count(tab.id) > 0 ? `${tab.label} ${count(tab.id)}` : tab.label}
+              className={`${TAB} inline-flex items-center font-semibold before:content-[attr(data-label)]`}
+            />
+          ))}
           <span
-            key={tab.id}
             data-ruler
-            data-label={count(tab.id) > 0 ? `${tab.label} ${count(tab.id)}` : tab.label}
-            className={`${TAB} inline-flex items-center font-semibold before:content-[attr(data-label)]`}
+            data-label={`${t("tabs.more")} ▾`}
+            className="canto-hit inline-flex min-h-8 items-center px-2 before:content-[attr(data-label)]"
           />
-        ))}
-        <span
-          data-ruler
-          data-label={`${t("tabs.more")} ▾`}
-          className="canto-hit inline-flex min-h-8 items-center px-2 before:content-[attr(data-label)]"
-        />
+        </div>
       </div>
     </div>
   );

@@ -5,6 +5,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Trancar com falha**: se o Rust não conseguir trancar o cofre, a tela avisa e relê o estado real em vez de fingir
+  que trancou. Com o cofre trancado, o cache do GitHub/GitLab e o dia escolhido na Agenda deixam de ficar na memória.
+- **Janela deslizando de lado**: escolher uma aba pelo menu **mais** empurrava o cabeçalho 112 px para a esquerda; a
+  cópia invisível da barra, usada só para medir as abas, agora fica recortada.
+
 ### Alterado
 
 - **Tarefas com a tarefa da vez**: no topo, um cartão mostra a tarefa em foco (ou a próxima em aberto) com horário,
@@ -21,6 +28,29 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   recolhido e a linha vermelha marca o agora. Reuniões e os detalhes de cada evento seguem como antes.
 
 ### Adicionado
+
+- **Estados de carregamento, erro e conexão em todas as abas**: Tarefas, Notas, Clipboard e Ajustes mostram o esqueleto
+  antes da primeira carga, em vez de piscar o vazio. Agenda, GitHub/GitLab e Atividade mantêm os dados antigos sob um
+  aviso com **tentar de novo** quando a atualização falha, mostram **atualizado às HH:MM** e param de consultar com a
+  janela escondida. A tela sem status ganha esqueleto e aviso com nova tentativa, e um selo **sem conexão** aparece no
+  cabeçalho.
+- **Menu "mais" e avisos pelo teclado**: o menu abre com o foco no primeiro item, anda com as setas e devolve o foco
+  com Esc; Alt mostra o número de cada aba; a doca do modo mini expande com o foco. **Dispensar todas** faz uma só
+  atualização, mostra **ver mais** além de 8 avisos e não esconde um aviso cujo fechamento falhou. Um sino no cabeçalho
+  conta os avisos pendentes e abre o pior primeiro. A paleta ganha **Atualizar aba atual** e `Ctrl+,` abre os Ajustes.
+- **Ajustes em grupos com busca**: cinco grupos recolhíveis (Aparência, Notificações, Privacidade e segurança, Dados e
+  contas, Aplicativo), um campo **buscar ajuste**, a zona sensível separada, erros de gravação na própria seção e um
+  aviso quando o GitHub não está conectado nos alertas que dependem dele.
+- **Tarefas**: **limpar concluídas** com desfazer, aviso com a contagem ao puxar pendências, Delete/Backspace apaga a
+  linha em foco e o foco segue para a vizinha, e um título que falha ao agendar não se duplica ao tentar de novo.
+- **Notas, Clipboard e Transcrições**: Esc com rascunho pergunta antes de descartar, o filtro por tag vira um chip com
+  ×, o modo privacidade borra também tags, a amostra de cor e as transcrições, **limpar** o clipboard pede confirmação
+  com a contagem, "copiar como" deixa de depender do mouse, e a transcrição aberta destaca a busca, tem **copiar** e
+  volta ao item com Esc.
+- **Agenda**: o dia escolhido sobrevive à troca de aba, `[` e `]` andam entre os dias e `H` volta a hoje, o vazio
+  distingue "sem conta" de "sem eventos" e leva aos Ajustes, e agendar uma tarefa pela lateral confirma com um aviso.
+- **Atividade**: aviso com nova tentativa quando a primeira carga falha, botão de atualizar visível, menu `···` pelo
+  teclado, a grade de horas lida por leitores de tela e um chip **meta** para editar o objetivo.
 
 - **Prévia do texto da menção no GitHub**: o aviso de menção agora mostra o trecho do comentário (ou da descrição) que
   cita você, em uma linha e com até 280 caracteres, como o GitLab já fazia. Quando o texto é longo, o recorte fica em

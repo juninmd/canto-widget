@@ -1,8 +1,10 @@
-import { describe, expect, mock, test } from "bun:test";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, mock, test } from "bun:test";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import ErrorBanner from "./ErrorBanner";
 
 describe("ErrorBanner", () => {
+  afterEach(cleanup);
+
   test("announces the failure and retries on click", () => {
     const onRetry = mock(() => {});
     render(<ErrorBanner message="Falhou" onRetry={onRetry} />);

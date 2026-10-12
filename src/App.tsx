@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useClearOnLock } from "./lib/useClearOnLock";
 import { MOD_KEY } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
@@ -75,6 +76,7 @@ function Canto() {
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
   const { status, error: statusError, checking, refresh } = useVaultStatus(setError);
   const today = useToday();
+  useClearOnLock(status?.unlocked === true);
   const agenda = useAgenda(status?.unlocked === true);
   const noteDraft = useNoteDraft(status?.unlocked === true);
   const [reminderLead, setReminderLead] = useReminderLead();
