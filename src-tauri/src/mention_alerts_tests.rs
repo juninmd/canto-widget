@@ -94,9 +94,14 @@ fn a_github_alert_carries_the_sender_found_for_its_thread() {
     let list = gh(&[7, 8]);
     let fresh: Vec<&ForgeItem> = list.items.iter().collect();
     let ana = Sender { name: "Ana Pires".into(), login: "ana".into(), avatar: String::new() };
-    let senders = HashMap::from([("o/r#7".to_string(), ana.clone())]);
-    let events = github_events(&fresh, &senders, false);
+    let found = HashMap::from([(
+        "o/r#7".to_string(),
+        Mentioned { sender: ana.clone(), excerpt: "@voce consegue olhar o retry?".into() },
+    )]);
+    let events = github_events(&fresh, &found, false);
     assert_eq!((events[0].sender.as_ref(), events[1].sender.as_ref()), (Some(&ana), None), "no lookup, no face");
+    assert_eq!(events[0].description, "@ana: @voce consegue olhar o retry?", "a preview of the text that mentions you");
+    assert_eq!(events[1].description, "Você foi mencionado em o/r#8.", "no lookup, the old sentence");
 }
 
 #[test]

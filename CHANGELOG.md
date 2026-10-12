@@ -22,6 +22,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Prévia do texto da menção no GitHub**: o aviso de menção agora mostra o trecho do comentário (ou da descrição) que
+  cita você, em uma linha e com até 280 caracteres, como o GitLab já fazia. Quando o texto é longo, o recorte fica em
+  volta do @usuário, com "…" no que foi cortado. Se o Canto não achar o comentário, o aviso segue com a frase de antes.
+
 - **Quem mencionou você, com nome e foto**: o aviso de menção no GitHub e no GitLab mostra a foto, o nome e o @usuário
   de quem escreveu (iniciais quando não há foto), e a faixa de avisos traz o nome em cada cartão. No GitHub o Canto
   procura o comentário que cita você; se não achar, o aviso aparece como antes, sem rosto. Nos resumos (mais de três

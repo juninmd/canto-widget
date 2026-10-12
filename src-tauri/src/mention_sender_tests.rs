@@ -24,9 +24,30 @@ fn a_mention_is_a_whole_word_in_any_case() {
 #[test]
 fn the_newest_text_that_mentions_the_user_names_the_sender() {
     let texts = vec![text("@voce veja", "ana"), text("sem menção", "bia"), text("de novo @voce", "caio")];
-    assert_eq!(pick(texts, "voce").map(|a| a.login).as_deref(), Some("caio"));
+    let (author, body) = pick(texts, "voce").expect("a sender");
+    assert_eq!((author.login.as_str(), body.as_str()), ("caio", "de novo @voce"));
     assert!(pick(vec![text("nada", "ana")], "voce").is_none());
     assert!(pick(vec![Text { body: Some("@voce".into()), user: None }], "voce").is_none());
+}
+
+#[test]
+fn a_short_text_is_flattened_and_a_long_one_keeps_the_stretch_around_the_mention() {
+    assert_eq!(excerpt("oi\n\n  @voce   olha", "voce", 280), "oi @voce olha");
+
+    let long = format!("{} @Voce veja o retry {}", "a".repeat(200), "z".repeat(200));
+    let cut = excerpt(&long, "voce", 100);
+    assert!(cut.starts_with('…') && cut.ends_with('…'), "{cut}");
+    assert!(cut.contains("@Voce veja o retry"), "{cut}");
+    assert_eq!(cut.chars().count(), 100 + 2);
+
+    let late = format!("{} @voce", "a".repeat(300));
+    let cut = excerpt(&late, "voce", 100);
+    assert!(cut.starts_with('…') && cut.ends_with("@voce"), "{cut}");
+    assert_eq!(cut.chars().count(), 100 + 1, "the window slides back instead of running past the end");
+
+    let early = format!("@voce {}", "a".repeat(300));
+    assert!(excerpt(&early, "voce", 100).starts_with("@voce a"));
+    assert!(excerpt(&"é".repeat(300), "voce", 50).ends_with('…'), "multi-byte text cuts on characters");
 }
 
 #[test]
