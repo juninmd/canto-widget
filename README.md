@@ -240,6 +240,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
+| Mention alert with a preview of the text |
+|---|
+| ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
+
 | Password changed, one file pending | Day summary |
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |

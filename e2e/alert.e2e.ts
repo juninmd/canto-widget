@@ -96,3 +96,28 @@ test("a mention names the person who wrote it, with their photo", async ({ page 
   await expect(who).toContainText("@marina");
   await expect(who.locator("img")).toHaveAttribute("src", /^data:image\/png/);
 });
+
+test("a GitHub mention previews the text that mentions you", async ({ page }) => {
+  const mention = {
+    id: "mention:github:acme/atlas#128",
+    title: "Retry do lote estoura o timeout",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://github.com/acme/atlas/pull/128",
+    organizer: "acme/atlas#128",
+    description:
+      "@marina: …conversei com o time e o retry está em 3 tentativas. @voce consegue olhar o backoff antes da release?",
+    tag: "github",
+    sender: { name: "Marina Souza", login: "marina", avatar: "" },
+  };
+  await mockTauri(page, { fixed: { alert_payload: [mention] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert).toContainText("@voce consegue olhar o backoff antes da release?");
+  await expect(alert.locator("[data-sender]")).toContainText("Marina Souza");
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});

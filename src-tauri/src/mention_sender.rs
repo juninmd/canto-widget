@@ -13,6 +13,8 @@ use crate::gitlab::Mention;
 const CACHE_MAX: usize = 64;
 /// The mention may be older than the last update (others replied meanwhile); look this far before it.
 const LOOKBACK_MINUTES: i64 = 60;
+/// How much of the text before the mention a cut preview keeps, so the sentence still makes sense.
+const CONTEXT_BEFORE: usize = 60;
 
 #[derive(Deserialize)]
 struct Author {
@@ -35,21 +37,48 @@ struct Profile {
     name: Option<String>,
 }
 
-/// `@login` as a whole word, any case; `a@login` (an e-mail) and `@login-bot` do not count.
-pub fn mentions_login(body: &str, login: &str) -> bool {
+/// Who wrote the text that mentions the user, and what it says (flattened and cut around the mention).
+#[derive(Debug, Clone, PartialEq)]
+pub struct Mentioned {
+    pub sender: Sender,
+    pub excerpt: String,
+}
+
+/// Byte offset of the first `@login` as a whole word, any case; `a@login` (an e-mail) and `@login-bot` do not count.
+/// Logins are ASCII, so lowercasing ASCII only keeps the offsets valid for `body`.
+fn mention_at(body: &str, login: &str) -> Option<usize> {
     if login.is_empty() {
-        return false;
+        return None;
     }
-    let (body, needle) = (body.to_lowercase(), format!("@{}", login.to_lowercase()));
+    let (lower, needle) = (body.to_ascii_lowercase(), format!("@{}", login.to_ascii_lowercase()));
     let word = |c: char| c.is_alphanumeric() || c == '_' || c == '-';
-    body.match_indices(&needle).any(|(i, _)| {
-        !body[..i].chars().next_back().is_some_and(word) && !body[i + needle.len()..].chars().next().is_some_and(word)
+    lower.match_indices(&needle).map(|(i, _)| i).find(|&i| {
+        !lower[..i].chars().next_back().is_some_and(word) && !lower[i + needle.len()..].chars().next().is_some_and(word)
     })
 }
 
+pub fn mentions_login(body: &str, login: &str) -> bool {
+    mention_at(body, login).is_some()
+}
+
+/// One line of at most `max` characters; a longer text keeps the stretch around the mention, with "…" for what was cut.
+pub fn excerpt(body: &str, login: &str, max: usize) -> String {
+    let flat = body.split_whitespace().collect::<Vec<_>>().join(" ");
+    let chars: Vec<char> = flat.chars().collect();
+    if chars.len() <= max {
+        return flat;
+    }
+    let at = mention_at(&flat, login).map_or(0, |b| flat[..b].chars().count());
+    let start = at.saturating_sub(CONTEXT_BEFORE).min(chars.len() - max);
+    let end = start + max;
+    let text: String = chars[start..end].iter().collect();
+    format!("{}{text}{}", if start > 0 { "…" } else { "" }, if end < chars.len() { "…" } else { "" })
+}
+
 /// The newest text that mentions `login`.
-fn pick(texts: Vec<Text>, login: &str) -> Option<Author> {
-    texts.into_iter().rev().find(|t| t.body.as_deref().is_some_and(|b| mentions_login(b, login)))?.user
+fn pick(texts: Vec<Text>, login: &str) -> Option<(Author, String)> {
+    let text = texts.into_iter().rev().find(|t| t.body.as_deref().is_some_and(|b| mentions_login(b, login)))?;
+    Some((text.user?, text.body.unwrap_or_default()))
 }
 
 fn since(updated_at: &str) -> Option<String> {
@@ -63,7 +92,7 @@ fn get<T: for<'de> Deserialize<'de>>(token: &str, path: &str, params: &[(&str, &
 }
 
 /// Comments first (newest mention wins); the thread's own text only when no comment mentions the user.
-pub fn github_sender(token: &str, item: &ForgeItem, login: &str) -> Option<Sender> {
+pub fn github_mention(token: &str, item: &ForgeItem, login: &str, max: usize) -> Option<Mentioned> {
     let base = format!("/repos/{}/issues/{}", item.repo, item.number);
     let mut params = vec![("per_page", "100")];
     let from = since(&item.updated_at);
@@ -71,9 +100,10 @@ pub fn github_sender(token: &str, item: &ForgeItem, login: &str) -> Option<Sende
         params.push(("since", f));
     }
     let comments: Vec<Text> = get(token, &format!("{base}/comments"), &params).unwrap_or_default();
-    let author = pick(comments, login).or_else(|| pick(vec![get(token, &base, &[])?], login))?;
+    let (author, body) = pick(comments, login).or_else(|| pick(vec![get(token, &base, &[])?], login))?;
     let name = get::<Profile>(token, &format!("/users/{}", author.login), &[]).and_then(|p| p.name).unwrap_or_default();
-    Some(Sender { name, login: author.login, avatar: author.avatar_url })
+    let sender = Sender { name, login: author.login, avatar: author.avatar_url };
+    Some(Mentioned { sender, excerpt: excerpt(&body, login, max) })
 }
 
 /// GitHub's CDN for profile pictures (`avatars.githubusercontent.com`, `avatars0`…).
