@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
 import { EditorContent } from "@tiptap/react";
-import { MOD_KEY } from "../lib/platform";
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
 import { LOCALE, t } from "../i18n";
 import { attachImage, IMAGE_TYPES, imageFiles, insertAt, storeImage } from "../lib/noteImages";
 import { safeImageId } from "../lib/noteImageNode";
 import { MAX_BODY, useRichNote } from "../lib/useRichNote";
+import NoteEditorActions from "./NoteEditorActions";
 import NoteLinkInput from "./NoteLinkInput";
 import NoteLinkRow from "./NoteLinkRow";
 import NoteThumbs from "./NoteThumbs";
@@ -18,6 +18,8 @@ export type Draft = { id: string | undefined; title: string; body: string; tags:
 
 type Props = {
   draft: Draft;
+  /** The draft as it opened; when given, cancelling after changes asks before discarding. */
+  original?: Draft;
   tasks: Task[];
   agenda: AgendaItem[];
   onChange: (d: Draft) => void;
@@ -26,13 +28,17 @@ type Props = {
   onCancel: () => void;
 };
 
+const sameLink = (a: NoteLink | null, b: NoteLink | null) => a?.kind === b?.kind && a?.id === b?.id;
+
 const FIELD = "canto-field text-sm focus-within:border-accent";
 
-export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onCancel }: Props) {
+export default function NoteEditor({ draft, original, tasks, agenda, onChange, onSave, onCancel }: Props) {
   const [raw, setRaw] = useState(false);
   const [linking, setLinking] = useState(false);
   const [attaching, setAttaching] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
+  const [confirmingDiscard, setConfirmingDiscard] = useState(false);
+  const [emptyTried, setEmptyTried] = useState(false);
   const rawRef = useRef<HTMLTextAreaElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const latest = useRef(draft);
@@ -74,14 +80,26 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
     }
   }
 
+  const empty = !draft.title.trim() && !draft.body.trim();
+  const changed = (d: Draft) =>
+    !!original && ((["title", "body", "tags"] as const).some((k) => d[k] !== original[k]) || !sameLink(d.link, original.link));
+
   function save() {
     const body = raw ? latest.current.body : flush();
+    if (!latest.current.title.trim() && !body.trim()) return setEmptyTried(true);
     void onSave({ ...latest.current, body });
   }
 
-  function cancel() {
+  function discardNow() {
     discard();
     onCancel();
+  }
+
+  function cancel() {
+    // The body is emitted on a short delay: flush so a just-typed note still counts as unsaved.
+    const body = raw ? latest.current.body : flush();
+    if (changed({ ...latest.current, body })) setConfirmingDiscard(true);
+    else discardNow();
   }
 
   function toggleRaw() {
@@ -97,7 +115,10 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
         save();
       }}
       onKeyDown={(e) => {
-        if (e.key === "Escape") cancel();
+        if (e.key === "Escape") {
+          if (confirmingDiscard) setConfirmingDiscard(false);
+          else cancel();
+        }
         if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
           e.preventDefault();
           save();
@@ -180,14 +201,14 @@ export default function NoteEditor({ draft, tasks, agenda, onChange, onSave, onC
         className="canto-field px-3 py-1.5 text-xs !text-muted"
       />
       <NoteLinkRow link={draft.link} tasks={tasks} agenda={agenda} onLink={(link) => change({ ...latest.current, link })} />
-      <div className="flex gap-2">
-        <button type="submit" title={`${MOD_KEY}+Enter`} className="flex-1 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-on-accent">
-          {t("notes.save")}
-        </button>
-        <button type="button" onClick={cancel} title="Esc" className="rounded-lg bg-edge px-3 py-1.5 text-sm text-fg">
-          {t("notes.cancel")}
-        </button>
-      </div>
+      <NoteEditorActions
+        empty={empty}
+        emptyTried={emptyTried}
+        confirmingDiscard={confirmingDiscard}
+        onKeepEditing={() => setConfirmingDiscard(false)}
+        onDiscard={discardNow}
+        onCancel={cancel}
+      />
     </form>
   );
 }

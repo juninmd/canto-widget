@@ -4,9 +4,11 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import type { AgendaItem, ResolvedAlert } from "../lib/api";
 
 const calls: { cmd: string; args?: Record<string, unknown> }[] = [];
+let failing = new Set<string>();
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
+    if (cmd === "alert_close" && failing.has(String(args?.id))) return Promise.reject("falha do Rust");
     return Promise.resolve(null);
   },
 }));
@@ -15,6 +17,7 @@ const { default: NotificationsColumn } = await import("./NotificationsColumn");
 afterEach(() => {
   cleanup();
   calls.length = 0;
+  failing = new Set();
 });
 
 const base = { start: "", end: "", all_day: false, location: "", meet: "", link: "" };
@@ -64,6 +67,56 @@ test("dismiss all closes every pending alert", async () => {
   });
   expect(calls.filter((c) => c.cmd === "alert_close").map((c) => c.args?.id)).toEqual(["pr:acme/atlas#4", "e1"]);
   expect(h.gone).toEqual(["pr:acme/atlas#4", "e1"]);
+  expect(h.refreshed(), "one reread after all the closes, not one per alert").toBe(1);
+});
+
+test("dismiss all keeps the alerts that failed to close and offers a retry", async () => {
+  failing = new Set(["e1"]);
+  const h = handlers();
+  render(<NotificationsColumn alerts={[ci, daily]} log={[]} {...h.props} />);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "dispensar todas" }));
+  });
+  expect(h.gone).toEqual(["pr:acme/atlas#4"]);
+  expect(screen.getByRole("alert").textContent).toContain("Não foi possível dispensar 1 aviso(s).");
+  failing = new Set();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
+  });
+  expect(h.gone).toContain("e1");
+});
+
+test("a card that fails to close stays, says why and can try again", async () => {
+  failing = new Set(["e1"]);
+  const h = handlers();
+  render(<NotificationsColumn alerts={[daily]} log={[]} {...h.props} />);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  });
+  expect(h.gone, "the alert vanished although Rust still holds it").toEqual([]);
+  expect(screen.getByRole("alert").textContent).toContain("Não foi possível fechar o aviso. falha do Rust");
+  expect(h.refreshed()).toBe(1);
+  failing = new Set();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
+  });
+  expect(h.gone).toEqual(["e1"]);
+});
+
+test("more than eight resolved alerts are capped, with a button to see the rest", () => {
+  const now = Date.now();
+  const log: ResolvedAlert[] = Array.from({ length: 11 }, (_, i) => ({
+    item: { ...daily, id: `e${i}`, title: `Reunião ${i}` },
+    outcome: "closed",
+    at: now - i * 1000,
+  }));
+  render(<NotificationsColumn alerts={[]} log={log} {...handlers().props} />);
+  const list = () => within(screen.getByRole("complementary")).getAllByRole("listitem");
+  expect(list()).toHaveLength(8);
+  fireEvent.click(screen.getByRole("button", { name: "ver mais (3)" }));
+  expect(list()).toHaveLength(11);
+  fireEvent.click(screen.getByRole("button", { name: "ver menos" }));
+  expect(list()).toHaveLength(8);
 });
 
 test("resolved alerts show what was done, only from today", () => {

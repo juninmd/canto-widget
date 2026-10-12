@@ -1,4 +1,5 @@
 import { afterEach, expect, mock, test } from "bun:test";
+import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { AgendaItem } from "../lib/api";
 
@@ -36,10 +37,12 @@ test("shows the kind, the title and the same actions as the pop-up", () => {
   expect(screen.getByRole("button", { name: "fechar" })).toBeDefined();
 });
 
-test("closing drops the alert in Rust too, so the dock stops listing it", () => {
+test("closing drops the alert in Rust too, so the dock stops listing it", async () => {
   const gone: string[] = [];
   render(<FocusedAlert event={meeting} onGone={(id) => gone.push(id)} onCompleted={() => {}} onOpenModels={() => {}} />);
-  fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  });
   expect(calls).toContainEqual({ cmd: "alert_close", args: { id: "e1" } });
   expect(gone).toEqual(["e1"]);
 });

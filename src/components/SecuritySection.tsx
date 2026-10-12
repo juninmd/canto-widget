@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { api, errText, type BiometricStatus, type UnlockEntry } from "../lib/api";
+import { api, type BiometricStatus, type UnlockEntry } from "../lib/api";
 import { AUTOLOCK_OPTIONS } from "../lib/autolock";
 import { timeAgo } from "../lib/time";
+import { useSectionError } from "../lib/useSectionError";
 import { useToast } from "../lib/toast";
 import ChangePassword from "./ChangePassword";
 import { LOCALE, t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 const METHOD_LABEL: Record<UnlockEntry["method"], string> = {
   password: t("settings.security.method.password"),
@@ -19,6 +21,7 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
   const [history, setHistory] = useState<UnlockEntry[]>([]);
   const [busy, setBusy] = useState(false);
   const notify = useToast();
+  const { error, fail, clear } = useSectionError(onError);
 
   const reload = () =>
     api
@@ -36,17 +39,19 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
   }, []);
 
   async function changeAutolock(minutes: number) {
+    clear();
     setAutolock(minutes);
     try {
       await api.autolockSet(minutes);
     } catch (e) {
-      onError(errText(e));
+      fail(e);
       await api.autolockGet().then(setAutolock).catch(() => {});
     }
   }
 
   async function toggle(enable: boolean) {
     setBusy(true);
+    clear();
     try {
       await (enable ? api.biometricEnable() : api.biometricDisable());
       notify({
@@ -55,7 +60,7 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
           : t("settings.security.biometricOff", { name: bio!.name }),
       });
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     } finally {
       await reload();
       setBusy(false);
@@ -63,8 +68,7 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
   }
 
   return (
-    <section className="flex flex-col gap-2">
-      <h3 className="text-xs font-semibold text-fg">{t("settings.security.title")}</h3>
+    <SettingsSection title={t("settings.security.title")} error={error}>
       <ChangePassword onChanged={() => void reload()} />
       {autolock !== null && (
         <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
@@ -114,6 +118,6 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
           </ul>
         </details>
       )}
-    </section>
+    </SettingsSection>
   );
 }

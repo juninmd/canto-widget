@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
-import { api, errText, todayLocal, type AgendaItem, type Task } from "../lib/api";
+import { api, errText, todayLocal, type Task } from "../lib/api";
 import { t } from "../i18n";
 import AgendaDayBar from "./AgendaDayBar";
 import AgendaHero from "./AgendaHero";
 import AgendaRail from "./AgendaRail";
 import AgendaRibbon from "./AgendaRibbon";
 import AgendaTray from "./AgendaTray";
+import AgendaEmpty from "./AgendaEmpty";
+import AgendaToolbar from "./AgendaToolbar";
+import ErrorBanner from "./ErrorBanner";
 import { conflicts, freeLabel, nextFree } from "../lib/agendaFree";
 import { minuteOf } from "../lib/agendaRail";
 import { dayBlocks, unscheduled } from "../lib/dayPlan";
@@ -13,50 +16,50 @@ import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
 import TranscriptsTab from "./TranscriptsTab";
 import { readView, saveView, type AgendaView } from "../lib/agendaView";
-import { clockFor } from "../lib/agendaDay";
+import { clockFor, shiftDay } from "../lib/agendaDay";
 import { useDayAgenda } from "../lib/useDayAgenda";
+import { useDayTasks } from "../lib/useDayTasks";
+import { useAgendaKeys } from "../lib/useAgendaKeys";
+import { useRefreshEvent } from "../lib/useRefreshEvent";
+import { readPicked, savePicked } from "../lib/agendaPicked";
+import { notConnected } from "../lib/agendaState";
+import { testEvent } from "../lib/agendaTestEvent";
+import { clockLabel } from "../lib/clockLabel";
 
 const systemNow = () => new Date();
 
 const VIEWS: AgendaView[] = ["today", "meetings"];
 const LABEL = { today: "agenda.view.today", meetings: "plan.viewMeetings" } as const;
 
-/// Synthetic event so the user can check the pop-up and sound without waiting for a meeting.
-function testEvent(): AgendaItem {
-  const now = new Date();
-  return {
-    id: `teste-${now.getTime()}`,
-    title: t("agenda.test.title"),
-    start: now.toISOString(),
-    end: new Date(now.getTime() + 30 * 60_000).toISOString(),
-    all_day: false,
-    location: t("agenda.test.location"),
-    meet: "https://meet.google.com/abc-defg-hij",
-    link: "",
-    organizer: t("agenda.test.organizer"),
-    guests: 3,
-    description: t("agenda.test.description"),
-  };
-}
-
 export default function AgendaTab({
   agenda: live,
+  privacy = false,
   onError,
+  onOpenSettings,
+  onBooked,
   now = systemNow,
   today = todayLocal(),
   version = 0,
 }: {
   agenda: Agenda;
   onError: (m: string) => void;
+  privacy?: boolean;
+  onOpenSettings?: () => void;
+  onBooked?: (message: string) => void;
   now?: () => Date;
   today?: string;
   version?: number;
 }) {
   // Following `today` (null) keeps the tab on the live day across midnight; picking a date pins it.
-  const [picked, setPicked] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(readPicked);
   const day = picked ?? today;
   const isToday = day === today;
-  const { items, loading, error, reload } = useDayAgenda(day, today, live);
+  const pickDay = (d: string) => {
+    const next = d === today ? null : d;
+    savePicked(next);
+    setPicked(next);
+  };
+  const { items, loading, error, fetchedAt, reload } = useDayAgenda(day, today, live);
   const [open, setOpen] = useState<string | null>(null);
   const [clock, setClock] = useState(now);
   useEffect(() => {
@@ -67,32 +70,32 @@ export default function AgendaTab({
   const clashes = useMemo(() => conflicts(items), [items]);
   const allDay = items.filter((e) => e.all_day);
   const [view, setView] = useState<AgendaView>(readView);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const hasDay = items.length > 0 || tasks.some((k) => !k.done && k.hora);
   const [reloadTasks, setReloadTasks] = useState(0);
+  const { tasks, error: tasksError } = useDayTasks(day, view === "today", version, reloadTasks);
+  const hasDay = items.length > 0 || tasks.some((k) => !k.done && k.hora);
   const pick = (v: AgendaView) => {
     setView(v);
     saveView(v);
   };
-
-  useEffect(() => {
-    if (view !== "today") return;
-    let live = true;
-    api
-      .tasksForDay(day)
-      .then((list) => live && setTasks(list ?? []))
-      .catch((e) => live && onError(errText(e)));
-    return () => {
-      live = false;
-    };
-  }, [view, day, version, reloadTasks, onError]);
+  useAgendaKeys(view !== "meetings", (k) => pickDay(k === "today" ? today : shiftDay(day, k === "prev" ? -1 : 1)));
 
   function schedule(task: Task, time: string) {
     api
       .taskSetSchedule(task.id, time, task.repetir ?? null)
-      .then(() => setReloadTasks((n) => n + 1))
+      .then(() => {
+        setReloadTasks((n) => n + 1);
+        onBooked?.(t("agenda.booked", { title: task.title, time }));
+      })
       .catch((e) => onError(errText(e)));
   }
+
+  const refresh = () => {
+    void reload();
+    setReloadTasks((n) => n + 1);
+  };
+  useRefreshEvent("agenda", refresh);
+  const disconnected = notConnected(error);
+  const stale = fetchedAt && items.length > 0 ? t("common.staleFailed", { time: clockLabel(fetchedAt), error }) : t("common.loadFailed", { error });
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -110,30 +113,20 @@ export default function AgendaTab({
         ))}
       </div>
 
-      {view !== "meetings" && <AgendaDayBar day={day} today={today} onPick={(d) => setPicked(d === today ? null : d)} />}
+      {view !== "meetings" && <AgendaDayBar day={day} today={today} onPick={pickDay} />}
 
       {view !== "meetings" && (
-        <div className="flex items-center justify-between text-[11px] text-faint">
-          <span>{isToday ? t("agenda.header") : ""}</span>
-          <span className="flex gap-0.5">
-            <button
-              type="button"
-              title={t("agenda.testAlertTitle")}
-              onClick={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
-              className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
-            >
-              {t("agenda.testAlert")}
-            </button>
-            <button
-              type="button"
-              onClick={() => void reload()}
-              className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
-            >
-              {loading ? "..." : t("agenda.refresh")}
-            </button>
-          </span>
-        </div>
+        <AgendaToolbar
+          isToday={isToday}
+          loading={loading}
+          fetchedAt={fetchedAt}
+          onTestAlert={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
+          onRefresh={refresh}
+        />
       )}
+
+      {view !== "meetings" && error && !(disconnected && !hasDay) && <ErrorBanner message={stale} onRetry={() => void reload()} busy={loading} />}
+      {view !== "meetings" && tasksError && <ErrorBanner message={t("agenda.tasksFailed", { error: tasksError })} onRetry={() => setReloadTasks((n) => n + 1)} />}
 
       {view === "today" && isToday && items.length > 0 && (
         <p role="status" className="rounded-md bg-edge/60 px-2 py-1 text-[11px] font-medium text-muted">
@@ -143,7 +136,7 @@ export default function AgendaTab({
 
       {view === "meetings" ? (
         <div className="min-h-0 flex-1">
-          <TranscriptsTab onError={onError} />
+          <TranscriptsTab privacy={privacy} onError={onError} />
         </div>
       ) : (
         <div className="flex-1 space-y-3 overflow-y-auto pr-1">
@@ -164,7 +157,7 @@ export default function AgendaTab({
             </>
           )}
           {!hasDay && loading && !error && <Skeleton label={t("agenda.loading")} />}
-          {!hasDay && !loading && <p className="px-2 py-6 text-center text-xs text-faint">{error || t(isToday ? "agenda.empty" : "agenda.emptyDay")}</p>}
+          {!hasDay && !loading && (!error || disconnected) && <AgendaEmpty notConnected={disconnected} isToday={isToday} onOpenSettings={onOpenSettings} />}
           <AgendaTray tasks={unscheduled(tasks)} blocks={dayBlocks(items, tasks)} nowMin={minuteOf(at)} onSchedule={schedule} />
         </div>
       )}

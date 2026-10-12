@@ -1,6 +1,7 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { errText, type ForgeFilter, type ForgeList, type ForgeLists, type ForgeSection } from "./api";
-import { appendPage, NO_FILTER } from "./forge";
+import { appendPage, NO_FILTER, type Forge } from "./forge";
+import { patchForgeCache, readForgeCache } from "./forgeCache";
 import { useLatestRequest } from "./useLatestRequest";
 
 const FIRST_PAGES: Record<ForgeSection, number> = { review_requested: 1, assigned: 1, my_prs: 1, my_issues: 1 };
@@ -10,9 +11,10 @@ export type ForgeSource = {
   section: (section: ForgeSection, page: number, filter: ForgeFilter) => Promise<ForgeList>;
 };
 
-export function useForgeLists(source: ForgeSource) {
-  const [lists, setLists] = useState<ForgeLists | null>(null);
-  const [filter, setFilter] = useState<ForgeFilter>(NO_FILTER);
+export function useForgeLists(source: ForgeSource, forge: Forge) {
+  const [seed] = useState(() => readForgeCache(forge));
+  const [lists, setLists] = useState<ForgeLists | null>(seed.lists);
+  const [filter, setFilter] = useState<ForgeFilter>(seed.filter);
   const [loading, setLoading] = useState(false);
   // A new filter hides the old list while it loads; if the search fails, that list and filter come back as they were.
   const [replacing, setReplacing] = useState(false);
@@ -68,9 +70,15 @@ export function useForgeLists(source: ForgeSource) {
   const clear = useCallback(() => {
     bump();
     setLists(null);
-  }, []);
+    setFilter(NO_FILTER);
+    patchForgeCache(forge, { lists: null, filter: NO_FILTER });
+  }, [forge]);
 
-  return { lists: replacing ? null : lists, filter, loading, loadingMore, error, setError, load, more, clear };
+  useEffect(() => {
+    if (lists) patchForgeCache(forge, { lists, filter });
+  }, [forge, lists, filter]);
+
+  return { lists: replacing ? null : lists, filter, seedFilter: seed.filter, loading, loadingMore, error, setError, load, more, clear };
 }
 
 export type ForgeListsState = ReturnType<typeof useForgeLists>;

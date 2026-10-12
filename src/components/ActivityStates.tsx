@@ -1,19 +1,13 @@
 import { t } from "../i18n";
+import { clockLabel } from "../lib/clockLabel";
 import { CheckIcon, CrossIcon, LockIcon, PulseIcon } from "./Icons";
+import Skeleton from "./Skeleton";
 import { COLUMN, LAYOUT } from "./activityLayout";
 
 const ORB = "grid h-14 w-14 place-items-center rounded-2xl border border-edge bg-panel text-accent-text";
 
-/** Shown while the first answer from Rust is on its way, shaped like the cards it stands for. */
-export function ActivityLoading() {
-  return (
-    <div role="status" aria-busy="true" aria-label={t("activity.loading")} className={LAYOUT}>
-      {[176, 110, 66, 200, 220].map((h, i) => (
-        <div key={i} aria-hidden="true" className="rounded-2xl bg-panel motion-safe:animate-pulse" style={{ height: h }} />
-      ))}
-    </div>
-  );
-}
+/** Shown while the first answer from Rust is on its way. */
+export const ActivityLoading = () => <Skeleton label={t("activity.loading")} rows={4} />;
 
 export function ActivityUnsupported() {
   return (
@@ -89,9 +83,10 @@ export function ActivityEmpty() {
   );
 }
 
-export const ActivityFooter = () => (
-  <p className="flex items-center justify-center gap-1.5 px-2 pb-3 pt-3 text-center text-[11px] text-faint">
+export const ActivityFooter = ({ updatedAt }: { updatedAt?: number | null }) => (
+  <p className="flex flex-wrap items-center justify-center gap-x-1.5 px-2 pb-3 pt-3 text-center text-[11px] text-faint">
     <LockIcon />
     <span>{t("activity.footer")}</span>
+    {updatedAt ? <span>· {t("common.updatedAt", { time: clockLabel(updatedAt) })}</span> : null}
   </p>
 );

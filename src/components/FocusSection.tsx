@@ -1,16 +1,16 @@
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 import { useFocusNudge } from "../lib/focusNudge";
 
 export default function FocusSection() {
   const [nudge, setNudge] = useFocusNudge();
   return (
-    <fieldset className="flex flex-col gap-1.5">
-      <legend className="mb-1 text-xs font-semibold text-fg">{t("focus.settingsTitle")}</legend>
+    <SettingsSection title={t("focus.settingsTitle")}>
       <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
         <input type="checkbox" checked={nudge} onChange={(e) => setNudge(e.target.checked)} className="canto-box" />
         {t("focus.settingsOverNudge")}
       </label>
       <p className="text-[11px] text-faint">{t("focus.settingsHint")}</p>
-    </fieldset>
+    </SettingsSection>
   );
 }

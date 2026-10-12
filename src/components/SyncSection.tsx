@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
-import { api, errText } from "../lib/api";
+import { api } from "../lib/api";
+import { useSectionError } from "../lib/useSectionError";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 export default function SyncSection({ onError }: { onError: (m: string) => void }) {
   const [folder, setFolder] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState("");
+  const { error, fail, clear } = useSectionError(onError);
 
   async function reload() {
     try {
       setFolder(await api.syncGet());
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     }
   }
 
@@ -23,24 +26,28 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
   async function choose() {
     setBusy(true);
     setInfo("");
+    clear();
     try {
       const chosen = await api.syncSetFolder();
       if (chosen) setFolder(chosen);
     } catch (e) {
-      onError(errText(e));
+      fail(e);
+      await reload();
     } finally {
       setBusy(false);
     }
   }
 
-  async function clear() {
+  async function stop() {
     setBusy(true);
+    clear();
     try {
       await api.syncClear();
       setFolder(null);
       setInfo("");
     } catch (e) {
-      onError(errText(e));
+      fail(e);
+      await reload();
     } finally {
       setBusy(false);
     }
@@ -49,19 +56,19 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
   async function syncNow() {
     setBusy(true);
     setInfo("");
+    clear();
     try {
       const r = await api.syncNow();
       setInfo(r ? t("settings.sync.merged", { tasks: r.tasks, notes: r.notes }) : t("settings.sync.nothingNew"));
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-xs font-semibold text-fg">{t("settings.sync.title")}</h2>
+    <SettingsSection title={t("settings.sync.title")} error={error}>
       <p className="text-xs text-muted">
         {t("settings.sync.hint")}
       </p>
@@ -94,7 +101,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
             <button
               type="button"
               disabled={busy}
-              onClick={() => void clear()}
+              onClick={() => void stop()}
               className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
             >
               {t("settings.sync.stop")}
@@ -103,6 +110,6 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
         )}
       </div>
       {info && <p className="text-[11px] text-accent-text">{info}</p>}
-    </section>
+    </SettingsSection>
   );
 }

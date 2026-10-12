@@ -63,7 +63,7 @@ export default function CommandPalette({ commands, onRun, onClose }: Props) {
         ref={input}
         type="text"
         role="combobox"
-        aria-expanded="true"
+        aria-expanded={results.length > 0}
         aria-controls="paleta-lista"
         aria-autocomplete="list"
         aria-activedescendant={current ? optionId(current.id) : undefined}
@@ -104,7 +104,10 @@ export default function CommandPalette({ commands, onRun, onClose }: Props) {
           </li>
         ))}
       </ul>
-      {results.length === 0 && <p className="px-1 text-xs text-muted">{t("palette.empty")}</p>}
+      {/* Always mounted: a live region only announces text that appears after it exists. */}
+      <p role="status" className={results.length === 0 ? "px-1 text-xs text-muted" : "sr-only"}>
+        {results.length === 0 ? t("palette.empty") : ""}
+      </p>
       <p className="text-[11px] text-faint">{t("palette.hint")}</p>
     </div>
   );

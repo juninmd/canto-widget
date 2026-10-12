@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
-import { api, errText, type DriveStatus } from "../lib/api";
+import { api, type DriveStatus } from "../lib/api";
+import { useSectionError } from "../lib/useSectionError";
 import { t } from "../i18n";
+import ErrorBanner from "./ErrorBanner";
 import GoogleAccount from "./GoogleAccount";
+import { SettingsSection } from "./SettingsSection";
+import Skeleton from "./Skeleton";
+
+const BUTTON = "canto-hit min-h-[24px] rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40";
 
 export default function GoogleSection({ onError }: { onError: (m: string) => void }) {
-  const [status, setStatus] = useState<DriveStatus>({ configured: false, connected: false, email: "" });
+  const [status, setStatus] = useState<DriveStatus | null>(null);
   const [clientId, setClientId] = useState("");
   const [clientSecret, setClientSecret] = useState("");
   const [busy, setBusy] = useState("");
   const [info, setInfo] = useState("");
+  const { error, fail, clear } = useSectionError(onError);
 
   async function reload() {
     try {
       setStatus(await api.driveStatus());
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     }
   }
 
@@ -26,26 +33,38 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
   async function run(label: string, fn: () => Promise<unknown>, msg: string) {
     setBusy(label);
     setInfo("");
+    clear();
     try {
       await fn();
       if (msg) setInfo(msg);
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     } finally {
       await reload();
       setBusy("");
     }
   }
 
+  if (status === null) {
+    return (
+      <SettingsSection title={t("google.heading")}>
+        <p className="text-xs text-muted">{t("google.intro")}</p>
+        {error ? <ErrorBanner message={t("common.loadFailed", { error })} onRetry={() => {
+            clear();
+            void reload();
+          }} /> : <Skeleton label={t("google.loading")} rows={1} />}
+      </SettingsSection>
+    );
+  }
+
   return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-xs font-semibold text-fg">{t("google.heading")}</h2>
+    <SettingsSection title={t("google.heading")} error={error}>
       <p className="text-xs text-muted">{t("google.intro")}</p>
 
       {/* Credentials are a one-time step: once the account is connected, they collapse (progressive disclosure). */}
       {/* Build with an embedded client: a custom credential becomes a collapsed, advanced option. */}
       <details open={!status.connected && !status.embedded}>
-        <summary className="min-h-[24px] cursor-pointer text-[11px] text-muted hover:text-fg">
+        <summary className="canto-hit min-h-[24px] cursor-pointer text-[11px] text-muted hover:text-fg">
           {status.embedded ? t("google.ownCredentials") : t("google.oauthCredentials", { saved: status.configured ? t("google.oauthSaved") : "" })}
         </summary>
         <div className="mt-2 flex flex-col gap-2 motion-safe:animate-aba">
@@ -71,7 +90,7 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
             onClick={() =>
               run("cfg", () => api.driveConfigure(clientId, clientSecret), t("google.credentialsSavedInVault"))
             }
-            className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
+            className={BUTTON}
           >
             {t("google.saveCredentials")}
           </button>
@@ -98,11 +117,11 @@ export default function GoogleSection({ onError }: { onError: (m: string) => voi
         type="button"
         disabled={busy !== "" || !status.configured}
         onClick={() => run("conn", async () => setInfo(t("google.signedInAs", { account: (await api.driveConnect()) || t("google.defaultAccount") })), "")}
-        className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
+        className={`${BUTTON} self-start`}
       >
         {busy === "conn" ? t("google.waitingBrowser") : status.connected ? t("google.switchAccount") : t("google.signIn")}
       </button>
       {info && <p className="text-[11px] text-accent-text">{info}</p>}
-    </section>
+    </SettingsSection>
   );
 }

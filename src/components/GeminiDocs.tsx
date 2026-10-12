@@ -1,6 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api, errText, type GeminiDoc } from "../lib/api";
+import { useWindowVisible } from "../lib/useWindowVisible";
 import { LOCALE, t } from "../i18n";
+import ErrorBanner from "./ErrorBanner";
+import { NoteIcon } from "./Icons";
 import Skeleton from "./Skeleton";
 
 const DAYS = 14;
@@ -17,19 +20,24 @@ function day(start: string): string {
 }
 
 /** Gemini keeps its notes in the organizer's Drive; the Calendar attachment is the link that reaches them. */
-export default function GeminiDocs({ query }: { query: string }) {
+export default function GeminiDocs({ query, quietWhenEmpty = false }: { query: string; quietWhenEmpty?: boolean }) {
   const [docs, setDocs] = useState<GeminiDoc[] | null>(null);
   const [error, setError] = useState("");
+  const visible = useWindowVisible();
 
-  useEffect(() => {
+  const load = useCallback(() => {
     let alive = true;
     const { timeMin, timeMax } = geminiWindow();
     api.geminiDocs(timeMin, timeMax).then(
-      (d) => alive && setDocs(d ?? []),
+      (d) => {
+        if (!alive) return;
+        setError("");
+        setDocs(d ?? []);
+      },
       (e) => {
         if (!alive) return;
         setError(errText(e));
-        setDocs([]);
+        setDocs((old) => old ?? []);
       },
     );
     return () => {
@@ -37,8 +45,13 @@ export default function GeminiDocs({ query }: { query: string }) {
     };
   }, []);
 
+  // Coming back to the window refreshes the list in place: the notes show up minutes after a meeting ends.
+  useEffect(() => (visible ? load() : undefined), [visible, load]);
+
   const q = query.trim().toLowerCase();
   const shown = (docs ?? []).filter((d) => !q || `${d.meeting} ${d.title}`.toLowerCase().includes(q));
+  // The tab's own empty state already speaks; a second empty line under it would stack two.
+  if (quietWhenEmpty && docs !== null && !error && shown.length === 0) return null;
 
   return (
     <section aria-label={t("gemini.heading")} className="mb-3">
@@ -48,7 +61,14 @@ export default function GeminiDocs({ query }: { query: string }) {
       {docs === null ? (
         <Skeleton label={t("gemini.loading")} rows={2} />
       ) : error ? (
-        <p className="px-2 py-1 text-[11px] text-faint">{t("gemini.unavailable", { error })}</p>
+        <ErrorBanner
+          message={t("gemini.unavailable", { error })}
+          onRetry={() => {
+            setError("");
+            setDocs(null);
+            load();
+          }}
+        />
       ) : shown.length === 0 ? (
         <p className="px-2 py-1 text-[11px] text-faint">
           {q ? t("gemini.noMatch") : t("gemini.empty", { days: DAYS })}
@@ -61,13 +81,16 @@ export default function GeminiDocs({ query }: { query: string }) {
                 type="button"
                 onClick={() => void api.openLink(d.url)}
                 title={d.url}
-                className="w-full rounded-lg border border-edge bg-ink/60 p-2 text-left hover:border-line"
+                className="w-full rounded-lg border border-edge bg-ink/60 p-2 text-left hover:border-line hover:bg-hover focus-visible:border-accent active:bg-active"
               >
                 <span className="flex items-baseline justify-between gap-2">
                   <span className="truncate text-sm font-medium text-fg">{d.meeting}</span>
                   <span className="shrink-0 text-[11px] text-faint">{day(d.start)}</span>
                 </span>
-                <span className="block truncate text-[11px] text-muted">📄 {d.title}</span>
+                <span className="flex items-center gap-1 text-[11px] text-muted">
+                  <NoteIcon />
+                  <span className="truncate">{d.title}</span>
+                </span>
               </button>
             </li>
           ))}

@@ -1,11 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, errText, type TranscriptMeta } from "../lib/api";
+import { highlight } from "../lib/highlight";
 import { useLatestRequest } from "../lib/useLatestRequest";
+import EmptyState from "./EmptyState";
 import GeminiDocs from "./GeminiDocs";
+import { NoteIcon, SearchIcon } from "./Icons";
 import Skeleton from "./Skeleton";
+import TranscriptFolder from "./TranscriptFolder";
+import TranscriptViewer from "./TranscriptViewer";
 import { LOCALE, t } from "../i18n";
 
-export default function TranscriptsTab({ onError }: { onError: (m: string) => void }) {
+export default function TranscriptsTab({ privacy = false, onError }: { privacy?: boolean; onError: (m: string) => void }) {
   const [dir, setDir] = useState("");
   const [editingDir, setEditingDir] = useState(false);
   const [query, setQuery] = useState("");
@@ -15,6 +20,10 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
   const [folderError, setFolderError] = useState("");
   const [loaded, setLoaded] = useState(false);
   const { bump, isLatest } = useLatestRequest();
+  const [reading, setReading] = useState("");
+  const cards = useRef(new Map<string, HTMLButtonElement>());
+  const opened = useRef("");
+  const mask = privacy ? "blur-sm select-none" : "";
 
   // The debounced search and an explicit "await reload()" (after changing the folder) can overlap;
   // without this guard, a slower older reply could land after a newer one and overwrite it.
@@ -51,102 +60,85 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  if (open) {
-    return (
-      <div className="flex h-full flex-col gap-2">
-        <div className="flex items-center justify-between gap-2">
-          <p className="truncate text-sm font-medium text-fg">{open.name}</p>
-          <button type="button" onClick={() => setOpen(null)} className="min-h-[24px] px-1 text-xs text-muted hover:text-fg">
-            {t("transcripts.back")}
-          </button>
-        </div>
-        <p className="flex-1 overflow-y-auto whitespace-pre-wrap rounded-lg border border-edge bg-ink p-2 text-xs leading-relaxed text-fg">
-          {open.text}
-        </p>
-      </div>
-    );
+  // Back from a transcript lands on the card that was opened, not at the top of the page.
+  useEffect(() => {
+    if (open === null && opened.current) cards.current.get(opened.current)?.focus();
+  }, [open]);
+
+  async function read(name: string) {
+    if (reading) return;
+    setReading(name);
+    try {
+      opened.current = name;
+      setOpen({ name, text: await api.transcriptRead(name) });
+    } catch (e) {
+      onError(errText(e));
+    } finally {
+      setReading("");
+    }
   }
+
+  async function saveDir(next: string) {
+    try {
+      await api.transcriptsSetDir(next);
+      setEditingDir(false);
+      await reload();
+    } catch (err) {
+      onError(errText(err));
+    }
+  }
+
+  if (open) {
+    return <TranscriptViewer name={open.name} text={open.text} query={query} privacy={privacy} onBack={() => setOpen(null)} onError={onError} />;
+  }
+
+  const noFiles = loaded && items.length === 0 && !folderError;
 
   return (
     <div className="flex h-full flex-col gap-2">
-      {editingDir ? (
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault();
-            try {
-              await api.transcriptsSetDir(dir);
-              setEditingDir(false);
-              await reload();
-            } catch (err) {
-              onError(errText(err));
-            }
-          }}
-          className="flex gap-1"
-        >
-          <input
-            autoFocus
-            value={dir}
-            onChange={(e) => setDir(e.target.value)}
-            className="flex-1 canto-field px-2 py-1 text-[11px]"
-          />
-          <button type="submit" className="rounded-lg bg-accent px-2 text-[11px] font-semibold text-on-accent">
-            {t("transcripts.saveDir")}
-          </button>
-        </form>
-      ) : (
-        <button
-          type="button"
-          onClick={() => setEditingDir(true)}
-          title={t("transcripts.changeDirTitle")}
-          className="min-h-[24px] truncate text-left text-[11px] text-faint hover:text-muted"
-        >
-          {t("transcripts.folder", { dir: dir || t("transcripts.folderUnset") })}
-        </button>
-      )}
+      <TranscriptFolder dir={dir} editing={editingDir} onEdit={() => setEditingDir(true)} onClose={() => setEditingDir(false)} onSave={saveDir} />
 
       <input
+        type="search"
         value={query}
         data-shortcut="search"
+        aria-label={t("transcripts.searchLabel")}
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("transcripts.searchPlaceholder")}
         className="canto-field px-3 py-1.5 text-sm"
       />
 
       <div className="flex-1 overflow-y-auto pr-1">
-        <GeminiDocs query={query} />
-        <h3 className="mb-1 text-xs font-semibold text-fg">{t("transcripts.filesHeading")}</h3>
+        <GeminiDocs query={query} quietWhenEmpty={noFiles} />
+        {items.length > 0 && <h3 className="mb-1 text-xs font-semibold text-fg">{t("transcripts.filesHeading")}</h3>}
         <ul className="space-y-2">
           {items.map((item) => (
             <li key={item.name}>
               <button
                 type="button"
-                onClick={async () => {
-                  try {
-                    setOpen({ name: item.name, text: await api.transcriptRead(item.name) });
-                  } catch (e) {
-                    onError(errText(e));
-                  }
+                ref={(el) => {
+                  if (el) cards.current.set(item.name, el);
+                  else cards.current.delete(item.name);
                 }}
-                className="w-full rounded-lg border border-edge bg-ink/60 p-2 text-left"
+                onClick={() => void read(item.name)}
+                aria-busy={reading === item.name}
+                aria-disabled={reading !== "" && reading !== item.name}
+                className="w-full rounded-lg border border-edge bg-ink/60 p-2 text-left hover:border-line hover:bg-hover focus-visible:border-accent active:bg-active aria-busy:opacity-60"
               >
                 <div className="flex items-baseline justify-between gap-2">
-                  <p className="truncate text-sm font-medium text-fg">{item.name}</p>
+                  <p className={`truncate text-sm font-medium text-fg ${mask}`}>{highlight(item.name, query)}</p>
                   <span className="shrink-0 text-[11px] text-faint">
                     {new Date(item.modified_at).toLocaleDateString(LOCALE)}
                   </span>
                 </div>
-                <p className="mt-0.5 line-clamp-3 text-xs text-muted">{item.preview}</p>
+                <p className={`mt-0.5 line-clamp-3 text-xs text-muted ${mask}`}>{highlight(item.preview, query)}</p>
               </button>
             </li>
           ))}
           {items.length === 0 && folderError && (
             <li role="alert" className="flex flex-col items-center gap-2 px-2 py-6 text-center text-xs text-danger">
               <span className="break-all">{folderError}</span>
-              <button
-                type="button"
-                onClick={() => setEditingDir(true)}
-                className="min-h-7 rounded-lg bg-edge px-3 text-fg"
-              >
+              <button type="button" onClick={() => setEditingDir(true)} className="canto-hit min-h-7 rounded-lg bg-edge px-3 text-fg">
                 {t("transcripts.pickOtherFolder")}
               </button>
             </li>
@@ -156,12 +148,15 @@ export default function TranscriptsTab({ onError }: { onError: (m: string) => vo
               <Skeleton label={t("transcripts.loading")} />
             </li>
           )}
-          {loaded && items.length === 0 && !folderError && (
-            <li className="px-2 py-6 text-center text-xs text-faint">
+          {noFiles && (
+            <EmptyState icon={query ? <SearchIcon /> : <NoteIcon />}>
               {query ? t("transcripts.emptySearch") : t("transcripts.empty")}
-            </li>
+            </EmptyState>
           )}
         </ul>
+        <p role="status" className={reading ? "mt-2 text-[11px] text-faint" : ""}>
+          {reading ? t("transcripts.opening", { name: reading }) : ""}
+        </p>
       </div>
     </div>
   );

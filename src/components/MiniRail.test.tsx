@@ -119,3 +119,14 @@ test("the mode menu is pinned inside the dock window so its options are never cu
   expect(menu.className).toContain("top-2");
   expect(menu.className).not.toContain("absolute");
 });
+
+test("focusing the mode switcher with the keyboard expands the dock like pointing at it, and leaving collapses it", () => {
+  render(<MiniRail alerts={[daily]} mode="mini" onOpen={() => {}} onMode={() => {}} />);
+  expect(last().width).toBe(24);
+  const button = screen.getByRole("button", { name: "trocar modo do canto" });
+  fireEvent.focus(button);
+  expect(last().width, "the switcher stayed invisible while focused").toBe(56);
+  fireEvent.blur(button);
+  act(() => jest.advanceTimersByTime(300));
+  expect(last().width).toBe(24);
+});

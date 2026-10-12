@@ -5,6 +5,8 @@ export const EMPTY_DRAFT: Draft = { id: undefined, title: "", body: "", tags: ""
 
 export type NoteDraft = {
   draft: Draft;
+  /** The draft as it was when the editor opened, to tell whether Esc would throw away typing. */
+  original: Draft;
   editing: boolean;
   setDraft: (d: Draft) => void;
   open: (d?: Draft) => void;
@@ -16,10 +18,10 @@ export type NoteDraft = {
  * Dropped when `active` turns false: a locked vault must not leave note text behind in the UI.
  */
 export function useNoteDraft(active = true): NoteDraft {
-  const [state, setState] = useState({ draft: EMPTY_DRAFT, editing: false });
+  const [state, setState] = useState({ draft: EMPTY_DRAFT, original: EMPTY_DRAFT, editing: false });
   const setDraft = useCallback((draft: Draft) => setState((s) => ({ ...s, draft })), []);
-  const open = useCallback((draft: Draft = EMPTY_DRAFT) => setState({ draft, editing: true }), []);
-  const close = useCallback(() => setState({ draft: EMPTY_DRAFT, editing: false }), []);
+  const open = useCallback((draft: Draft = EMPTY_DRAFT) => setState({ draft, original: draft, editing: true }), []);
+  const close = useCallback(() => setState({ draft: EMPTY_DRAFT, original: EMPTY_DRAFT, editing: false }), []);
   useEffect(() => {
     if (!active) close();
   }, [active, close]);

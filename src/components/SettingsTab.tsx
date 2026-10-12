@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { TOGGLE_LABEL } from "../lib/platform";
-import { api, errText } from "../lib/api";
+import { useState, type ReactNode } from "react";
+import { GROUPS, loadOpenGroups, saveOpenGroups, sectionMatches, type GroupId, type SectionId } from "../lib/settingsGroups";
 import BackupSection from "./BackupSection";
 import SyncSection from "./SyncSection";
 import GoogleSection from "./GoogleSection";
@@ -18,6 +17,10 @@ import DoNotDisturbSection from "./DoNotDisturbSection";
 import MyPrAlertsSection from "./MyPrAlertsSection";
 import ReviewAlertsSection from "./ReviewAlertsSection";
 import FullscreenHoldSection from "./FullscreenHoldSection";
+import AutostartSection from "./AutostartSection";
+import ShortcutsSection from "./ShortcutsSection";
+import SettingsGroup from "./SettingsGroup";
+import { SensitiveZone } from "./SettingsSection";
 import type { Tab } from "./TabBar";
 import type { LeadMinutes } from "../lib/reminderLead";
 import { t } from "../i18n";
@@ -28,73 +31,89 @@ type Props = {
   onHiddenTabs: (hidden: Tab[]) => void;
   reminderLead: LeadMinutes;
   onReminderLead: (lead: LeadMinutes) => void;
+  onShowShortcuts: () => void;
 };
 
-export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminderLead, onReminderLead }: Props) {
-  const [autostart, setAutostart] = useState(false);
-  const [busy, setBusy] = useState(false);
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminderLead, onReminderLead, onShowShortcuts }: Props) {
+  const [open, setOpen] = useState<GroupId[]>(loadOpenGroups);
+  const [query, setQuery] = useState("");
+  const searching = query.trim() !== "";
 
-  async function reload() {
-    try {
-      setAutostart(await api.autostartStatus());
-    } catch (e) {
-      onError(errText(e));
-    }
+  const sections: Record<SectionId, ReactNode> = {
+    skin: <SkinPicker />,
+    density: <DensityPicker />,
+    language: <LanguagePicker />,
+    tabs: <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />,
+    reminders: <RemindersSection lead={reminderLead} onChange={onReminderLead} />,
+    dnd: <DoNotDisturbSection onError={onError} />,
+    fullscreen: <FullscreenHoldSection onError={onError} />,
+    reviewAlerts: <ReviewAlertsSection onError={onError} />,
+    myPrAlerts: <MyPrAlertsSection onError={onError} />,
+    activity: <ActivitySection onError={onError} />,
+    focus: <FocusSection />,
+    security: <SecuritySection onError={onError} />,
+    google: <GoogleSection onError={onError} />,
+    backup: <BackupSection onError={onError} />,
+    sync: <SyncSection onError={onError} />,
+    window: <WindowSection onError={onError} />,
+    autostart: <AutostartSection onError={onError} />,
+    shortcuts: <ShortcutsSection onOpen={onShowShortcuts} />,
+    update: <UpdateSection />,
+  };
+
+  function toggle(id: GroupId) {
+    const next = open.includes(id) ? open.filter((g) => g !== id) : [...open, id];
+    setOpen(next);
+    saveOpenGroups(next);
   }
 
-  useEffect(() => {
-    void reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  async function toggle(enabled: boolean) {
-    setBusy(true);
-    try {
-      await api.autostartSet(enabled);
-    } catch (e) {
-      onError(errText(e));
-    } finally {
-      // Reloads even on failure: the OS registry is the source of truth, not the screen.
-      await reload();
-      setBusy(false);
-    }
-  }
+  // Filtered sections are hidden, not unmounted: remounting would repeat their loads (the update check, Google).
+  const visible = (id: SectionId, group: GroupId) => !searching || sectionMatches(id, group, query);
+  const shown = GROUPS.filter((g) => [...g.sections, ...g.sensitive].some((s) => visible(s, g.id)));
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-y-auto pr-1 text-sm [&>fieldset]:rounded-xl [&>fieldset]:border [&>fieldset]:border-edge [&>fieldset]:bg-ink/40 [&>fieldset]:p-3 [&>section]:rounded-xl [&>section]:border [&>section]:border-edge [&>section]:bg-ink/40 [&>section]:p-3 [&_legend]:float-left [&_legend]:mb-1.5 [&_legend]:w-full [&_legend]:p-0 [&_legend+*]:clear-both">
-      <section className="flex flex-col gap-2">
-        <p className="text-xs text-muted">
-          {t("settings.shortcutHint.before")} <span className="text-muted">{TOGGLE_LABEL}</span> {t("settings.shortcutHint.middle")}{" "}
-          <kbd className="rounded border border-line px-1 text-[11px]">?</kbd> {t("settings.shortcutHint.after")}
+    <div className="flex h-full flex-col gap-3 overflow-y-auto pr-1 text-sm">
+      <div>
+        <input
+          type="search"
+          value={query}
+          aria-label={t("settings.search.label")}
+          placeholder={t("settings.search.label")}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Escape" && query && (e.stopPropagation(), setQuery(""))}
+          className="canto-field w-full px-3 py-1.5 text-sm"
+        />
+        <p role="status" className={searching && shown.length === 0 ? "mt-1.5 text-xs text-faint" : "text-xs text-faint"}>
+          {searching && shown.length === 0 ? t("settings.search.empty", { query: query.trim() }) : ""}
         </p>
-        <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
-          <input
-            type="checkbox"
-            checked={autostart}
-            disabled={busy}
-            onChange={(e) => void toggle(e.target.checked)}
-            className="canto-box"
-          />
-          {t("settings.autostart")}
-        </label>
-      </section>
-      <SkinPicker />
-      <DensityPicker />
-      <LanguagePicker />
-      <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />
-      <FocusSection />
-      <ActivitySection onError={onError} />
-      <RemindersSection lead={reminderLead} onChange={onReminderLead} />
-      <DoNotDisturbSection onError={onError} />
-      <FullscreenHoldSection onError={onError} />
-      <ReviewAlertsSection onError={onError} />
-      <MyPrAlertsSection onError={onError} />
-      <SecuritySection onError={onError} />
-      <WindowSection onError={onError} />
-      <BackupSection onError={onError} />
-      <SyncSection onError={onError} />
-      <GoogleSection onError={onError} />
-      <UpdateSection />
+      </div>
+      {GROUPS.map((g) => (
+        <div key={g.id} hidden={!shown.includes(g)}>
+          <SettingsGroup
+            id={g.id}
+            title={t(`settings.group.${g.id}`)}
+            open={searching || open.includes(g.id)}
+            onToggle={() => toggle(g.id)}
+          >
+            {g.sections.map((s) => (
+              <div key={s} hidden={!visible(s, g.id)}>
+                {sections[s]}
+              </div>
+            ))}
+            {g.sensitive.length > 0 && (
+              <div hidden={!g.sensitive.some((s) => visible(s, g.id))}>
+                <SensitiveZone>
+                  {g.sensitive.map((s) => (
+                    <div key={s} hidden={!visible(s, g.id)}>
+                      {sections[s]}
+                    </div>
+                  ))}
+                </SensitiveZone>
+              </div>
+            )}
+          </SettingsGroup>
+        </div>
+      ))}
     </div>
   );
 }

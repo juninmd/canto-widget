@@ -1,6 +1,8 @@
 import { useEditorState, type Editor } from "@tiptap/react";
 import { MOD_KEY } from "../lib/platform";
 import { t, type MessageKey } from "../i18n";
+import { ChecklistIcon, ImageIcon, LinkIcon } from "./Icons";
+import type { ReactNode } from "react";
 
 type Props = {
   editor: Editor;
@@ -12,7 +14,7 @@ type Props = {
   onAttach: () => void;
 };
 
-type Tool = { key: string; label: MessageKey; glyph: string; keys?: string; run: (e: Editor) => void; active: (e: Editor) => boolean };
+type Tool = { key: string; label: MessageKey; glyph: ReactNode; keys?: string; run: (e: Editor) => void; active: (e: Editor) => boolean };
 
 const TOOLS: Tool[] = [
   { key: "bold", label: "notes.fmtBold", glyph: "B", keys: "B", run: (e) => e.chain().focus().toggleBold().run(), active: (e) => e.isActive("bold") },
@@ -27,12 +29,23 @@ const TOOLS: Tool[] = [
   },
   { key: "bullet", label: "notes.fmtBullet", glyph: "•", run: (e) => e.chain().focus().toggleBulletList().run(), active: (e) => e.isActive("bulletList") },
   { key: "ordered", label: "notes.fmtOrdered", glyph: "1.", run: (e) => e.chain().focus().toggleOrderedList().run(), active: (e) => e.isActive("orderedList") },
-  { key: "task", label: "notes.fmtTask", glyph: "☑", run: (e) => e.chain().focus().toggleTaskList().run(), active: (e) => e.isActive("taskList") },
+  { key: "task", label: "notes.fmtTask", glyph: <ChecklistIcon />, run: (e) => e.chain().focus().toggleTaskList().run(), active: (e) => e.isActive("taskList") },
   { key: "codeBlock", label: "notes.fmtCodeBlock", glyph: "{}", run: (e) => e.chain().focus().toggleCodeBlock().run(), active: (e) => e.isActive("codeBlock") },
 ];
 
 const BTN = "grid h-7 min-w-7 place-items-center rounded px-1 text-xs disabled:opacity-40";
 const on = (pressed: boolean) => (pressed ? "bg-edge text-accent-text" : "text-muted hover:bg-edge hover:text-fg");
+
+/** Arrow keys walk the bar's enabled buttons, as a toolbar should; Tab still visits each one. */
+function moveFocus(e: React.KeyboardEvent<HTMLDivElement>) {
+  const buttons = [...e.currentTarget.querySelectorAll<HTMLButtonElement>("button:not(:disabled)")];
+  const at = buttons.indexOf(e.target as HTMLButtonElement);
+  const step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+  if (at < 0 || (!step && e.key !== "Home" && e.key !== "End")) return;
+  e.preventDefault();
+  const last = buttons.length - 1;
+  buttons[e.key === "Home" ? 0 : e.key === "End" ? last : (at + step + buttons.length) % buttons.length]?.focus();
+}
 
 /** Compact formatting bar sized for the ~420px widget; every button mirrors a shortcut or markdown input rule. */
 export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, onLink, onAttach }: Props) {
@@ -44,7 +57,12 @@ export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, on
     }),
   });
   return (
-    <div role="toolbar" aria-label={t("notes.toolbar")} className="flex flex-wrap items-center gap-0.5 rounded-lg border border-line bg-ink p-0.5">
+    <div
+      role="toolbar"
+      aria-label={t("notes.toolbar")}
+      onKeyDown={moveFocus}
+      className="flex flex-wrap items-center gap-0.5 rounded-lg border border-line bg-ink p-0.5"
+    >
       {TOOLS.map((tool) => (
         <button
           key={tool.key}
@@ -72,7 +90,7 @@ export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, on
         onClick={onLink}
         className={`${BTN} ${on(!raw && (linking || state.link))}`}
       >
-        🔗
+        <LinkIcon />
       </button>
       <button
         type="button"
@@ -83,7 +101,7 @@ export default function NoteToolbar({ editor, raw, attaching, linking, onRaw, on
         onClick={onAttach}
         className={`${BTN} ${on(false)}`}
       >
-        🖼
+        <ImageIcon />
       </button>
       <button
         type="button"

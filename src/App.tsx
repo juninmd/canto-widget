@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MOD_KEY, TOGGLE_LABEL } from "./lib/platform";
+import { MOD_KEY } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
-import { api, errText, type VaultStatus } from "./lib/api";
+import { api, errText } from "./lib/api";
+import { useVaultStatus } from "./lib/useVaultStatus";
+import { useOnline, useOnReconnect } from "./lib/useOnline";
+import { requestRefresh } from "./lib/refreshEvent";
 import { useAgenda } from "./lib/useAgenda";
 import { useNoteDraft } from "./lib/useNoteDraft";
 import { useUpdateNotice } from "./lib/useUpdateNotice";
@@ -33,11 +36,11 @@ import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
-import DndIndicator from "./components/DndIndicator";
 import FocusBar from "./components/FocusBar";
 import { focusStore } from "./lib/focus";
-import { ExpandIcon, EyeIcon, EyeOffIcon, HelpIcon, LockIcon, MinimizeIcon, ShrinkIcon } from "./components/Icons";
-import ModeSwitcher from "./components/ModeSwitcher";
+import AppHeader from "./components/AppHeader";
+import ErrorBanner from "./components/ErrorBanner";
+import Skeleton from "./components/Skeleton";
 import MiniRail from "./components/MiniRail";
 import FocusedAlert from "./components/FocusedAlert";
 import NotificationsColumn from "./components/NotificationsColumn";
@@ -56,7 +59,6 @@ export default function App() {
 }
 
 function Canto() {
-  const [status, setStatus] = useState<VaultStatus | null>(null);
   const [hiddenTabs, setHiddenTabs] = useHiddenTabs();
   const tabs = visibleTabs(hiddenTabs);
   const [tab, setTab] = useState<Tab>(() => tabs[0].id);
@@ -71,6 +73,7 @@ function Canto() {
   const openSettings = useCallback(() => changeTab("settings"), [changeTab]);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
+  const { status, error: statusError, checking, refresh } = useVaultStatus(setError);
   const today = useToday();
   const agenda = useAgenda(status?.unlocked === true);
   const noteDraft = useNoteDraft(status?.unlocked === true);
@@ -123,18 +126,11 @@ function Canto() {
     if (action.type === "globalSearch") return setSearchOpen((v) => !v);
     if (action.type === "palette") return setPaletteOpen((v) => !v);
     if (helpOpen || searchOpen || paletteOpen || onboardingOpen) return;
+    if (action.type === "settings") return openSettings();
     if (action.type === "tab") return tabs[action.index - 1] && changeTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
     focusShortcut(action.target);
   });
-
-  const refresh = useCallback(async () => {
-    try {
-      setStatus(await api.status());
-    } catch (e) {
-      setError(errText(e));
-    }
-  }, [setError]);
 
   // Only a fresh "criar cofre" sets justCreated; a plain unlock never shows onboarding again.
   const openVault = useCallback(
@@ -144,10 +140,6 @@ function Canto() {
     },
     [refresh],
   );
-
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
 
   // Rust locks the vault on its own after a period of inactivity; the UI needs to know.
   useEffect(() => {
@@ -194,14 +186,38 @@ function Canto() {
   }, [changeTab]);
 
   async function lock() {
-    await focusStore.stop();
-    setHelpOpen(false);
-    setSearchOpen(false);
-    setPaletteOpen(false);
-    setOnboardingOpen(false);
-    await api.lock();
+    try {
+      await focusStore.stop();
+      setHelpOpen(false);
+      setSearchOpen(false);
+      setPaletteOpen(false);
+      setOnboardingOpen(false);
+      await api.lock();
+    } catch (e) {
+      setError(t("app.lockFailed", { error: errText(e) }));
+    }
+    // Locked or not, what the screen shows must be what Rust holds.
     await refresh();
   }
+
+  const online = useOnline();
+  const refreshCurrent = () => {
+    if (tab === "tasks") setTasksVersion((v) => v + 1);
+    if (tab === "agenda") void agenda.reload();
+    refreshAlerts();
+    requestRefresh(tab);
+  };
+  useOnReconnect(online, () => {
+    void agenda.reload();
+    refreshAlerts();
+    requestRefresh();
+  });
+  // The bell walks through the pending alerts, worst first, in the banner the dock click uses.
+  const showNextAlert = () => {
+    if (alerts.length === 0) return;
+    const at = alerts.findIndex((a) => a.id === focusId);
+    setFocusId(alerts[(at + 1) % alerts.length].id);
+  };
 
   // Called only while the palette is open: it reflects the agenda and privacy at that moment.
   const paletteCommands = () =>
@@ -225,6 +241,7 @@ function Canto() {
         void copyDaySummary(today, agenda.items)
           .then(() => notify({ message: t("palette.summaryCopied") }))
           .catch(() => setError(t("summary.copyFailed", { mod: MOD_KEY }))),
+      refreshTab: refreshCurrent,
       help: () => setHelpOpen(true),
       hide: () => void getCurrentWindow().hide(),
       mini: () => pickMode("mini"),
@@ -284,73 +301,30 @@ function Canto() {
           }}
         />
       )}
-      <header
-        data-tauri-drag-region
-        className="flex items-center justify-between border-b border-edge px-3 py-1.5"
-      >
-        <span data-tauri-drag-region className="flex items-center gap-2 text-xs font-semibold tracking-wide text-fg">
-          <span aria-hidden="true" className="size-2 rounded-full bg-accent shadow-[0_0_10px_var(--color-accent)]" />
-          {t("app.name")}
-        </span>
-        <div className="flex items-center gap-0.5 text-[11px] text-muted">
-          <DndIndicator onError={setError} />
-          {status?.unlocked && (
-            <>
-              <button
-                type="button"
-                onClick={() => setHelpOpen(true)}
-                aria-label={t("app.shortcuts")}
-                title={t("app.shortcuts.title")}
-                className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
-              >
-                <HelpIcon />
-              </button>
-              <button
-                type="button"
-                onClick={lock}
-                title={t("app.lock.title")}
-                className="canto-hit inline-flex h-7 items-center gap-1.5 rounded-lg px-2 hover:bg-hover hover:text-fg active:bg-active"
-              >
-                <LockIcon />
-                {t("app.lock")}
-              </button>
-              <button
-                type="button"
-                onClick={togglePrivacy}
-                aria-pressed={privacy}
-                aria-label={privacy ? t("app.privacy.disable") : t("app.privacy.enable")}
-                title={privacy ? t("app.privacy.onTitle") : t("app.privacy.offTitle")}
-                className={`canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active ${privacy ? "text-accent-text" : ""}`}
-              >
-                {privacy ? <EyeOffIcon /> : <EyeIcon />}
-              </button>
-            </>
-          )}
-          <ModeSwitcher mode={mode} onPick={pickMode} />
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            aria-pressed={mode === "max"}
-            aria-label={mode === "max" ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
-            title={mode === "max" ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
-            className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
-          >
-            {mode === "max" ? <ShrinkIcon /> : <ExpandIcon />}
-          </button>
-          <button
-            type="button"
-            onClick={() => void getCurrentWindow().hide()}
-            className="canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active"
-            title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
-            aria-label={t("app.hide")}
-          >
-            <MinimizeIcon />
-          </button>
-        </div>
-      </header>
+      <AppHeader
+        unlocked={status?.unlocked === true}
+        online={online}
+        privacy={privacy}
+        mode={mode}
+        pending={alerts.length}
+        bell={mode === "normal"}
+        onBell={showNextAlert}
+        onHelp={() => setHelpOpen(true)}
+        onLock={() => void lock()}
+        onTogglePrivacy={togglePrivacy}
+        onPickMode={pickMode}
+        onToggleFullscreen={toggleFullscreen}
+        onError={setError}
+      />
 
       {!status ? (
-        <div className="flex-1" />
+        <div className="flex-1 p-3">
+          {statusError ? (
+            <ErrorBanner message={t("common.loadFailed", { error: statusError })} busy={checking} onRetry={() => void refresh()} />
+          ) : (
+            <Skeleton label={t("app.statusLoading")} />
+          )}
+        </div>
       ) : !status.unlocked ? (
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
@@ -393,7 +367,7 @@ function Canto() {
                 {tab === "clipboard" && (
                   <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
                 )}
-                {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} onError={setError} />}
+                {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={openSettings} onBooked={(message) => notify({ message })} />}
                 {tab === "github" && <GithubTab onError={setError} />}
                 {tab === "gitlab" && <GitlabTab onError={setError} />}
                 {tab === "status" && <StatusTab />}
@@ -406,6 +380,7 @@ function Canto() {
                     onHiddenTabs={setHiddenTabs}
                     reminderLead={reminderLead}
                     onReminderLead={setReminderLead}
+                    onShowShortcuts={() => setHelpOpen(true)}
                   />
                 )}
               </main>

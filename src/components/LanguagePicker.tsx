@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 import { LANGUAGE_CHOICES, loadChoice, saveChoice, type LanguageChoice } from "../i18n/language";
 
 /** Each language in its own name, so someone who picked the wrong one can still find theirs. */
@@ -10,10 +11,7 @@ export default function LanguagePicker({ reload = () => location.reload() }: { r
   const [choice, setChoice] = useState<LanguageChoice>(loadChoice);
 
   return (
-    <section className="flex flex-col gap-2">
-      <h3 id="language-title" className="text-xs font-semibold text-fg">
-        {t("settings.language.title")}
-      </h3>
+    <SettingsSection id="language-title" title={t("settings.language.title")}>
       <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-labelledby="language-title">
         {LANGUAGE_CHOICES.map((c) => (
           <button
@@ -36,6 +34,6 @@ export default function LanguagePicker({ reload = () => location.reload() }: { r
           </button>
         ))}
       </div>
-    </section>
+    </SettingsSection>
   );
 }

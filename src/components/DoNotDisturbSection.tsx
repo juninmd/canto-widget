@@ -1,14 +1,14 @@
 import { DND_CHOICES, useDoNotDisturb } from "../lib/doNotDisturb";
+import { useSectionError } from "../lib/useSectionError";
 import { t, LOCALE } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 export default function DoNotDisturbSection({ onError }: { onError: (m: string) => void }) {
-  const { state, start, stop } = useDoNotDisturb(onError);
+  const { error, fail, clear } = useSectionError(onError);
+  const { state, start, stop } = useDoNotDisturb(fail);
 
   return (
-    <section className="flex flex-col gap-2">
-      <h3 id="dnd-title" className="text-xs font-semibold text-fg">
-        {t("settings.dnd.title")}
-      </h3>
+    <SettingsSection id="dnd-title" title={t("settings.dnd.title")} error={error}>
       <p className="text-xs text-muted">{t("settings.dnd.hint")}</p>
       {state.active ? (
         <div className="flex min-h-7 items-center gap-2 text-xs">
@@ -21,7 +21,10 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
           </span>
           <button
             type="button"
-            onClick={() => void stop()}
+            onClick={() => {
+              clear();
+              void stop();
+            }}
             className="min-h-7 rounded-lg border border-edge px-2.5 text-muted hover:text-fg"
           >
             {t("settings.dnd.turnOff")}
@@ -33,7 +36,10 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
             <button
               key={choice}
               type="button"
-              onClick={() => void start(choice)}
+              onClick={() => {
+                clear();
+                void start(choice);
+              }}
               className="min-h-7 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg"
             >
               {t(`settings.dnd.${choice}`)}
@@ -41,6 +47,6 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
           ))}
         </div>
       )}
-    </section>
+    </SettingsSection>
   );
 }

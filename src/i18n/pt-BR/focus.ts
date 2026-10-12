@@ -60,6 +60,8 @@ export const focus = {
   "activity.copyFailed": "Não deu para copiar. Selecione o texto e use {mod}+C.",
   "activity.refreshNow": "Atualizar agora",
   "activity.goalMenu": "Ajustar meta de foco",
+  "activity.goalChip": "meta {goal}",
+  "activity.goalChipSet": "definir meta",
   "activity.chartLabel": "Distribuição do tempo por categoria",
   "activity.activeWord": "ativo",
   "activity.legendLabel": "categorias",

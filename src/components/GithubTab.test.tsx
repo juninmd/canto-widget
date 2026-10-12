@@ -13,6 +13,7 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { default: GithubTab } = await import("./GithubTab");
+const { clearForgeCache } = await import("../lib/forgeCache");
 
 const empty = { total: 0, items: [] };
 const item = {
@@ -35,6 +36,7 @@ async function mount() {
 }
 
 beforeEach(() => {
+  clearForgeCache();
   calls = [];
   responses = {};
 });

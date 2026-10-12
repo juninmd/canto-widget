@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { api, type AgendaItem, type ResolvedAlert } from "../lib/api";
 import { outcomeLabel, resolvedToday, toneOf } from "../lib/alerts";
 import { LOCALE, t } from "../i18n";
 import AlertCard from "./AlertCard";
 import { TONE } from "./AlertStrip";
+import ErrorBanner from "./ErrorBanner";
 import { CheckIcon } from "./Icons";
 
 const SHOWN = 8;
@@ -22,12 +24,18 @@ type Props = {
 /** The extra column of the maximized mode: what is pending, with its actions, and what was handled today. */
 export default function NotificationsColumn({ alerts, log, onGone, onRefresh, onCompleted, onOpenModels }: Props) {
   const done = resolvedToday(log);
+  const [all, setAll] = useState(false);
+  const [failed, setFailed] = useState(0);
+  const [busy, setBusy] = useState(false);
 
-  function dismissAll() {
-    for (const a of alerts) {
-      void api.alertClose(a.id).finally(onRefresh);
-      onGone(a.id);
-    }
+  // One reread once every close has answered; the ones that failed stay in the list.
+  async function dismissAll() {
+    setBusy(true);
+    const results = await Promise.allSettled(alerts.map((a) => api.alertClose(a.id)));
+    for (const [i, r] of results.entries()) if (r.status === "fulfilled") onGone(alerts[i].id);
+    setFailed(results.filter((r) => r.status === "rejected").length);
+    setBusy(false);
+    onRefresh();
   }
 
   return (
@@ -42,13 +50,16 @@ export default function NotificationsColumn({ alerts, log, onGone, onRefresh, on
         {alerts.length > 1 && (
           <button
             type="button"
-            onClick={dismissAll}
-            className="canto-hit min-h-[24px] whitespace-nowrap rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active"
+            onClick={() => void dismissAll()}
+            disabled={busy}
+            className="canto-hit min-h-[24px] whitespace-nowrap rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active disabled:opacity-50"
           >
             {t("notif.dismissAll")}
           </button>
         )}
       </div>
+
+      {failed > 0 && <ErrorBanner message={t("notif.dismissFailed", { n: failed })} busy={busy} onRetry={() => void dismissAll()} />}
 
       {alerts.length === 0 ? (
         <div className="flex items-center gap-2.5 rounded-xl border border-edge bg-ink/60 p-3 text-xs text-muted">
@@ -77,7 +88,7 @@ export default function NotificationsColumn({ alerts, log, onGone, onRefresh, on
         <p className="text-xs text-muted">{t("notif.resolvedEmpty")}</p>
       ) : (
         <ul className="flex flex-col">
-          {done.slice(0, SHOWN).map((r, i) => (
+          {(all ? done : done.slice(0, SHOWN)).map((r, i) => (
             <li key={`${r.item.id}-${r.at}-${i}`} className="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 text-xs hover:bg-hover">
               <span
                 aria-hidden="true"
@@ -95,6 +106,16 @@ export default function NotificationsColumn({ alerts, log, onGone, onRefresh, on
             </li>
           ))}
         </ul>
+      )}
+      {done.length > SHOWN && (
+        <button
+          type="button"
+          onClick={() => setAll((v) => !v)}
+          aria-expanded={all}
+          className="canto-hit min-h-[24px] self-start rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active"
+        >
+          {all ? t("notif.showLess") : t("notif.showMore", { n: done.length - SHOWN })}
+        </button>
       )}
     </aside>
   );

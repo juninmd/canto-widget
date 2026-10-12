@@ -3,11 +3,13 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 let saved = { ci: true, stalled: true, stalled_hours: 48, mentions: true };
+let connected = true;
 const calls: { cmd: string; args: { config?: typeof saved } }[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: { config?: typeof saved }) => {
     calls.push({ cmd, args });
+    if (cmd === "github_status") return Promise.resolve({ connected, login: "", source: "", device_flow: true });
     if (cmd === "my_pr_alerts_set") saved = args.config as typeof saved;
     return Promise.resolve(saved);
   },
@@ -18,6 +20,7 @@ const { default: MyPrAlertsSection } = await import("./MyPrAlertsSection");
 beforeEach(() => {
   saved = { ci: true, stalled: true, stalled_hours: 48, mentions: true };
   calls.length = 0;
+  connected = true;
 });
 afterEach(cleanup);
 
@@ -67,4 +70,10 @@ test("the mention alert is its own switch and leaves the other settings as they 
     fireEvent.click(box);
   });
   expect(sent()).toEqual([{ ci: true, stalled: true, stalled_hours: 48, mentions: false }]);
+});
+
+test("without a GitHub connection the section says where to connect it", async () => {
+  connected = false;
+  await show();
+  expect(screen.getByText("Conecte o GitHub na aba GitHub para receber estes avisos.")).toBeTruthy();
 });
