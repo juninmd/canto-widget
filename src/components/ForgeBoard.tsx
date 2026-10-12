@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { api } from "../lib/api";
 import { freshness, isFiltered, visibleSections, type Forge } from "../lib/forge";
 import type { ForgeListsState } from "../lib/useForgeLists";
 import { useMentions } from "../lib/useMentions";
@@ -34,6 +35,12 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDiscon
   useEffect(() => {
     if (onMentions && !loaded) void loadMentions();
   }, [onMentions, loaded, loadMentions]);
+  // The badge already counts what the watcher saw, so the subtab can show it before it is ever opened.
+  const [known, setKnown] = useState(0);
+  useEffect(() => {
+    api.mentionsUnread().then((n) => typeof n === "number" && setKnown(n), () => {});
+  }, []);
+  const unread = mentions.reply?.unread ?? known;
   const busy = onMentions ? mentions.loading : gh.loading;
   const refresh = () => void (onMentions ? loadMentions(true) : gh.load(gh.filter, true, true));
   return (
@@ -59,7 +66,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDiscon
         onChange={setSub}
         tabs={[
           { key: "lists", label: t("forge.sub.lists", { pr: forge === "gitlab" ? "MRs" : "PRs" }) },
-          { key: "mentions", label: t("forge.sub.mentions") },
+          { key: "mentions", label: unread > 0 ? t("forge.sub.mentionsCount", { n: unread }) : t("forge.sub.mentions") },
         ]}
       />
       {onMentions ? (

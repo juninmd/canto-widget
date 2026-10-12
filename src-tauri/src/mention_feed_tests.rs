@@ -42,6 +42,7 @@ fn todo(id: u64, body: &str) -> Mention {
         project: "acme/atlas".into(),
         at: "2026-10-12T09:00:00.000Z".into(),
         is_pr: true,
+        done: false,
     }
 }
 
@@ -79,4 +80,48 @@ fn a_thread_that_mentions_me_and_my_team_is_listed_once() {
     let both = with_teams(list(&[1, 2]), list(&[2, 3]));
     assert_eq!((both.total, both.items.iter().map(|i| i.number).collect::<Vec<_>>()), (3, vec![1, 2, 3]));
     assert_eq!(with_teams(list(&[1]), list(&[])).items.len(), 1);
+}
+
+fn saved_with(read: &[&str], threads: &[&str], authors: &[&str]) -> Saved {
+    let mut s = Saved::default();
+    s.mark(&read.iter().map(|r| r.to_string()).collect::<Vec<_>>(), true, 1);
+    threads.iter().for_each(|t| s.mute_thread(t, "", true));
+    authors.iter().for_each(|a| s.mute_author(a, true));
+    s
+}
+
+#[test]
+fn rows_come_back_flagged_unread_muted_or_done_and_the_badge_only_counts_the_open_ones() {
+    let mut done = todo(7, "ok");
+    done.done = true;
+    let mut rows = gitlab_rows(&[todo(5, "um"), todo(6, "dois"), done], "voce");
+    assert_eq!(
+        rows.iter().map(|r| (r.unread, r.done)).collect::<Vec<_>>(),
+        [(true, false), (true, false), (false, true)]
+    );
+
+    flag(&mut rows, &saved_with(&["gitlab:5"], &["https://git.example.com/acme/atlas/-/merge_requests/6"], &[]));
+    assert_eq!(
+        rows.iter().map(|r| (r.unread, r.muted)).collect::<Vec<_>>(),
+        [(false, false), (true, true), (false, false)]
+    );
+    assert_eq!(
+        lights(&rows).iter().map(|l| l.id.as_str()).collect::<Vec<_>>(),
+        ["gitlab:5", "gitlab:6"],
+        "a done to-do is not counted"
+    );
+
+    flag(&mut rows, &saved_with(&[], &[], &["ANA"]));
+    assert!(rows.iter().all(|r| r.muted), "a muted person is muted in every row, whatever the case");
+    assert!(!rows[2].unread, "a done to-do never turns unread again");
+}
+
+#[test]
+fn github_rows_start_unread_and_the_badge_learns_authors_only_from_earlier_lookups() {
+    let items = [thread(7, true), thread(8, false)];
+    let rows = github_rows(&items, &HashMap::new());
+    assert!(rows.iter().all(|r| r.unread && !r.muted && !r.done));
+    let known = HashMap::from([(items[0].reference.clone(), Mentioned { sender: ana(), excerpt: "x".into() })]);
+    let l = github_lights(&items, &known);
+    assert_eq!((l[0].id.as_str(), l[0].login.as_str(), l[1].login.as_str()), ("github:o/r#7", "ana", ""));
 }

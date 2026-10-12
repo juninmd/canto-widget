@@ -1,4 +1,5 @@
 //! The mentions subtab of the GitHub and GitLab tabs.
+use serde::Serialize;
 use tauri::Manager;
 
 use crate::blocking::run;
@@ -11,13 +12,24 @@ use crate::forge_filter::{ForgeFilter, Section};
 use crate::github_teams;
 use crate::gitlab_todos;
 use crate::mention_feed::{self, MentionRow};
+use crate::mentions_state::{self, MentionsUnread, GITHUB, GITLAB};
 use crate::model::now_ms;
 use crate::my_pr_alerts::MyPrAlerts;
 use crate::vault::AppState;
 
-/// Open threads that mention the user's @login directly (a team mention does not match), newest first.
+#[derive(Serialize)]
+pub struct MentionsReply {
+    pub rows: Vec<MentionRow>,
+    /// When the list left the forge (ms; 0 when it was just asked); older than now when it came from the cache.
+    pub fetched_at: i64,
+    /// Set when the rate limit forced a cached copy: fresh data only after this instant (ms).
+    pub limited_until: Option<i64>,
+    pub unread: u32,
+}
+
+/// Open threads that mention the user's @login directly (and their teams, when asked), newest first.
 #[tauri::command]
-pub async fn github_mentions(app: tauri::AppHandle, force: Option<bool>) -> Result<Vec<MentionRow>> {
+pub async fn github_mentions(app: tauri::AppHandle, force: Option<bool>) -> Result<MentionsReply> {
     run(move || {
         let state = app.state::<AppState>();
         state.touch();
@@ -33,7 +45,9 @@ pub async fn github_mentions(app: tauri::AppHandle, force: Option<bool>) -> Resu
             list = mention_feed::with_teams(list, teams);
             names.extend(github_teams::lookup(&cred));
         }
-        Ok(rows(&list.items, &cred, &names))
+        let mut rows = rows(&list.items, &cred, &names);
+        let unread = flag(&state, &app.state::<MentionsUnread>(), GITHUB, &mut rows)?;
+        Ok(MentionsReply { rows, fetched_at: list.fetched_at, limited_until: list.limited_until, unread })
     })
     .await
 }
@@ -45,17 +59,29 @@ fn rows(items: &[ForgeItem], token: &str, names: &[String]) -> Vec<MentionRow> {
     rows
 }
 
-/// The user's pending "mentioned" to-dos.
+/// Marks what the user read or muted and remembers the list for the badge; returns how many are unread.
+fn flag(state: &AppState, unread: &MentionsUnread, slot: usize, rows: &mut [MentionRow]) -> Result<u32> {
+    let saved = mentions_state::load(state)?;
+    mention_feed::flag(rows, &saved);
+    Ok(unread.set(slot, mention_feed::lights(rows), &saved))
+}
+
+/// The user's mention to-dos: the pending ones and, when asked, the ones already done.
 #[tauri::command]
-pub async fn gitlab_mentions(app: tauri::AppHandle) -> Result<Vec<MentionRow>> {
+pub async fn gitlab_mentions(app: tauri::AppHandle, include_done: Option<bool>) -> Result<MentionsReply> {
     run(move || {
         let state = app.state::<AppState>();
         state.touch();
         let cfg = state.gitlab_config()?.ok_or_else(|| AppError::Gitlab("conecte sua conta do GitLab".into()))?;
         let acc = to_account(&cfg);
-        let mut rows = mention_feed::gitlab_rows(&gitlab_todos::mentions(&acc)?, &cfg.username);
+        let todos = match include_done.unwrap_or(false) {
+            true => gitlab_todos::mentions_with_done(&acc)?,
+            false => gitlab_todos::mentions(&acc)?,
+        };
+        let mut rows = mention_feed::gitlab_rows(&todos, &cfg.username);
         mention_feed::gitlab_photos(&mut rows, &cfg.base_url);
-        Ok(rows)
+        let unread = flag(&state, &app.state::<MentionsUnread>(), GITLAB, &mut rows)?;
+        Ok(MentionsReply { rows, fetched_at: 0, limited_until: None, unread })
     })
     .await
 }

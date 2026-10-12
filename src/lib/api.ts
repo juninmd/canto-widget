@@ -153,6 +153,20 @@ export type MentionRow = {
   at: string;
   sender: Sender | null;
   preview: string;
+  /** Not marked read yet. */
+  unread: boolean;
+  /** The thread or its author is muted. */
+  muted: boolean;
+  /** GitLab: the to-do is already done there. */
+  done: boolean;
+};
+export type MentionsReply = {
+  rows: MentionRow[];
+  /** ms; 0 when the list was just asked for. */
+  fetched_at: number;
+  /** Set when the rate limit forced a cached copy: fresh data only after this instant (ms). */
+  limited_until: number | null;
+  unread: number;
 };
 /** What was done with an alert: the main action, snoozed, closed or (a service) muted. */
 export type AlertOutcome = "done" | "snoozed" | "closed" | "muted";
@@ -319,7 +333,7 @@ export const api = {
   githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("github_section", { section, page, filter }),
   /** Fallback click for a PR the batch left out; shares the batch's cache. */
-  githubMentions: (force = false) => invoke<MentionRow[]>("github_mentions", { force }),
+  githubMentions: (force = false) => invoke<MentionsReply>("github_mentions", { force }),
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
@@ -344,7 +358,11 @@ export const api = {
   gitlabSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("gitlab_section", { section, page, filter }),
   /** One call per click, not per list row: never fetched for a whole page at once. */
-  gitlabMentions: () => invoke<MentionRow[]>("gitlab_mentions"),
+  gitlabMentions: (includeDone = false) => invoke<MentionsReply>("gitlab_mentions", { includeDone }),
+  mentionRead: (ids: string[], read: boolean) => invoke<number>("mention_read", { ids, read }),
+  mentionMuteThread: (url: string, title: string, muted: boolean) => invoke<number>("mention_mute_thread", { url, title, muted }),
+  mentionMuteAuthor: (login: string, muted: boolean) => invoke<number>("mention_mute_author", { login, muted }),
+  mentionsUnread: () => invoke<number>("mentions_unread"),
   gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),

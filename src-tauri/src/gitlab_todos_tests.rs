@@ -34,6 +34,7 @@ fn only_todos_on_the_configured_instance_are_kept_and_mentions_are_told_apart() 
             project: "a/b".into(),
             at: "2026-10-12T09:00:00.000Z".into(),
             is_pr: false,
+            done: false,
         }
     );
     assert!(found[1].author.is_empty() && found[1].title.is_empty(), "missing fields default to empty");

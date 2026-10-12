@@ -89,6 +89,10 @@ pub fn activity_path(dir: &Path) -> PathBuf {
     dir.join("atividade.json")
 }
 
+pub fn mentions_path(dir: &Path) -> PathBuf {
+    dir.join("mencoes.json")
+}
+
 pub fn health_path(dir: &Path) -> PathBuf {
     dir.join("saude.json")
 }

@@ -20,6 +20,8 @@ pub struct Mention {
     pub project: String,
     pub at: String,
     pub is_pr: bool,
+    /// Already marked done on GitLab (only listed when asked for).
+    pub done: bool,
 }
 
 #[derive(Deserialize)]
@@ -55,15 +57,22 @@ struct TodoProject {
     path_with_namespace: String,
 }
 
-/// Every pending to-do on the configured instance, newest first; a link outside it is dropped like in the lists.
-pub fn pending(acc: &Account) -> Result<Vec<Mention>> {
+/// Every to-do of one `state` (`pending` or `done`) on the configured instance, newest first; a link outside it is
+/// dropped like in the lists.
+fn fetch(acc: &Account, state: &str) -> Result<Vec<Mention>> {
     let url = url::Url::parse_with_params(
         &format!("{}/api/v4/todos", acc.base),
-        [("state", "pending"), ("per_page", "50"), ("page", "1")],
+        [("state", state), ("per_page", "50"), ("page", "1")],
     )
     .map_err(|e| AppError::Gitlab(e.to_string()))?;
     let res = client()?.get(url).bearer_auth(acc.token.as_str()).send().map_err(network)?;
-    Ok(todos_in(response(res)?, &acc.base))
+    let mut todos = todos_in(response(res)?, &acc.base);
+    todos.iter_mut().for_each(|m| m.done = state == "done");
+    Ok(todos)
+}
+
+pub fn pending(acc: &Account) -> Result<Vec<Mention>> {
+    fetch(acc, "pending")
 }
 
 /// "Mentioned" and "directly addressed" are the to-dos GitLab creates for an @-mention (a group mention included).
@@ -73,6 +82,13 @@ pub fn is_mention(m: &Mention) -> bool {
 
 pub fn mentions(acc: &Account) -> Result<Vec<Mention>> {
     Ok(pending(acc)?.into_iter().filter(is_mention).collect())
+}
+
+/// The pending mentions and, after them, the ones already done.
+pub fn mentions_with_done(acc: &Account) -> Result<Vec<Mention>> {
+    let mut all = mentions(acc)?;
+    all.extend(fetch(acc, "done")?.into_iter().filter(is_mention));
+    Ok(all)
 }
 
 fn todos_in(raw: Vec<RawTodo>, base: &str) -> Vec<Mention> {
@@ -90,6 +106,7 @@ fn todos_in(raw: Vec<RawTodo>, base: &str) -> Vec<Mention> {
             author: t.author.map(|u| u.username).unwrap_or_default(),
             body: t.body,
             project: t.project.map(|p| p.path_with_namespace).unwrap_or_default(),
+            done: false,
         })
         .collect()
 }
