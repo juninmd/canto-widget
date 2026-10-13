@@ -29,6 +29,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Captura rápida**: `Ctrl+Alt+N` (`Ctrl+Cmd+N` no macOS) abre uma janelinha no meio da tela, de qualquer app, para
+  anotar uma tarefa de hoje (Enter) ou uma nota (Ctrl+Enter), sem mostrar o widget. Esc fecha sem salvar, e a tarefa
+  aceita a mesma sintaxe da lista ("Daily às 9h30 !alta"). Com o cofre trancado, o atalho abre o widget na tela de
+  senha.
+- **Idioma espanhol**: a interface ganha o espanhol em Ajustes → Idioma, e o modo automático usa o espanhol em sistemas
+  configurados para ele. As notificações e o ícone da bandeja seguem em inglês nessa língua por enquanto.
+
 - **Resumo do dia**, nos Ajustes (desligado por padrão): um aviso só por manhã com quantas reuniões você tem (e a hora da
   primeira que ainda vem), as tarefas abertas, as revisões pedidas e as menções não lidas. O que for zero fica de fora e
   um dia sem nada não avisa. Você escolhe a hora (das 6 às 12 h) e se vale só em dias úteis; o aviso vale até 4 h depois

@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import AlertWindow from "./AlertWindow";
+import CaptureWindow from "./CaptureWindow";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
 import { LANGUAGE } from "./i18n";
@@ -15,11 +16,11 @@ followSystem(() => {
   if (loadSkin() === "sistema") applySkin("sistema");
 });
 
-// The pop-up window loads the same bundle with `?alert` (see `tauri.conf.json`).
-const popup = new URLSearchParams(location.search).has("alert");
+// The pop-up and capture windows load the same bundle with `?alert` / `?capture` (see `tauri.conf.json`).
+const windowParams = new URLSearchParams(location.search);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {popup ? <AlertWindow /> : <App />}
+    {windowParams.has("alert") ? <AlertWindow /> : windowParams.has("capture") ? <CaptureWindow /> : <App />}
   </React.StrictMode>,
 );

@@ -1,6 +1,6 @@
 use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
 
-use crate::{paste_plain, tray_live, window};
+use crate::{capture, paste_plain, tray_live, window};
 
 fn toggle_shortcut() -> Shortcut {
     #[cfg(target_os = "macos")]
@@ -42,6 +42,16 @@ fn paste_plain_shortcut() -> Shortcut {
 
 const PASTE_PLAIN_LABEL: &str = if cfg!(target_os = "macos") { "Ctrl+Cmd+V" } else { "Ctrl+Alt+V" };
 
+fn capture_shortcut() -> Shortcut {
+    #[cfg(target_os = "macos")]
+    let mods = Modifiers::SUPER | Modifiers::CONTROL;
+    #[cfg(not(target_os = "macos"))]
+    let mods = Modifiers::CONTROL | Modifiers::ALT;
+    Shortcut::new(Some(mods), Code::KeyN)
+}
+
+const CAPTURE_LABEL: &str = if cfg!(target_os = "macos") { "Ctrl+Cmd+N" } else { "Ctrl+Alt+N" };
+
 fn register_with_fallback<E>(
     primary: Shortcut,
     fallback: Shortcut,
@@ -57,8 +67,8 @@ fn register_with_fallback<E>(
 }
 
 pub fn register(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let (toggle, join, join_fallback, paste_plain) =
-        (toggle_shortcut(), join_shortcut(), join_fallback_shortcut(), paste_plain_shortcut());
+    let (toggle, join, join_fallback, paste_plain, capture) =
+        (toggle_shortcut(), join_shortcut(), join_fallback_shortcut(), paste_plain_shortcut(), capture_shortcut());
     app.plugin(
         tauri_plugin_global_shortcut::Builder::new()
             .with_handler(move |app, shortcut, event| {
@@ -71,12 +81,18 @@ pub fn register(app: &tauri::AppHandle) -> tauri::Result<()> {
                     tray_live::join_next_meeting(app);
                 } else if shortcut == &paste_plain {
                     paste_plain::strip_formatting(app);
+                } else if shortcut == &capture {
+                    let _ = capture::open(app);
                 }
             })
             .build(),
     )?;
 
-    for (shortcut, label) in [(toggle_shortcut(), TOGGLE_SHORTCUT_LABEL), (paste_plain_shortcut(), PASTE_PLAIN_LABEL)] {
+    for (shortcut, label) in [
+        (toggle_shortcut(), TOGGLE_SHORTCUT_LABEL),
+        (paste_plain_shortcut(), PASTE_PLAIN_LABEL),
+        (capture_shortcut(), CAPTURE_LABEL),
+    ] {
         if let Err(error) = app.global_shortcut().register(shortcut) {
             eprintln!("atalho global indisponivel ({label}): {error}");
         }
@@ -93,6 +109,12 @@ pub fn register(app: &tauri::AppHandle) -> tauri::Result<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn capture_shortcut_does_not_clash_with_the_others() {
+        let all = [toggle_shortcut(), join_shortcut(), join_fallback_shortcut(), paste_plain_shortcut()];
+        assert!(all.iter().all(|s| *s != capture_shortcut()));
+    }
 
     #[test]
     fn meeting_shortcut_uses_fallback_when_primary_is_taken() {

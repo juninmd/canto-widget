@@ -298,4 +298,11 @@ export const app: Record<keyof typeof source, string> = {
   "common.offlineStale": "No connection. Showing the last saved data.",
   "common.loadFailed": "Could not load. {error}",
   "common.staleFailed": "Could not refresh. Showing the data from {time}. {error}",
+  "capture.title": "quick capture",
+  "capture.placeholder": "what do you want to remember?",
+  "capture.task": "task for today",
+  "capture.note": "note",
+  "capture.hint": "Enter: task · Ctrl+Enter: note · Esc: close",
+  "capture.close": "close",
+  "shortcuts.capture": "quick capture of a task or note, from any app",
 };

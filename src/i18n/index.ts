@@ -1,11 +1,12 @@
 import { en } from "./en";
+import { es } from "./es";
 import { loadChoice, resolveLanguage, type Language } from "./language";
 import { ptBR } from "./pt-BR";
 
 export type MessageKey = keyof typeof ptBR;
 type Params = Record<string, string | number>;
 
-const CATALOGS: Record<Language, Record<MessageKey, string>> = { "pt-BR": ptBR, en };
+const CATALOGS: Record<Language, Record<MessageKey, string>> = { "pt-BR": ptBR, en, es };
 
 /** Resolved once at startup: module-level labels (tabs, shortcuts) read it, so a change reloads the page. */
 export const LANGUAGE: Language = resolveLanguage(
@@ -14,7 +15,7 @@ export const LANGUAGE: Language = resolveLanguage(
 );
 
 /** BCP 47 tag for `Intl` / `toLocale*` calls, kept next to the messages it matches. */
-export const LOCALE = LANGUAGE === "en" ? "en-US" : "pt-BR";
+export const LOCALE = LANGUAGE === "en" ? "en-US" : LANGUAGE === "es" ? "es-419" : "pt-BR";
 
 const messages = CATALOGS[LANGUAGE];
 

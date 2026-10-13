@@ -4,7 +4,11 @@ import { SettingsSection } from "./SettingsSection";
 import { LANGUAGE_CHOICES, loadChoice, saveChoice, type LanguageChoice } from "../i18n/language";
 
 /** Each language in its own name, so someone who picked the wrong one can still find theirs. */
-const NATIVE_NAME: Record<Exclude<LanguageChoice, "auto">, string> = { "pt-BR": "Português (Brasil)", en: "English" };
+const NATIVE_NAME: Record<Exclude<LanguageChoice, "auto">, string> = {
+  "pt-BR": "Português (Brasil)",
+  en: "English",
+  es: "Español",
+};
 
 /** Module-level labels are resolved at startup, so a new language takes effect by reloading the UI. */
 export default function LanguagePicker({ reload = () => location.reload() }: { reload?: () => void }) {

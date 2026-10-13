@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { IS_MAC, MOD_KEY, TOGGLE_KEYS } from "./platform";
+import { CAPTURE_KEYS, IS_MAC, MOD_KEY, TOGGLE_KEYS } from "./platform";
 import { t } from "../i18n";
 /** `index` is 1-based and counts only the visible tabs, so Alt+N matches what the bar shows. */
 export type Action =
@@ -49,6 +49,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
     title: t("shortcuts.group.global"),
     items: [
       { keys: TOGGLE_KEYS, description: t("shortcuts.toggle") },
+      { keys: CAPTURE_KEYS, description: t("shortcuts.capture") },
       { keys: ["F11"], description: t("shortcuts.fullscreen") },
     ],
   },

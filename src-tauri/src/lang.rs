@@ -34,10 +34,11 @@ pub fn toggle_label() -> String {
     format!("{}  ({})", tr("Mostrar / esconder", "Show / hide"), crate::TOGGLE_SHORTCUT_LABEL)
 }
 
+/// Spanish has no Rust strings yet, so notifications and the tray fall back to English.
 pub fn parse(lang: &str) -> Result<bool> {
     match lang {
         "pt-BR" => Ok(false),
-        "en" => Ok(true),
+        "en" | "es" => Ok(true),
         _ => Err(AppError::Config("idioma não suportado".into())),
     }
 }
@@ -64,6 +65,7 @@ mod tests {
     fn only_supported_languages_are_accepted() {
         assert!(!parse("pt-BR").unwrap());
         assert!(parse("en").unwrap());
+        assert!(parse("es").unwrap());
         assert!(parse("fr").is_err());
         assert!(parse("").is_err());
     }
