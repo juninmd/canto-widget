@@ -62,7 +62,7 @@ sends a notification, with **snooze 10 min**.
 ### ✅ Tasks that remind you
 
 A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -180,6 +180,8 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 ![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
+![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
+
 | First-run welcome | Global search (`Ctrl+K`) | Self-hosted GitLab tab | Meeting alert |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
@@ -224,7 +226,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English or Portuguese |
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 

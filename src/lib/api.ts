@@ -233,6 +233,8 @@ export const api = {
   subtaskToggle: (id: string, subtaskId: string) => invoke<void>("subtask_toggle", { id, subtaskId }),
   subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
   taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
+  /** Hides the quick-capture window (Esc or after saving). */
+  captureClose: () => invoke<void>("capture_close"),
   taskSetEstimate: (id: string, minutes: number | null) => invoke<void>("task_set_estimate", { id, minutes }),
   taskAddTime: (id: string, secs: number) => invoke<void>("task_add_time", { id, secs }),
   activityStatus: () => invoke<ActivityStatus>("activity_status"),

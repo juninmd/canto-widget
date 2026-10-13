@@ -293,4 +293,11 @@ export const app = {
   "common.offlineStale": "Sem conexão. Mostrando os últimos dados salvos.",
   "common.loadFailed": "Não foi possível carregar. {error}",
   "common.staleFailed": "Não foi possível atualizar. Mostrando os dados de {time}. {error}",
+  "capture.title": "captura rápida",
+  "capture.placeholder": "o que você quer lembrar?",
+  "capture.task": "tarefa de hoje",
+  "capture.note": "nota",
+  "capture.hint": "Enter: tarefa · Ctrl+Enter: nota · Esc: fechar",
+  "capture.close": "fechar",
+  "shortcuts.capture": "captura rápida de tarefa ou nota, de qualquer app",
 } as const;

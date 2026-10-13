@@ -12,6 +12,7 @@ pub mod biometric;
 pub mod blocking;
 pub mod calendar;
 pub mod calendar_event;
+pub mod capture;
 pub mod checks_cache;
 pub mod clip_os;
 pub mod clip_transform;
@@ -209,6 +210,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::vault_status,
+            capture::capture_close,
             commands::vault_create,
             commands::vault_unlock,
             commands::vault_lock,

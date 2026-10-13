@@ -1,14 +1,15 @@
-export type Language = "pt-BR" | "en";
+export type Language = "pt-BR" | "en" | "es";
 export type LanguageChoice = "auto" | Language;
 
-export const LANGUAGE_CHOICES: readonly LanguageChoice[] = ["auto", "pt-BR", "en"];
+export const LANGUAGE_CHOICES: readonly LanguageChoice[] = ["auto", "pt-BR", "en", "es"];
 const KEY = "canto.language";
 
-/** "auto" follows the OS: Portuguese for any `pt*` locale, English for everything else. */
+/** "auto" follows the OS: Portuguese for `pt*`, Spanish for `es*`, English for everything else. */
 export function resolveLanguage(choice: LanguageChoice, systemLanguages: readonly string[]): Language {
   if (choice !== "auto") return choice;
   const first = systemLanguages[0]?.toLowerCase() ?? "";
-  return first === "" || first.startsWith("pt") ? "pt-BR" : "en";
+  if (first === "" || first.startsWith("pt")) return "pt-BR";
+  return first.startsWith("es") ? "es" : "en";
 }
 
 export function parseChoice(raw: string | null): LanguageChoice {
