@@ -123,7 +123,7 @@ sensitive.
 it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and each PR carries a small
 **CI badge** (passed, failed, running or no CI) from its head commit's checks. When someone **requests your
 review**, an OS notification tells you (on by default, switch it off in Settings). Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
-scroll with **show more**. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 respects the rate limit. Sign in with a read-only personal token or from the browser (device flow).
 
 </td>

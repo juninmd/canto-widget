@@ -63,3 +63,23 @@ fn item_keeps_what_the_sort_needs_and_a_ready_reference() {
         ("2026-09-01T08:00:00Z", 4, "octo/canto#9")
     );
 }
+
+#[test]
+fn raw_comment_parses_user_and_url() {
+    let json = serde_json::json!({
+        "id": 12345,
+        "html_url": "https://github.com/octo/canto/pull/7#issuecomment-12345",
+        "body": "Que app legal!",
+        "created_at": "2026-09-15T10:00:00Z",
+        "user": {
+            "login": "joao",
+            "type": "User",
+            "avatar_url": "https://avatars.githubusercontent.com/u/123"
+        }
+    });
+    let c: RawComment = serde_json::from_value(json).unwrap();
+    assert_eq!(c.id, 12345);
+    assert_eq!(c.body, "Que app legal!");
+    assert_eq!(c.user.as_ref().unwrap().login, "joao");
+    assert_eq!(c.user.as_ref().unwrap().user_type.as_deref(), Some("User"));
+}

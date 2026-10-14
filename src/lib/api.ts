@@ -181,6 +181,15 @@ export type GuestPhotos = { photos: Record<string, string>; needs_consent: boole
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type PrRef = { repo: string; number: number };
 export type PrChecks = PrRef & { status: ChecksStatus };
+export type PrComment = {
+  id: number;
+  author: string;
+  author_type: string;
+  avatar_url: string;
+  body: string;
+  created_at: string;
+  url: string;
+};
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 export type StatusItem = { title: string; link: string; published_at: number };
 export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
@@ -341,6 +350,8 @@ export const api = {
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
+  /** Fetch comments on a PR to display in the commenters catalog. */
+  githubPrComments: (repo: string, number: number) => invoke<PrComment[]>("github_pr_comments", { repo, number }),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),

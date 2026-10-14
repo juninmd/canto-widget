@@ -93,6 +93,19 @@ pub async fn github_prs_checks(app: tauri::AppHandle, prs: Vec<PrRef>) -> Result
     .await
 }
 
+/// Comments on one PR/MR, so the commenters catalog can display them.
+#[tauri::command]
+pub async fn github_pr_comments(app: tauri::AppHandle, repo: String, number: u64) -> Result<Vec<github::PrComment>> {
+    let Some(pr) = github_checks::pick(vec![PrRef { repo, number }]).pop() else {
+        return Err(AppError::Format("repositório inválido".into()));
+    };
+    run(move || {
+        let cred = token(&app)?;
+        github::pr_comments(&cred, &pr.repo, pr.number)
+    })
+    .await
+}
+
 /// `None` when GitHub isn't connected: the summary just leaves it out.
 pub(crate) fn activity_since(app: &tauri::AppHandle, activity: Activity, w: &Window) -> Option<Result<ForgeList>> {
     match app.state::<AppState>().github_config() {

@@ -490,3 +490,35 @@ test("the subtab shows the unread count the badge already knows, and says when t
   expect(screen.getByRole("status").textContent).toContain("limite de requisições");
   expect(screen.getByRole("tab", { name: "menções · 1" })).toBeTruthy();
 });
+
+test("switching to the commenters view loads comments and displays the catalog", async () => {
+  responses.github_status = connected;
+  const commentedPr = { ...item, comments: 2 };
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [commentedPr] } }));
+  responses.github_pr_comments = () =>
+    Promise.resolve([
+      {
+        id: 777,
+        author: "joaorafaelsoarest",
+        author_type: "User",
+        avatar_url: "",
+        body: "Que app legal! Vou testar",
+        created_at: "2026-09-15T10:00:00Z",
+        url: "https://github.com/octo/canto/pull/42#issuecomment-777",
+      },
+    ]);
+  await mount();
+  const commentersTab = screen.getByRole("tab", { name: "Comentários (1)" });
+  expect(commentersTab).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(commentersTab);
+  });
+  for (let i = 0; i < 5; i++) await act(async () => {});
+
+  expect(calls.some((c) => c.cmd === "github_pr_comments")).toBe(true);
+  expect(screen.getByText("Catálogo de comentaristas")).toBeTruthy();
+  expect(screen.getAllByText(/@joaorafaelsoarest/).length).toBeGreaterThan(0);
+  expect(screen.getByText("Que app legal! Vou testar")).toBeTruthy();
+});
+
