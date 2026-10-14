@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { mockTauri } from "./mock";
+import { goTab, mockTauri } from "./mock";
 
 test("render and capture commenters catalog", async ({ page }) => {
   const item = {
@@ -52,7 +52,7 @@ test("render and capture commenters catalog", async ({ page }) => {
 
   await page.goto("/");
   // Switch to GitHub tab
-  await page.getByRole("tab", { name: "GitHub" }).click();
+  await goTab(page, "GitHub");
   await expect(page.getByText("Catálogo de comentaristas", { exact: false })).toBeHidden();
 
   // Click on "Comentários (1)" tab
