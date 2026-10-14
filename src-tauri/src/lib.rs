@@ -312,6 +312,7 @@ pub fn run() {
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
             cmd_github_lists::github_prs_checks,
+            cmd_github_lists::github_pr_comments,
             review_alert::review_alerts_get,
             review_alert::review_alerts_set,
             my_pr_alerts::my_pr_alerts_get,

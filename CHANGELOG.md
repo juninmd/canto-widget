@@ -29,6 +29,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Catálogo de comentaristas e comentários em PRs**: na aba GitHub, o seletor permite alternar entre **Itens** e **Comentários**. Exibe uma grade de comentaristas com avatar, tags diferenciando pessoas de bots, contadores de comentários e PRs, busca em tempo real, filtro para ocultar bots, paginação para listas extensas e listagem contextual dos comentários por autor.
 - **Captura rápida**: `Ctrl+Alt+N` (`Ctrl+Cmd+N` no macOS) abre uma janelinha no meio da tela, de qualquer app, para
   anotar uma tarefa de hoje (Enter) ou uma nota (Ctrl+Enter), sem mostrar o widget. Esc esc sem salvar, e a tarefa
   aceita a mesma sintaxe da lista ("Daily às 9h30 !alta"). Com o cofre trancado, o atalho abre o widget na tela de
