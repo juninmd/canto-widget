@@ -20,7 +20,23 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   janelas livres são linhas próprias. Uma janela livre oferece encaixar uma tarefa sem horário, o que já passou fica
   recolhido e a linha vermelha marca o agora. Reuniões e os detalhes de cada evento seguem como antes.
 
+### Corrigido
+
+- **Falhas TCP no Windows**: conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR
+  esperada independentemente do idioma do sistema operacional.
+
 ### Adicionado
+
+- **Tema Glass**: novo tema com estética de vidro translúcido, superfícies semi-transparentes
+  com desfoque de fundo (backdrop blur), azul vivo, reflexo especular na borda superior e contraste
+  acessível em conformidade com WCAG AA.
+
+- **42 idiomas na interface**: 40 novos catálogos com 926 mensagens cada, seletor com busca por nome nativo ou
+  código, detecção de variantes regionais, datas e números no idioma escolhido e texto da direita para a esquerda
+  em árabe, hebraico e persa. Os novos catálogos são carregados sob demanda. Bandeja e títulos de notificações
+  acompanham o idioma; alguns detalhes de alertas ainda usam inglês e os erros do Rust continuam em português.
+  Cada idioma tem seu README, com 31 novas traduções completas e navegação entre os 42 documentos.
+  Os novos catálogos e READMEs usam tradução automática, ainda sem revisão por falantes nativos.
 
 - **Meus endpoints na aba Status API**: uma subaba ao lado de **serviços** para acompanhar o que é seu. Cada endpoint é
   um **endereço** (http ou https), um **DNS + certificado** (mede a resolução do nome e lê a validade do certificado que o

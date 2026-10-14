@@ -49,6 +49,11 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       // Rust always answers these with an object; null would crash the tabs, not test them.
       github_status: { connected: false, login: "", source: "", device_flow: false },
       drive_status: { configured: false, connected: false, email: "" },
+      activity_status: { supported: true, enabled: false },
+      autostart_status: false,
+      review_alerts_get: false,
+      fullscreen_hold_get: false,
+      my_pr_alerts_get: { ci: false, stalled: false, stalled_hours: 48, mentions: false },
       models_get: o.models ?? { alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
       ...o.fixed,
     };
@@ -107,6 +112,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
 
 /** Opens a tab by name: straight from the bar, or from the "mais" menu when the window is too narrow for it. */
 export async function goTab(page: Page, name: string) {
+  await page.getByRole("tablist").first().waitFor();
   const tab = page.getByRole("tab", { name, exact: true });
   if ((await tab.count()) > 0) return tab.click();
   await page.getByRole("button", { name: /^mais/ }).click();

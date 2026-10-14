@@ -5,9 +5,11 @@ import AlertWindow from "./AlertWindow";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
 import { LANGUAGE } from "./i18n";
+import { RTL_LANGUAGES } from "./i18n/languages";
 import "./styles.css";
 
 document.documentElement.lang = LANGUAGE;
+document.documentElement.dir = RTL_LANGUAGES.includes(LANGUAGE) ? "rtl" : "ltr";
 applySkin(loadSkin());
 applyDensity(loadDensity());
 // Stays at boot, not in the picker: the system theme can change with Settings closed.

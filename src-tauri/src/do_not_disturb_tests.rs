@@ -89,6 +89,9 @@ fn every_os_notification_goes_through_the_gate() {
     let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
     for entry in std::fs::read_dir(dir).unwrap() {
         let path = entry.unwrap().path();
+        if !path.is_file() || path.extension().and_then(|extension| extension.to_str()) != Some("rs") {
+            continue;
+        }
         let name = path.file_name().unwrap().to_string_lossy().to_string();
         if name == "notification.rs" || name.ends_with("_tests.rs") {
             continue;
@@ -111,6 +114,9 @@ fn every_alert_pop_up_goes_through_the_gate() {
     // Meeting alerts, task reminders, snoozes and the UI's alert_open all ring through open_alert.
     for entry in std::fs::read_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("src")).unwrap() {
         let path = entry.unwrap().path();
+        if !path.is_file() || path.extension().and_then(|extension| extension.to_str()) != Some("rs") {
+            continue;
+        }
         let name = path.file_name().unwrap().to_string_lossy().to_string();
         if name != "window.rs" && !name.ends_with("_tests.rs") {
             assert!(!std::fs::read_to_string(&path).unwrap().contains("ALERT_EVENT"), "{name} bypasses open_alert");

@@ -7,17 +7,17 @@ afterEach(cleanup);
 
 test("each skin shows by name, not just by color", () => {
   render(<SkinPicker />);
-  for (const name of ["Padrão", "Hueco Mundo", "Drácula", "Claro", "Seguir o sistema"]) {
+  for (const name of ["Padrão", "Hueco Mundo", "Drácula", "Glass", "Claro", "Seguir o sistema"]) {
     expect(screen.getByRole("radio", { name })).toBeTruthy();
   }
 });
 
 test("picking a skin applies it to the document and is remembered", () => {
   render(<SkinPicker />);
-  fireEvent.click(screen.getByRole("radio", { name: "Drácula" }));
-  expect(document.documentElement.dataset.skin).toBe("dracula");
-  expect(screen.getByRole("radio", { name: "Drácula" }).getAttribute("aria-checked")).toBe("true");
+  fireEvent.click(screen.getByRole("radio", { name: "Glass" }));
+  expect(document.documentElement.dataset.skin).toBe("glass");
+  expect(screen.getByRole("radio", { name: "Glass" }).getAttribute("aria-checked")).toBe("true");
   cleanup();
   render(<SkinPicker />);
-  expect(screen.getByRole("radio", { name: "Drácula" }).getAttribute("aria-checked")).toBe("true");
+  expect(screen.getByRole("radio", { name: "Glass" }).getAttribute("aria-checked")).toBe("true");
 });

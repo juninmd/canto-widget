@@ -1,14 +1,18 @@
-export type Language = "pt-BR" | "en";
+import { languageNames, type Language } from "./languages";
+export type { Language } from "./languages";
 export type LanguageChoice = "auto" | Language;
 
-export const LANGUAGE_CHOICES: readonly LanguageChoice[] = ["auto", "pt-BR", "en"];
+export const LANGUAGE_CHOICES: readonly LanguageChoice[] = ["auto", ...languageNames.map(([code]) => code)];
 const KEY = "canto.language";
 
-/** "auto" follows the OS: Portuguese for any `pt*` locale, English for everything else. */
+/** Regional variants use their base catalog; an unsupported primary language falls back to English. */
 export function resolveLanguage(choice: LanguageChoice, systemLanguages: readonly string[]): Language {
   if (choice !== "auto") return choice;
   const first = systemLanguages[0]?.toLowerCase() ?? "";
-  return first === "" || first.startsWith("pt") ? "pt-BR" : "en";
+  if (!first || first === "pt" || first.startsWith("pt-")) return "pt-BR";
+  const base = first.split("-")[0];
+  const code = base === "iw" ? "he" : base === "no" ? "nb" : base;
+  return languageNames.find(([language]) => language === code)?.[0] ?? "en";
 }
 
 export function parseChoice(raw: string | null): LanguageChoice {

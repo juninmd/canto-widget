@@ -93,6 +93,51 @@
   --color-cat-web: #50fa7b;
   --color-cat-other: #6272a4;
 }
+:root[data-skin="glass"] {
+  --color-ink: #0c1017;
+  --color-panel: #161b26;
+  --color-edge: #273142;
+  --color-accent: #0a84ff;
+  --color-accent-text: #409cff;
+  --color-on-accent: #001026;
+  --color-fg: #f5f5f7;
+  --color-muted: #a1abbc;
+  --color-faint: #8894a8;
+  --color-line: #586987;
+  --color-danger: #ff453a;
+  --color-ok: #32d74b;
+  --color-warn: #ffd60a;
+  --color-cat-games: #ff375f;
+  --color-cat-meet: #64d2ff;
+  --color-cat-docs: #ffd60a;
+  --color-cat-chat: #bf5af2;
+  --color-cat-web: #30d158;
+  --color-cat-other: #98989d;
+}
+
+/* Glass: translucidez acentuada, reflexo da borda superior e superfícies vítreas */
+:root[data-skin="glass"] .bg-panel\/95 {
+  background-color: color-mix(in srgb, var(--color-panel) 75%, transparent);
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+}
+:root[data-skin="glass"] .shadow-2xl {
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.15),
+    inset 0 0 0 1px rgb(255 255 255 / 0.05),
+    0 24px 48px rgb(0 0 0 / 0.5);
+}
+:root[data-skin="glass"] .canto-field {
+  background: color-mix(in srgb, var(--color-ink) 72%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-color: color-mix(in srgb, var(--color-edge) 85%, white 15%);
+}
+:root[data-skin="glass"] .bg-panel {
+  background-color: color-mix(in srgb, var(--color-panel) 80%, transparent);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
 
 /* Tailwind's spacing and text sizes are all rem: scaling the root font-size zooms everything at once. */
 :root[data-density="compacta"] {
