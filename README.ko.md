@@ -77,7 +77,7 @@ Windows Hello 선택 사항입니다.
 ### ✅ 상기시켜주는 작업
 
 시간과 반복 횟수(매일, 주중 또는 매주)가 포함된 일일 체크리스트입니다. **`Daily at 9:30am`**를 입력하고
-알림이 이미 설정되었습니다. 우선순위에 **`!high`**(또는 `!alta`, `!média`, `!baixa`)을 추가하거나 행의 점을 클릭하여 순환합니다. 긴 제목은 잘리지 않고 줄바꿈됩니다. 모든 작업에 대한 **포커스 타이머**: 추정치를 제공하고 ▶를 누르면 모든 탭 아래에 고정된 막대가 해당 작업에 대한 시간을 계산합니다(한 번 넘어가면 빨간색). 시간은 매분마다 저장소에 저장됩니다. **일 요약** 붙여넣기 가능(작업, 집중 시간, 총 시간이 포함된 회의, PRs/MRs 열기, 병합, 검토 및 병합 없이 종료), 마크다운의 **주간 및 월간 보고서**, 어제의 **보류 항목 가져오기**.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -138,7 +138,7 @@ JSON 형식 또는 압축, 한 줄의 텍스트, 대문자 또는 소문자(기�
 그것. 초안, PRs **검토를 기다리는 중** 및 PRs **일주일 동안 중단됨**이 눈에 띄고 각 PR에는 작은
 **CI 배지**(통과, 실패, 실행 중 또는 CI 없음)는 헤드 커밋 검사에서 가져옵니다. 누군가 **요청하면
 검토**, OS 알림을 통해 알려줍니다(기본적으로 켜져 있으며 설정에서 꺼짐). 텍스트로 필터링(`repo:` 또는 `label:`, PRs만 또는 문제만), 업데이트, 생성 또는 댓글별로 정렬
-**더 보기**로 스크롤하세요. 또한 **GitLab.com 및 자체 호스팅 GitLab**을 지원하며 5분 캐시를 통해
+scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 비율 제한을 준수합니다. 읽기 전용 개인 토큰을 사용하거나 브라우저(디바이스 흐름)에서 로그인하세요.
 
 </td>
@@ -175,13 +175,14 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 잠금 및 `?`에 바로가기가 나열되어 있습니다. `Ctrl+Shift+P`(macOS의 경우 `Cmd+Shift+P`)은 모든 명령이 포함된 **명령 팔레트**를 엽니다.
 이름별 작업: 탭으로 이동, 새 작업 또는 메모, 다음 회의 참여, 오늘의 요약 복사, 스킨 전환, 잠금.
 
-## 🎨 다섯 개의 스킨
+## 🎨 Six skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>기본값</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>휴에코 문도</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>드라큘라</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>빛</b></td>
 </tr>
 </table>
@@ -195,6 +196,8 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 
 ![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
+![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
+
 | 첫 실행 환영 | 글로벌 검색(`Ctrl+K`) | 자체 호스팅 GitLab 탭 | 회의 알림 |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
@@ -206,6 +209,14 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 | 동기화된 폴더 | 컴팩트한 밀도 | 잠긴 금고 | GitHub 연결 |
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
+
+| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+|---|---|---|---|
+| ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
+
+| Discard an unsaved note draft |
+|---|
+| ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
 | 모드: 미니, 숨김, 일반, 최대화 | 미니 모드: 화면 가장자리에 알림 |
 |---|---|
@@ -231,7 +242,7 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| 작업 알림 | 마스터 비밀번호 변경 | 상태 API(선택 탭) | 언어: 영어 또는 포르투갈어 |
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -249,7 +260,27 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 
 | 작업이 중단되어 CI 실패 | 누군가 나를 언급했습니다 | 설정 |
 |---|---|---|
-| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+
+| Mention alert with who wrote it |
+|---|
+| ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
+
+| Mention alert with a preview of the text |
+|---|
+| ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
+
+| More alerts about my own work |
+|---|
+| ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+
+| Day summary alert | Day summary setting |
+|---|---|
+| ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
+
+| Mentions subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
 | 비밀번호가 변경되었습니다. 파일 1개가 보류 중입니다. | 일요약 |
 |---|---|

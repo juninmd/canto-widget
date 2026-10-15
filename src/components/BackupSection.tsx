@@ -1,19 +1,23 @@
 import { useState } from "react";
-import { api, errText } from "../lib/api";
+import { api } from "../lib/api";
+import { useSectionError } from "../lib/useSectionError";
 import { t } from "../i18n";
+import { SettingsSection } from "./SettingsSection";
 
 export default function BackupSection({ onError }: { onError: (m: string) => void }) {
   const [busy, setBusy] = useState("");
   const [info, setInfo] = useState("");
+  const { error, fail, clear } = useSectionError(onError);
 
   // `fn` returns "" when the user cancels the dialog: cancelling is neither error nor success.
   async function run(label: string, fn: () => Promise<string>) {
     setBusy(label);
     setInfo("");
+    clear();
     try {
       setInfo(await fn());
     } catch (e) {
-      onError(errText(e));
+      fail(e);
     } finally {
       setBusy("");
     }
@@ -30,8 +34,7 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
   };
 
   return (
-    <section className="flex flex-col gap-2">
-      <h2 className="text-xs font-semibold text-fg">{t("settings.backup.title")}</h2>
+    <SettingsSection title={t("settings.backup.title")} error={error}>
       <p className="text-xs text-muted">
         {t("settings.backup.hint.before")} <code>.canto</code> {t("settings.backup.hint.middle")}{" "}
         <span className="text-fg">{t("settings.backup.hint.emphasis")}</span> {t("settings.backup.hint.after")}
@@ -56,6 +59,6 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
       </div>
       <p className="text-[11px] text-faint">{t("settings.backup.auto")}</p>
       {info && <p className="break-all text-[11px] text-accent-text">{info}</p>}
-    </section>
+    </SettingsSection>
   );
 }

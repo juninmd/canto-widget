@@ -1,5 +1,5 @@
 //! Tray extras that need live data: the "entrar" item for the soonest meeting with a Meet link,
-//! the matching global shortcut, and the taskbar badge (review-requested PRs/MRs + open tasks).
+//! the matching global shortcut, and the taskbar badge (review-requested PRs/MRs + open tasks + unread mentions).
 use std::time::Duration;
 
 use tauri::menu::MenuItem;
@@ -57,7 +57,8 @@ fn tick(app: &AppHandle) {
 
     let reviews = cmd_forges::review_requested_total(app);
     let tasks = *state.badge_tasks.lock().unwrap() as u64;
-    badge::apply(app, (reviews + tasks).min(u32::MAX as u64) as u32);
+    let mentions = u64::from(app.state::<crate::mentions_state::MentionsUnread>().count());
+    badge::apply(app, (reviews + tasks + mentions).min(u32::MAX as u64) as u32);
 }
 
 fn fetch_next_meeting(app: &AppHandle) -> Option<AgendaItem> {

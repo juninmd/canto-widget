@@ -1,7 +1,6 @@
 import { t } from "../i18n";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
-import { parseQuickTask } from "../lib/quickAdd";
 import SummaryPanel from "./SummaryPanel";
 import TaskRow from "./TaskRow";
 import TaskNow from "./TaskNow";
@@ -14,13 +13,24 @@ import { useNewIds, useExit } from "../lib/motion";
 import { mergeOrder, useReorder } from "../lib/useReorder";
 import { focusStore } from "../lib/focus";
 import EmptyState from "./EmptyState";
-import { ChecklistIcon, PlusIcon } from "./Icons";
+import Skeleton from "./Skeleton";
+import TaskAddForm from "./TaskAddForm";
+import { useTaskBulk } from "../lib/useTaskBulk";
+import { ChecklistIcon } from "./Icons";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
+/** After a delete the focused row is gone; focus goes to the next row (or the add field) instead of falling to <body>. */
+function refocusAfterDelete(list: HTMLElement | null, neighborId: string | undefined) {
+  if (document.activeElement && document.activeElement !== document.body) return;
+  const target = neighborId
+    ? list?.querySelector<HTMLElement>(`[data-reorder-id="${neighborId}"] input[type="checkbox"]`)
+    : document.querySelector<HTMLElement>('[data-shortcut="new"]');
+  target?.focus();
+}
+
 export default function TasksTab({ today, version, agenda = [], onError }: Props) {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [title, setTitle] = useState("");
   const [editing, setEditing] = useState<{ id: string; title: string } | null>(null);
   // Ending the edit unmounts the still-focused input, and the webview fires a
   // blur on it with the previous render's closure. Without this guard, Esc would save
@@ -31,6 +41,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const [checking, setChecking] = useState("");
   const { leaving, leave } = useExit();
   const { bump, isLatest } = useLatestRequest();
+  const listRef = useRef<HTMLUListElement>(null);
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
@@ -58,21 +69,6 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     void api.badgeSetTasks(tasks.filter((task) => !task.done).length).catch(() => {});
   }, [tasks, loadedFor, today]);
 
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
-    if (!title.trim()) return;
-    try {
-      const quick = parseQuickTask(title);
-      const created = await api.taskAdd(quick.title, today);
-      if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
-      if (quick.priority) await api.taskSetPriority(created.id, quick.priority);
-      setTitle("");
-      await reload();
-    } catch (e) {
-      onError(errText(e));
-    }
-  }
-
   const undoable = useUndo(onError, reload);
   const isNew = useNewIds(
     tasks.map((task) => task.id),
@@ -93,13 +89,16 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     editEnded.current = true;
     const target = editing;
     setEditing(null);
-    if (!target.title.trim() || target.title === tasks.find((task) => task.id === target.id)?.title) return;
+    if (!target.title.trim()) return onError(t("tasks.renameEmpty"));
+    if (target.title === tasks.find((task) => task.id === target.id)?.title) return;
     await run(() => api.taskRename(target.id, target.title));
   }
 
   const runningId = useRunning()?.id ?? null;
   const now = pickNow(tasks, runningId);
-  const done = tasks.filter((task) => task.done).length;
+  const doneIds = tasks.filter((task) => task.done).map((task) => task.id);
+  const done = doneIds.length;
+  const bulk = useTaskBulk(today, doneIds, reload, onError);
   const visible = priorityFilter ? tasks.filter((task) => task.priority === priorityFilter) : tasks;
   const firstDone = visible.find((task) => task.done)?.id;
   const firstOpen = visible.find((task) => !task.done)?.id;
@@ -126,27 +125,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <form onSubmit={add} className="flex gap-2">
-        <div className="relative flex-1">
-          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
-            <PlusIcon />
-          </span>
-          <input
-            value={title}
-            data-shortcut="new"
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder={t("tasks.addPlaceholder")}
-            className="canto-field w-full py-2 pl-9 pr-3 text-sm"
-          />
-        </div>
-        <button
-          type="submit"
-          aria-label={t("tasks.add")}
-          className="grid w-10 place-items-center rounded-xl bg-accent text-on-accent shadow-[var(--shadow-raised)] hover:brightness-110"
-        >
-          <PlusIcon />
-        </button>
-      </form>
+      <TaskAddForm today={today} reload={reload} onError={onError} />
 
       {now && !priorityFilter && <TaskNow task={now} />}
 
@@ -156,10 +135,11 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         priorityFilter={priorityFilter}
         onPriorityFilter={setPriorityFilter}
         onSummary={() => setSummary(true)}
-        onCarryOver={() => void run(() => api.carryOver(today))}
+        onCarryOver={() => void bulk.carryOver()}
+        onClearDone={() => void bulk.clearDone()}
       />
 
-      <ul className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
+      <ul ref={listRef} className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
         {visible.map((task) => (
           <Fragment key={task.id}>
             {(task.id === firstOpen || task.id === firstDone) && (
@@ -198,7 +178,10 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
             }}
             onDelete={() => {
               if (focusStore.get()?.id === task.id) focusStore.discard();
-              void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title }))));
+              const neighbor = visible[visible.indexOf(task) + 1] ?? visible[visible.indexOf(task) - 1];
+              void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title })))).then(
+                () => setTimeout(() => refocusAfterDelete(listRef.current, neighbor?.id), 0),
+              );
             }}
             onToggleDetails={() => setDetails(details === task.id ? "" : task.id)}
             onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(task.id, time, repeat))}
@@ -214,8 +197,16 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           />
           </Fragment>
         ))}
-        {tasks.length === 0 && (
-          <EmptyState icon={<ChecklistIcon />}>{t("tasks.empty")}</EmptyState>
+        {tasks.length === 0 && loadedFor !== today && (
+          <li>
+            <Skeleton label={t("tasks.loading")} />
+          </li>
+        )}
+        {tasks.length === 0 && loadedFor === today && (
+          <EmptyState icon={<ChecklistIcon />}>
+            {t("tasks.empty")}
+            <span className="mt-1.5 block text-[11px] text-faint/90">{t("tasks.emptyHint")}</span>
+          </EmptyState>
         )}
         {tasks.length > 0 && visible.length === 0 && (
           <EmptyState icon={<ChecklistIcon />}>{t("tasks.emptyPriority")}</EmptyState>

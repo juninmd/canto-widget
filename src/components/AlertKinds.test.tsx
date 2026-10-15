@@ -262,3 +262,75 @@ test("a GitHub mention is tagged GitHub in the strip and the summary has no open
   });
   expect(screen.queryByRole("button", { name: "abrir" })).toBeNull();
 });
+
+const ana = { name: "Ana Pires", login: "ana", avatar: "data:image/png;base64,AA==" };
+
+test("a mention shows who wrote it: photo, name and login in the pop-up and the name in the strip", async () => {
+  const gh: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:acme/atlas#3", tag: "github", sender: ana };
+  await show([mentionedOnGitlab, gh]);
+  expect(screen.getAllByText("você foi mencionado").length).toBeGreaterThan(0);
+  expect(screen.getByText("Ana Pires mencionou você")).toBeTruthy();
+  expect(screen.getByText("mencionou você")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(cards()[1]);
+  });
+  const who = document.querySelector("[data-sender]")!;
+  expect(who.textContent).toContain("Ana Pires");
+  expect(who.textContent).toContain("@ana");
+  expect(who.querySelector("img")?.getAttribute("src")).toBe("data:image/png;base64,AA==");
+});
+
+test("a sender without a photo falls back to initials and one without a name shows the login", async () => {
+  const noPhoto: AgendaItem = { ...mentionedOnGitlab, sender: { ...ana, avatar: "" } };
+  await show([noPhoto]);
+  const who = document.querySelector("[data-sender]")!;
+  expect(who.querySelector("img")).toBeNull();
+  expect(who.textContent).toContain("AP");
+  cleanup();
+  await show([{ ...mentionedOnGitlab, sender: { name: "", login: "ana", avatar: "" } }]);
+  expect(document.querySelector("[data-sender]")!.textContent).toContain("ana");
+});
+
+const approved: AgendaItem = {
+  ...failingCi,
+  id: "pr:approved:acme/atlas#12",
+  description: "Marina Souza aprovou este PR.\nótimo trabalho",
+  tag: "approved",
+  sender: { name: "Marina Souza", login: "marina", avatar: "data:image/png;base64,iVBORw0KGgo=" },
+};
+
+test("an approval names who approved, with their photo, and still opens the PR", async () => {
+  await show([approved]);
+  expect(screen.getByText("aprovado")).toBeTruthy();
+  const who = document.querySelector("[data-sender]") as HTMLElement;
+  expect(who.textContent).toContain("Marina Souza");
+  expect(who.textContent).toContain("@marina");
+  expect(who.querySelector("img")?.getAttribute("src")).toMatch(/^data:image\/png/);
+  expect(screen.getByText(/ótimo trabalho/)).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir PR" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/pull/12" });
+});
+
+test("a conflict outranks an approval in the pending list", async () => {
+  await show([approved, { ...failingCi, id: "pr:conflict:acme/atlas#13", tag: "conflict", title: "Outro PR" }]);
+  expect(cards()[0].textContent).toContain("Outro PR");
+});
+
+test("the day summary lists what is waiting, has no action but closing and says what it is", async () => {
+  const digest: AgendaItem = {
+    ...base,
+    start: "",
+    id: "digest:morning:2026-10-12",
+    title: "Resumo do dia",
+    description: "3 reuniões, a primeira às 10:30\n2 tarefas abertas\n1 revisão pedida",
+    tag: "digest",
+  };
+  await show([digest]);
+  expect(screen.getAllByText("resumo do dia").length).toBeGreaterThan(0);
+  expect(screen.getByText(/3 reuniões, a primeira às 10:30/)).toBeTruthy();
+  expect(screen.getByText(/1 revisão pedida/)).toBeTruthy();
+  expect(screen.getByRole("button", { name: "fechar" })).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+});

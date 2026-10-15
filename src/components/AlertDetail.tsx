@@ -1,12 +1,13 @@
 import type { ReactNode } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hour, people, status as agendaStatus, tally } from "../lib/agenda";
-import { kindOf, levelLabel, toneOf } from "../lib/alerts";
+import { kindOf, levelLabel, prLabel, toneOf } from "../lib/alerts";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import AlertGuests from "./AlertGuests";
 import AlertJobs from "./AlertJobs";
 import AlertPrep from "./AlertPrep";
+import SenderLine from "./SenderLine";
 import { TONE } from "./AlertStrip";
 
 function Box({ label, children }: { label: string; children: ReactNode }) {
@@ -34,6 +35,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
     <>
       <p className={`text-[11px] uppercase tracking-widest ${tone.text}`}>{t(`alert.kind.${kind}`)}</p>
       <h1 className="line-clamp-2 text-xl font-semibold leading-tight">{event.title}</h1>
+      {(kind === "mention" || kind === "pr") && event.sender && <SenderLine sender={event.sender} />}
       <div className="flex flex-wrap gap-1.5">
         {kind === "status" && (
           <>
@@ -50,7 +52,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         )}
         {kind === "pr" && (
           <>
-            <Chip tone={tone.text}>{t(event.tag === "ci" ? "alert.pr.ci" : "alert.pr.stalled")}</Chip>
+            <Chip tone={tone.text}>{prLabel(event.tag)}</Chip>
             {event.organizer && <Chip>{event.organizer}</Chip>}
             {event.tag === "stalled" && event.start && <Chip>{timeAgo(event.start)}</Chip>}
           </>

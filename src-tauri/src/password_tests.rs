@@ -115,6 +115,24 @@ fn the_endpoint_list_stays_readable_after_a_password_change() {
 }
 
 #[test]
+fn what_the_user_read_and_muted_stays_readable_after_a_password_change() {
+    use crate::mentions_state::{self, Saved};
+    let st = state("mencoes");
+    mentions_state::update(&st, |s| {
+        s.mark(&["gitlab:5".to_string()], true, 1);
+        s.mute_thread("https://github.com/o/r/pull/1", "Corrige o parser", true);
+        s.mute_author("Marina", true);
+    })
+    .unwrap();
+    let before: Saved = mentions_state::load(&st).unwrap();
+    st.change_password("senha-velha", "senha-nova").unwrap();
+    st.lock();
+    st.unlock("senha-nova").unwrap();
+    assert_eq!(mentions_state::load(&st).unwrap(), before, "the mute list was lost to the password change");
+    cleanup(&st);
+}
+
+#[test]
 fn local_backups_import_with_the_new_password() {
     let st = state("backup");
     crate::backup::daily(&st.dir, "2026-09-01").unwrap();

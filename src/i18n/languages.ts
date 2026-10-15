@@ -17,5 +17,5 @@ export type Language = typeof languageNames[number][0];
 export const NATIVE_NAMES = Object.fromEntries(languageNames) as Record<Language, string>;
 export const RTL_LANGUAGES: readonly Language[] = ["ar", "he", "fa"];
 export function localeFor(language: Language): string {
-  return ({ en: "en-US", zh: "zh-CN" } as Partial<Record<Language, string>>)[language] ?? language;
+  return ({ en: "en-US", zh: "zh-CN", es: "es-419" } as Partial<Record<Language, string>>)[language] ?? language;
 }

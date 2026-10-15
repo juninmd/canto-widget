@@ -35,6 +35,17 @@ pub struct AgendaItem {
     /// Short state for alerts that aren't calendar events: a Status API indicator or a model's rank.
     #[serde(default)]
     pub tag: String,
+    /// Who triggered the alert (a mention on GitHub or GitLab); `None` when the forge did not say.
+    #[serde(default)]
+    pub sender: Option<Sender>,
+}
+
+/// The person behind a mention alert; `avatar` is a `data:` URL because the CSP allows no remote image.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq)]
+pub struct Sender {
+    pub name: String,
+    pub login: String,
+    pub avatar: String,
 }
 
 /// A person on the guest list; rooms are left out.

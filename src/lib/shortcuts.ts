@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { IS_MAC, MOD_KEY, TOGGLE_KEYS } from "./platform";
+import { CAPTURE_KEYS, IS_MAC, MOD_KEY, TOGGLE_KEYS } from "./platform";
 import { t } from "../i18n";
 /** `index` is 1-based and counts only the visible tabs, so Alt+N matches what the bar shows. */
 export type Action =
@@ -10,10 +10,13 @@ export type Action =
   | { type: "fullscreen" }
   | { type: "privacy" }
   | { type: "globalSearch" }
-  | { type: "palette" };
+  | { type: "palette" }
+  | { type: "settings" };
 
 /** Ctrl+K is already the global search; the palette takes the editor-style Ctrl+Shift+P instead. */
 export const PALETTE_KEYS = [MOD_KEY, IS_MAC ? "⇧" : "Shift", "P"];
+
+export const SETTINGS_KEYS = [MOD_KEY, ","];
 
 export type Shortcut = { keys: string[]; description: string };
 
@@ -24,8 +27,11 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
     items: [
       { keys: ["Alt", "1–9"], description: t("shortcuts.tabs") },
       { keys: ["/"], description: t("shortcuts.search") },
+      { keys: ["[", "]"], description: t("shortcuts.agendaDays") },
+      { keys: ["H"], description: t("shortcuts.agendaToday") },
       { keys: [MOD_KEY, "K"], description: t("shortcuts.globalSearch") },
       { keys: PALETTE_KEYS, description: t("shortcuts.palette") },
+      { keys: SETTINGS_KEYS, description: t("shortcuts.settings") },
       { keys: ["Esc"], description: t("shortcuts.escape") },
       { keys: ["?"], description: t("shortcuts.help") },
     ],
@@ -43,6 +49,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
     title: t("shortcuts.group.global"),
     items: [
       { keys: TOGGLE_KEYS, description: t("shortcuts.toggle") },
+      { keys: CAPTURE_KEYS, description: t("shortcuts.capture") },
       { keys: ["F11"], description: t("shortcuts.fullscreen") },
     ],
   },
@@ -58,6 +65,7 @@ export function interpret(e: Key, typing: boolean, mac = IS_MAC): Action | null 
   const mod = mac ? e.metaKey && !e.ctrlKey : e.ctrlKey && !e.metaKey;
   if (mod && !e.altKey && e.shiftKey && e.code === "KeyP") return { type: "palette" };
   if (mod && !e.altKey && e.code === "KeyK") return { type: "globalSearch" };
+  if (mod && !e.altKey && !e.shiftKey && e.code === "Comma") return { type: "settings" };
   if (e.altKey && !e.ctrlKey && !e.metaKey) {
     const n = /^Digit([1-9])$/.exec(e.code);
     if (n) return { type: "tab", index: Number(n[1]) };

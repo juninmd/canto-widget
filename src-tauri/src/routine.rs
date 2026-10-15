@@ -169,6 +169,14 @@ pub fn task_set_schedule(
     })?
 }
 
+/// How many tasks on `day` are still open, recurring ones included.
+pub fn open_count(state: &AppState, day: &str) -> Result<usize> {
+    state.in_background(|d| {
+        let created = materialize(d, day, now_ms());
+        (d.tasks.iter().filter(|t| t.day == day && !t.done).count(), created > 0)
+    })
+}
+
 /// Open tasks with a time on `day`, materializing the day's recurring instances first.
 pub fn reminders_for(state: &AppState, day: &str) -> Result<Vec<Task>> {
     state.in_background(|d| {

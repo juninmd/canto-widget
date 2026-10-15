@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { interpret, SHORTCUT_GROUPS } from "./shortcuts";
 
-const key = (key: string, extra: Partial<{ code: string; altKey: boolean; ctrlKey: boolean; metaKey: boolean }> = {}) => ({
+const key = (key: string, extra: Partial<{ code: string; altKey: boolean; ctrlKey: boolean; metaKey: boolean; shiftKey: boolean }> = {}) => ({
   key,
   code: extra.code ?? "",
   altKey: false,
@@ -63,4 +63,18 @@ test("Ctrl+Shift+P (Cmd+Shift+P on macOS) opens the palette, even while typing",
 test("the help lists the palette shortcut", () => {
   const items = SHORTCUT_GROUPS.flatMap((g) => g.items);
   expect(items.find((i) => i.description.startsWith("paleta de comandos"))?.keys).toEqual(["Ctrl", "Shift", "P"]);
+});
+
+test("Ctrl+, opens settings even while typing, but Ctrl+Shift+, and Alt+, do not", () => {
+  const comma = { code: "Comma", ctrlKey: true };
+  expect(interpret(key(",", comma), true, false)).toEqual({ type: "settings" });
+  expect(interpret(key(",", { code: "Comma", metaKey: true }), false, true)).toEqual({ type: "settings" });
+  expect(interpret(key(",", { ...comma, shiftKey: true }), false, false)).toBeNull();
+  expect(interpret(key(",", { code: "Comma", altKey: true }), false, false)).toBeNull();
+  expect(interpret(key(","), false, false), "a bare comma is typing").toBeNull();
+});
+
+test("the help lists the settings shortcut", () => {
+  const keys = SHORTCUT_GROUPS.flatMap((g) => g.items).find((i) => i.description === "abrir os ajustes")?.keys;
+  expect(keys?.at(-1)).toBe(",");
 });

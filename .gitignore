@@ -11,3 +11,4 @@ client_secret_*.json
 *.key
 test-results/
 playwright-report/
+__pycache__/

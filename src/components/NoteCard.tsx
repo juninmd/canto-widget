@@ -2,7 +2,8 @@ import type { Note } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { highlight } from "../lib/highlight";
 import { LOCALE, t } from "../i18n";
-import { DownloadIcon, PinIcon } from "./Icons";
+import { CrossIcon, DownloadIcon, PinIcon } from "./Icons";
+import NoteLinkKind from "./NoteLinkKind";
 import NoteThumbs from "./NoteThumbs";
 import NotePreview from "./NotePreview";
 
@@ -51,7 +52,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
           <DownloadIcon />
         </button>
         <button type="button" onClick={onDelete} className={`${actionBtn} text-faint opacity-0 hover:text-danger`} aria-label={t("notes.deleteLabel", { title: n.title })}>
-          ×
+          <CrossIcon />
         </button>
       </div>
       <div className="mt-1 flex flex-wrap items-center gap-1">
@@ -59,10 +60,11 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
             <button
               type="button"
               onClick={() => onOpenLink(n.link!.kind)}
-              title={n.link.kind === "task" ? t("notes.goToTasks") : t("notes.goToAgenda")}
-              className="canto-hit min-h-[24px] max-w-full truncate rounded-md bg-edge px-1.5 text-[11px] text-muted hover:bg-active hover:text-fg"
+              title={privacy ? undefined : n.link.kind === "task" ? t("notes.goToTasks") : t("notes.goToAgenda")}
+              className={`canto-hit min-h-[24px] max-w-full truncate rounded-md bg-edge px-1.5 text-[11px] text-muted hover:bg-active hover:text-fg ${mask}`}
             >
-              {n.link.kind === "task" ? "✓" : "📅"} {n.link.label}
+              <NoteLinkKind kind={n.link.kind} />
+              {n.link.label}
             </button>
           )}
           {n.tags.map((tag) => (
@@ -70,8 +72,8 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
               key={tag}
               type="button"
               onClick={() => onTag(tag)}
-              title={t("notes.filterByTag", { tag })}
-              className="canto-hit min-h-[24px] rounded-md bg-edge px-1.5 text-[11px] text-muted hover:bg-active hover:text-fg"
+              title={privacy ? undefined : t("notes.filterByTag", { tag })}
+              className={`canto-hit min-h-[24px] rounded-md bg-edge px-1.5 text-[11px] text-muted hover:bg-active hover:text-fg ${mask}`}
             >
               #{tag}
             </button>

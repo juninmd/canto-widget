@@ -1,0 +1,27 @@
+import type { models as source } from "../pt-BR/models";
+
+export const models: Record<keyof typeof source, string> = {
+  "models.header": "Índice de inteligencia · {n} modelos",
+  "models.headerEmpty": "Índice de inteligencia",
+  "models.updatedAgo": "actualizado {ago}",
+  "models.refresh": "actualizar",
+  "models.throttled": "datos guardados por 3 h; próxima consulta a las {time}",
+  "models.nextFetchTitle": "el ranking se consulta como máximo una vez cada 3 h",
+  "models.loading": "consultando el ranking de modelos",
+  "models.sort.intelligence": "inteligencia",
+  "models.sort.price": "precio",
+  "models.sort.speed": "velocidad",
+  "models.sortLabel": "ordenar por {sort}; haz clic para cambiar",
+  "models.alertOn": "avisarme cuando cambie el top 10",
+  "models.alertOff": "dejar de avisar sobre el top 10",
+  "models.alertsHint": "la campana te avisa cuando un modelo entra al top 10 o sube dentro de él; se revisa cada 6 h mientras la bóveda está abierta",
+  "models.badge.new": "nuevo",
+  "models.badge.up": "sube",
+  "models.price": "${price} / 1M tokens",
+  "models.speed": "{n} tok/s",
+  "models.noPrice": "sin precio",
+  "models.openTitle": "abrir {name} en Artificial Analysis",
+  "models.scoreTitle": "{score} puntos en el Índice de inteligencia",
+  "models.empty": "todavía no hay ningún modelo con Índice de inteligencia",
+  "models.source": "datos:",
+};

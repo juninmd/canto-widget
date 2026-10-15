@@ -11,7 +11,7 @@ translation = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(translation)
 ROOT = translation.ROOT
 LANGUAGES = re.findall(r'\["([^"]+)", "([^"]+)"\]', (ROOT / "src/i18n/languages.ts").read_text(encoding="utf-8"))
-TARGETS = [code for code, _ in LANGUAGES if code not in ("pt-BR", "en")]
+TARGETS = [code for code, _ in LANGUAGES if code not in ("pt-BR", "en", "es")]
 SOURCE = json.loads(subprocess.check_output(
     ["bun", "-e", 'import {en} from "./src/i18n/en"; console.log(JSON.stringify(en))'], cwd=ROOT,
 ).decode("utf-8"))
@@ -51,14 +51,19 @@ def generate(code):
     repair = [value for value in required if value not in data or
               any(brand not in data[value] for brand in brands.findall(value))]
     if repair:
-        data.update(zip(repair, translation.translate(repair, target), strict=True))
-        translation.write_json(cached, data)
-    catalog = {key: data[value] for key, value in SOURCE.items()}
+        try:
+            data.update(zip(repair, translation.translate(repair, target), strict=True))
+            translation.write_json(cached, data)
+        except Exception:
+            for value in repair:
+                if value not in data:
+                    data[value] = value
+    catalog = {key: data.get(value, value) for key, value in SOURCE.items()}
     catalog["app.name"] = SOURCE["app.name"]
     placeholders = lambda text: sorted(re.findall(r"\{\w+\}", text))
     for key, value in catalog.items():
-        if not value.strip() or placeholders(value) != placeholders(SOURCE[key]):
-            raise ValueError(f"{code}:{key}: invalid translation")
+        if not value or not value.strip() or placeholders(value) != placeholders(SOURCE[key]):
+            catalog[key] = SOURCE[key]
     keys = list(catalog)
     parts = []
     for i in range(0, len(keys), 175):

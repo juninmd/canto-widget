@@ -8,6 +8,10 @@ import { mergeApps, mergeFocus, weekSeries, type Day } from "../lib/activityView
 import { MOD_KEY } from "../lib/platform";
 import { dayStart } from "../lib/summary";
 import { useToast } from "../lib/toast";
+import { clockLabel } from "../lib/clockLabel";
+import { useWindowVisible } from "../lib/useWindowVisible";
+import { useRefreshEvent } from "../lib/useRefreshEvent";
+import ErrorBanner from "./ErrorBanner";
 import ActivityBar, { type Period } from "./ActivityBar";
 import ActivityDay from "./ActivityDay";
 import ActivityHeat from "./ActivityHeat";
@@ -33,10 +37,15 @@ export default function ActivityTab({ today, onError }: { today: string; onError
   const [editGoal, setEditGoal] = useState(false);
   const [cats, setCats] = useState(readOverrides);
   const [hidden, setHidden] = useState<ReadonlySet<Category>>(new Set());
+  const [fetchedAt, setFetchedAt] = useState<number | null>(null);
+  const [loadError, setLoadError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const visible = useWindowVisible();
   const start = dayStart(today);
   setCategoryOverrides(cats);
 
   const load = useCallback(async () => {
+    setBusy(true);
     try {
       const st = await api.activityStatus();
       setStatus(st);
@@ -44,17 +53,26 @@ export default function ActivityTab({ today, onError }: { today: string; onError
       const days = [0, 1, 2, 3, 4, 5, 6].map((i) => start - i * DAY_MS);
       const sums = await Promise.all(days.map((d) => api.activitySummary(d, d + DAY_MS)));
       setWeek(sums.map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs, focus: s.focus })));
+      setFetchedAt(Date.now());
+      setLoadError("");
     } catch (e) {
-      onError(errText(e));
+      // Shown as a banner: the 60 s poll would otherwise raise the same toast every minute.
+      setLoadError(errText(e));
+    } finally {
+      setBusy(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start]);
 
+  // A hidden widget has nobody to show it to: the poll sleeps and catches up when the window returns.
   useEffect(() => {
+    if (!visible) return;
     void load();
     const id = setInterval(() => void load(), REFRESH_MS);
     return () => clearInterval(id);
-  }, [load]);
+  }, [load, visible]);
+
+  useRefreshEvent("activity", () => void load());
 
   async function enable() {
     try {
@@ -65,7 +83,14 @@ export default function ActivityTab({ today, onError }: { today: string; onError
     }
   }
 
-  if (!status || (status.supported && status.enabled && !week)) return <div className={ROOT}><ActivityLoading /></div>;
+  const banner = loadError && (
+    <ErrorBanner
+      message={week && fetchedAt ? t("common.staleFailed", { time: clockLabel(fetchedAt), error: loadError }) : t("common.loadFailed", { error: loadError })}
+      onRetry={() => void load()}
+      busy={busy}
+    />
+  );
+  if (!status || (status.supported && status.enabled && !week)) return <div className={ROOT}>{banner || <ActivityLoading />}</div>;
   if (!status.supported) return <div className={ROOT}><ActivityUnsupported /></div>;
   if (!status.enabled || !week) return <div className={ROOT}><ActivityOff onEnable={() => void enable()} /></div>;
 
@@ -105,7 +130,11 @@ export default function ActivityTab({ today, onError }: { today: string; onError
         onCopy={() => void copy()}
         onRefresh={() => void load()}
         onGoal={() => setEditGoal(true)}
+        goalMin={goalMin}
+        showGoal={!empty}
+        loading={busy}
       />
+      {banner}
       {empty ? (
         <ActivityEmpty />
       ) : period === "today" ? (
@@ -129,7 +158,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
           </div>
         </div>
       )}
-      <ActivityFooter />
+      <ActivityFooter updatedAt={fetchedAt} />
     </div>
   );
 }

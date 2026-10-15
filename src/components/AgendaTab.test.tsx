@@ -25,6 +25,7 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { default: AgendaTab } = await import("./AgendaTab");
+const { savePicked } = await import("../lib/agendaPicked");
 
 const notes = { title: "Anotações do Gemini", url: "https://docs.google.com/document/d/abc", mime: "" };
 
@@ -61,7 +62,10 @@ beforeEach(() => {
   photoCalls.length = 0;
   photos = null;
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  savePicked(null);
+});
 
 test("an event opens its details on click and closes on a second click", async () => {
   render(<AgendaTab agenda={agenda({ items: [planning] })} onError={() => {}} />);

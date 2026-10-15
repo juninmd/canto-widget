@@ -8,6 +8,11 @@ import { clipKind, KIND_LABEL, type ClipKind } from "../lib/clip";
 import { t } from "../i18n";
 import ClipCard from "./ClipCard";
 import EmptyState from "./EmptyState";
+import Skeleton from "./Skeleton";
+import ClipNote from "./ClipNote";
+import ClipClearConfirm from "./ClipClearConfirm";
+import { useCopied } from "../lib/useCopied";
+import { useWindowVisible } from "../lib/useWindowVisible";
 import { ClipboardIcon, SearchIcon } from "./Icons";
 
 const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
@@ -22,7 +27,11 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
   const [maxPinned, setMaxPinned] = useState("100");
   // While the field is focused the poll must not overwrite what the user is typing.
   const editingMax = useRef(false);
-  const [copied, setCopied] = useState("");
+  const [copied, flashCopied] = useCopied();
+  const [confirmingClear, setConfirmingClear] = useState(false);
+  const visibleWindow = useWindowVisible();
+  // The poll fails the same way every 2.5s; the person hears about a given failure once, until it recovers.
+  const lastError = useRef("");
 
   const [loadedFor, setLoadedFor] = useState<string | null>(null);
   const { leaving, leave } = useExit();
@@ -38,11 +47,19 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
       setItems(list.items);
       if (!editingMax.current) setMaxPinned(String(list.max_pinned));
       setLoadedFor(q);
+      lastError.current = "";
     } catch (e) {
-      if (isLatest(id)) onError(errText(e));
+      const message = errText(e);
+      if (isLatest(id) && message !== lastError.current) {
+        lastError.current = message;
+        onError(message);
+      }
     }
   }
 
+  const pinnedCount = items.filter((i) => i.pinned).length;
+  // Under a search the list is partial, so only an unfiltered list says how much a clear removes.
+  const clearable = loadedFor === "" && !query ? items.length - pinnedCount : -1;
   const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
 
   async function editMaxPinned(text: string) {
@@ -59,6 +76,8 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
   }
 
   useEffect(() => {
+    // A hidden window has nobody watching the list; coming back reloads at once.
+    if (!visibleWindow) return;
     const timer = setTimeout(() => void reload(query), 150);
     const tick = setInterval(() => void reload(query), 2500);
     return () => {
@@ -66,7 +85,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
       clearInterval(tick);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  }, [query, visibleWindow]);
 
   const undoable = useUndo(onError, () => reload());
   // The clipboard watcher brings in new items every 2.5s: they slide in at the top.
@@ -86,9 +105,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <p className="text-[11px] text-faint">
-        {t("clipboard.historyNote")} <span className="text-muted">{t("clipboard.historyNoteEmphasis")}</span>.
-      </p>
+      <ClipNote />
       <div className="flex gap-2">
         <div className="relative flex-1">
           <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
@@ -105,13 +122,25 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
         </div>
         <button
           type="button"
-          onClick={() => run(async () => undoable(await api.clipClear(), t("clipboard.cleared")))}
+          onClick={() => setConfirmingClear(true)}
+          disabled={clearable === 0}
           title={t("clipboard.clearTitle")}
-          className="canto-hit rounded-xl bg-edge px-3 text-xs text-fg hover:bg-active active:bg-active"
+          className="canto-hit rounded-xl bg-edge px-3 text-xs text-fg hover:bg-active active:bg-active disabled:opacity-50"
         >
           {t("clipboard.clear")}
         </button>
       </div>
+      {confirmingClear && (
+        <ClipClearConfirm
+          removing={clearable >= 0 ? clearable : null}
+          pinned={pinnedCount}
+          onCancel={() => setConfirmingClear(false)}
+          onConfirm={() => {
+            setConfirmingClear(false);
+            void run(async () => undoable(await api.clipClear(), t("clipboard.cleared")));
+          }}
+        />
+      )}
       <div className="flex items-center gap-2 text-[11px]">
         <select
           value={kindFilter}
@@ -155,15 +184,13 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
             onCopy={() =>
               run(async () => {
                 await api.clipCopy(i.id);
-                setCopied(i.id);
-                setTimeout(() => setCopied(""), 1200);
+                flashCopied(i.id);
               })
             }
             onCopyAs={(mode) =>
               run(async () => {
                 await api.clipCopyAs(i.id, mode);
-                setCopied(i.id);
-                setTimeout(() => setCopied(""), 1200);
+                flashCopied(i.id);
               })
             }
             onPin={() => run(() => api.clipPin(i.id))}
@@ -172,7 +199,12 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
             }
           />
         ))}
-        {visible.length === 0 && (
+        {visible.length === 0 && loadedFor === null && (
+          <li>
+            <Skeleton label={t("clipboard.loading")} />
+          </li>
+        )}
+        {visible.length === 0 && loadedFor !== null && (
           <EmptyState icon={query || kindFilter !== "all" ? <SearchIcon /> : <ClipboardIcon />}>
             {query || kindFilter !== "all" ? t("clipboard.emptySearch") : t("clipboard.empty")}
           </EmptyState>

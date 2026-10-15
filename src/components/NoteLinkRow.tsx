@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { AgendaItem, NoteLink, Task } from "../lib/api";
 import { t } from "../i18n";
 import NoteLinkPicker from "./NoteLinkPicker";
+import NoteLinkKind from "./NoteLinkKind";
 
 type Props = { link: NoteLink | null; tasks: Task[]; agenda: AgendaItem[]; onLink: (link: NoteLink | null) => void };
 
@@ -25,7 +26,8 @@ export default function NoteLinkRow({ link, tasks, agenda, onLink }: Props) {
     return (
       <div className="flex items-center gap-2 text-xs text-muted">
         <span className="min-w-0 flex-1 truncate">
-          {link.kind === "task" ? "✓" : "📅"} {link.label}
+          <NoteLinkKind kind={link.kind} />
+          {link.label}
         </span>
         <button type="button" onClick={() => onLink(null)} className="min-h-[24px] px-1 hover:text-danger">
           {t("notes.unlink")}

@@ -11,6 +11,7 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [deviceCode, setDeviceCode] = useState<DeviceCode | null>(null);
+  const [copied, setCopied] = useState(false);
   const mounted = useRef(true);
 
   // Leaving the tab mid device-flow can't leave Rust polling GitHub.
@@ -56,6 +57,15 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
     }
   }
 
+  async function copyCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
+
   if (deviceCode) {
     return (
       <div className="flex flex-col gap-2 text-xs text-muted">
@@ -63,10 +73,16 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
         <p className="select-text text-center font-mono text-2xl font-semibold tracking-widest text-fg" aria-label={t("github.deviceCodeLabel")}>
           {deviceCode.user_code}
         </p>
-        <button type="button" onClick={() => void api.openLink(deviceCode.url)} className="min-h-7 rounded-lg bg-edge px-3 text-fg">
+        <p role="status" className="sr-only">
+          {copied ? t("github.codeCopied") : t("github.codeAnnounce", { code: deviceCode.user_code.split("").join(" ") })}
+        </p>
+        <button type="button" onClick={() => void copyCode(deviceCode.user_code)} className="canto-hit min-h-7 rounded-lg border border-edge px-3 text-fg hover:bg-hover active:bg-active">
+          {copied ? t("github.codeCopied") : t("github.copyCode")}
+        </button>
+        <button type="button" onClick={() => void api.openLink(deviceCode.url).catch(() => {})} className="canto-hit min-h-7 rounded-lg bg-edge px-3 text-fg hover:bg-active active:bg-active">
           {t("github.openUrl", { url: deviceCode.url.replace("https://", "") })}
         </button>
-        <button type="button" onClick={() => void api.githubDeviceCancel()} className="canto-hit min-h-[24px] self-center rounded-md px-1.5 hover:bg-hover active:bg-active">
+        <button type="button" onClick={() => void api.githubDeviceCancel().catch(() => {})} className="canto-hit min-h-7 self-center rounded-md px-1.5 hover:bg-hover active:bg-active">
           {t("github.cancel")}
         </button>
       </div>
@@ -77,7 +93,7 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
     <div className="flex flex-col gap-3 text-xs text-muted">
       <p>{t("github.intro")}</p>
       {device && (
-        <button type="button" onClick={() => void signInWithApp()} disabled={busy} className="min-h-8 rounded-lg bg-accent px-3 font-semibold text-on-accent disabled:opacity-40">
+        <button type="button" onClick={() => void signInWithApp()} disabled={busy} className="canto-hit min-h-7 rounded-lg bg-accent px-3 font-semibold text-on-accent disabled:opacity-40">
           {t("github.signIn")}
         </button>
       )}
@@ -95,12 +111,12 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
           className={FIELD}
         />
         <p className="text-[11px] text-faint">
-          {t("github.tokenHint")} <em>Read-only</em>.{" "}
+          {t("github.tokenHint")} <em>{t("github.readOnly")}</em>.{" "}
           <button type="button" onClick={() => void api.openLink(TOKEN_URL)} className="canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
             {t("github.createToken")}
           </button>
         </p>
-        <button type="submit" disabled={busy || !token.trim()} className="min-h-7 self-start rounded-lg bg-edge px-3 text-fg disabled:opacity-40">
+        <button type="submit" disabled={busy || !token.trim()} className="canto-hit min-h-7 self-start rounded-lg bg-edge px-3 text-fg disabled:opacity-40">
           {busy ? t("github.checking") : t("github.saveToken")}
         </button>
       </form>

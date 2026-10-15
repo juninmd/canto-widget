@@ -142,3 +142,62 @@ test("with room for everything there is no 'mais' button", () => {
   expect(screen.queryByRole("button", { name: /mais/ })).toBeNull();
   expect(bar()).toHaveLength(10);
 });
+
+test("opening the menu focuses its first item; only the focused item is a Tab stop", () => {
+  withLayout(() => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: /mais/ }));
+    const items = screen.getAllByRole("menuitem");
+    expect(document.activeElement).toBe(items[0]);
+    expect(items.filter((i) => i.tabIndex === 0)).toEqual([items[0]]);
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "ArrowDown" });
+    expect(document.activeElement).toBe(items[1]);
+    expect(items.filter((i) => i.tabIndex === 0)).toEqual([items[1]]);
+  });
+});
+
+test("arrows rove through the menu and wrap; Home and End jump to the edges", () => {
+  withLayout(() => {
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: /mais/ }));
+    const items = screen.getAllByRole("menuitem");
+    const menu = screen.getByRole("menu");
+    fireEvent.keyDown(menu, { key: "ArrowUp" });
+    expect(document.activeElement).toBe(items[items.length - 1]);
+    fireEvent.keyDown(menu, { key: "ArrowDown" });
+    expect(document.activeElement).toBe(items[0]);
+    fireEvent.keyDown(menu, { key: "End" });
+    expect(document.activeElement).toBe(items[items.length - 1]);
+    fireEvent.keyDown(menu, { key: "Home" });
+    expect(document.activeElement).toBe(items[0]);
+  });
+});
+
+test("Esc closes the menu and returns focus to the 'mais' button; ArrowDown on it opens the menu", () => {
+  withLayout(() => {
+    render(<Harness />);
+    const more = screen.getByRole("button", { name: /mais/ });
+    fireEvent.click(more);
+    fireEvent.keyDown(screen.getByRole("menu"), { key: "Escape" });
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(more);
+    fireEvent.keyDown(more, { key: "ArrowDown" });
+    expect(screen.getByRole("menu")).toBeDefined();
+  });
+});
+
+test("holding Alt shows each tab's number; the shortcut is also exposed to assistive tech", () => {
+  render(<Harness />);
+  expect(screen.getAllByRole("tab")[1].getAttribute("aria-keyshortcuts")).toBe("Alt+2");
+  expect(screen.getAllByRole("tab")[1].textContent).toBe("Notas");
+  fireEvent.keyDown(window, { key: "Alt", altKey: true });
+  expect(screen.getAllByRole("tab")[1].textContent).toBe("Notas2");
+  fireEvent.keyUp(window, { key: "Alt", altKey: false });
+  expect(screen.getAllByRole("tab")[1].textContent).toBe("Notas");
+});
+
+test("a tab with pending items shows a badge that says how many", () => {
+  render(<TabBar current="tasks" onChange={() => {}} attention={{ github: 3, notes: 0 }} />);
+  expect(screen.getByRole("tab", { name: "GitHub pendências: 3" })).toBeDefined();
+  expect(screen.getByRole("tab", { name: "Notas" })).toBeDefined();
+});

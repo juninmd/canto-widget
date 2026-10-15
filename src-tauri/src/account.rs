@@ -63,9 +63,11 @@ pub fn as_data_url(content_type: &str, bytes: &[u8]) -> Option<String> {
 
 /// The photo is decorative: any failure becomes `None` and the UI shows the initial.
 pub fn download_avatar(url: &str) -> Option<String> {
-    if !is_trusted_photo(url) {
-        return None;
-    }
+    is_trusted_photo(url).then(|| download_image(url)).flatten()
+}
+
+/// The caller has already decided the host is trusted; redirects are off, so it cannot be bounced elsewhere.
+pub fn download_image(url: &str) -> Option<String> {
     let res = client().ok()?.get(url).send().ok()?.error_for_status().ok()?;
     let content_type = res.headers().get(reqwest::header::CONTENT_TYPE)?.to_str().ok()?.to_string();
     // Without Content-Length the body might not end: read at most one byte past the cap.

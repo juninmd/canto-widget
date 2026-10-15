@@ -1,5 +1,6 @@
 import { catalogLoaders } from "./loaders";
 import { en } from "./en";
+import { es } from "./es";
 import { localeFor } from "./languages";
 import { loadChoice, resolveLanguage, type Language } from "./language";
 import { ptBR } from "./pt-BR";
@@ -17,7 +18,14 @@ export const LANGUAGE: Language = resolveLanguage(
 export const LOCALE = localeFor(LANGUAGE);
 
 // Keep the original catalogs synchronous for test runners; additional languages load before labels are computed.
-const messages = LANGUAGE === "pt-BR" ? ptBR : LANGUAGE === "en" ? en : await catalogLoaders[LANGUAGE]();
+const messages =
+  LANGUAGE === "pt-BR"
+    ? ptBR
+    : LANGUAGE === "en"
+      ? en
+      : LANGUAGE === "es"
+        ? es
+        : await catalogLoaders[LANGUAGE]();
 
 /** Looks up a user-facing string; `{name}` placeholders are filled from `params`. */
 export function t(key: MessageKey, params?: Params): string {

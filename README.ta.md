@@ -77,7 +77,7 @@ Windows Hello விருப்பமானது.
 ### ✅ உங்களுக்கு நினைவூட்டும் பணிகள்
 
 நேரம் மற்றும் மறுநிகழ்வு கொண்ட தினசரி சரிபார்ப்பு பட்டியல் (ஒவ்வொரு நாளும், வார நாட்கள் அல்லது வாரந்தோறும்). வகை **`Daily at 9:30am`** மற்றும் தி
-நினைவூட்டல் ஏற்கனவே அமைக்கப்பட்டுள்ளது; முன்னுரிமைக்காக **`!high`** (அல்லது `!alta`, `!média`, `!baixa`) சேர்க்கவும் அல்லது அதைச் சுழற்சி செய்ய வரிசையில் உள்ள புள்ளியைக் கிளிக் செய்யவும். துண்டிக்கப்படுவதற்குப் பதிலாக நீண்ட தலைப்புகள் மூடப்பட்டிருக்கும். எந்தப் பணியிலும் **ஃபோகஸ் டைமரை**: மதிப்பீட்டைக் கொடுக்கவும், ▶ஐ அழுத்தவும், மேலும் ஒவ்வொரு தாவலின் கீழும் பின் செய்யப்பட்ட பட்டை அதற்கு எதிரான நேரத்தைக் கணக்கிடும் (நீங்கள் சென்றவுடன் சிவப்பு); ஒவ்வொரு நிமிடமும் பெட்டகத்திற்கு நேரம் சேமிக்கப்படுகிறது. **நாள் சுருக்கம்** ஒட்டுவதற்குத் தயாராக உள்ளது (பணிகள், கவனம் செலுத்திய நேரம், மொத்த நேரத்துடன் கூடிய சந்திப்புகள், PRs/MRs திறக்கப்பட்டது, ஒன்றிணைக்கப்பட்டது, மதிப்பாய்வு செய்யப்பட்டது மற்றும் இணைக்கப்படாமல் மூடப்பட்டது), மார்க் டவுனில் **வாராந்திர மற்றும் மாதாந்திர அறிக்கை**, மற்றும் **நிலுவையில் உள்ள பொருட்களை இழுக்க** நேற்றிலிருந்து.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -138,7 +138,7 @@ JSON வடிவமைக்கப்பட்டது அல்லது ச�
 அது. வரைவுகள், PRs **உங்கள் மதிப்பாய்விற்காக காத்திருக்கிறது** மற்றும் PRs **ஸ்டால்** ஒரு வாரம் தனித்து நிற்கிறது, மேலும் ஒவ்வொரு PR சிறிய
 **CI பேட்ஜ்** (கடந்துவிட்டது, தோல்வியடைந்தது, இயங்கவில்லை அல்லது CI இல்லை) அதன் தலைவரின் காசோலைகளில் இருந்து. யாராவது **உங்களிடம் கோரும்போது
 மதிப்பாய்வு**, OS அறிவிப்பு உங்களுக்குச் சொல்கிறது (இயல்புநிலையாக, அமைப்புகளில் அதை அணைக்கவும்). உரை மூலம் வடிகட்டவும், `repo:` அல்லது `label:`, PRs மட்டும் அல்லது சிக்கல்கள் மட்டும், புதுப்பித்தல், உருவாக்கம் அல்லது கருத்துகள் மூலம் வரிசைப்படுத்தவும் மற்றும்
-**மேலும் காட்டு** உடன் உருட்டவும். மேலும் **GitLab.com மற்றும் சுய-ஹோஸ்ட் செய்யப்பட்ட GitLab** ஐ ஆதரிக்கிறது, 5 நிமிட கேச்
+scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 விகித வரம்பை மதிக்கிறது. படிக்க மட்டுமேயான தனிப்பட்ட டோக்கன் அல்லது உலாவியில் (சாதன ஓட்டம்) உள்நுழையவும்.
 
 </td>
@@ -175,13 +175,14 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 பூட்டுகள் மற்றும் `?` குறுக்குவழிகளை பட்டியலிடுகிறது. `Ctrl+Shift+P` (macOS இல் `Cmd+Shift+P`) ஒரு **கட்டளை தட்டு** ஒவ்வொன்றிலும் திறக்கிறது
 பெயரின்படி செயல்: ஒரு தாவலுக்குச் செல்லவும், புதிய பணி அல்லது குறிப்பு, அடுத்த சந்திப்பில் சேரவும், அன்றைய சுருக்கத்தை நகலெடுக்கவும், தோலை மாற்றவும், பூட்டவும்.
 
-## 🎨 ஐந்து தோல்கள்
+## 🎨 Six skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Default</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>டிராகுலா</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -195,6 +196,8 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 
 ![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
+![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
+
 | முதல் ஓட்ட வரவேற்பு | உலகளாவிய தேடல் (`Ctrl+K`) | சுய-ஹோஸ்ட் செய்யப்பட்ட GitLab தாவல் | சந்திப்பு எச்சரிக்கை |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
@@ -206,6 +209,14 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 | ஒத்திசைக்கப்பட்ட கோப்புறை | கச்சிதமான அடர்த்தி | பூட்டிய பெட்டகம் | இணைக்கவும் GitHub |
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
+
+| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+|---|---|---|---|
+| ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
+
+| Discard an unsaved note draft |
+|---|
+| ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
 | முறைகள்: மினி, மறைக்கப்பட்ட, இயல்பான, அதிகப்படுத்தப்பட்ட | மினி பயன்முறை: திரை விளிம்பில் விழிப்பூட்டல்கள் |
 |---|---|
@@ -231,7 +242,7 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| பணி நினைவூட்டல் | முதன்மை கடவுச்சொல்லை மாற்றவும் | நிலை API (தேர்வு தாவல்) | மொழி: ஆங்கிலம் அல்லது போர்த்துகீசியம் |
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -249,7 +260,27 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 
 | CI தோல்வியடைந்தது, உடைந்த வேலைகளுடன் | யாரோ என்னை குறிப்பிட்டுள்ளனர் | அமைப்புகளில் அவற்றின் சுவிட்சுகள் |
 |---|---|---|
-| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+
+| Mention alert with who wrote it |
+|---|
+| ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
+
+| Mention alert with a preview of the text |
+|---|
+| ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
+
+| More alerts about my own work |
+|---|
+| ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+
+| Day summary alert | Day summary setting |
+|---|---|
+| ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
+
+| Mentions subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
 | கடவுச்சொல் மாற்றப்பட்டது, ஒரு கோப்பு நிலுவையில் உள்ளது | நாள் சுருக்கம் |
 |---|---|

@@ -187,7 +187,7 @@ test("picking an unsupported file through the button shows the error instead of 
 test("picking a task from the link picker sets the link, and it can be removed", () => {
   const { changes } = mount("x");
   click("vincular a uma tarefa ou evento");
-  click("✓ comprar leite");
+  click("comprar leite");
   expect(changes.at(-1)?.link).toEqual({ kind: "task", id: "t1", label: "comprar leite" });
   click("desvincular");
   expect(changes.at(-1)?.link).toBeNull();
@@ -196,9 +196,9 @@ test("picking a task from the link picker sets the link, and it can be removed",
 test("Esc inside the link picker closes only the picker, not the whole note", () => {
   const { cancelled } = mount("x");
   click("vincular a uma tarefa ou evento");
-  act(() => void fireEvent.keyDown(screen.getByText("✓ comprar leite"), { key: "Escape" }));
+  act(() => void fireEvent.keyDown(screen.getByText("comprar leite"), { key: "Escape" }));
   expect(cancelled()).toBe(0);
-  expect(screen.queryByText("✓ comprar leite")).toBeNull();
+  expect(screen.queryByText("comprar leite")).toBeNull();
 });
 
 test("a 50 KB note opens in the editor without stalling", () => {

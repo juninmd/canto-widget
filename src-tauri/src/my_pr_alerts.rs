@@ -1,5 +1,5 @@
 //! Pop-up alerts about the user's own open GitHub PRs: CI that just turned red, and PRs nobody reviewed for
-//! too long. Polls the same cached lists the tab uses, only with GitHub connected and the vault open.
+//! too long. Holds the settings of every own-work alert (`own_work_alerts.rs` reads them). Polls the same cached lists the tab uses, only with GitHub connected and the vault open.
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -36,6 +36,24 @@ pub struct Config {
     /// Pop-up when someone @-mentions the user on GitHub or GitLab (`mention_alerts.rs` reads it).
     #[serde(default = "on")]
     pub mentions: bool,
+    /// Approved or changes requested on the user's PRs/MRs.
+    #[serde(default = "on")]
+    pub reviews: bool,
+    /// A PR/MR that became ready to merge, or got a conflict.
+    #[serde(default = "on")]
+    pub merge_state: bool,
+    /// New comments on the user's PRs/MRs.
+    #[serde(default = "on")]
+    pub comments: bool,
+    /// Issues, PRs and MRs someone assigned to the user.
+    #[serde(default = "on")]
+    pub assigned: bool,
+    /// Replies in threads the user commented on (GitHub); off by default, it is the noisiest.
+    #[serde(default)]
+    pub replies: bool,
+    /// Also the threads that mention one of the user's teams (GitHub, needs the `read:org` scope); off by default.
+    #[serde(default)]
+    pub team_mentions: bool,
 }
 
 fn on() -> bool {
@@ -48,7 +66,18 @@ fn default_hours() -> u32 {
 
 impl Default for Config {
     fn default() -> Self {
-        Self { ci: true, stalled: true, stalled_hours: default_hours(), mentions: true }
+        Self {
+            ci: true,
+            stalled: true,
+            stalled_hours: default_hours(),
+            mentions: true,
+            reviews: true,
+            merge_state: true,
+            comments: true,
+            assigned: true,
+            replies: false,
+            team_mentions: false,
+        }
     }
 }
 

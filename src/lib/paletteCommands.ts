@@ -1,6 +1,7 @@
 import type { AgendaItem } from "./api";
 import type { Tab } from "../components/TabBar";
 import { MOD_KEY } from "./platform";
+import { SETTINGS_KEYS } from "./shortcuts";
 import { SKINS, type SkinId } from "./theme";
 import { PALETTE_PROVIDERS, type PaletteCommand } from "./palette";
 import { t } from "../i18n";
@@ -20,6 +21,7 @@ export type PaletteContext = {
   togglePrivacy: () => void;
   toggleFullscreen: () => void;
   copySummary: () => void;
+  refreshTab: () => void;
   help: () => void;
   hide: () => void;
   mini: () => void;
@@ -57,7 +59,14 @@ export function buildCommands(ctx: PaletteContext): PaletteCommand[] {
       run: () => ctx.joinMeeting(meeting),
     },
     visible.has("tasks") && { id: "summary.copy", title: t("palette.copySummary"), run: ctx.copySummary },
-    { id: "settings.open", title: t("palette.settings"), keywords: [t("palette.keywords.settings")], run: () => ctx.goTab("settings") },
+    {
+      id: "settings.open",
+      title: t("palette.settings"),
+      keywords: [t("palette.keywords.settings")],
+      keys: SETTINGS_KEYS,
+      run: () => ctx.goTab("settings"),
+    },
+    { id: "tab.refresh", title: t("palette.refresh"), keywords: [t("palette.keywords.refresh")], run: ctx.refreshTab },
     ...SKINS.map((s) => ({
       id: `skin.${s.id}`,
       title: t("palette.skin", { name: s.name }),

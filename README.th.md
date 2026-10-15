@@ -77,7 +77,7 @@ Windows Hello optional.
 ### ✅ งานที่เตือนคุณ
 
 รายการตรวจสอบรายวันพร้อมเวลาและการเกิดซ้ำ (ทุกวัน วันธรรมดา หรือรายสัปดาห์) พิมพ์ **`Daily at 9:30am`** และ
-reminder is already set; เพิ่ม **`!high`** (หรือ `!alta`, `!média`, `!baixa`) สำหรับลำดับความสำคัญ หรือคลิกจุดบนแถวเพื่อวนรอบ ชื่อยาวตัดกันแทนที่จะถูกตัดออก **ตัวจับเวลาโฟกัส** ในงานใดๆ: ให้ค่าประมาณ กด ▶ และแถบที่ปักหมุดไว้ข้างใต้ทุกแท็บจะนับเวลาเทียบกับงานนั้น (สีแดงเมื่อคุณข้ามไป) เวลาจะถูกบันทึกไว้ในห้องนิรภัยทุกนาที **สรุปวัน** พร้อมที่จะวาง (งาน เวลาที่มุ่งเน้น การประชุมพร้อมเวลาทั้งหมด PRs/MRs เปิด ผสาน ตรวจสอบ และปิดโดยไม่ต้องรวมเข้าด้วยกัน) **รายงานรายสัปดาห์และรายเดือน** ในมาร์กดาวน์ และ **ดึงรายการที่ค้างอยู่** จากเมื่อวาน
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -138,7 +138,7 @@ JSON อยู่ในรูปแบบหรือกะทัดรัด �
 มัน. ฉบับร่าง PRs **กำลังรอการตรวจทานของคุณ** และ PRs **จนตรอก** เป็นเวลาหนึ่งสัปดาห์โดดเด่น และ PR แต่ละรายการจะมีขนาดเล็ก
 **ตรา CI** (ผ่าน ล้มเหลว กำลังทำงาน หรือไม่มี CI) จากการตรวจสอบของหัวหน้า เมื่อมีคน**ร้องขอของคุณ
 ตรวจสอบ** การแจ้งเตือนของระบบปฏิบัติการจะแจ้งให้คุณทราบ (เปิดโดยค่าเริ่มต้น ให้ปิดในการตั้งค่า) กรองตามข้อความ `repo:` หรือ `label:`, PRs เท่านั้นหรือเฉพาะประเด็นเท่านั้น จัดเรียงตามการอัปเดต การสร้าง หรือความคิดเห็น และ
-เลื่อนด้วย **แสดงเพิ่มเติม** นอกจากนี้ยังสนับสนุน **GitLab.com และ GitLab** ที่โฮสต์เองด้วยแคช 5 นาทีที่
+scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 เคารพขีดจำกัดอัตรา ลงชื่อเข้าใช้ด้วยโทเค็นส่วนตัวแบบอ่านอย่างเดียวหรือจากเบราว์เซอร์ (การไหลของอุปกรณ์)
 
 </td>
@@ -175,13 +175,14 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 ล็อคและ `?` แสดงรายการทางลัด `Ctrl+Shift+P` (`Cmd+Shift+P` บน macOS) เปิด **ชุดคำสั่ง** ด้วยทุก ๆ
 การดำเนินการตามชื่อ: ไปที่แท็บ งานใหม่หรือบันทึกย่อ เข้าร่วมการประชุมครั้งถัดไป คัดลอกสรุปของวัน สลับสกิน ล็อค
 
-## 🎨 ห้าสกิน
+## 🎨 Six skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>ค่าเริ่มต้น</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>ฮูเอโก มุนโด</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>แดร็กคูล่า</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>แสง</b></td>
 </tr>
 </table>
@@ -195,6 +196,8 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 
 ![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
+![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
+
 | ยินดีต้อนรับรันครั้งแรก | ค้นหาทั่วโลก (`Ctrl+K`) | แท็บ GitLab ที่โฮสต์เอง | แจ้งเตือนการประชุม |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
@@ -206,6 +209,14 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 | โฟลเดอร์ที่ซิงค์ | ความหนาแน่นกะทัดรัด | ห้องนิรภัยที่ถูกล็อค | เชื่อมต่อ GitHub |
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
+
+| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+|---|---|---|---|
+| ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
+
+| Discard an unsaved note draft |
+|---|
+| ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
 | โหมด: มินิ, ซ่อน, ปกติ, ขยายใหญ่สุด | โหมดมินิ: แจ้งเตือนที่ขอบหน้าจอ |
 |---|---|
@@ -231,7 +242,7 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| การแจ้งเตือนงาน | เปลี่ยนรหัสผ่านหลัก | สถานะ API (แท็บเลือกใช้) | ภาษา: อังกฤษหรือโปรตุเกส |
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -249,7 +260,27 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 
 | CI ล้มเหลวด้วยงานพัง | มีคนพูดถึงฉัน | สวิตช์ของพวกเขาอยู่ในการตั้งค่า |
 |---|---|---|
-| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+
+| Mention alert with who wrote it |
+|---|
+| ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
+
+| Mention alert with a preview of the text |
+|---|
+| ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
+
+| More alerts about my own work |
+|---|
+| ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+
+| Day summary alert | Day summary setting |
+|---|---|
+| ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
+
+| Mentions subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
 | เปลี่ยนรหัสผ่านแล้ว มีหนึ่งไฟล์ที่รอดำเนินการ | สรุปวัน |
 |---|---|

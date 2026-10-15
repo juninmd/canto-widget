@@ -146,6 +146,7 @@ fn short(msg: &str) -> String {
         ("timed out", "tempo esgotado"),
         ("timeout", "tempo esgotado"),
         ("refused", "conexão recusada"),
+        ("recus", "conexão recusada"),
         ("dns", "o nome não resolve"),
         ("certificate", "certificado inválido"),
     ];

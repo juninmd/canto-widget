@@ -72,12 +72,15 @@ test("Enter alone does not save", async () => {
   expect(calls.some((c) => c.cmd === "note_save")).toBe(false);
 });
 
-test("Esc cancels the editor and discards the draft", async () => {
+test("Esc cancels the editor and, once confirmed, discards the draft", async () => {
   const title = await openEditor();
   await act(async () => {
     fireEvent.change(title, { target: { value: "nao quero isto" } });
     fireEvent.keyDown(title, { key: "Escape" });
     await Promise.resolve();
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "descartar" }));
   });
 
   expect(calls.some((c) => c.cmd === "note_save")).toBe(false);

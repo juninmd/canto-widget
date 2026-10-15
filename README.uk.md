@@ -77,7 +77,7 @@ Windows Hello необов’язковий.
 ### ✅ Завдання, які нагадують
 
 Щоденний контрольний список із зазначенням часу та повторення (кожен день, будні або щотижня). Введіть **`Daily at 9:30am`** і
-нагадування вже встановлено; додайте **`!high`** (або `!alta`, `!média`, `!baixa`) для пріоритету або натисніть крапку в рядку, щоб змінити його. Довгі заголовки обертаються замість того, щоб бути обрізаними. **Фокусуйте таймер** на будь-якому завданні: дайте йому оцінку, натисніть ▶, і смужка, закріплена під кожною вкладкою, відраховує час проти нього (червона, коли ви переходите); час зберігається в сховищі щохвилини. **Підсумок дня**, готовий до вставлення (завдання, зосереджений час, наради із загальним часом, PRs/MRs відкриті, об’єднані, переглянуті та закриті без об’єднання), **тижневий і місячний звіт** у розмітці та **перетягнути незавершені елементи** за вчорашній день.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -138,7 +138,7 @@ Windows Hello необов’язковий.
 це. Чернетки, PRs **очікує на ваш перегляд** і PRs **зупинено** на тиждень виділяються, і кожен PR містить невелику
 **Значок CI** (пройшов, не пройшов, працює чи не CI) з перевірок головного коміту. Коли хтось **просить вас
 переглянути**, сповіщає вас сповіщення ОС (за умовчанням увімкнено, вимкніть у налаштуваннях). Фільтрувати за текстом, `repo:` чи `label:`, лише PRs або лише проблеми, сортувати за оновленням, створенням чи коментарями та
-прокрутіть за допомогою **показати більше**. Також підтримує **GitLab.com і GitLab** з 5-хвилинним кеш-пам’яттю, що
+scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 дотримується обмеження ставок. Увійдіть за допомогою персонального токена лише для читання або з браузера (потік пристрою).
 
 </td>
@@ -175,13 +175,14 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 блокує, а `?` перелічує ярлики. `Ctrl+Shift+P` (`Cmd+Shift+P` в macOS) відкриває **командну палітру** з кожним
 дія за назвою: перейти до вкладки, нового завдання чи нотатки, приєднатися до наступної зустрічі, скопіювати підсумок дня, змінити оформлення, заблокувати.
 
-## 🎨 П'ять скінів
+## 🎨 Six skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>За замовчуванням</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -195,6 +196,8 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 
 ![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
+![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
+
 | Ласкаво просимо до першого запуску | Глобальний пошук (`Ctrl+K`) | Саморозміщена вкладка GitLab | Сповіщення про зустріч |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
@@ -206,6 +209,14 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 | Синхронізована папка | Компактна щільність | Замкнене сховище | Підключіть GitHub |
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
+
+| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+|---|---|---|---|
+| ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
+
+| Discard an unsaved note draft |
+|---|
+| ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
 | Режими: міні, прихований, нормальний, розгорнутий | Міні-режим: сповіщення на краю екрана |
 |---|---|
@@ -231,7 +242,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Пам'ятка про завдання | Змінити головний пароль | Статус API (вкладка згоди) | Мова: англійська або португальська |
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -249,7 +260,27 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 
 | CI не вдалось, зі зламаними завданнями | Хтось згадав мене | Їх перемикачі в налаштуваннях |
 |---|---|---|
-| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+
+| Mention alert with who wrote it |
+|---|
+| ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
+
+| Mention alert with a preview of the text |
+|---|
+| ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
+
+| More alerts about my own work |
+|---|
+| ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+
+| Day summary alert | Day summary setting |
+|---|---|
+| ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
+
+| Mentions subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
 | Пароль змінено, один файл очікує | Підсумок дня |
 |---|---|

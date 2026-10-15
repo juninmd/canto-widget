@@ -12,6 +12,7 @@ pub mod biometric;
 pub mod blocking;
 pub mod calendar;
 pub mod calendar_event;
+pub mod capture;
 pub mod checks_cache;
 pub mod clip_os;
 pub mod clip_transform;
@@ -27,6 +28,7 @@ pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_health;
+pub mod cmd_mentions;
 pub mod cmd_models;
 pub mod cmd_notes;
 pub mod cmd_report;
@@ -48,8 +50,12 @@ pub mod github_auth;
 pub mod github_checks;
 pub mod github_failures;
 pub mod github_query;
+pub mod github_teams;
+pub mod github_thread;
 pub mod gitlab;
 pub mod gitlab_query;
+pub mod gitlab_todos;
+pub mod gitlab_work;
 pub mod global_shortcuts;
 pub mod google_token;
 pub mod guest_photos;
@@ -65,11 +71,15 @@ pub mod lang;
 pub mod meet;
 pub mod meeting_alert;
 pub mod mention_alerts;
+pub mod mention_feed;
+pub mod mention_sender;
+pub mod mentions_state;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
 pub mod models_rank;
 pub mod models_state;
+pub mod morning_digest;
 pub mod my_pr_alerts;
 pub mod my_pr_events;
 pub mod net;
@@ -77,9 +87,13 @@ pub mod next_meeting;
 pub mod note_images;
 pub mod notification;
 pub mod oauth;
+pub mod own_work_alerts;
+pub mod own_work_github;
+pub mod own_work_gitlab;
 pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
+pub mod pr_state;
 pub mod priority;
 pub mod report;
 pub mod review_alert;
@@ -104,6 +118,7 @@ pub mod vault;
 pub mod window;
 pub mod window_mode;
 pub mod window_state;
+pub mod work_events;
 
 pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
 
@@ -146,6 +161,8 @@ pub fn run() {
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
+            app.manage(mentions_state::MentionsUnread::default());
+            app.manage(morning_digest::MorningDigest::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
             app.manage(alert_log::AlertLog::default());
@@ -167,6 +184,8 @@ pub fn run() {
             review_alert::watch(app.handle().clone());
             my_pr_alerts::watch(app.handle().clone());
             mention_alerts::watch(app.handle().clone());
+            own_work_alerts::watch(app.handle().clone());
+            morning_digest::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
             #[cfg(not(debug_assertions))]
@@ -191,6 +210,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::vault_status,
+            capture::capture_close,
             commands::vault_create,
             commands::vault_unlock,
             commands::vault_lock,
@@ -281,9 +301,18 @@ pub fn run() {
             cmd_github::github_device_cancel,
             cmd_github::github_disconnect,
             cmd_github_lists::github_lists,
+            cmd_mentions::github_mentions,
+            cmd_mentions::gitlab_mentions,
+            mentions_state::mention_read,
+            mentions_state::mention_mute_thread,
+            mentions_state::mention_mute_author,
+            mentions_state::mentions_unread,
+            morning_digest::morning_digest_get,
+            morning_digest::morning_digest_set,
             cmd_github_lists::github_section,
             cmd_github_lists::github_pr_checks,
             cmd_github_lists::github_prs_checks,
+            cmd_github_lists::github_pr_comments,
             review_alert::review_alerts_get,
             review_alert::review_alerts_set,
             my_pr_alerts::my_pr_alerts_get,

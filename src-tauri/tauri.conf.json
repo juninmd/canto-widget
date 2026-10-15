@@ -47,6 +47,22 @@
         "focusable": false,
         "center": false,
         "dragDropEnabled": false
+      },
+      {
+        "label": "capture",
+        "title": "Canto",
+        "url": "index.html?capture",
+        "width": 400,
+        "height": 150,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "center": true,
+        "dragDropEnabled": false
       }
     ],
     "security": {

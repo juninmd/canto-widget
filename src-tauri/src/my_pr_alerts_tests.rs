@@ -126,9 +126,12 @@ fn the_switches_default_on_at_48_hours_and_survive_a_restart() {
     let dir = std::env::temp_dir().join(format!("canto-my-pr-alerts-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let _ = std::fs::remove_file(dir.join(FILE));
-    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: true, stalled: true, stalled_hours: 48, mentions: true });
-    MyPrAlerts::load(&dir).set(Config { ci: false, stalled: true, stalled_hours: 24, mentions: false }).unwrap();
-    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, stalled: true, stalled_hours: 24, mentions: false });
+    assert_eq!(MyPrAlerts::load(&dir).get(), Config::default());
+    MyPrAlerts::load(&dir).set(Config { ci: false, stalled_hours: 24, mentions: false, ..Config::default() }).unwrap();
+    assert_eq!(
+        MyPrAlerts::load(&dir).get(),
+        Config { ci: false, stalled_hours: 24, mentions: false, ..Config::default() }
+    );
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -137,15 +140,9 @@ fn an_absurd_wait_is_clamped_and_a_file_missing_fields_keeps_the_defaults() {
     let dir = std::env::temp_dir().join(format!("canto-my-pr-alerts-clamp-{}", std::process::id()));
     std::fs::create_dir_all(&dir).unwrap();
     let alerts = MyPrAlerts::load(&dir);
-    assert_eq!(
-        alerts.set(Config { ci: true, stalled: true, stalled_hours: 0, mentions: true }).unwrap().stalled_hours,
-        1
-    );
-    assert_eq!(
-        alerts.set(Config { ci: true, stalled: true, stalled_hours: 99_999, mentions: true }).unwrap().stalled_hours,
-        336
-    );
+    assert_eq!(alerts.set(Config { stalled_hours: 0, ..Config::default() }).unwrap().stalled_hours, 1);
+    assert_eq!(alerts.set(Config { stalled_hours: 99_999, ..Config::default() }).unwrap().stalled_hours, 336);
     std::fs::write(dir.join(FILE), r#"{"ci":false}"#).unwrap();
-    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, stalled: true, stalled_hours: 48, mentions: true });
+    assert_eq!(MyPrAlerts::load(&dir).get(), Config { ci: false, ..Config::default() });
     let _ = std::fs::remove_dir_all(&dir);
 }

@@ -95,13 +95,10 @@ a interface; as notas chegam em páginas de 50 com **mostrar mais**; um card ace
 |---|---|---|---|---|
 | 1 | Quick add em linguagem natural ("amanhã 14h reunião") | Todoist, TickTick | Parser de data/hora embutido no campo de nova tarefa. [Todoist](https://ellieplanner.com/productivity-copilot/todoist-pricing), [TickTick](https://ticktick.com/) | P |
 | 2 | Snooze de lembretes | TickTick/Todoist (adiar tarefa) | Botão "adiar 10min/1h" no pop-up de lembrete, em vez de só marcar feito/dispensar. | P |
-| 3 | Entrar na reunião pelo menu da bandeja (tray), sem abrir o widget | MeetingBar | Item de menu com a próxima reunião e botão "Join" direto no ícone de bandeja. [MeetingBar](https://github.com/leits/MeetingBar) | P |
-| 4 | Badge de contagem (issues/PRs, tarefas do dia) no ícone da bandeja/dock | Gitify | Contador de notificações não lidas sobre o ícone. [Gitify](https://gitify.io/) | P |
 | 5 | Colar como texto puro / converter formato ao colar | PowerToys Advanced Paste | Atalho para colar sem formatação ou transformar (ex.: markdown→texto). [Microsoft Learn](https://learn.microsoft.com/en-us/windows/powertoys/advanced-paste) | P |
 | 6 | Exclusão de apps sensíveis do histórico de clipboard (ex.: gerenciadores de senha) | CopyQ (ignora certas janelas), Ditto | Lista de apps/janelas ignoradas ao capturar clipboard — reduz risco de vazar senha copiada. [CopyQ security](https://copyq.readthedocs.io/en/latest/security.html) | P |
 | 7 | Markdown renderizado nas notas (preview) | Obsidian, Joplin | Editor com preview de markdown (negrito, listas, links) em vez de texto plano. [Joplin](https://github.com/laurent22/joplin) | M |
 | 8 | Suporte a múltiplos provedores Git (GitLab, Bitbucket, Gitea) além do GitHub | Gitify | Amplia a aba de "issues/PRs" para outros hosts. [Gitify](https://gitify.io/) | M |
-| 9 | Criação de reunião ad-hoc / atalho global "entrar na próxima reunião" de qualquer app | MeetingBar | Hotkey dedicado (não só abrir o widget) que já abre o link do Meet mais próximo. [MeetingBar](https://github.com/leits/MeetingBar) | P |
 
 ### O que já entrou
 
@@ -111,6 +108,9 @@ a interface; as notas chegam em páginas de 50 com **mostrar mais**; um card ace
 | Adiar lembrete | **adiar 10 min** no aviso de reunião e no lembrete de tarefa; tarefa concluída ou apagada no intervalo não toca de novo. |
 | Colar como texto puro / converter formato | Atalho que limpa a formatação da área de transferência e, no histórico, **copiar como**: JSON formatado ou compacto, uma linha, MAIÚSCULAS e minúsculas. |
 | Excluir apps sensíveis do clipboard | No Windows, conteúdo marcado com `ExcludeClipboardContentFromMonitorProcessing` ou `Clipboard Viewer Ignore` não é lido. |
+| Entrar na reunião pelo tray | Item **Entrar: <título>** no menu da bandeja com a próxima reunião que tem Meet, atualizado a cada 90 s. |
+| Atalho global para entrar | Atalho global que abre o Meet da próxima reunião de qualquer app. |
+| Badge de contagem | Revisões pedidas (GitHub/GitLab) somadas às tarefas abertas do dia: número no Dock do macOS, ponto vermelho no Windows e no Linux. |
 
 As demais seguem abertas como ideias para próximas versões.
 

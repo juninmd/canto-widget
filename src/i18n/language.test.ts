@@ -5,6 +5,7 @@ test("automatic matches supported regional locales and keeps the primary languag
   expect(resolveLanguage("auto", ["pt-BR", "en-US"])).toBe("pt-BR");
   expect(resolveLanguage("auto", ["pt-PT"])).toBe("pt-BR");
   expect(resolveLanguage("auto", ["en-GB"])).toBe("en");
+  expect(resolveLanguage("auto", ["es-MX", "en-US"])).toBe("es");
   expect(resolveLanguage("auto", ["de-DE", "pt-BR"])).toBe("de");
   expect(resolveLanguage("auto", ["fr-CA"])).toBe("fr");
   expect(resolveLanguage("auto", ["zh-CN"])).toBe("zh");
@@ -23,6 +24,7 @@ test("an explicit choice wins over the system", () => {
 
 test("unknown stored values fall back to automatic", () => {
   expect(parseChoice("en")).toBe("en");
+  expect(parseChoice("es")).toBe("es");
   expect(parseChoice("fr")).toBe("fr");
   expect(parseChoice("xx")).toBe("auto");
   expect(parseChoice(null)).toBe("auto");

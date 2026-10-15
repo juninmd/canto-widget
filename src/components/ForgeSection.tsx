@@ -123,6 +123,9 @@ function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
             <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>
           </span>
         </span>
+        <span aria-hidden="true" title={t("forge.openExternal")} className="shrink-0 self-start text-[11px] text-faint">
+          ↗
+        </span>
       </button>
       {item.is_pr && !ci && (
         <div className="mt-1 flex items-center gap-2 pl-7 text-[11px]">

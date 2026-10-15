@@ -31,7 +31,7 @@ afterEach(cleanup);
 test("lists the Gemini notes of recent meetings and opens the doc in the browser", async () => {
   await show();
   expect(screen.getByText("Retro da sprint")).toBeTruthy();
-  expect(screen.getByText("📄 Offsite - Transcript")).toBeTruthy();
+  expect(screen.getByText("Offsite - Transcript")).toBeTruthy();
   await act(async () => {
     fireEvent.click(screen.getByText("Retro da sprint"));
   });
@@ -59,4 +59,16 @@ test("without a Google account the section explains itself instead of spinning",
 test("the search window is the last 14 days up to now", () => {
   const now = new Date("2026-09-18T12:00:00Z");
   expect(geminiWindow(now)).toEqual({ timeMin: "2026-09-04T12:00:00.000Z", timeMax: "2026-09-18T12:00:00.000Z" });
+});
+
+test("coming back to a hidden window reloads the notes", async () => {
+  await show();
+  const hide = (hidden: boolean) => {
+    Object.defineProperty(document, "hidden", { value: hidden, configurable: true });
+    document.dispatchEvent(new Event("visibilitychange"));
+  };
+  await act(async () => hide(true));
+  expect(calls.filter((c) => c.cmd === "gemini_docs")).toHaveLength(1);
+  await act(async () => hide(false));
+  expect(calls.filter((c) => c.cmd === "gemini_docs")).toHaveLength(2);
 });

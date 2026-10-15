@@ -72,3 +72,108 @@ test("dismissing one alert leaves the others and tells Rust which one", async ({
   const close = (await calls(page)).find((c) => c.cmd === "alert_close");
   expect(close?.args).toEqual({ id: "status:exemplo" });
 });
+
+test("a mention names the person who wrote it, with their photo", async ({ page }) => {
+  const mention = {
+    id: "mention:gitlab:42",
+    title: "Falha no deploy de produção",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://git.example.com/acme/atlas/-/issues/9",
+    organizer: "acme/atlas",
+    description: "@marina: @voce consegue olhar o retry do lote?",
+    tag: "gitlab",
+    sender: { name: "Marina Souza", login: "marina", avatar: "data:image/png;base64,iVBORw0KGgo=" },
+  };
+  await mockTauri(page, { fixed: { alert_payload: [mention] } });
+  await ring(page);
+
+  const who = page.getByRole("alertdialog").locator("[data-sender]");
+  await expect(who).toContainText("Marina Souza");
+  await expect(who).toContainText("@marina");
+  await expect(who.locator("img")).toHaveAttribute("src", /^data:image\/png/);
+});
+
+test("a GitHub mention previews the text that mentions you", async ({ page }) => {
+  const mention = {
+    id: "mention:github:acme/atlas#128",
+    title: "Retry do lote estoura o timeout",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://github.com/acme/atlas/pull/128",
+    organizer: "acme/atlas#128",
+    description:
+      "@marina: …conversei com o time e o retry está em 3 tentativas. @voce consegue olhar o backoff antes da release?",
+    tag: "github",
+    sender: { name: "Marina Souza", login: "marina", avatar: "" },
+  };
+  await mockTauri(page, { fixed: { alert_payload: [mention] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert).toContainText("@voce consegue olhar o backoff antes da release?");
+  await expect(alert.locator("[data-sender]")).toContainText("Marina Souza");
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});
+
+test("an approved PR names who approved it, with their photo, and a conflict ranks above it", async ({ page }) => {
+  const base = { start: "", end: "", all_day: false, location: "", meet: "", link: "" };
+  const approved = {
+    ...base,
+    id: "pr:approved:acme/atlas#128",
+    title: "Corrige o parser de CSV com aspas",
+    organizer: "acme/atlas#128",
+    link: "https://github.com/acme/atlas/pull/128",
+    description: "Marina Souza aprovou este PR.\nBoa, o teste de aspas cobre o caso do lote.",
+    tag: "approved",
+    sender: { name: "Marina Souza", login: "marina", avatar: "" },
+  };
+  const conflict = {
+    ...base,
+    id: "pr:conflict:acme/atlas#131",
+    title: "Cache de relatórios por período",
+    organizer: "acme/atlas#131",
+    link: "https://github.com/acme/atlas/pull/131",
+    description: "Conflito com a branch base; atualize este PR para poder fazer merge.",
+    tag: "conflict",
+  };
+  await mockTauri(page, { fixed: { alert_payload: [approved, conflict] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert.getByRole("heading", { level: 1 })).toHaveText("Cache de relatórios por período");
+  await alert.getByRole("button", { name: /Corrige o parser/ }).click();
+  await expect(alert.locator("[data-sender]")).toContainText("Marina Souza");
+  await expect(alert).toContainText("Boa, o teste de aspas cobre o caso do lote.");
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});
+
+test("the morning summary lists what is waiting and only offers to close", async ({ page }) => {
+  const digest = {
+    id: "digest:morning:2026-10-12",
+    title: "Resumo do dia",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "",
+    description: "3 reuniões, a primeira às 10:30\n2 tarefas abertas\n2 revisões pedidas\n4 menções não lidas",
+    tag: "digest",
+  };
+  await mockTauri(page, { fixed: { alert_payload: [digest] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert).toContainText("3 reuniões, a primeira às 10:30");
+  await expect(alert).toContainText("4 menções não lidas");
+  await expect(alert.getByRole("button", { name: "fechar" })).toBeVisible();
+  await expect(alert.getByRole("button", { name: /adiar/ })).toHaveCount(0);
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});

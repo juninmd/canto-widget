@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { t } from "../i18n";
 import { api, errText, type Subtask } from "../lib/api";
+import { CrossIcon, PlusIcon } from "./Icons";
 
 type Props = { taskId: string; subtasks: Subtask[]; onError: (m: string) => void; onChange: () => void };
 
@@ -49,7 +50,7 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
               className="grid size-5 shrink-0 place-items-center rounded text-faint opacity-0 hover:text-danger focus-visible:opacity-100 group-hover:opacity-100"
               aria-label={t("tasks.subtaskDelete", { title: s.title })}
             >
-              ×
+              <CrossIcon />
             </button>
           </li>
         ))}
@@ -62,8 +63,8 @@ export default function TaskSubtasks({ taskId, subtasks, onError, onChange }: Pr
           aria-label={t("tasks.subtaskNew")}
           className="flex-1 canto-field !rounded-md px-1.5 py-0.5"
         />
-        <button type="submit" aria-label={t("tasks.subtaskAdd")} className="rounded bg-edge px-2 text-fg">
-          +
+        <button type="submit" aria-label={t("tasks.subtaskAdd")} className="grid place-items-center rounded bg-edge px-2 text-fg">
+          <PlusIcon />
         </button>
       </form>
     </div>

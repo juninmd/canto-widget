@@ -3,6 +3,7 @@ import { listen } from "@tauri-apps/api/event";
 import { api, errText, UPDATE_PROGRESS_EVENT, type UpdateInfo, type UpdateProgress } from "../lib/api";
 import { t } from "../i18n";
 import { plainNotes } from "../lib/releaseNotes";
+import { SettingsSection } from "./SettingsSection";
 
 const brDate = (iso: string) => iso.split("-").reverse().join("/");
 
@@ -55,10 +56,7 @@ export default function UpdateSection() {
   }
 
   return (
-    <section className="flex flex-col gap-2" aria-labelledby="updates-title">
-      <h3 id="updates-title" className="text-xs font-semibold text-fg">
-        {t("update.title")}
-      </h3>
+    <SettingsSection id="updates-title" title={t("update.title")}>
       <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs">
         <dt className="text-muted">{t("update.current")}</dt>
         <dd className="font-mono text-fg">{info?.current ?? "…"}</dd>
@@ -98,6 +96,6 @@ export default function UpdateSection() {
       >
         {checking ? t("update.checking") : t("update.checkNow")}
       </button>
-    </section>
+    </SettingsSection>
   );
 }

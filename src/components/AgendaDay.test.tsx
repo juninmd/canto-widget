@@ -14,6 +14,7 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { default: AgendaTab } = await import("./AgendaTab");
+const { savePicked } = await import("../lib/agendaPicked");
 
 const at = (h: number, m = 0) => new Date(2026, 8, 30, h, m).toISOString();
 const ev = (id: string, h: number, m: number, endH: number, endM: number, extra: Partial<AgendaItem> = {}): AgendaItem => ({
@@ -33,7 +34,10 @@ beforeEach(() => {
   localStorage.removeItem("canto.agendaView");
   tasks = [task("Revisar PR", { hora: "09:15", estimate_min: 30 }), task("Escrever changelog", { estimate_min: 30 })];
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  savePicked(null);
+});
 
 test("today is the default view and reads the day's tasks", async () => {
   await show([ev("Daily do time", 9, 0, 9, 30)]);

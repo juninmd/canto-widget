@@ -1,7 +1,7 @@
 import type { AgendaItem, AlertOutcome, ResolvedAlert } from "./api";
 import { minutesUntil } from "./agenda";
 import { TASK_PREFIX } from "./reminders";
-import { t } from "../i18n";
+import { t, type MessageKey } from "../i18n";
 
 /** Same prefixes as `STATUS_PREFIX` and `MODEL_PREFIX` in `notification.rs`. */
 export const STATUS_PREFIX = "status:";
@@ -10,8 +10,10 @@ export const MODEL_PREFIX = "model:";
 export const PR_PREFIX = "pr:";
 /** Same prefix as `MENTION_PREFIX` in `notification.rs`: someone @-mentioned the user on GitHub or GitLab. */
 export const MENTION_PREFIX = "mention:";
+/** Same prefix as `DIGEST_PREFIX` in `notification.rs`: the morning summary of the day. */
+export const DIGEST_PREFIX = "digest:";
 
-export type AlertKind = "status" | "model" | "pr" | "mention" | "task" | "meeting";
+export type AlertKind = "status" | "model" | "pr" | "mention" | "digest" | "task" | "meeting";
 export type Tone = "danger" | "warn" | "accent" | "muted";
 
 export function kindOf(e: AgendaItem): AlertKind {
@@ -19,7 +21,28 @@ export function kindOf(e: AgendaItem): AlertKind {
   if (e.id.startsWith(MODEL_PREFIX)) return "model";
   if (e.id.startsWith(PR_PREFIX)) return "pr";
   if (e.id.startsWith(MENTION_PREFIX)) return "mention";
+  if (e.id.startsWith(DIGEST_PREFIX)) return "digest";
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
+}
+
+/** Red CI and a conflict are the loud ones; good news and plain activity are calm. */
+const PR_TONE: Record<string, Tone> = {
+  ci: "danger",
+  conflict: "danger",
+  stalled: "warn",
+  changes: "warn",
+  approved: "accent",
+  ready: "accent",
+  comment: "accent",
+  reply: "accent",
+  assigned: "accent",
+  updates: "accent",
+};
+
+/** The one-line name of an own-work alert: its tag, or "sem revisão" for the first kind that had none. */
+export function prLabel(tag: string | undefined): string {
+  const known = ["ci", "stalled", "approved", "changes", "ready", "conflict", "comment", "reply", "assigned", "updates"];
+  return t(`alert.pr.${known.includes(tag ?? "") ? tag : "stalled"}` as MessageKey);
 }
 
 /** Statuspage's indicator decides how loud a service alert is; everything else keeps one tone per kind. */
@@ -31,7 +54,7 @@ export function toneOf(e: AgendaItem): Tone {
     case "model":
       return "muted";
     case "pr":
-      return e.tag === "ci" ? "danger" : "warn";
+      return PR_TONE[e.tag ?? ""] ?? "warn";
     default:
       return "accent";
   }
@@ -78,4 +101,9 @@ export function outcomeLabel(item: AgendaItem, outcome: AlertOutcome): string {
 export function resolvedToday(list: readonly ResolvedAlert[], now = new Date()): ResolvedAlert[] {
   const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   return list.filter((r) => r.at >= midnight);
+}
+
+/** The name to show for whoever triggered an alert: the full name, else the login; empty when unknown. */
+export function senderName(e: AgendaItem): string {
+  return e.sender?.name || e.sender?.login || "";
 }

@@ -67,7 +67,20 @@ export type Note = {
 };
 
 /** Pop-ups about the user's own PRs: red CI, and no review for `stalled_hours`. */
-export type MyPrAlerts = { ci: boolean; stalled: boolean; stalled_hours: number; mentions: boolean };
+/** The morning summary: off by default, at a local hour, on working days unless asked otherwise. */
+export type MorningDigest = { enabled: boolean; hour: number; weekdays_only: boolean };
+export type MyPrAlerts = {
+  ci: boolean;
+  stalled: boolean;
+  stalled_hours: number;
+  mentions: boolean;
+  reviews: boolean;
+  merge_state: boolean;
+  comments: boolean;
+  assigned: boolean;
+  replies: boolean;
+  team_mentions: boolean;
+};
 
 export type ClipMode = "json_pretty" | "json_compact" | "one_line" | "upper" | "lower";
 
@@ -128,6 +141,34 @@ export type AgendaItem = {
   attendees?: Guest[];
   /** Short state for alerts that aren't calendar events: a Status API indicator or a model's rank. */
   tag?: string;
+  /** Who mentioned the user (GitHub/GitLab); `avatar` is a `data:` URL or empty. */
+  sender?: Sender | null;
+};
+export type Sender = { name: string; login: string; avatar: string };
+/** One thread that mentions the user; `sender` and `preview` stay empty when the comment could not be found. */
+export type MentionRow = {
+  id: string;
+  title: string;
+  reference: string;
+  url: string;
+  is_pr: boolean;
+  at: string;
+  sender: Sender | null;
+  preview: string;
+  /** Not marked read yet. */
+  unread: boolean;
+  /** The thread or its author is muted. */
+  muted: boolean;
+  /** GitLab: the to-do is already done there. */
+  done: boolean;
+};
+export type MentionsReply = {
+  rows: MentionRow[];
+  /** ms; 0 when the list was just asked for. */
+  fetched_at: number;
+  /** Set when the rate limit forced a cached copy: fresh data only after this instant (ms). */
+  limited_until: number | null;
+  unread: number;
 };
 /** What was done with an alert: the main action, snoozed, closed or (a service) muted. */
 export type AlertOutcome = "done" | "snoozed" | "closed" | "muted";
@@ -140,6 +181,15 @@ export type GuestPhotos = { photos: Record<string, string>; needs_consent: boole
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type PrRef = { repo: string; number: number };
 export type PrChecks = PrRef & { status: ChecksStatus };
+export type PrComment = {
+  id: number;
+  author: string;
+  author_type: string;
+  avatar_url: string;
+  body: string;
+  created_at: string;
+  url: string;
+};
 export type GeminiDoc = { meeting: string; start: string; title: string; url: string };
 export type StatusItem = { title: string; link: string; published_at: number };
 export type StatusLive = { indicator: "none" | "minor" | "major" | "critical" | "maintenance"; description: string };
@@ -192,6 +242,8 @@ export const api = {
   subtaskToggle: (id: string, subtaskId: string) => invoke<void>("subtask_toggle", { id, subtaskId }),
   subtaskRemove: (id: string, subtaskId: string) => invoke<void>("subtask_remove", { id, subtaskId }),
   taskSetPriority: (id: string, priority: Priority | null) => invoke<void>("task_set_priority", { id, priority }),
+  /** Hides the quick-capture window (Esc or after saving). */
+  captureClose: () => invoke<void>("capture_close"),
   taskSetEstimate: (id: string, minutes: number | null) => invoke<void>("task_set_estimate", { id, minutes }),
   taskAddTime: (id: string, secs: number) => invoke<void>("task_add_time", { id, secs }),
   activityStatus: () => invoke<ActivityStatus>("activity_status"),
@@ -294,13 +346,18 @@ export const api = {
   githubSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("github_section", { section, page, filter }),
   /** Fallback click for a PR the batch left out; shares the batch's cache. */
+  githubMentions: (force = false) => invoke<MentionsReply>("github_mentions", { force }),
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
+  /** Fetch comments on a PR to display in the commenters catalog. */
+  githubPrComments: (repo: string, number: number) => invoke<PrComment[]>("github_pr_comments", { repo, number }),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
   reviewAlertsSet: (enabled: boolean) => invoke<boolean>("review_alerts_set", { enabled }),
+  morningDigestGet: () => invoke<MorningDigest>("morning_digest_get"),
+  morningDigestSet: (config: MorningDigest) => invoke<MorningDigest>("morning_digest_set", { config }),
   myPrAlertsGet: () => invoke<MyPrAlerts>("my_pr_alerts_get"),
   myPrAlertsSet: (config: MyPrAlerts) => invoke<MyPrAlerts>("my_pr_alerts_set", { config }),
 
@@ -318,6 +375,11 @@ export const api = {
   gitlabSection: (section: ForgeSection, page: number, filter: ForgeFilter) =>
     invoke<ForgeList>("gitlab_section", { section, page, filter }),
   /** One call per click, not per list row: never fetched for a whole page at once. */
+  gitlabMentions: (includeDone = false) => invoke<MentionsReply>("gitlab_mentions", { includeDone }),
+  mentionRead: (ids: string[], read: boolean) => invoke<number>("mention_read", { ids, read }),
+  mentionMuteThread: (url: string, title: string, muted: boolean) => invoke<number>("mention_mute_thread", { url, title, muted }),
+  mentionMuteAuthor: (login: string, muted: boolean) => invoke<number>("mention_mute_author", { login, muted }),
+  mentionsUnread: () => invoke<number>("mentions_unread"),
   gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),
   /** PRs/MRs opened since local midnight on every connected forge; one failing forge only adds to `errors`. */
   forgesOpenedSince: (sinceMs: number) => invoke<ForgeOpened>("forges_opened_since", { sinceMs }),

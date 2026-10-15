@@ -77,7 +77,7 @@ skickar ett meddelande, med **snooze 10 min**.
 ### ✅ Uppgifter som påminner dig
 
 En daglig checklista med tid och återkommande (varje dag, vardagar eller veckovis). Skriv **`Daily at 9:30am`** och
-påminnelse är redan inställd; lägg till **`!high`** (eller `!alta`, `!média`, `!baixa`) för prioritet, eller klicka på pricken på raden för att växla den. Långa titlar lindas istället för att skäras av. **Fokustimer** på vilken uppgift som helst: ge den en uppskattning, tryck på ▶ och en stapel under varje flik räknar tiden mot den (röd när du går över); tiden sparas till valvet varje minut. **Dagssammanfattning** redo att klistra in (uppgifter, fokuserad tid, möten med total tid, PRs/MRs öppnade, sammanslagna, granskade och stängda utan sammanslagning), en **vecko- och månadsrapport** i markdown, och **överdrag väntande objekt** från igår.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -138,7 +138,7 @@ känslig.
 det. Utkast, PRs **väntar på din recension** och PRs **stoppad** i en vecka sticker ut, och varje PR har en liten
 **CI-märke** (godkänd, misslyckad, igång eller ingen CI) från sina huvudbevakningskontroller. När någon **begär din
 recension**, säger ett OS-meddelande till dig (på som standard, stäng av det i Inställningar). Filtrera efter text, `repo:` eller `label:`, PRs endast eller endast problem, sortera efter uppdatering, skapande eller kommentarer, och
-scrolla med **visa mer**. Stöder även **GitLab.com och självvärd GitLab**, med en 5-minuters cache som
+scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 respekterar taxegränsen. Logga in med en skrivskyddad personlig token eller från webbläsaren (enhetsflöde).
 
 </td>
@@ -175,13 +175,14 @@ när det tar slut; ett klick stänger av den igen. Den överlever en omstart och
 låser och `?` listar genvägarna. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) öppnar en **kommandopalett** med varje
 action by name: gå till en flik, ny uppgift eller anteckning, gå med i nästa möte, kopiera dagens sammanfattning, byt skal, lås.
 
-## 🎨 Fem skinn
+## 🎨 Six skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Standard</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -195,6 +196,8 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 
 ![GitHub tab in fullscreen](docs/prints/app/12-tela-cheia.png)
 
+![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
+
 | Första gången välkommen | Global sökning (`Ctrl+K`) | Egen värd fliken GitLab | Mötesvarning |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
@@ -206,6 +209,14 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 | Synkroniserad mapp | Kompakt densitet | Låst valv | Anslut GitHub |
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
+
+| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+|---|---|---|---|
+| ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
+
+| Discard an unsaved note draft |
+|---|
+| ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
 | Lägen: Mini, Dold, Normal, Maximerad | Miniläge: varningar på skärmens kant |
 |---|---|
@@ -231,7 +242,7 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Uppgiftspåminnelse | Ändra huvudlösenord | Status API (flik för opt-in) | Språk: engelska eller portugisiska |
+| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -249,7 +260,27 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 
 | CI misslyckades, med de trasiga jobben | Någon nämnde mig | Deras växlar i Inställningar |
 |---|---|---|
-| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: CI failed, PR without a review for 24, 48 or 72 hours, and mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+| ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
+
+| Mention alert with who wrote it |
+|---|
+| ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
+
+| Mention alert with a preview of the text |
+|---|
+| ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
+
+| More alerts about my own work |
+|---|
+| ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+
+| Day summary alert | Day summary setting |
+|---|---|
+| ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
+
+| Mentions subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
 | Lösenordet ändrat, en fil väntar | Dagssammanfattning |
 |---|---|
