@@ -1,24 +1,32 @@
 //! UI language on the Rust side: OS notifications and the tray menu follow the choice made in Settings.
 //! Errors returned to the UI stay pt-BR (see AGENTS.md).
-use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 use tauri::menu::MenuItem;
 use tauri::{AppHandle, Manager};
 
 use crate::error::{AppError, Result};
 
-static ENGLISH: AtomicBool = AtomicBool::new(false);
+#[path = "lang_catalogs.rs"]
+mod catalogs;
+
+static LANGUAGE: AtomicUsize = AtomicUsize::new(1);
 
 pub fn english() -> bool {
-    ENGLISH.load(Ordering::Relaxed)
+    // Legacy alert builders only have two catalogs, so additional languages use their English text.
+    LANGUAGE.load(Ordering::Relaxed) != 1
 }
 
-/// Picks the string for the current language; both sides are compile-time literals.
+/// Built-in catalogs keep native notification labels offline.
 pub fn tr(pt: &'static str, en: &'static str) -> &'static str {
-    if english() {
-        en
-    } else {
+    translate(catalogs::CODES[LANGUAGE.load(Ordering::Relaxed)], pt, en)
+}
+
+fn translate(code: &str, pt: &'static str, en: &'static str) -> &'static str {
+    if code == "pt-BR" {
         pt
+    } else {
+        catalogs::translated(code, en).unwrap_or(en)
     }
 }
 
@@ -34,18 +42,13 @@ pub fn toggle_label() -> String {
     format!("{}  ({})", tr("Mostrar / esconder", "Show / hide"), crate::TOGGLE_SHORTCUT_LABEL)
 }
 
-/// Spanish has no Rust strings yet, so notifications and the tray fall back to English.
-pub fn parse(lang: &str) -> Result<bool> {
-    match lang {
-        "pt-BR" => Ok(false),
-        "en" | "es" => Ok(true),
-        _ => Err(AppError::Config("idioma não suportado".into())),
-    }
+pub fn parse(lang: &str) -> Result<usize> {
+    catalogs::CODES.iter().position(|code| *code == lang).ok_or_else(|| AppError::Config("idioma não suportado".into()))
 }
 
 #[tauri::command]
 pub fn language_set(app: AppHandle, lang: String) -> Result<()> {
-    ENGLISH.store(parse(&lang)?, Ordering::Relaxed);
+    LANGUAGE.store(parse(&lang)?, Ordering::Relaxed);
     if let Some(items) = app.try_state::<TrayLabels>() {
         let _ = items.toggle.set_text(toggle_label());
         let _ = items.mini.set_text(tr("Modo mini", "Mini mode"));
@@ -63,10 +66,22 @@ mod tests {
 
     #[test]
     fn only_supported_languages_are_accepted() {
-        assert!(!parse("pt-BR").unwrap());
-        assert!(parse("en").unwrap());
-        assert!(parse("es").unwrap());
-        assert!(parse("fr").is_err());
+        for (index, code) in catalogs::CODES.iter().enumerate() {
+            assert_eq!(parse(code).unwrap(), index);
+        }
+        assert!(parse("xx").is_err());
         assert!(parse("").is_err());
+    }
+
+    #[test]
+    fn native_labels_cover_every_language_without_changing_process_state() {
+        for code in catalogs::CODES.iter().filter(|code| !["en", "pt-BR"].contains(code)) {
+            for key in ["Lock vault", "Mini mode", "Meeting starting", "Task reminder", "Quit"] {
+                assert!(!catalogs::translated(code, key).unwrap().is_empty(), "{code}:{key}");
+            }
+        }
+        assert_eq!(translate("es", "Sair", "Quit"), "Salir");
+        assert_eq!(translate("pt-BR", "Sair", "Quit"), "Sair");
+        assert_eq!(translate("en", "Sair", "Quit"), "Quit");
     }
 }

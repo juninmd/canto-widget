@@ -20,7 +20,7 @@ const ratio = (a: string, b: string) => {
 };
 
 test("every skin was found, with the tokens the checks below read", () => {
-  expect(Object.keys(skins).sort()).toEqual(["claro", "dracula", "hueco-mundo", "padrao"]);
+  expect(Object.keys(skins).sort()).toEqual(["claro", "dracula", "glass", "hueco-mundo", "padrao"]);
   for (const t of Object.values(skins)) {
     for (const k of ["ink", "panel", "edge", "fg", "muted", "faint", "line", "accent", "accent-text", "on-accent", "danger", "ok", "warn"]) {
       expect(t[k], k).toMatch(/^#[0-9a-f]{6}$/i);

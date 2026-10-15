@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const port = Number(process.env.CANTO_E2E_PORT ?? 1420);
+const url = `http://localhost:${port}`;
+
 export default defineConfig({
   testDir: "e2e",
   testMatch: "**/*.e2e.ts",
@@ -8,14 +11,14 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://localhost:1420",
+    baseURL: url,
     trace: "retain-on-failure",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 420, height: 580 } } }],
   webServer: {
-    command: "bun run dev",
-    url: "http://localhost:1420",
-    reuseExistingServer: !process.env.CI,
+    command: `bun run dev -- --port ${port}`,
+    url,
+    reuseExistingServer: false,
     timeout: 60_000,
   },
 });

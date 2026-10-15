@@ -1,11 +1,12 @@
 import { t } from "../i18n";
-export type SkinId = "padrao" | "hueco-mundo" | "dracula" | "claro" | "sistema";
+export type SkinId = "padrao" | "hueco-mundo" | "dracula" | "glass" | "claro" | "sistema";
 type SkinReal = Exclude<SkinId, "sistema">;
 
 export const SKINS: { id: SkinId; name: string; sample: string }[] = [
   { id: "padrao", name: t("theme.skin.default"), sample: "#4ade80" },
   { id: "hueco-mundo", name: "Hueco Mundo", sample: "#e11d48" },
   { id: "dracula", name: t("theme.skin.dracula"), sample: "#bd93f9" },
+  { id: "glass", name: t("theme.skin.glass"), sample: "#0a84ff" },
   { id: "claro", name: t("theme.skin.light"), sample: "#dbe3ec" },
   { id: "sistema", name: t("theme.skin.system"), sample: "linear-gradient(135deg, #f8fafc 50%, #111826 50%)" },
 ];

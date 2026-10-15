@@ -108,6 +108,8 @@ export const app = {
 
   "settings.language.title": "Idioma",
   "settings.language.auto": "Automático (sistema)",
+  "settings.language.search": "Buscar idioma",
+  "settings.language.translationNote": "Os novos idiomas usam traduções automáticas. Alguns alertas de integrações e erros do backend ainda podem aparecer em inglês ou português.",
   "settings.density.title": "Tamanho da interface",
   "settings.density.compact": "Compacta",
   "settings.density.default": "Padrão",
@@ -263,6 +265,7 @@ export const app = {
   "theme.title": "Tema",
   "theme.skin.default": "Padrão",
   "theme.skin.dracula": "Drácula",
+  "theme.skin.glass": "Glass",
   "theme.skin.light": "Claro",
   "theme.skin.system": "Seguir o sistema",
 

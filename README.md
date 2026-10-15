@@ -12,9 +12,9 @@
 [![Rust](https://img.shields.io/badge/Rust-encrypted%20core-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](src-tauri)
 [![React 19](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=white&labelColor=0f172a)](src)
 
-**[Features](#-features)** · **[Skins](#-five-skins)** · **[Install](#%EF%B8%8F-install)** · **[Security](#-security-at-a-glance)** · **[Documentation](#-documentation)**
+**[Features](#-features)** · **[Skins](#-six-skins)** · **[Install](#%EF%B8%8F-install)** · **[Security](#-security-at-a-glance)** · **[Documentation](#-documentation)**
 
-<sub>**English** · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [हिन्दी](README.hi.md)</sub>
+<sub>**English** · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [हिन्दी](README.hi.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [فارسی](README.fa.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Українська](README.uk.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Magyar](README.hu.md) · [Svenska](README.sv.md) · [Dansk](README.da.md) · [Norsk bokmål](README.nb.md) · [Suomi](README.fi.md) · [Ελληνικά](README.el.md) · [Български](README.bg.md) · [Hrvatski](README.hr.md) · [Српски](README.sr.md) · [Slovenščina](README.sl.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [Eesti](README.et.md) · [Bahasa Indonesia](README.id.md) · [Bahasa Melayu](README.ms.md) · [Tiếng Việt](README.vi.md) · [ไทย](README.th.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Kiswahili](README.sw.md) · [Català](README.ca.md)</sub>
 
 </div>
 
@@ -23,6 +23,20 @@
 > **Tasks with reminders, notes, clipboard history, an agenda with meeting alerts, transcripts and your GitHub PRs
 > in a small window pinned to the corner of the screen.** Pops up with `Ctrl+Alt+Space`, hides when you don't need
 > it and keeps everything encrypted on your machine, with no account and no server.
+
+## 🌐 Languages
+
+Canto offers **42 interface languages**, each with its own README. Choose yours in **Settings → Language**;
+the searchable picker uses native language names, and automatic mode follows your primary system language.
+Arabic, Hebrew and Persian use right-to-left text. Additional language catalogs load on demand.
+
+The 40 new interface catalogs and 31 new README translations are machine translations and have not been
+reviewed by native speakers. Portuguese and English remain the original interface catalogs. Tray labels and
+notification headings follow the selected language; some integration alert details fall back to English,
+and backend errors remain in Portuguese. Task title syntax keeps the existing Portuguese and English keywords.
+
+![Searchable language picker](docs/prints/languages-picker.png)
+![Arabic interface with right-to-left text](docs/prints/languages-ar.png)
 
 ## ✨ Why Canto
 
@@ -160,13 +174,14 @@ when it ends; one click turns it back off. It survives a restart and ends on its
 locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
 action by name: go to a tab, new task or note, join the next meeting, copy the day's summary, switch skin, lock.
 
-## 🎨 Five skins
+## 🎨 Six skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Default</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>

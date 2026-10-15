@@ -27,7 +27,23 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   janelas livres são linhas próprias. Uma janela livre oferece encaixar uma tarefa sem horário, o que já passou fica
   recolhido e a linha vermelha marca o agora. Reuniões e os detalhes de cada evento seguem como antes.
 
+### Corrigido
+
+- **Falhas TCP no Windows**: conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR
+  esperada independentemente do idioma do sistema operacional.
+
 ### Adicionado
+
+- **Tema Glass**: novo tema com estética de vidro translúcido, superfícies semi-transparentes
+  com desfoque de fundo (backdrop blur), azul vivo, reflexo especular na borda superior e contraste
+  acessível em conformidade com WCAG AA.
+
+- **42 idiomas na interface**: 40 novos catálogos com 926 mensagens cada, seletor com busca por nome nativo ou
+  código, detecção de variantes regionais, datas e números no idioma escolhido e texto da direita para a esquerda
+  em árabe, hebraico e persa. Os novos catálogos são carregados sob demanda. Bandeja e títulos de notificações
+  acompanham o idioma; alguns detalhes de alertas ainda usam inglês e os erros do Rust continuam em português.
+  Cada idioma tem seu README, com 31 novas traduções completas e navegação entre os 42 documentos.
+  Os novos catálogos e READMEs usam tradução automática, ainda sem revisão por falantes nativos.
 
 - **Catálogo de comentaristas e comentários em PRs**: na aba GitHub, o seletor permite alternar entre **Itens** e **Comentários**. Exibe uma grade de comentaristas com avatar, tags diferenciando pessoas de bots, contadores de comentários e PRs, busca em tempo real, filtro para ocultar bots, paginação para listas extensas e listagem contextual dos comentários por autor.
 - **Captura rápida**: `Ctrl+Alt+N` (`Ctrl+Cmd+N` no macOS) abre uma janelinha no meio da tela, de qualquer app, para
@@ -97,6 +113,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   de quem escreveu (iniciais quando não há foto), e a faixa de avisos traz o nome em cada cartão. No GitHub o Canto
   procura o comentário que cita você; se não achar, o aviso aparece como antes, sem rosto. Nos resumos (mais de 3
   menções) cada linha começa com o nome. A foto só vem do próprio GitHub, da instância do GitLab ou do Gravatar.
+>>>>>>> origin/main
 - **Meus endpoints na aba Status API**: uma subaba ao lado de **serviços** para acompanhar o que é seu. Cada endpoint é
   um **endereço** (http ou https), um **DNS + certificado** (mede a resolução do nome e lê a validade do certificado que o
   servidor apresenta na porta) ou um **TCP + porta**. Os blocos da grade mostram a latência atual e as últimas leituras;

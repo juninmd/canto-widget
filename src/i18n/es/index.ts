@@ -7,3 +7,4 @@ import { models } from "./models";
 import { tasks } from "./tasks";
 
 export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health };
+export const messages = es;

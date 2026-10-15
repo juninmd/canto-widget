@@ -15,6 +15,8 @@ test("following the system picks light by day and the dark default at night", ()
   expect(resolveSkin("sistema", true)).toBe("claro");
   expect(resolveSkin("sistema", false)).toBe("padrao");
   expect(resolveSkin("dracula", true)).toBe("dracula");
+  expect(resolveSkin("glass", true)).toBe("glass");
+  expect(resolveSkin("glass", false)).toBe("glass");
 });
 
 test("applies the resolved skin to the document but keeps the 'sistema' choice", () => {
@@ -25,6 +27,12 @@ test("applies the resolved skin to the document but keeps the 'sistema' choice",
   system(false);
   applySkin(loadSkin());
   expect(document.documentElement.dataset.skin).toBe("padrao");
+});
+
+test("explicit glass skin is applied to the document and persisted", () => {
+  applySkin("glass");
+  expect(document.documentElement.dataset.skin).toBe("glass");
+  expect(loadSkin()).toBe("glass");
 });
 
 test("an unknown saved value falls back to the default", () => {

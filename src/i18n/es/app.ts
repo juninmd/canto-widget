@@ -113,6 +113,8 @@ export const app: Record<keyof typeof source, string> = {
 
   "settings.language.title": "Idioma",
   "settings.language.auto": "Automático (sistema)",
+  "settings.language.search": "buscar idioma…",
+  "settings.language.translationNote": "Los idiomas adicionales usan traducción automática.",
   "settings.density.title": "Tamaño de la interfaz",
   "settings.density.compact": "Compacto",
   "settings.density.default": "Normal",
@@ -268,6 +270,7 @@ export const app: Record<keyof typeof source, string> = {
   "theme.title": "Tema",
   "theme.skin.default": "Predeterminado",
   "theme.skin.dracula": "Dracula",
+  "theme.skin.glass": "Glass",
   "theme.skin.light": "Claro",
   "theme.skin.system": "Seguir al sistema",
 

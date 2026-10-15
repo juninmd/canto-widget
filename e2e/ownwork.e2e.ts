@@ -21,7 +21,7 @@ test("settings list every own-work alert as a switch", async ({ page }) => {
   await page.setViewportSize({ width: 420, height: 1100 });
   await page.goto("/");
   await goTab(page, "Ajustes");
-  await page.getByRole("searchbox").fill("conflito");
+  await page.getByRole("searchbox", { name: "buscar ajuste" }).fill("conflito");
   const section = page.getByRole("group", { name: "Avisos do GitHub e do GitLab" });
   await section.scrollIntoViewIfNeeded();
   for (const label of [
@@ -51,7 +51,7 @@ test("the day summary is a setting with an hour and a working-days switch, off u
   await page.setViewportSize({ width: 420, height: 900 });
   await page.goto("/");
   await goTab(page, "Ajustes");
-  await page.getByRole("searchbox").fill("resumo");
+  await page.getByRole("searchbox", { name: "buscar ajuste" }).fill("resumo");
   const section = page.getByRole("group", { name: "Resumo do dia" });
   await expect(section.getByLabel("avisar com o resumo do dia")).toBeChecked();
   await expect(section.getByLabel("a partir das")).toHaveValue("9");
