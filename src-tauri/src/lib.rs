@@ -99,6 +99,7 @@ pub mod report;
 pub mod review_alert;
 pub mod routine;
 pub mod snooze;
+pub mod startup;
 pub mod status_alert;
 pub mod status_cache;
 pub mod status_derived;
@@ -149,7 +150,6 @@ pub fn run() {
                 app.set_activation_policy(tauri::ActivationPolicy::Accessory);
                 app.set_dock_visibility(false);
             }
-            global_shortcuts::register(app.handle())?;
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
@@ -170,9 +170,11 @@ pub fn run() {
             app.manage(task_reminder::ReminderLead::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
+            global_shortcuts::register(app.handle())?;
+            build_tray(app.handle())?;
+            startup::create_windows(app.handle())?;
             background::start(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
-            build_tray(app.handle())?;
             tray_live::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());

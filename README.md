@@ -458,6 +458,8 @@ bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && ca
 bun run tauri build                                      # installer for the current platform
 ```
 
+Webviews are created after Rust state and the tray are initialized, so startup IPC calls cannot race setup.
+
 Every PR runs CI on Windows, macOS and Linux. Conventional `fix`, `feat` and breaking commits merged into `main`
 get a SemVer tag, generated release notes and signed installers built in parallel; the release is published after verification (details in
 [CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
