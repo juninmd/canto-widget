@@ -275,3 +275,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
   atualiza o texto da nota.
 - **Blocos de código nas notas**: trechos entre
+- **Aba Steam**: quatro subabas num só lugar. **Ofertas** varre a lista de desejos e mostra o que está em promoção,
+  do maior desconto para o menor, com o preço antigo riscado; **em alta** traz os mais vendidos da loja; **jogue agora**
+  lista os últimos 5 jogos recentes com o tempo das últimas duas semanas e o total; e o **catálogo** ordena a loja pela
+  nota das análises, com busca pelo nome. O que é público precisa só do **SteamID64**; a chave da Steam Web API é
+  opcional e libera apenas os jogos recentes. Os preços vêm em reais e cada linha abre a página do jogo. A aba começa
+  desligada, a um clique nos Ajustes, e a conexão fica selada no cofre, acompanhando a troca da senha.

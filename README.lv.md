@@ -77,7 +77,7 @@ nosūta paziņojumu ar **atlikt 10 min**.
 ### ✅ Uzdevumi, kas atgādina
 
 Ikdienas kontrolsaraksts ar laiku un atkārtošanos (katru dienu, darba dienas vai nedēļu). Ierakstiet **`Daily at 9:30am`** un
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+atgādinājums jau ir iestatīts; pievienojiet **`!high`** (vai `!alta`, `!média`, `!baixa`) kā prioritāti vai noklikšķiniet uz punkta uz rindas, lai to pārvietotu. Garie nosaukumi iesaiņo, nevis tiek nogriezti. **Fokusējiet taimeri** uz jebkuru uzdevumu: sniedziet to aptuvenu, nospiediet ▶, un zem katras cilnes piespraustā josla uzskaita laiku (sarkans, kad esat pārvarējis); laiks tiek saglabāts glabātavā katru minūti. **Dienas kopsavilkums** gatavs ielīmēšanai (uzdevumi, koncentrētais laiks, sapulces ar kopējo laiku, PRs/MRs atvērts, sapludināts, pārskatīts un aizvērts bez sapludināšanas), **nedēļas un mēneša pārskats** ar atlaidi un **neapstiprinātus vienumus** no vakardienas. **Ātrā tveršana** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` operētājsistēmā macOS) ieraksta uzdevumu vai piezīmi no jebkuras lietotnes, neatverot logrīku.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ jūtīgs.
 to. Melnraksti, PRs **gaida jūsu atsauksmi** un PRs **apstājās** nedēļu, un katrs PR nes nelielu
 **CI emblēma** (nokārtota, neizdevusies, darbojas vai nav CI) no tās galvenās veiktās pārbaudes. Kad kāds **pieprasa jūsu
 pārskatīt**, OS paziņojums informē (ieslēgts pēc noklusējuma, izslēdziet to sadaļā Iestatījumi). Filtrējiet pēc teksta, tikai `repo:` vai `label:`, PRs vai tikai problēmām, kārtojiet pēc atjauninājuma, izveides vai komentāriem un
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+ritiniet ar **rādīt vairāk**. Pārslēdzieties uz skatu **Komentāri**, lai skatītu **Komentētāju kataloga** režģi ar visiem, kas komentēja jūsu PRs (iemiesojumi, cilvēka un robota emblēmas, komentāru skaits, meklēšana, robotu filtrs, progresīvā lappušu šķirošana) un viņu komentārus. Atbalsta arī **GitLab.com un pašmitināto GitLab** ar 5 minūšu kešatmiņu, kas
 ievēro likmes ierobežojumu. Pierakstieties, izmantojot tikai lasāmu personīgo pilnvaru vai pārlūkprogrammu (ierīces plūsma).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam, neizejot no logrīka
+
+Četras Steam apakšcilnes: **vēlmju saraksta piedāvājumi** (vispirms lielākā atlaide), **pārdotākie**, **spēlēt tūlīt** un
+**katalogs sakārtots pēc reitinga**. Publiskajiem sarakstiem nepieciešama tikai jūsu **SteamID64**; izvēles **Steam Web API atslēga**
+pievieno piecas jaunākās spēles ar to spēles laiku. Cenas ir reālas, katra rinda atver veikala lapu, un
+cilne sākas pēc noklusējuma, vienas izvēles rūtiņas attālumā sadaļā Iestatījumi.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ kad tas beidzas; viens klikšķis to atkal izslēdz. Tas pārdzīvo restartēša
 bloķē un `?` uzskaita īsceļus. `Ctrl+Shift+P` (`Cmd+Shift+P` operētājsistēmā macOS) atver **komandu paleti** ar katru
 darbība pēc nosaukuma: dodieties uz cilni, jaunu uzdevumu vai piezīmi, pievienojieties nākamajai sapulcei, kopējiet dienas kopsavilkumu, mainiet apvalku, bloķējiet.
 
-## 🎨 Six skins
+## 🎨 Sešas ādas
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Noklusējums</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Drakula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Stikls</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Gaišs</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Iestatījumi grupās, ar meklēšanu | Meklēšana filtrē grupas | Bezsaistes mikroshēma galvenē | Apstipriniet pirms starpliktuves notīrīšanas |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Atmest nesaglabātu piezīmes melnrakstu |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -242,7 +255,7 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Uzdevuma atgādinājums | Mainīt galveno paroli | Statuss API (izvēles cilne) | Valoda: angļu, portugāļu vai spāņu |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -262,23 +275,23 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Minēt brīdinājumu ar to, kas to uzrakstījis |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Pieminēšanas brīdinājums ar teksta priekšskatījumu |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Vairāk brīdinājumu par manu darbu |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Dienas kopsavilkuma brīdinājums | Dienas kopsavilkuma iestatījums |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Piemin apakšcilni (GitHub un GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -317,6 +330,10 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 | AI modeļi, kas sarindoti pēc izlūkošanas indeksa |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: pēdējās piecas aizvadītās spēles ar abiem spēles laikiem |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Viens brīdinājuma pārklājums visam neapstiprinātajam: pārtraukumiem, sanāksmēm, uzdevumiem un jauniem AI modeļiem |
 |---|
@@ -458,6 +475,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Tīmekļa skati tiek izveidoti pēc Rust stāvokļa, un tekne ir inicializēta, tāpēc startēšanas IPC izsaukumi nevar veikt iestatīšanu.
 
 Katrs PR palaiž CI operētājsistēmās Windows, macOS un Linux. Parastās `fix`, `feat` un laužošās saistības ir apvienotas `main`
 iegūstiet SemVer tagu, ģenerētas izlaiduma piezīmes un parakstītus instalētājus, kas izveidoti paralēli; laidiens tiek publicēts pēc verifikācijas (sīkāka informācija

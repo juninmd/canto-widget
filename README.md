@@ -143,6 +143,19 @@ respects the rate limit. Sign in with a read-only personal token or from the bro
 </td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam without leaving the widget
+
+Four sub-tabs for Steam: **wishlist deals** (biggest discount first), **top sellers**, **play now** and the
+**catalog ordered by rating**. The public lists only need your **SteamID64**; an optional **Steam Web API key**
+adds the five most recent games with their playtimes. Prices come in reais, every row opens the store page, and
+the tab starts off by default, one checkbox away in Settings.
+
+</td>
+</tr>
+<tr>
 <td>
 
 ### ⚙️ Settings and automatic updates
@@ -316,6 +329,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | AI models ranked by the Intelligence Index |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: the last five games played, with both playtimes |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | One alert overlay for everything pending: outages, meetings, tasks and new AI models |
 |---|

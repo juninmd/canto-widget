@@ -77,7 +77,7 @@ sender et varsel, med **slumre 10 min**.
 ### ✅ Oppgaver som minner deg på
 
 En daglig sjekkliste med tid og gjentakelse (hver dag, ukedager eller ukentlig). Skriv inn **`Daily at 9:30am`** og
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+påminnelse er allerede satt; legg til **`!high`** (eller `!alta`, `!média`, `!baixa`) for prioritet, eller klikk på prikken på raden for å bla gjennom den. Lange titler pakkes inn i stedet for å bli kuttet av. **Fokustimer** på enhver oppgave: gi den et estimat, trykk på ▶ og en stolpe festet under hver fane teller tiden mot den (rød når du går over); tiden lagres til hvelvet hvert minutt. **Dagsoppsummering** klar til å lime inn (oppgaver, fokusert tid, møter med total tid, PRs/MRs åpnet, slått sammen, gjennomgått og lukket uten sammenslåing), en **ukentlig og månedlig rapport** i nedtelling, og **trekk over ventende elementer** fra i går. **Rask fangst** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` på macOS) skriver en oppgave eller et notat fra en hvilken som helst app, uten å åpne widgeten.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ sensitive.
 det. Utkast, PRs **venter på vurderingen din** og PRs **stoppet** i en uke skiller seg ut, og hver PR har en liten
 **CI-merke** (bestått, mislyktes, løpende eller ingen CI) fra kontrollene til hovedkommisjonen. Når noen ** ber om din
 anmeldelse**, forteller en OS-varsling deg (på som standard, slå den av i Innstillinger). Filtrer etter tekst, `repo:` eller `label:`, PRs bare eller kun problemer, sorter etter oppdatering, opprettelse eller kommentarer, og
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+bla med **vis mer**. Bytt til **Kommentarer**-visningen for å se et **Kommentarkatalog**-rutenett over alle som kommenterte PRs (avatarer, menneskelige vs bot-merker, antall kommentarer, søk, botfilter, progressiv paginering) og deres kommentarer. Støtter også **GitLab.com og selvvertsbasert GitLab**, med en 5-minutters hurtigbuffer som
 respekterer takstgrensen. Logg på med et skrivebeskyttet personlig token eller fra nettleseren (enhetsflyt).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam uten å forlate widgeten
+
+Fire underfaner for Steam: **ønskelistetilbud** (største rabatt først), **toppselgere**, **spill nå** og
+**katalogen sortert etter vurdering**. De offentlige listene trenger bare din **SteamID64**; en valgfri **Steam Web API nøkkel**
+legger til de fem siste spillene med spilletidene deres. Prisene kommer i reais, hver rad åpner butikksiden, og
+fanen starter som standard, én avmerkingsboks unna i Innstillinger.
 
 </td>
 </tr>
@@ -175,7 +188,7 @@ når det slutter; ett klikk slår den av igjen. Den overlever en omstart og slut
 låser og `?` viser snarveiene. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) åpner en **kommandopalett** med hver
 handling etter navn: gå til en fane, ny oppgave eller notat, bli med på neste møte, kopier dagens sammendrag, bytt hud, lås.
 
-## 🎨 Six skins
+## 🎨 Seks skinn
 
 <table>
 <tr>
@@ -210,11 +223,11 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Innstillinger i grupper, med søk | Søk filtrerer gruppene | Frakoblet brikke i overskriften | Bekreft før du tømmer utklippstavlen |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Forkast et ulagret notatutkast |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -242,7 +255,7 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Oppgavepåminnelse | Endre hovedpassord | Status API (opt-in-fane) | Språk: engelsk, portugisisk eller spansk |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -262,23 +275,23 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Nevn varsel med hvem som skrev det |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Nevn varsling med forhåndsvisning av teksten |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Flere varsler om mitt eget arbeid |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Dagsoppsummeringsvarsel | Innstilling for dagsoppsummering |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Omtaler underfane (GitHub og GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -317,6 +330,10 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 | AI-modeller rangert etter Intelligence Index |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: de siste fem kampene spilt, med begge spilletid |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Ett varseloverlegg for alt som venter: avbrudd, møter, oppgaver og nye AI-modeller |
 |---|
@@ -458,6 +475,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Webvisninger opprettes etter tilstanden Rust og skuffen er initialisert, så oppstarts-IPC-anrop kan ikke settes opp.
 
 Hver PR kjører CI på Windows, macOS og Linux. Konvensjonelle `fix`, `feat` og brytende forpliktelser slått sammen til `main`
 få en SemVer-tag, genererte utgivelsesnotater og signerte installatører bygget parallelt; utgivelsen publiseres etter bekreftelse (detaljer i

@@ -47,7 +47,7 @@ def generate(code):
         data = dict(zip(unique, output, strict=True))
         translation.write_json(cached, data)
     required = list(dict.fromkeys([*SOURCE.values(), *NATIVE, *(README_LINES[i] for i in READ_ME_KEYS)]))
-    brands = re.compile(r"\b(?:Rust|React|Tauri|Bun|Electron|TypeScript|Argon2id|AES-256-GCM)\b")
+    brands = re.compile(r"\b(?:Steam|Rust|React|Tauri|Bun|Electron|TypeScript|Argon2id|AES-256-GCM)\b")
     repair = [value for value in required if value not in data or
               any(brand not in data[value] for brand in brands.findall(value))]
     if repair:

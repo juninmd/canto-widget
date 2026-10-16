@@ -77,7 +77,7 @@ Windows Hello opcionális.
 ### ✅ Feladatok, amelyek emlékeztetnek
 
 Napi ellenőrző lista idővel és ismétlődéssel (minden nap, hétköznap vagy hetente). Írja be a **`Daily at 9:30am`** parancsot, majd a
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+emlékeztető már be van állítva; adja hozzá a **`!high`** (vagy `!alta`, `!média`, `!baixa`) értéket a prioritásként, vagy kattintson a pontra a sorban a váltáshoz. A hosszú címek ahelyett, hogy levágnák őket, burkolnak. **Fókuszálás az időzítőre** bármilyen feladatra: adja meg a becslést, nyomja meg a ▶ gombot, és a minden fül alatt rögzített sáv számolja az időt (piros, ha áthalad); az időt percenként menti a trezor. **Napi összefoglaló** beillesztésre készen (feladatok, koncentrált idő, értekezletek teljes idővel, PRs/MRs megnyitott, egyesített, áttekintett és összevonás nélkül lezárt), **heti és havi jelentés** leértékelésben, és **a függőben lévő tételek áthúzása** tegnapról. **Gyors rögzítés** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` macOS-en) a widget megnyitása nélkül rögzít egy feladatot vagy jegyzetet bármely alkalmazásból.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ lefagy bármit: megtartja az indítást és figyelmeztet. Windows rendszeren kih
 azt. A piszkozatok, a PRs **az értékelésére várva** és a PRs **egy hétig leállt** kiemelkedik, és mindegyik PR tartalmaz egy kis
 **CI-jelvény** (megfelelt, megbukott, fut vagy nincs CI) a fő-kötelezettségi ellenőrzésekből. Amikor valaki **kéri Önt
 felülvizsgálat**, az operációs rendszer értesítése közli (alapértelmezés szerint be, kapcsolja ki a Beállításokban). Szűrés szöveg szerint, csak `repo:` vagy `label:`, PRs vagy csak problémák, rendezés frissítés, létrehozás vagy megjegyzések szerint, és
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+görgessen a **show more** gombbal. Váltson a **Megjegyzések** nézetre, hogy megtekinthesse a **Hozzászólók katalógusának** rácsát mindenkiről, aki megjegyzést fűzött a PRs-hoz (avatarok, ember és bot jelvények, megjegyzések számlálása, keresés, botszűrő, progresszív oldalszámozás) és azok megjegyzései. Támogatja a **GitLab.com-ot és a saját üzemeltetésű GitLab** webhelyet is, 5 perces gyorsítótárral
 tiszteletben tartja a díjszabást. Jelentkezzen be csak olvasható személyes tokennel vagy a böngészőből (eszközfolyamat).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam a widget elhagyása nélkül
+
+Négy allap a Steam számára: **kívánságlista-ajánlatok** (a legnagyobb kedvezmény először), **legkeresettebb**, **játék most** és a
+**katalógus értékelés szerint rendezve**. A nyilvános listákhoz csak a **SteamID64**; opcionális **Steam Web API kulcs**
+hozzáadja az öt legutóbbi játékot a játékidejükkel. Az árak reálisan jönnek, minden sor megnyitja az üzlet oldalát, és
+a lap alapértelmezés szerint elindul, egy jelölőnégyzettől távolabb a Beállításokban.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ amikor véget ér; egy kattintás visszakapcsolja. Túlél egy újraindítást �
 zárolja és a `?` listázza a parancsikonokat. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS-en) megnyit egy **parancspalettát** minden
 művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakozzon a következő értekezlethez, másolja a napi összefoglalót, cserélje ki a felületet, zárolja.
 
-## 🎨 Six skins
+## 🎨 Hat skin
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Alapértelmezett</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Üveg</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Beállítások csoportokban, kereséssel | A keresés szűri a csoportokat | Offline chip a fejlécben | Erősítse meg a vágólap törlése előtt |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Nem mentett jegyzetvázlat elvetése |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -242,7 +255,7 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Feladat emlékeztető | Fő jelszó módosítása | Állapot API (feliratkozási lap) | Nyelv: angol, portugál vagy spanyol |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -262,23 +275,23 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Említse meg a figyelmeztetést azzal, hogy ki írta |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Figyelmeztetés említése a szöveg előnézetével |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| További figyelmeztetések a saját munkámmal kapcsolatban |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Napi összefoglaló riasztás | Napi összefoglaló beállítás |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Megemlíti az allapot (GitHub és GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -317,6 +330,10 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 | Az Intelligence Index szerint rangsorolt ​​mesterséges intelligencia modellek |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: az utolsó öt lejátszott meccs, mindkét játékidővel |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Egyetlen riasztási fedvény minden függőben lévő dologhoz: leállások, értekezletek, feladatok és új AI-modellek |
 |---|
@@ -458,6 +475,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+A webnézetek a Rust állapot után jönnek létre, és a tálca inicializálva van, így az indítási IPC-hívások nem versenyezhetnek a beállítással.
 
 Minden PR CI-t futtat Windows, macOS és Linux rendszeren. A hagyományos `fix`, `feat` és a feltörő véglegesítések egyesültek a `main`-ba
 kap egy SemVer címkét, generált kiadási megjegyzéseket és párhuzamosan épített aláírt telepítőket; a kiadást ellenőrzés után teszik közzé (részletek itt

@@ -77,7 +77,7 @@ saadab märguande **lükka 10 min**.
 ### ✅ Ülesanded, mis meenutavad
 
 Igapäevane kontrollnimekiri aja ja kordusega (iga päev, nädalapäevad või nädalad). Tippige **`Daily at 9:30am`** ja
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+meeldetuletus on juba seatud; lisage prioriteediks **`!high`** (või `!alta`, `!média`, `!baixa`) või klõpsake selle tsükli muutmiseks real punkti. Pikad pealkirjad mähivad selle asemel, et neid ära lõigata. **Fokustage taimer** mis tahes ülesandele: andke sellele hinnang, vajutage ▶ ja iga vahelehe alla kinnitatud riba arvestab aega selle vastu (punane, kui üle lähete); iga minut salvestatakse aeg varahoidlasse. **Päeva kokkuvõte** on kleepimiseks valmis (ülesanded, keskendunud aeg, koosolekud koguajaga, PRs/MRs avatud, liidetud, üle vaadatud ja suletud ilma ühendamiseta), **nädala- ja kuuaruanne** allahindluses ja **ootelolevate üksuste eemaldamine** eilsest. **Kiire jäädvustamine** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` macOS-is) salvestab ülesande või märkme mis tahes rakendusest ilma vidinat avamata.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ tundlik.
 seda. Mustandid, PRs **ootavad teie arvustust** ja PRs **seiskunud** nädalaks paistavad silma ning igal PR on väike
 **CI-märk** (läbitud, ebaõnnestunud, töötab või puudub CI) oma peamiste kontrollide kaudu. Kui keegi **soovib teie
 ülevaade**, teatab OS-i märguanne (vaikimisi sees, lülitage see seadetes välja). Filtreerige teksti järgi, ainult `repo:` või `label:`, PRs või ainult probleemide järgi, sortige värskenduse, loomise või kommentaaride järgi ja
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+kerige nupuga **näita rohkem**. Lülituge vaatele **Kommentaarid**, et näha **Kommenteerijate kataloogi** võrgustikku kõigist, kes kommenteerisid teie PRs (avatarid, inimeste ja robotite märgid, kommentaaride arv, otsing, robotite filter, järkjärguline lehekülgede järjekord) ja nende kommentaare. Toetab ka **GitLab.com ja isehostitavat GitLab** 5-minutilise vahemäluga
 austab intressipiirangut. Logige sisse kirjutuskaitstud isikliku loaga või brauserist (seadme voog).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam vidinast lahkumata
+
+Neli alamvahekaarti Steam jaoks: **sooviloendi pakkumised** (kõigepealt suurim allahindlus), **enimmüüdud**, **mängi kohe** ja
+**hinnangu järgi järjestatud kataloog**. Avalikud loendid vajavad ainult teie **SteamID64**; valikuline **Steam veebivõti API**
+lisab viis viimast mängu koos nende mänguaegadega. Hinnad tulevad reaalides, iga rida avab poe lehe ja
+vahekaart käivitub vaikimisi, seadetes ühe märkeruudu kaugusel.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ kui see lõpeb; üks klõps lülitab selle uuesti välja. See elab üle taaskäi
 lukustab ja `?` loetleb otseteed. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS-is) avab **käsupaleti** iga
 toiming nime järgi: minge vahekaardile, uuele ülesandele või märkmele, liituge järgmise koosolekuga, kopeerige päeva kokkuvõte, vahetage nahka, lukustage.
 
-## 🎨 Six skins
+## 🎨 Kuus nahka
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Vaikimisi</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Klaas</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Seadistused rühmades, otsinguga | Otsing filtreerib rühmad | Võrguühenduseta kiip päises | Kinnitage enne lõikepuhvri tühjendamist |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Loobu salvestamata märkme mustand |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -242,7 +255,7 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Ülesande meeldetuletus | Peaparooli muutmine | Olek API (lubamise vahekaart) | Keel: inglise, portugali või hispaania keel |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -262,23 +275,23 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Mainige hoiatus koos selle kirjutajaga |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Mainige hoiatus koos teksti eelvaatega |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Rohkem teateid minu enda töö kohta |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Päeva kokkuvõtte märguanne | Päeva kokkuvõtte seadistus |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Mainib alamvahekaarti (GitHub ja GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -317,6 +330,10 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 | Intelligentsusindeksi järgi järjestatud AI mudelid |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: viimased viis mängitud mängu mõlema mänguajaga |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Üks märguannete ülekate kõige ootel oleva kohta: katkestused, koosolekud, ülesanded ja uued AI mudelid |
 |---|
@@ -458,6 +475,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Veebivaated luuakse pärast oleku Rust olekut ja salv initsialiseeritakse, nii et käivitus-IPC-kutsed ei saa häälestusega rassida.
 
 Igas PR töötab Windowsis, macOS-is ja Linuxis CI. Tavalised `fix`, `feat` ja rikkuvad kohustused liideti `main`
 hankige paralleelselt ehitatud SemVer silt, genereeritud väljalaskemärkmed ja allkirjastatud installiprogrammid; väljaanne avaldatakse pärast kinnitamist (üksikasjad

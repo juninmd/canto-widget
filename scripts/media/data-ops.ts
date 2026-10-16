@@ -75,3 +75,61 @@ export const MODELS = {
   throttled: false,
   error: null,
 };
+
+const steamGame = (appid: number, name: string, price: string, original = "", discount = 0, review: number | null = null, label = "") => ({
+  appid,
+  name,
+  price,
+  original,
+  discount,
+  review,
+  review_label: label,
+});
+
+/** Invented games on purpose: a real title with a price and a discount would read as a fact. */
+export const STEAM = {
+  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },
+  steam_deals: {
+    has_more: true,
+    items: [
+      steamGame(900001, "Aurora Drift", "R$ 14,99", "R$ 59,99", 75),
+      steamGame(900002, "Maré Profunda", "R$ 9,99", "R$ 39,99", 75),
+      steamGame(900003, "Nimbus Racer", "R$ 29,90", "R$ 119,90", 75),
+      steamGame(900004, "Forja Tática", "R$ 19,99", "R$ 49,99", 60),
+      steamGame(900005, "Papiro Quest", "R$ 7,49", "R$ 29,99", 75),
+      steamGame(900006, "Rochedo Survival", "R$ 34,99", "R$ 69,99", 50),
+    ],
+  },
+  steam_trending: {
+    has_more: false,
+    items: [
+      steamGame(900010, "Vento Valley", "Grátis", "", 0, 96, "Muito positivas"),
+      steamGame(900011, "Lumen Cove", "R$ 89,90", "", 0, 94, "Muito positivas"),
+      steamGame(900012, "Basalto", "R$ 49,90", "", 0, 92, "Muito positivas"),
+      steamGame(900013, "Kestrel Arena", "R$ 24,99", "", 0, 91, "Muito positivas"),
+      steamGame(900014, "Tide Runner", "R$ 39,90", "", 0, 89, "Muito positivas"),
+      steamGame(900015, "Ember Path", "R$ 12,49", "R$ 49,99", 75, 88, "Muito positivas"),
+    ],
+  },
+  steam_catalog: {
+    has_more: true,
+    items: [
+      steamGame(900020, "Quill Chronicles", "R$ 59,90", "", 0, 98, "Extremamente positivas"),
+      steamGame(900021, "Orca Bay", "R$ 34,99", "", 0, 97, "Extremamente positivas"),
+      steamGame(900022, "Pedra Alta", "R$ 19,99", "", 0, 96, "Extremamente positivas"),
+      steamGame(900023, "Terra de Vento", "R$ 44,90", "", 0, 95, "Extremamente positivas"),
+      steamGame(900024, "Coral", "Grátis", "", 0, 94, "Muito positivas"),
+      steamGame(900025, "Vale Noturno", "R$ 27,49", "", 0, 93, "Muito positivas"),
+    ],
+  },
+  steam_recent: {
+    has_key: true,
+    items: [
+      { appid: 900030, name: "Aurora Drift", recent_min: 135, total_min: 4210 },
+      { appid: 900031, name: "Maré Profunda", recent_min: 78, total_min: 615 },
+      { appid: 900032, name: "Papiro Quest", recent_min: 42, total_min: 1305 },
+      { appid: 900033, name: "Forja Tática", recent_min: 21, total_min: 2870 },
+      { appid: 900034, name: "Lumen Cove", recent_min: 12, total_min: 96 },
+    ],
+  },
+};

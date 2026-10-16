@@ -1,6 +1,7 @@
 import { test } from "@playwright/test";
 import { shoot } from "./out";
 import { fullScene, openTab } from "./scene";
+import { STEAM } from "./data-ops";
 import { settle } from "./stage";
 
 const EVENING = new Date(2026, 9, 9, 17, 40);
@@ -56,4 +57,13 @@ test("activity: week, off and a wide window", async ({ browser }) => {
   const wide = await fullScene(browser, { now: EVENING, width: 980, height: 640 });
   await openTab(wide, "Atividade", 1400);
   await shoot(wide, "activity-wide");
+});
+
+test("steam: wishlist deals and the recent games", async ({ browser }) => {
+  const page = await fullScene(browser, { fixed: STEAM });
+  await openTab(page, "Steam");
+  await page.screenshot({ path: "docs/prints/app/86-steam.png", omitBackground: true });
+  await page.getByRole("tab", { name: "jogue agora" }).click();
+  await settle(page, 800);
+  await page.screenshot({ path: "docs/prints/app/87-steam-recentes.png", omitBackground: true });
 });

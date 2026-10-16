@@ -33,6 +33,7 @@ pub mod cmd_models;
 pub mod cmd_notes;
 pub mod cmd_report;
 pub mod cmd_status;
+pub mod cmd_steam;
 pub mod cmd_sync;
 pub mod commands;
 pub mod crypto;
@@ -105,6 +106,9 @@ pub mod status_cache;
 pub mod status_derived;
 pub mod status_feed;
 pub mod status_live;
+pub mod steam;
+pub mod steam_feed;
+pub mod steam_parse;
 pub mod store;
 pub mod subtask;
 pub mod sync;
@@ -158,6 +162,7 @@ pub fn run() {
             app.manage(status_alert::StatusAlerts::load(&dir));
             app.manage(health_watch::HealthState::default());
             app.manage(cmd_models::ModelsLock::default());
+            app.manage(cmd_steam::SteamLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
@@ -338,6 +343,13 @@ pub fn run() {
             status_alert::status_alerts_set,
             cmd_models::models_get,
             cmd_models::models_alerts_set,
+            cmd_steam::steam_status,
+            cmd_steam::steam_connect,
+            cmd_steam::steam_disconnect,
+            cmd_steam::steam_deals,
+            cmd_steam::steam_trending,
+            cmd_steam::steam_catalog,
+            cmd_steam::steam_recent,
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,
             do_not_disturb::dnd_clear,

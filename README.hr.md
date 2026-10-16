@@ -77,7 +77,7 @@ Windows Hello izborno.
 ### ✅ Zadaci koji vas podsjećaju
 
 Dnevni kontrolni popis s vremenom i ponavljanjem (svaki dan, radnim danima ili tjedno). Upišite **`Daily at 9:30am`** i
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+podsjetnik je već postavljen; dodajte **`!high`** (ili `!alta`, `!média`, `!baixa`) za prioritet ili kliknite točku na retku da biste ga kružili. Dugi naslovi omotani su umjesto da budu odrezani. **Fokusirajte mjerač vremena** na bilo koji zadatak: dajte mu procjenu, pritisnite ▶ i traka prikvačena ispod svake kartice računa vrijeme u odnosu na njega (crvena kada prijeđete preko); vrijeme se sprema u trezor svake minute. **Dnevni sažetak** spreman za lijepljenje (zadaci, fokusirano vrijeme, sastanci s ukupnim vremenom, PRs/MRs otvorenih, spojenih, pregledanih i zatvorenih bez spajanja), **tjedno i mjesečno izvješće** u markdownu i **povlačenje stavki na čekanju** od jučer. **Brzo snimanje** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` na macOS-u) zapisuje zadatak ili bilješku iz bilo koje aplikacije, bez otvaranja widgeta.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ osjetljiva.
 to. Nacrti, PRs **čekaju vašu recenziju** i PRs **odloženo** tjedan dana ističu se, a svaki PR nosi mali
 **CI bedž** (prošao, nije prošao, izvodi se ili nema CI) iz provjera glavnog izvršenja. Kada netko **zahtijeva vaš
 pregled**, kaže vam obavijest OS-a (uključeno prema zadanim postavkama, isključite ga u postavkama). Filtrirajte po tekstu, `repo:` ili `label:`, samo PRs ili samo problemima, sortirajte po ažuriranju, izradi ili komentarima i
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+pomičite se pomoću **prikaži više**. Prebacite se na prikaz **Komentari** da biste vidjeli mrežu **Kataloga komentatora** svih koji su komentirali vaš PRs (avatare, značke ljudi u odnosu na botove, broj komentara, pretraživanje, filtar botova, progresivno označavanje stranica) i njihove komentare. Također podržava **GitLab.com i GitLab** s vlastitim hostom, s 5-minutnom predmemorijom koja
 poštuje ograničenje stope. Prijavite se s osobnim tokenom samo za čitanje ili iz preglednika (tijek uređaja).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam bez napuštanja widgeta
+
+Četiri podkartice za Steam: **ponude s popisa želja** (najprije najveći popust), **najprodavanije**, **igrajte sada** i
+**katalog poredan po ocjeni**. Javni popisi trebaju samo vaše **SteamID64**; izborni **Steam Web API ključ**
+dodaje pet najnovijih igara s njihovim vremenom igranja. Cijene su izražene u realima, svaki redak otvara stranicu trgovine i
+kartica počinje prema zadanim postavkama, jedan potvrdni okvir dalje u Postavkama.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ kada završi; jedan klik ga ponovno isključuje. Preživi ponovno pokretanje i z
 zaključava i `?` navodi prečace. `Ctrl+Shift+P` (`Cmd+Shift+P` na macOS-u) otvara **paletu naredbi** sa svakim
 akcija prema nazivu: idite na karticu, novi zadatak ili bilješku, pridružite se sljedećem sastanku, kopirajte dnevni sažetak, promijenite masku, zaključajte.
 
-## 🎨 Six skins
+## 🎨 Šest skinova
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Zadano</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Staklo</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Postavke u grupama, s pretraživanjem | Pretraživanje filtrira grupe | Offline čip u zaglavlju | Potvrdite prije brisanja međuspremnika |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Odbaci nespremljenu skicu bilješke |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -242,7 +255,7 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Podsjetnik na zadatak | Promjena glavne lozinke | Status API (kartica za uključivanje) | Jezik: engleski, portugalski ili španjolski |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -262,23 +275,23 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Navedite upozorenje s tim tko ga je napisao |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Upozorenje o spominjanju s pregledom teksta |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Više upozorenja o mom radu |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Upozorenje o dnevnom sažetku | Postavka dnevnog sažetka |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Podkartica Spominjanja (GitHub i GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -317,6 +330,10 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 | Modeli umjetne inteligencije rangirani prema Indeksu inteligencije |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: zadnjih pet igranja, s oba vremena igranja |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Jedno preklapanje upozorenja za sve što je na čekanju: prekide rada, sastanke, zadatke i nove AI modele |
 |---|
@@ -458,6 +475,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Web-prikazi se stvaraju nakon stanja Rust i tray se inicijaliziraju, tako da se početni IPC pozivi ne mogu utrkivati ​​u postavljanju.
 
 Svaki PR pokreće CI na Windows, macOS i Linux. Konvencionalni `fix`, `feat` i kršenje obaveza spojeni su u `main`
 dobiti SemVer oznaku, generirane napomene o izdanju i potpisane instalatere izgrađene paralelno; objava se objavljuje nakon provjere (detalji u

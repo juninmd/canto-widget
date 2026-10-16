@@ -11,7 +11,7 @@ CACHE = ROOT / ".translations-cache.tmp"
 PROTECTED = re.compile(
     r"```[\s\S]*?```|`[^`]+`|!?\[[^\]]*\]\([^)]*\)|<[^>]+>|"
     r"(?<=\]\()[^)]*(?=\))|\{\w+\}|\n|Daily at 9:30 !high|(?i:\bcanto\b)|"
-    r"\b(?:Canto|GitHub|GitLab|Google|Windows Hello|Meet|OAuth|PKCE|DNS|TCP|HTTPS?|API|"
+    r"\b(?:Canto|Steam|SteamID64|GitHub|GitLab|Google|Windows Hello|Meet|OAuth|PKCE|DNS|TCP|HTTPS?|API|"
     r"Ctrl|Alt|Shift|Cmd|Enter|Escape|Tab|Backspace|Delete|Space|F[1-9]\d?|PRs?|MRs?|"
     r"Rust|React|Tauri|Bun|Electron|TypeScript|Argon2id|AES-256-GCM)\b"
 )
