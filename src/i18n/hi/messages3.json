@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "कार्य सूची की चौड़ाई",
-  "notif.resizeHint": "आकार बदलने के लिए खींचें; रीसेट करने के लिए डबल क्लिक करें",
   "alert.close": "बंद करें",
   "alert.digestSummary": "दिन का सारांश",
   "alert.modelNew": "नया मॉडल",

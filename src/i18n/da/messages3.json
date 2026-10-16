@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "opgavelistens bredde",
-  "notif.resizeHint": "træk for at ændre størrelse; dobbeltklik for at nulstille",
   "alert.close": "tæt på",
   "alert.digestSummary": "dagsoversigt",
   "alert.modelNew": "ny model",

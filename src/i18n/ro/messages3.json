@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "lățimea listei de sarcini",
-  "notif.resizeHint": "trageți pentru a redimensiona; dublu clic pentru a reseta",
   "alert.close": "aproape",
   "alert.digestSummary": "rezumatul zilei",
   "alert.modelNew": "model nou",

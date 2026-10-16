@@ -101,47 +101,70 @@ test.describe("maximized", () => {
     await mockTauri(page, { fixed: { window_config: config(false), alert_payload: pending } });
     await page.goto("/");
     await page.getByRole("button", { name: "tela cheia" }).click();
-    return page.getByRole("complementary", { name: "notificações" });
+    return page;
   }
 
-  test("the right column lists the pending alerts with their actions", async ({ page }) => {
-    const column = await maximize(page);
-    await expect(column.getByRole("list", { name: "avisos pendentes" }).getByRole("listitem")).toHaveCount(3);
-    await expect(column.getByRole("button", { name: "entrar no Meet" })).toBeVisible();
-    await column.getByRole("button", { name: "fechar" }).first().click();
-    await expect(column.getByRole("list", { name: "avisos pendentes" }).getByRole("listitem")).toHaveCount(2);
+  test("the open tab takes the whole window: no column and no divider", async ({ page }) => {
+    await maximize(page);
+    await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
+    await expect(page.getByRole("separator")).toHaveCount(0);
+    await expect(page.getByRole("complementary")).toHaveCount(0);
+    const main = (await page.getByRole("tabpanel").boundingBox())!;
+    expect(main.width, "the task list used to stop around 416 px").toBeGreaterThan(1100);
+  });
+
+  test("the header bell opens the alerts screen with every pending alert and its actions", async ({ page }) => {
+    await maximize(page);
+    await page.getByRole("button", { name: /avisos pendentes/ }).click();
+    const panel = page.getByRole("dialog", { name: "notificações" });
+    await expect(panel.getByRole("list", { name: "avisos pendentes" }).getByRole("listitem")).toHaveCount(3);
+    await expect(panel.getByRole("button", { name: "entrar no Meet" })).toBeVisible();
+    const box = (await panel.boundingBox())!;
+    expect(box.width, "the alerts used to live in a 300 px column").toBeGreaterThan(1100);
+  });
+
+  test("closing an alert here keeps the rest and lists what was handled today", async ({ page }) => {
+    await maximize(page);
+    await page.getByRole("button", { name: /avisos pendentes/ }).click();
+    const panel = page.getByRole("dialog", { name: "notificações" });
+    await panel.getByRole("button", { name: "fechar" }).first().click();
+    await expect(panel.getByRole("list", { name: "avisos pendentes" }).getByRole("listitem")).toHaveCount(2);
     expect((await calls(page)).filter((c) => c.cmd === "alert_close")).toHaveLength(1);
-    await expect(column.getByText("resolvidas hoje")).toBeVisible();
-    await expect(column.getByRole("listitem").filter({ hasText: "fechado" })).toHaveCount(1);
+    await expect(panel.getByText("resolvidas hoje")).toBeVisible();
+    await expect(panel.getByRole("listitem").filter({ hasText: "fechado" })).toHaveCount(1);
   });
 
-  test("dragging the divider resizes the task list and the width survives a reload", async ({ page }) => {
+  test("going back and Esc return to the tab that was open", async ({ page }) => {
     await maximize(page);
-    const bar = page.getByRole("separator", { name: "largura da lista de tarefas" });
-    const start = Number(await bar.getAttribute("aria-valuenow"));
-    const box = (await bar.boundingBox())!;
-    await page.mouse.move(box.x + box.width / 2, box.y + 200);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 + 120, box.y + 200, { steps: 6 });
-    await page.mouse.up();
-    expect(Number(await bar.getAttribute("aria-valuenow"))).toBe(start + 120);
-    await page.reload();
-    await page.getByRole("button", { name: "tela cheia" }).click();
-    await expect(page.getByRole("separator", { name: "largura da lista de tarefas" })).toHaveAttribute("aria-valuenow", String(start + 120));
+    const bell = page.getByRole("button", { name: /avisos pendentes/ });
+    await bell.click();
+    await page.getByRole("dialog", { name: "notificações" }).getByRole("button", { name: "voltar" }).click();
+    await expect(page.getByRole("dialog", { name: "notificações" })).toHaveCount(0);
+    await expect(bell).toBeFocused();
+
+    await bell.click();
+    // A click on the empty area below the cards moves focus out of the dialog: Esc must still close it.
+    await page.getByRole("dialog", { name: "notificações" }).click({ position: { x: 1000, y: 640 } });
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("dialog", { name: "notificações" })).toHaveCount(0);
+    await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
   });
 
-  test("the divider answers the keyboard and never squeezes a column below its minimum", async ({ page }) => {
+  test("with the alerts up the keyboard cannot reach the bar behind them", async ({ page }) => {
     await maximize(page);
-    const bar = page.getByRole("separator", { name: "largura da lista de tarefas" });
-    await bar.focus();
-    await page.keyboard.press("Home");
-    await expect(bar).toHaveAttribute("aria-valuenow", "360");
-    await page.keyboard.press("ArrowLeft");
-    await expect(bar).toHaveAttribute("aria-valuenow", "360");
-    await page.keyboard.press("End");
-    const right = (await page.getByRole("complementary", { name: "notificações" }).boundingBox())!;
-    expect(right.width).toBeGreaterThanOrEqual(298);
-    await page.keyboard.press("Enter");
-    await expect(bar).toHaveAttribute("aria-valuenow", "416");
+    await page.getByRole("button", { name: /avisos pendentes/ }).click();
+    const panel = page.getByRole("dialog", { name: "notificações" });
+    // Tab from the last control of the screen wraps back inside it: the bar behind never takes the focus.
+    await panel.getByRole("button", { name: "fechar" }).last().focus();
+    await page.keyboard.press("Tab");
+    await expect(panel.getByRole("button", { name: "dispensar todas" })).toBeFocused();
+  });
+
+  test("a shortcut pressed on the alerts screen lands in the field it opens", async ({ page }) => {
+    await maximize(page);
+    await page.getByRole("button", { name: /avisos pendentes/ }).click();
+    await page.keyboard.press("n");
+    await expect(page.getByRole("dialog", { name: "notificações" })).toHaveCount(0);
+    await expect(page.locator('[data-shortcut="new"]')).toBeFocused();
   });
 });

@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "タスクリストの幅",
-  "notif.resizeHint": "ドラッグしてサイズを変更します。ダブルクリックしてリセットします",
   "alert.close": "閉じる",
   "alert.digestSummary": "一日の概要",
   "alert.modelNew": "新しいモデル",

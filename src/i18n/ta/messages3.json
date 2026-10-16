@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "பணி பட்டியல் அகலம்",
-  "notif.resizeHint": "அளவை மாற்ற இழுக்கவும்; மீட்டமைக்க இருமுறை கிளிக் செய்யவும்",
   "alert.close": "நெருக்கமான",
   "alert.digestSummary": "நாள் சுருக்கம்",
   "alert.modelNew": "புதிய மாடல்",

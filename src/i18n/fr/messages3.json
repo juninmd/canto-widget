@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "largeur de la liste des tâches",
-  "notif.resizeHint": "faites glisser pour redimensionner ; double-cliquez pour réinitialiser",
   "alert.close": "fermer",
   "alert.digestSummary": "résumé de la journée",
   "alert.modelNew": "nouveau modèle",

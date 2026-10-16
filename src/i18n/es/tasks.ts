@@ -148,8 +148,6 @@ export const tasks: Record<keyof typeof source, string> = {
   "notif.showLess": "mostrar menos",
   "notif.dismissFailed": "No se pudieron descartar {n} aviso(s).",
   "notif.closeFailed": "No se pudo cerrar el aviso. {error}",
-  "notif.resize": "ancho de la lista de tareas",
-  "notif.resizeHint": "arrastra para cambiar el tamaño; doble clic para restablecer",
   "alert.close": "cerrar",
   "alert.digestSummary": "resumen del día",
   "alert.modelNew": "modelo nuevo",

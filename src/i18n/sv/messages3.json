@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "uppgiftslistans bredd",
-  "notif.resizeHint": "dra för att ändra storlek; dubbelklicka för att återställa",
   "alert.close": "nära",
   "alert.digestSummary": "dag sammanfattning",
   "alert.modelNew": "ny modell",

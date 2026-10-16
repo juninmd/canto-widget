@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "ширина листе задатака",
-  "notif.resizeHint": "превуците да бисте променили величину; двапут кликните за ресетовање",
   "alert.close": "затворити",
   "alert.digestSummary": "дневни резиме",
   "alert.modelNew": "нови модел",

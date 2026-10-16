@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "uzdevumu saraksta platums",
-  "notif.resizeHint": "velciet, lai mainītu izmēru; veiciet dubultklikšķi, lai atiestatītu",
   "alert.close": "aizveriet",
   "alert.digestSummary": "dienas kopsavilkums",
   "alert.modelNew": "jauns modelis",

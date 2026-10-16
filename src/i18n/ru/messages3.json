@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "ширина списка задач",
-  "notif.resizeHint": "перетащите, чтобы изменить размер; двойной щелчок для сброса",
   "alert.close": "закрыть",
   "alert.digestSummary": "итоги дня",
   "alert.modelNew": "новая модель",

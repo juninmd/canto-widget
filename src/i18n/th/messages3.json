@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "ความกว้างของรายการงาน",
-  "notif.resizeHint": "ลากเพื่อปรับขนาด ดับเบิลคลิกเพื่อรีเซ็ต",
   "alert.close": "ปิด",
   "alert.digestSummary": "สรุปวัน",
   "alert.modelNew": "รุ่นใหม่",

@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "Breite der Aufgabenliste",
-  "notif.resizeHint": "ziehen, um die Größe zu ändern; Doppelklicken Sie zum Zurücksetzen",
   "alert.close": "schließen",
   "alert.digestSummary": "Tageszusammenfassung",
   "alert.modelNew": "neues Modell",

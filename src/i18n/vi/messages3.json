@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "chiều rộng danh sách nhiệm vụ",
-  "notif.resizeHint": "kéo để thay đổi kích thước; nhấp đúp chuột để thiết lập lại",
   "alert.close": "đóng",
   "alert.digestSummary": "tóm tắt ngày",
   "alert.modelNew": "mẫu mới",

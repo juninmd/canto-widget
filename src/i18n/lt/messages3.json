@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "užduočių sąrašo plotis",
-  "notif.resizeHint": "vilkite, kad pakeistumėte dydį; dukart spustelėkite, kad nustatytumėte iš naujo",
   "alert.close": "uždaryti",
   "alert.digestSummary": "dienos santrauka",
   "alert.modelNew": "naujas modelis",

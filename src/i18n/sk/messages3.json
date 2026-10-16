@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "šírka zoznamu úloh",
-  "notif.resizeHint": "pretiahnutím zmeníte veľkosť; dvojitým kliknutím obnovíte",
   "alert.close": "zavrieť",
   "alert.digestSummary": "zhrnutie dňa",
   "alert.modelNew": "nový model",

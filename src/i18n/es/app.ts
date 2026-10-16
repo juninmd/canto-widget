@@ -210,7 +210,7 @@ export const app: Record<keyof typeof source, string> = {
   "shortcuts.tabs": "cambiar de pestaña, en el orden de la barra",
   "shortcuts.search": "buscar en la pestaña actual",
   "shortcuts.globalSearch": "búsqueda global en las tareas, notas y portapapeles de hoy",
-  "shortcuts.escape": "cerrar la ayuda, detalles, edición, búsqueda global o la paleta",
+  "shortcuts.escape": "cerrar los avisos, la ayuda, los detalles, la edición, la búsqueda global o la paleta",
   "shortcuts.help": "abrir o cerrar esta ayuda",
   "shortcuts.new": "nueva tarea o nueva tarjeta",
   "shortcuts.lock": "bloquear la bóveda",
