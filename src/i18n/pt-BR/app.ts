@@ -205,7 +205,7 @@ export const app = {
   "shortcuts.tabs": "trocar de aba, na ordem da barra",
   "shortcuts.search": "buscar na aba atual",
   "shortcuts.globalSearch": "busca global em tarefas de hoje, notas e clipboard",
-  "shortcuts.escape": "fechar ajuda, detalhes, edição, a busca global ou a paleta",
+  "shortcuts.escape": "fechar os avisos, a ajuda, os detalhes, a edição, a busca global ou a paleta",
   "shortcuts.help": "abrir ou fechar esta ajuda",
   "shortcuts.new": "nova tarefa ou novo card",
   "shortcuts.lock": "trancar o cofre",

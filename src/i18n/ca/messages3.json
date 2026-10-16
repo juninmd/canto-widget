@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "amplada de la llista de tasques",
-  "notif.resizeHint": "arrossegueu per canviar la mida; feu doble clic per restablir",
   "alert.close": "tancar",
   "alert.digestSummary": "resum del dia",
   "alert.modelNew": "nou model",

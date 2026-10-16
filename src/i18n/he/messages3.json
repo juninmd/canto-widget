@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "רוחב רשימת המשימות",
-  "notif.resizeHint": "גרור כדי לשנות את הגודל; לחץ פעמיים כדי לאפס",
   "alert.close": "לסגור",
   "alert.digestSummary": "סיכום יום",
   "alert.modelNew": "דגם חדש",

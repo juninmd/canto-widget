@@ -45,9 +45,7 @@ import ErrorBanner from "./components/ErrorBanner";
 import Skeleton from "./components/Skeleton";
 import MiniRail from "./components/MiniRail";
 import FocusedAlert from "./components/FocusedAlert";
-import NotificationsColumn from "./components/NotificationsColumn";
-import Splitter from "./components/Splitter";
-import { clampLeft, useSplitLeft, useWidth } from "./lib/split";
+import NotificationsPanel from "./components/NotificationsPanel";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
 import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
@@ -101,15 +99,19 @@ function Canto() {
   const pickMode = (next: Parameters<typeof setMode>[0]) => void setMode(next).catch((e) => setError(errText(e)));
   const toggleFullscreen = () => pickMode(mode === "max" ? "normal" : "max");
   const { alerts, log, drop, refresh: refreshAlerts } = useAlertList(true);
-  const split = useSplitLeft();
-  const [body, setBody] = useState<HTMLDivElement | null>(null);
-  const bodyWidth = useWidth(body);
-  const leftPx = bodyWidth > 0 ? clampLeft(split.left, bodyWidth) : split.left;
+  // The bell in the header is the only way in: the alerts take the whole window instead of a column beside the tabs.
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  // An auto-lock is Rust's, not a click on lock: the screen must not pop back up on the next unlock.
+  useEffect(() => {
+    if (!status?.unlocked) setAlertsOpen(false);
+  }, [status?.unlocked]);
   // Set by a click on the dock: the normal window opens with that alert on top.
   const [focusId, setFocusId] = useState<string | null>(null);
   const focused = alerts.find((a) => a.id === focusId);
   useEffect(() => {
-    if (mode === "mini") setFocusId(null);
+    if (mode !== "mini") return;
+    setFocusId(null);
+    setAlertsOpen(false);
   }, [mode]);
   // Completing from the toast changes the task outside the tab: the list needs to reread.
   const [tasksVersion, setTasksVersion] = useState(0);
@@ -123,15 +125,19 @@ function Canto() {
   }, [setError]);
 
   useShortcuts(status?.unlocked === true, (action) => {
-    if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "fullscreen") return toggleFullscreen();
     if (action.type === "privacy") return togglePrivacy();
+    // The alerts screen owns the window: any other action closes it instead of acting behind it.
+    if (alertsOpen) setAlertsOpen(false);
+    if (action.type === "help") return setHelpOpen((v) => !v);
     if (action.type === "globalSearch") return setSearchOpen((v) => !v);
     if (action.type === "palette") return setPaletteOpen((v) => !v);
     if (helpOpen || searchOpen || paletteOpen || onboardingOpen) return;
     if (action.type === "settings") return openSettings();
     if (action.type === "tab") return tabs[action.index - 1] && changeTab(tabs[action.index - 1].id);
     if (action.type === "lock") return void lock();
+    // The screen hands focus back to the bell as it unmounts: the field has to be focused after that.
+    if (alertsOpen) return void setTimeout(() => focusShortcut(action.target), 0);
     focusShortcut(action.target);
   });
 
@@ -195,6 +201,7 @@ function Canto() {
       setSearchOpen(false);
       setPaletteOpen(false);
       setOnboardingOpen(false);
+      setAlertsOpen(false);
       await api.lock();
     } catch (e) {
       setError(t("app.lockFailed", { error: errText(e) }));
@@ -215,12 +222,8 @@ function Canto() {
     refreshAlerts();
     requestRefresh();
   });
-  // The bell walks through the pending alerts, worst first, in the banner the dock click uses.
-  const showNextAlert = () => {
-    if (alerts.length === 0) return;
-    const at = alerts.findIndex((a) => a.id === focusId);
-    setFocusId(alerts[(at + 1) % alerts.length].id);
-  };
+  // The bell opens the whole alerts window; the dock click still opens one alert on top of the normal window.
+  const openAlerts = () => setAlertsOpen(true);
 
   // Called only while the palette is open: it reflects the agenda and privacy at that moment.
   const paletteCommands = () =>
@@ -293,6 +296,20 @@ function Canto() {
           }}
         />
       )}
+      {alertsOpen && status?.unlocked && (
+        <NotificationsPanel
+          alerts={alerts}
+          log={log}
+          onGone={drop}
+          onRefresh={refreshAlerts}
+          onCompleted={() => setTasksVersion((v) => v + 1)}
+          onOpenModels={() => {
+            setAlertsOpen(false);
+            changeTab("models");
+          }}
+          onClose={() => setAlertsOpen(false)}
+        />
+      )}
       {paletteOpen && status?.unlocked && (
         <CommandPalette
           commands={paletteCommands()}
@@ -310,8 +327,7 @@ function Canto() {
         privacy={privacy}
         mode={mode}
         pending={alerts.length}
-        bell={mode === "normal"}
-        onBell={showNextAlert}
+        onBell={openAlerts}
         onHelp={() => setHelpOpen(true)}
         onLock={() => void lock()}
         onTogglePrivacy={togglePrivacy}
@@ -331,78 +347,60 @@ function Canto() {
       ) : !status.unlocked ? (
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
-        <div ref={setBody} className="flex min-h-0 flex-1">
-          <div
-            className={`flex min-h-0 min-w-0 flex-col ${mode === "max" ? "shrink-0" : "flex-1"}`}
-            style={mode === "max" ? { width: leftPx } : undefined}
-          >
-              <TabBar current={tab} onChange={changeTab} tabs={tabs} />
-              {focused && (
-                <FocusedAlert
-                  event={focused}
-                  onGone={drop}
-                  onSettled={refreshAlerts}
-                  onCompleted={() => setTasksVersion((v) => v + 1)}
-                  onOpenModels={() => changeTab("models")}
-                />
-              )}
-              <main
-                id={panelId(tab)}
-                key={tab}
-                role="tabpanel"
-                aria-labelledby={`aba-${tab}`}
-                className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
-              >
-                {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
-                {tab === "notes" && (
-                  <NotesTab
-                    today={today}
-                    agenda={agenda.items}
-                    privacy={privacy}
-                    initialQuery={jumpQuery}
-                    querySeq={jumpSeq}
-                    onOpenTasks={() => changeTab("tasks")}
-                    onOpenAgenda={() => changeTab("agenda")}
-                    onError={setError}
-                    note={noteDraft}
-                  />
-                )}
-                {tab === "clipboard" && (
-                  <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
-                )}
-                {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={openSettings} onBooked={(message) => notify({ message })} />}
-                {tab === "github" && <GithubTab onError={setError} />}
-                {tab === "gitlab" && <GitlabTab onError={setError} />}
-                {tab === "steam" && <SteamTab onError={setError} />}
-                {tab === "status" && <StatusTab />}
-                {tab === "models" && <ModelsTab />}
-                {tab === "activity" && <ActivityTab today={today} onError={setError} />}
-                {tab === "settings" && (
-                  <SettingsTab
-                    onError={setError}
-                    hiddenTabs={hiddenTabs}
-                    onHiddenTabs={setHiddenTabs}
-                    reminderLead={reminderLead}
-                    onReminderLead={setReminderLead}
-                    onShowShortcuts={() => setHelpOpen(true)}
-                  />
-                )}
-              </main>
-              <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
-          </div>
-          {mode === "max" && (
-            <>
-              <Splitter left={leftPx} total={bodyWidth} onChange={split.setLeft} onCommit={split.commit} />
-              <NotificationsColumn
-                alerts={alerts}
-                log={log}
-                onGone={drop}
-                onRefresh={refreshAlerts}
-                onCompleted={() => setTasksVersion((v) => v + 1)}
-                onOpenModels={() => changeTab("models")}
-              />
-            </>
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <TabBar current={tab} onChange={changeTab} tabs={tabs} />
+          {focused && (
+            <FocusedAlert
+              event={focused}
+              onGone={drop}
+              onSettled={refreshAlerts}
+              onCompleted={() => setTasksVersion((v) => v + 1)}
+              onOpenModels={() => changeTab("models")}
+            />
           )}
+          <main
+            id={panelId(tab)}
+            key={tab}
+            role="tabpanel"
+            aria-labelledby={`aba-${tab}`}
+            className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
+          >
+            {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
+            {tab === "notes" && (
+              <NotesTab
+                today={today}
+                agenda={agenda.items}
+                privacy={privacy}
+                initialQuery={jumpQuery}
+                querySeq={jumpSeq}
+                onOpenTasks={() => changeTab("tasks")}
+                onOpenAgenda={() => changeTab("agenda")}
+                onError={setError}
+                note={noteDraft}
+              />
+            )}
+            {tab === "clipboard" && (
+              <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
+            )}
+            {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={openSettings} onBooked={(message) => notify({ message })} />}
+            {tab === "github" && <GithubTab onError={setError} />}
+            {tab === "gitlab" && <GitlabTab onError={setError} />}
+            {tab === "steam" && <SteamTab onError={setError} />}
+            {tab === "status" && <StatusTab />}
+            {tab === "models" && <ModelsTab />}
+            {tab === "activity" && <ActivityTab today={today} onError={setError} />}
+            {tab === "settings" && (
+              <SettingsTab
+                onError={setError}
+                hiddenTabs={hiddenTabs}
+                onHiddenTabs={setHiddenTabs}
+                reminderLead={reminderLead}
+                onReminderLead={setReminderLead}
+                onShowShortcuts={() => setHelpOpen(true)}
+              />
+            )}
+          </main>
+          <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
         </div>
       )}
     </div>

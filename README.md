@@ -183,6 +183,11 @@ model **enters the top 10** or **climbs within it** (checked every 6 hours while
 system notification for 30 min, 1 h, 2 h, until tomorrow or until you turn it off. A moon in the top bar shows
 when it ends; one click turns it back off. It survives a restart and ends on its own.
 
+🔔 **Every alert in one screen:** the bell in the header (count and colour when anything is pending) opens the
+alerts over the whole window in any mode: one card per alert with its actions, **dismiss all**, and what was
+resolved today under them — with nothing pending, it is how you still reach today's log. From the dock, a click
+still opens that single alert on top of the normal window.
+
 ⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
 locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
 action by name: go to a tab, new task or note, join the next meeting, copy the day's summary, switch skin, lock.
@@ -234,9 +239,13 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Click an alert in the dock | Maximized: tasks and notifications, with a draggable divider |
+| Click an alert in the dock | Maximized: the whole window for the open tab |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
+
+| The bell opens the alerts over the whole window |
+|---|
+| ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
 | Mini: the mode menu opens inside the dock window |
 |---|

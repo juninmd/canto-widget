@@ -9,6 +9,8 @@ let vaultStatus = { exists: true, unlocked: true };
 let miniOn = false;
 let statusFailures = 0;
 let lockFails = false;
+/** `null` keeps the app's default single pending alert; a list replaces it per test. */
+let alertPayload: unknown[] | null = null;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
@@ -34,7 +36,7 @@ mock.module("@tauri-apps/api/core", () => ({
         miniOn = args?.enabled === true;
         return Promise.resolve(null);
       case "alert_payload":
-        return Promise.resolve([{ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" }]);
+        return Promise.resolve(alertPayload ?? [{ ...meetingIn(0), id: "task:t1", title: "pagar boleto", meet: "" }]);
       case "notes_search":
         return Promise.resolve(
           args?.query === "reuniao"
@@ -110,6 +112,7 @@ beforeEach(() => {
   miniOn = false;
   statusFailures = 0;
   lockFails = false;
+  alertPayload = null;
   fullscreenOn = false;
   hidden = false;
   localStorage.clear();
@@ -400,7 +403,7 @@ test("a tab requested by the pop-up brings the dock back to the normal window", 
   expect(calls.some((c) => c.cmd === "window_mini_set" && c.args?.enabled === false)).toBe(true);
 });
 
-test("maximized shows the notifications beside the task list, with a divider to resize them", async () => {
+test("maximized gives the open tab the whole width: no divider and no side column", async () => {
   render(<App />);
   await settle();
   fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
@@ -409,23 +412,86 @@ test("maximized shows the notifications beside the task list, with a divider to 
   });
   await settle();
   expect(fullscreenOn).toBe(true);
-  const column = screen.getByRole("complementary", { name: "notificações" });
-  expect(column.textContent).toContain("pagar boleto");
-  expect(screen.getByRole("separator", { name: "largura da lista de tarefas" })).toBeDefined();
-  expect(screen.queryByText("agenda de hoje"), "the agenda already has its own tab").toBeNull();
+  expect(screen.getByRole("tablist")).toBeDefined();
+  expect(screen.queryByRole("separator", { name: "largura da lista de tarefas" })).toBeNull();
+  expect(screen.queryByRole("complementary", { name: "notificações" })).toBeNull();
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual([]);
 });
 
-test("closing a card in the notifications column tells Rust and reads the log again", async () => {
+test("the bell on the maximized window opens the alerts screen", async () => {
   fullscreenOn = true;
   render(<App />);
   await settle();
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
+  expect(within(screen.getByRole("dialog", { name: "notificações" })).getByText("pagar boleto")).toBeTruthy();
+});
+
+test("closing a card in the alerts screen tells Rust and reads the log again", async () => {
+  render(<App />);
+  await settle();
   const before = calls.filter((c) => c.cmd === "alert_log").length;
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "fechar" }));
   });
   await settle();
   expect(calls.find((c) => c.cmd === "alert_close")?.args?.id).toBe("task:t1");
   expect(calls.filter((c) => c.cmd === "alert_log").length, "the resolved list would stay stale").toBeGreaterThan(before);
+});
+
+test("with nothing pending the bell still reaches the alerts screen, where today's log lives", async () => {
+  alertPayload = [];
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 0" }));
+  const panel = screen.getByRole("dialog", { name: "notificações" });
+  expect(within(panel).getByText("nenhum aviso pendente")).toBeTruthy();
+  expect(within(panel).getByText("nada resolvido ainda hoje")).toBeTruthy();
+});
+
+test("the alerts screen does not let another overlay open behind it", async () => {
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
+  await act(async () => {
+    fireEvent.keyDown(document.body, { key: "k", code: "KeyK", ctrlKey: true });
+  });
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual(["busca global"]);
+});
+
+test("a shortcut typed with the alerts screen up reaches the field, not the bell", async () => {
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
+  // The two acts mirror the real order: the screen unmounts (and hands focus to the bell) before the field is focused.
+  await act(async () => {
+    fireEvent.keyDown(document.body, { key: "n", code: "KeyN" });
+  });
+  await act(async () => {
+    jest.advanceTimersByTime(10);
+  });
+  await settle();
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual([]);
+  expect((document.activeElement as HTMLElement).dataset.shortcut, "the new-task field should have the focus").toBe("new");
+});
+
+test("a lock closes the alerts screen and it stays closed on the next unlock", async () => {
+  render(<App />);
+  await settle();
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual(["notificações"]);
+  vaultStatus = { exists: true, unlocked: false };
+  await act(async () => listeners["canto://auto-lock"]({ payload: 15 }));
+  await settle();
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual([]);
+  vaultStatus = { exists: true, unlocked: true };
+  await act(async () => listeners["canto://auto-lock"]({ payload: 15 }));
+  await settle();
+  expect(screen.getByRole("tablist"), "the vault is unlocked again").toBeTruthy();
+  expect(
+    screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label")),
+    "the screen came back with the unlock",
+  ).toEqual([]);
 });
 
 test("hidden from the mode icon hides the window like the minus button", async () => {
@@ -492,14 +558,15 @@ test("offline shows a chip in the header, and coming back rereads the agenda and
   }
 });
 
-test("a pending alert puts a bell in the header that opens it in the focus banner", async () => {
+test("a pending alert puts a bell in the header that opens the alerts screen", async () => {
   render(<App />);
   await settle();
-  expect(screen.queryByRole("region", { name: "aviso em foco" })).toBeNull();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
-  });
-  expect(within(screen.getByRole("region", { name: "aviso em foco" })).getByText("pagar boleto")).toBeTruthy();
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual([]);
+  fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
+  const panel = screen.getByRole("dialog", { name: "notificações" });
+  expect(within(panel).getByText("pagar boleto")).toBeTruthy();
+  fireEvent.click(within(panel).getByRole("button", { name: "voltar" }));
+  expect(screen.queryAllByRole("dialog").map((d) => d.getAttribute("aria-label"))).toEqual([]);
 });
 
 test("Ctrl+, opens settings, and the palette can open settings and refresh the current tab", async () => {

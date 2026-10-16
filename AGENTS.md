@@ -38,7 +38,7 @@ and publishes a release after the checks pass.
 src/                      React UI (one component per file, tests next to it)
   lib/api.ts              the only place that calls invoke(); IPC types live here
   lib/                    pure logic (agenda, dayPlan, focus, activity, reminders, shortcuts, summary, theme, motion) + hooks
-  components/             MiniRail (dock), ModeSwitcher (mode menu), AlertCard/FocusedAlert, NotificationsColumn + Splitter (maximized mode), TabBar (overflow into a "mais" menu via lib/fitTabs); tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, ActivityTab, SettingsTab) and sections
+  components/             MiniRail (dock), ModeSwitcher (mode menu), AlertCard/FocusedAlert/NotificationsPanel (the alerts screen the header bell opens), TabBar (overflow into a "mais" menu via lib/fitTabs); tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, ActivityTab, SettingsTab) and sections
 src-tauri/src/
   lib.rs                  plugin setup, tray, background watchers, invoke_handler list
   vault.rs, store.rs, crypto.rs   AppState/session, sealed envelopes, Argon2id + AES-256-GCM

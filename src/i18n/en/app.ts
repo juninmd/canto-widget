@@ -210,7 +210,7 @@ export const app: Record<keyof typeof source, string> = {
   "shortcuts.tabs": "switch tabs, in tab bar order",
   "shortcuts.search": "search the current tab",
   "shortcuts.globalSearch": "global search across today's tasks, notes and clipboard",
-  "shortcuts.escape": "close help, details, editing, global search or the palette",
+  "shortcuts.escape": "close the alerts, help, details, editing, global search or the palette",
   "shortcuts.help": "open or close this help",
   "shortcuts.new": "new task or new card",
   "shortcuts.lock": "lock the vault",

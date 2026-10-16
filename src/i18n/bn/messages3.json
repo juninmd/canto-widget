@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "কাজের তালিকার প্রস্থ",
-  "notif.resizeHint": "আকার পরিবর্তন করতে টেনে আনুন; রিসেট করতে ডাবল ক্লিক করুন",
   "alert.close": "বন্ধ",
   "alert.digestSummary": "দিনের সারাংশ",
   "alert.modelNew": "নতুন মডেল",

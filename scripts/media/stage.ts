@@ -9,7 +9,7 @@ export type SceneOptions = MockOptions & {
   width?: number;
   height?: number;
   skin?: "padrao" | "hueco-mundo" | "dracula" | "glass" | "claro";
-  /** localStorage entries written before the app boots (hidden tabs, split width...). */
+  /** localStorage entries written before the app boots (hidden tabs, language...). */
   storage?: Record<string, string>;
   /** Page to open: "/" for the widget, "/?alert" for the pop-up window. */
   path?: string;

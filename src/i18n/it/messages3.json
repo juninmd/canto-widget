@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "larghezza dell'elenco attività",
-  "notif.resizeHint": "trascina per ridimensionare; fare doppio clic per reimpostare",
   "alert.close": "chiudere",
   "alert.digestSummary": "riepilogo della giornata",
   "alert.modelNew": "nuovo modello",

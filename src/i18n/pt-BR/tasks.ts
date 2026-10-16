@@ -146,8 +146,6 @@ export const tasks = {
   "notif.showLess": "ver menos",
   "notif.dismissFailed": "Não foi possível dispensar {n} aviso(s).",
   "notif.closeFailed": "Não foi possível fechar o aviso. {error}",
-  "notif.resize": "largura da lista de tarefas",
-  "notif.resizeHint": "arraste para redimensionar; duplo clique restaura",
   "alert.close": "fechar",
   "alert.digestSummary": "resumo do dia",
   "alert.modelNew": "modelo novo",
