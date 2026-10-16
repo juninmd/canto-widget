@@ -37,6 +37,8 @@ pub struct AppState {
     pub forges: crate::forge_cache::ForgeCache,
     /// Guests' directory photos; dropped on lock like the rest of the plaintext.
     pub guest_photos: crate::guest_photos::GuestPhotos,
+    /// Steam lists (wishlist deals, top sellers, catalog); dropped on lock with the rest.
+    pub steam: crate::steam::SteamCache,
     /// Soonest upcoming event with a Meet link, refreshed by `tray_live::watch`; read by the tray and the join shortcut.
     pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
     /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.
@@ -58,6 +60,7 @@ impl AppState {
             trash: Default::default(),
             forges: Default::default(),
             guest_photos: Default::default(),
+            steam: Default::default(),
             next_meeting: Mutex::new(None),
             badge_tasks: Mutex::new(0),
             clip_lock: Mutex::new(()),
@@ -140,6 +143,7 @@ impl AppState {
         self.trash.clear();
         self.forges.clear();
         self.guest_photos.clear();
+        self.steam.clear();
         *self.next_meeting.lock().unwrap() = None;
         *self.badge_tasks.lock().unwrap() = 0;
     }

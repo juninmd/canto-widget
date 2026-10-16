@@ -77,7 +77,7 @@ Windows Hello по избор.
 ### ✅ Задачи, които ви напомнят
 
 Ежедневен контролен списък с време и повторение (всеки ден, през делничните дни или седмично). Въведете **`Daily at 9:30am`** и
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+напомнянето вече е зададено; добавете **`!high`** (или `!alta`, `!média`, `!baixa`) за приоритет или щракнете върху точката в реда, за да го превключите. Дългите заглавия се увиват, вместо да се отрязват. **Фокусирайте таймера** върху всяка задача: дайте му приблизителна оценка, натиснете ▶ и лента, закрепена под всеки раздел, отчита времето спрямо него (червена, след като преминете); времето се записва в трезора всяка минута. **Резюме за деня**, готово за поставяне (задачи, фокусирано време, срещи с общо време, PRs/MRs отворени, обединени, прегледани и затворени без обединяване), **седмичен и месечен отчет** в маркдаун и **изтегляне на висящи елементи** от вчера. **Бързо заснемане** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` на macOS) записва задача или бележка от всяко приложение, без да отваряте изпълнимия модул.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ JSON форматиран или компактен, текст на един р
 то. Чернови, PRs **очаква преглед** и PRs **застоял** за една седмица се открояват и всеки PR носи малък
 **CI значка** (преминала, неуспешна, работеща или без CI) от проверките на главния комит. Когато някой **поиска вашите
 преглед**, ви казва известие от операционната система (включено по подразбиране, изключете го в настройките). Филтриране по текст, `repo:` или `label:`, PRs само или само проблеми, сортиране по актуализация, създаване или коментари и
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+превъртете с **покажи още**. Превключете към изгледа **Коментари**, за да видите таблица **Каталог с коментатори** на всички, които са коментирали вашия PRs (аватари, значки за хора срещу ботове, брой коментари, търсене, филтър за ботове, прогресивно страници) и техните коментари. Също така поддържа **GitLab.com и самостоятелно хостван GitLab**, с 5-минутен кеш, който
 спазва ограничението на скоростта. Влезте с личен токен само за четене или от браузъра (поток на устройството).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam, без да напускате джаджата
+
+Четири подраздела за Steam: **оферти в списъка с желания** (първо най-голямата отстъпка), **най-продавани**, **играйте сега** и
+**каталог подреден по рейтинг**. Публичните списъци се нуждаят само от вашите **SteamID64**; незадължителен ключ **Steam Web API ключ**
+добавя петте най-нови игри с техните времена за игра. Цените са в реали, всеки ред отваря страницата на магазина и
+разделът започва по подразбиране, на едно квадратче за отметка в Настройки.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ OneDrive, Syncthing...), започнете със системата и раз�
 заключва и `?` изброява преките пътища. `Ctrl+Shift+P` (`Cmd+Shift+P` на macOS) отваря **командна палитра** с всеки
 действие по име: отидете на раздел, нова задача или бележка, присъединете се към следващата среща, копирайте резюмето за деня, превключете кожата, заключване.
 
-## 🎨 Six skins
+## 🎨 Шест скина
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>По подразбиране</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Дракула</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Стъкло</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Настройки в групи, с търсене | Търсене филтрира групите | Офлайн чип в заглавката | Потвърдете, преди да изчистите клипборда |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Отхвърляне на незаписана чернова на бележка |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Напомняне за задача | Промяна на главната парола | Статус API (раздел за включване) | Език: английски, португалски или испански |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Споменаване на предупреждение с кой го е написал |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Предупреждение за споменаване с преглед на текста |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Още сигнали за собствената ми работа |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Обобщен сигнал за деня | Обобщена настройка за деня |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Подраздел Споменавания (GitHub и GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ OneDrive, Syncthing...), започнете със системата и раз�
 | AI модели, класирани по индекса на интелигентността |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: последните пет изиграни игри, с двете времена за игра |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Едно наслагване за предупреждение за всичко чакащо: прекъсвания, срещи, задачи и нови AI модели |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Уеб изгледите се създават след състояние Rust и треят се инициализира, така че IPC повикванията при стартиране не могат да се състезават при настройка.
 
 Всеки PR изпълнява CI на Windows, macOS и Linux. Конвенционалните `fix`, `feat` и нарушаващите задълженията са обединени в `main`
 вземете SemVer таг, генерирани бележки за изданието и подписани инсталатори, изградени паралелно; съобщението се публикува след проверка (подробности в

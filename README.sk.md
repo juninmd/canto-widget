@@ -77,7 +77,7 @@ odošle upozornenie s **odložením o 10 minút**.
 ### ✅ Úlohy, ktoré vám pripomenú
 
 Denný kontrolný zoznam s časom a opakovaním (každý deň, v pracovné dni alebo týždenne). Napíšte **`Daily at 9:30am`** a
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+pripomienka je už nastavená; pridajte **`!high`** (alebo `!alta`, `!média`, `!baixa`) ako prioritu alebo kliknite na bodku v riadku, aby ste ho mohli prepínať. Dlhé nadpisy sa zabalia namiesto toho, aby boli odrezané. **Časovač zaostrenia** na akúkoľvek úlohu: urobte odhad, stlačte ▶ a pruh pripnutý pod každou záložkou odpočítava čas (po prejdení červený); čas sa ukladá do trezoru každú minútu. **Zhrnutie dňa** pripravené na prilepenie (úlohy, sústredený čas, stretnutia s celkovým časom, PRs/MRs otvorené, zlúčené, skontrolované a zatvorené bez zlúčenia), **týždenný a mesačný prehľad** v znížení ceny a **vytiahnutie čakajúcich položiek** zo včera. **Rýchle snímanie** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` na macOS) zaznamená úlohu alebo poznámku z ľubovoľnej aplikácie bez otvorenia miniaplikácie.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ citlivý.
 to. Koncepty, PRs **čakajúce na vašu recenziu** a PRs **zastavená** na týždeň vynikajú a každá PR nesie malú
 **Odznak CI** (úspešný, neúspešný, spustený alebo žiadny CI) z kontrol hlavného odovzdania. Keď vás niekto **požiada
 review**, upozorní vás na to upozornenie operačného systému (v predvolenom nastavení zapnuté, v Nastaveniach ho vypnite). Filtrujte podľa textu, `repo:` alebo `label:`, iba PRs alebo iba problémov, zoraďte podľa aktualizácie, vytvorenia alebo komentárov a
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+posúvajte pomocou **zobraziť viac**. Prepnite na zobrazenie **Komentáre** a zobrazte **Katalóg komentátorov** mriežku všetkých, ktorí komentovali vaše PRs (avatarov, odznaky medzi ľuďmi a robotmi, počty komentárov, vyhľadávanie, filter robotov, postupné stránkovanie) a ich komentáre. Podporuje tiež **GitLab.com a vlastný GitLab** s 5-minútovou vyrovnávacou pamäťou, ktorá
 rešpektuje limit sadzby. Prihláste sa pomocou osobného tokenu iba na čítanie alebo z prehliadača (postup zariadenia).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam bez opustenia miniaplikácie
+
+Štyri podkarty pre Steam: **ponuky zoznamu želaní** (najväčšia zľava ako prvá), **najpredávanejšie**, **hrať teraz** a
+**katalóg zoradený podľa hodnotenia**. Verejné zoznamy potrebujú iba vaše **SteamID64**; voliteľný **Steam webový kľúč API**
+pridáva päť najnovších hier s ich hracími časmi. Ceny prichádzajú v realoch, každý riadok otvára stránku obchodu a
+karta sa predvolene spustí o jedno začiarkavacie políčko v Nastaveniach.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ keď skončí; jedným kliknutím ho opäť vypnete. Prežije reštart a skonč�
 uzamkne a `?` zobrazí zoznam skratiek. `Ctrl+Shift+P` (`Cmd+Shift+P` v systéme MacOS) otvorí **paletu príkazov** s každým
 akcia podľa názvu: prejdite na kartu, novú úlohu alebo poznámku, pripojte sa k ďalšej schôdzi, skopírujte súhrn dňa, prepnite vzhľad, uzamknite.
 
-## 🎨 Six skins
+## 🎨 Šesť skinov
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Predvolené</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Sklo</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Svetlo</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Nastavenia v skupinách, s vyhľadávaním | Vyhľadávanie filtruje skupiny | Offline čip v hlavičke | Pred vymazaním schránky potvrďte |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Zahodiť neuložený koncept poznámky |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Pripomenutie úlohy | Zmeniť hlavné heslo | Stav API (karta prihlásenia) | Jazyk: angličtina, portugalčina alebo španielčina |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Uveďte upozornenie, kto to napísal |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Upozornenie zmienky s náhľadom textu |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Ďalšie upozornenia o mojej vlastnej práci |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Súhrnné denné upozornenie | Nastavenie súhrnu dňa |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Podkarta zmienky (GitHub a GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 | Modely AI zoradené podľa Intelligence Index |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: posledných päť odohraných zápasov s oboma hracími časmi |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Jedno prekrytie výstrahy pre všetko čakajúce: výpadky, stretnutia, úlohy a nové modely AI |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Webviews sa vytvárajú po stave Rust a zásobník je inicializovaný, takže spúšťacie IPC volania nemôžu pretekať.
 
 Každý PR spúšťa CI v systémoch Windows, MacOS a Linux. Konvenčné `fix`, `feat` a porušujúce odovzdania sa zlúčili do `main`
 získať značku SemVer, vygenerované poznámky k vydaniu a podpísané inštalačné programy postavené paralelne; vydanie je zverejnené po overení (podrobnosti v

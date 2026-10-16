@@ -77,7 +77,7 @@ menghantar pemberitahuan, dengan **tunda 10 min**.
 ### ✅ Tugasan yang mengingatkan anda
 
 Senarai semak harian dengan masa dan berulang (setiap hari, hari bekerja atau mingguan). Taip **`Daily at 9:30am`** dan
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+peringatan telah ditetapkan; tambah **`!high`** (atau `!alta`, `!média`, `!baixa`) untuk keutamaan, atau klik titik pada baris untuk mengitarnya. Tajuk panjang membalut bukannya dipotong. **Pemasa fokus** pada sebarang tugasan: berikan anggaran, tekan ▶ dan bar yang disematkan di bawah setiap tab mengira masa menentangnya (merah sebaik sahaja anda melepasi); masa disimpan ke bilik kebal setiap minit. **Ringkasan hari** sedia untuk ditampal (tugas, masa yang difokuskan, mesyuarat dengan jumlah masa, PRs/MRs dibuka, digabungkan, disemak dan ditutup tanpa digabungkan), **laporan mingguan dan bulanan** dalam penurunan nilai dan **tarik semula item yang belum selesai** dari semalam. **Tangkapan pantas** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` pada macOS) mencatat tugas atau nota daripada mana-mana apl, tanpa membuka widget.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ sensitif.
 ia. Draf, PRs **menunggu semakan anda** dan PRs **terhenti** selama seminggu terserlah, dan setiap PR membawa sekeping kecil
 **Lencana CI** (lulus, gagal, berjalan atau tiada CI) daripada semakan komit utamanya. Apabila seseorang **meminta anda
 semakan**, pemberitahuan OS memberitahu anda (dihidupkan secara lalai, matikannya dalam Tetapan). Tapis mengikut teks, `repo:` atau `label:`, PRs sahaja atau isu sahaja, mengisih mengikut kemas kini, penciptaan atau ulasan dan
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+tatal dengan **tunjukkan lagi**. Beralih ke paparan **Ulasan** untuk melihat grid **Katalog Pengulas** semua orang yang mengulas pada PRs anda (avatar, lencana manusia lwn bot, kiraan ulasan, carian, penapis bot, penomboran progresif) dan ulasan mereka. Juga menyokong **GitLab.com dan GitLab** yang dihoskan sendiri, dengan cache 5 minit yang
 menghormati had kadar. Log masuk dengan token peribadi baca sahaja atau daripada penyemak imbas (aliran peranti).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam tanpa meninggalkan widget
+
+Empat subtab untuk Steam: **tawaran senarai keinginan** (diskaun terbesar dahulu), **terlaris**, **main sekarang** dan
+**katalog dipesan mengikut rating**. Senarai awam hanya memerlukan **SteamID64** anda; pilihan **Steam Web API kunci**
+menambah lima permainan terbaharu dengan masa permainan mereka. Harga datang dalam reais, setiap baris membuka halaman kedai, dan
+tab bermula secara lalai, hanya satu kotak pilihan dalam Tetapan.
 
 </td>
 </tr>
@@ -175,7 +188,7 @@ apabila ia berakhir; satu klik mematikannya kembali. Ia bertahan apabila dimulak
 kunci dan `?` menyenaraikan pintasan. `Ctrl+Shift+P` (`Cmd+Shift+P` pada macOS) membuka **palet arahan** dengan setiap
 tindakan mengikut nama: pergi ke tab, tugasan baharu atau nota, sertai mesyuarat seterusnya, salin ringkasan hari itu, tukar kulit, kunci.
 
-## 🎨 Six skins
+## 🎨 Enam kulit
 
 <table>
 <tr>
@@ -210,11 +223,11 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Tetapan dalam kumpulan, dengan carian | Carian menapis kumpulan | Cip luar talian dalam pengepala | Sahkan sebelum mengosongkan papan keratan |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Buang draf nota yang belum disimpan |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Peringatan tugas | Tukar kata laluan induk | Status API (tab ikut serta) | Bahasa: Inggeris, Portugis atau Sepanyol |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Sebut makluman dengan siapa yang menulisnya |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Sebut makluman dengan pratonton teks |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Lagi makluman tentang kerja saya sendiri |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Makluman ringkasan hari | Tetapan ringkasan hari |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Menyebut subtab (GitHub dan GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 | Model AI disenaraikan mengikut Indeks Perisikan |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: lima perlawanan terakhir dimainkan, dengan kedua-dua masa permainan |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Satu tindanan amaran untuk semua yang belum selesai: gangguan, mesyuarat, tugas dan model AI baharu |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Paparan web dibuat selepas keadaan Rust dan dulang dimulakan, jadi panggilan IPC permulaan tidak boleh berlumba persediaan.
 
 Setiap PR menjalankan CI pada Windows, macOS dan Linux. Konvensional `fix`, `feat` dan melanggar komitmen digabungkan menjadi `main`
 dapatkan teg SemVer, nota keluaran yang dijana dan pemasang yang ditandatangani dibina selari; keluaran diterbitkan selepas pengesahan (butiran dalam

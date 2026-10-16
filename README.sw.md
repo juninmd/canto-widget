@@ -77,7 +77,7 @@ hutuma arifa, na **ahirisha kwa dakika 10**.
 ### ✅ Kazi zinazokukumbusha
 
 Orodha ya ukaguzi ya kila siku yenye wakati na marudio (kila siku, siku za wiki au kila wiki). Andika **`Daily at 9:30am`** na
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+ukumbusho tayari umewekwa; ongeza **`!high`** (au `!alta`, `!média`, `!baixa`) kwa kipaumbele, au ubofye kitone kwenye safu mlalo ili kukizungusha. Majina marefu hufunga badala ya kukatwa. **Kipima muda** cha kulenga kazi yoyote: ipe makadirio, bonyeza ▶ na upau uliobandikwa chini ya kila kichupo huhesabu muda dhidi yake (nyekundu unapoipitia); wakati unahifadhiwa kwenye kuba kila dakika. **Muhtasari wa siku** tayari kubandika (majukumu, muda uliolenga, mikutano yenye jumla ya muda, PRs/MRs iliyofunguliwa, kuunganishwa, kukaguliwa na kufungwa bila kuunganishwa), ripoti **ya kila wiki na kila mwezi** katika alama chini, na **vuta juu ya vipengee vinavyosubiri ** kutoka jana. **Kunasa kwa haraka** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` kwenye macOS) huweka kazi au dokezo kutoka kwa programu yoyote, bila kufungua wijeti.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ nyeti.
 hiyo. Rasimu, PRs **inasubiri ukaguzi wako** na PRs **zilizokwama** kwa wiki moja zitatoweka, na kila PR hubeba ndogo
 **beji ya CI** (iliyopitishwa, imeshindwa, inaendesha au hakuna CI) kutoka kwa ukaguzi wa ahadi yake kuu. Wakati mtu ** anaomba yako
 hakiki**, arifa ya Mfumo wa Uendeshaji inakuambia (washa kwa chaguo-msingi, izime kwenye Mipangilio). Chuja kwa maandishi, `repo:` au `label:`, PRs pekee au matoleo pekee, panga kwa sasisho, uundaji au maoni, na
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+tembeza kwa **onyesha zaidi**. Badili hadi mwonekano wa **Maoni** ili kuona gridi ya **orodha ya Watoa maoni** ya kila mtu ambaye alitoa maoni kwenye PRs yako (avatars, beji za binadamu dhidi ya roboti, hesabu za maoni, utafutaji, kichujio cha roboti, uwekaji kurasa unaoendelea) na maoni yao. Pia inasaidia **GitLab.com na inayojiendesha yenyewe GitLab**, ikiwa na akiba ya dakika 5 ambayo
 inaheshimu kikomo cha viwango. Ingia kwa kutumia tokeni ya kibinafsi ya kusoma tu au kutoka kwa kivinjari (mtiririko wa kifaa).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam bila kuacha wijeti
+
+Vichupo vidogo vinne vya Steam: **orodha ya matamanio** (punguzo kubwa kwanza), **wauzaji wakuu**, **cheza sasa** na
+**katalogi iliyoagizwa kwa ukadiriaji**. Orodha za umma zinahitaji tu **SteamID64** yako; hiari **Steam Mtandao API ufunguo**
+inaongeza michezo mitano ya hivi majuzi zaidi na saa zake za kucheza. Bei huja kwa reais, kila safu hufungua ukurasa wa duka, na
+kichupo kinaanza kwa chaguo-msingi, kisanduku tiki kimoja kipo kwenye Mipangilio.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ inapoisha; mbofyo mmoja huizima. Inasalia kuanza upya na kuishia yenyewe.
 kufuli na `?` kuorodhesha njia za mkato. `Ctrl+Shift+P` (`Cmd+Shift+P` kwenye macOS) hufungua **paleti ya amri** na kila
 kitendo kwa jina: nenda kwenye kichupo, kazi mpya au dokezo, jiunge na mkutano unaofuata, nakili muhtasari wa siku, badilisha ngozi, funga.
 
-## 🎨 Six skins
+## 🎨 Ngozi sita
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Chaguomsingi</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Kioo</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Nuru</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Mipangilio katika vikundi, na utafutaji | Tafuta huchuja vikundi | Chip ya nje ya mtandao kwenye kichwa | Thibitisha kabla ya kufuta ubao wa kunakili |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Tupa rasimu ya noti ambayo haijahifadhiwa |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Kikumbusho cha kazi | Badilisha nenosiri kuu | Hali API (kichupo cha kujijumuisha) | Lugha: Kiingereza, Kireno au Kihispania |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Taja arifa na aliyeiandika |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Taja arifa kwa onyesho la kukagua maandishi |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Tahadhari zaidi kuhusu kazi yangu mwenyewe |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Arifa ya muhtasari wa siku | Mpangilio wa muhtasari wa siku |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Kichupo kidogo cha kutaja (GitHub na GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 | Miundo ya AI iliyoorodheshwa kwa Kielezo cha Ujasusi |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: michezo mitano iliyopita iliyochezwa, na saa zote mbili za kucheza |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Uwekeleaji mmoja wa tahadhari kwa kila kitu kinachosubiri: kukatika, mikutano, kazi na miundo mipya ya AI |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Mionekano ya wavuti huundwa baada ya hali ya Rust na trei huanzishwa, kwa hivyo simu za IPC zinazowashwa haziwezi kukimbia usanidi.
 
 Kila PR huendesha CI kwenye Windows, macOS na Linux. Ahadi za kawaida `fix`, `feat` na kuvunja zimeunganishwa kuwa `main`
 pata lebo ya SemVer, madokezo ya kutolewa yaliyotolewa na visakinishi vilivyotiwa saini vilivyojengwa sambamba; toleo linachapishwa baada ya uthibitishaji (maelezo katika

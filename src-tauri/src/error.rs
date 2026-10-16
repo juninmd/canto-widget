@@ -22,6 +22,8 @@ pub enum AppError {
     Github(String),
     #[error("gitlab: {0}")]
     Gitlab(String),
+    #[error("steam: {0}")]
+    Steam(String),
     /// The forge's quota ran out; `reset_at` (ms) tells the cache when to try again.
     #[error("{message}")]
     RateLimited { message: String, reset_at: i64 },

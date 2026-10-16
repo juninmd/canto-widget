@@ -77,7 +77,7 @@ Windows Hello אופציונלי.
 ### ✅ משימות שמזכירות לך
 
 רשימת בדיקה יומית עם זמן וחזרה (כל יום, ימי חול או שבוע). הקלד **`Daily at 9:30am`** וה-
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+התזכורת כבר מוגדרת; הוסף את **`!high`** (או `!alta`, `!média`, `!baixa`) עבור העדיפות, או לחץ על הנקודה בשורה כדי לעבור אותה. כותרות ארוכות עוטפות במקום להיות מנותקות. **מיקוד טיימר** בכל משימה: תן לה אומדן, לחץ על ▶ ופס מוצמד מתחת לכל לשונית סופר את הזמן נגדה (אדום ברגע שאתה עובר); הזמן נשמר לכספת בכל דקה. **סיכום יום** מוכן להדבקה (משימות, זמן ממוקד, פגישות עם זמן כולל, PRs/MRs נפתח, מוזג, נבדק ונסגר ללא מיזוג), **דוח שבועי וחודשי** ב-markdown, ו-**משיכת פריטים ממתינים** מאתמול. **לכידה מהירה** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` ב-macOS) רושם משימה או הערה מכל אפליקציה, מבלי לפתוח את הווידג'ט.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ JSON בפורמט או קומפקטי, טקסט בשורה אחת, באותיו�
 זה. טיוטות, PRs **מחכים לביקורת שלכם** וPRs **נתקעו** למשך שבוע בולטות, וכל PR נושא
 **תג CI** (עבר, נכשל, פועל או לא CI) מהבדיקות של ה-head commit שלו. כשמישהו **מבקש שלך
 סקירה**, הודעת מערכת ההפעלה אומרת לך (מופעל כברירת מחדל, כבה אותה בהגדרות). סנן לפי טקסט, `repo:` או `label:`, PRs בלבד או בעיות בלבד, מיין לפי עדכון, יצירה או הערות, וכן
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+גלול עם **הצג עוד**. עבור לתצוגת **הערות** כדי לראות רשת **קטלוג מגיבים** של כל מי שהגיב על PRs שלך (אווטארים, תגים אנושיים לעומת בוטים, ספירת תגובות, חיפוש, מסנן בוטים, עימוד פרוגרסיבי) וההערות שלהם. תומך גם ב-**GitLab.com וב-GitLab** באירוח עצמי, עם מטמון של 5 דקות
 מכבד את מגבלת התעריף. היכנס עם אסימון אישי לקריאה בלבד או מהדפדפן (זרימת מכשיר).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam מבלי לעזוב את הווידג'ט
+
+ארבע כרטיסיות משנה עבור Steam: **עסקאות רשימת משאלות** (ההנחה הגדולה ביותר תחילה), **מוכרים מובילים**, **שחק עכשיו** וה
+**קטלוג בהזמנה לפי דירוג**. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; מפתח **Steam אינטרנט API אופציונלי**
+מוסיף את חמשת המשחקים האחרונים עם זמני המשחק שלהם. המחירים מגיעים בריאל, כל שורה פותחת את עמוד החנות, ו
+הכרטיסייה מתחילה כברירת מחדל, במרחק של תיבת סימון אחת בהגדרות.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 מנעולים ו`?` מפרט את קיצורי הדרך. `Ctrl+Shift+P` (`Cmd+Shift+P` ב-macOS) פותח **פלטת פקודות** עם כל
 פעולה לפי שם: עבור לטאב, משימה או הערה חדשה, הצטרף לפגישה הבאה, העתק את סיכום היום, החלף עור, נעילה.
 
-## 🎨 Six skins
+## 🎨 שישה סקינים
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>ברירת מחדל</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>דרקולה</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>זכוכית</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>אור</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| הגדרות בקבוצות, עם חיפוש | החיפוש מסנן את הקבוצות | שבב לא מקוון בכותרת | אשר לפני ניקוי הלוח |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| מחק טיוטת הערה שלא נשמרה |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| תזכורת משימה | שנה סיסמת אב | סטטוס API (כרטיסיית הסכמה) | שפה: אנגלית, פורטוגזית או ספרדית |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| אזכור התראה עם מי שכתב את זה |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| התראת אזכור עם תצוגה מקדימה של הטקסט |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| התראות נוספות על העבודה שלי |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| התראה על סיכום יום | הגדרת סיכום יום |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| כרטיסיית המשנה (GitHub וGitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 | מודלים של AI מדורגים לפי אינדקס המודיעין |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: חמשת המשחקים האחרונים ששיחקו, עם שני זמני המשחק |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | שכבת התראה אחת לכל מה שממתין: הפסקות, פגישות, משימות ודגמי AI חדשים |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+תצוגות אינטרנט נוצרות לאחר מצב Rust והמגש מאותחל, כך ששיחות IPC לאתחול אינן יכולות להתקין במהירות.
 
 כל PR מריץ CI ב-Windows, macOS ו-Linux. קונבנציונלי `fix`, `feat` ו-breaking commits מוזגו לתוך `main`
 קבל תג SemVer, הפקת הערות שחרור ומתקינים חתומים שנבנו במקביל; השחרור מתפרסם לאחר אימות (פרטים ב

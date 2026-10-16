@@ -77,7 +77,7 @@ Windows Hello 선택 사항입니다.
 ### ✅ 상기시켜주는 작업
 
 시간과 반복 횟수(매일, 주중 또는 매주)가 포함된 일일 체크리스트입니다. **`Daily at 9:30am`**를 입력하고
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+알림이 이미 설정되었습니다. 우선순위에 **`!high`**(또는 `!alta`, `!média`, `!baixa`)을 추가하거나 행의 점을 클릭하여 순환합니다. 긴 제목은 잘리지 않고 줄바꿈됩니다. 모든 작업에 대한 **포커스 타이머**: 추정치를 제공하고 ▶를 누르면 모든 탭 아래에 고정된 막대가 해당 작업에 대한 시간을 계산합니다(한 번 넘어가면 빨간색). 시간은 매분마다 저장소에 저장됩니다. **일 요약** 붙여넣기 가능(작업, 집중 시간, 총 시간이 포함된 회의, PRs/MRs 열기, 병합, 검토 및 병합 없이 종료), 마크다운의 **주간 및 월간 보고서**, 어제의 **보류 항목 가져오기**. **빠른 캡처**(macOS의 경우 `Ctrl+Alt+N`, `Ctrl+Cmd+N`)는 위젯을 열지 않고도 모든 앱에서 작업이나 메모를 기록합니다.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ JSON 형식 또는 압축, 한 줄의 텍스트, 대문자 또는 소문자(기�
 그것. 초안, PRs **검토를 기다리는 중** 및 PRs **일주일 동안 중단됨**이 눈에 띄고 각 PR에는 작은
 **CI 배지**(통과, 실패, 실행 중 또는 CI 없음)는 헤드 커밋 검사에서 가져옵니다. 누군가 **요청하면
 검토**, OS 알림을 통해 알려줍니다(기본적으로 켜져 있으며 설정에서 꺼짐). 텍스트로 필터링(`repo:` 또는 `label:`, PRs만 또는 문제만), 업데이트, 생성 또는 댓글별로 정렬
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+**더 보기**로 스크롤하세요. **댓글** 보기로 전환하여 PRs(아바타, 사람 대 봇 배지, 댓글 수, 검색, 봇 필터, 점진적 페이지 매김)에 댓글을 단 모든 사람의 **댓글 작성자 카탈로그** 그리드와 해당 댓글을 확인하세요. 또한 **GitLab.com 및 자체 호스팅 GitLab**를 지원하며 5분 캐시를 통해
 비율 제한을 준수합니다. 읽기 전용 개인 토큰을 사용하거나 브라우저(디바이스 흐름)에서 로그인하세요.
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam 위젯을 떠나지 않고
+
+Steam에 대한 4개의 하위 탭: **위시리스트 거래**(가장 큰 할인 우선), **최고 판매자**, **지금 플레이** 및
+**등급별로 정렬된 카탈로그**. 공개 목록에는 **SteamID64**만 필요합니다. 선택적 **Steam 웹 API 키**
+최근 5개의 게임을 플레이 시간과 함께 추가합니다. 가격은 레알로 표시되며, 모든 행에서 상점 페이지가 열립니다.
+탭은 기본적으로 설정에서 하나의 확인란으로 시작됩니다.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 잠금 및 `?`에 바로가기가 나열되어 있습니다. `Ctrl+Shift+P`(macOS의 경우 `Cmd+Shift+P`)은 모든 명령이 포함된 **명령 팔레트**를 엽니다.
 이름별 작업: 탭으로 이동, 새 작업 또는 메모, 다음 회의 참여, 오늘의 요약 복사, 스킨 전환, 잠금.
 
-## 🎨 Six skins
+## 🎨 여섯 개의 스킨
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>기본값</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>휴에코 문도</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>드라큘라</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>유리</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>빛</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| 검색을 통한 그룹 설정 | 검색은 그룹을 필터링합니다 | 헤더의 오프라인 칩 | 클립보드를 지우기 전에 확인 |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| 저장되지 않은 메모 초안 삭제 |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| 작업 알림 | 마스터 비밀번호 변경 | 상태 API(선택 탭) | 언어: 영어, 포르투갈어 또는 스페인어 |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| 작성한 사람과 함께 경고 언급 |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| 텍스트 미리보기가 포함된 멘션 알림 |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| 내 작업에 대한 추가 알림 |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| 요일 요약 알림 | 요일 요약 설정 |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| 멘션 하위 탭(GitHub 및 GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 | 지능 지수로 순위가 매겨진 AI 모델 |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: 최근 5경기(두 플레이 시간 포함) |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | 중단, 회의, 작업 및 새로운 AI 모델 등 보류 중인 모든 것에 대한 단일 경고 오버레이 |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Webview는 Rust 상태 이후에 생성되고 트레이가 초기화되므로 시작 IPC 호출은 경쟁 설정을 할 수 없습니다.
 
 모든 PR은 Windows, macOS 및 Linux에서 CI를 실행합니다. 기존 `fix`, `feat` 및 중단 커밋이 `main`에 병합되었습니다.
 SemVer 태그, 생성된 릴리스 노트 및 병렬로 구축된 서명된 설치 프로그램을 가져옵니다. 릴리스는 검증 후 게시됩니다(자세한 내용은

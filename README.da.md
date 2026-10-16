@@ -77,7 +77,7 @@ sender en notifikation med **snooze 10 min**.
 ### ✅ Opgaver, der minder dig om
 
 En daglig tjekliste med tid og gentagelse (hver dag, hverdage eller ugentligt). Skriv **`Daily at 9:30am`** og
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+påmindelsen er allerede indstillet; tilføj **`!high`** (eller `!alta`, `!média`, `!baixa`) som prioritet, eller klik på prikken på rækken for at skifte mellem den. Lange titler ombrydes i stedet for at blive skåret af. **Fokustimer** på enhver opgave: giv den et estimat, tryk på ▶ og en bjælke fastgjort under hver fane tæller tiden imod den (rød, når du går over); tiden gemmes til boksen hvert minut. **Dagsoversigt** klar til at indsætte (opgaver, fokuseret tid, møder med samlet tid, PRs/MRs åbnet, flettet, gennemgået og lukket uden sammenlægning), en **ugentlig og månedlig rapport** i markdown, og **træk over afventende varer** fra i går. **Hurtig optagelse** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` på macOS) skriver en opgave eller en note fra enhver app uden at åbne widgetten.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ følsomme.
 det. Udkast, PRs **venter på din anmeldelse** og PRs **stoppet** i en uge skiller sig ud, og hver PR bærer en lille
 **CI-emblem** (bestået, mislykket, kørende eller ingen CI) fra dets head commits kontroller. Når nogen **anmoder om din
 anmeldelse**, fortæller en OS-notifikation dig (til som standard, sluk det i Indstillinger). Filtrer efter tekst, `repo:` eller `label:`, PRs kun eller kun problemer, sorter efter opdatering, oprettelse eller kommentarer, og
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+rul med **vis mere**. Skift til visningen **Kommentarer** for at se et **Kommentarkatalog**-gitter med alle, der kommenterede dine PRs (avatarer, menneskelige vs bot-badges, antal kommentarer, søgning, botfilter, progressiv sideopdeling) og deres kommentarer. Understøtter også **GitLab.com og selv-hostet GitLab**, med en 5-minutters cache, der
 overholder takstgrænsen. Log ind med et skrivebeskyttet personligt token eller fra browseren (enhedsflow).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam uden at forlade widgetten
+
+Fire underfaner til Steam: **ønskelistetilbud** (største rabat først), **topsælgere**, **spil nu** og
+**katalog sorteret efter vurdering**. De offentlige lister behøver kun din **SteamID64**; en valgfri **Steam Web API nøgle**
+tilføjer de fem seneste spil med deres spilletider. Priserne kommer i reais, hver række åbner butikssiden, og
+fanen starter som standard, et afkrydsningsfelt væk i Indstillinger.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ når det slutter; et klik slår den fra igen. Den overlever en genstart og ender
 låser og `?` viser genvejene. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) åbner en **kommandopalet** med hver
 handling efter navn: gå til en fane, ny opgave eller note, deltag i næste møde, kopier dagens opsummering, skift skin, lås.
 
-## 🎨 Six skins
+## 🎨 Seks skins
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Standard</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glas</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Lys</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Indstillinger i grupper, med søgning | Søgning filtrerer grupperne | Offline chip i overskriften | Bekræft før du rydder udklipsholderen |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Kassér en ikke-gemt notekladde |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Opgavepåmindelse | Skift hovedadgangskode | Status API (opt-in fane) | Sprog: engelsk, portugisisk eller spansk |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Omtale alarm med hvem der skrev det |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Omtale advarsel med en forhåndsvisning af teksten |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Flere advarsler om mit eget arbejde |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Dagsoversigt advarsel | Indstilling af dagsoversigt |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Underfanen Omtaler (GitHub og GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 | AI-modeller rangeret efter Intelligence Index |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: de seneste fem spil spillet, med begge spilletider |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Én advarselsoverlejring for alt afventende: udfald, møder, opgaver og nye AI-modeller |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Webvisninger oprettes efter tilstanden Rust, og bakken initialiseres, så opstarts-IPC-kald kan ikke opsætte race.
 
 Hver PR kører CI på Windows, macOS og Linux. Konventionelle `fix`, `feat` og breaking commits slået sammen til `main`
 få et SemVer tag, genererede release notes og signerede installatører bygget parallelt; udgivelsen offentliggøres efter verifikation (detaljer i

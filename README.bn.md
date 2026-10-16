@@ -77,7 +77,7 @@ Windows Hello ঐচ্ছিক।
 ### ✅ কাজ যা আপনাকে মনে করিয়ে দেয়
 
 সময় এবং পুনরাবৃত্তি সহ একটি দৈনিক চেকলিস্ট (প্রতিদিন, সপ্তাহের দিন বা সাপ্তাহিক)। টাইপ করুন **`Daily at 9:30am`_** এবং
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+অনুস্মারক ইতিমধ্যে সেট করা আছে; অগ্রাধিকারের জন্য **`!high`** (বা `!alta`, `!média`, `!baixa`) যোগ করুন, অথবা সাইকেল করতে সারির বিন্দুতে ক্লিক করুন। লম্বা শিরোনাম কেটে ফেলার পরিবর্তে মোড়ানো। **ফোকাস টাইমার** যেকোনো কাজের উপর: এটির একটি অনুমান দিন, ▶ টিপুন এবং প্রতিটি ট্যাবের নীচে পিন করা একটি বার এটির বিপরীতে সময় গণনা করে (আপনি একবার উপরে গেলে লাল); সময় প্রতি মিনিটে ভল্টে সংরক্ষণ করা হয়। **দিনের সারাংশ** পেস্ট করার জন্য প্রস্তুত (কাজ, ফোকাস করা সময়, মোট সময়ের সাথে মিটিং, PRs/MRs খোলা, মার্জ করা, পর্যালোচনা করা এবং মার্জ না করে বন্ধ করা), মার্কডাউনে একটি **সাপ্তাহিক এবং মাসিক প্রতিবেদন** এবং গতকাল থেকে **মুলতুবি থাকা আইটেমগুলিকে ** টানুন। **দ্রুত ক্যাপচার** (macOS-এ `Ctrl+Alt+N`, `Ctrl+Cmd+N`) উইজেট না খুলেই যেকোনো অ্যাপ থেকে একটি টাস্ক বা নোট যোগ করে।
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ JSON ফরম্যাট করা বা কমপ্যাক্ট, এক 
 এটা খসড়া, PRs **আপনার পর্যালোচনার জন্য অপেক্ষা করছে** এবং PRs **স্টলড** এক সপ্তাহের জন্য আলাদা, এবং প্রতিটি PR একটি ছোট বহন করে
 **সিআই ব্যাজ** (পাশ করা, ব্যর্থ, চলমান বা কোন সিআই নেই) তার প্রধান প্রতিশ্রুতির চেক থেকে। যখন কেউ **আপনার অনুরোধ করে
 পর্যালোচনা**, একটি OS বিজ্ঞপ্তি আপনাকে বলে (ডিফল্টরূপে চালু, সেটিংসে এটি বন্ধ করুন)। পাঠ্য দ্বারা ফিল্টার করুন, `repo:` বা `label:`, PRs শুধুমাত্র বা শুধুমাত্র সমস্যা, আপডেট, সৃষ্টি বা মন্তব্য দ্বারা সাজান এবং
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+**আরো দেখান** দিয়ে স্ক্রোল করুন। যারা আপনার PRs (অবতার, মানব বনাম বট ব্যাজ, মন্তব্যের সংখ্যা, অনুসন্ধান, বট ফিল্টার, প্রগতিশীল পৃষ্ঠা সংখ্যা) এবং তাদের মন্তব্যগুলিতে মন্তব্য করেছেন তাদের প্রত্যেকের একটি **মন্তব্যকারীর ক্যাটালগ** গ্রিড দেখতে **মন্তব্য** দৃশ্যে স্যুইচ করুন৷ এছাড়াও **GitLab.com এবং স্ব-হোস্টেড GitLab** সমর্থন করে, একটি 5-মিনিট ক্যাশ সহ
 হারের সীমাকে সম্মান করে। শুধুমাত্র পঠনযোগ্য ব্যক্তিগত টোকেন দিয়ে বা ব্রাউজার থেকে সাইন ইন করুন (ডিভাইস প্রবাহ)।
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam উইজেট ছাড়াই
+
+Steam এর জন্য চারটি সাব-ট্যাব: **ইচ্ছা তালিকার ডিল** (প্রথমে সবচেয়ে বড় ছাড়), **শীর্ষ বিক্রেতা**, **এখনই খেলুন** এবং
+**ক্যাটালগ রেটিং দ্বারা আদেশ**. সর্বজনীন তালিকার জন্য শুধুমাত্র আপনার **SteamID64**; একটি ঐচ্ছিক **Steam ওয়েব API কী**
+তাদের খেলার সময়ের সাথে সবচেয়ে সাম্প্রতিক পাঁচটি গেম যোগ করে। দাম reais আসা, প্রতিটি সারি দোকান পাতা খোলে, এবং
+ট্যাবটি ডিফল্টরূপে শুরু হয়, সেটিংসে একটি চেকবক্স দূরে।
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 লক করে এবং `?` শর্টকাট তালিকা করে। `Ctrl+Shift+P` (macOS এ `Cmd+Shift+P`) প্রতিটির সাথে একটি **কমান্ড প্যালেট** খোলে
 নাম অনুসারে কাজ: একটি ট্যাবে যান, নতুন টাস্ক বা নোট, পরবর্তী মিটিংয়ে যোগ দিন, দিনের সারাংশ কপি করুন, স্কিন স্যুইচ করুন, লক করুন।
 
-## 🎨 Six skins
+## 🎨 ছয়টি চামড়া
 
 <table>
 <tr>
 <td align="center">_<img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br>__<b>ডিফল্ট</b>__</td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br>__<b>Hueco Mundo</b></td>
 <td align="center">_<img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br>__<b>Dracula</b>_</td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center">_<img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br>__<b>Glass</b>__</td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br>__<b>আলো</b>__</td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| গ্রুপে সেটিংস, সার্চ সহ | অনুসন্ধান গোষ্ঠীগুলিকে ফিল্টার করে | হেডারে অফলাইন চিপ | ক্লিপবোর্ড সাফ করার আগে নিশ্চিত করুন |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| একটি অসংরক্ষিত নোট খসড়া বাতিল করুন |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| টাস্ক রিমাইন্ডার | মাস্টার পাসওয়ার্ড পরিবর্তন করুন | স্থিতি API (অপ্ট-ইন ট্যাব) | ভাষা: ইংরেজি, পর্তুগিজ বা স্প্যানিশ |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| কে লিখেছে তার সাথে সতর্কতা উল্লেখ করুন |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| পাঠ্যের পূর্বরূপ সহ সতর্কতা উল্লেখ করুন |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| আমার নিজের কাজ সম্পর্কে আরও সতর্কতা |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| দিনের সারাংশ সতর্কতা | দিনের সারাংশ সেটিং |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| উল্লেখ সাবট্যাব (GitHub এবং GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 | ইন্টেলিজেন্স ইনডেক্স দ্বারা র্যাঙ্ক করা এআই মডেল |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: শেষ পাঁচটি খেলা খেলা হয়েছে, উভয় খেলার সময় সহ |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | মুলতুবি থাকা সবকিছুর জন্য একটি সতর্কতা ওভারলে: বিভ্রাট, মিটিং, কাজ এবং নতুন এআই মডেল |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+ওয়েবভিউ Rust স্টেটের পরে তৈরি করা হয় এবং ট্রে আরম্ভ করা হয়, তাই স্টার্টআপ IPC কল রেস সেটআপ করতে পারে না।
 
 প্রতিটি PR Windows, macOS এবং Linux-এ CI চালায়। প্রচলিত `fix`, `feat` এবং ব্রেকিং কমিট `main` এ একত্রিত হয়েছে
 একটি SemVer ট্যাগ, উত্পন্ন রিলিজ নোট এবং সমান্তরালভাবে নির্মিত স্বাক্ষরিত ইনস্টলার পান; রিলিজ যাচাই করার পরে প্রকাশিত হয় (বিস্তারিত

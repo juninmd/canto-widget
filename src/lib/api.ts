@@ -217,6 +217,25 @@ export type ModelsView = {
   error: string | null;
 };
 
+/** A game on any Steam list; `price` and `original` come from Steam already localized in BRL. */
+export type SteamRow = {
+  appid: number;
+  name: string;
+  price: string;
+  /** Set only while the game is discounted. */
+  original: string;
+  discount: number;
+  /** Positive reviews, 0..=100; null for a game Steam has no review summary for. */
+  review: number | null;
+  review_label: string;
+};
+export type SteamList = { items: SteamRow[]; has_more: boolean };
+/** Both playtimes are minutes, as the Steam Web API reports them. */
+export type RecentGame = { appid: number; name: string; recent_min: number; total_min: number };
+/** `has_key` false means only the recent list is unavailable: the UI explains instead of erroring. */
+export type SteamRecent = { items: RecentGame[]; has_key: boolean };
+export type SteamStatus = { configured: boolean; steamid: string; has_key: boolean; name: string };
+
 export const api = {
   status: () => invoke<VaultStatus>("vault_status"),
   create: (password: string) => invoke<void>("vault_create", { password }),
@@ -401,6 +420,18 @@ export const api = {
   /** Artificial Analysis ranking; Rust fetches at most once every 3 h, `force` included. */
   modelsGet: (force = false) => invoke<ModelsView>("models_get", { force }),
   modelsAlertsSet: (enabled: boolean) => invoke<boolean>("models_alerts_set", { enabled }),
+
+  /** Only the SteamID64 (and an optional Web API key) is stored; every list is fetched in Rust. */
+  steamStatus: () => invoke<SteamStatus>("steam_status"),
+  /** Returns the saved status; a bad id, a bad key or a bare vanity name without a key is rejected. */
+  steamConnect: (steamId: string, apiKey: string) => invoke<SteamStatus>("steam_connect", { steamId, apiKey }),
+  steamDisconnect: () => invoke<SteamStatus>("steam_disconnect"),
+  /** Wishlist deals, biggest discount first. */
+  steamDeals: (force = false) => invoke<SteamList>("steam_deals", { force }),
+  steamTrending: (force = false) => invoke<SteamList>("steam_trending", { force }),
+  /** Top rated games for `term` (empty = the whole store), reviews first. */
+  steamCatalog: (term: string, force = false) => invoke<SteamList>("steam_catalog", { term, force }),
+  steamRecent: (force = false) => invoke<SteamRecent>("steam_recent", { force }),
 
   dndGet: () => invoke<DndState>("dnd_get"),
   /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */

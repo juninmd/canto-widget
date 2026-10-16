@@ -77,7 +77,7 @@ Windows Hello اختیاری است.
 ### ✅ وظایفی که به شما یادآوری می کنند
 
 چک لیست روزانه با زمان و تکرار (هر روز، روزهای هفته یا هفتگی). **`Daily at 9:30am`** را تایپ کنید و
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+یادآوری قبلاً تنظیم شده است. **`!high`** (یا `!alta`، `!média`، `!baixa`) را برای اولویت اضافه کنید، یا روی نقطه روی ردیف کلیک کنید تا آن را چرخه کنید. عناوین طولانی به جای قطع شدن، بسته می شوند. **تمرکز تایمر** روی هر کاری: آن را تخمین بزنید، ▶ را فشار دهید و نواری که در زیر هر برگه سنجاق شده است، زمان را در مقابل آن می شمارد (به محض رفتن قرمز). زمان در هر دقیقه در خرک ذخیره می شود. **خلاصه روز** آماده چسباندن (وظایف، زمان متمرکز، جلسات با کل زمان، PRs/MRs باز، ادغام، بازبینی و بسته شدن بدون ادغام)، **گزارش هفتگی و ماهانه** در علامت گذاری، و **از دیروز موارد معلق** را جمع آوری کنید. **عکسبرداری سریع** (`Ctrl+Alt+N`، `Ctrl+Cmd+N` در macOS) بدون باز کردن ویجت، یک کار یا یادداشت را از هر برنامه ای یادداشت می کند.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for t
 آن را پیش‌نویس‌ها، PRs **منتظر بازبینی شما** و PRs ** متوقف شده** به مدت یک هفته برجسته هستند، و هر PR مقدار کمی را به همراه دارد
 **نشان CI** (گذرانده، ناموفق، در حال اجرا یا عدم وجود CI) از چک های اصلی آن. وقتی کسی ** از شما درخواست می کند
 بررسی **، یک اعلان سیستم عامل به شما می گوید (به طور پیش فرض روشن است، آن را در تنظیمات خاموش کنید). فیلتر بر اساس متن، `repo:` یا `label:`، PRs فقط یا فقط مشکلات، مرتب‌سازی بر اساس به‌روزرسانی، ایجاد یا نظرات، و
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+با **نمایش بیشتر** پیمایش کنید. به نمای **نظرات** بروید تا یک شبکه **کاتالوگ نظرات** از همه کسانی که روی PRs شما نظر داده اند (آواتارها، نشان های انسان در مقابل ربات، تعداد نظرات، جستجو، فیلتر ربات، صفحه بندی پیشرونده) و نظرات آنها را مشاهده کنید. همچنین از **GitLab.com و میزبانی خود GitLab** پشتیبانی می کند، با یک کش 5 دقیقه ای که
 محدودیت نرخ را رعایت می کند. با یک نشانه شخصی فقط خواندنی یا از مرورگر (جریان دستگاه) وارد شوید.
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam بدون خروج از ویجت
+
+چهار زبانه فرعی برای Steam: **تخفیف های لیست علاقه** (ابتدا بزرگترین تخفیف)، **فروشندگان برتر**، **اکنون بازی کنید** و
+**کاتالوگ به ترتیب رتبه**. لیست های عمومی فقط به **SteamID64** شما نیاز دارند. یک کلید **Steam وب API اختیاری**
+پنج بازی اخیر را با زمان پخش آنها اضافه می کند. قیمت ها به صورت واقعی می آیند، هر ردیف صفحه فروشگاه را باز می کند و
+برگه به طور پیش فرض شروع می شود، یک کادر انتخاب دورتر در تنظیمات.
 
 </td>
 </tr>
@@ -175,7 +188,7 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 قفل می کند و `?` میانبرها را فهرست می کند. `Ctrl+Shift+P` (`Cmd+Shift+P` در macOS) یک **پالت فرمان** را با هر
 اقدام بر اساس نام: رفتن به یک برگه، کار یا یادداشت جدید، پیوستن به جلسه بعدی، کپی کردن خلاصه روز، تغییر پوسته، قفل کردن.
 
-## 🎨 Six skins
+## 🎨 شش پوست
 
 <table>
 <tr>
@@ -210,11 +223,11 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| تنظیمات در گروه، با جستجو | جستجو گروه ها را فیلتر می کند | تراشه آفلاین در هدر | قبل از پاک کردن کلیپ بورد تایید کنید |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| دور انداختن پیش نویس یادداشت ذخیره نشده |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| یادآوری کار | تغییر رمز اصلی | وضعیت API (برگه انتخاب کردن) | زبان: انگلیسی، پرتغالی یا اسپانیایی |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| ذکر هشدار با کسی که آن را نوشته است |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| ذکر هشدار با پیش نمایش متن |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| هشدارهای بیشتر درباره کار خودم |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| هشدار خلاصه روز | تنظیم خلاصه روز |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| از زبانه فرعی نام برد (GitHub و GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 | رتبه بندی مدل های هوش مصنوعی بر اساس شاخص هوش |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: پنج بازی آخر انجام شده، با هر دو زمان بازی |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | یک پوشش هشدار برای همه چیز در انتظار: قطع، جلسات، وظایف و مدل‌های جدید هوش مصنوعی |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+وب‌نماها پس از حالت Rust ایجاد می‌شوند و سینی اولیه می‌شود، بنابراین تماس‌های IPC راه‌اندازی نمی‌توانند با راه‌اندازی رقابت کنند.
 
 هر PR CI را در Windows، macOS و Linux اجرا می کند. مرسوم `fix`، `feat` و commit های شکستن در `main` ادغام شدند
 یک تگ SemVer، یادداشت‌های انتشار تولید شده و نصب‌کننده‌های امضا شده که به صورت موازی ساخته شده‌اند را دریافت کنید. انتشار پس از تأیید منتشر می شود (جزئیات در

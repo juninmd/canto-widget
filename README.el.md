@@ -77,7 +77,7 @@ Windows Hello προαιρετικό.
 ### ✅ Εργασίες που σας θυμίζουν
 
 Μια καθημερινή λίστα ελέγχου με χρόνο και επανάληψη (κάθε μέρα, καθημερινές ή εβδομαδιαία). Πληκτρολογήστε **`Daily at 9:30am`** και το
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+Η υπενθύμιση έχει ήδη οριστεί. προσθέστε **`!high`** (ή `!alta`, `!média`, `!baixa`) για την προτεραιότητα ή κάντε κλικ στην κουκκίδα στη σειρά για να την κυκλώσετε. Οι μεγάλοι τίτλοι τυλίγονται αντί να κόβονται. **Εστίαση χρονοδιακόπτη** σε οποιαδήποτε εργασία: δώστε της μια εκτίμηση, πατήστε ▶ και μια μπάρα καρφιτσωμένη κάτω από κάθε καρτέλα μετράει το χρόνο σε σχέση με αυτήν (κόκκινη μόλις περάσετε). ο χρόνος αποθηκεύεται στο θησαυροφυλάκιο κάθε λεπτό. **Σύνοψη ημέρας** έτοιμη για επικόλληση (εργασίες, επικεντρωμένος χρόνος, συσκέψεις με συνολικό χρόνο, PRs/MRs άνοιγμα, συγχώνευση, έλεγχος και κλείσιμο χωρίς συγχώνευση), **εβδομαδιαία και μηνιαία αναφορά** σε μαρκάρισμα και **ανάκτηση εκκρεμών στοιχείων** από χθες. **Γρήγορη λήψη** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` σε macOS) σημειώνει μια εργασία ή μια σημείωση από οποιαδήποτε εφαρμογή, χωρίς να ανοίξει το γραφικό στοιχείο.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for t
 αυτό. Τα πρόχειρα, PRs **αναμένοντας την κριτική σας** και PRs **σταμάτησε** για μια εβδομάδα ξεχωρίζουν και κάθε PR φέρει ένα μικρό
 **Σήμα CI** (πέτυχε, απέτυχε, εκτελείται ή καθόλου CI) από τους ελέγχους της επικεφαλής δέσμευσης. Όταν κάποιος **σας ζητήσει
 αναθεώρηση**, σας λέει μια ειδοποίηση λειτουργικού συστήματος (ενεργό από προεπιλογή, απενεργοποιήστε το στις Ρυθμίσεις). Φιλτράρισμα κατά κείμενο, `repo:` ή `label:`, PRs μόνο ή μόνο ζητήματα, ταξινόμηση κατά ενημέρωση, δημιουργία ή σχόλια και
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+κύλιση με **εμφάνιση περισσότερων**. Μεταβείτε στην προβολή **Σχόλια** για να δείτε ένα πλέγμα **Κατάλογο σχολιαστών** με όλους όσους σχολίασαν στο PRs σας (άβαταρ, σήματα ανθρώπου εναντίον ρομπότ, πλήθος σχολίων, αναζήτηση, φίλτρο bot, προοδευτική σελιδοποίηση) και τα σχόλιά τους. Υποστηρίζει επίσης **GitLab.com και αυτο-φιλοξενούμενο GitLab**, με προσωρινή μνήμη 5 λεπτών που
 τηρεί το όριο του συντελεστή. Συνδεθείτε με ένα προσωπικό διακριτικό μόνο για ανάγνωση ή από το πρόγραμμα περιήγησης (ροή συσκευής).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam χωρίς να βγείτε από το γραφικό στοιχείο
+
+Τέσσερις υποκαρτέλες για Steam: **προσφορές λίστας επιθυμιών** (πρώτα η μεγαλύτερη έκπτωση), **κορυφαίες πωλήσεις**, **παίξε τώρα** και
+**κατάλογος με παραγγελία**. Οι δημόσιες λίστες χρειάζονται μόνο το **SteamID64** σας. ένα προαιρετικό κλειδί **Steam Web API**
+προσθέτει τα πέντε πιο πρόσφατα παιχνίδια με τους χρόνους παιχνιδιού τους. Οι τιμές έρχονται σε ρεάλ, κάθε σειρά ανοίγει τη σελίδα καταστήματος και
+η καρτέλα ξεκινά από προεπιλογή, ένα πλαίσιο ελέγχου μακριά στις Ρυθμίσεις.
 
 </td>
 </tr>
@@ -175,7 +188,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 κλειδώνει και `?` παραθέτει τις συντομεύσεις. `Ctrl+Shift+P` (`Cmd+Shift+P` σε macOS) ανοίγει μια **παλέτα εντολών** με κάθε
 ενέργεια με βάση το όνομα: μετάβαση σε μια καρτέλα, νέα εργασία ή σημείωση, συμμετοχή στην επόμενη συνάντηση, αντιγραφή της σύνοψης της ημέρας, αλλαγή δέρματος, κλείδωμα.
 
-## 🎨 Six skins
+## 🎨 Έξι δέρματα
 
 <table>
 <tr>
@@ -210,11 +223,11 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Ρυθμίσεις σε ομάδες, με αναζήτηση | Η αναζήτηση φιλτράρει τις ομάδες | Τσιπ εκτός σύνδεσης στην κεφαλίδα | Επιβεβαιώστε πριν διαγράψετε το πρόχειρο |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Απορρίψτε ένα μη αποθηκευμένο πρόχειρο σημείωσης |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Υπενθύμιση εργασιών | Αλλαγή κύριου κωδικού πρόσβασης | Κατάσταση API (καρτέλα συμμετοχής) | Γλώσσα: Αγγλικά, Πορτογαλικά ή Ισπανικά |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Αναφέρετε ειδοποίηση με ποιος το έγραψε |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Αναφορά ειδοποίησης με προεπισκόπηση του κειμένου |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Περισσότερες ειδοποιήσεις για τη δική μου δουλειά |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Συνοπτική ειδοποίηση ημέρας | Ρύθμιση σύνοψης ημέρας |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Υποκαρτέλα Αναφορών (GitHub και GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 | Τα μοντέλα τεχνητής νοημοσύνης ταξινομούνται με βάση τον δείκτη νοημοσύνης |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: τα τελευταία πέντε παιχνίδια που παίχτηκαν, και με τους δύο χρόνους παιχνιδιού |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Μία επικάλυψη ειδοποίησης για οτιδήποτε εκκρεμεί: διακοπές, συσκέψεις, εργασίες και νέα μοντέλα τεχνητής νοημοσύνης |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Οι προβολές ιστού δημιουργούνται μετά την κατάσταση Rust και την προετοιμασία του δίσκου, επομένως οι κλήσεις IPC εκκίνησης δεν μπορούν να δρομολογηθούν.
 
 Κάθε PR εκτελεί CI σε Windows, macOS και Linux. Τα συμβατικά `fix`, `feat` και breaking commit συγχωνεύτηκαν σε `main`
 λάβετε μια ετικέτα SemVer, δημιουργήθηκαν σημειώσεις έκδοσης και υπογεγραμμένα προγράμματα εγκατάστασης που έχουν κατασκευαστεί παράλληλα. η έκδοση δημοσιεύεται μετά από επαλήθευση (λεπτομέρειες στο

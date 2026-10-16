@@ -50,7 +50,7 @@ const models = { alerts: false, total: 3, fetched_at: now, next_fetch_at: now + 
 ] };
 
 
-const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Modelos IA", "Ajustes"];
+const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Modelos IA", "Steam", "Ajustes"];
 const MIN = 24;
 
 /** Buttons, tabs and selects under 24 CSS px (WCAG 2.5.8), skipping what is not on screen. */
@@ -73,12 +73,18 @@ for (const density of ["compacta", "padrao"]) {
     test(`${tab}: every button is at least 24 px in the ${density} density`, async ({ page }) => {
       await page.addInitScript((d) => localStorage.setItem("canto.densidade", d), density);
       await mockTauri(page, {
-        notes: notes as never, statuses: statuses as never, models: models as never, hiddenTabs: tab === "Status API" ? [] : undefined,
+        notes: notes as never, statuses: statuses as never, models: models as never,
+        // Status API and Steam are hidden by default: show them so the sweep can open them.
+        hiddenTabs: tab === "Status API" || tab === "Steam" ? [] : undefined,
+        knownTabs:
+          tab === "Steam" ? ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "activity"] : undefined,
         fixed: {
           tasks_for_day: tasks, clip_list: { items: clips, max_pinned: 100 }, agenda_today: agenda,
           github_status: { connected: true, login: "voce", source: "token", device_flow: false }, github_lists: lists,
           my_pr_alerts_get: { ci: true, stalled: true, stalled_hours: 48, mentions: true }, review_alerts_get: true,
           activity_status: { supported: true, enabled: false },
+          steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },
+          steam_deals: { has_more: true, items: [{ appid: 900001, name: "Aurora Drift", price: "R$ 14,99", original: "R$ 59,99", discount: 75, review: null, review_label: "" }] },
         },
       });
       await page.goto("/");

@@ -77,7 +77,7 @@ siunčia pranešimą su **snausti 10 min**.
 ### ✅ Užduotys, kurios jums primena
 
 Kasdieninis kontrolinis sąrašas su laiku ir pasikartojimu (kasdien, darbo dienomis arba kas savaitę). Įveskite **`Daily at 9:30am`** ir
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+priminimas jau nustatytas; pridėkite **`!high`** (arba `!alta`, `!média`, `!baixa`) kaip prioritetą arba spustelėkite tašką eilutėje, kad ją pakeistumėte. Ilgi pavadinimai apvyniojami, o ne nukirpti. **Sufokusuokite laikmatį** atliekant bet kokią užduotį: pateikite įvertinimą, paspauskite ▶ ir po kiekvienu skirtuku prisegta juosta skaičiuos laiką (raudona, kai peržengsite); kas minutę laikas išsaugomas saugykloje. **Dienos suvestinė** paruošta įklijuoti (užduotys, skirtas laikas, susitikimai su visu laiku, PRs/MRs atidarytas, sujungtas, peržiūrėtas ir uždarytas nesujungus), **savaitės ir mėnesio ataskaita** sumažinta ir **atsitraukti laukiančius elementus** nuo vakar. **Greitas fiksavimas** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` sistemoje „MacOS“) įrašo užduotį arba pastabą iš bet kurios programos neatidarius valdiklio.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ jautrus.
 tai. Juodraščiai, PRs **laukiu jūsų peržiūros** ir PRs **užstojo** savaitei, išsiskiria ir kiekvienas PR turi mažą
 **CI ženklelis** (išlaikytas, neišlaikytas, veikia arba nėra CI) iš pagrindinio atlikto patikrinimo. Kai kas nors ** prašo jūsų
 peržiūra**, apie tai praneš OS pranešimas (įjungta pagal numatytuosius nustatymus, išjunkite jį nustatymuose). Filtruokite pagal tekstą, tik `repo:` arba `label:`, PRs arba tik problemas, rūšiuokite pagal naujinimą, kūrimą ar komentarus ir
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+slinkite naudodami **rodyti daugiau**. Perjunkite į **Komentarų** rodinį, kad pamatytumėte **Komentatorių katalogo** tinklelį su visų, kurie pakomentavo jūsų PRs (avatarai, žmogaus ir roboto ženkleliai, komentarų skaičius, paieška, robotų filtras, laipsniškas puslapių rūšiavimas) ir jų komentarus. Taip pat palaiko **GitLab.com ir savarankiškai priglobtą GitLab** su 5 minučių talpykla, kuri
 laikosi normos ribos. Prisijunkite naudodami tik skaitomą asmeninį prieigos raktą arba naudodami naršyklę (įrenginio srautas).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam neišeinant iš valdiklio
+
+Keturi Steam antriniai skirtukai: **pageidavimų sąrašo pasiūlymai** (pirmiausia didžiausia nuolaida), **perkamiausi**, **žaisk dabar** ir
+**katalogas surikiuotas pagal reitingą**. Viešiesiems sąrašams reikia tik jūsų **SteamID64**; pasirenkamas **Steam žiniatinklio API raktas**
+prideda penkis naujausius žaidimus su jų žaidimo laiku. Kainos pateikiamos realiomis, kiekviena eilutė atidaro parduotuvės puslapį ir
+skirtukas paleidžiamas pagal numatytuosius nustatymus, nustatymuose už vieną žymimąjį laukelį.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ kai jis baigiasi; vienu paspaudimu jis vėl išjungiamas. Jis išgyvena iš nauj
 užrakina ir `?` pateikia sparčiųjų klavišų sąrašą. `Ctrl+Shift+P` (`Cmd+Shift+P` sistemoje „MacOS“) atidaro **komandų paletę** su kiekviena
 veiksmas pagal pavadinimą: eikite į skirtuką, naują užduotį ar pastabą, prisijunkite prie kito susitikimo, nukopijuokite dienos suvestinę, pakeiskite apvalkalą, užrakinkite.
 
-## 🎨 Six skins
+## 🎨 Šeši skinai
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Numatytasis</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Stiklas</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Nustatymai grupėse, su paieška | Paieška filtruoja grupes | Lustas neprisijungus antraštėje | Patvirtinkite prieš išvalydami iškarpinę |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Išmeskite neišsaugotą užrašo juodraštį |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Užduočių priminimas | Keisti pagrindinį slaptažodį | Būsena API (pasirinkimo skirtukas) | Kalba: anglų, portugalų arba ispanų |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Paminėkite įspėjimą, kas jį parašė |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Paminėkite įspėjimą su teksto peržiūra |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Daugiau įspėjimų apie mano darbą |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Dienos suvestinės įspėjimas | Dienos suvestinės nustatymas |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Pamini antrinį skirtuką (GitHub ir GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 | AI modeliai reitinguojami pagal intelekto indeksą |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: paskutiniai penki sužaisti žaidimai, abu žaidimo laikai |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Viena įspėjimo perdanga apie viską, kas laukia: gedimai, susitikimai, užduotys ir nauji AI modeliai |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Žiniatinklio rodiniai sukuriami po Rust būsenos, o dėklas inicijuojamas, todėl paleisties IPC skambučiai negali varžytis.
 
 Kiekviename PR veikia CI „Windows“, „MacOS“ ir „Linux“. Įprasti `fix`, `feat` ir pažeidimai sujungti į `main`
 gauti SemVer žymą, sugeneruotas laidos pastabas ir pasirašytas diegimo programas, sukurtas lygiagrečiai; leidimas paskelbiamas po patikrinimo (išsamiau

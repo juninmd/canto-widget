@@ -77,7 +77,7 @@ lähettää ilmoituksen, jossa on **torkku 10 min**.
 ### ✅ Tehtävät, jotka muistuttavat sinua
 
 Päivittäinen tarkistuslista ajan ja toistumisen kanssa (joka päivä, arkisin tai viikoittain). Kirjoita **`Daily at 9:30am`** ja
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+muistutus on jo asetettu; lisää **`!high`** (tai `!alta`, `!média`, `!baixa`) tärkeysjärjestykseen tai napsauta rivin pistettä vaihtaaksesi sitä. Pitkät otsikot kietoutuvat sen sijaan, että niitä leikattaisiin pois. **Keskity ajastin** mihin tahansa tehtävään: anna sille arvio, paina ▶ ja jokaisen välilehden alle kiinnitetty palkki laskee ajan siihen nähden (punainen, kun ylität); aika tallennetaan holviin minuutin välein. **Päivän yhteenveto** valmiina liitettäväksi (tehtävät, keskittynyt aika, kokoukset kokonaisajalla, PRs/MRs avattu, yhdistetty, tarkistettu ja suljettu yhdistämättä), **viikko- ja kuukausiraportti** alennettuna ja **poistaa odottavat kohteet** eiliseltä. **Pikakaappaus** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` macOS:ssä) tallentaa tehtävän tai muistiinpanon mistä tahansa sovelluksesta avaamatta widgetiä.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ herkkä.
 se. Luonnokset, PRs **odottavat arvosteluasi** ja PRs **pysähdyksissä** viikon ajan erottuvat joukosta, ja jokaisessa PR on pieni
 **CI-merkki** (hyväksytty, epäonnistunut, käynnissä tai ei CI:tä) sen pääsitoumustarkistuksista. Kun joku ** pyytää sinua
 tarkistaa**, käyttöjärjestelmän ilmoitus kertoo (oletusarvoisesti käytössä, poista se käytöstä asetuksista). Suodata tekstin mukaan, `repo:` tai `label:`, PRs tai vain ongelmat, lajittele päivityksen, luomisen tai kommenttien mukaan ja
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+vieritä **näytä lisää**. Siirry **Kommentit**-näkymään nähdäksesi **Kommentoijaluettelo**-ruudukon kaikista PRs-kuvaasi kommentoineista (avatarit, ihminen vs. botti -merkit, kommenttien määrä, haku, bottisuodatin, progressiivinen sivutus) ja heidän kommenttejaan. Tukee myös **GitLab.comia ja itseisännöityä GitLab**, 5 minuutin välimuistilla
 noudattaa hintarajaa. Kirjaudu sisään vain luku -tilassa olevalla henkilökohtaisella tunnuksella tai selaimesta (laitevirta).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam poistumatta widgetistä
+
+Neljä alavälilehteä Steam: **toivelistatarjoukset** (suurin alennus ensin), **myydyimmät**, **pelaa nyt** ja
+**katalogi luokituksen mukaan**. Julkiset luettelot tarvitsevat vain **SteamID64**; valinnainen **Steam Web API -avain**
+lisää viisi viimeisintä peliä peliaikoineen. Hinnat tulevat realeina, jokainen rivi avaa kaupan sivun ja
+välilehti alkaa oletusarvoisesti yhden valintaruudun päässä asetuksista.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ kun se loppuu; yksi klikkaus sammuttaa sen takaisin. Se selviää uudelleenkäyn
 lukitsee ja `?` luettelee pikakuvakkeet. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS:ssä) avaa **komentopaletin** jokaisella
 toiminto nimen mukaan: siirry välilehdelle, uuteen tehtävään tai muistiinpanoon, liity seuraavaan kokoukseen, kopioi päivän yhteenveto, vaihda ulkoasua, lukitse.
 
-## 🎨 Six skins
+## 🎨 Kuusi skiniä
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Oletus</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Lasi</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Kevyt</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Asetukset ryhmissä, haulla | Haku suodattaa ryhmät | Offline-siru otsikossa | Vahvista ennen leikepöydän tyhjentämistä |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Hylkää tallentamaton muistiinpanon luonnos |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Tehtävämuistutus | Vaihda pääsalasana | Tila API (opt-in-välilehti) | Kieli: englanti, portugali tai espanja |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Mainitse hälytys sen kirjoittajan kanssa |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Mainitse hälytys tekstin esikatselulla |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Lisää hälytyksiä omasta työstäni |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Päivän yhteenvetohälytys | Päivän yhteenvetoasetus |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Mainitsee alavälilehden (GitHub ja GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 | AI-mallit älykkyysindeksin mukaan |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: viisi viimeistä pelattua peliä, molemmat peliajat |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Yksi varoituspeitto kaikelle odottavalle: katkokset, kokoukset, tehtävät ja uudet tekoälymallit |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Verkkonäkymät luodaan Rust-tilan jälkeen ja alusta on alustettu, joten käynnistyksen IPC-kutsut eivät voi kilpailla.
 
 Jokainen PR käyttää CI:tä Windowsissa, macOS:ssä ja Linuxissa. Perinteiset `fix`, `feat` ja rikkovat sitoumukset yhdistettiin `main`
 hanki SemVer-tunniste, luodut julkaisutiedot ja allekirjoitetut asennusohjelmat, jotka on rakennettu rinnakkain; julkaisu julkaistaan varmentamisen jälkeen (lisätietoja kohdassa

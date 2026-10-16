@@ -77,7 +77,7 @@ gửi thông báo với **báo lại 10 phút**.
 ### ✅ Nhiệm vụ nhắc nhở bạn
 
 Danh sách kiểm tra hàng ngày với thời gian và tần suất lặp lại (hàng ngày, các ngày trong tuần hoặc hàng tuần). Nhập **`Daily at 9:30am`** và
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+lời nhắc đã được đặt; thêm **`!high`** (hoặc `!alta`, `!média`, `!baixa`) cho mức độ ưu tiên hoặc nhấp vào dấu chấm trên hàng để xoay vòng. Tiêu đề dài được bọc lại thay vì bị cắt bỏ. **Đồng hồ hẹn giờ tập trung** vào bất kỳ tác vụ nào: đưa ra ước tính cho tác vụ đó, nhấn vào phím ► và một thanh được ghim bên dưới mỗi tab sẽ đếm thời gian thực hiện tác vụ đó (màu đỏ khi bạn thực hiện xong); thời gian được lưu vào vault mỗi phút. **Tóm tắt ngày** sẵn sàng để dán (nhiệm vụ, thời gian tập trung, cuộc họp với tổng thời gian, PRs/MRs đã mở, hợp nhất, xem xét và đóng mà không hợp nhất), **báo cáo hàng tuần và hàng tháng** trong phần đánh dấu và **kéo qua các mục đang chờ xử lý** từ ngày hôm qua. **Chụp nhanh** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` trên macOS) ghi lại một tác vụ hoặc ghi chú từ bất kỳ ứng dụng nào mà không cần mở tiện ích.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ nhạy cảm.
 nó. Bản nháp, PRs **đang chờ bạn xem xét** và PRs **bị đình trệ** trong một tuần và mỗi bản PR đều mang theo một bản nháp nhỏ
 **Huy hiệu CI** (đạt, không thành công, đang chạy hoặc không có CI) từ các lần kiểm tra của người đứng đầu. Khi ai đó ** yêu cầu bạn
 review**, một thông báo của hệ điều hành sẽ cho bạn biết (bật theo mặc định, tắt trong Cài đặt). Lọc theo văn bản, chỉ `repo:` hoặc `label:`, PRs hoặc chỉ các vấn đề, sắp xếp theo cập nhật, sáng tạo hoặc nhận xét và
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+cuộn với **hiển thị thêm**. Chuyển sang chế độ xem **Nhận xét** để xem lưới **Danh mục người nhận xét** gồm tất cả những người đã nhận xét về PRs của bạn (hình đại diện, huy hiệu con người và bot, số lượng nhận xét, tìm kiếm, bộ lọc bot, phân trang lũy ​​tiến) và nhận xét của họ. Đồng thời hỗ trợ **GitLab.com và GitLab** tự lưu trữ, với bộ đệm 5 phút
 tôn trọng giới hạn tỷ lệ. Đăng nhập bằng mã thông báo cá nhân chỉ đọc hoặc từ trình duyệt (luồng thiết bị).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam mà không cần rời khỏi tiện ích
+
+Bốn tab phụ dành cho Steam: **ưu đãi trong danh sách yêu thích** (giảm giá lớn nhất trước), **bán chạy nhất**, **chơi ngay** và
+**danh mục được sắp xếp theo xếp hạng**. Danh sách công khai chỉ cần **SteamID64** của bạn; một **Steam khóa Web API tùy chọn**
+thêm năm trò chơi gần đây nhất cùng với thời gian chơi của chúng. Giá được tính bằng reais, mỗi hàng sẽ mở ra trang cửa hàng và
+tab bắt đầu theo mặc định, cách một hộp kiểm trong Cài đặt.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ khi nó kết thúc; một cú nhấp chuột sẽ tắt nó đi. Nó tồn tạ
 khóa và `?` liệt kê các phím tắt. `Ctrl+Shift+P` (`Cmd+Shift+P` trên macOS) mở **bảng lệnh** với mọi
 hành động theo tên: chuyển đến tab, nhiệm vụ hoặc ghi chú mới, tham gia cuộc họp tiếp theo, sao chép tóm tắt trong ngày, chuyển đổi giao diện, khóa.
 
-## 🎨 Six skins
+## 🎨 Sáu giao diện
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Mặc định</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Kính</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Ánh sáng</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Cài đặt theo nhóm, với tìm kiếm | Tìm kiếm lọc các nhóm | Chip ngoại tuyến trong tiêu đề | Xác nhận trước khi xóa bảng nhớ tạm |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Hủy bản nháp ghi chú chưa được lưu |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Nhắc nhở nhiệm vụ | Đổi mật khẩu chính | Trạng thái API (tab chọn tham gia) | Ngôn ngữ: Tiếng Anh, tiếng Bồ Đào Nha hoặc tiếng Tây Ban Nha |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Đề cập cảnh báo với người đã viết nó |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Đề cập đến cảnh báo với bản xem trước của văn bản |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Thêm thông báo về công việc của riêng tôi |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Cảnh báo tóm tắt ngày | Cài đặt tóm tắt ngày |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Tab phụ đề cập (GitHub và GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 | Các mô hình AI được xếp hạng theo Chỉ số thông minh |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: năm trận đã chơi gần đây nhất, với cả hai thời gian chơi |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Một lớp phủ cảnh báo cho mọi thứ đang chờ xử lý: ngừng hoạt động, cuộc họp, nhiệm vụ và mô hình AI mới |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Các lượt xem web được tạo sau trạng thái Rust và khay được khởi tạo, do đó, các cuộc gọi IPC khởi động không thể thiết lập cuộc đua.
 
 Mọi PR đều chạy CI trên Windows, macOS và Linux. `fix`, `feat` thông thường và các cam kết vi phạm được hợp nhất thành `main`
 nhận thẻ SemVer, ghi chú phát hành được tạo và trình cài đặt đã ký được xây dựng song song; bản phát hành được xuất bản sau khi xác minh (chi tiết trong

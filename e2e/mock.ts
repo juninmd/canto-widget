@@ -18,6 +18,8 @@ export type MockOptions = {
   images?: Record<string, string>;
   /** What `models_get` answers; defaults to an empty list. */
   models?: Record<string, unknown>;
+  /** What `steam_status` answers; the lists go through `fixed`. */
+  steam?: Record<string, unknown>;
   /** Tabs the saved hidden list already knew about (`canto.knownTabs`), so new tabs aren't auto-hidden. */
   knownTabs?: string[];
   /** Fixed answers for commands the defaults do not cover, by command name. */
@@ -55,6 +57,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       fullscreen_hold_get: false,
       my_pr_alerts_get: { ci: false, stalled: false, stalled_hours: 48, mentions: false },
       models_get: o.models ?? { alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
+      steam_status: o.steam ?? { configured: false, steamid: "", has_key: false, name: "" },
       ...o.fixed,
     };
     let pending = Array.isArray(fixed.alert_payload) ? [...(fixed.alert_payload as { id: string }[])] : null;

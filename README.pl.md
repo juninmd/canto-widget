@@ -77,7 +77,7 @@ wysyła powiadomienie z opcją **drzemka 10 min**.
 ### ✅ Zadania, które Ci przypominają
 
 Codzienna lista kontrolna z czasem i częstotliwością (codziennie, w dni powszednie lub co tydzień). Wpisz **`Daily at 9:30am`** i
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+przypomnienie jest już ustawione; dodaj **`!high`** (lub `!alta`, `!média`, `!baixa`) jako priorytet lub kliknij kropkę w wierszu, aby go zmienić. Długie tytuły zawijają się, zamiast być obcinane. **Skoncentruj licznik czasu** na dowolnym zadaniu: oszacuj jego wartość, naciśnij ▶, a pasek przypięty pod każdą zakładką zlicza czas (czerwony po przejściu); czas jest zapisywany w skarbcu co minutę. **Podsumowanie dnia** gotowe do wklejenia (zadania, skupiony czas, spotkania z całkowitym czasem, PRs/MRs otwarte, połączone, sprawdzone i zamknięte bez łączenia), **raport tygodniowy i miesięczny** w przecenach oraz **przeciągnij oczekujące elementy** z wczoraj. **Szybkie przechwytywanie** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` na macOS) zapisuje zadanie lub notatkę z dowolnej aplikacji bez otwierania widżetu.
 
 </td>
 </tr>
@@ -138,8 +138,21 @@ wrażliwy.
 to. Wersje robocze, PRs **czekają na Twoją recenzję** i PRs **zablokowane** na tydzień wyróżniają się, a każdy PR nosi małą
 **Odznaka CI** (zaliczony, niezaliczony, działający lub brak CI) z kontroli głównego zatwierdzenia. Kiedy ktoś **poprosi Cię o Twoje
 przeglądu**, poinformuje Cię powiadomienie systemu operacyjnego (domyślnie włączone, wyłącz je w Ustawieniach). Filtruj według tekstu, `repo:` lub `label:`, tylko PRs lub tylko problemów, sortuj według aktualizacji, utworzenia lub komentarzy i
-scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
+przewiń za pomocą **pokaż więcej**. Przejdź do widoku **Komentarze**, aby wyświetlić siatkę **Katalog komentujących** zawierającą wszystkie osoby, które skomentowały Twoje PRs (awatary, plakietki człowieka i bota, liczbę komentarzy, wyszukiwanie, filtr botów, stopniową paginację) i ich komentarze. Obsługuje także **GitLab.com i hostowaną na własnym serwerze GitLab** z 5-minutową pamięcią podręczną
 przestrzega limitu stawki. Zaloguj się za pomocą tokena osobistego tylko do odczytu lub z przeglądarki (przepływ urządzenia).
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td>
+
+### 🎮 Steam bez opuszczania widżetu
+
+Cztery podzakładki dla Steam: **oferty z listy życzeń** (najpierw największy rabat), **najlepiej sprzedające się**, **zagraj teraz** i
+**katalog uporządkowany według ocen**. Listy publiczne wymagają jedynie Twojego **SteamID64**; opcjonalny klucz **Steam Web API**
+dodaje pięć najnowszych gier wraz z czasem ich odtwarzania. Ceny podawane są w realach, każdy wiersz otwiera stronę sklepu i
+karta zaczyna się domyślnie, jedno pole wyboru w Ustawieniach.
 
 </td>
 </tr>
@@ -175,14 +188,14 @@ kiedy to się skończy; jedno kliknięcie wyłącza je ponownie. Przetrwa ponown
 blokuje, a `?` wyświetla listę skrótów. `Ctrl+Shift+P` (`Cmd+Shift+P` na macOS) otwiera **paletę poleceń** przy każdym
 akcja według nazwy: przejdź do zakładki, nowego zadania lub notatki, dołącz do kolejnego spotkania, skopiuj podsumowanie dnia, zmień skórkę, zablokuj.
 
-## 🎨 Six skins
+## 🎨 Sześć skórek
 
 <table>
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>Domyślne</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
-<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Szkło</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Światło</b></td>
 </tr>
 </table>
@@ -210,11 +223,11 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|---|---|---|
 | ![Settings pointing at a Dropbox folder](docs/prints/app/27-ajustes-sync.png) | ![Compact interface on the Tasks tab](docs/prints/app/28-densidade-compacta.png) | ![Password screen with Windows Hello](docs/prints/app/09-cofre-trancado.png) | ![Connect with a token or from the browser](docs/prints/app/10-github-conectar.png) |
 
-| Settings in groups, with search | Search filters the groups | Offline chip in the header | Confirm before clearing the clipboard |
+| Ustawienia w grupach z wyszukiwaniem | Wyszukiwanie filtruje grupy | Układ offline w nagłówku | Potwierdź przed wyczyszczeniem schowka |
 |---|---|---|---|
 | ![Settings grouped into Appearance, Notifications, Privacy and security, Data and accounts, and App](docs/prints/ux-melhorias/ajustes-grupos.png) | ![The "buscar ajuste" field opening only the Notifications group](docs/prints/ux-melhorias/ajustes-busca.png) | ![A "sem conexão" chip beside the title when the network drops](docs/prints/ux-melhorias/sem-conexao.png) | ![An inline bar asks to clear 2 items and keeps the pinned one](docs/prints/ux-melhorias/clipboard-limpar.png) |
 
-| Discard an unsaved note draft |
+| Odrzuć niezapisaną wersję roboczą notatki |
 |---|
 | ![Esc on a changed note asks to discard or keep editing](docs/prints/ux-melhorias/notas-descartar.png) |
 
@@ -246,7 +259,7 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
-| Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
+| Przypomnienie o zadaniu | Zmień hasło główne | Status API (zakładka zgody) | Język: angielski, portugalski lub hiszpański |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |
 
@@ -266,23 +279,23 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|---|---|
 | ![Pop-up with a pull request whose CI failed, listing the failed jobs and their steps](docs/prints/app/55-aviso-meus-prs.png) | ![Pop-up when someone mentions me on GitLab, with the text and the link](docs/prints/app/57-aviso-mencao.png) | ![Settings: one switch per alert about my own work (CI, review, approval, merge state, comments, assignments, replies), plus mentions and team mentions](docs/prints/app/56-ajustes-meus-prs.png) |
 
-| Mention alert with who wrote it |
+| Wspomnij o tym, kto to napisał |
 |---|
 | ![Mention pop-up showing the author's photo, name and @login; the strip shows each author's name, with initials when there is no photo](docs/prints/app/79-aviso-mencao-com-autor.png) |
 
-| Mention alert with a preview of the text |
+| Wspomnienie alertu z podglądem tekstu |
 |---|
 | ![GitHub mention pop-up with the author and a preview of the comment that mentions me, cut around the @login](docs/prints/app/80-aviso-mencao-previa.png) |
 
-| More alerts about my own work |
+| Więcej alertów o mojej twórczości |
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
-| Day summary alert | Day summary setting |
+| Alert podsumowujący dzień | Ustawienie podsumowania dnia |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |
 
-| Mentions subtab (GitHub and GitLab) |
+| Podkarta Wzmianki (GitHub i GitLab) |
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
@@ -321,6 +334,10 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 | Modele AI uszeregowane według indeksu inteligencji |
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
+
+| Steam: pięć ostatnich rozegranych meczów, z czasem gry w obu przypadkach |
+|---|
+| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
 
 | Jedna nakładka alertów dla wszystkich oczekujących informacji: awarie, spotkania, zadania i nowe modele AI |
 |---|
@@ -462,6 +479,8 @@ bun run lint && bun test                                 # types and UI tests
 bun run build && cd src-tauri && cargo clippy --all-targets -- -D warnings && cargo test
 bun run tauri build                                      # installer for the current platform
 ```
+
+Widoki internetowe są tworzone po zainicjowaniu stanu Rust i zasobnika, więc uruchamiane wywołania IPC nie mogą być konfigurowane w trybie wyścigowym.
 
 Każdy PR obsługuje CI w systemach Windows, macOS i Linux. Konwencjonalne `fix`, `feat` i łamanie zatwierdzeń połączone w `main`
 uzyskaj tag SemVer, wygenerowane informacje o wersji i podpisane instalatory wbudowane równolegle; publikacja publikowana jest po weryfikacji (szczegóły w pkt
