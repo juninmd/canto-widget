@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "lebar daftar tugas",
-  "notif.resizeHint": "seret untuk mengubah ukuran; klik dua kali untuk mengatur ulang",
   "alert.close": "tutup",
   "alert.digestSummary": "ringkasan hari",
   "alert.modelNew": "model baru",

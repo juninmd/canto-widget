@@ -226,6 +226,10 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|---|
 | ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
 
+| The bell opens the alerts over the whole window |
+|---|
+| ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
+
 | Mini: nabídka režimu se otevře uvnitř dokovacího okna |
 |---|
 | ![The mode menu in the dock window: Mini, Hidden, Normal and Maximized, fully visible beside the alert icons](docs/prints/app/67-modo-mini-menu.png) |

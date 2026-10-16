@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "širina seznama opravil",
-  "notif.resizeHint": "povlecite za spreminjanje velikosti; dvakrat kliknite za ponastavitev",
   "alert.close": "blizu",
   "alert.digestSummary": "dnevni povzetek",
   "alert.modelNew": "nov model",

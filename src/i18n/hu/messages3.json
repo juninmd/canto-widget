@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "feladatlista szélessége",
-  "notif.resizeHint": "húzással átméretezheti; kattintson duplán a visszaállításhoz",
   "alert.close": "bezárni",
   "alert.digestSummary": "nap összefoglalója",
   "alert.modelNew": "új modell",

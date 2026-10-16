@@ -12,9 +12,9 @@ type Props = {
   online: boolean;
   privacy: boolean;
   mode: Mode;
-  /** Alerts waiting for an answer; announced to screen readers when it changes, and shown as a bell when `bell`. */
+  /** Alerts waiting for an answer; announced to screen readers when it changes, and the bell's badge. */
   pending: number;
-  bell: boolean;
+  /** Opens the alerts screen; the bell is the only way in, so it shows even with nothing pending. */
   onBell: () => void;
   onHelp: () => void;
   onLock: () => void;
@@ -56,20 +56,20 @@ export default function AppHeader(p: Props) {
         </span>
         {p.unlocked && (
           <>
-            {p.bell && p.pending > 0 && (
-              <button
-                type="button"
-                onClick={p.onBell}
-                aria-label={t("app.bell", { n: p.pending })}
-                title={t("app.bell.title", { n: p.pending })}
-                className={`${BUTTON} relative text-warn`}
-              >
-                <BellIcon on />
+            <button
+              type="button"
+              onClick={p.onBell}
+              aria-label={t("app.bell", { n: p.pending })}
+              title={t("app.bell.title", { n: p.pending })}
+              className={`${BUTTON} relative ${p.pending > 0 ? "text-warn" : ""}`}
+            >
+              <BellIcon on={p.pending > 0} />
+              {p.pending > 0 && (
                 <span aria-hidden="true" className="absolute -right-0.5 -top-0.5 min-w-3.5 rounded-full bg-warn px-1 text-center text-[9px] font-semibold leading-3.5 text-on-accent">
                   {p.pending}
                 </span>
-              </button>
-            )}
+              )}
+            </button>
             <button
               type="button"
               onClick={p.onHelp}

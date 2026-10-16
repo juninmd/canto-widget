@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "عرض قائمة المهام",
-  "notif.resizeHint": "اسحب لتغيير الحجم؛ انقر مرتين لإعادة التعيين",
   "alert.close": "قريب",
   "alert.digestSummary": "ملخص اليوم",
   "alert.modelNew": "نموذج جديد",

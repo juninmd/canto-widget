@@ -195,9 +195,11 @@ Atalho global escondendo e trazendo o widget de volta:
   API privada de transparência (`macOSPrivateApi`), o que impede publicar na Mac App Store; no Linux depende de
   um compositor ativo.
 - **Tela cheia** pelo botão ⤢ do topo ou `F11`. Em tela cheia a posição e o tamanho do canto não são
-  sobrescritos: ao sair, o widget volta ao que era. É o modo **Maximizado**: a lista de tarefas ganha, ao lado, a
-  coluna de **notificações** (avisos pendentes com suas ações e o que foi resolvido hoje), separada por uma
-  divisória que você arrasta ou move com as setas.
+  sobrescritos: ao sair, o widget volta ao que era. É o modo **Maximizado**: a aba aberta ocupa a janela inteira.
+- **Avisos** pelo sino do topo, que fica sempre no cabeçalho (preenchido e com o número quando há pendentes): em
+  qualquer modo (Normal ou Maximizado) ele abre a tela de avisos sobre a janela, com um card por aviso pendente e suas
+  ações, **dispensar todas** e, embaixo, o que foi **resolvido hoje** — sem nada pendente é por ele que se chega ao
+  que foi resolvido. `Esc` ou **voltar** fecha e devolve o foco ao sino.
 - **Modos** pelo ícone de painel no topo (ao lado do olho), pela paleta (`Ctrl+Shift+P`) ou pelo menu da bandeja:
   **Mini** (só um trilho na borda direita da tela, com um traço por aviso pendente; passe o mouse para ver os
   ícones e o texto, clique para abrir o Canto já nesse aviso), **Escondido** (só na bandeja), **Normal** e

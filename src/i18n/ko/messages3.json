@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "작업 목록 너비",
-  "notif.resizeHint": "드래그하여 크기를 조정하세요. 재설정하려면 두 번 클릭하세요.",
   "alert.close": "닫기",
   "alert.digestSummary": "하루 요약",
   "alert.modelNew": "새 모델",

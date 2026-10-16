@@ -12,7 +12,7 @@ mock.module("@tauri-apps/api/core", () => ({
     return Promise.resolve(null);
   },
 }));
-const { default: NotificationsColumn } = await import("./NotificationsColumn");
+const { default: NotificationsPanel } = await import("./NotificationsPanel");
 
 afterEach(() => {
   cleanup();
@@ -27,30 +27,66 @@ const ci: AgendaItem = { ...base, id: "pr:acme/atlas#4", title: "PR #4 falhou", 
 const handlers = () => {
   const gone: string[] = [];
   let refreshed = 0;
-  return { gone, refreshed: () => refreshed, props: { onGone: (id: string) => gone.push(id), onRefresh: () => refreshed++, onCompleted: () => {}, onOpenModels: () => {} } };
+  let closed = 0;
+  return {
+    gone,
+    refreshed: () => refreshed,
+    closed: () => closed,
+    props: {
+      onGone: (id: string) => gone.push(id),
+      onRefresh: () => refreshed++,
+      onCompleted: () => {},
+      onOpenModels: () => {},
+      onClose: () => closed++,
+    },
+  };
 };
 
 test("each pending alert is a card with the pop-up's actions, under a count", () => {
   const h = handlers();
-  render(<NotificationsColumn alerts={[ci, daily]} log={[]} {...h.props} />);
-  const column = screen.getByRole("complementary", { name: "notificações" });
-  expect(within(column).getByText("2")).toBeDefined();
-  const list = within(column).getByRole("list", { name: "avisos pendentes" });
+  render(<NotificationsPanel alerts={[ci, daily]} log={[]} {...h.props} />);
+  const panel = screen.getByRole("dialog", { name: "notificações" });
+  expect(within(panel).getByText("2")).toBeDefined();
+  const list = within(panel).getByRole("list", { name: "avisos pendentes" });
   expect(within(list).getAllByRole("listitem")).toHaveLength(2);
   expect(within(list).getByRole("button", { name: "abrir PR" })).toBeDefined();
   expect(within(list).getByRole("button", { name: "entrar no Meet" })).toBeDefined();
 });
 
 test("nothing pending says so and offers no dismiss-all", () => {
-  render(<NotificationsColumn alerts={[]} log={[]} {...handlers().props} />);
+  render(<NotificationsPanel alerts={[]} log={[]} {...handlers().props} />);
   expect(screen.getByText("nenhum aviso pendente")).toBeDefined();
   expect(screen.getByText("tudo em dia")).toBeDefined();
   expect(screen.queryByRole("button", { name: "dispensar todas" })).toBeNull();
 });
 
+test("closing the screen answers Esc and the back button", () => {
+  const h = handlers();
+  render(<NotificationsPanel alerts={[daily]} log={[]} {...h.props} />);
+  fireEvent.keyDown(window, { key: "Escape" });
+  expect(h.closed()).toBe(1);
+  fireEvent.click(within(screen.getByRole("dialog", { name: "notificações" })).getByRole("button", { name: "voltar" }));
+  expect(h.closed()).toBe(2);
+});
+
+test("Tab wraps inside the screen instead of reaching the bar behind it", () => {
+  render(<NotificationsPanel alerts={[ci, daily]} log={[]} {...handlers().props} />);
+  const panel = screen.getByRole("dialog", { name: "notificações" });
+  const first = within(panel).getByRole("button", { name: "dispensar todas" });
+  const last = within(panel).getAllByRole("button", { name: "fechar" }).at(-1)!;
+
+  last.focus();
+  fireEvent.keyDown(panel, { key: "Tab" });
+  expect(document.activeElement, "Tab from the last control left the screen").toBe(first);
+
+  first.focus();
+  fireEvent.keyDown(panel, { key: "Tab", shiftKey: true });
+  expect(document.activeElement).toBe(last);
+});
+
 test("closing a card releases it in Rust and asks for the log again once Rust answered", async () => {
   const h = handlers();
-  render(<NotificationsColumn alerts={[daily]} log={[]} {...h.props} />);
+  render(<NotificationsPanel alerts={[daily]} log={[]} {...h.props} />);
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "fechar" }));
   });
@@ -61,7 +97,7 @@ test("closing a card releases it in Rust and asks for the log again once Rust an
 
 test("dismiss all closes every pending alert", async () => {
   const h = handlers();
-  render(<NotificationsColumn alerts={[ci, daily]} log={[]} {...h.props} />);
+  render(<NotificationsPanel alerts={[ci, daily]} log={[]} {...h.props} />);
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "dispensar todas" }));
   });
@@ -73,7 +109,7 @@ test("dismiss all closes every pending alert", async () => {
 test("dismiss all keeps the alerts that failed to close and offers a retry", async () => {
   failing = new Set(["e1"]);
   const h = handlers();
-  render(<NotificationsColumn alerts={[ci, daily]} log={[]} {...h.props} />);
+  render(<NotificationsPanel alerts={[ci, daily]} log={[]} {...h.props} />);
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "dispensar todas" }));
   });
@@ -89,7 +125,7 @@ test("dismiss all keeps the alerts that failed to close and offers a retry", asy
 test("a card that fails to close stays, says why and can try again", async () => {
   failing = new Set(["e1"]);
   const h = handlers();
-  render(<NotificationsColumn alerts={[daily]} log={[]} {...h.props} />);
+  render(<NotificationsPanel alerts={[daily]} log={[]} {...h.props} />);
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "fechar" }));
   });
@@ -110,8 +146,8 @@ test("more than eight resolved alerts are capped, with a button to see the rest"
     outcome: "closed",
     at: now - i * 1000,
   }));
-  render(<NotificationsColumn alerts={[]} log={log} {...handlers().props} />);
-  const list = () => within(screen.getByRole("complementary")).getAllByRole("listitem");
+  render(<NotificationsPanel alerts={[]} log={log} {...handlers().props} />);
+  const list = () => within(screen.getByRole("dialog")).getAllByRole("listitem");
   expect(list()).toHaveLength(8);
   fireEvent.click(screen.getByRole("button", { name: "ver mais (3)" }));
   expect(list()).toHaveLength(11);
@@ -127,13 +163,13 @@ test("resolved alerts show what was done, only from today", () => {
     { item: ci, outcome: "snoozed", at: Math.max(earlier, now.getTime() - 120_000) },
     { item: { ...daily, id: "old", title: "Reunião de ontem" }, outcome: "closed", at: now.getTime() - 2 * 86_400_000 },
   ];
-  render(<NotificationsColumn alerts={[]} log={log} {...handlers().props} />);
+  render(<NotificationsPanel alerts={[]} log={log} {...handlers().props} />);
   expect(screen.getByText("entrou no Meet")).toBeDefined();
   expect(screen.getByText("adiado")).toBeDefined();
   expect(screen.queryByText("Reunião de ontem")).toBeNull();
 });
 
 test("with nothing resolved yet it says so", () => {
-  render(<NotificationsColumn alerts={[daily]} log={[]} {...handlers().props} />);
+  render(<NotificationsPanel alerts={[daily]} log={[]} {...handlers().props} />);
   expect(screen.getByText("nada resolvido ainda hoje")).toBeDefined();
 });

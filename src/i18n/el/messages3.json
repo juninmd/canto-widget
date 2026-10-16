@@ -75,8 +75,6 @@
   "notif.showLess": "show less",
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
-  "notif.resize": "πλάτος λίστας εργασιών",
-  "notif.resizeHint": "Σύρετε για αλλαγή μεγέθους. διπλό κλικ για επαναφορά",
   "alert.close": "κλείσιμο",
   "alert.digestSummary": "περίληψη ημέρας",
   "alert.modelNew": "νέο μοντέλο",
