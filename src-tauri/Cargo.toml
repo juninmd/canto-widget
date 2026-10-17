@@ -72,9 +72,6 @@ security-framework = "3.7"
 objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSProcessInfo", "NSString", "NSObject"] }
 
 [profile.release]
-
-[patch.crates-io]
-zip = { version = "9.0.0", default-features = false }
 codegen-units = 1
 lto = true
 strip = true
