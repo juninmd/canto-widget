@@ -159,6 +159,21 @@ in Settings.
 </td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/90-agentes.png" alt="Agents tab: fictitious installed CLIs with the latest version, the release date and a summary of what changed"></td>
+<td>
+
+### 🤖 The agent CLIs, installed or not
+
+The coding-agent harnesses in one list: **Claude Code**, **Codex CLI**, **Gemini CLI**, **OpenCode**,
+**GitHub Copilot CLI** and **Aider**. Each row says whether the CLI is installed **on this machine** (and where),
+shows the **latest GitHub release** with its date and a summary of what changed, and — when the CLI is missing —
+brings the **install command ready to copy**. Canto only copies: **nothing is installed or executed** by the
+widget. Public data, no account or key, with a 30-minute cache. The tab starts off by default, one checkbox away
+in Settings.
+
+</td>
+</tr>
+<tr>
 <td>
 
 ### ⚙️ Settings and automatic updates

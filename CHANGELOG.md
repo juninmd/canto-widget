@@ -5,6 +5,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Aba Agentes**: os CLIs de agente mais usados (Claude Code, Codex CLI, Gemini CLI, OpenCode, GitHub Copilot CLI e
+  Aider) num só lugar. Cada linha diz se o CLI está instalado nesta máquina — e onde —, mostra a **última release** do
+  GitHub com a data e um resumo do que mudou, e, quando o CLI não está instalado, traz o comando de instalação
+  **pronto para copiar**. O Canto só copia: nada é instalado nem executado por ele. A lista de releases é pública,
+  não precisa de conta nem de chave, e fica 30 min em memória antes de consultar o GitHub de novo. A aba começa
+  desligada, a um clique nos Ajustes.
+
 ### Corrigido
 
 - **Fechamento ao abrir no Windows**: as janelas só carregam depois de inicializar os estados do Rust e a

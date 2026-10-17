@@ -27,6 +27,7 @@ pub mod cmd_gemini;
 pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
+pub mod cmd_harness;
 pub mod cmd_health;
 pub mod cmd_mentions;
 pub mod cmd_models;
@@ -60,6 +61,9 @@ pub mod gitlab_work;
 pub mod global_shortcuts;
 pub mod google_token;
 pub mod guest_photos;
+pub mod harness;
+pub mod harness_cache;
+pub mod harness_feed;
 pub mod health;
 pub mod health_cert;
 pub mod health_probe;
@@ -166,6 +170,7 @@ pub fn run() {
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
             app.manage(health_watch::HealthState::default());
+            app.manage(harness_cache::HarnessCache::default());
             app.manage(cmd_models::ModelsLock::default());
             app.manage(cmd_steam::SteamLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
@@ -340,6 +345,7 @@ pub fn run() {
             cmd_report::report_agenda,
             cmd_report::report_vault,
             cmd_status::api_status,
+            cmd_harness::harness_list,
             cmd_health::health_list,
             cmd_health::health_save,
             cmd_health::health_remove,
