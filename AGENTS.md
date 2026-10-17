@@ -104,9 +104,11 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - File names on disk, AAD strings (`canto.vault.v1`, ...), the `.canto` extension and the Windows Hello credential
   name `com.junin.canto.cofre` never change.
 - **Releases are automated and semantic.** `release.yml` versions each first-parent commit on `main` from its
-  Conventional Commit title: `fix` bumps patch, `feat` bumps minor, `!` or `BREAKING CHANGE` bumps major; `docs`,
-  `chore`, `test`, `ci` and `refactor` without a break publish nothing. It builds the signed installers in
-  parallel, merges and verifies `latest.json`, and publishes with notes generated from the commit (`scripts/release-notes.ts`: a summary line, entries grouped by Conventional Commit type from the merged pull request's commits or the squash body, a download table and the compare link; the updater manifest must carry the identical text, so keep it deterministic). A six-hour
+  Conventional Commit title: `fix` bumps patch, `feat` bumps minor, `!` or `BREAKING CHANGE` bumps major; any other
+  type without a break (`docs`, `chore`, `test`, `ci`, `refactor`, `perf`) publishes nothing on its own and is folded
+  into the next release that qualifies — a `perf` before a `feat` reaches the notes under "Desempenho". It builds the
+  signed installers in parallel, merges and verifies `latest.json`, and publishes with notes generated from the
+  commit (`scripts/release-notes.ts`: a summary line, entries grouped by Conventional Commit type from the merged pull request's commits or the squash body, a download table and the compare link; the updater manifest must carry the identical text, so keep it deterministic). A six-hour
   schedule retries failed or missed runs. Never hand-push a version tag or edit release versions manually.
 
 ## Security rules
