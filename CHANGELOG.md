@@ -39,6 +39,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Falhas TCP no Windows**: conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR
   esperada independentemente do idioma do sistema operacional.
 
+### Desempenho
+
+- **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
+  foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
+  dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
+
 ### Adicionado
 
 - **Tema Glass**: novo tema com estética de vidro translúcido, superfícies semi-transparentes

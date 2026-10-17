@@ -137,6 +137,24 @@ fn failed_persist_leaves_memory_as_it_was_on_disk() {
 }
 
 #[test]
+fn a_mutation_that_changes_nothing_does_not_reseal_the_vault() {
+    let st = state("nada-mudou");
+    st.create("senha-mestra").unwrap();
+    let path = store::vault_path(&st.dir);
+    let before = std::fs::read(&path).unwrap();
+
+    // Every seal uses a fresh nonce, so identical bytes prove the file was never rewritten.
+    st.mutate(|_| ()).unwrap();
+    st.mutate(|d| d.tasks.len()).unwrap();
+    assert_eq!(std::fs::read(&path).unwrap(), before, "re-sealed the vault with nothing changed");
+
+    st.mutate(|d| d.deleted.insert("tarefa".into(), 1)).unwrap();
+    assert_ne!(std::fs::read(&path).unwrap(), before, "did not persist a real change");
+    assert!(st.read(|d| d.deleted.contains_key("tarefa")).unwrap());
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
+#[test]
 fn manual_lock_reports_the_transition_once() {
     let st = state("tranca-bandeja");
     st.create("senha-mestra").unwrap();
