@@ -7,6 +7,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Cinco abas de protótipo**: sugestões de próximas features, cada uma numa aba própria, **oculta por padrão** e
+  com dados fictícios — são maquetes, sem backend: nada é buscado, nada é salvo e o rodapé de cada uma diz o que
+  ainda faltaria para existir. **Clima** (agora, próximas horas numa curva e próximos dias, com aviso de chuva),
+  **Hábitos** (checks de hoje, sequência e a semana), **Mercado** (dólar, euro, bitcoin e Ibovespa com a variação
+  do dia), **Snippets** (trechos com etiquetas, busca, cópia em um clique e "colar no app em foco") e **Leituras**
+  (fila de RSS/Atom com o que não foi lido e o tempo de leitura).
+
 - **Aba Agentes**: os CLIs de agente mais usados (Claude Code, Codex CLI, Gemini CLI, OpenCode, GitHub Copilot CLI e
   Aider) num só lugar. Cada linha diz se o CLI está instalado nesta máquina — e onde —, mostra a **última release** do
   GitHub com a data e um resumo do que mudou, e, quando o CLI não está instalado, traz o comando de instalação

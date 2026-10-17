@@ -32,6 +32,11 @@ import GithubTab from "./components/GithubTab";
 import GitlabTab from "./components/GitlabTab";
 import SteamTab from "./components/SteamTab";
 import AgentsTab from "./components/AgentsTab";
+import ProtoWeather from "./components/ProtoWeather";
+import ProtoHabits from "./components/ProtoHabits";
+import ProtoMarket from "./components/ProtoMarket";
+import ProtoSnippets from "./components/ProtoSnippets";
+import ProtoReads from "./components/ProtoReads";
 import StatusTab from "./components/StatusTab";
 import ModelsTab from "./components/ModelsTab";
 import ActivityTab from "./components/ActivityTab";
@@ -390,6 +395,11 @@ function Canto() {
             {tab === "status" && <StatusTab />}
             {tab === "models" && <ModelsTab />}
             {tab === "agents" && <AgentsTab onError={setError} />}
+            {tab === "weather" && <ProtoWeather />}
+            {tab === "habits" && <ProtoHabits />}
+            {tab === "market" && <ProtoMarket />}
+            {tab === "snippets" && <ProtoSnippets />}
+            {tab === "reads" && <ProtoReads />}
             {tab === "activity" && <ActivityTab today={today} onError={setError} />}
             {tab === "settings" && (
               <SettingsTab
