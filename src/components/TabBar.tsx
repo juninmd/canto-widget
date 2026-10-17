@@ -5,7 +5,7 @@ import { t } from "../i18n";
 import TabMore, { TabBadge } from "./TabMore";
 
 export type Tab =
-  | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "steam" | "status" | "models" | "activity" | "settings";
+  | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "steam" | "status" | "models" | "agents" | "activity" | "settings";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: t("tabs.tasks") },
@@ -17,6 +17,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "steam", label: "Steam" },
   { id: "status", label: t("tabs.status") },
   { id: "models", label: t("tabs.models") },
+  { id: "agents", label: t("agents.tab") },
   { id: "activity", label: t("tabs.activity") },
   { id: "settings", label: t("tabs.settings") },
 ];

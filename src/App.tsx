@@ -31,6 +31,7 @@ import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
 import GitlabTab from "./components/GitlabTab";
 import SteamTab from "./components/SteamTab";
+import AgentsTab from "./components/AgentsTab";
 import StatusTab from "./components/StatusTab";
 import ModelsTab from "./components/ModelsTab";
 import ActivityTab from "./components/ActivityTab";
@@ -388,6 +389,7 @@ function Canto() {
             {tab === "steam" && <SteamTab onError={setError} />}
             {tab === "status" && <StatusTab />}
             {tab === "models" && <ModelsTab />}
+            {tab === "agents" && <AgentsTab onError={setError} />}
             {tab === "activity" && <ActivityTab today={today} onError={setError} />}
             {tab === "settings" && (
               <SettingsTab

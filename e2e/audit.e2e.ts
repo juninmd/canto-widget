@@ -48,9 +48,27 @@ const models = { alerts: false, total: 3, fetched_at: now, next_fetch_at: now + 
   { id: "m2", name: "Boreal 2 Pro", creator: "Acme AI", rank: 2, score: 70.1, price: 2.1, speed: 95, new_until: 0 },
   { id: "m3", name: "Cedro Mini", creator: "Verde Co", rank: 3, score: 64.8, price: 0.4, speed: 210, new_until: 0 },
 ] };
+/** One installed and one missing, so the sweep checks the path line, the copy button and the GitHub link. */
+const agents = [
+  {
+    id: "claude", name: "Claude Code", repo: "anthropics/claude-code", site: "https://github.com/anthropics/claude-code",
+    install_tool: "npm", install_command: "npm install -g @anthropic-ai/claude-code",
+    installed: true, path: "D:\\tools\\npm\\claude.cmd",
+    release: { tag: "v2.1.302", name: "2.1.302", published_at: new Date(now - 7_200_000).toISOString(), url: "https://github.com/anthropics/claude-code/releases/tag/v2.1.302", notes: "## O que mudou\n\n- corrige o modo plano\n\n## ⬇️ Downloads\n" },
+    error: null,
+  },
+  {
+    id: "aider", name: "Aider", repo: "Aider-AI/aider", site: "https://github.com/Aider-AI/aider",
+    install_tool: "pipx", install_command: "pipx install aider-chat",
+    installed: false, path: null, release: null, error: null,
+  },
+];
 
 
-const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Modelos IA", "Steam", "Ajustes"];
+const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Modelos IA", "Steam", "Agentes", "Ajustes"];
+/** Hidden by default: the sweep shows them and tells the app they were already known, so they don't auto-hide. */
+const HIDDEN_BY_DEFAULT = ["Status API", "Steam", "Agentes"];
+const ALL_TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents", "activity"];
 const MIN = 24;
 
 /** Buttons, tabs and selects under 24 CSS px (WCAG 2.5.8), skipping what is not on screen. */
@@ -74,10 +92,8 @@ for (const density of ["compacta", "padrao"]) {
       await page.addInitScript((d) => localStorage.setItem("canto.densidade", d), density);
       await mockTauri(page, {
         notes: notes as never, statuses: statuses as never, models: models as never,
-        // Status API and Steam are hidden by default: show them so the sweep can open them.
-        hiddenTabs: tab === "Status API" || tab === "Steam" ? [] : undefined,
-        knownTabs:
-          tab === "Steam" ? ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "activity"] : undefined,
+        hiddenTabs: HIDDEN_BY_DEFAULT.includes(tab) ? [] : undefined,
+        knownTabs: HIDDEN_BY_DEFAULT.includes(tab) ? ALL_TABS : undefined,
         fixed: {
           tasks_for_day: tasks, clip_list: { items: clips, max_pinned: 100 }, agenda_today: agenda,
           github_status: { connected: true, login: "voce", source: "token", device_flow: false }, github_lists: lists,
@@ -85,6 +101,7 @@ for (const density of ["compacta", "padrao"]) {
           activity_status: { supported: true, enabled: false },
           steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },
           steam_deals: { has_more: true, items: [{ appid: 900001, name: "Aurora Drift", price: "R$ 14,99", original: "R$ 59,99", discount: 75, review: null, review_label: "" }] },
+          harness_list: agents,
         },
       });
       await page.goto("/");

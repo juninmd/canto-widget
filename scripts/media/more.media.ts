@@ -67,3 +67,9 @@ test("steam: wishlist deals and the recent games", async ({ browser }) => {
   await settle(page, 800);
   await page.screenshot({ path: "docs/prints/app/87-steam-recentes.png", omitBackground: true });
 });
+
+test("agentes: the installed CLIs with their latest release", async ({ browser }) => {
+  const page = await fullScene(browser);
+  await openTab(page, "Agentes");
+  await page.screenshot({ path: "docs/prints/app/90-agentes.png", omitBackground: true });
+});
