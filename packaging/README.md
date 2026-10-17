@@ -66,7 +66,11 @@ do `cargo build` (o Rust embute o `dist/` via `generate_context!`).
 
 ## Se a versão mudar
 
-`PackageVersion`/`version` e os `Sha256`/`sha256` desses manifestos (winget e Homebrew) são da `v0.1.0`; uma
-nova release exige atualizar os três junto, senão o pacote instala uma versão errada — o mesmo problema que
-`latest.json` do updater evita para quem já tem o Canto instalado, mas esses manifestos ficam fora do alcance
-do updater.
+`bun scripts/packaging.ts write vX.Y.Z` reescreve `winget/` e `homebrew/` com a versão e os `sha256` lidos direto
+dos assets da release (o campo `digest` da API do GitHub) — nada é copiado à mão, e o hash do winget sai em
+maiúsculas como o manifesto pede. `bun scripts/packaging.ts check vX.Y.Z` falha quando algum dos quatro arquivos
+ficou para trás, que é como um pacote passa a instalar uma versão antiga. O `tag` do manifesto Flatpak continua
+sendo escrito à mão: não há gerador para ele.
+
+Republicar continua sendo à mão (winget-pkgs e homebrew-cask pedem fork e PR, ver acima); o script só garante que
+o que vai no PR é o que a release publicou.
