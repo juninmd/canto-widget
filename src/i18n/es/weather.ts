@@ -1,0 +1,31 @@
+import type { weather as source } from "../pt-BR/weather";
+
+export const weather: Record<keyof typeof source, string> = {
+  "weather.tab": "Clima",
+  "weather.loading": "consultando el clima",
+  "weather.ask.title": "Elegir la ciudad",
+  "weather.ask.hint":
+    "Escribe el nombre de la ciudad. Canto resuelve las coordenadas en Open-Meteo, que es abierta y sin clave, y guarda solo eso: ninguna dirección tuya sale de aquí.",
+  "weather.city.label": "Ciudad",
+  "weather.city.placeholder": "p. ej.: Madrid",
+  "weather.search": "buscar",
+  "weather.searching": "buscando la ciudad",
+  "weather.change": "cambiar de ciudad",
+  "weather.forget": "olvidar la ciudad",
+  "weather.refresh": "actualizar",
+  "weather.refreshTitle": "la previsión se busca como máximo una vez cada 30 min",
+  "weather.now": "ahora",
+  "weather.feels": "sensación de {temp} °C",
+  "weather.hours": "próximas horas",
+  "weather.days": "próximos días",
+  "weather.rainFrom": "lluvia desde las {time}",
+  "weather.rain": "{n}% de lluvia",
+  "weather.clear": "cielo despejado",
+  "weather.cloudy": "parcialmente nublado",
+  "weather.fog": "niebla",
+  "weather.drizzle": "llovizna",
+  "weather.rainy": "lluvia",
+  "weather.snow": "nieve",
+  "weather.storm": "tormenta",
+  "weather.source": "datos: Open-Meteo",
+};

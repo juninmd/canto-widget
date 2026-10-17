@@ -174,6 +174,33 @@ in Settings.
 </td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: 22 °C now, rain from 13:00, the next hours as a curve and the next four days"></td>
+<td>
+
+### 🌤️ The weather without leaving the widget
+
+Type the city name once and Canto keeps only its coordinates: **now**, the **next hours as a curve** with the rain
+chance, the **next days** and the **rain window** ("rain from 13:00"). Open-Meteo, which is open and
+**keyless** — no account, no address of yours leaving the machine — and a 30-minute cache. The tab starts off by
+default, one checkbox away in Settings.
+
+</td>
+</tr>
+<tr>
+<td>
+
+### 📰 An RSS/Atom reader with thumbnails
+
+Paste the feed addresses and read them in one place: **unread count**, newest first, each card with the **source
+favicon**, the age, a summary and, when the entry has one, a **thumbnail** — all of it downloaded by Rust and
+handed over as `data:` URLs, so the window never talks to a remote origin. Cards open in the browser and can be
+marked **read/unread**; a feed that breaks stays visible in red. Keyless, 15-minute cache, the list saved next to
+the vault (it is only public addresses). The tab starts off by default.
+
+</td>
+<td><img src="docs/prints/app/96-leituras.png" alt="Reads tab: unread count, feed chips with one broken in red, and reading cards with source, age, summary and the open/mark-as-read actions"></td>
+</tr>
+<tr>
 <td>
 
 ### ⚙️ Settings and automatic updates
@@ -424,34 +451,27 @@ is kept and what never is.
 
 <sub>All screenshots use fictitious data.</sub>
 
-## 🧪 Prototypes: five suggested tabs
+## 🧪 Prototypes: three suggested tabs
 
-Five suggestions, shipped as **prototypes**: they start hidden (one checkbox away in Settings) and are **mockups
-with fictitious data** — no backend, nothing stored, nothing fetched. Each screen says what it would still need, so
-the idea can be judged before it becomes real.
+**Clima** and **Leituras** started here, were picked and are now real features (up the page). These three are still
+**prototypes**: they start hidden (one checkbox away in Settings) and are **mockups with fictitious data** — no
+backend, nothing stored, nothing fetched. Each screen says what it would still need, so the idea can be judged
+before it becomes real.
 
-| Weather | Habits |
+| Habits | Market |
 |---|---|
-| <img src="docs/prints/app/92-prototipo-clima.png" alt="Weather prototype: 22 °C now, rain from 16:00, the next hours as a curve and the next days"> | <img src="docs/prints/app/93-prototipo-habitos.png" alt="Habits prototype: today's habits with their streaks and a grid of the last seven days"> |
+| <img src="docs/prints/app/93-prototipo-habitos.png" alt="Habits prototype: today's habits with their streaks and a grid of the last seven days"> | <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> |
 
-| Market | Snippets |
-|---|---|
-| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> | <img src="docs/prints/app/95-prototipo-snippets.png" alt="Snippets prototype: search, tags, one-click copy and a paste-into-the-focused-app button"> |
-
-| Reads |
+| Snippets |
 |---|
-| <img src="docs/prints/app/96-prototipo-leituras.png" alt="Reads prototype: a reading queue with what is unread, the reading time and the source"> |
+| <img src="docs/prints/app/95-prototipo-snippets.png" alt="Snippets prototype: search, tags, one-click copy and a paste-into-the-focused-app button"> |
 
-- **Weather** — now, the next hours and the next days, with a rain warning. Would need Open-Meteo (open, keyless),
-  the city kept in the vault and a 30 min cache.
 - **Habits** — today's checks, the streak and the last seven days. Would need only the vault, and the streak could
   feed the routine alerts that already exist.
 - **Market** — dollar (PTAX), euro, bitcoin and Ibovespa with the day's variation. Would need the Central Bank and
   CoinGecko, both keyless, with a 15 min cache per quote.
 - **Snippets** — reusable pieces with tags, search, one-click copy and "paste into the focused app". Would need only
   the vault; the paste shortcut reuses the focused app Activity already records.
-- **Reads** — an RSS/Atom queue with what is unread and the reading time. Would need RSS/Atom as in the Status API,
-  keyless, with the list and the "read" state in the vault.
 
 <sub>All screenshots use fictitious data.</sub>
 

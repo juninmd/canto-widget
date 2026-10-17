@@ -1,0 +1,31 @@
+import type { weather as source } from "../pt-BR/weather";
+
+export const weather: Record<keyof typeof source, string> = {
+  "weather.tab": "Weather",
+  "weather.loading": "checking the weather",
+  "weather.ask.title": "Pick a city",
+  "weather.ask.hint":
+    "Type the city name. Canto resolves the coordinates at Open-Meteo, which is open and keyless, and keeps only that — no address of yours leaves the machine.",
+  "weather.city.label": "City",
+  "weather.city.placeholder": "e.g. Lisbon",
+  "weather.search": "search",
+  "weather.searching": "finding the city",
+  "weather.change": "change city",
+  "weather.forget": "forget the city",
+  "weather.refresh": "refresh",
+  "weather.refreshTitle": "the forecast is fetched at most once every 30 min",
+  "weather.now": "now",
+  "weather.feels": "feels like {temp} °C",
+  "weather.hours": "next hours",
+  "weather.days": "next days",
+  "weather.rainFrom": "rain from {time}",
+  "weather.rain": "{n}% rain",
+  "weather.clear": "clear sky",
+  "weather.cloudy": "partly cloudy",
+  "weather.fog": "fog",
+  "weather.drizzle": "drizzle",
+  "weather.rainy": "rain",
+  "weather.snow": "snow",
+  "weather.storm": "thunderstorm",
+  "weather.source": "data: Open-Meteo",
+};

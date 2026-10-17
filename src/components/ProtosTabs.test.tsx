@@ -12,11 +12,9 @@ mock.module("@tauri-apps/api/core", () => ({
   },
 }));
 
-const { default: ProtoWeather } = await import("./ProtoWeather");
 const { default: ProtoHabits } = await import("./ProtoHabits");
 const { default: ProtoMarket } = await import("./ProtoMarket");
 const { default: ProtoSnippets } = await import("./ProtoSnippets");
-const { default: ProtoReads } = await import("./ProtoReads");
 
 beforeEach(() => {
   calls.length = 0;
@@ -27,18 +25,6 @@ beforeEach(() => {
   });
 });
 afterEach(cleanup);
-
-test("the weather prototype shows now, the next hours and the next days", () => {
-  render(<ProtoWeather />);
-  expect(screen.getByText("protótipo")).toBeTruthy();
-  expect(screen.getByText("22 °C")).toBeTruthy();
-  expect(document.querySelector("[data-proto-now]")?.textContent).toContain("parcialmente nublado");
-  expect(screen.getByText("chuva a partir das 16:00")).toBeTruthy();
-  expect(screen.getByText("próximas horas")).toBeTruthy();
-  expect(document.querySelector("polyline")?.getAttribute("points")).toBeTruthy();
-  expect(document.querySelectorAll("[data-proto-day]")).toHaveLength(4);
-  expect(screen.getByText(/Open-Meteo, que é aberto e sem chave/)).toBeTruthy();
-});
 
 test("the habits prototype checks a habit off without touching the vault", () => {
   render(<ProtoHabits />);
@@ -71,24 +57,12 @@ test("the snippets prototype searches, copies and offers the paste shortcut", as
   expect(calls).toEqual([]);
 });
 
-test("the reads prototype marks one as read and only opens the browser on a click", async () => {
-  render(<ProtoReads />);
-  expect(screen.getByText("2 não lidos")).toBeTruthy();
-  await act(async () => fireEvent.click(screen.getAllByRole("button", { name: "marcar como lido" })[0]));
-  expect(screen.getByText("1 não lidos")).toBeTruthy();
-  expect(calls).toEqual([]);
-  await act(async () => fireEvent.click(screen.getAllByRole("button", { name: "abrir no navegador" })[0]));
-  expect(calls).toEqual(["open_link"]);
-});
-
 test("no prototype calls the backend on mount: they are mockups", () => {
   render(
     <>
-      <ProtoWeather />
       <ProtoHabits />
       <ProtoMarket />
       <ProtoSnippets />
-      <ProtoReads />
     </>,
   );
   expect(calls).toEqual([]);

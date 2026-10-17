@@ -1,22 +1,11 @@
 import type { protos as source } from "../pt-BR/protos";
 
 export const protos: Record<keyof typeof source, string> = {
-  "protos.tab.weather": "Weather",
   "protos.tab.habits": "Habits",
   "protos.tab.market": "Market",
   "protos.tab.snippets": "Snippets",
-  "protos.tab.reads": "Reads",
   "protos.badge": "prototype",
   "protos.needs": "what is missing: {text}",
-  "protos.weather.now": "now",
-  "protos.weather.feels": "feels like {temp} °C",
-  "protos.weather.clear": "clear sky",
-  "protos.weather.cloudy": "partly cloudy",
-  "protos.weather.rain": "rain",
-  "protos.weather.hours": "next hours",
-  "protos.weather.days": "next days",
-  "protos.weather.rainFrom": "rain from {time}",
-  "protos.weather.needs": "Open-Meteo, which is open and keyless, plus the city kept in the vault and a 30 min cache",
   "protos.habits.today": "today",
   "protos.habits.streak": "{n} days in a row",
   "protos.habits.best": "best: {n}",
@@ -31,9 +20,4 @@ export const protos: Record<keyof typeof source, string> = {
   "protos.snippets.paste": "paste into the focused app",
   "protos.snippets.uses": "{n} uses",
   "protos.snippets.needs": "the vault only; the paste shortcut reuses the focused app Activity already records",
-  "protos.reads.unread": "{n} unread",
-  "protos.reads.minutes": "{n} min read",
-  "protos.reads.open": "open in the browser",
-  "protos.reads.markRead": "mark as read",
-  "protos.reads.needs": "RSS/Atom as in the Status API, keyless; the list and the \"read\" state live in the vault",
 };

@@ -19,11 +19,11 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "status", label: t("tabs.status") },
   { id: "models", label: t("tabs.models") },
   { id: "agents", label: t("agents.tab") },
-  { id: "weather", label: t("protos.tab.weather") },
+  { id: "weather", label: t("weather.tab") },
   { id: "habits", label: t("protos.tab.habits") },
   { id: "market", label: t("protos.tab.market") },
   { id: "snippets", label: t("protos.tab.snippets") },
-  { id: "reads", label: t("protos.tab.reads") },
+  { id: "reads", label: t("reads.tab") },
   { id: "activity", label: t("tabs.activity") },
   { id: "settings", label: t("tabs.settings") },
 ];

@@ -5,16 +5,14 @@ const ALL_TABS = [
   "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
   "weather", "habits", "market", "snippets", "reads", "activity",
 ];
-/** The five prototypes, plus what the other tabs already hide: the bar keeps its usual size. */
-const HIDDEN = ["gitlab", "status", "activity", "steam", "agents"];
+/** Clima and Leituras are real features now; the three mockups still start hidden. */
+const HIDDEN = ["gitlab", "status", "activity", "steam", "agents", "weather", "reads"];
 
 /** One distinctive line of each mockup, in the order of the tab bar. */
 const MARKERS: [string, string][] = [
-  ["Clima", "chuva a partir das 16:00"],
   ["Hábitos", "3 dias seguidos"],
   ["Mercado", "+0,31% no dia"],
   ["Snippets", "colar no app em foco"],
-  ["Leituras", "não lidos"],
 ];
 
 test("each prototype tab opens with its mockup", async ({ page }) => {
@@ -38,14 +36,14 @@ test("a prototype is a mockup: opening and copying ask nothing from Rust", async
   await expect(page.locator("[data-proto-snippet=s3]").getByRole("button", { name: "copiar ✓" })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("select date_trunc");
   const cmds = (await calls(page)).map((c) => c.cmd);
-  expect(cmds.filter((cmd) => /proto|weather|habit|market|snippet|read/.test(cmd))).toEqual([]);
+  expect(cmds.filter((cmd) => /proto|habit|market|snippet/.test(cmd))).toEqual([]);
 });
 
 test("a prototype starts hidden for someone who saved a choice before it existed", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   await mockTauri(page, { hiddenTabs: ["gitlab"], knownTabs: ["tasks", "notes", "clipboard", "agenda", "github", "gitlab"] });
   await page.goto("/");
-  for (const tab of ["Clima", "Hábitos", "Mercado", "Snippets", "Leituras"]) {
+  for (const tab of ["Hábitos", "Mercado", "Snippets"]) {
     await expect(page.getByRole("tab", { name: tab, exact: true })).toHaveCount(0);
   }
 });

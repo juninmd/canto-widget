@@ -5,8 +5,10 @@ import { focus } from "./focus";
 import { health } from "./health";
 import { integrations } from "./integrations";
 import { models } from "./models";
+import { reads } from "./reads";
 import { protos } from "./protos";
 import { steam } from "./steam";
 import { tasks } from "./tasks";
+import { weather } from "./weather";
 
-export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos };
+export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads };

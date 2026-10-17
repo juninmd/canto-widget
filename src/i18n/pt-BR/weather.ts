@@ -1,0 +1,31 @@
+// A área do clima: o rótulo da aba mora aqui, e não no app.ts, para não deslocar as chaves já traduzidas
+// nos catálogos gerados (scripts/expand-languages.py divide por ordem).
+export const weather = {
+  "weather.tab": "Clima",
+  "weather.loading": "consultando o clima",
+  "weather.ask.title": "Escolher a cidade",
+  "weather.ask.hint":
+    "Escreva o nome da cidade. O Canto busca as coordenadas na Open-Meteo, que é aberta e não pede chave, e guarda só isso — nenhum endereço seu sai daqui.",
+  "weather.city.label": "Cidade",
+  "weather.city.placeholder": "ex.: São Paulo",
+  "weather.search": "buscar",
+  "weather.searching": "buscando a cidade",
+  "weather.change": "trocar de cidade",
+  "weather.forget": "esquecer a cidade",
+  "weather.refresh": "atualizar",
+  "weather.refreshTitle": "a previsão é buscada no máximo uma vez a cada 30 min",
+  "weather.now": "agora",
+  "weather.feels": "sensação de {temp} °C",
+  "weather.hours": "próximas horas",
+  "weather.days": "próximos dias",
+  "weather.rainFrom": "chuva a partir das {time}",
+  "weather.rain": "{n}% de chuva",
+  "weather.clear": "céu limpo",
+  "weather.cloudy": "parcialmente nublado",
+  "weather.fog": "neblina",
+  "weather.drizzle": "garoa",
+  "weather.rainy": "chuva",
+  "weather.snow": "neve",
+  "weather.storm": "trovoada",
+  "weather.source": "dados: Open-Meteo",
+} as const;

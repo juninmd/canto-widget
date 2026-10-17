@@ -122,6 +122,27 @@ for (const density of ["compacta", "padrao"]) {
             ],
           },
           harness_list: agents,
+          weather_get: {
+            place: { city: "Aurora", country: "Brasil", lat: -23.5, lon: -46.6 },
+            forecast: {
+              now: { temp: 22.4, feels: 24.1, condition: "cloudy" },
+              hours: [
+                { at: "2026-10-17T10:00", temp: 22.4, rain: 10, condition: "cloudy" },
+                { at: "2026-10-17T11:00", temp: 25.2, rain: 70, condition: "rain" },
+              ],
+              days: [{ date: "2026-10-17", min: 16.4, max: 27, rain: 80, condition: "rain" }],
+              rain_from: "2026-10-17T11:00",
+            },
+            fetched_at: now,
+            error: null,
+          },
+          reads_get: {
+            feeds: [{ url: "https://blog.exemplo.test/feed", label: "Blog Exemplo", error: null }],
+            items: [
+              { id: "a1", title: "Como o cache do Cargo decide o que recompilar", url: "https://blog.exemplo.test/a1", host: "blog.exemplo.test", source: "Blog Exemplo", published_at: now - 7_200_000, summary: "Um resumo curto do texto.", unread: true, has_image: false },
+            ],
+            fetched_at: now,
+          },
         },
       });
       await page.goto("/");

@@ -1,0 +1,26 @@
+import type { reads as source } from "../pt-BR/reads";
+
+export const reads: Record<keyof typeof source, string> = {
+  "reads.tab": "Reads",
+  "reads.loading": "fetching the feeds",
+  "reads.header": "{unread} unread of {total}",
+  "reads.empty": "no feed yet",
+  "reads.emptyItems": "nothing to read in the feeds",
+  "reads.add.title": "Add a feed",
+  "reads.add.hint": "Paste the RSS or Atom address. Canto checks it before saving and keeps only the list of addresses.",
+  "reads.add.label": "Feed address",
+  "reads.add.placeholder": "https://example.com/feed.xml",
+  "reads.add.submit": "add",
+  "reads.add.working": "checking the feed",
+  "reads.refresh": "refresh",
+  "reads.refreshTitle": "feeds are fetched at most once every 15 min",
+  "reads.open": "open in the browser",
+  "reads.openTitle": "open {title} in the browser",
+  "reads.markRead": "mark as read",
+  "reads.markUnread": "mark as unread",
+  "reads.remove": "remove the feed",
+  "reads.removeTitle": "remove {label}",
+  "reads.minutes": "{n} min read",
+  "reads.feeds": "feeds",
+  "reads.source": "RSS and Atom, keyless",
+};

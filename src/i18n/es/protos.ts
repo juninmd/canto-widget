@@ -1,22 +1,11 @@
 import type { protos as source } from "../pt-BR/protos";
 
 export const protos: Record<keyof typeof source, string> = {
-  "protos.tab.weather": "Clima",
   "protos.tab.habits": "Hábitos",
   "protos.tab.market": "Mercado",
   "protos.tab.snippets": "Snippets",
-  "protos.tab.reads": "Lecturas",
   "protos.badge": "prototipo",
   "protos.needs": "lo que falta: {text}",
-  "protos.weather.now": "ahora",
-  "protos.weather.feels": "sensación de {temp} °C",
-  "protos.weather.clear": "cielo despejado",
-  "protos.weather.cloudy": "parcialmente nublado",
-  "protos.weather.rain": "lluvia",
-  "protos.weather.hours": "próximas horas",
-  "protos.weather.days": "próximos días",
-  "protos.weather.rainFrom": "lluvia desde las {time}",
-  "protos.weather.needs": "Open-Meteo, que es abierto y sin clave, más la ciudad guardada en la bóveda y una caché de 30 min",
   "protos.habits.today": "hoy",
   "protos.habits.streak": "{n} días seguidos",
   "protos.habits.best": "récord: {n}",
@@ -31,9 +20,4 @@ export const protos: Record<keyof typeof source, string> = {
   "protos.snippets.paste": "pegar en la app en foco",
   "protos.snippets.uses": "{n} usos",
   "protos.snippets.needs": "solo la bóveda; el atajo de pegar reutiliza la app en foco que la Actividad ya registra",
-  "protos.reads.unread": "{n} sin leer",
-  "protos.reads.minutes": "{n} min de lectura",
-  "protos.reads.open": "abrir en el navegador",
-  "protos.reads.markRead": "marcar como leído",
-  "protos.reads.needs": "RSS/Atom como en Status API, sin clave; la lista y lo \"leído\" viven en la bóveda",
 };
