@@ -58,7 +58,7 @@ Windows Hello volitelné.
 ⏰ **Už to nezmeškáte.** 1 minutu před schůzkou a v době připomenutí se widget objeví, přehraje zvuk a
 odešle upozornění s **odložením o 10 minut**.
 
-🪶 **Light.** Tauri v2 (Rust + webové zobrazení systému) místo Electronu: 3,5 MB instalační program.
+🪶 **Světlo.** Tauri v2 (Rust + webové zobrazení systému) namísto Electron: 3,5 MB instalační program.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Vždy aktuální.** Aktualizuje se z aplikace a instaluje pouze to, co je podepsáno vlastním klíčem projektu.
@@ -94,7 +94,7 @@ Dnešní události pocházejí z kalendáře Google (pouze pro čtení). Před m
 Každá karta zobrazuje odznak s vaší odpovědí (přijato, možná, odmítnuto, čeká). Kliknutím na událost zjistíte, kdo ji zorganizoval
 to, program, každý host s iniciálami avataru a jeho odpovědí a přílohami, jako jsou Blížence poznámky.
 V horním řádku je uveden **další volný slot** v délce alespoň 15 minut (odmítnuté pozvánky a celodenní akce ne
-počet) a události, které se překrývají, získají odznak **konflikt** s názvem druhé události. Zobrazení **Dnes** vede probíhající schůzkou (zbývající čas, tlačítko připojit se, varování před střetem) nebo další, poté **den v jednom řádku** (schůzky, úkoly a volný čas v rámci pracovní doby, s časem na schůzky, volný čas a konflikty) a jedna časová osa, kde jsou schůzky, úkoly s časem a volné mezery samy o sobě řadami: mezera nabízí, aby se vešla nečasovaná úloha.
+počet) a události, které se překrývají, získají odznak **konflikt** s názvem druhé události. Zobrazení **Dnes** vede probíhající schůzkou (zbývající čas, tlačítko připojit se, varování před střetem) nebo další, poté **den v jednom řádku** (schůzky, úkoly a volný čas v rámci pracovní doby, se započítáním času na schůzky, volný čas a konflikty) a jedna časová osa, kde jsou schůzky, úkoly s časem a volné mezery samy o sobě řadami: mezera nabízí, aby se vešla nečasovaná úloha.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -150,11 +150,12 @@ respektuje limit sazby. Přihlaste se pomocí osobního tokenu pouze pro čtení
 ### 🎮 Steam aniž byste opustili widget
 
 Čtyři podkarty pro Steam: **nabídky na přání** (největší sleva jako první, každá s tím, co ušetří), **nejprodávanější**
-hodnoceno, **hrát nyní** a **katalog seřazený podle hodnocení**. Každý řádek nese **obrázek kapsle**, **recenze
-skóre** s vlastním zněním Steam a počtem recenzí se počítá, přeškrtnutou cenou, cenou v realech a co
-sleva ušetří — a seznam sečte celkovou úsporu. Veřejné seznamy potřebují pouze vaše **SteamID64**; an
-volitelný **Steam Web API klíč** přidá pět nejnovějších her s jejich hracími časy. Karta se ve výchozím nastavení spustí,
-o jedno zaškrtávací políčko v Nastavení.
+hodnoceno, **hrát hned** (každá hra Steam hlásí za poslední dva týdny) a **katalog seřazený podle hodnocení**, stránkovaný
+s **načíst více**, aby se dostal do zbytku obchodu. Každý řádek nese **obrázek kapsle**, **skóre recenze**
+s vlastním zněním Steam a kolik recenzí se počítá, přeškrtnutá cena, cena v reálu a co
+sleva ušetří — a seznam sečte celkovou úsporu. Veřejné seznamy potřebují pouze vaše **SteamID64**; volitelný
+**Steam Web API klíč** přidává nejnovější hry s jejich hracími časy. Karta se ve výchozím nastavení spustí, o jedno zaškrtávací políčko
+v Nastavení.
 
 </td>
 </tr>
@@ -177,7 +178,7 @@ poslední dva týdny plus `.vtt`, `.srt`, `.txt` a `.md` přepisy z místní slo
 
 🤖 **Modely AI** (ve výchozím nastavení na liště karet, **žádný klíč nebo účet API**): LLM seřazené podle
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, přečteno z jeho veřejné stránky žebříčku,
-s ukazatelem skóre, tvůrcem, cenou za 1 milion tokenů a rychlostí, seřazenými podle inteligence, ceny nebo rychlosti. Načítá se v
+s ukazatelem skóre, tvůrcem, cenou za 1 milion tokenů a rychlostí, seřazenými podle inteligence, ceny nebo rychlosti. Vyzvedává se v
 většinou jednou za 3 hodiny a přihlášení 🔔 vás upozorní, když a
 model **vstoupí do top 10** nebo **vstoupí do ní** (kontrolováno každých 6 hodin, když je trezor odemčen),
 "nové" a "nahoru" odznaky na týden.
@@ -222,7 +223,7 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
 
-| Úkol s dílčími úkoly, prioritou a PR | Editor poznámek | Více typů schránek | Zabezpečení: automatické zamykání a odemykání |
+| Úkol s dílčími úkoly, prioritou a PR | Editor poznámek | Více typů schránky | Zabezpečení: automatické zamykání a odemykání |
 |---|---|---|---|
 | ![Checklist, priority and PR link on a task](docs/prints/app/23-tarefas-detalhes.png) | ![Note editor with a checklist and a highlighted SQL block](docs/prints/app/24-notas-markdown.png) | ![Clipboard recognizing link, color, json, e-mail and phone](docs/prints/app/25-clipboard-tipos.png) | ![Configurable auto-lock and a log of the latest unlocks](docs/prints/app/26-ajustes-seguranca.png) |
 
@@ -346,6 +347,10 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: katalog podle hodnocení, s "načíst více" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Jedno překryvné upozornění pro vše čekající: výpadky, schůzky, úkoly a nové modely umělé inteligence |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -368,7 +373,7 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|---|
 | ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda Today view: the meeting in progress with time left and a conflict warning, then the day in one line with meeting time, free time and conflicts](docs/prints/app/54-agenda-hoje.png) |
 
-| Zobrazení dne: překrývající se události sdílejí šířku vedle sebe |
+| Denní pohled: překrývající se události sdílejí šířku vedle sebe |
 |---|
 | ![Agenda timeline: meetings, a task with a time and the free gaps as rows, each gap offering to fit an untimed task](docs/prints/app/55-agenda-linha.png) |
 
@@ -394,7 +399,7 @@ nemůže nahlásit zaměřené okno, takže tam zůstane nedostupné). Vypnuto, 
 je zachováno a co nikdy není.
 
 - **Den**: kobliha podle kategorie s celkovým počtem uvnitř, jejíž legenda skrývá kategorii, změnu oproti dni
-před a dobu nečinnosti (bez klávesnice nebo myši po dobu 2 minut). Pod ním denní cíl zaměřený na kód s pruhem a
+před a po dobu nečinnosti (bez klávesnice nebo myši po dobu 2 minut). Pod ním denní cíl zaměřený na kód s pruhem a
 jedna tečka za den, tři zvýraznění (nejdelší úsek v jedné aplikaci, přepínání aplikací, špička), časová osa, kde
 den, nečinné úseky a nejvytíženější aplikace sdílejí jednu časovou osu se značkou „nyní“ a seznamem aplikací
 (klepnutím na jednu změníte její kategorii) nebo úkolů, na kterých časovač ostření běžel.
@@ -437,7 +442,7 @@ Stáhněte si instalační program pro vaši platformu z **[Releases](https://gi
 
 1. Při prvním spuštění vytvoříte **hlavní heslo**. Neexistuje žádná obnova: ztratit heslo, ztratit data.
 2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` v systému macOS) zobrazí a skryje widget.
-3. Hotovo. Když se dodá nová verze, Canto vás upozorní a **Nastavení → Aktualizace** se aktualizuje jedním kliknutím.
+3. Hotovo. Když se dodává nová verze, Canto vás upozorní a **Nastavení → Aktualizace** se aktualizuje jedním kliknutím.
 
 > [!POZNÁMKA]
 > Instalační programy ještě nejsou podepsané kódem: SmartScreen (Windows) a Gatekeeper (macOS) varují při prvním spuštění.
@@ -451,7 +456,7 @@ repozitáře: publikování je ruční rozhodnutí a akce správce.
 
 | Vrstva | Ochrana |
 |---|---|
-| Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, nový nikdy při každém zápisu, atomový zápis s `fsync` |
+| Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, nový zápis při každém zápisu, atomový zápis s `fsync` |
 | Klíč | Pouze RAM, vynulováno na zámku; konfigurovatelný automatický zámek (5 až 60 minut nečinnosti, 15 minut ve výchozím nastavení) |
 | Síť | pouze proces Rust mluví se sítí; webview nemá vzdálený původ (CSP) a nikdy nevidí tokeny |
 | Google | volitelné, pouze `calendar.events.readonly`, `directory.readonly` (fotografie kolegů z Workspace v seznamu hostů) plus profil, OAuth s PKCE a zpětnou smyčkou |

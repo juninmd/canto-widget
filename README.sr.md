@@ -150,11 +150,12 @@ Windows Hello опционо.
 ### 🎮 Steam без напуштања виџета
 
 Четири подкартице за Steam: **понуде на листи жеља** (прво највећи попуст, свака са оним што уштеди), **најпродаванији**
-рангирани, **играј одмах** и **каталог поређан по рејтингу**. Сваки ред носи **уметност капсуле**, **рецензију
-резултат** са сопственом формулацијом Steam и колико рецензија се рачуна, прецртаном ценом, ценом у реалу и шта
-попуст штеди — а листа сабира укупну уштеду. Јавним листама је потребан само ваш **SteamID64**; ан
-опциони **Steam Веб API тастер** додаје пет најновијих игара са њиховим временом играња. Картица подразумевано почиње,
-једно поље за потврду у подешавањима.
+рангиран, **играј одмах** (свака утакмица Steam извештава за последње две недеље) и **каталог поредан по оцени**, страница
+са **учитајте више** тако да стигне до остатка продавнице. Сваки ред носи **слика капсуле**, **оцену прегледа**
+са сопственом формулацијом Steam и колико рецензија се рачуна, прецртаном ценом, реалном ценом и
+попуст уштеде — и листа сабира укупну уштеду. Јавним листама је потребан само ваш **SteamID64**; опционо
+**Steam Веб API тастер** додаје недавне игре са њиховим временом играња. Картица подразумевано почиње са једним пољем за потврду
+у подешавањима.
 
 </td>
 </tr>
@@ -250,7 +251,7 @@ Windows Hello опционо.
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
-| Мини: мени режима се отвара унутар док прозора |
+| Мини: мени режима се отвара унутар прозора за пристајање |
 |---|
 | ![The mode menu in the dock window: Mini, Hidden, Normal and Maximized, fully visible beside the alert icons](docs/prints/app/67-modo-mini-menu.png) |
 
@@ -346,6 +347,10 @@ Windows Hello опционо.
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: каталог по оцени, са "учитај више" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Једно преклапање упозорења за све на чекању: прекиде, састанке, задатке и нове АИ моделе |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -439,7 +444,7 @@ Windows Hello опционо.
 2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` на мацОС-у) приказује и сакрива виџет.
 3. Готово. Када се нова верзија пошаље, Canto вас обавештава, а **Подешавања → Ажурирања** се ажурира једним кликом.
 
-> [!НОТЕ]
+> [!НАПОМЕНА]
 > Инсталациони програми још увек нису потписани кодом: СмартСцреен (Виндовс) и Гатекеепер (мацОС) упозоравају при првом покретању.
 > Аутоматско ажурирање се верификује према сопственом потпису пројекта пре покретања.
 

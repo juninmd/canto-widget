@@ -68,6 +68,10 @@ test("the Steam tab shows the deals with art, score, price and what they save", 
   await page.getByRole("tab", { name: "jogue agora" }).click();
   await expect(page.locator("[data-steam]").first()).toContainText("Forja Tática");
   await expect(page.locator("[data-steam]").first()).toContainText("2 h 15 min");
+  await page.getByRole("tab", { name: "catálogo" }).click();
+  await expect(page.getByRole("button", { name: "ver mais jogos" })).toBeVisible();
+  const catalog = (await calls(page)).filter((c) => c.cmd === "steam_catalog").at(-1);
+  expect(catalog?.args).toEqual({ term: "", page: 0, force: false });
 });
 
 test("an unconnected Steam tab asks for the SteamID and connects", async ({ page }) => {

@@ -58,7 +58,7 @@ Windows Hello optioneel.
 ⏰ **Je zult het niet missen.** 1 minuut vóór een vergadering en ter herinnering verschijnt de widget, speelt een geluid af en
 stuurt een melding, met **snooze 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + de systeemwebview) in plaats van Electron: een installatieprogramma van 3,5 MB.
+🪶 **Light.** Tauri v2 (Rust + de systeemwebweergave) in plaats van Electron: een installatieprogramma van 3,5 MB.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Altijd up-to-date.** Updates vanuit de app en installeert alleen wat is ondertekend door de eigen sleutel van het project.
@@ -134,7 +134,7 @@ gevoelig.
 
 ### 🐙 Uw GitHub in één oogopslag
 
-**Review gevraagd aan mij**, toegewezen aan mij, PRs en nummers die ik heb geopend, met een PR of nummerpictogram en wie de problemen heeft geopend
+**Beoordeling van mij aangevraagd**, toegewezen aan mij, PRs en nummers die ik heb geopend, met een PR of nummerpictogram en wie de problemen heeft geopend
 het. Concepten, PRs **wachten op uw beoordeling** en PRs **een week lang vastgelopen** vallen op, en elke PR heeft een kleine
 **CI-badge** (geslaagd, mislukt, actief of geen CI) van de controles van de hoofdcommit. Wanneer iemand **uw verzoekt
 review**, meldt een OS-melding (standaard ingeschakeld, schakel dit uit in Instellingen). Filter op tekst, `repo:` of `label:`, alleen PRs of alleen problemen, sorteer op update, creatie of commentaar, en
@@ -150,11 +150,12 @@ respecteert de tarieflimiet. Meld u aan met een alleen-lezen persoonlijk token o
 ### 🎮 Steam zonder de widget te verlaten
 
 Vier subtabbladen voor Steam: **verlanglijstaanbiedingen** (grootste korting eerst, elk met wat het bespaart), de **bestsellers**
-gerangschikt, **speel nu** en de **catalogus gerangschikt op beoordeling**. Elke rij bevat de **capsulekunst**, de **recensie
-score** met de eigen bewoording van Steam en hoeveel beoordelingen het telt, de doorgestreepte prijs, de prijs in reais en wat
-de korting bespaart – en de lijst telt de totale besparing op. De openbare lijsten hebben alleen uw **SteamID64** nodig; een
-optionele **Steam Web API sleutel** voegt de vijf meest recente games met hun speeltijden toe. Het tabblad begint standaard,
-één selectievakje verwijderd in Instellingen.
+gerangschikt, **speel nu** (elke game Steam rapporteert over de afgelopen twee weken) en de **catalogus geordend op beoordeling**, op pagina's
+met **laad meer** zodat het de rest van de winkel bereikt. Elke rij bevat de **capsulekunst**, de **beoordelingsscore**
+met de eigen bewoording van Steam en hoeveel beoordelingen het telt, de doorgestreepte prijs, de prijs in reais en wat de
+korting bespaart - en de lijst telt de totale besparing op. De openbare lijsten hebben alleen uw **SteamID64** nodig; een optioneel
+**Steam Web API sleutel** voegt de recente games met hun speeltijden toe. Het tabblad begint standaard, één selectievakje verderop
+in Instellingen.
 
 </td>
 </tr>
@@ -345,6 +346,10 @@ En **Volg-systeem**, dat samen met het besturingssysteem tussen licht en donker 
 | Steam: de topverkopers, genummerd | Steam: de laatste vijf gespeelde wedstrijden, met beide speeltijden |
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: de catalogus op beoordeling, met "laad meer" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Eén waarschuwingsoverlay voor alles wat in behandeling is: storingen, vergaderingen, taken en nieuwe AI-modellen |
 |---|

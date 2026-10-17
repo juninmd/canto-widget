@@ -150,11 +150,12 @@ tôn trọng giới hạn tỷ lệ. Đăng nhập bằng mã thông báo cá nh
 ### 🎮 Steam mà không cần rời khỏi tiện ích
 
 Bốn tab phụ dành cho Steam: **giao dịch trong danh sách yêu thích** (giảm giá lớn nhất trước, mỗi tab sẽ tiết kiệm được), **sản phẩm bán chạy nhất**
-được xếp hạng, **chơi ngay** và **danh mục được sắp xếp theo xếp hạng**. Mỗi hàng đều có **capsule art**, **review
-ghi điểm** bằng cách diễn đạt của chính Steam và số lượng bài đánh giá được tính, giá bị gạch bỏ, giá bằng reais và giá trị gì
-khoản giảm giá tiết kiệm được - và danh sách cộng tổng số tiền tiết kiệm được. Danh sách công khai chỉ cần **SteamID64** của bạn; một
-tùy chọn **Steam Phím API Web** thêm năm trò chơi gần đây nhất cùng với thời gian chơi của chúng. Tab bắt đầu theo mặc định,
-một hộp kiểm trong Cài đặt.
+được xếp hạng, **chơi ngay** (mọi trận đấu Steam báo cáo trong hai tuần qua) và **danh mục được sắp xếp theo xếp hạng**, được phân trang
+với **tải thêm** để nó đến được phần còn lại của cửa hàng. Mỗi hàng đều có **capsule art**, **điểm đánh giá**
+với cách diễn đạt của chính Steam và số lượng bài đánh giá được tính, giá bị gạch bỏ, giá bằng reais và giá trị
+giảm giá tiết kiệm - và danh sách cộng tổng số tiền tiết kiệm được. Danh sách công khai chỉ cần **SteamID64** của bạn; một tùy chọn
+**Steam Phím API trên web** thêm các trò chơi gần đây cùng với thời gian chơi của chúng. Tab bắt đầu theo mặc định, cách một hộp kiểm
+trong Cài đặt.
 
 </td>
 </tr>
@@ -207,7 +208,7 @@ hành động theo tên: chuyển đến tab, nhiệm vụ hoặc ghi chú mới
 </tr>
 </table>
 
-Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và tối cùng với hệ điều hành. Tất cả đều vượt qua độ tương phản AA.
+Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa ánh sáng và bóng tối cùng với hệ điều hành. Tất cả đều vượt qua độ tương phản AA.
 
 <details>
 <summary>🖥️ Nhiều màn hình hơn: triển khai, tìm kiếm toàn cầu, bảng lệnh, GitLab, nhiệm vụ phụ, trình chỉnh sửa ghi chú, bảo mật, đồng bộ hóa, mật độ và hơn thế nữa</summary>
@@ -346,6 +347,10 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: danh mục theo xếp hạng, có "tải thêm" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Một lớp phủ cảnh báo cho mọi thứ đang chờ xử lý: ngừng hoạt động, cuộc họp, nhiệm vụ và mô hình AI mới |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -400,7 +405,7 @@ ngày, các khoảng thời gian nhàn rỗi và các ứng dụng bận rộn n
 (chạm vào một mục để thay đổi danh mục của nó) hoặc các tác vụ mà bộ hẹn giờ lấy nét đã thực hiện.
 - **Tuần**: các cột xếp chồng lên nhau mỗi ngày với đường trung bình và dấu chấm bên dưới mỗi ngày đáp ứng mục tiêu, bản đồ nhiệt một giờ
 với đỉnh điểm của bạn và danh sách tương tự trong cả tuần.
-- **Bố cục và giao diện**: một cột trong cửa sổ mặc định, hai cột khi cửa sổ rộng (tối đa); mỗi làn da đều có một cái riêng
+- **Bố cục và giao diện**: một cột trong cửa sổ mặc định, hai cột khi cửa sổ rộng (tối đa hóa); mỗi làn da đều có một cái riêng
 màu sắc danh mục, kiểm tra độ tương phản. Menu bên cạnh ngày sao chép nó dưới dạng văn bản.
 
 <sub>Tất cả ảnh chụp màn hình đều sử dụng dữ liệu hư cấu.</sub>
@@ -451,9 +456,9 @@ kho lưu trữ: xuất bản là một quyết định và hành động thủ c
 
 | Lớp | Bảo vệ |
 |---|---|
-| Kho tiền | Argon2id (19 MiB, t=2) → AES-256-GCM, một phiên bản mới trên mỗi lần viết, viết nguyên tử với `fsync` |
+| Kho tiền | Argon2id (19 MiB, t=2) → AES-256-GCM, một điểm mới trên mỗi lần viết, viết nguyên tử với `fsync` |
 | Chìa khóa | Chỉ RAM, bằng 0 khi khóa; tự động khóa có thể định cấu hình (5 đến 60 phút không hoạt động, 15 phút theo mặc định) |
-| Mạng | chỉ có quá trình Rust giao tiếp với mạng; chế độ xem web không có Nguồn gốc từ xa (CSP) và không bao giờ thấy mã thông báo |
+| Mạng | chỉ tiến trình Rust mới kết nối với mạng; chế độ xem web không có Nguồn gốc từ xa (CSP) và không bao giờ thấy mã thông báo |
 | Google | tùy chọn, chỉ `calendar.events.readonly`, `directory.readonly` (ảnh của đồng nghiệp Workspace trong danh sách khách mời) cùng với hồ sơ, OAuth với PKCE và loopback |
 | GitHub | mã thông báo tùy chọn, được mã hóa; các mục chỉ mở nếu liên kết là `https://github.com/` |
 | GitLab | địa chỉ và mã thông báo tùy chọn, được mã hóa; Chỉ `https://`, không chuyển hướng, chỉ liên kết từ phiên bản đã định cấu hình |
@@ -467,7 +472,7 @@ Tìm thấy một lỗ hổng? [SECURITY.md](SECURITY.md).
 | Tài liệu | Có gì trong đó |
 |---|---|
 | 📖 [User guide](docs/uso.md) | tab, tác vụ định kỳ, phím tắt, giao diện, khả năng truy cập, cửa sổ, cập nhật và bắt đầu với hệ thống |
-| 🔌 [Integrations](docs/integracoes.md) | Google chương trình nghị sự và GitHub (mã thông báo cá nhân hoặc luồng thiết bị) |
+| 🔌 [Integrations](docs/integracoes.md) | Google chương trình làm việc và GitHub (mã thông báo cá nhân hoặc luồng thiết bị) |
 | 🛡️ [Security and data](docs/seguranca.md) | mô hình mối đe dọa, sao lưu `.canto`, hợp nhất, thay đổi mật khẩu, tập tin trên đĩa |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetBar, Gitify và kiểm tra âm lượng |
 | 📝 [CHANGELOG](CHANGELOG.md) | những gì đã thay đổi trong mỗi phiên bản |
@@ -476,7 +481,7 @@ Tìm thấy một lỗ hổng? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Phát triển
 
-Điều kiện tiên quyết: [Bun](https://bun.sh) ≥ 1,2, Rust ổn định ≥ 1,85 và
+Điều kiện tiên quyết: [Bun](https://bun.sh) ≥ 1,2, ổn định Rust ≥ 1,85 và
 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) cho hệ thống của bạn.
 
 ```bash

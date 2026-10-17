@@ -150,11 +150,12 @@ respecta el límit de tarifa. Inicieu la sessió amb un testimoni personal de no
 ### 🎮 Steam sense sortir del giny
 
 Quatre subpestanyes per a Steam: **ofertes de la llista de desitjos** (el descompte més gran primer, cadascuna amb el que estalvia), els **més venuts**
-classificat, **juga ara** i el **catàleg ordenat per puntuació**. Cada fila inclou l'**art de la càpsula**, la **revisió
-puntuació** amb la redacció pròpia de Steam i quantes ressenyes compta, el preu ratllat, el preu en reals i què
-el descompte estalvia, i la llista suma l'estalvi total. Les llistes públiques només necessiten el vostre **SteamID64**; un
-La clau opcional **Steam Web API** afegeix els cinc jocs més recents amb els seus temps de joc. La pestanya comença per defecte,
-una casella de selecció a Configuració.
+classificat, **juga ara** (cada joc que Steam informa durant les dues últimes setmanes) i el **catàleg ordenat per classificació**, paginat
+amb **carregar més** perquè arribi a la resta de la botiga. Cada fila inclou l'**art de la càpsula**, la **puntuació de la revisió**
+amb la redacció pròpia de Steam i quantes ressenyes compta, el preu ratllat, el preu en reals i quin és el
+estalvis de descompte, i la llista suma l'estalvi total. Les llistes públiques només necessiten el vostre **SteamID64**; una opcional
+La clau **Steam Web API** afegeix els jocs recents amb els seus temps de joc. La pestanya comença de manera predeterminada, a una casella de selecció
+a Configuració.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ I **Seguir el sistema**, que canvia entre clar i fosc juntament amb el sistema o
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: el catàleg per valoració, amb "carregar més" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Una sola superposició d'alerta per a tot el que està pendent: interrupcions, reunions, tasques i nous models d'IA |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -368,7 +373,7 @@ I **Seguir el sistema**, que canvia entre clar i fosc juntament amb el sistema o
 |---|---|
 | ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda Today view: the meeting in progress with time left and a conflict warning, then the day in one line with meeting time, free time and conflicts](docs/prints/app/54-agenda-hoje.png) |
 
-| Visualització diària: els esdeveniments superposats comparteixen l'amplada costat a costat |
+| Visualització diària: els esdeveniments superposats comparteixen l'amplada un al costat de l'altre |
 |---|
 | ![Agenda timeline: meetings, a task with a time and the free gaps as rows, each gap offering to fit an untimed task](docs/prints/app/55-agenda-linha.png) |
 
@@ -400,10 +405,10 @@ dia, els trams inactius i les aplicacions més ocupades comparteixen un eix temp
 (toqueu-ne una per canviar-ne la categoria) o de les tasques en què s'executava el temporitzador de focus.
 - **Setmana**: columnes apilades per dia amb la línia mitjana i un punt a sota de cada dia que compleix l'objectiu, un mapa de calor d'una hora
 amb el teu pic, i les mateixes llistes per a tota la setmana.
-- **Disposició i aspectes**: una columna a la finestra per defecte, dues un cop sigui ampla (maximitzada); cada pell té la seva
+- **Disposició i aspectes**: una columna a la finestra per defecte, dues un cop és ampla (maximitzada); cada pell té la seva
 colors de categoria, comprovats per contrast. El menú al costat del dia el copia com a text.
 
-<sub>Totes les captures de pantalla utilitzen dades fictícies.</sub>
+<sub>Totes les captures de pantalla utilitzen dades fictícias.</sub>
 
 ## ⚖️ En comparació amb el que hi ha fora
 

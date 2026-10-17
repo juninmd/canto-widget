@@ -94,4 +94,7 @@ test("steam: wishlist deals, the ranking and the recent games", async ({ browser
   await page.getByRole("tab", { name: "jogue agora" }).click();
   await settle(page, 900);
   await page.screenshot({ path: "docs/prints/app/89-steam-recentes.png", omitBackground: true });
+  await page.getByRole("tab", { name: "catálogo" }).click();
+  await settle(page, 900);
+  await page.screenshot({ path: "docs/prints/app/90-steam-catalogo.png", omitBackground: true });
 });

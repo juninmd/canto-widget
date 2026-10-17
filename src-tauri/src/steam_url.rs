@@ -69,11 +69,16 @@ pub fn trending_url() -> Url {
     store("/search/", &[("filter", "globaltopsellers")])
 }
 
-pub fn catalog_url(term: &str) -> Url {
+pub fn catalog_url(term: &str, page: usize) -> Url {
     let mut url = store("/search/", &[("sort_by", "Reviews_DESC")]);
-    if !term.trim().is_empty() {
-        url.query_pairs_mut().append_pair("term", term.trim());
+    let mut query = url.query_pairs_mut();
+    if page > 0 {
+        query.append_pair("start", &(page * crate::steam::CATALOG_PAGE).to_string());
     }
+    if !term.trim().is_empty() {
+        query.append_pair("term", term.trim());
+    }
+    drop(query);
     url
 }
 

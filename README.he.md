@@ -22,7 +22,7 @@
 <br>
 
 > **משימות עם תזכורות, הערות, היסטוריית לוח, סדר יום עם התראות פגישות, תמלילים וה-GitHub PRs שלך
-> בחלון קטן המוצמד לפינת המסך.** קופץ עם `Ctrl+Alt+Space`, מסתיר כשלא צריך
+> בחלון קטן המוצמד לפינת המסך.** צץ עם `Ctrl+Alt+Space`, מסתיר כשלא צריך
 > זה ושומר הכל מוצפן במחשב שלך, ללא חשבון וללא שרת.
 
 ## 🌐 שפות
@@ -150,11 +150,12 @@ JSON בפורמט או קומפקטי, טקסט בשורה אחת, באותיו�
 ### 🎮 Steam מבלי לעזוב את הווידג'ט
 
 ארבע כרטיסיות משנה עבור Steam: **עסקאות רשימת משאלות** (ההנחה הגדולה ביותר תחילה, כל אחת מהן מה שהיא חוסכת), **המוכרים הטובים ביותר**
-מדורג, **שחק עכשיו** ו**הקטלוג מסודר לפי דירוג**. כל שורה נושאת את **אמנות הקפסולה**, **הביקורת
-ציון** עם הניסוח של Steam עצמו וכמה ביקורות זה סופר, המחיר המרוחק, המחיר בריאיס ומה
-ההנחה חוסכת - והרשימה מצטברת את החיסכון הכולל. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; an
-אופציונלי **Steam מפתח אינטרנט API** מוסיף את חמשת המשחקים האחרונים עם זמני המשחק שלהם. הכרטיסייה מתחילה כברירת מחדל,
-במרחק תיבת סימון אחת בהגדרות.
+מדורג, **שחק עכשיו** (כל משחק Steam מדווח בשבועיים האחרונים) ו**הקטלוג מסודר לפי דירוג**, דפוף
+עם **טען עוד** כך שיגיע לשאר החנות. כל שורה נושאת את **אמנות הקפסולה**, **ציון הביקורת**
+עם הניסוח של Steam עצמו וכמה סקירות זה נחשב, המחיר המרוחק, המחיר בריאיס ומה
+חיסכון בהנחה - והרשימה מצטברת את החיסכון הכולל. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; אופציונלי
+**Steam מפתח אינטרנט API** מוסיף את המשחקים האחרונים עם זמני המשחק שלהם. הכרטיסייה מתחילה כברירת מחדל, במרחק תיבת סימון אחת
+בהגדרות.
 
 </td>
 </tr>
@@ -310,7 +311,7 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |
 
-| דוח שבועי | סדר היום: הזמן הפנוי הבא ועימותים |
+| דיווח שבועי | סדר היום: הזמן הפנוי הבא ועימותים |
 |---|---|
 | ![Weekly report in markdown: totals, one line per workday, tasks done, notes, meetings grouped by title and PRs/MRs](docs/prints/app/40-relatorio-semanal.png) | ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) |
 
@@ -345,6 +346,10 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 | Steam: המוכרים המובילים, ממוספרים | Steam: חמשת המשחקים האחרונים ששיחקו, עם שני זמני המשחק |
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: הקטלוג לפי דירוג, עם "טען עוד" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | שכבת התראה אחת לכל מה שממתין: הפסקות, פגישות, משימות ודגמי AI חדשים |
 |---|
@@ -440,18 +445,18 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 3. בוצע. כאשר גרסה חדשה נשלחת, Canto מודיע לך, ו-**הגדרות → עדכונים** מתעדכן בלחיצה אחת.
 
 > [!הערה]
-> המתקנים עדיין לא חתומים בקוד: SmartScreen (Windows) ו-Gatekeeper (macOS) מזהירים בעת ההשקה הראשונה.
+> המתקנים עדיין לא חתומים בקוד: SmartScreen (Windows) ו-gatekeeper (macOS) מזהירים בהפעלה הראשונה.
 > עדכונים אוטומטיים מאומתים מול החתימה של הפרויקט עצמו לפני ההפעלה.
 
 מניפסטים מוכנים עבור winget וה-Homebrew (בתוספת שלד עבור Flatpak, חסום כרגע) חיים ב
-[`packaging/`](packaging/README.md) - הוכן ומאומת באופן מקומי, אך עדיין לא פורסם לאלו
+[`packaging/`](packaging/README.md) - הוכן ומאומת באופן מקומי, אך עדיין לא פורסם לאלה
 מאגרים: פרסום הוא החלטה ופעולה ידנית של המתחזק.
 
 ## 🔒 אבטחה במבט חטוף
 
 | שכבה | הגנה |
 |---|---|
-| כספת | Argon2id (19 MiB, t=2) ← AES-256-GCM, נונס טרי בכל כתיבה, כתיבה אטומית עם `fsync` |
+| כספת | Argon2id (19 MiB, t=2) ← AES-256-GCM, נון טרי על כל כתיבה, כתיבה אטומית עם `fsync` |
 | מפתח | זיכרון RAM בלבד, מאופס בנעילה; נעילה אוטומטית הניתנת להגדרה (5 עד 60 דקות סרק, 15 דקות כברירת מחדל) |
 | רשת | רק תהליך Rust מדבר עם הרשת; לתצוגת האינטרנט אין מקור מרוחק (CSP) ולעולם לא רואים אסימונים |
 | Google | אופציונלי, רק `calendar.events.readonly`, `directory.readonly` (תמונות של עמיתים לעבודה ברשימת האורחים) בתוספת פרופיל, OAuth עם PKCE ו-loopback |

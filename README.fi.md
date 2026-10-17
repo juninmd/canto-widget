@@ -34,7 +34,7 @@ Arabia, heprea ja persia käyttävät tekstiä oikealta vasemmalle. Lisää kiel
 40 uutta käyttöliittymäluetteloa ja 31 uutta README-käännöstä ovat konekäännöksiä, eivätkä ole olleet niitä
 äidinkielenään puhuvien arvioima. Portugali ja englanti pysyvät alkuperäisinä käyttöliittymäluetteloina. Lokeron etiketit ja
 ilmoitusotsikot seuraavat valittua kieltä; jotkin integraatiovaroitustiedot ovat englanninkielisiä,
-ja backend-virheet pysyvät portugaliksi. Tehtävän otsikon syntaksi säilyttää olemassa olevat portugali- ja englanninkieliset avainsanat.
+ja taustavirheet pysyvät portugaliksi. Tehtävän otsikon syntaksi säilyttää olemassa olevat portugali- ja englanninkieliset avainsanat.
 
 ![Searchable language picker](docs/prints/languages-picker.png)
 ![Arabic interface with right-to-left text](docs/prints/languages-ar.png)
@@ -58,7 +58,7 @@ Windows Hello valinnainen.
 ⏰ **Et jää paitsi.** 1 minuutti ennen kokousta ja muistutuksen aikaan widget ponnahtaa esiin, toistaa äänen ja
 lähettää ilmoituksen, jossa on **torkku 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + järjestelmän verkkonäkymä) Electronin sijaan: 3,5 Mt:n asennusohjelma.
+🪶 **Kevyt.** Tauri v2 (Rust + järjestelmän verkkonäkymä) Electron:n sijaan: 3,5 Mt:n asennusohjelma.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Aina ajan tasalla.** Päivittyy sovelluksesta ja asentaa vain sen, mikä on allekirjoitettu projektin omalla avaimella.
@@ -109,7 +109,7 @@ Haettavat kortit, joissa on `#tags`, kiinnitys ylös ja yhden napsautuksen tunni
 muotoilupalkki (lihavoitu, kursivoitu, koodi, otsikko, luettelot, tarkistuslistat, jotka valitset suoraan tekstissä, koodilohkot syntaksilla
 korostus, linkit, kuvat) ja merkintöjen pikakuvakkeet kirjoittaessasi (`# `, `- `, `[ ] `, ` ``` `); **MD**-kytkin
 näyttää raaka-arvon, joka on edelleen tapa, jolla muistiinpanot tallennetaan, haetaan, synkronoidaan ja viedään. Linkit avautuvat
-`Ctrl`+napsautus, vain http(t). Liitä, pudota tai liitä kuvia (PNG, JPEG, GIF, WebP enintään 2 Mt), kukin omiin sinetöityihinsä
+`Ctrl`+napsautus, vain http(t). Liitä, pudota tai liitä kuvia (PNG, JPEG, GIF, WebP enintään 2 Mt), kukin sinetöitynä
 salattu tiedosto, joka näkyy muistiinpanon sisällä ja pikkukuvina kortilla; he pysyvät tällä koneella kohteen `.canto` ulkopuolella
 varmuuskopiot. Käsittelee tuhansia muistiinpanoja: luettelo on sivuttu ja haku kattaa ne kaikki.
 
@@ -150,11 +150,12 @@ noudattaa hintarajaa. Kirjaudu sisään vain luku -tilassa olevalla henkilökoht
 ### 🎮 Steam poistumatta widgetistä
 
 Neljä alavälilehteä kohteelle Steam: **toivelistatarjoukset** (suurin alennus ensin, jokainen säästöineen), **myydyimmät**
-rankattu, **pelaa nyt** ja **katalogi luokituksen mukaan**. Jokaisella rivillä on **kapselitaide**, **arvostelu
-pisteet** Steam:n omalla sanamuodolla ja kuinka monta arvostelua se laskee, yliviivattu hinta, hinta realeina ja mitä
-alennus säästää — ja lista laskee yhteen kokonaissäästön. Julkiset luettelot tarvitsevat vain **SteamID64**; an
-valinnainen **Steam Web API -näppäin** lisää viisi viimeisintä peliä soittoaikoineen. Välilehti alkaa oletusarvoisesti,
-yhden valintaruudun päässä asetuksista.
+paremmuusjärjestykseen, **pelaa nyt** (jokainen peli Steam raportoi viimeisen kahden viikon ajalta) ja **katalogi luokituksen mukaan**, sivuttu
+**lataa lisää**, jotta se saavuttaa muun myymälän. Jokaisella rivillä on **kapselitaide**, **arvostelupiste**
+Steam:n omalla sanamuodolla ja kuinka monta arvostelua se laskee, yliviivattu hinta, hinta realeina ja mitä
+alennussäästöt — ja luettelo laskee yhteen kokonaissäästön. Julkiset luettelot tarvitsevat vain **SteamID64**; valinnainen
+**Steam Web API -näppäin** lisää viimeisimmät pelit niiden peliajoineen. Välilehti alkaa oletusarvoisesti yhden valintaruudun päässä
+Asetuksissa.
 
 </td>
 </tr>
@@ -172,7 +173,7 @@ OneDrive, synkronointi...), aloita järjestelmästä ja **Päivitykset**-osiosta
 </tr>
 </table>
 
-Siellä on myös 🎙️ **Kokoukset**, Agendan alavälilehti listan ja päivän vieressä: Kaksosten muistiinpanot ja transkriptit kohteesta
+Siinä on myös 🎙️ **Kokoukset**, Agendan alavälilehti List and Day:n vieressä: Kaksosten muistiinpanot ja transkriptit kohteesta
 viimeiset kaksi viikkoa sekä `.vtt`, `.srt`, `.txt` ja `.md` transkriptioita paikallisesta kansiosta, siivottu ja haettavissa.
 
 🤖 **AI-mallit** (oletusarvoisesti välilehtipalkissa, **ei API-avainta tai tiliä**): LLM:t, jotka on luokiteltu
@@ -314,7 +315,7 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|---|
 | ![Weekly report in markdown: totals, one line per workday, tasks done, notes, meetings grouped by title and PRs/MRs](docs/prints/app/40-relatorio-semanal.png) | ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) |
 
-| Esityslista: vapaa juuri nyt | Komentopaletti (`Ctrl+Shift+P`) |
+| Agenda: ilmainen juuri nyt | Komentopaletti (`Ctrl+Shift+P`) |
 |---|---|
 | ![Agenda saying "free now until 13:00" because the lunch invite was declined](docs/prints/app/34-agenda-livre-agora.png) | ![Command palette listing tabs, new task, global search, join the next meeting and skins, with their shortcuts](docs/prints/app/38-paleta-comandos.png) |
 
@@ -345,6 +346,10 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 | Steam: eniten myytyjä, numeroitu | Steam: viisi viimeistä pelattua peliä, molemmat peliajat |
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: luettelo luokituksen mukaan, "lataa lisää" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Yksi varoituspeitto kaikelle odottavalle: katkokset, kokoukset, tehtävät ja uudet tekoälymallit |
 |---|
@@ -394,13 +399,13 @@ ei voi ilmoittaa kohdistetusta ikkunasta, joten se ei ole käytettävissä siell
 säilytetään ja mitä ei koskaan säilytetä.
 
 - **Päivä**: donitsi luokittain, jonka sisällä on kokonaismäärä, jonka selite kätkee luokan, muutos päivästä
-ennen ja tyhjäkäyntiaika (ei näppäimistöä tai hiirtä 2 minuuttiin). Sen alapuolella on päivittäinen koodin keskittymistavoite sen sarjan ja
+ennen ja tyhjäkäyntiaika (ei näppäimistöä tai hiirtä 2 minuuttiin). Sen alapuolella päivittäinen koodin keskittymistavoite sen sarjan ja
 yksi piste päivässä, kolme kohokohtaa (yhden sovelluksen pisin jakso, sovelluskytkimet, huipputunti), aikajana, jossa koko
 päivä, tyhjäkäynti venyy ja vilkkaimmat sovellukset jakavat yhden aika-akselin "nyt"-merkin ja luettelon kanssa
 (napauta yhtä vaihtaaksesi sen luokkaa) tai tarkennusajastimen suorittamista tehtävistä.
 - **Viikko**: pinotut sarakkeet päivässä, joissa on keskiarvoviiva ja piste jokaisen tavoitteen saavuttaneen päivän alla, tunnin lämpökartta
 huippusi kanssa ja samat listat koko viikolle.
-- **Layout and skins**: yksi sarake oletusikkunassa, kaksi kun se on leveä (maksimoitu); jokaisella iholla on omansa
+- **Layout and skins**: yksi sarake oletusikkunassa, kaksi kun se on leveä (suurin); jokaisella iholla on omansa
 luokan värit, tarkastettu kontrastin suhteen. Päivän vieressä oleva valikko kopioi sen tekstinä.
 
 <sub>Kaikissa kuvakaappauksissa käytetään kuvitteellista dataa.</sub>
@@ -423,7 +428,7 @@ Mikään tutkituista työkaluista ei kata useampaa kuin kahta näistä rintamist
 <sub>✅ natiivi · ➖ osittainen, laajennuksen kautta tai valinnainen · — ei mitään · ? julkaisematon · n/a ei tallenna käyttäjätietoja</sub>
 
 Mitä vertailuarvo toi tänne: **aika juuri tehtävän otsikossa** (Todoist/TickTick), **torkkuhälytys**
-(TickTick) ja **leikepöytä, joka kunnioittaa salasanojen hallintaa** (CopyQ/Ditto).
+(TickTick) ja **leikepöytä, joka kunnioittaa salasananhallintaohjelmia** (CopyQ/Ditto).
 
 ## ⬇️ Asenna
 
@@ -451,9 +456,9 @@ arkistot: julkaiseminen on ylläpitäjän manuaalinen päätös ja toimenpide.
 
 | Kerros | Suojaus |
 |---|---|
-| Holvi | Argon2id (19 MiB, t=2) → AES-256-GCM, tuore nolla jokaisessa kirjoituksessa, atomikirjoitus `fsync` |
+| Holvi | Argon2id (19 MiB, t=2) → AES-256-GCM, tuore nonce jokaisessa kirjoituksessa, atomikirjoitus `fsync` |
 | Avain | Vain RAM, nollattu lukituksesta; konfiguroitavissa oleva automaattinen lukitus (5–60 minuuttia tyhjäkäynnillä, oletuksena 15 minuuttia) |
-| Verkko | vain Rust-prosessi puhuu verkon kanssa; verkkonäkymällä ei ole etälähdettä (CSP) eikä se koskaan näe tunnuksia |
+| Verkko | vain Rust-prosessi keskustelee verkon kanssa; verkkonäkymällä ei ole etälähdettä (CSP) eikä se koskaan näe tunnuksia |
 | Google | valinnainen, vain `calendar.events.readonly`, `directory.readonly` (Työtilan kollegoiden valokuvat vierasluettelossa) plus profiili, OAuth PKCE:lla ja silmukalla |
 | GitHub | valinnainen, salattu tunnus; kohteet avautuvat vain, jos linkki on `https://github.com/` |
 | GitLab | valinnainen, salattu osoite ja tunnus; `https://` vain, ei uudelleenohjauksia, linkit vain määritetystä ilmentymästä |
@@ -472,7 +477,7 @@ Löysitkö vian? [SECURITY.md](SECURITY.md).
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify ja äänenvoimakkuustestit |
 | 📝 [CHANGELOG](CHANGELOG.md) | mikä muuttui kussakin versiossa |
 | 🤝 [How to contribute](CONTRIBUTING.md) | ympäristö, testit, PRs ja julkaisun julkaiseminen |
-| 🤖 [Agent guide](AGENTS.md) | sopimuksia ja ansoja kaikille, jotka muokkaavat koodia tekoälyn avulla |
+| 🤖 [Agent guide](AGENTS.md) | sopimuksia ja ansoja kaikille, jotka muokkaavat koodia AI:lla |
 
 ## 🛠️ Kehitys
 
@@ -497,4 +502,4 @@ hanki SemVer-tunniste, luodut julkaisutiedot ja allekirjoitetut asennusohjelmat,
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Made with 🦀 Rust, ⚛️ React ja ☕ niille, jotka elävät kokousten välillä.</sub></div>
+<div align="center"><sub>Valmistettu: 🦀 Rust, ⚛️ React ja ☕ niille, jotka elävät kokousten välillä.</sub></div>

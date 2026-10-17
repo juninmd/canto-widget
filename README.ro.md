@@ -28,11 +28,11 @@
 ## 🌐 Limbi
 
 Canto oferă **42 de limbi de interfață**, fiecare cu propriul README. Alegeți-l pe **Setări → Limbă**;
-selectorul care poate fi căutat folosește nume de limbi materne, iar modul automat urmează limba principală a sistemului.
+selectorul de căutare folosește nume de limbi materne, iar modul automat urmează limba principală a sistemului.
 Arabă, ebraică și persană folosesc text de la dreapta la stânga. Cataloage de limbi suplimentare se încarcă la cerere.
 
 Cele 40 de cataloage noi de interfață și 31 de noi traduceri README sunt traduceri automate și nu au fost
-revizuit de vorbitori nativi. Portugheza și engleza rămân cataloagele originale de interfață. etichete pentru tavi si
+revizuit de vorbitori nativi. Portugheză și engleză rămân cataloagele originale de interfață. etichete pentru tavi si
 titlurile de notificare urmează limba selectată; unele detalii de alertă de integrare revin în limba engleză,
 iar erorile de backend rămân în portugheză. Sintaxa titlului sarcinii păstrează cuvintele cheie existente în portugheză și engleză.
 
@@ -92,7 +92,7 @@ Alăturați-vă următoarei întâlniri cu `Ctrl+Alt+M` (`Ctrl+Cmd+M` pe macOS).
 Evenimentele de astăzi provin din Google Calendar (numai în citire). Cu un minut înainte, widget-ul sare pe ecran cu
 **alăturați-vă Meet**, redă un sunet și trimite o notificare de sistem, indiferent de fila în care vă aflați sau chiar dacă este ascunsă.
 Fiecare card prezintă o insignă cu răspunsul dvs. (acceptat, poate, refuzat, în așteptare). Faceți clic pe eveniment pentru a vedea cine a organizat
-aceasta, agenda, fiecare invitat cu un avatar cu inițialele și răspunsul lor și atașamente, cum ar fi notele Gemeni.
+acesta, agenda, fiecare invitat cu un avatar cu inițialele și răspunsul lor și atașamente, cum ar fi notele Gemeni.
 Linia de sus vă arată **următorul slot gratuit** de cel puțin 15 minute (invitațiile refuzate și evenimentele de toată ziua nu
 numără), iar evenimentele care se suprapun primesc o insignă **conflict** care denumește celălalt eveniment. Vizualizarea **Azi** conduce cu întâlnirea în desfășurare (timp rămas, butonul de alăturare, avertisment de ciocnire) sau următoarea, apoi **ziua într-o singură linie** (întâlniri, sarcini și timp liber pe parcursul orelor de lucru, cu timpul de întâlnire, timpul liber și conflictele luate în considerare) și o cronologie în care întâlnirile, sarcinile cu un timp și golurile libere sunt rânduri proprii, se potrivesc cu o sarcină deja depășită: departe.
 
@@ -121,7 +121,7 @@ copii de rezervă. Gestionează mii de note: lista este paginată și căutarea 
 ### 📋 Clipboard care nu uită niciodată (sau scurge)
 
 Istoric criptat cu căutare și PIN; recunoaște legăturile, culorile și codul. Treceți cu mouse-ul pe un articol pentru a-l **copiați rescris**:
-Format JSON sau compact, text pe o singură linie, MAJUSCULE sau minuscule (intrarea din istoric rămâne așa cum era). O copie uriașă (un jurnal de 100 MB) nu
+Format JSON sau compact, text pe o singură linie, MAJUSCULE sau minuscule (intrarea istoricului rămâne așa cum era). O copie uriașă (un jurnal de 100 MB) nu
 îngheață orice: păstrează startul și te avertizează. Pe Windows, omite orice marca managerii de parole ca
 sensibile.
 
@@ -150,11 +150,12 @@ respectă limita de rată. Conectați-vă cu un token personal numai pentru citi
 ### 🎮 Steam fără a părăsi widget-ul
 
 Patru sub-file pentru Steam: **oferte pe lista de dorințe** (cea mai mare reducere mai întâi, fiecare cu ceea ce economisește), **cele mai vândute**
-clasat, **jocați acum** și **catalogul ordonat după rating**. Fiecare rând conține **capsule art**, **recenzia
-scor** cu formularea proprie a lui Steam și câte recenzii contează, prețul tăiat, prețul în reali și ce
-reducerea economisește — iar lista adună economiile totale. Listele publice au nevoie doar de **SteamID64**; an
-opțional **Steam Web API tasta** adaugă cele mai recente cinci jocuri cu timpul lor de joacă. Fila începe implicit,
-la o casetă de selectare distanță în Setări.
+clasat, **joacă acum** (fiecare joc Steam raportează pentru ultimele două săptămâni) și **catalog ordonat după evaluare**, paginat
+cu **incarca mai mult** ca sa ajunga in restul magazinului. Fiecare rând conține **capsule art**, **score review**
+cu formularea propriei Steam și câte recenzii contează, prețul tăiat, prețul în reali și cât
+economii cu reducere — iar lista adună economiile totale. Listele publice au nevoie doar de **SteamID64**; un optional
+Tasta **Steam Web API** adaugă jocurile recente cu timpul lor de joacă. Fila începe în mod implicit, la o casetă de selectare distanță
+în Setări.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ acțiune după nume: accesați o filă, o nouă sarcină sau o notă, alăturaț
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: catalogul după rating, cu „încărcați mai mult” |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | O singură suprapunere de alerte pentru tot ce este în așteptare: întreruperi, întâlniri, sarcini și noi modele AI |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -360,7 +365,7 @@ acțiune după nume: accesați o filă, o nouă sarcină sau o notă, alăturaț
 |---|
 | ![Agenda tab on tomorrow with the day stepper, the first meeting and the day in one line](docs/prints/app/75-agenda-dia.png) |
 
-| Sarcini: sarcina curentă cu cronometru și listă grupată | GitHub: banda rezumat deasupra listelor | GitLab: aceeași bandă, fără țigla CI |
+| Sarcini: sarcina curentă cu temporizator și listă grupată | GitHub: banda rezumat deasupra listelor | GitLab: aceeași bandă, fără țigla CI |
 |---|---|---|
 | ![Tasks tab with a card for the next task, its timer and estimate, and the list split into pending and done](docs/prints/app/72-tarefas-agora.png) | ![GitHub tab with reviews, my PRs, failed CI and my issues counted above the lists](docs/prints/app/73-github-resumo.png) | ![GitLab tab with the same summary strip, without CI](docs/prints/app/74-gitlab-resumo.png) |
 
@@ -393,14 +398,14 @@ aplicație focalizată în timp ce utilizați computerul, într-un fișier local
 nu pot raporta fereastra focalizată, așa că rămâne indisponibilă acolo). Dezactivați până când vă înscrieți și primul ecran spune ce
 se păstrează și ceea ce nu este niciodată.
 
-- **Ziua**: o gogoașă pe categorii cu totalul în interior, a cărei legendă ascunde o categorie, schimbarea față de zi
+- **Ziua**: o gogoașă pe categorie cu totalul în interior, a cărei legendă ascunde o categorie, schimbarea față de zi
 înainte și timpul de inactivitate (fără tastatură sau mouse timp de 2 minute). Dedesubt, un obiectiv zilnic de concentrare a codului cu seria sa și
 un punct pe zi, trei momente evidențiate (cea mai lungă întindere într-o aplicație, comutatoare de aplicație, oră de vârf), o cronologie în care întregul
 Ziua inactivă se întinde și cele mai aglomerate aplicații au o singură axă de timp cu un marcator „acum” și o listă de aplicații
 (atingeți unul pentru a-i schimba categoria) sau a sarcinilor pe care a rulat cronometrul de focalizare.
 - **Săptămâna**: coloane stivuite pe zi, cu linia medie și un punct sub fiecare zi care a îndeplinit obiectivul, o hartă termică de oră
 cu vârful tău și aceleași liste pentru întreaga săptămână.
-- **Layout și skinuri**: o coloană în fereastra implicită, două odată ce este lată (maximizat); fiecare piele are a ei
+- **Layout și skinuri**: o coloană în fereastra implicită, două odată ce este lată (maximizată); fiecare piele are a ei
 culori de categorie, verificate pentru contrast. Meniul de lângă zi îl copiază ca text.
 
 <sub>Toate capturile de ecran folosesc date fictive.</sub>
@@ -422,7 +427,7 @@ Niciunul dintre instrumentele cercetate nu acoperă mai mult de două dintre ace
 
 <sub>✅ nativ · ➖ parțial, prin extensie sau opțional · — niciunul · ? nepublicat · n/a nu stochează datele utilizatorului</sub>
 
-Ce a adus reperul aici: **ora chiar în titlul sarcinii** (Todoist/TickTick), **amâna alerta**
+Ce a adus reperul aici: **time chiar în titlul sarcinii** (Todoist/TickTick), **amâna alerta**
 (TickTick) și **clipboard care respectă managerii de parole** (CopyQ/Ditto).
 
 ## ⬇️ Instalează
@@ -435,7 +440,7 @@ Descărcați programul de instalare pentru platforma dvs. de pe **[Releases](htt
 | 🍎 macOS | `.dmg` pentru Apple Silicon sau Intel |
 | 🐧 Linux | `.AppImage`, `.deb` sau `.rpm` |
 
-1. La prima rulare creați **parola principală**. Nu există recuperare: pierdeți parola, pierdeți datele.
+1. La prima rulare, creați **parola principală**. Nu există recuperare: pierdeți parola, pierdeți datele.
 2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` pe macOS) afișează și ascunde widgetul.
 3. Gata. Când se livrează o nouă versiune, Canto vă anunță, iar **Setări → Actualizări** se actualizează cu un singur clic.
 
@@ -451,9 +456,9 @@ depozite: publicarea este o decizie și o acțiune manuală a întreținătorulu
 
 | Strat | Protecție |
 |---|---|
-| Seif | Argon2id (19 MiB, t=2) → AES-256-GCM, un nonce nou la fiecare scriere, scriere atomică cu `fsync` |
+| Seif | Argon2id (19 MiB, t=2) → AES-256-GCM, un nonce proaspăt la fiecare scriere, scriere atomică cu `fsync` |
 | Cheie | Numai RAM, zero la blocare; blocare automată configurabilă (5 până la 60 de minute inactiv, 15 minute în mod implicit) |
-| Rețea | doar procesul Rust vorbește cu rețeaua; vizualizarea web nu are origine la distanță (CSP) și nu vede niciodată simboluri |
+| Rețea | numai procesul Rust vorbește cu rețeaua; vizualizarea web nu are origine la distanță (CSP) și nu vede niciodată simboluri |
 | Google | opțional, numai `calendar.events.readonly`, `directory.readonly` (fotografiile colegilor din spațiul de lucru în lista de invitați) plus profil, OAuth cu PKCE și loopback |
 | GitHub | jeton opțional, criptat; articolele se deschid numai dacă linkul este `https://github.com/` |
 | GitLab | adresa opțională și token criptată; Numai `https://`, fără redirecționări, linkuri numai din instanța configurată |

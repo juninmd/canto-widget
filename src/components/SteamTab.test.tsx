@@ -8,11 +8,24 @@ let status: SteamStatus;
 let deals: SteamList;
 let trending: SteamList;
 let catalog: SteamList;
+let moreCatalog: SteamList;
 let recent: SteamRecent;
 let fail = "";
 let failStatus = "";
 
 const CAPSULE = "data:image/png;base64,iVBORw0KGgo=";
+
+// happy-dom ships an IntersectionObserver that never fires, so the lazy thumbnail would never load.
+globalThis.IntersectionObserver = class {
+  private cb: (entries: { isIntersecting: boolean }[]) => void;
+  constructor(cb: (entries: { isIntersecting: boolean }[]) => void) {
+    this.cb = cb;
+  }
+  observe() {
+    this.cb([{ isIntersecting: true }]);
+  }
+  disconnect() {}
+} as unknown as typeof IntersectionObserver;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
@@ -32,7 +45,7 @@ mock.module("@tauri-apps/api/core", () => ({
       case "steam_trending":
         return Promise.resolve(trending);
       case "steam_catalog":
-        return Promise.resolve(catalog);
+        return Promise.resolve(Number(args.page ?? 0) === 0 ? catalog : moreCatalog);
       case "steam_recent":
         return Promise.resolve(recent);
       default:
@@ -98,8 +111,9 @@ beforeEach(() => {
   };
   catalog = {
     items: [game(413150, "Stardew Valley", "R$24,99", { review: 98, review_key: "overwhelmingly_positive", review_count: 1 })],
-    has_more: false,
+    has_more: true,
   };
+  moreCatalog = { items: [game(620, "Portal 2", "R$33,99", { review: 89, review_key: "very_positive", review_count: 3854 })], has_more: false };
   recent = {
     items: [
       {
@@ -182,13 +196,26 @@ test("jogue agora explains the missing key, and with a key it lists both playtim
 test("o catálogo searches with the term that was typed", async () => {
   await show();
   await click(screen.getByRole("tab", { name: "catálogo" }));
-  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([{ term: "", force: false }]);
+  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([{ term: "", page: 0, force: false }]);
   fireEvent.change(screen.getByTestId("steam-search"), { target: { value: "portal" } });
   await click(screen.getByRole("button", { name: "buscar no catálogo" }));
   expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
-    { term: "", force: false },
-    { term: "portal", force: false },
+    { term: "", page: 0, force: false },
+    { term: "portal", page: 0, force: false },
   ]);
+});
+
+test("o catálogo pages through the rest of the store and appends what comes", async () => {
+  await show();
+  await click(screen.getByRole("tab", { name: "catálogo" }));
+  expect(rows()).toEqual(["413150"]);
+  await click(screen.getByRole("button", { name: "ver mais jogos" }));
+  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
+    { term: "", page: 0, force: false },
+    { term: "", page: 1, force: false },
+  ]);
+  expect(rows()).toEqual(["413150", "620"]);
+  expect(screen.queryByRole("button", { name: "ver mais jogos" })).toBeNull();
 });
 
 test("atualizar asks Rust to force the fetch and clicking the row opens the store", async () => {

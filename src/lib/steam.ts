@@ -1,5 +1,6 @@
 /** Steam helpers that don't need the network: the store link, a readable playtime and the money. */
 import { LOCALE, type MessageKey } from "../i18n";
+import type { SteamRow } from "./api";
 
 /** Where a row opens: the store page of the game. */
 export function steamUrl(appid: number): string {
@@ -46,6 +47,12 @@ const REVIEW_KEYS: Record<string, MessageKey> = {
 /** The message that names Steam's bucket, or null when the store gave no bucket. */
 export function reviewLabelKey(bucket: string): MessageKey | null {
   return REVIEW_KEYS[bucket] ?? null;
+}
+
+/** Appends a page, dropping what the store already listed (a row can repeat between pages). */
+export function mergeGames(current: SteamRow[], next: SteamRow[]): SteamRow[] {
+  const seen = new Set(current.map((row) => row.appid));
+  return [...current, ...next.filter((row) => !seen.has(row.appid))];
 }
 
 /** Counts as the reader's language writes them ("12.345"). */

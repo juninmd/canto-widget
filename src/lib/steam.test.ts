@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { brl, count, playtime, reviewLabelKey, reviewTone, steamUrl } from "./steam";
+import { brl, count, mergeGames, playtime, reviewLabelKey, reviewTone, steamUrl } from "./steam";
+import type { SteamRow } from "./api";
 
 test("a row opens the store page of its app", () => {
   expect(steamUrl(620)).toBe("https://store.steampowered.com/app/620/");
@@ -63,4 +64,12 @@ test("a review count is grouped the way the language writes numbers", () => {
   expect(count(12345)).toBe("12.345");
   expect(count(1)).toBe("1");
   expect(count(-5)).toBe("0");
+});
+
+test("a new page is appended without repeating what is already listed", () => {
+  const row = (appid: number) => ({ appid }) as SteamRow;
+  const merged = mergeGames([row(1), row(2)], [row(2), row(3)]);
+  expect(merged.map((r) => r.appid)).toEqual([1, 2, 3]);
+  expect(mergeGames([], [row(9)]).map((r) => r.appid)).toEqual([9]);
+  expect(mergeGames([row(1)], [])).toHaveLength(1);
 });

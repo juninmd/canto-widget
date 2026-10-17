@@ -58,7 +58,7 @@ Windows Hello opcionális.
 ⏰ **Nem fogsz lemaradni.** 1 perccel a megbeszélés előtt és az emlékeztető idején a widget felugrik, lejátszik egy hangot és
 értesítést küld, **szundi 10 perc**.
 
-🪶 **Light.** Tauri v2 (Rust + a rendszer webnézete) Electron helyett: 3,5 MB-os telepítő.
+🪶 **Light.** Tauri v2 (Rust + a rendszer webnézete) a Electron helyett: 3,5 MB-os telepítő.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Mindig naprakész.** Az alkalmazáson belül frissít, és csak azt telepíti, amit a projekt saját kulcsa aláírt.
@@ -90,8 +90,8 @@ Csatlakozzon a következő megbeszéléshez a következővel: `Ctrl+Alt+M` (`Ctr
 `Ctrl+Alt+Shift+M` (`Ctrl+Cmd+Shift+M` macOS-en); a tálca menü elérhető marad, ha mindkettő nem elérhető.
 
 A mai események a Google Naptárból származnak (csak olvasható). Egy perccel azelőtt a widget a következővel ugrik a képernyőre
-**csatlakozik a Meet**-hoz, hangot ad le és rendszerértesítést küld, függetlenül attól, hogy melyik lapon van, vagy ha rejtve van.
-Minden kártyán egy jelvény látható a válaszoddal (elfogadva, esetleg, elutasítva, várakozva). Kattintson az eseményre, hogy megtudja, ki szervezte
+**csatlakozik a Meet**-hoz, hangot ad le, és rendszerértesítést küld, függetlenül attól, hogy melyik lapon van, vagy ha rejtve van.
+Minden kártyán egy jelvény látható a válaszoddal (elfogadva, esetleg, elutasítva, vár). Kattintson az eseményre, hogy megtudja, ki szervezte
 ez, a napirend, minden vendég kezdőbetűs avatarral és válaszukkal, valamint mellékletekkel, például Ikrek jegyzeteivel.
 A felső sorban a **következő ingyenes idő** legalább 15 perce látható (az elutasított meghívók és az egész napos események nem
 szám), és az egymást átfedő események **konfliktus** jelvényt kapnak a másik esemény megnevezésével. A **Ma** nézet a folyamatban lévő értekezletre (még hátralévő idő, csatlakozási gomb, összecsapásra figyelmeztetés) vagy a következőre vezet, majd **a nap egy sorban** (az értekezletek, feladatok és szabadidő a munkaidőn keresztül, az értekezletek, a szabadidő és a konfliktusok számlálásával) és egy idővonal, ahol az értekezletek, a feladatok egy időponttal és a szabad hézagok már sorakoznak a feladaton, hogy összeillessze a s ga istime.
@@ -150,11 +150,12 @@ tiszteletben tartja a díjszabást. Jelentkezzen be csak olvasható személyes t
 ### 🎮 Steam a widget elhagyása nélkül
 
 Négy allap a Steam számára: **kívánságlista-ajánlatok** (első a legnagyobb kedvezmény, mindegyik azzal, amit megtakarít), a **legkeresettebb**
-rangsorolt, **játék most** és a **katalógus értékelés szerint rendezve**. Minden sor tartalmazza a **kapszula rajzot**, a **áttekintést
-pontszám** Steam saját megfogalmazásával, és hogy hány vélemény számít, az áthúzott ár, az ár reálban és mi
-a kedvezmény megtakarít – és a lista összeadja a teljes megtakarítást. A nyilvános listákhoz csak a **SteamID64**; an
-opcionális **Steam Web API gomb** hozzáadja az öt legutóbbi játékot a játékidővel együtt. A lap alapértelmezés szerint elindul,
-egy jelölőnégyzet választja el a Beállításokban.
+rangsorolt, **játssz most** (minden játék Steam jelentése az elmúlt két hétről) és a **katalógus értékelés szerint rendezve**, lapozva
+a **tölts be többet**, hogy elérje az üzlet többi részét. Minden sor tartalmazza a **kapszula festményt**, a **áttekintési pontszámot**
+Steam saját megfogalmazásával, és hány véleményt számít, az áthúzott árral, reálban kifejezett árral és
+kedvezményes megtakarítások — és a lista összeadja a teljes megtakarítást. A nyilvános listákhoz csak a **SteamID64**; egy opcionális
+**Steam Web API kulcs** hozzáadja a legutóbbi játékokat a játékidővel együtt. A lap alapértelmezés szerint egy jelölőnégyzettől távolabb indul
+a Beállításokban.
 
 </td>
 </tr>
@@ -182,7 +183,7 @@ leggyakrabban 3 óránként, és az opt-in 🔔 értesíti Önt, ha a
 a modell **bekerül a legjobb 10-be** vagy **felmászik azon** (6 óránként ellenőrzik, amíg a páncélszekrény nincs zárolva),
 "új" és "feljebb" jelvények egy hétig.
 
-🌙 **Ne zavarjanak:** a Beállításokban vagy a tálcán elnémíthatja a megbeszélések figyelmeztetéseit, feladatemlékeztetőit, állapotfigyelmeztetéseit és minden
+🌙 **Ne zavarjanak:** a Beállításokban vagy a tálcán, elnémíthatja a megbeszélések figyelmeztetéseit, feladatemlékeztetőit, állapotfigyelmeztetéseit és minden
 rendszerértesítés 30 percig, 1 óráig, 2 óráig, holnapig vagy amíg ki nem kapcsolja. A felső sávban egy hold látható
 amikor véget ér; egy kattintás visszakapcsolja. Túlél egy újraindítást és magától véget ér.
 
@@ -346,6 +347,10 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: a katalógus értékelés szerint, a "tölts be többet" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Egyetlen riasztási fedvény minden függőben lévő dologhoz: leállások, értekezletek, feladatok és új AI-modellek |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -397,7 +402,7 @@ megtartják, és amit soha.
 előtt és az üresjárati idő (2 percig nincs billentyűzet vagy egér). Alatta napi kód-fókusz cél a sorozatával és
 napi egy pont, három kiemelés (leghosszabb szakasz egy alkalmazásban, alkalmazásváltások, csúcsidő), egy idővonal, ahol az egész
 nap, az üresjárat megnyúlik, és a legforgalmasabb alkalmazások egy időtengelyen osztoznak a "most" jelölővel és az alkalmazások listájával
-(koppintson az egyikre a kategória módosításához) vagy azon feladatok közül, amelyeken a fókuszidőzítő fut.
+(koppintson az egyikre a kategória módosításához), vagy azon feladatok közül, amelyeken a fókuszidőzítő fut.
 - **Hét**: halmozott oszlopok naponta az átlagos vonallal és egy ponttal minden nap alatt, amely elérte a célt, óra hőtérkép
 a csúcsoddal, és ugyanazokkal a listákkal egész hétre.
 - **Elrendezés és felületek**: egy oszlop az alapértelmezett ablakban, kettő, ha széles (maximális); minden bőrnek megvan a maga
@@ -420,7 +425,7 @@ A vizsgált eszközök egyike sem fed le egyszerre kettőnél több frontot. For
 | MeetingBar | — | — | — | ✅ | — | n/a |
 | Gitify | — | — | — | — | ✅ | n/a |
 
-<sub>✅ natív · ➖ részleges, bővítményen keresztül vagy opcionális · — nincs · ? közzé nem tett · n/a nem tárol felhasználói adatokat</sub>
+<sub>✅ natív · ➖ részleges, kiterjesztéssel vagy opcionális · — nincs · ? közzé nem tett · n/a nem tárol felhasználói adatokat</sub>
 
 Amit a benchmark hozott ide: **időpont a feladat címében** (Todoist/TickTick), **riasztás elhalasztása**
 (TickTick) és **vágólap, amely tiszteletben tartja a jelszókezelőket** (CopyQ/Ditto).
@@ -451,7 +456,7 @@ adattárak: a közzététel a fenntartó kézi döntése és tevékenysége.
 
 | Réteg | Védelem |
 |---|---|
-| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, minden írásnál friss, atomi írás `fsync` |
+| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, minden írásnál friss nonce, atomi írás `fsync` |
 | Kulcs | Csak RAM, zároláskor nullázva; konfigurálható automatikus zárolás (5–60 perc üresjárat, alapértelmezés szerint 15 perc) |
 | Hálózat | csak a Rust folyamat beszél a hálózattal; a webnézetnek nincs távoli eredete (CSP), és soha nem lát tokeneket |
 | Google | opcionális, csak `calendar.events.readonly`, `directory.readonly` (Munkaterületi kollégák fényképei a vendéglistában) plusz profil, OAuth PKCE és loopback |
@@ -497,4 +502,4 @@ kap egy SemVer címkét, generált kiadási megjegyzéseket és párhuzamosan é
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Készült: 🦀 Rust, ⚛️ React és ☕ azok számára, akik a találkozások között élnek.</sub></div>
+<div align="center"><sub>Készült: 🦀 Rust, ⚛️ React és ☕ azoknak, akik találkozások között élnek.</sub></div>

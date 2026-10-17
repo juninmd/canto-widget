@@ -436,8 +436,8 @@ export const api = {
   /** Wishlist deals, biggest discount first. */
   steamDeals: (force = false) => invoke<SteamList>("steam_deals", { force }),
   steamTrending: (force = false) => invoke<SteamList>("steam_trending", { force }),
-  /** Top rated games for `term` (empty = the whole store), reviews first. */
-  steamCatalog: (term: string, force = false) => invoke<SteamList>("steam_catalog", { term, force }),
+  /** Top rated games for `term` (empty = the whole store), reviews first; `page` starts at 0. */
+  steamCatalog: (term: string, page = 0, force = false) => invoke<SteamList>("steam_catalog", { term, page, force }),
   steamRecent: (force = false) => invoke<SteamRecent>("steam_recent", { force }),
   /** One capsule as a `data:` URL, cached in Rust; empty when Steam has no art for the app. */
   steamImage: (url: string) => invoke<string>("steam_image", { url }),

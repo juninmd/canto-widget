@@ -1,6 +1,31 @@
 use super::*;
 
 #[test]
+fn a_full_catalog_page_promises_more_and_a_short_one_ends_the_list() {
+    let row = |appid: u32| SteamRow {
+        appid,
+        name: format!("jogo {appid}"),
+        price: String::new(),
+        original: String::new(),
+        discount: 0,
+        review: None,
+        review_key: String::new(),
+        review_count: 0,
+        saved_cents: 0,
+        art: String::new(),
+    };
+    let full: Vec<SteamRow> = (0..steam::CATALOG_PAGE as u32).map(row).collect();
+    let page = paged(full.clone());
+    assert_eq!((page.items.len(), page.has_more), (steam::CATALOG_PAGE, true));
+
+    let mut short = full;
+    short.pop();
+    let last = paged(short);
+    assert_eq!((last.items.len(), last.has_more), (steam::CATALOG_PAGE - 1, false));
+    assert!(!paged(Vec::new()).has_more, "the store had nothing left");
+}
+
+#[test]
 fn a_recent_list_without_a_key_says_so_instead_of_calling_out() {
     let view = recent(&SteamConfig::default()).unwrap();
     assert!(!view.has_key);

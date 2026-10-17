@@ -22,7 +22,7 @@
 <br>
 
 > **Zadania z przypomnieniami, notatkami, historią schowka, planem zajęć z alertami o spotkaniach, transkrypcjami i Twoim GitHub PRs
-> w małym okienku przypiętym do rogu ekranu.** Wyskakuje z `Ctrl+Alt+Space`, chowa się, gdy nie potrzebujesz
+> w małym okienku przypiętym do rogu ekranu.** Pojawia się z `Ctrl+Alt+Space`, chowa się, gdy nie potrzebujesz
 > go i przechowuje wszystko zaszyfrowane na Twoim komputerze, bez konta i bez serwera.
 
 ## 🌐 Języki
@@ -58,7 +58,7 @@ Windows Hello opcjonalne.
 ⏰ **Nie przegapisz tego.** 1 minutę przed spotkaniem oraz w momencie przypomnienia widget wyskakuje, odtwarza dźwięk i
 wysyła powiadomienie z opcją **drzemka 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + przeglądanie systemu) zamiast Electron: instalator 3,5 MB.
+🪶 **Light.** Tauri v2 (Rust + widok sieciowy systemu) zamiast Electron: instalator 3,5 MB.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Zawsze aktualne.** Aktualizuje się z poziomu aplikacji i instaluje tylko to, co jest podpisane własnym kluczem projektu.
@@ -94,7 +94,7 @@ Dzisiejsze wydarzenia pochodzą z kalendarza Google (tylko do odczytu). Minutę 
 Na każdej karcie znajduje się plakietka z Twoją odpowiedzią (być może zaakceptowana, odrzucona, oczekująca). Kliknij wydarzenie, aby zobaczyć, kto był jego organizatorem
 to, porządek obrad, każdy gość z awatarem z inicjałami i odpowiedzią oraz załączniki, takie jak notatki Bliźniąt.
 Górna linia wskazuje **następny wolny termin** trwający co najmniej 15 minut (odrzucone zaproszenia i wydarzenia całodniowe nie
-count), a zdarzenia, które się pokrywają, otrzymują plakietkę **konfliktu** nazywającą drugie wydarzenie. Widok **Dzisiaj** prowadzi do spotkania w toku (pozostały czas, przycisk dołączenia, ostrzeżenie o kolizji) lub następnego, następnie **dzień w jednej linii** (spotkania, zadania i czas wolny w godzinach pracy, z policzonymi godzinami spotkań, czasem wolnym i konfliktami) i jedną osią czasu, na której spotkania, zadania z czasem i wolnymi przerwami są osobnymi rzędami: luka oferuje dopasowanie do zadania bez limitu czasu, a to, co już się skończyło, składa się.
+count), a zdarzenia, które się pokrywają, otrzymują plakietkę **konfliktu** nazywającą drugie wydarzenie. Widok **Dzisiaj** prowadzi do spotkania w toku (pozostały czas, przycisk dołączenia, ostrzeżenie o kolizji) lub następnego, następnie **dzień w jednej linii** (spotkania, zadania i czas wolny w godzinach pracy, z policzonymi godzinami spotkań, czasem wolnym i konfliktami) i jedną osią czasu, na której spotkania, zadania z czasem i wolne przerwy są odrębnymi rzędami: luka oferuje dopasowanie do zadania bez limitu czasu, a to, co już się skończyło, składa się.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -150,11 +150,12 @@ przestrzega limitu stawki. Zaloguj się za pomocą tokena osobistego tylko do od
 ### 🎮 Steam bez opuszczania widżetu
 
 Cztery podzakładki dla Steam: **oferty z listy życzeń** (najpierw największy rabat, każda z tym, co pozwala zaoszczędzić), **najlepiej sprzedające się**
-rankingowe, **zagraj teraz** i **katalog uporządkowany według ocen**. W każdym rzędzie znajduje się **sztuka kapsułki** i **recenzja
-wynik** z własnym sformułowaniem Steam i liczbą recenzji, które to liczy, ceną przekreśloną, ceną w realach i tym, co
-rabat oszczędza — a lista sumuje całkowitą oszczędność. Listy publiczne wymagają jedynie Twojego **SteamID64**; an
-opcjonalny **Steam Web API klucz** dodaje pięć najnowszych gier wraz z czasem ich odtwarzania. Zakładka domyślnie uruchamia się,
-jedno pole wyboru dalej w Ustawieniach.
+rankingowe, **zagraj teraz** (każda gra Steam raportuje z ostatnich dwóch tygodni) i **katalog uporządkowany według ocen**, strona
+z **załaduj więcej**, aby dotarło do reszty sklepu. W każdym rzędzie znajduje się **ilustracja kapsułki** i **wynik recenzji**
+z własnym sformułowaniem Steam i liczbą recenzji, które to liczy, ceną przekreśloną, ceną w realach i tym, co
+oszczędności rabatowe — a lista sumuje całkowitą oszczędność. Listy publiczne wymagają jedynie Twojego **SteamID64**; opcja
+**Steam Web API klucz** dodaje najnowsze gry wraz z czasem ich odtwarzania. Karta zaczyna się domyślnie, jedno pole wyboru dalej
+w Ustawieniach.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: katalog według ocen, z opcją „załaduj więcej” |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Jedna nakładka alertów dla wszystkich oczekujących informacji: awarie, spotkania, zadania i nowe modele AI |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -398,7 +403,7 @@ przed i czas bezczynności (bez klawiatury i myszy przez 2 minuty). Poniżej zna
 jedna kropka dziennie, trzy najważniejsze momenty (najdłuższy odcinek w jednej aplikacji, zmiany aplikacji, godziny szczytu), oś czasu, na której cała
 dziennie, bezczynne odcinki i najbardziej obciążone aplikacje mają wspólną oś czasu ze znacznikiem „teraz” i listą aplikacji
 (dotknij jednego, aby zmienić jego kategorię) lub zadań, na których działał licznik czasu skupienia.
-- **Tydzień**: ułożone kolumny dziennie ze średnią linią i kropką pod każdym dniem, w którym osiągnięto cel, godzinną mapę cieplną
+- **Tydzień**: ułożone kolumny dziennie ze średnią linią i kropką pod każdym dniem, w którym osiągnięto cel, godzinową mapę cieplną
 ze swoim szczytem i tymi samymi listami przez cały tydzień.
 - **Układ i skórki**: jedna kolumna w oknie domyślnym, dwie, gdy jest szerokie (zmaksymalizowane); każda skóra ma swoją własną
 kolory kategorii, sprawdzone pod kątem kontrastu. Menu obok dnia kopiuje go jako tekst.
@@ -443,7 +448,7 @@ Pobierz instalator dla swojej platformy z **[Releases](https://github.com/juninm
 > Instalatory nie są jeszcze podpisane kodem: SmartScreen (Windows) i Gatekeeper (macOS) ostrzegają przy pierwszym uruchomieniu.
 > Przed uruchomieniem automatyczne aktualizacje są weryfikowane na podstawie własnego podpisu projektu.
 
-Gotowe manifesty dla wingeta i Homebrew (plus szkielet dla Flatpaka, aktualnie zablokowany) są już gotowe
+Gotowe manifesty dla wingeta i Homebrew (plus szkielet dla Flatpaka, obecnie zablokowany) są już gotowe
 [`packaging/`](packaging/README.md) — przygotowane i zweryfikowane lokalnie, ale jeszcze tam nie opublikowane
 repozytoria: publikacja to ręczna decyzja i działanie opiekuna.
 
@@ -453,13 +458,13 @@ repozytoria: publikacja to ręczna decyzja i działanie opiekuna.
 |---|---|
 | Skarbiec | Argon2id (19 MiB, t=2) → AES-256-GCM, nowy jednorazowy zapis przy każdym zapisie, zapis atomowy z `fsync` |
 | Klucz | Tylko pamięć RAM, wyzerowana przy blokadzie; konfigurowalna automatyczna blokada (od 5 do 60 minut bezczynności, domyślnie 15 minut) |
-| Sieć | tylko proces Rusta komunikuje się z siecią; przeglądarka internetowa nie ma zdalnego źródła (CSP) i nigdy nie widzi tokenów |
+| Sieć | tylko proces Rust komunikuje się z siecią; widok sieciowy nie ma zdalnego źródła (CSP) i nigdy nie widzi tokenów |
 | Google | opcjonalnie, tylko `calendar.events.readonly`, `directory.readonly` (zdjęcia współpracowników Workspace na liście gości) plus profil, OAuth z PKCE i pętlą zwrotną |
 | GitHub | opcjonalny, szyfrowany token; elementy otwierają się tylko wtedy, gdy łącze to `https://github.com/` |
 | GitLab | opcjonalnie, szyfrowany adres i token; Tylko `https://`, brak przekierowań, linki tylko ze skonfigurowanej instancji |
 | Aktualizacje | instaluje tylko pakiet podpisany kluczem projektu; zmodyfikowane pobieranie jest odrzucane przed uruchomieniem |
 
-Pełny model, kopie zapasowe, łączenie między komputerami i miejsce przechowywania każdego pliku: [docs/seguranca.md](docs/seguranca.md).
+Pełny model, tworzenie kopii zapasowych, łączenie między maszynami i miejsce przechowywania każdego pliku: [docs/seguranca.md](docs/seguranca.md).
 Znalazłeś wadę? [SECURITY.md](SECURITY.md).
 
 ## 📚 Dokumentacja
@@ -471,7 +476,7 @@ Znalazłeś wadę? [SECURITY.md](SECURITY.md).
 | 🛡️ [Security and data](docs/seguranca.md) | model zagrożenia, kopia zapasowa `.canto`, scalanie, zmiana hasła, pliki na dysku |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify i testy wolumenowe |
 | 📝 [CHANGELOG](CHANGELOG.md) | co zmieniło się w każdej wersji |
-| 🤝 [How to contribute](CONTRIBUTING.md) | środowisko, testy, PRs i jak opublikować wydanie |
+| 🤝 [How to contribute](CONTRIBUTING.md) | środowisko, testy, PRs i sposób publikacji wydania |
 | 🤖 [Agent guide](AGENTS.md) | kontrakty i pułapki dla każdego, kto edytuje kod za pomocą AI |
 
 ## 🛠️Rozwój

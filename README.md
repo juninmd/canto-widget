@@ -149,11 +149,12 @@ respects the rate limit. Sign in with a read-only personal token or from the bro
 ### 🎮 Steam without leaving the widget
 
 Four sub-tabs for Steam: **wishlist deals** (biggest discount first, each with what it saves), the **top sellers**
-ranked, **play now** and the **catalog ordered by rating**. Every row carries the **capsule art**, the **review
-score** with Steam's own wording and how many reviews it counts, the crossed-out price, the price in reais and what
-the discount saves — and the list adds up the total saving. The public lists only need your **SteamID64**; an
-optional **Steam Web API key** adds the five most recent games with their playtimes. The tab starts off by default,
-one checkbox away in Settings.
+ranked, **play now** (every game Steam reports for the last two weeks) and the **catalog ordered by rating**, paged
+with **load more** so it reaches the rest of the store. Every row carries the **capsule art**, the **review score**
+with Steam's own wording and how many reviews it counts, the crossed-out price, the price in reais and what the
+discount saves — and the list adds up the total saving. The public lists only need your **SteamID64**; an optional
+**Steam Web API key** adds the recent games with their playtimes. The tab starts off by default, one checkbox away
+in Settings.
 
 </td>
 </tr>
@@ -344,6 +345,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Steam: the top sellers, numbered | Steam: the last five games played, with both playtimes |
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: the catalog by rating, with "load more" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | One alert overlay for everything pending: outages, meetings, tasks and new AI models |
 |---|

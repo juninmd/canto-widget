@@ -49,7 +49,7 @@ a pozadinske pogreške ostaju na portugalskom. Sintaksa naslova zadatka zadržav
 Ako živite između sastanaka, PRs i malih stavki na čekanju, završit ćete s pet otvorenih aplikacija. Canto stavlja sve
 jedno mjesto.
 
-🔒 **Šifrirano prema zadanim postavkama.** Argon2id + AES-256-GCM s glavnom lozinkom; ključ postoji samo u RAM-u.
+🔒 **Kriptirano prema zadanim postavkama.** Argon2id + AES-256-GCM s glavnom lozinkom; ključ postoji samo u RAM-u.
 Windows Hello izborno.
 
 🏠 **Vaši podaci ostaju s vama.** Bez telemetrije, bez poslužitelja, nije potreban račun. Sigurnosna kopija je jednostruko šifrirana
@@ -58,7 +58,7 @@ Windows Hello izborno.
 ⏰ **Nećete ga propustiti.** 1 minutu prije sastanka i u vrijeme podsjetnika, widget se pojavljuje, reproducira zvuk i
 šalje obavijest s **odgodi 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + web-prikaz sustava) umjesto Electrona: instalacijski program od 3,5 MB.
+🪶 **Lagano.** Tauri v2 (Rust + web-prikaz sustava) umjesto Electron: program za instalaciju od 3,5 MB.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Uvijek ažuran.** Ažurira se unutar aplikacije i instalira samo ono što je potpisano vlastitim ključem projekta.
@@ -108,7 +108,7 @@ broj), a događaji koji se preklapaju dobivaju značku **sukoba** koja imenuje d
 Kartice koje se mogu pretraživati s `#tags`, prikvači na vrh i filtar oznake jednim klikom; svaka kartica prikazuje početak **renderirane** bilješke (naslovi, popisi za provjeru, kod, poveznice), a ne sirovo označavanje. **WYSIWYG uređivač** s kompaktnim
 traka za oblikovanje (podebljano, kurziv, kod, naslov, popisi, popisi za provjeru koje označavate u tekstu, blokovi koda sa sintaksom
 isticanje, veze, slike) i prečaci za označavanje dok upisujete (`# `, `- `, `[ ] `, ` ``` `); **MD** prekidač
-prikazuje neobrađeno označavanje, što je i dalje način na koji se bilješke pohranjuju, pretražuju, sinkroniziraju i izvoze. Veze se otvaraju sa
+prikazuje neobrađeno označavanje, što je i dalje način na koji se bilješke pohranjuju, pretražuju, sinkroniziraju i izvoze. Linkovi se otvaraju sa
 `Ctrl`+klik, samo http(s). Zalijepite, ispustite ili priložite slike (PNG, JPEG, GIF, WebP do 2 MB), svaka zapečaćena u svom
 šifrirana datoteka, prikazana unutar bilješke i kao sličice na kartici; ostaju na ovom stroju, izvan `.canto`
 sigurnosne kopije. Obrađuje tisuće bilješki: popis je listan i pretraživanje ih pokriva sve.
@@ -150,11 +150,12 @@ poštuje ograničenje stope. Prijavite se s osobnim tokenom samo za čitanje ili
 ### 🎮 Steam bez napuštanja widgeta
 
 Četiri podkartice za Steam: **ponude s popisa želja** (najprije najveći popust, svaki s uštedom), **najprodavaniji**
-rangirani, **igraj sada** i **katalog poredan po ocjeni**. Svaki red nosi **capsule art**, **recenziju
-rezultat** s vlastitim tekstom Steam i koliko pregleda broji, prekriženom cijenom, cijenom u realima i što
-popust štedi — a popis zbraja ukupnu uštedu. Javni popisi trebaju samo vaše **SteamID64**; an
-izborni **Steam Web API ključ** dodaje pet najnovijih igara s njihovim vremenima igranja. Kartica počinje prema zadanim postavkama,
-jedan potvrdni okvir u Postavkama.
+rangiran, **igraj sada** (svaka igra Steam izvješća za posljednja dva tjedna) i **katalog poredan po ocjeni**, stranicama
+s **učitajte više** tako da stigne do ostatka trgovine. Svaki red nosi **capsule art**, **ocjenu recenzije**
+s vlastitim tekstom Steam i koliko pregleda broji, prekriženom cijenom, cijenom u realima i što
+popust štedi — a popis zbraja ukupnu uštedu. Javni popisi trebaju samo vaše **SteamID64**; izborno
+**Steam Tipka Web API** dodaje nedavne igre s njihovim vremenom igranja. Kartica prema zadanim postavkama počinje, jedan potvrdni okvir dalje
+u Postavkama.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: katalog po ocjenama, uz "učitaj još" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Jedno preklapanje upozorenja za sve što je na čekanju: prekide rada, sastanke, zadatke i nove AI modele |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -356,7 +361,7 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|---|---|
 | ![Status API, My endpoints sub-tab: a grid of tiles with latency, recent readings and certificate days](docs/prints/app/76-endpoints-grade.png) | ![An endpoint open over the whole row with the latency chart, the limit line and the stats](docs/prints/app/77-endpoints-aberto.png) | ![The new endpoint form with the DNS + certificate kind selected](docs/prints/app/78-endpoints-novo.png) |
 
-| Dnevni red za bilo koji dan: strelice za prethodni i sljedeći, alat za odabir datuma i gumb za povratak na današnji dan |
+| Dnevni red za bilo koji dan: strelice za prethodni i sljedeći, birač datuma i gumb za povratak na današnji dan |
 |---|
 | ![Agenda tab on tomorrow with the day stepper, the first meeting and the day in one line](docs/prints/app/75-agenda-dia.png) |
 
@@ -393,14 +398,14 @@ fokusirana aplikacija dok koristite računalo, u zapečaćenoj lokalnoj datoteci
 ne može prijaviti fokusirani prozor, pa tamo ostaje nedostupan). Isključeno dok se ne uključite i prvi zaslon ne kaže što
 čuva se i ono što nikad nije.
 
-- **Dan**: krafna po kategoriji s ukupnim iznutra, čija legenda skriva kategoriju, promjena u odnosu na dan
+- **Dan**: krafna po kategoriji s ukupnim iznutra, čija legenda skriva kategoriju, promjena prema danu
 prije i vrijeme mirovanja (bez tipkovnice ili miša 2 minute). Ispod njega, dnevni cilj s fokusom na kod sa svojim nizom i
-jedna točka po danu, tri isticanja (najduži dio u jednoj aplikaciji, izmjene aplikacija, vršni sat), vremenska traka na kojoj cijeli
+jedna točka po danu, tri isticanja (najduži dio u jednoj aplikaciji, promjene aplikacija, vršni sat), vremenska traka na kojoj se cijeli
 dan, neaktivnost se proteže, a najprometnije aplikacije dijele jednu vremensku os s oznakom "sada" i popisom aplikacija
 (dodirnite jedan da biste promijenili njegovu kategoriju) ili od zadataka na kojima se pokrenuo mjerač vremena fokusa.
 - **Tjedan**: naslagani stupci po danu s prosječnom linijom i točkom ispod svakog dana koji je ispunio cilj, satna toplinska karta
-s vašim vrhom, i iste liste za cijeli tjedan.
-- **Raspored i maske**: jedan stupac u zadanom prozoru, dva kada je širok (maksimiziran); svaka koža ima svoju
+sa svojim vrhom, i iste liste za cijeli tjedan.
+- **Izgled i maske**: jedan stupac u zadanom prozoru, dva kada je širok (maksimiziran); svaka koža ima svoju
 kategorije boja, provjeren kontrast. Izbornik pored dana kopira ga kao tekst.
 
 <sub>Sve snimke zaslona koriste fiktivne podatke.</sub>
@@ -423,7 +428,7 @@ Nijedan od istraženih alata ne pokriva više od dva od ovih frontova odjednom. 
 <sub>✅ izvorni · ➖ djelomično, putem proširenja ili izborno · — ništa · ? neobjavljeno · n/a ne pohranjuje korisničke podatke</sub>
 
 Što je mjerilo donijelo ovdje: **vrijeme točno u naslovu zadatka** (Todoist/TickTick), **odgoda upozorenja**
-(TickTick) i **međuspremnik koji poštuje upravitelje lozinki** (CopyQ/Isto).
+(TickTick) i **međuspremnik koji poštuje upravitelje lozinki** (CopyQ/Ditto).
 
 ## ⬇️ Instaliraj
 
@@ -451,12 +456,12 @@ repozitoriji: objavljivanje je ručna odluka i radnja održavatelja.
 
 | Sloj | Zaštita |
 |---|---|
-| Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, novi nonce pri svakom upisivanju, atomsko upisivanje s `fsync` |
+| Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, novi nonce pri svakom pisanju, atomsko pisanje s `fsync` |
 | Ključ | Samo RAM, postavljen na nulu pri zaključavanju; podesivo automatsko zaključavanje (5 do 60 min mirovanja, 15 min prema zadanim postavkama) |
 | Mreža | samo proces Rust razgovara s mrežom; webview nema udaljeno podrijetlo (CSP) i nikada ne vidi tokene |
-| Google | izborno, samo `calendar.events.readonly`, `directory.readonly` (Fotografije kolega iz Workspacea na listi gostiju) plus profil, OAuth s PKCE i povratna petlja |
+| Google | izborno, samo `calendar.events.readonly`, `directory.readonly` (fotografije kolega iz Workspacea na popisu gostiju) plus profil, OAuth s PKCE i povratna petlja |
 | GitHub | izborni, šifrirani token; stavke se otvaraju samo ako je veza `https://github.com/` |
-| GitLab | izborna, šifrirana adresa i token; `https://` samo, bez preusmjeravanja, poveznice samo s konfigurirane instance |
+| GitLab | izborna, šifrirana adresa i token; Samo `https://`, bez preusmjeravanja, veze samo s konfigurirane instance |
 | Ažuriranja | instalira samo paket potpisan ključem projekta; neovlašteno preuzimanje odbacuje se prije pokretanja |
 
 Potpuni model, sigurnosna kopija, spajanje između strojeva i gdje svaka datoteka živi: [docs/seguranca.md](docs/seguranca.md).

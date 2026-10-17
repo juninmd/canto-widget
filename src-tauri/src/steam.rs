@@ -17,8 +17,10 @@ pub const LANGUAGE: &str = "portuguese";
 /// How many rows each list shows: one widget pane, not a storefront.
 pub const DEALS: usize = 12;
 pub const TRENDING: usize = 25;
-pub const CATALOG: usize = 25;
-pub const RECENT: usize = 5;
+/// The store answers 50 rows per search page, and `start` only moves in 50s.
+pub const CATALOG_PAGE: usize = 50;
+/// Everything Steam reports for the last two weeks, within a bound the pane can scroll.
+pub const RECENT: usize = 30;
 /// Fresh enough to skip the network; the "atualizar" button bypasses it.
 pub const TTL_MS: i64 = 5 * 60_000;
 /// The catalog keys on free text and every capsule is an entry, so the cache is capped; the oldest

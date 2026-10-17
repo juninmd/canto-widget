@@ -3,7 +3,7 @@
 use url::Url;
 
 use crate::error::{AppError, Result};
-use crate::steam::{self, RecentGame, SteamConfig, SteamList, SteamRecent, SteamRow, CATALOG, DEALS, TRENDING};
+use crate::steam::{self, RecentGame, SteamConfig, SteamList, SteamRecent, SteamRow, DEALS, TRENDING};
 use crate::steam_feed::{self as feed, FetchError};
 
 pub fn failed(e: FetchError) -> AppError {
@@ -18,12 +18,19 @@ pub fn list(url: &Url, take: usize) -> Result<SteamList> {
     Ok(SteamList { items, has_more })
 }
 
+/// A store search page: a full page means the store probably has more, a short one is the last.
+pub fn paged(mut items: Vec<SteamRow>) -> SteamList {
+    let has_more = items.len() >= steam::CATALOG_PAGE;
+    items.truncate(steam::CATALOG_PAGE);
+    SteamList { items, has_more }
+}
+
 pub fn trending() -> Result<SteamList> {
     list(&crate::steam_url::trending_url(), TRENDING)
 }
 
-pub fn catalog(term: &str) -> Result<SteamList> {
-    list(&crate::steam_url::catalog_url(term), CATALOG)
+pub fn catalog(term: &str, page: usize) -> Result<SteamList> {
+    Ok(paged(feed::search(&crate::steam_url::catalog_url(term, page)).map_err(failed)?))
 }
 
 /// The wishlist is scanned whole for discounts; only the best few get their title, capsule and score.

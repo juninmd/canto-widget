@@ -150,11 +150,12 @@ respekterer takstgrensen. Logg på med et skrivebeskyttet personlig token eller 
 ### 🎮 Steam uten å forlate widgeten
 
 Fire underfaner for Steam: **ønskelistetilbud** (største rabatt først, hver med det den sparer), **toppselgerne**
-rangert, **spill nå** og **katalogen sortert etter vurdering**. Hver rad har **kapselkunsten**, **anmeldelsen
-poengsum** med Steams egen ordlyd og hvor mange anmeldelser det teller, prisen som er krysset ut, prisen i reais og hva
-rabatten sparer — og listen summerer den totale besparelsen. De offentlige listene trenger bare din **SteamID64**; an
-valgfri **Steam Web API nøkkel** legger til de fem siste spillene med spilletidene deres. Fanen starter som standard,
-én avmerkingsboks unna i Innstillinger.
+rangert, **spill nå** (hvert spill Steam rapporterer de siste to ukene) og **katalogen sortert etter rangering**, sidesøkt
+med **last mer** så den når resten av butikken. Hver rad har **kapselkunst**, **anmeldelsesresultatet**
+med Steams egen ordlyd og hvor mange anmeldelser den teller, prisen som er krysset ut, prisen i reais og hva
+rabattbesparelser - og listen summerer den totale besparelsen. De offentlige listene trenger bare din **SteamID64**; en valgfri
+**Steam Web API nøkkel** legger til de siste spillene med spilletidene deres. Fanen starter som standard, én avmerkingsboks unna
+i Innstillinger.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: katalogen etter vurdering, med "last mer" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Ett varseloverlegg for alt som venter: avbrudd, møter, oppgaver og nye AI-modeller |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -407,7 +412,7 @@ kategorifarger, sjekket for kontrast. Menyen ved siden av dagen kopierer den som
 
 ## ⚖️ Sammenlignet med det som finnes der ute
 
-Ingen av verktøyene som forskes på dekker mer enn to av disse frontene samtidig. Kilder og detaljer i
+Ingen av verktøyene som undersøkes dekker mer enn to av disse frontene samtidig. Kilder og detaljer i
 [docs/benchmark.md](docs/benchmark.md).
 
 | | Oppgaver + påminnelse | Merknader | Utklippstavle | Møter | GitHub | Lokal kryptering som standard |
@@ -435,7 +440,7 @@ Last ned installasjonsprogrammet for plattformen din fra **[Releases](https://gi
 | 🍎 macOS | `.dmg` for Apple Silicon eller Intel |
 | 🐧 Linux | `.AppImage`, `.deb` eller `.rpm` |
 
-1. Ved første kjøring oppretter du **hovedpassordet**. Det er ingen gjenoppretting: mist passordet, mist dataene.
+1. Ved første kjøring oppretter du **hovedpassordet**. Det er ingen gjenoppretting: mister passordet, mister dataene.
 2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` på macOS) viser og skjuler widgeten.
 3. Ferdig. Når en ny versjon sendes, varsler Canto deg, og **Innstillinger → Oppdateringer** oppdateres med ett klikk.
 
@@ -451,13 +456,13 @@ repositories: publisering er en manuell beslutning og handling av vedlikeholdere
 
 | Lag | Beskyttelse |
 |---|---|
-| Hvelv | Argon2id (19 MiB, t=2) → AES-256-GCM, en fersk nonce på hver skriving, atomskriving med `fsync` |
+| Hvelv | Argon2id (19 MiB, t=2) → AES-256-GCM, en ny nonce på hver skriving, atomskriving med `fsync` |
 | Nøkkel | Kun RAM, nullstilt på lås; konfigurerbar autolås (5 til 60 min inaktiv, 15 min som standard) |
 | Nettverk | bare Rust-prosessen snakker med nettverket; webvisningen har ingen ekstern opprinnelse (CSP) og ser aldri tokens |
-| Google | valgfritt, kun `calendar.events.readonly`, `directory.readonly` (Arbeidsmiljøkollegers bilder i gjestelisten) pluss profil, OAuth med PKCE og loopback |
+| Google | valgfritt, kun `calendar.events.readonly`, `directory.readonly` (Arbeidsområde-kollegers bilder i gjestelisten) pluss profil, OAuth med PKCE og loopback |
 | GitHub | valgfritt, kryptert token; elementer åpnes bare hvis lenken er `https://github.com/` |
-| GitLab | valgfri, kryptert adresse og token; Kun `https://`, ingen omdirigeringer, kun lenker fra den konfigurerte forekomsten |
-| Oppdateringer | installerer bare en pakke signert med prosjektets nøkkel; en tuklet nedlasting forkastes før den kjøres |
+| GitLab | valgfri, kryptert adresse og token; Bare `https://`, ingen omdirigeringer, kun lenker fra den konfigurerte forekomsten |
+| Oppdateringer | installerer kun en pakke signert med prosjektets nøkkel; en tuklet nedlasting forkastes før den kjøres |
 
 Full modell, sikkerhetskopiering, slå sammen på tvers av maskiner og hvor hver fil bor: [docs/seguranca.md](docs/seguranca.md).
 Har du funnet en feil? [SECURITY.md](SECURITY.md).
@@ -476,7 +481,7 @@ Har du funnet en feil? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Utvikling
 
-Forutsetninger: [Bun](https://bun.sh) ≥ 1,2, stabil Rust ≥ 1,85 og
+Forutsetninger: [Bun](https://bun.sh) ≥ 1.2, stabil Rust ≥ 1.85 og
 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) for systemet ditt.
 
 ```bash

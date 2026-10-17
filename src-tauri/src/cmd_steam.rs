@@ -106,9 +106,9 @@ pub async fn steam_trending(app: AppHandle, force: bool) -> Result<SteamList> {
 }
 
 #[tauri::command]
-pub async fn steam_catalog(app: AppHandle, term: String, force: bool) -> Result<SteamList> {
-    if term.chars().count() > 100 {
-        return Err(AppError::Config("busca longa demais".into()));
+pub async fn steam_catalog(app: AppHandle, term: String, page: usize, force: bool) -> Result<SteamList> {
+    if term.chars().count() > 100 || page > 500 {
+        return Err(AppError::Config("busca inválida".into()));
     }
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
@@ -116,8 +116,8 @@ pub async fn steam_catalog(app: AppHandle, term: String, force: bool) -> Result<
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        let key = format!("catalog:{}", term.trim().to_lowercase());
-        state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term))
+        let key = format!("catalog:{page}:{}", term.trim().to_lowercase());
+        state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term, page))
     })
     .await
 }

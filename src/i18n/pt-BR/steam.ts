@@ -18,6 +18,7 @@ export const steam = {
   "steam.sub.recent": "jogue agora",
   "steam.sub.catalog": "catálogo",
   "steam.refresh": "atualizar",
+  "steam.loadMore": "ver mais jogos",
   "steam.deals.empty": "nenhuma oferta na sua lista de desejos agora",
   "steam.deals.more": "há mais ofertas na sua lista de desejos",
   "steam.trending.empty": "a Steam não devolveu os mais vendidos agora",

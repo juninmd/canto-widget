@@ -89,12 +89,12 @@ Windows Hello 선택 사항입니다.
 `Ctrl+Alt+M`(macOS에서는 `Ctrl+Cmd+M`)과(와) 다음 회의에 참여하세요. 등록이 실패하면 Canto가 시도합니다.
 `Ctrl+Alt+Shift+M`(macOS에서는 `Ctrl+Cmd+Shift+M`); 트레이 메뉴는 둘 다 사용할 수 없는 경우에도 계속 사용할 수 있습니다.
 
-오늘의 이벤트는 Google 캘린더(읽기 전용)에서 가져왔습니다. 1분 전에 위젯이 다음과 같이 화면으로 점프합니다.
+오늘의 일정은 Google 캘린더(읽기 전용)에서 가져왔습니다. 1분 전에 위젯이 다음과 같이 화면으로 점프합니다.
 **Meet**에 가입하면 현재 탭이 있든 숨겨져 있든 상관없이 소리를 재생하고 시스템 알림을 보냅니다.
 각 카드에는 답변(수락됨, 미정, 거부됨, 대기 중)이 포함된 배지가 표시됩니다. 누가 주최했는지 보려면 이벤트를 클릭하세요.
-그것, 의제, 이니셜 아바타와 답변, 그리고 Gemini의 메모와 같은 첨부 파일이 있는 모든 손님.
+그것, 의제, 이니셜 아바타와 대답, 그리고 Gemini의 메모와 같은 첨부 파일이 있는 모든 손님.
 맨 윗줄에는 최소 15분의 **다음 무료 슬롯**이 표시됩니다(거부된 초대 및 종일 이벤트는 그렇지 않음).
-개수), 겹치는 이벤트에는 다른 이벤트의 이름을 지정하는 **충돌** 배지가 표시됩니다. **오늘** 보기는 진행 중인 회의(남은 시간, 참여 버튼, 충돌 경고) 또는 다음 회의, 그 다음 **한 줄의 하루**(업무 시간 전체의 회의, 작업 및 자유 시간, 회의 시간, 자유 시간 및 충돌 계산 포함)와 회의, 시간이 있는 작업 및 여유 공백이 자체 행으로 표시되는 하나의 타임라인으로 이어집니다.
+개수), 겹치는 이벤트에는 다른 이벤트의 이름을 지정하는 **충돌** 배지가 표시됩니다. **오늘** 보기는 진행 중인 회의(남은 시간, 참여 버튼, 충돌 경고) 또는 다음 회의, 그 다음 **한 줄의 하루**(업무 시간 전체의 회의, 작업 및 자유 시간, 회의 시간, 자유 시간 및 충돌 계산)와 회의, 시간이 있는 작업 및 여유 공백이 자체 행으로 표시되는 하나의 타임라인으로 이어집니다.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -139,7 +139,7 @@ JSON 형식 또는 압축, 한 줄의 텍스트, 대문자 또는 소문자(기�
 **CI 배지**(통과, 실패, 실행 중 또는 CI 없음)는 헤드 커밋 검사에서 가져옵니다. 누군가 **요청하면
 검토**, OS 알림을 통해 알려줍니다(기본적으로 켜져 있으며 설정에서 꺼짐). 텍스트로 필터링(`repo:` 또는 `label:`, PRs만 또는 문제만), 업데이트, 생성 또는 댓글별로 정렬
 **더 보기**로 스크롤하세요. **댓글** 보기로 전환하여 PRs(아바타, 사람 대 봇 배지, 댓글 수, 검색, 봇 필터, 점진적 페이지 매김)에 댓글을 단 모든 사람의 **댓글 작성자 카탈로그** 그리드와 해당 댓글을 확인하세요. 또한 **GitLab.com 및 자체 호스팅 GitLab**를 지원하며 5분 캐시를 통해
-비율 제한을 준수합니다. 읽기 전용 개인 토큰을 사용하거나 브라우저(디바이스 흐름)에서 로그인하세요.
+비율 제한을 존중합니다. 읽기 전용 개인 토큰을 사용하거나 브라우저(디바이스 흐름)에서 로그인하세요.
 
 </td>
 </tr>
@@ -150,11 +150,12 @@ JSON 형식 또는 압축, 한 줄의 텍스트, 대문자 또는 소문자(기�
 ### 🎮 Steam 위젯을 떠나지 않고
 
 Steam에 대한 4개의 하위 탭: **위시리스트 거래**(가장 큰 할인부터, 각각 할인된 금액 포함), **최고 판매자**
-순위, **지금 플레이** 및 **등급순으로 정렬된 카탈로그**. 모든 행에는 **캡슐 아트**, **리뷰가 표시되어 있습니다.
-Steam의 문구와 포함된 리뷰 수, 줄을 그은 가격, 레알 가격 등으로 점수**를 매기세요.
-할인이 절약되고 목록에 총 절약 금액이 합산됩니다. 공개 목록에는 **SteamID64**만 필요합니다. 안
-선택 사항 **Steam 웹 API 키**는 가장 최근 게임 5개를 플레이 시간과 함께 추가합니다. 탭은 기본적으로 시작됩니다.
-설정에서 하나의 확인란을 선택하세요.
+순위, **지금 플레이**(지난 2주 동안 모든 게임 Steam 보고) 및 **등급순으로 정렬된 카탈로그**, 페이징됨
+**더 많이 로드**하면 매장의 나머지 부분에도 도달할 수 있습니다. 모든 행에는 **캡슐 아트**, **리뷰 점수**가 표시됩니다.
+Steam의 문구와 포함되는 리뷰 수, 줄을 그은 가격, 레알 가격 및
+할인 절약 - 목록에 총 절약 금액이 합산됩니다. 공개 목록에는 **SteamID64**만 필요합니다. 선택 사항
+**Steam 웹 API 키**는 최근 게임을 플레이 시간과 함께 추가합니다. 탭은 기본적으로 하나의 확인란으로 시작됩니다.
+설정에서.
 
 </td>
 </tr>
@@ -334,7 +335,7 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|---|
 | ![The same note in the raw markdown mode, with the image reference and its thumbnail](docs/prints/app/43-notas-editor-markdown.png) | ![The WYSIWYG note editor on the light skin](docs/prints/app/44-notas-editor-claro.png) |
 
-| 작업: 행의 우선순위, 긴 제목 줄바꿈 | 렌더링된 마크다운이 포함된 메모 목록 |
+| 작업: 행의 우선순위, 긴 제목 줄 바꿈 | 렌더링된 마크다운이 포함된 메모 목록 |
 |---|---|
 | ![Task list where each row shows its priority dot, a long title wraps over several lines and the time sits under the title](docs/prints/app/45-tarefas-prioridade.png) | ![Note cards showing a heading, a checklist, a code block and a numbered list rendered instead of raw markdown](docs/prints/app/46-notas-card-markdown.png) |
 
@@ -345,6 +346,10 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 | Steam: 최고 판매자, 번호 매기기 | Steam: 최근 5경기(두 플레이 시간 포함) |
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: 등급별 카탈로그("더 로드" 포함) |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | 중단, 회의, 작업 및 새로운 AI 모델 등 보류 중인 모든 것에 대한 단일 경고 오버레이 |
 |---|
@@ -451,9 +456,9 @@ Winget 및 Homebrew에 대한 기성 매니페스트(현재 차단된 Flatpak용
 
 | 레이어 | 보호 |
 |---|---|
-| 금고 | Argon2id(19MiB, t=2) → AES-256-GCM, 모든 쓰기에 대한 새로운 nonce, `fsync`을 사용한 원자 쓰기 |
+| 금고 | Argon2id (19 MiB, t=2) → AES-256-GCM, 모든 쓰기에 대한 새로운 nonce, `fsync`를 사용한 원자 쓰기 |
 | 열쇠 | RAM만 해당, 잠금 시 0으로 설정됨 구성 가능한 자동 잠금(유휴 시간 5~60분, 기본적으로 15분) |
-| 네트워크 | Rust 프로세스만 네트워크와 대화합니다. webview에는 원격 원본(CSP)이 없으며 토큰이 표시되지 않습니다 |
+| 네트워크 | Rust 프로세스만 네트워크와 통신합니다. webview에는 원격 원본(CSP)이 없으며 토큰이 표시되지 않습니다 |
 | Google | 선택 사항, `calendar.events.readonly`, `directory.readonly`(게스트 목록의 작업 공간 동료 사진) 및 프로필, PKCE 및 루프백이 포함된 OAuth |
 | GitHub | 선택사항, 암호화된 토큰; 링크가 `https://github.com/`인 경우에만 항목이 열립니다 |
 | GitLab | 선택사항, 암호화된 주소 및 토큰 `https://`만, 리디렉션 없음, 구성된 인스턴스에서만 링크 |
@@ -476,7 +481,7 @@ Winget 및 Homebrew에 대한 기성 매니페스트(현재 차단된 Flatpak용
 
 ## 🛠️ 개발
 
-전제 조건: [Bun](https://bun.sh) ≥ 1.2, 안정적인 Rust ≥ 1.85 및
+전제 조건: [Bun](https://bun.sh) ≥ 1.2, 안정적 Rust ≥ 1.85 및
 귀하의 시스템에 대한 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/).
 
 ```bash
@@ -493,8 +498,8 @@ Webview는 Rust 상태 이후에 생성되고 트레이가 초기화되므로 �
 SemVer 태그, 생성된 릴리스 노트 및 병렬로 구축된 서명된 설치 프로그램을 가져옵니다. 릴리스는 검증 후 게시됩니다(자세한 내용은
 [CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
 
-## 📄 라이센스
+## 📄 라이선스
 
 [MIT](LICENSE) © 안토니오 카를로스
 
-<div align="center"><sub>회의 사이에 생활하는 사람들을 위해 🦀 Rust, ⚛️ React 및 🔥로 제작되었습니다.</sub></div>
+<div align="center"><sub>미팅 사이에 거주하시는 분들을 위해 🦀 Rust, ⚛️ React 및 주목으로 제작되었습니다.</sub></div>

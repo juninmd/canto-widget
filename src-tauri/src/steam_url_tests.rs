@@ -10,7 +10,7 @@ fn param(url: &Url, name: &str) -> Option<String> {
 
 #[test]
 fn every_store_url_asks_for_brazilian_prices_in_portuguese() {
-    for url in [trending_url(), catalog_url(""), price_url(&[620]), basic_url(620), reviews_url(620)] {
+    for url in [trending_url(), catalog_url("", 0), price_url(&[620]), basic_url(620), reviews_url(620)] {
         assert_eq!(param(&url, "cc").as_deref(), Some("BR"), "{url}");
         assert_eq!(param(&url, "l").as_deref(), Some("portuguese"), "{url}");
     }
@@ -24,11 +24,13 @@ fn the_trending_list_is_the_global_top_sellers() {
 }
 
 #[test]
-fn the_catalog_sorts_by_reviews_and_takes_the_search_term() {
-    assert_eq!(param(&catalog_url(""), "sort_by").as_deref(), Some("Reviews_DESC"));
-    assert_eq!(param(&catalog_url(""), "term"), None, "an empty search is left out");
-    assert_eq!(param(&catalog_url("  portal 2 "), "term").as_deref(), Some("portal 2"));
-    assert!(param(&catalog_url(""), "start").is_none(), "the first page is the default");
+fn the_catalog_sorts_by_reviews_and_pages_by_50() {
+    assert_eq!(param(&catalog_url("", 0), "sort_by").as_deref(), Some("Reviews_DESC"));
+    assert_eq!(param(&catalog_url("", 0), "term"), None, "an empty search is left out");
+    assert_eq!(param(&catalog_url("  portal 2 ", 0), "term").as_deref(), Some("portal 2"));
+    assert_eq!(param(&catalog_url("", 0), "start"), None, "the first page is the default");
+    assert_eq!(param(&catalog_url("", 1), "start").as_deref(), Some("50"));
+    assert_eq!(param(&catalog_url("", 3), "start").as_deref(), Some("150"));
 }
 
 #[test]

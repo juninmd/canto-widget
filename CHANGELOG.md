@@ -282,10 +282,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Blocos de código nas notas**: trechos entre
 - **Aba Steam**: quatro subabas num só lugar. **Ofertas** varre a lista de desejos e mostra o que está em promoção,
   do maior desconto para o menor; **em alta** traz os mais vendidos da loja, numerados; **jogue agora** lista os
-  últimos 5 jogos recentes com o tempo das últimas duas semanas e o total; e o **catálogo** ordena a loja pela
-  nota das análises, com busca pelo nome. Cada linha mostra a **capa** do jogo, a **nota** nas palavras da própria
-  Steam (com quantas análises ela conta), o preço antigo riscado, o preço em reais e **quanto o desconto economiza**
-  — e a lista soma a economia total. O que é público precisa só do **SteamID64**; a chave da Steam Web API é
-  opcional e libera apenas os jogos recentes. A aba começa desligada, a um clique nos Ajustes, e a conexão fica
-  selada no cofre, acompanhando a troca da senha. As capas não vêm de origem remota: o Rust baixa cada uma e
-  entrega como `data:` URL, então a CSP segue fechada.
+  jogos recentes das últimas duas semanas (até 30) com o tempo de cada um e o total; e o **catálogo** ordena a loja
+  pela nota das análises, com busca pelo nome e **ver mais jogos** para seguir página a página. Cada linha mostra a
+  **capa** do jogo, a **nota** nas palavras da própria Steam (com quantas análises ela conta), o preço antigo riscado,
+  o preço em reais e **quanto o desconto economiza** — e a lista soma a economia total. O que é público precisa só do
+  **SteamID64**; a chave da Steam Web API é opcional e libera apenas os jogos recentes. A aba começa desligada, a um
+  clique nos Ajustes, e a conexão fica selada no cofre, acompanhando a troca da senha. As capas não vêm de origem
+  remota: o Rust baixa cada uma e entrega como `data:` URL, então a CSP segue fechada.

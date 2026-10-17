@@ -33,7 +33,7 @@ Arabščina, hebrejščina in perzijščina uporabljajo besedilo od desne proti 
 
 40 novih katalogov vmesnikov in 31 novih prevodov README so strojni prevodi in niso bili
 pregledali naravni govorci. Portugalski in angleški jezik ostajata izvirna kataloga vmesnikov. Etikete na pladnjih in
-naslovi obvestil sledijo izbranemu jeziku; nekatere podrobnosti opozorila o integraciji so v angleščini,
+naslovi obvestil sledijo izbranemu jeziku; nekateri podatki opozorila o integraciji so v angleščini,
 in napake v ozadju ostanejo v portugalščini. Sintaksa naslova opravila ohranja obstoječe portugalske in angleške ključne besede.
 
 ![Searchable language picker](docs/prints/languages-picker.png)
@@ -94,7 +94,7 @@ Današnji dogodki prihajajo iz koledarja Google (samo za branje). Minuto prej gr
 Vsaka kartica prikazuje značko z vašim odgovorom (sprejeto, morda, zavrnjeno, čaka). Kliknite dogodek, da vidite, kdo ga je organiziral
 to, dnevni red, vsak gost z začetnicami avatarja in njihovim odgovorom ter priponke, kot so Geminijevi zapiski.
 Zgornja vrstica vam pove **naslednji prosti termin** za vsaj 15 minut (zavrnjena povabila in celodnevni dogodki ne
-štetje), dogodki, ki se prekrivajo, pa dobijo značko **konflikt**, ki poimenuje drugi dogodek. Pogled **Danes** vodi s sestankom v teku (preostali čas, gumb za pridružitev, opozorilo o spopadih) ali naslednjim, nato pa **dan v eni vrstici** (sestanki, opravila in prosti čas med delovnimi urami, s preštetimi časi sestankov, prostim časom in konflikti) in eno časovnico, kjer so sestanki, opravila s časom in proste vrzeli vrstice zase: vrzel ponuja, da se prilega neodmerjenemu opravilu, in kar je že čez, se zloži stran.
+štetje), dogodki, ki se prekrivajo, pa dobijo značko **konflikt**, ki poimenuje drugi dogodek. Pogled **Danes** vodi s sestankom v teku (preostali čas, gumb za pridružitev, opozorilo o sporu) ali naslednjim, nato pa **dan v eni vrstici** (sestanki, opravila in prosti čas med delovnimi urami, s preštetimi časi sestankov, prostim časom in konflikti) in eno časovnico, kjer so sestanki, opravila s časom in proste vrzeli vrstice zase: vrzel ponuja, da se prilega neodmerjenemu opravilu, in kar je že čez, se zloži stran.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -150,11 +150,12 @@ upošteva omejitev stopnje. Prijavite se z osebnim žetonom samo za branje ali i
 ### 🎮 Steam, ne da bi zapustili pripomoček
 
 Štirje podzavihki za Steam: **ponudbe na seznamu želja** (najprej največji popust, vsak s svojim prihrankom), **najbolje prodajani**
-razvrščeni, **igraj zdaj** in **katalog, razvrščen po ocenah**. Vsaka vrstica nosi **umetniško kapsulo**, **recenzijo
-rezultat** z lastnim besedilom Steam in številom ocen šteje, prečrtano ceno, ceno v realih in kaj
-popust prihrani — in seznam sešteje skupni prihranek. Javni seznami potrebujejo samo vaš **SteamID64**; an
-izbirni ključ **Steam Web API** doda pet najnovejših iger z njihovimi igralnimi časi. Zavihek se privzeto začne,
-eno potrditveno polje stran v nastavitvah.
+razvrščeno, **igraj zdaj** (vsaka igra Steam poroča za zadnja dva tedna) in **katalog, razvrščen po oceni**, strani
+z **naloži več**, da doseže preostalo trgovino. Vsaka vrstica nosi **umetnost kapsule**, **oceno ocene**
+z lastnim besedilom Steam in številom ocen šteje, prečrtano ceno, ceno v realih in kaj
+popust prihrani — in seznam sešteje skupni prihranek. Javni seznami potrebujejo samo vaš **SteamID64**; neobvezno
+**Steam Web API tipka** doda nedavne igre z njihovimi igralnimi časi. Zavihek se privzeto začne, eno potrditveno polje stran
+v nastavitvah.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ In **Follow system**, ki preklaplja med svetlobo in temo skupaj z OS. Vsi presta
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: katalog po ocenah, z "naloži več" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Eno opozorilo za vse, kar je v teku: izpade, sestanke, naloge in nove modele AI |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -356,7 +361,7 @@ In **Follow system**, ki preklaplja med svetlobo in temo skupaj z OS. Vsi presta
 |---|---|---|
 | ![Status API, My endpoints sub-tab: a grid of tiles with latency, recent readings and certificate days](docs/prints/app/76-endpoints-grade.png) | ![An endpoint open over the whole row with the latency chart, the limit line and the stats](docs/prints/app/77-endpoints-aberto.png) | ![The new endpoint form with the DNS + certificate kind selected](docs/prints/app/78-endpoints-novo.png) |
 
-| Dnevni red katerega koli dne: puščice za prejšnji in naslednji dan, izbirnik datuma in gumb za vrnitev na današnji dan |
+| Dnevni red za kateri koli dan: puščice za prejšnji in naslednji dan, izbirnik datuma in gumb za vrnitev na današnji dan |
 |---|
 | ![Agenda tab on tomorrow with the day stepper, the first meeting and the day in one line](docs/prints/app/75-agenda-dia.png) |
 
@@ -396,10 +401,10 @@ se hrani in kar nikoli ni.
 - **Dan**: krof po kategoriji s skupnim zneskom v notranjosti, katerega legenda skriva kategorijo, sprememba glede na dan
 pred in čas nedejavnosti (brez tipkovnice ali miške 2 minuti). Pod njim je dnevni cilj s poudarkom na kodi s svojo serijo in
 ena pika na dan, trije poudarki (najdaljši odsek v eni aplikaciji, preklopi med aplikacijami, največja ura), časovna premica, na kateri je celotna
-dan, mirovanje se razteza in najbolj obremenjene aplikacije si delijo eno časovno os z oznako »zdaj« in seznamom aplikacij
-(dotaknite se enega, da spremenite njegovo kategorijo) ali opravil, pri katerih je potekal časovnik fokusa.
+dan, mirovanje se razteza in najbolj obremenjene aplikacije si delijo eno časovno os z oznako "zdaj" in seznamom aplikacij
+(dotaknite se enega, da spremenite njegovo kategorijo) ali opravil, pri katerih se je izvajal časovnik fokusa.
 - **Teden**: zloženi stolpci na dan s črto povprečja in piko pod vsakim dnem, ki je dosegel cilj, urni toplotni zemljevid
-z vašim vrhom in isti seznami ves teden.
+z vašim vrhom in isti seznami za ves teden.
 - **Postavitev in preobleke**: en stolpec v privzetem oknu, dva, ko je široko (maksimirano); vsaka koža ima svojega
 barve kategorije, preverjen kontrast. Meni zraven dneva ga kopira kot besedilo.
 
@@ -423,7 +428,7 @@ Nobeno od raziskanih orodij ne pokriva več kot dveh od teh front hkrati. Viri i
 <sub>✅ izvorno · ➖ delno, prek razširitve ali izbirno · — brez · ? neobjavljeno · n/a ne shranjuje uporabniških podatkov</sub>
 
 Kaj je merilo uspešnosti prineslo tukaj: **čas prav v naslovu opravila** (Todoist/TickTick), **dremež opozorila**
-(TickTick) in **odložišče, ki upošteva upravitelje gesel** (CopyQ/Enako).
+(TickTick) in **odložišče, ki upošteva upravitelje gesel** (CopyQ/Ditto).
 
 ## ⬇️ Namestite
 
@@ -443,7 +448,7 @@ Prenesite namestitveni program za svojo platformo iz **[Releases](https://github
 > Namestitveni programi še niso podpisani s kodo: SmartScreen (Windows) in Gatekeeper (macOS) opozorita ob prvem zagonu.
 > Samodejne posodobitve se pred zagonom preverijo glede na lastni podpis projekta.
 
-Pripravljeni manifesti za winget in Homebrew (ter okostje za Flatpak, trenutno blokiran) živijo v
+Pripravljeni manifesti za winget in Homebrew (plus okostje za Flatpak, trenutno blokiran) živijo v
 [`packaging/`](packaging/README.md) — pripravljeno in preverjeno lokalno, vendar še ni objavljeno
 repozitoriji: objava je ročna odločitev in dejanje vzdrževalca.
 
@@ -451,7 +456,7 @@ repozitoriji: objava je ročna odločitev in dejanje vzdrževalca.
 
 | Plast | Zaščita |
 |---|---|
-| Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, svež nonce pri vsakem pisanju, atomsko pisanje z `fsync` |
+| Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, svež nonce ob vsakem pisanju, atomsko pisanje z `fsync` |
 | Ključ | Samo RAM, na ničlo ob zaklepanju; nastavljivo samodejno zaklepanje (5 do 60 min mirovanja, 15 min privzeto) |
 | Omrežje | samo proces Rust komunicira z omrežjem; spletni pogled nima oddaljenega izvora (CSP) in nikoli ne vidi žetonov |
 | Google | neobvezno, samo `calendar.events.readonly`, `directory.readonly` (fotografije sodelavcev iz delovnega prostora na seznamu gostov) plus profil, OAuth z PKCE in povratno zanko |

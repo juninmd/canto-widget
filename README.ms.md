@@ -150,11 +150,12 @@ menghormati had kadar. Log masuk dengan token peribadi baca sahaja atau daripada
 ### 🎮 Steam tanpa meninggalkan widget
 
 Empat subtab untuk Steam: **tawaran senarai keinginan** (diskaun terbesar dahulu, setiap satu dengan apa yang jimat), **terlaris**
-berperingkat, **main sekarang** dan **katalog yang dipesan mengikut rating**. Setiap baris membawa **seni kapsul**, **semakan
-markah** dengan perkataan Steam sendiri dan berapa banyak ulasan yang dikira, harga yang dicoret, harga dalam reai dan apa
-diskaun menjimatkan — dan senarai menambah jumlah penjimatan. Senarai awam hanya memerlukan **SteamID64** anda; an
-pilihan **Steam Web API kunci** menambah lima permainan terbaharu dengan masa permainan mereka. Tab bermula secara lalai,
-satu kotak pilihan lagi dalam Tetapan.
+berperingkat, **main sekarang** (setiap perlawanan Steam melaporkan selama dua minggu lepas) dan **katalog yang dipesan mengikut rating**, dihalakan halaman
+dengan **muatkan lebih** supaya ia sampai ke seluruh kedai. Setiap baris membawa **seni kapsul**, **skor ulasan**
+dengan perkataan Steam sendiri dan berapa banyak ulasan yang dikira, harga yang dicoret, harga dalam reais dan berapa
+penjimatan diskaun — dan senarai itu menambah jumlah penjimatan. Senarai awam hanya memerlukan **SteamID64** anda; pilihan
+**Steam Web API kunci** menambahkan permainan terbaru dengan masa permainan mereka. Tab bermula secara lalai, satu kotak pilihan lagi
+dalam Tetapan.
 
 </td>
 </tr>
@@ -346,6 +347,10 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
+| Steam: katalog mengikut penilaian, dengan "muatkan lagi" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
 | Satu tindanan amaran untuk semua yang belum selesai: gangguan, mesyuarat, tugas dan model AI baharu |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
@@ -390,7 +395,7 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 
 Tab **Aktiviti** mula disembunyikan (hidupkannya di bawah Tetapan → tab kelihatan). Ia hanya merekodkan nama
 aplikasi terfokus semasa anda menggunakan komputer, dalam fail tempatan tertutup yang tidak pernah mencapai sandaran atau penyegerakan (Wayland
-tidak dapat melaporkan tetingkap fokus, jadi ia kekal tidak tersedia di sana). Matikan sehingga anda ikut serta dan skrin pertama menyatakan apa
+tidak dapat melaporkan tetingkap fokus, jadi ia kekal tidak tersedia di sana). Mati sehingga anda ikut serta dan skrin pertama menyatakan apa
 disimpan dan yang tidak pernah ada.
 
 - **Hari**: donat mengikut kategori dengan jumlah di dalam, yang legendanya menyembunyikan kategori, perubahan terhadap hari itu
@@ -443,7 +448,7 @@ Muat turun pemasang untuk platform anda daripada **[Releases](https://github.com
 > Pemasang belum ditandatangani kod lagi: SmartScreen (Windows) dan Gatekeeper (macOS) memberi amaran pada pelancaran pertama.
 > Kemas kini automatik disahkan terhadap tandatangan projek sendiri sebelum dijalankan.
 
-Manifes sedia dibuat untuk winget dan Homebrew (serta rangka untuk Flatpak, sedang disekat) tinggal di
+Manifes siap sedia untuk winget dan Homebrew (serta rangka untuk Flatpak, sedang disekat) tinggal di
 [`packaging/`](packaging/README.md) — disediakan dan disahkan secara tempatan, tetapi belum diterbitkan kepada mereka
 repositori: penerbitan adalah keputusan dan tindakan manual oleh penyelenggara.
 

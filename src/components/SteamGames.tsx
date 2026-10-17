@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { errText, type SteamList } from "../lib/api";
-import { brl } from "../lib/steam";
+import { brl, mergeGames } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -19,14 +19,26 @@ type Props = {
   numbered?: boolean;
   /** Adds up what the discounts save: only meaningful on a wishlist. */
   totalSaved?: boolean;
+  /** Fetches the next page and appends it, for a list the store pages. */
+  loadMore?: () => Promise<SteamList>;
   rows?: number;
 };
 
 /** The shape shared by "ofertas", "em alta" and "catálogo": fetch, refresh, banner and the row list. */
-export default function SteamGames({ load, empty, toolbar, more, numbered = false, totalSaved = false, rows = 8 }: Props) {
+export default function SteamGames({
+  load,
+  empty,
+  toolbar,
+  more,
+  numbered = false,
+  totalSaved = false,
+  loadMore,
+  rows = 8,
+}: Props) {
   const [list, setList] = useState<SteamList | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const run = useCallback(
     async (force: boolean) => {
@@ -42,6 +54,20 @@ export default function SteamGames({ load, empty, toolbar, more, numbered = fals
     },
     [load],
   );
+
+  async function loadAnother() {
+    if (!loadMore || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const next = await loadMore();
+      setList((prev) => (prev ? { items: mergeGames(prev.items, next.items), has_more: next.has_more } : next));
+      setError("");
+    } catch (e) {
+      setError(errText(e));
+    } finally {
+      setLoadingMore(false);
+    }
+  }
 
   useEffect(() => {
     void run(false);
@@ -77,6 +103,16 @@ export default function SteamGames({ load, empty, toolbar, more, numbered = fals
             <SteamRowItem key={row.appid} row={row} rank={numbered ? i + 1 : undefined} />
           ))}
         </ul>
+      )}
+      {loadMore && list.has_more && (
+        <button
+          type="button"
+          onClick={() => void loadAnother()}
+          disabled={loadingMore}
+          className="canto-hit min-h-7 shrink-0 self-start rounded-lg border border-edge px-2 text-xs text-muted hover:bg-hover hover:text-fg disabled:opacity-50"
+        >
+          {t("steam.loadMore")}
+        </button>
       )}
       {list.has_more && more && <p className="text-[11px] text-faint">{more}</p>}
     </div>
