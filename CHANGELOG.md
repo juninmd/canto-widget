@@ -5,6 +5,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Aba Agentes**: os CLIs de agente mais usados (Claude Code, Codex CLI, Gemini CLI, OpenCode, GitHub Copilot CLI e
+  Aider) num só lugar. Cada linha diz se o CLI está instalado nesta máquina — e onde —, mostra a **última release** do
+  GitHub com a data e um resumo do que mudou, e, quando o CLI não está instalado, traz o comando de instalação
+  **pronto para copiar**. O Canto só copia: nada é instalado nem executado por ele. A lista de releases é pública,
+  não precisa de conta nem de chave, e fica 30 min em memória antes de consultar o GitHub de novo. A aba começa
+  desligada, a um clique nos Ajustes.
+
 ### Corrigido
 
 - **Fechamento ao abrir no Windows**: as janelas só carregam depois de inicializar os estados do Rust e a
@@ -39,11 +48,20 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Falhas TCP no Windows**: conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR
   esperada independentemente do idioma do sistema operacional.
 
+### Desempenho
+
+- **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
+  foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
+  dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
+
 ### Adicionado
 
 - **Manifestos de winget e Homebrew gerados da release**: `bun scripts/packaging.ts write vX.Y.Z` reescreve os
   quatro arquivos com a versão e os `sha256` lidos dos próprios assets da release, e `check vX.Y.Z` falha quando
   algum ficou para trás — antes, uma release nova podia deixar o pacote instalando a versão antiga.
+- **Erros no idioma escolhido**: as mensagens de erro que o Rust devolve à interface deixam de ser sempre em
+  português: seguem o idioma escolhido em Ajustes, com o inglês como texto de reserva nos idiomas que ainda não
+  têm tradução — o mesmo critério já usado pela bandeja e pelos avisos.
 - **Tema Glass**: novo tema com estética de vidro translúcido, superfícies semi-transparentes
   com desfoque de fundo (backdrop blur), azul vivo, reflexo especular na borda superior e contraste
   acessível em conformidade com WCAG AA.
@@ -123,7 +141,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   de quem escreveu (iniciais quando não há foto), e a faixa de avisos traz o nome em cada cartão. No GitHub o Canto
   procura o comentário que cita você; se não achar, o aviso aparece como antes, sem rosto. Nos resumos (mais de 3
   menções) cada linha começa com o nome. A foto só vem do próprio GitHub, da instância do GitLab ou do Gravatar.
->>>>>>> origin/main
 - **Meus endpoints na aba Status API**: uma subaba ao lado de **serviços** para acompanhar o que é seu. Cada endpoint é
   um **endereço** (http ou https), um **DNS + certificado** (mede a resolução do nome e lê a validade do certificado que o
   servidor apresenta na porta) ou um **TCP + porta**. Os blocos da grade mostram a latência atual e as últimas leituras;

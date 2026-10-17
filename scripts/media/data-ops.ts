@@ -104,6 +104,46 @@ const steamGame = (
   art: steamArtUrl(appid),
 });
 
+const agent = (
+  id: string,
+  name: string,
+  installTool: string,
+  installCommand: string,
+  installed: boolean,
+  release: { tag: string; published_at: string; notes: string } | null,
+) => ({
+  id,
+  name,
+  repo: `acme/${id}`,
+  site: `https://github.com/acme/${id}`,
+  install_tool: installTool,
+  install_command: installCommand,
+  installed,
+  path: installed ? `D:\\tools\\npm\\${id}.cmd` : null,
+  release: release && { ...release, name: release.tag, url: `https://github.com/acme/${id}/releases/tag/${release.tag}` },
+  error: null,
+});
+
+const agentRelease = (tag: string, days: number, notes: string) => ({
+  tag,
+  published_at: new Date(NOW.getTime() - days * 86_400_000).toISOString(),
+  notes,
+});
+
+/** Real CLI names with invented versions and notes: the real tags change every week and would drift. */
+export const AGENTS = {
+  harness_list: [
+    agent("claude", "Claude Code", "npm", "npm install -g @anthropic-ai/claude-code", true,
+      agentRelease("v2.4.0", 2, "## O que mudou\n\n- corrige o modo plano em terminais estreitos\n- novo comando /agents\n")),
+    agent("codex", "Codex CLI", "npm", "npm install -g @openai/codex", false, null),
+    agent("gemini", "Gemini CLI", "npm", "npm install -g @google/gemini-cli", true,
+      agentRelease("v0.9.1", 9, "## O que mudou\n\n- sessões retomáveis por projeto\n")),
+    agent("opencode", "OpenCode", "npm", "npm install -g opencode-ai", false, null),
+    agent("copilot", "GitHub Copilot CLI", "npm", "npm install -g @github/copilot", true,
+      agentRelease("v1.2.7", 16, "## O que mudou\n\n- pedidos em lote no mesmo repositório\n")),
+  ],
+};
+
 /** Invented games on purpose: a real title with a price and a discount would read as a fact. */
 export const STEAM = {
   steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },

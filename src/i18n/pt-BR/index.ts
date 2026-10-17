@@ -1,4 +1,5 @@
 import { app } from "./app";
+import { agents } from "./agents";
 import { content } from "./content";
 import { focus } from "./focus";
 import { health } from "./health";
@@ -8,4 +9,4 @@ import { steam } from "./steam";
 import { tasks } from "./tasks";
 
 /** One file per area so features can be translated (and reviewed) independently. */
-export const ptBR = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam } as const;
+export const ptBR = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents } as const;

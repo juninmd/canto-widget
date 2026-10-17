@@ -67,8 +67,8 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   `src/i18n/pt-BR/<area>.ts` and `src/i18n/en/<area>.ts` (app, tasks, content, integrations). A new key goes in
   **both** languages (the type and a parity test fail otherwise). Dates and numbers use `LOCALE`, not a literal.
   Symbols, key names and brand names stay inline. The language is chosen in Settings (`canto.language`, default
-  "auto") and resolved once at startup; Rust gets it via `language_set` for notifications and the tray
-  (`lang::tr`). Errors from Rust are still pt-BR strings in Rust. UI tests run in pt-BR (`src/test-setup.ts`).
+  "auto") and resolved once at startup; Rust gets it via `language_set` for notifications, the tray and the
+  errors it returns (`lang::tr`, `AppError::text`), whose English text is the fallback. UI tests run in pt-BR (`src/test-setup.ts`).
 - Comments only for *why*, one line. No narrating comments, no section banners.
 - Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
 - One feature per module; commands are thin, logic is a pure function with a unit test.
@@ -91,7 +91,8 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - **Local files** (`janela.json`, `biometria.json`, `drive.json`, `autostart.json`) read legacy keys through
   `#[serde(alias = "...")]`, each with a legacy-JSON test. Keep the alias when renaming.
 - Commands that read or write the vault are `#[tauri::command(async)]`: a sync command runs on the main thread and
-  each persist re-seals the whole vault (~120 ms at 22 MB), freezing the window. Lists sent to the webview are paged
+  each persist re-seals the whole vault (~120 ms at 22 MB), freezing the window. `with_session` therefore writes
+  only when the draft differs from what is in memory. Lists sent to the webview are paged
   or bounded (`notes_search` takes `limit` and returns `{total, items}`).
 - **Updater signing**: `plugins.updater.pubkey` in `tauri.conf.json` must match the private key in the
   `TAURI_SIGNING_PRIVATE_KEY` secret. Changing the pubkey without shipping it first under the old key leaves every

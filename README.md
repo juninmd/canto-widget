@@ -33,7 +33,7 @@ Arabic, Hebrew and Persian use right-to-left text. Additional language catalogs 
 The 40 new interface catalogs and 31 new README translations are machine translations and have not been
 reviewed by native speakers. Portuguese and English remain the original interface catalogs. Tray labels and
 notification headings follow the selected language; some integration alert details fall back to English,
-and backend errors remain in Portuguese. Task title syntax keeps the existing Portuguese and English keywords.
+as do the errors the backend returns, in any of the 42 languages. Task title syntax keeps the existing Portuguese and English keywords.
 
 ![Searchable language picker](docs/prints/languages-picker.png)
 ![Arabic interface with right-to-left text](docs/prints/languages-ar.png)
@@ -154,6 +154,21 @@ with **load more** so it reaches the rest of the store. Every row carries the **
 with Steam's own wording and how many reviews it counts, the crossed-out price, the price in reais and what the
 discount saves — and the list adds up the total saving. The public lists only need your **SteamID64**; an optional
 **Steam Web API key** adds the recent games with their playtimes. The tab starts off by default, one checkbox away
+in Settings.
+
+</td>
+</tr>
+<tr>
+<td><img src="docs/prints/app/90-agentes.png" alt="Agents tab: fictitious installed CLIs with the latest version, the release date and a summary of what changed"></td>
+<td>
+
+### 🤖 The agent CLIs, installed or not
+
+The coding-agent harnesses in one list: **Claude Code**, **Codex CLI**, **Gemini CLI**, **OpenCode**,
+**GitHub Copilot CLI** and **Aider**. Each row says whether the CLI is installed **on this machine** (and where),
+shows the **latest GitHub release** with its date and a summary of what changed, and — when the CLI is missing —
+brings the **install command ready to copy**. Canto only copies: **nothing is installed or executed** by the
+widget. Public data, no account or key, with a 30-minute cache. The tab starts off by default, one checkbox away
 in Settings.
 
 </td>
