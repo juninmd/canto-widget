@@ -41,6 +41,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Manifestos de winget e Homebrew gerados da release**: `bun scripts/packaging.ts write vX.Y.Z` reescreve os
+  quatro arquivos com a versão e os `sha256` lidos dos próprios assets da release, e `check vX.Y.Z` falha quando
+  algum ficou para trás — antes, uma release nova podia deixar o pacote instalando a versão antiga.
 - **Tema Glass**: novo tema com estética de vidro translúcido, superfícies semi-transparentes
   com desfoque de fundo (backdrop blur), azul vivo, reflexo especular na borda superior e contraste
   acessível em conformidade com WCAG AA.
