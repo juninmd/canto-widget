@@ -49,7 +49,7 @@ a backend chyby zostávajú v portugalčine. Syntax názvu úlohy zachováva exi
 Ak žijete medzi stretnutiami, PRs a malými čakajúcimi položkami, skončíte s otvorenými piatimi aplikáciami. Canto dáva do toho všetko
 jedno miesto.
 
-🔒 **Predvolene šifrované.** Argon2id + AES-256-GCM s hlavným heslom; kľúč vždy existuje iba v RAM.
+🔒 **V predvolenom nastavení šifrované.** Argon2id + AES-256-GCM s hlavným heslom; kľúč vždy existuje iba v RAM.
 Windows Hello voliteľné.
 
 🏠 **Vaše dáta zostanú s vami.** Nulová telemetria, nulový server, nie je potrebný žiadny účet. Záloha je jediná šifrovaná
@@ -58,10 +58,10 @@ Windows Hello voliteľné.
 ⏰ **Nezmeškáte to.** 1 minútu pred stretnutím a v čase pripomenutia sa miniaplikácia objaví, prehrá zvuk a
 odošle upozornenie s **odložením o 10 minút**.
 
-🪶 **Svetlo.** Tauri v2 (Rust + webové zobrazenie systému) namiesto Electronu: 3,5 MB inštalačný program.
+🪶 **Svetlo.** Tauri v2 (Rust + webové zobrazenie systému) namiesto Electron: 3,5 MB inštalačný program.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
-🔄 **Vždy aktuálne.** Aktualizuje sa v rámci aplikácie a nainštaluje iba to, čo je podpísané vlastným kľúčom projektu.
+🔄 **Vždy aktuálne.** Aktualizuje sa z aplikácie a nainštaluje iba to, čo je podpísané vlastným kľúčom projektu.
 
 </td>
 </tr>
@@ -93,8 +93,8 @@ Dnešné udalosti pochádzajú z Google Kalendára (iba na čítanie). Minútu p
 **pripojte sa k Meet**, prehrá zvuk a odošle systémové upozornenie bez ohľadu na to, na ktorej karte sa nachádzate, alebo aj keď je skrytá.
 Každá karta zobrazuje odznak s vašou odpoveďou (prijatá, možno, odmietnutá, čaká). Kliknutím na udalosť zistíte, kto ju organizoval
 to, program, každý hosť s iniciálami avatara a ich odpoveďou a prílohami, ako sú Blížencove poznámky.
-V hornom riadku sa zobrazuje **ďalší voľný slot** v trvaní najmenej 15 minút (odmietnuté pozvánky a celodenné udalosti sa
-počet) a udalosti, ktoré sa prekrývajú, dostanú odznak **konflikt** s názvom inej udalosti. Zobrazenie **Dnes** vedie s prebiehajúcou schôdzou (zostávajúci čas, tlačidlo pripojiť sa, varovanie pred konfliktom) alebo nasledujúcou, potom **deň v jednom riadku** (stretnutia, úlohy a voľný čas počas pracovnej doby, s časom stretnutia, voľný čas a konflikty) a jedna časová os, kde sú schôdze, úlohy s časom a voľné medzery riadky samy o sebe: medzera ponúka, aby sa zmestila nečasovaná úloha.
+V hornom riadku nájdete **ďalší voľný slot** v trvaní najmenej 15 minút (odmietnuté pozvánky a celodenné udalosti
+počet) a udalosti, ktoré sa prekrývajú, dostanú odznak **konflikt** s názvom inej udalosti. Zobrazenie **Dnes** vedie s prebiehajúcou schôdzou (zostávajúci čas, tlačidlo pripojiť sa, varovanie pred konfliktom) alebo nasledujúcou, potom **deň v jednom riadku** (stretnutia, úlohy a voľný čas v rámci pracovnej doby, s časom stretnutia, voľný čas a konflikty) a jedna časová os, kde sú schôdze, úlohy s časom a voľné medzery riadky samy o sebe: medzera ponúka, aby sa zmestila nečasovaná úloha.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -106,7 +106,7 @@ počet) a udalosti, ktoré sa prekrývajú, dostanú odznak **konflikt** s názv
 ### 🗒️ Poznámky ako karty
 
 Vyhľadávateľné karty s `#tags`, pripnutím navrch a filtrom značiek jedným kliknutím; každá karta zobrazuje začiatok poznámky **vykreslený** (názvy, kontrolné zoznamy, kód, odkazy), nie hrubé označenie. **WYSIWYG editor** s kompaktom
-lišta formátovania (tučné, kurzíva, kód, nadpis, zoznamy, kontrolné zoznamy, ktoré zaškrtávate priamo v texte, bloky kódu so syntaxou
+lišta formátovania (tučné, kurzíva, kód, nadpis, zoznamy, kontrolné zoznamy, ktoré začiarknete priamo v texte, bloky kódu so syntaxou
 zvýrazňovanie, odkazy, obrázky) a označovacie skratky pri písaní (`# `, `- `, `[ ] `, ` ``` `); prepínač **MD**
 zobrazuje hrubé zníženie, čo je stále spôsob, akým sa poznámky ukladajú, vyhľadávajú, synchronizujú a exportujú. Odkazy sa otvárajú pomocou
 `Ctrl`+kliknutie, iba http(s). Prilepte, vložte alebo pripojte obrázky (PNG, JPEG, GIF, WebP do veľkosti 2 MB), každý zapečatený vo svojom
@@ -144,15 +144,18 @@ rešpektuje limit sadzby. Prihláste sa pomocou osobného tokenu iba na čítani
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam bez opustenia miniaplikácie
 
-Štyri podkarty pre Steam: **ponuky zoznamu želaní** (najväčšia zľava ako prvá), **najpredávanejšie**, **hrať teraz** a
-**katalóg zoradený podľa hodnotenia**. Verejné zoznamy potrebujú iba vaše **SteamID64**; voliteľný **Steam webový kľúč API**
-pridáva päť najnovších hier s ich hracími časmi. Ceny prichádzajú v realoch, každý riadok otvára stránku obchodu a
-karta sa predvolene spustí o jedno začiarkavacie políčko v Nastaveniach.
+Štyri podkarty pre Steam: **ponuky na prianie** (najvyššia zľava, každá s tým, čo ušetrí), **najpredávanejšie**
+hodnotené, **hrať teraz** (každá hra Steam nahlási za posledné dva týždne) a **katalóg zoradený podľa hodnotenia**, stránkovaný
+s **načítať viac**, aby sa dostal do zvyšku obchodu. Každý riadok nesie **obrázok kapsuly**, **skóre recenzie**
+s vlastným znením Steam a koľko recenzií sa počíta, prečiarknutá cena, cena v realoch a aké
+zľava šetrí – a zoznam spočíta celkovú úsporu. Verejné zoznamy potrebujú iba vaše **SteamID64**; voliteľné
+**Steam Web API kľúč** pridáva najnovšie hry s ich hracími časmi. Karta sa predvolene spustí, o jedno začiarkavacie políčko ďalej
+v Nastaveniach.
 
 </td>
 </tr>
@@ -184,6 +187,11 @@ model **vstúpi do top 10** alebo **vstúpi do nej** (kontroluje sa každých 6 
 systémové upozornenie na 30 min, 1 h, 2 h, do zajtra alebo kým ho nevypnete. Zobrazí sa mesiac v hornej lište
 keď skončí; jedným kliknutím ho opäť vypnete. Prežije reštart a skončí sám.
 
+🔔 **Každé upozornenie na jednej obrazovke:** zvonček v hlavičke (počet a farba, keď niečo čaká) otvorí
+upozornenia cez celé okno v akomkoľvek režime: jedna karta na upozornenie s jeho akciami, **zavrieť všetky** a čo bolo
+vyriešené dnes pod nimi — bez toho, aby ste nič čakali, takto sa stále dostanete k dnešnému denníku. Z doku, kliknutie
+stále otvorí toto jediné upozornenie v hornej časti normálneho okna.
+
 ⌨️ **Všetko pomocou klávesnice:** `Alt+1`…`Alt+7` prepínanie kariet, `N` vytváranie, `/` vyhľadávanie, `F11` celá obrazovka, `Alt+L`
 uzamkne a `?` zobrazí zoznam skratiek. `Ctrl+Shift+P` (`Cmd+Shift+P` v systéme MacOS) otvorí **paletu príkazov** s každým
 akcia podľa názvu: prejdite na kartu, novú úlohu alebo poznámku, pripojte sa k ďalšej schôdzi, skopírujte súhrn dňa, prepnite vzhľad, uzamknite.
@@ -211,7 +219,7 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 
 ![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
 
-| Vitajte pri prvom spustení | Globálne vyhľadávanie (`Ctrl+K`) | Vlastná karta GitLab | Upozornenie na stretnutie |
+| Vitajte pri prvom spustení | Globálne vyhľadávanie (`Ctrl+K`) | Karta GitLab s vlastným hosťovaním | Upozornenie na stretnutie |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
 
@@ -235,11 +243,11 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Kliknite na upozornenie v doku | Maximalizované: úlohy a upozornenia s posuvným oddeľovačom |
+| Kliknite na upozornenie v doku | Maximalizované: celé okno pre otvorenú kartu |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Zvonček otvára upozornenia cez celé okno |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ A **Follow system**, ktorý prepína medzi svetlom a tmou spolu s OS. Všetky pr
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: posledných päť odohraných zápasov s oboma hracími časmi |
+| Steam: najpredávanejšie, očíslované | Steam: posledných päť odohraných zápasov s oboma hracími časmi |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: katalóg podľa hodnotenia, s "načítať viac" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Jedno prekrytie výstrahy pre všetko čakajúce: výpadky, stretnutia, úlohy a nové modely AI |
 |---|
@@ -389,7 +401,7 @@ je zachované a čo nikdy nie je.
 - **Deň**: šiška podľa kategórie s celkovým počtom vnútri, ktorej legenda ukrýva kategóriu, zmenu oproti dňu
 pred a čas nečinnosti (bez klávesnice alebo myši po dobu 2 minút). Pod ním denný cieľ zameraný na kód s pruhom a
 jedna bodka za deň, tri zvýraznenia (najdlhší úsek v jednej aplikácii, prepínanie aplikácií, hodina špičky), časová os, kde
-deň, nečinnosť sa tiahne a najrušnejšie aplikácie zdieľajú jednu časovú os so značkou „teraz“ a zoznamom aplikácií
+deň, nečinnosť sa tiahne a najvyťaženejšie aplikácie zdieľajú jednu časovú os so značkou „teraz“ a zoznamom aplikácií
 (klepnutím na jednu zmeníte jej kategóriu) alebo úloh, pri ktorých sa spúšťal časovač zaostrenia.
 - **Týždeň**: zoskupené stĺpce za deň s priemernou čiarou a bodkou pod každým dňom, ktorý splnil cieľ, hodinová teplotná mapa
 s vaším vrcholom a rovnaké zoznamy na celý týždeň.
@@ -403,7 +415,7 @@ farby kategórie, skontrolovaný kontrast. Menu vedľa dňa ho skopíruje ako te
 Žiadny zo skúmaných nástrojov nepokrýva viac ako dve z týchto frontov naraz. Zdroje a podrobnosti v
 [docs/benchmark.md](docs/benchmark.md).
 
-| | Úlohy + pripomienka | Poznámky | Schránka | Stretnutia | GitHub | Lokálne šifrovanie štandardne |
+| | Úlohy + pripomienka | Poznámky | Schránka | Stretnutia | GitHub | Predvolene lokálne šifrovanie |
 |---|:-:|:-:|:-:|:-:|:-:|:-:|
 | **Canto** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Todoist / TickTick | ✅ | ➖ | — | — | — | — |
@@ -446,7 +458,7 @@ repozitáre: publikovanie je manuálne rozhodnutie a činnosť správcu.
 |---|---|
 | Trezor | Argon2id (19 MiB, t=2) → AES-256-GCM, nový raz pri každom zápise, atómový zápis s `fsync` |
 | Kľúč | Iba RAM, vynulované na uzamknutie; konfigurovateľný automatický zámok (5 až 60 minút nečinnosti, 15 minút štandardne) |
-| Sieť | iba proces Rust hovorí so sieťou; webview nemá vzdialený pôvod (CSP) a nikdy nevidí tokeny |
+| Sieť | iba proces Rust hovorí do siete; webview nemá vzdialený pôvod (CSP) a nikdy nevidí tokeny |
 | Google | voliteľné, iba `calendar.events.readonly`, `directory.readonly` (fotografie kolegov z pracovného priestoru v zozname hostí) plus profil, OAuth s PKCE a spätnou slučkou |
 | GitHub | voliteľný, šifrovaný token; položky sa otvárajú iba vtedy, ak je odkaz `https://github.com/` |
 | GitLab | voliteľná, šifrovaná adresa a token; Iba `https://`, žiadne presmerovania, odkazy iba z nakonfigurovanej inštancie |

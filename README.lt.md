@@ -28,7 +28,7 @@
 ## 🌐 Kalbos
 
 Canto siūlo **42 sąsajos kalbas**, kurių kiekviena turi savo README. Pasirinkite savo skiltyje **Nustatymai → Kalba**;
-paieškos rinkiklis naudoja gimtosios kalbos pavadinimus, o automatinis režimas atitinka jūsų pagrindinę sistemos kalbą.
+Paieškos rinkiklis naudoja gimtosios kalbos pavadinimus, o automatinis režimas atitinka jūsų pagrindinę sistemos kalbą.
 Arabų, hebrajų ir persų kalbomis vartojamas tekstas iš dešinės į kairę. Papildomi kalbų katalogai įkeliami pagal poreikį.
 
 40 naujų sąsajų katalogų ir 31 naujas README vertimas yra mašininiai vertimai ir dar nebuvo
@@ -58,7 +58,7 @@ Windows Hello neprivaloma.
 ⏰ **Nepraleisite.** Likus 1 minutei iki susitikimo ir priminimo metu, valdiklis iššoka, paleidžia garsą ir
 siunčia pranešimą su **snausti 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + sistemos žiniatinklio vaizdas) vietoj Electron: 3,5 MB diegimo programa.
+🪶 **Light.** Tauri v2 (Rust + sistemos žiniatinklio rodinys) vietoj Electron: 3,5 MB diegimo programa.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Visada atnaujinama.** Atnaujinama iš programos ir įdiegiama tik tai, kas pasirašyta paties projekto raktu.
@@ -94,7 +94,7 @@ Prisijunkite prie kito susitikimo naudodami `Ctrl+Alt+M` (`Ctrl+Cmd+M` sistemoje
 Kiekvienoje kortelėje rodomas ženklelis su jūsų atsakymu (priimta, galbūt, atmesta, laukiama). Spustelėkite įvykį, kad pamatytumėte, kas jį organizavo
 tai, dienotvarkė, kiekvienas svečias su inicialais avataras ir jų atsakymas bei priedai, kaip Dvynių užrašai.
 Viršutinėje eilutėje nurodomas **kitas nemokamas laikas** mažiausiai 15 minučių (atmesti kvietimai ir visos dienos renginiai
-skaičius), o įvykiai, kurie sutampa, gauna **konflikto** ženklelį, įvardijantį kitą įvykį. Rodinyje **Šiandien** rodomas vykstantis susitikimas (liko laikas, prisijungimo mygtukas, įspėjimas apie susidūrimą) arba kitas, tada **dieną vienoje eilutėje** (susitikimai, užduotys ir laisvas laikas darbo valandomis, skaičiuojant susitikimo laiką, laisvą laiką ir konfliktus) ir viena laiko juosta, kurioje susitikimai, užduotys su laiku ir laisvos spragos jau siūlo savo užduočių eilutes.
+skaičius), o įvykiai, kurie sutampa, gauna **konflikto** ženklelį, įvardijantį kitą įvykį. Rodinyje **Šiandien** rodomas vykstantis susitikimas (liko laikas, prisijungimo mygtukas, įspėjimas apie susidūrimą) arba kitas, tada **diena vienoje eilutėje** (susitikimai, užduotys ir laisvas laikas darbo valandomis, skaičiuojant susitikimo laiką, laisvą laiką ir konfliktus) ir viena laiko juosta, kurioje susitikimai, užduotys su laiku ir laisvos spragos jau siūlo savo užduočių eilutes.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -144,15 +144,18 @@ laikosi normos ribos. Prisijunkite naudodami tik skaitomą asmeninį prieigos ra
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam neišeinant iš valdiklio
 
-Keturi Steam antriniai skirtukai: **pageidavimų sąrašo pasiūlymai** (pirmiausia didžiausia nuolaida), **perkamiausi**, **žaisk dabar** ir
-**katalogas surikiuotas pagal reitingą**. Viešiesiems sąrašams reikia tik jūsų **SteamID64**; pasirenkamas **Steam žiniatinklio API raktas**
-prideda penkis naujausius žaidimus su jų žaidimo laiku. Kainos pateikiamos realiomis, kiekviena eilutė atidaro parduotuvės puslapį ir
-skirtukas paleidžiamas pagal numatytuosius nustatymus, nustatymuose už vieną žymimąjį laukelį.
+Keturi Steam antriniai skirtukai: **pageidavimų sąrašo pasiūlymai** (pirmiausia didžiausia nuolaida, su kiekvienu sutaupoma), **perkamiausi**
+reitinguojamas, **žaisk dabar** (paskutines dvi savaites praneša apie kiekvieną žaidimą Steam) ir **katalogas, išdėstytas pagal įvertinimą**, puslapiuose
+su **įkelkite daugiau**, kad pasiektų likusią parduotuvės dalį. Kiekvienoje eilutėje yra **kapsulės paveikslėlis**, **apžvalgos balas**
+su paties Steam formuluote ir kiek atsiliepimų ji skaičiuojama, perbraukta kaina, kaina realais ir kokia
+sutaupo nuolaida – ir sąraše pridedama visa sutaupyta suma. Viešiesiems sąrašams reikia tik jūsų **SteamID64**; neprivalomas
+**Steam Žiniatinklio API klavišas** prideda naujausius žaidimus su jų žaidimo laiku. Skirtukas paleidžiamas pagal numatytuosius nustatymus, už vieno žymės langelio
+nustatymuose.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ modelis **patenka į 10 geriausių** arba **lipa į jį** (tikrinama kas 6 valan
 🌙 **Netrukdyti:** nustatymuose arba dėkle nutildykite susitikimo įspėjimus, užduočių priminimus, būsenos įspėjimus ir kiekvieną
 sistemos pranešimas 30 min., 1 val., 2 val., iki rytojaus arba kol jį išjungsite. Viršutinėje juostoje rodomas mėnulis
 kai jis baigiasi; vienu paspaudimu jis vėl išjungiamas. Jis išgyvena iš naujo ir baigiasi savaime.
+
+🔔 **Kiekvienas įspėjimas viename ekrane:** varpelis antraštėje (skaičiuokite ir nuspalvinkite, kai laukiama) atidaro
+įspėjimai visame lange bet kuriuo režimu: viena kortelė kiekvienam įspėjimui su jo veiksmais, **atmesti visus** ir kas buvo
+išspręsta šiandien pagal juos – nieko nelaukiant, taip vis dar pasieksite šiandienos žurnalą. Iš doko spustelėjimas
+vis tiek atidaro tą vienintelį įspėjimą įprasto lango viršuje.
 
 ⌨️ **Viskas naudojant klaviatūrą:** `Alt+1`…`Alt+7` perjunkite skirtukus, `N` kuria, `/` ieško, `F11` viso ekrano, `Alt+L`
 užrakina ir `?` pateikia sparčiųjų klavišų sąrašą. `Ctrl+Shift+P` (`Cmd+Shift+P` sistemoje „MacOS“) atidaro **komandų paletę** su kiekviena
@@ -235,11 +243,11 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Spustelėkite įspėjimą doke | Maksimalus: užduotys ir pranešimai su nutraukiamu skirstytuvu |
+| Spustelėkite įspėjimą doke | Maksimalus: visas atidaryto skirtuko langas |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Varpelis atidaro įspėjimus visame lange |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -307,7 +315,7 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|---|
 | ![Weekly report in markdown: totals, one line per workday, tasks done, notes, meetings grouped by title and PRs/MRs](docs/prints/app/40-relatorio-semanal.png) | ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) |
 
-| Darbotvarkė: šiuo metu nemokama | Komandų paletė (`Ctrl+Shift+P`) |
+| Dienotvarkė: šiuo metu nemokama | Komandų paletė (`Ctrl+Shift+P`) |
 |---|---|
 | ![Agenda saying "free now until 13:00" because the lunch invite was declined](docs/prints/app/34-agenda-livre-agora.png) | ![Command palette listing tabs, new task, global search, join the next meeting and skins, with their shortcuts](docs/prints/app/38-paleta-comandos.png) |
 
@@ -335,11 +343,15 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: paskutiniai penki sužaisti žaidimai, abu žaidimo laikai |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: perkamiausi, sunumeruoti | Steam: paskutiniai penki sužaisti žaidimai, abu žaidimo laikai |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
-| Viena įspėjimo perdanga apie viską, kas laukia: gedimai, susitikimai, užduotys ir nauji AI modeliai |
+| Steam: katalogas pagal įvertinimą su "įkelti daugiau" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
+| Viena įspėjimo perdanga apie viską, kas laukiama: gedimai, susitikimai, užduotys ir nauji AI modeliai |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
 
@@ -349,7 +361,7 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|---|---|
 | ![Status API, My endpoints sub-tab: a grid of tiles with latency, recent readings and certificate days](docs/prints/app/76-endpoints-grade.png) | ![An endpoint open over the whole row with the latency chart, the limit line and the stats](docs/prints/app/77-endpoints-aberto.png) | ![The new endpoint form with the DNS + certificate kind selected](docs/prints/app/78-endpoints-novo.png) |
 
-| Bet kurios dienos darbotvarkė: ankstesnė ir kita rodyklės, datos rinkiklis ir mygtukas Grįžti į šiandieną |
+| Bet kurios dienos dienotvarkė: ankstesnė ir kita rodyklės, datos rinkiklis ir mygtukas Grįžti į šiandieną |
 |---|
 | ![Agenda tab on tomorrow with the day stepper, the first meeting and the day in one line](docs/prints/app/75-agenda-dia.png) |
 
@@ -369,7 +381,7 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 |---|
 | ![GitHub tab where review requests are listed oldest first, the one past 48 hours in red, each with a snooze 4 h link](docs/prints/app/54-radar-de-revisao.png) |
 
-| Susitikimai kaip darbotvarkės antrinis skirtukas, šalia Sąrašas ir Diena |
+| Susirinkimai kaip darbotvarkės antrinis skirtukas, šalia Sąrašas ir Diena |
 |---|
 | ![Agenda tab with the Today and Meetings sub-tabs, the Meetings one selected: folder, search box and three fictitious transcripts](docs/prints/app/52-agenda-reunioes.png) |
 
@@ -382,7 +394,7 @@ Ir **Sekite sistemą**, kuri kartu su OS persijungia iš šviesios ir tamsios. V
 | ![Activity tab on the week view: stacked columns per day with the average line and a dot under each day that met the goal, then the hour heat map](docs/prints/app/69-atividade-semana.png) | ![Activity tab turned off: what is kept and what never is, then the button to turn tracking on](docs/prints/app/70-atividade-desligada.png) | ![Activity tab on a wide window: summary and goal on the left, timeline and lists on the right](docs/prints/app/71-atividade-janela-larga.png) |
 
 Skirtukas **Veikla** pradedamas paslėpti (įjunkite jį skiltyje Nustatymai → matomi skirtukai). Jis įrašo tik pavadinimą
-sufokusuota programa, kai naudojatės kompiuteriu, uždarame vietiniame faile, kuris niekada nepasiekia atsarginių kopijų arba nesinchronizuoja (Wayland
+sufokusuota programa, kai naudojate kompiuterį, uždarame vietiniame faile, kuris niekada nepasiekia atsarginių kopijų arba sinchronizuoja (Wayland
 negali pranešti apie paryškintą langą, todėl jis ten nepasiekiamas). Išjungta, kol pasirinksite, ir pirmame ekrane bus parodyta, kas
 yra saugomas ir kas niekada nėra.
 
@@ -400,7 +412,7 @@ kategorijos spalvos, patikrintas kontrastas. Šalia dienos esantis meniu nukopij
 
 ## ⚖️ Palyginti su tuo, kas ten yra
 
-Nė vienas iš tirtų įrankių neapima daugiau nei dviejų šių frontų vienu metu. Šaltiniai ir detalės
+Nė vienas iš tirtų įrankių neapima daugiau nei dviejų iš šių frontų vienu metu. Šaltiniai ir detalės
 [docs/benchmark.md](docs/benchmark.md).
 
 | | Užduotys + priminimas | Pastabos | Iškarpinė | Susitikimai | GitHub | Vietinis šifravimas pagal numatytuosius nustatymus |
@@ -415,7 +427,7 @@ Nė vienas iš tirtų įrankių neapima daugiau nei dviejų šių frontų vienu 
 
 <sub>✅ gimtoji · ➖ dalinė, per plėtinį arba pasirenkama · — nėra · ? nepaskelbta · n/a nesaugo vartotojo duomenų</sub>
 
-Ką čia atnešė etalonas: ** laikas tiesiai užduoties pavadinime** (Todoist / TickTick), ** įspėjimo atidėjimas**
+Ką čia atnešė etalonas: ** laikas tiesiai užduoties pavadinime** (Todoist / TickTick), ** įspėjimo snaudimas**
 („TickTick“) ir **iškarpinė, kuri gerbia slaptažodžių tvarkykles** („CopyQ/Ditto“).
 
 ## ⬇️ Įdiegti
@@ -430,7 +442,7 @@ Atsisiųskite savo platformos diegimo programą iš **[Releases](https://github.
 
 1. Pirmą kartą paleidus sukuriate **pagrindinį slaptažodį**. Atkūrimo nėra: pameskite slaptažodį, praraskite duomenis.
 2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` sistemoje „macOS“) rodo ir paslepia valdiklį.
-3. Atlikta. Kai pristatoma nauja versija, Canto apie tai praneš, o **Nustatymai → Atnaujinimai** atnaujina vienu spustelėjimu.
+3. Atlikta. Kai pristatoma nauja versija, Canto praneš apie tai, o **Nustatymai → Atnaujinimai** atnaujina vienu paspaudimu.
 
 > [!PASTABA]
 > Diegimo programos dar nepasirašytos kodu: „SmartScreen“ („Windows“) ir „Gatekeeper“ („MacOS“) įspėja pirmą kartą paleidžiant.
@@ -444,9 +456,9 @@ saugyklos: publikavimas yra prižiūrėtojo rankinis sprendimas ir veiksmas.
 
 | Sluoksnis | Apsauga |
 |---|---|
-| Skliautas | Argon2id (19 MiB, t = 2) → AES-256-GCM, naujos kartos kiekvieno rašymo metu, atominis rašymas su `fsync` |
+| Skliautas | Argon2id (19 MiB, t = 2) → AES-256-GCM, naujas įrašas kiekvieno rašymo metu, atominis rašymas su `fsync` |
 | Raktas | Tik RAM, užrakintas nulis; konfigūruojamas automatinis užraktas (nuo 5 iki 60 min. tuščiąja eiga, 15 min pagal numatytuosius nustatymus) |
-| Tinklas | tik Rust procesas kalbasi su tinklu; žiniatinklio rodinys neturi nuotolinės kilmės (CSP) ir niekada nemato prieigos raktų |
+| Tinklas | tik Rust procesas bendrauja su tinklu; žiniatinklio rodinys neturi nuotolinės kilmės (CSP) ir niekada nemato prieigos raktų |
 | Google | neprivaloma, tik `calendar.events.readonly`, `directory.readonly` (darbo vietos kolegų nuotraukos svečių sąraše) plius profilis, OAuth su PKCE ir atgalinis ryšys |
 | GitHub | neprivalomas, šifruotas prieigos raktas; elementai atidaromi tik tada, jei nuoroda yra `https://github.com/` |
 | GitLab | neprivalomas, užšifruotas adresas ir prieigos raktas; Tik `https://`, jokių peradresavimų, nuorodos tik iš sukonfigūruoto egzemplioriaus |
@@ -457,7 +469,7 @@ Radai trūkumą? [SECURITY.md](SECURITY.md).
 
 ## 📚 Dokumentacija
 
-| Dokumentas | Kas jame yra |
+| Dokumentas | Kas jame |
 |---|---|
 | 📖 [User guide](docs/uso.md) | skirtukai, pasikartojančios užduotys, spartieji klavišai, apvalkalai, pasiekiamumas, langas, naujinimai ir pradžia nuo sistemos |
 | 🔌 [Integrations](docs/integracoes.md) | Google darbotvarkė ir GitHub (asmeninis prieigos raktas arba įrenginio srautas) |
@@ -490,4 +502,4 @@ gauti SemVer žymą, sugeneruotas laidos pastabas ir pasirašytas diegimo progra
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Pagaminta naudojant 🦀 Rust, ⚛️ React ir ☕ tiems, kurie gyvena tarp susitikimų.</sub></div>
+<div align="center"><sub>Sukurta naudojant 🦀 Rust, ⚛️ React ir ☕ tiems, kurie gyvena tarp susitikimų.</sub></div>

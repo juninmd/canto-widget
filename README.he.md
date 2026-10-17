@@ -22,7 +22,7 @@
 <br>
 
 > **משימות עם תזכורות, הערות, היסטוריית לוח, סדר יום עם התראות פגישות, תמלילים וה-GitHub PRs שלך
-> בחלון קטן המוצמד לפינת המסך.** קופץ עם `Ctrl+Alt+Space`, מסתיר כשלא צריך
+> בחלון קטן המוצמד לפינת המסך.** צץ עם `Ctrl+Alt+Space`, מסתיר כשלא צריך
 > זה ושומר הכל מוצפן במחשב שלך, ללא חשבון וללא שרת.
 
 ## 🌐 שפות
@@ -144,15 +144,18 @@ JSON בפורמט או קומפקטי, טקסט בשורה אחת, באותיו�
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam מבלי לעזוב את הווידג'ט
 
-ארבע כרטיסיות משנה עבור Steam: **עסקאות רשימת משאלות** (ההנחה הגדולה ביותר תחילה), **מוכרים מובילים**, **שחק עכשיו** וה
-**קטלוג בהזמנה לפי דירוג**. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; מפתח **Steam אינטרנט API אופציונלי**
-מוסיף את חמשת המשחקים האחרונים עם זמני המשחק שלהם. המחירים מגיעים בריאל, כל שורה פותחת את עמוד החנות, ו
-הכרטיסייה מתחילה כברירת מחדל, במרחק של תיבת סימון אחת בהגדרות.
+ארבע כרטיסיות משנה עבור Steam: **עסקאות רשימת משאלות** (ההנחה הגדולה ביותר תחילה, כל אחת מהן מה שהיא חוסכת), **המוכרים הטובים ביותר**
+מדורג, **שחק עכשיו** (כל משחק Steam מדווח בשבועיים האחרונים) ו**הקטלוג מסודר לפי דירוג**, דפוף
+עם **טען עוד** כך שיגיע לשאר החנות. כל שורה נושאת את **אמנות הקפסולה**, **ציון הביקורת**
+עם הניסוח של Steam עצמו וכמה סקירות זה נחשב, המחיר המרוחק, המחיר בריאיס ומה
+חיסכון בהנחה - והרשימה מצטברת את החיסכון הכולל. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; אופציונלי
+**Steam מפתח אינטרנט API** מוסיף את המשחקים האחרונים עם זמני המשחק שלהם. הכרטיסייה מתחילה כברירת מחדל, במרחק תיבת סימון אחת
+בהגדרות.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 🌙 **אל תפריע:** בהגדרות או במגש, השתקת התראות פגישות, תזכורות משימות, התראות סטטוס וכל
 הודעת מערכת למשך 30 דקות, שעה אחת, שעתיים, עד מחר או עד שתכבה אותה. ירח בסרגל העליון מראה
 מתי זה נגמר; לחיצה אחת מכבה אותו בחזרה. זה שורד הפעלה מחדש ומסתיים לבד.
+
+🔔 **כל התראה במסך אחד:** הפעמון בכותרת (ספירה וצבע כאשר משהו ממתין) פותח את
+התראות על כל החלון בכל מצב: כרטיס אחד לכל התראה עם הפעולות שלו, **בטל הכל**, ומה היה
+נפתרה היום תחתיהם - בלי שום דבר תלוי ועומד, כך אתה עדיין מגיע ליומן של היום. מהרציף, קליק
+עדיין פותח את ההתראה היחידה על גבי החלון הרגיל.
 
 ⌨️ **הכל לפי מקלדת:** `Alt+1`...`Alt+7` מעבר לשוניות, `N` יוצר, `/` חיפושים, `F11` מסך מלא, `Alt+L`
 מנעולים ו`?` מפרט את קיצורי הדרך. `Ctrl+Shift+P` (`Cmd+Shift+P` ב-macOS) פותח **פלטת פקודות** עם כל
@@ -235,11 +243,11 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| לחץ על התראה ברציף | מקסימום: משימות והתראות, עם מפריד הניתן לגרירה |
+| לחץ על התראה ברציף | מקסימום: כל החלון עבור הכרטיסייה הפתוחה |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| הפעמון פותח את ההתראות על כל החלון |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -303,7 +311,7 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |
 
-| דוח שבועי | סדר היום: הזמן הפנוי הבא ועימותים |
+| דיווח שבועי | סדר היום: הזמן הפנוי הבא ועימותים |
 |---|---|
 | ![Weekly report in markdown: totals, one line per workday, tasks done, notes, meetings grouped by title and PRs/MRs](docs/prints/app/40-relatorio-semanal.png) | ![Agenda with "next free time: 09:45–10:00 (15 min)" on top and two overlapping events marked as conflict](docs/prints/app/33-agenda-tempo-livre.png) |
 
@@ -335,9 +343,13 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: חמשת המשחקים האחרונים ששיחקו, עם שני זמני המשחק |
+| Steam: המוכרים המובילים, ממוספרים | Steam: חמשת המשחקים האחרונים ששיחקו, עם שני זמני המשחק |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: הקטלוג לפי דירוג, עם "טען עוד" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | שכבת התראה אחת לכל מה שממתין: הפסקות, פגישות, משימות ודגמי AI חדשים |
 |---|
@@ -433,18 +445,18 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 3. בוצע. כאשר גרסה חדשה נשלחת, Canto מודיע לך, ו-**הגדרות → עדכונים** מתעדכן בלחיצה אחת.
 
 > [!הערה]
-> המתקנים עדיין לא חתומים בקוד: SmartScreen (Windows) ו-Gatekeeper (macOS) מזהירים בעת ההשקה הראשונה.
+> המתקנים עדיין לא חתומים בקוד: SmartScreen (Windows) ו-gatekeeper (macOS) מזהירים בהפעלה הראשונה.
 > עדכונים אוטומטיים מאומתים מול החתימה של הפרויקט עצמו לפני ההפעלה.
 
 מניפסטים מוכנים עבור winget וה-Homebrew (בתוספת שלד עבור Flatpak, חסום כרגע) חיים ב
-[`packaging/`](packaging/README.md) - הוכן ומאומת באופן מקומי, אך עדיין לא פורסם לאלו
+[`packaging/`](packaging/README.md) - הוכן ומאומת באופן מקומי, אך עדיין לא פורסם לאלה
 מאגרים: פרסום הוא החלטה ופעולה ידנית של המתחזק.
 
 ## 🔒 אבטחה במבט חטוף
 
 | שכבה | הגנה |
 |---|---|
-| כספת | Argon2id (19 MiB, t=2) ← AES-256-GCM, נונס טרי בכל כתיבה, כתיבה אטומית עם `fsync` |
+| כספת | Argon2id (19 MiB, t=2) ← AES-256-GCM, נון טרי על כל כתיבה, כתיבה אטומית עם `fsync` |
 | מפתח | זיכרון RAM בלבד, מאופס בנעילה; נעילה אוטומטית הניתנת להגדרה (5 עד 60 דקות סרק, 15 דקות כברירת מחדל) |
 | רשת | רק תהליך Rust מדבר עם הרשת; לתצוגת האינטרנט אין מקור מרוחק (CSP) ולעולם לא רואים אסימונים |
 | Google | אופציונלי, רק `calendar.events.readonly`, `directory.readonly` (תמונות של עמיתים לעבודה ברשימת האורחים) בתוספת פרופיל, OAuth עם PKCE ו-loopback |

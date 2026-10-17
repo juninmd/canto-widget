@@ -112,7 +112,12 @@ pub mod status_feed;
 pub mod status_live;
 pub mod steam;
 pub mod steam_feed;
+pub mod steam_lists;
 pub mod steam_parse;
+pub mod steam_player;
+pub mod steam_review;
+pub mod steam_store;
+pub mod steam_url;
 pub mod store;
 pub mod subtask;
 pub mod sync;
@@ -356,6 +361,7 @@ pub fn run() {
             cmd_steam::steam_trending,
             cmd_steam::steam_catalog,
             cmd_steam::steam_recent,
+            cmd_steam::steam_image,
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,
             do_not_disturb::dnd_clear,

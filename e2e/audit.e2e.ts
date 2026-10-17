@@ -100,7 +100,24 @@ for (const density of ["compacta", "padrao"]) {
           my_pr_alerts_get: { ci: true, stalled: true, stalled_hours: 48, mentions: true }, review_alerts_get: true,
           activity_status: { supported: true, enabled: false },
           steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },
-          steam_deals: { has_more: true, items: [{ appid: 900001, name: "Aurora Drift", price: "R$ 14,99", original: "R$ 59,99", discount: 75, review: null, review_label: "" }] },
+          steam_image: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+          steam_deals: {
+            has_more: true,
+            items: [
+              {
+                appid: 900001,
+                name: "Aurora Drift",
+                price: "R$ 14,99",
+                original: "R$ 59,99",
+                discount: 75,
+                review: 91,
+                review_key: "very_positive",
+                review_count: 12345,
+                saved_cents: 4500,
+                art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900001/capsule_231x87.jpg",
+              },
+            ],
+          },
           harness_list: agents,
         },
       });

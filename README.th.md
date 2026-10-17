@@ -21,7 +21,7 @@
 
 <br>
 
-> **งานที่มีการเตือนความจำ บันทึกย่อ ประวัติคลิปบอร์ด วาระการประชุมพร้อมการแจ้งเตือนการประชุม ข้อความถอดเสียง และ GitHub PRs ของคุณ
+> **งานที่มีการเตือนความจำ บันทึก ประวัติคลิปบอร์ด วาระการประชุมพร้อมการแจ้งเตือนการประชุม สำเนาบันทึกและ GitHub PRs ของคุณ
 > ในหน้าต่างเล็กๆ ที่ปักหมุดไว้ที่มุมหน้าจอ** ปรากฏขึ้นพร้อมกับ `Ctrl+Alt+Space` ซ่อนเมื่อคุณไม่ต้องการ
 > และเก็บทุกอย่างเข้ารหัสไว้บนเครื่องของคุณ โดยไม่มีบัญชีและไม่มีเซิร์ฟเวอร์
 
@@ -49,8 +49,8 @@ Canto มี **ภาษาอินเทอร์เฟซ 42 ภาษา** �
 หากคุณอยู่ระหว่างการประชุม PRs และรายการที่ค้างอยู่เล็กน้อย คุณจะเปิดแอปได้ห้าแอป Canto ใส่ทุกอย่างลงไป
 ที่เดียว
 
-🔒 **เข้ารหัสโดยค่าเริ่มต้น** Argon2id + AES-256-GCM พร้อมรหัสผ่านหลัก กุญแจนั้นมีอยู่ใน RAM เท่านั้น
-Windows Hello optional.
+🔒 **เข้ารหัสโดยค่าเริ่มต้น** Argon2id + AES-256-GCM ด้วยรหัสผ่านหลัก กุญแจนั้นมีอยู่ใน RAM เท่านั้น
+Windows Hello ไม่บังคับ
 
 🏠 **ข้อมูลของคุณอยู่กับคุณ** ไม่ต้องใช้การวัดทางไกล เซิร์ฟเวอร์เป็นศูนย์ ไม่ต้องใช้บัญชี การสำรองข้อมูลเป็นการเข้ารหัสเดียว
 `.canto` ไฟล์
@@ -67,7 +67,7 @@ Windows Hello optional.
 </tr>
 </table>
 
-## 🧰 Features
+## 🧰 คุณสมบัติ
 
 <table>
 <tr>
@@ -84,7 +84,7 @@ Windows Hello optional.
 <tr>
 <td>
 
-### 📅 เริ่มประชุมแล้วเหรอ? It tells you.
+### 📅 เริ่มประชุมแล้วเหรอ? มันบอกคุณ.
 
 เข้าร่วมการประชุมครั้งถัดไปกับ `Ctrl+Alt+M` (`Ctrl+Cmd+M` บน macOS) หากการลงทะเบียนล้มเหลว Canto จะพยายาม
 `Ctrl+Alt+Shift+M` (`Ctrl+Cmd+Shift+M` บน macOS); เมนูถาดจะยังคงใช้งานได้หากทั้งสองรายการไม่พร้อมใช้งาน
@@ -93,7 +93,7 @@ Windows Hello optional.
 **เข้าร่วม Meet** เล่นเสียงและส่งการแจ้งเตือนของระบบ ไม่ว่าคุณจะอยู่บนแท็บใดก็ตาม หรือแม้แต่แท็บนั้นถูกซ่อนอยู่ก็ตาม
 การ์ดแต่ละใบจะแสดงป้ายพร้อมคำตอบของคุณ (ยอมรับ อาจ ปฏิเสธ กำลังรอ) คลิกกิจกรรมเพื่อดูว่าใครเป็นผู้จัด
 มัน กำหนดการ แขกทุกคนที่มีอวตารย่อและคำตอบของพวกเขา และไฟล์แนบ เช่น บันทึกของราศีเมถุน
-บรรทัดบนสุดจะบอกคุณถึง **ช่วงว่างถัดไป** อย่างน้อย 15 นาที (คำเชิญที่ถูกปฏิเสธและกิจกรรมตลอดทั้งวันจะไม่
+บรรทัดบนสุดจะบอกคุณถึง **ช่วงว่างถัดไป** อย่างน้อย 15 นาที (คำเชิญที่ถูกปฏิเสธและกิจกรรมตลอดทั้งวันไม่
 นับ) และเหตุการณ์ที่ทับซ้อนกันจะได้รับป้าย **ข้อขัดแย้ง** เพื่อตั้งชื่อกิจกรรมอื่น มุมมอง **วันนี้** นำไปสู่การประชุมที่กำลังดำเนินอยู่ (เวลาที่เหลือ ปุ่มเข้าร่วม การเตือนการปะทะกัน) หรือรายการถัดไป จากนั้น **วันในบรรทัดเดียว** (การประชุม งาน และเวลาว่างตลอดชั่วโมงทำงาน พร้อมเวลาประชุม เวลาว่าง และข้อขัดแย้งที่นับไว้) และไทม์ไลน์เดียวที่การประชุม งานที่มีเวลา และช่องว่างที่ว่างเป็นแถวของตัวเอง: ช่องว่างเสนอให้เหมาะกับงานที่ไม่มีเวลา และสิ่งที่เกินพับไปแล้ว
 
 </td>
@@ -144,15 +144,18 @@ JSON อยู่ในรูปแบบหรือกะทัดรัด �
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam โดยไม่ต้องออกจากวิดเจ็ต
 
-แท็บย่อยสี่แท็บสำหรับ Steam: **ข้อเสนอสิ่งที่อยากได้** (ส่วนลดสูงสุดก่อน) **สินค้าขายดี** **เล่นเลย** และ
-**แคตตาล็อกเรียงลำดับตามการให้คะแนน** รายการสาธารณะต้องการเพียง **SteamID64** ของคุณเท่านั้น ตัวเลือก **Steam เว็บ API คีย์**
-เพิ่มห้าเกมล่าสุดพร้อมเวลาเล่น ราคามาจริงทุกแถวเปิดหน้าร้านและ
-แท็บจะเริ่มต้นโดยค่าเริ่มต้น โดยเหลือช่องทำเครื่องหมายหนึ่งช่องในการตั้งค่า
+แท็บย่อยสี่แท็บสำหรับ Steam: **ข้อเสนอสิ่งที่ปรารถนา** (ส่วนลดมากที่สุดก่อน แต่ละรายการมีส่วนลดที่ประหยัดได้) **สินค้าขายดี**
+จัดอันดับ **เล่นเลย** (ทุกเกม Steam รายงานในช่วงสองสัปดาห์ที่ผ่านมา) และ **แค็ตตาล็อกเรียงลำดับตามการให้คะแนน** เพจ
+ด้วย **โหลดเพิ่ม** จึงไปถึงส่วนอื่นๆ ของร้าน ทุกแถวจะมี **ภาพแคปซูล** **คะแนนรีวิว**
+ด้วยถ้อยคำของ Steam เอง และจำนวนรีวิวที่รีวิว ราคาที่ขีดฆ่า ราคาเป็นสกุลเงินเรียล และสิ่งที่
+ส่วนลดที่บันทึกไว้ - และรายการจะรวมการประหยัดทั้งหมด รายการสาธารณะต้องการเพียง **SteamID64** ของคุณเท่านั้น ไม่จำเป็น
+**Steam เว็บ API คีย์** เพิ่มเกมล่าสุดพร้อมกับเวลาเล่น แท็บจะเริ่มต้นโดยค่าเริ่มต้น โดยอยู่ห่างออกไปหนึ่งช่องทำเครื่องหมาย
+ในการตั้งค่า
 
 </td>
 </tr>
@@ -184,9 +187,14 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 การแจ้งเตือนระบบเป็นเวลา 30 นาที 1 ชั่วโมง 2 ชั่วโมง จนถึงวันพรุ่งนี้หรือจนกว่าคุณจะปิด พระจันทร์ในแถบด้านบนปรากฏขึ้น
 เมื่อมันจบลง; คลิกเพียงครั้งเดียวก็จะปิดอีกครั้ง มันรอดจากการรีสตาร์ทและจบลงด้วยตัวเอง
 
+🔔 **ทุกการแจ้งเตือนในหน้าจอเดียว:** กระดิ่งในส่วนหัว (นับและสีเมื่อมีสิ่งใดรอดำเนินการ) จะเปิดขึ้น
+การแจ้งเตือนทั่วทั้งหน้าต่างในโหมดใดก็ได้: การ์ดหนึ่งใบต่อการแจ้งเตือนพร้อมการดำเนินการ **ยกเลิกทั้งหมด** และสิ่งที่เป็นอยู่
+แก้ไขในวันนี้ภายใต้พวกเขา - โดยไม่ต้องรออะไร นั่นคือวิธีที่คุณยังคงเข้าถึงบันทึกของวันนี้ จากท่าเรือ คลิกเพียงครั้งเดียว
+ยังคงเปิดการแจ้งเตือนเดียวนั้นที่ด้านบนของหน้าต่างปกติ
+
 ⌨️ **ทุกอย่างด้วยแป้นพิมพ์:** `Alt+1`…`Alt+7` สลับแท็บ, `N` สร้าง, `/` การค้นหา, `F11` เต็มหน้าจอ, `Alt+L`
 ล็อคและ `?` แสดงรายการทางลัด `Ctrl+Shift+P` (`Cmd+Shift+P` บน macOS) เปิด **ชุดคำสั่ง** ด้วยทุก ๆ
-การดำเนินการตามชื่อ: ไปที่แท็บ งานใหม่หรือบันทึกย่อ เข้าร่วมการประชุมครั้งถัดไป คัดลอกสรุปของวัน สลับสกิน ล็อค
+ดำเนินการตามชื่อ: ไปที่แท็บ งานใหม่หรือบันทึกย่อ เข้าร่วมการประชุมครั้งถัดไป คัดลอกสรุปของวัน สลับสกิน ล็อค
 
 ## 🎨 หกสกิน
 
@@ -235,11 +243,11 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| คลิกการแจ้งเตือนใน Dock | ขยายใหญ่สุด: งานและการแจ้งเตือน พร้อมตัวแบ่งแบบลากได้ |
+| คลิกการแจ้งเตือนใน Dock | ขยายใหญ่สุด: ทั้งหน้าต่างสำหรับแท็บที่เปิด |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| กระดิ่งเปิดการแจ้งเตือนทั่วทั้งหน้าต่าง |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: ห้าเกมล่าสุดที่เล่น โดยทั้งสองเวลาเล่น |
+| Steam: สินค้าขายดีลำดับที่ | Steam: ห้าเกมล่าสุดที่เล่น โดยทั้งสองเวลาเล่น |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: แค็ตตาล็อกตามการให้คะแนน โดยมี "โหลดเพิ่มเติม" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | การแจ้งเตือนซ้อนทับสำหรับทุกสิ่งที่ค้างอยู่: การหยุดทำงาน การประชุม งาน และโมเดล AI ใหม่ |
 |---|
@@ -438,13 +450,13 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 
 รายการสำเร็จรูปสำหรับ winget และ Homebrew (รวมถึงโครงกระดูกสำหรับ Flatpak ซึ่งปัจจุบันถูกบล็อก) อาศัยอยู่ใน
 [`packaging/`](packaging/README.md) — จัดทำและตรวจสอบภายในเครื่อง แต่ยังไม่ได้เผยแพร่ไปยังสิ่งเหล่านั้น
-repositories: publishing is a manual decision and action by the maintainer.
+พื้นที่เก็บข้อมูล: การเผยแพร่เป็นการตัดสินใจและการดำเนินการด้วยตนเองโดยผู้ดูแล
 
 ## 🔒 สรุปความปลอดภัย
 
 | เลเยอร์ | การป้องกัน |
 |---|---|
-| ห้องนิรภัย | Argon2id (19 MiB, t=2) → AES-256-GCM, nonce ใหม่ในทุกการเขียน, การเขียนแบบอะตอมมิกด้วย `fsync` |
+| ห้องนิรภัย | Argon2id (19 MiB, t=2) → AES-256-GCM ความสดใหม่ในทุกการเขียน การเขียนแบบอะตอมมิกด้วย `fsync` |
 | คีย์ | RAM เท่านั้น ล็อคเป็นศูนย์ ล็อคอัตโนมัติที่กำหนดค่าได้ (ไม่ได้ใช้งาน 5 ถึง 60 นาที โดยค่าเริ่มต้น 15 นาที) |
 | เครือข่าย | เฉพาะกระบวนการ Rust เท่านั้นที่พูดคุยกับเครือข่าย webview ไม่มีต้นกำเนิดระยะไกล (CSP) และไม่เคยเห็นโทเค็น |
 | Google | ตัวเลือก เฉพาะ `calendar.events.readonly`, `directory.readonly` (รูปภาพของเพื่อนร่วมงาน Workspace ในรายชื่อแขก) พร้อมโปรไฟล์ OAuth พร้อม PKCE และ loopback |
@@ -459,11 +471,11 @@ repositories: publishing is a manual decision and action by the maintainer.
 
 | เอกสาร | มีอะไรอยู่ในนั้น |
 |---|---|
-| 📖 [User guide](docs/uso.md) | tabs, recurring tasks, shortcuts, skins, accessibility, window, updates and start with the system |
-| 🔌 [Integrations](docs/integracoes.md) | Google agenda and GitHub (personal token or device flow) |
-| 🛡️ [Security and data](docs/seguranca.md) | threat model, `.canto` backup, merge, password change, files on disk |
+| 📖 [User guide](docs/uso.md) | แท็บ, งานที่เกิดซ้ำ, ทางลัด, สกิน, การเข้าถึง, หน้าต่าง, อัปเดตและเริ่มต้นด้วยระบบ |
+| 🔌 [Integrations](docs/integracoes.md) | Google วาระการประชุมและ GitHub (โทเค็นส่วนบุคคลหรือการไหลของอุปกรณ์) |
+| 🛡️ [Security and data](docs/seguranca.md) | โมเดลภัยคุกคาม, การสำรองข้อมูล `.canto`, รวม, การเปลี่ยนรหัสผ่าน, ไฟล์บนดิสก์ |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify และการทดสอบระดับเสียง |
-| 📸 [CHANGELOG](CHANGELOG.md) | สิ่งที่เปลี่ยนแปลงไปในแต่ละเวอร์ชั่น |
+| 📝 [CHANGELOG](CHANGELOG.md) | สิ่งที่เปลี่ยนแปลงไปในแต่ละเวอร์ชั่น |
 | 🤝 [How to contribute](CONTRIBUTING.md) | สภาพแวดล้อม การทดสอบ PRs และวิธีการเผยแพร่รุ่น |
 | 🤖 [Agent guide](AGENTS.md) | สัญญาและกับดักสำหรับใครก็ตามที่แก้ไขโค้ดด้วย AI |
 
@@ -482,12 +494,12 @@ bun run tauri build                                      # installer for the cur
 
 Webviews ถูกสร้างขึ้นหลังจากสถานะ Rust และถาดถูกเตรียมใช้งาน ดังนั้นการเรียก IPC เริ่มต้นจึงไม่สามารถแข่งขันกับการตั้งค่าได้
 
-Every PR runs CI on Windows, macOS and Linux. `fix` แบบธรรมดา, `feat` และการทำลายคอมมิตถูกรวมเข้ากับ `main`
-get a SemVer tag, generated release notes and signed installers built in parallel; การเผยแพร่เผยแพร่หลังจากการตรวจสอบแล้ว (รายละเอียดใน
+ทุก PR รัน CI บน Windows, macOS และ Linux `fix` แบบธรรมดา, `feat` และการทำลายคอมมิตถูกรวมเข้ากับ `main`
+รับแท็ก SemVer สร้างบันทึกประจำรุ่นและตัวติดตั้งที่ลงนามซึ่งสร้างขึ้นพร้อมกัน การเผยแพร่จะเผยแพร่หลังจากการตรวจสอบแล้ว (รายละเอียดใน
 [CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
 
 ## 📄 ใบอนุญาต
 
 [MIT](LICENSE) © อันโตนิโอ คาร์ลอส
 
-<div align="center"><sub>Made with 🦀 Rust, ⚛️ React and ☕ for those who live between meetings.</sub></div>
+<div align="center"><sub>ทำด้วย Rust, ⚛️ React และ ☕ สำหรับผู้ที่อยู่ระหว่างการประชุม</sub></div>

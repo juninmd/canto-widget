@@ -33,7 +33,7 @@ Arabisk, hebraisk og persisk bruger tekst fra højre mod venstre. Yderligere spr
 
 De 40 nye grænsefladekataloger og 31 nye README-oversættelser er maskinoversættelser og er ikke blevet
 gennemgået af indfødte. Portugisisk og engelsk forbliver de originale grænsefladekataloger. Bakkeetiketter og
-meddelelsesoverskrifter følger det valgte sprog; nogle integrationsadvarselsdetaljer falder tilbage til engelsk,
+meddelelsesoverskrifter følger det valgte sprog; nogle integrationsalarmdetaljer falder tilbage til engelsk,
 og backend-fejl forbliver på portugisisk. Syntaks for opgavetitel beholder de eksisterende portugisiske og engelske søgeord.
 
 ![Searchable language picker](docs/prints/languages-picker.png)
@@ -139,20 +139,23 @@ det. Udkast, PRs **venter på din anmeldelse** og PRs **stoppet** i en uge skill
 **CI-emblem** (bestået, mislykket, kørende eller ingen CI) fra dets head commits kontroller. Når nogen **anmoder om din
 anmeldelse**, fortæller en OS-notifikation dig (til som standard, sluk det i Indstillinger). Filtrer efter tekst, `repo:` eller `label:`, PRs kun eller kun problemer, sorter efter opdatering, oprettelse eller kommentarer, og
 rul med **vis mere**. Skift til visningen **Kommentarer** for at se et **Kommentarkatalog**-gitter med alle, der kommenterede dine PRs (avatarer, menneskelige vs bot-badges, antal kommentarer, søgning, botfilter, progressiv sideopdeling) og deres kommentarer. Understøtter også **GitLab.com og selv-hostet GitLab**, med en 5-minutters cache, der
-overholder takstgrænsen. Log ind med et skrivebeskyttet personligt token eller fra browseren (enhedsflow).
+respekterer takstgrænsen. Log ind med et skrivebeskyttet personligt token eller fra browseren (enhedsflow).
 
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam uden at forlade widgetten
 
-Fire underfaner til Steam: **ønskelistetilbud** (største rabat først), **topsælgere**, **spil nu** og
-**katalog sorteret efter vurdering**. De offentlige lister behøver kun din **SteamID64**; en valgfri **Steam Web API nøgle**
-tilføjer de fem seneste spil med deres spilletider. Priserne kommer i reais, hver række åbner butikssiden, og
-fanen starter som standard, et afkrydsningsfelt væk i Indstillinger.
+Fire underfaner til Steam: **ønskelistetilbud** (største rabat først, hver med hvad den sparer), **topsælgere**
+rangeret, **spil nu** (hvert spil Steam rapporterer i de sidste to uger) og **kataloget sorteret efter vurdering**, sidet
+med **indlæs mere**, så den når resten af butikken. Hver række bærer **kapselkunsten**, **anmeldelsesresultatet**
+med Steams egen formulering og hvor mange anmeldelser det tæller, den overstregede pris, prisen i reais og hvad
+rabatbesparelser - og listen summerer den samlede besparelse. De offentlige lister behøver kun din **SteamID64**; en valgfri
+**Steam Web API nøgle** tilføjer de seneste spil med deres spilletider. Fanen starter som standard, et afkrydsningsfelt væk
+i Indstillinger.
 
 </td>
 </tr>
@@ -177,12 +180,17 @@ de sidste to uger, plus `.vtt`, `.srt`, `.txt` og `.md` transskriptioner fra en 
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, læst fra dens offentlige ranglisteside,
 med en scorebar, skaber, pris pr. 1M tokens og hastighed, sorterbar efter intelligens, pris eller hastighed. Den henter kl
 mest én gang hver 3. time, og tilmeldingen 🔔 giver dig besked, når en
-model **går ind i top 10** eller **klatrer inden for den** (kontrolleres hver 6. time, mens hvælvingen er ulåst), med
+model **kommer ind i top 10** eller **klatrer inden for den** (kontrolleres hver 6. time, mens hvælvingen er ulåst), med
 "nye" og "op" badges i en uge.
 
 🌙 **Forstyr ikke:** i Indstillinger eller bakken, dæmp mødeadvarsler, opgavepåmindelser, statusadvarsler og hver
 systembesked i 30 min, 1 t, 2 t, indtil i morgen, eller indtil du slukker det. En måne i den øverste bjælke viser
 når det slutter; et klik slår den fra igen. Den overlever en genstart og ender af sig selv.
+
+🔔 **Hver advarsel på én skærm:** klokken i overskriften (tæller og farve, når noget afventer) åbner
+advarsler over hele vinduet i enhver tilstand: et kort pr. advarsel med dets handlinger, **afvis alle**, og hvad der var
+løst i dag under dem - uden noget afventende, det er sådan, du stadig når dagens log. Fra kajen, et klik
+åbner stadig den enkelte advarsel oven på det normale vindue.
 
 ⌨️ **Alt med tastatur:** `Alt+1`...`Alt+7` skifter fane, `N` opretter, `/` søger, `F11` fuldskærm, `Alt+L`
 låser og `?` viser genvejene. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) åbner en **kommandopalet** med hver
@@ -235,11 +243,11 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klik på en advarsel i docken | Maksimeret: opgaver og meddelelser, med en trækbar skillelinje |
+| Klik på en advarsel i docken | Maksimeret: hele vinduet for den åbne fane |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Klokken åbner alarmerne over hele vinduet |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: de seneste fem spil spillet, med begge spilletider |
+| Steam: topsælgere, nummereret | Steam: de seneste fem spil spillet, med begge spilletider |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: kataloget efter vurdering, med "indlæs mere" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Én advarselsoverlejring for alt afventende: udfald, møder, opgaver og nye AI-modeller |
 |---|
@@ -383,12 +395,12 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 
 Fanen **Aktivitet** starter skjult (slå den til under Indstillinger → synlige faner). Den registrerer kun navnet på
 fokuseret program, mens du bruger computeren, i en forseglet lokal fil, der aldrig når sikkerhedskopier eller synkronisering (Wayland
-kan ikke rapportere det fokuserede vindue, så det forbliver utilgængeligt der). Fra, indtil du tilmelder dig, og den første skærm siger hvad
+kan ikke rapportere det fokuserede vindue, så det forbliver utilgængeligt der). Slukket, indtil du tilmelder dig, og den første skærm siger hvad
 holdes og hvad der aldrig er.
 
 - **Dag**: en doughnut efter kategori med totalen indeni, hvis forklaring skjuler en kategori, ændringen i forhold til dagen
 før og inaktiv tid (ingen tastatur eller mus i 2 minutter). Under det, et dagligt kodefokus mål med sin streak og
-en prik om dagen, tre højdepunkter (længste strækning i én app, app-skift, spidsbelastningstidspunkt), en tidslinje, hvor hele
+en prik om dagen, tre højdepunkter (længste strækning i én app, app-omskiftere, peak time), en tidslinje, hvor hele
 dag, den ledige strækker sig, og de travleste apps deler en tidsakse med en "nu"-markør og en liste over applikationer
 (tryk på en for at ændre dens kategori) eller af de opgaver, som fokustimeren kørte på.
 - **Uge**: stablede kolonner pr. dag med den gennemsnitlige linje og en prik under hver dag, der opfyldte målet, et times varmekort
@@ -446,7 +458,7 @@ repositories: publicering er en manuel beslutning og handling fra vedligeholdere
 |---|---|
 | Hvælving | Argon2id (19 MiB, t=2) → AES-256-GCM, en frisk nonce på hver skrivning, atomisk skrivning med `fsync` |
 | Nøgle | Kun RAM, nulstillet ved lås; konfigurerbar autolås (5 til 60 min i tomgang, 15 min som standard) |
-| Netværk | kun Rust-processen taler til netværket; webvisningen har ingen ekstern oprindelse (CSP) og ser aldrig tokens |
+| Netværk | kun Rust processen taler til netværket; webvisningen har ingen ekstern oprindelse (CSP) og ser aldrig tokens |
 | Google | valgfrit, kun `calendar.events.readonly`, `directory.readonly` (Workspace-kollegers billeder på gæstelisten) plus profil, OAuth med PKCE og loopback |
 | GitHub | valgfri, krypteret token; elementer åbnes kun, hvis linket er `https://github.com/` |
 | GitLab | valgfri, krypteret adresse og token; Kun `https://`, ingen omdirigeringer, kun links fra den konfigurerede instans |
