@@ -30,24 +30,39 @@ doc.
 **Para publicar:** fork de [homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask), copiar para
 `Casks/c/canto.rb`, `brew audit --cask --online canto` numa máquina com macOS, abrir PR.
 
-## Flatpak (`flatpak/com.junin.canto.yml`) — bloqueado
+## Flatpak (`flatpak/com.junin.canto.yml`) — preparado, não verificado
 
-Flathub builda a partir do código-fonte dentro de um sandbox sem rede; as dependências JS precisam vir
-vendoradas via `flatpak-node-generator`, que só lê `package-lock.json`, `yarn.lock` ou `pnpm-lock.yaml`
-([confirmado na doc do `flatpak-builder-tools`](https://github.com/flatpak/flatpak-builder-tools/tree/master/node)).
-Este projeto usa `bun.lock` (ver `AGENTS.md`: "bun; never npm/yarn/pnpm"), que esse gerador não entende — não
-existe hoje um `flatpak-bun-generator` equivalente para verificar.
+O bloqueio era o lockfile: o Flathub builda a partir do código-fonte num sandbox sem rede, e o
+`flatpak-node-generator` só lê `package-lock.json`, `yarn.lock` ou `pnpm-lock.yaml` — nenhum deles existia,
+porque o projeto usa `bun.lock`.
 
-O manifesto em `flatpak/` é só o esqueleto (runtime, permissões, `.desktop`, ícone, `cargo build --release`);
-o passo do frontend (`bun install && bun run build`, que gera o `dist/` que o Rust embute via
-`generate_context!`) está comentado como TODO. `flatpak-builder` não roda neste manifesto do jeito que está.
+**Resolvido:** `bun install --yarn` escreve um `yarn.lock` a partir do `bun.lock`. Medido contra `bun.lock`:
+**196 pacotes resolvidos, 196 na mesma versão**, incluindo os binários por plataforma. A rota do
+`package-lock.json` (`npm install --package-lock-only`) foi descartada: divergia em **39 versões** (entre elas
+os `@rolldown/binding-*` e o `lightningcss`, que são justamente os binários nativos do bundler), ou seja, o
+sandbox geraria um `dist/` diferente do que o CI testa. O arquivo está em `flatpak/yarn.lock`; para regerar
+depois de mexer nas dependências, sem sujar a raiz do projeto:
 
-**Para desbloquear**, alguma destas, decisão do mantenedor:
-- Gerar um `package-lock.json` só para o build do Flatpak (bun consegue instalar a partir de um lockfile do
-  npm em alguns casos; não verificado se o resultado bate com o `bun.lock` real) e vendorar via
-  `flatpak-node-generator npm package-lock.json`.
-- Ou vendorar as dependências manualmente com `type: file`/`type: archive` por pacote (trabalhoso, mas sem
-  depender de um gerador que não existe para bun).
+```bash
+mkdir -p /tmp/canto-flatpak && cp package.json bun.lock /tmp/canto-flatpak/
+(cd /tmp/canto-flatpak && bun install --yarn --ignore-scripts)
+cp /tmp/canto-flatpak/yarn.lock packaging/flatpak/yarn.lock
+```
+
+O manifesto usa `org.freedesktop.Sdk.Extension.node20` (branch 23.08, Node 20.20.1; o Vite 8 pede
+`^20.19` ou `>=22.12`) e o `yarn` que essa extensão já traz. O `tsc --noEmit` do `bun run build` fica de fora
+do sandbox: a checagem de tipos é gate do CI, o pacote só precisa do `dist/`, que o `vite build` produz antes
+do `cargo build` (o Rust embute o `dist/` via `generate_context!`).
+
+**O que ainda falta** — e por isso o manifesto não roda hoje:
+
+- `generated-sources.json` e `cargo-sources.json`, os dois arquivos que o `flatpak-builder-tools` gera e que
+  baixam e fixam o hash de cada dependência JS e de cada crate. Ambos são regenerados a cada mudança de
+  lockfile, então nascem commitados ao lado do manifesto.
+- **Nada disso foi executado**: não há `flatpak-builder` nem `flatpak-node-generator` na máquina onde isto foi
+  escrito (Windows). A verificação real depende de uma máquina Linux.
+
+**Para publicar:** Flathub pede conta própria e um app novo; a submissão é um PR em `flathub/flathub`.
 
 ## Se a versão mudar
 
