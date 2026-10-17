@@ -178,7 +178,11 @@ impl AppState {
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         // Mutating a draft keeps memory equal to disk when persist fails; the clone is small next to the re-seal.
         let mut draft = session.data.clone();
-        let (out, changed) = f(&mut draft);
+        let (out, reported) = f(&mut draft);
+        // A caller that reports a change may still have written the values already in memory (a task saved
+        // with nothing edited, the focus timer flushing the same seconds twice). Re-sealing the whole vault
+        // for that costs ~120 ms at 22 MB, so the draft has to differ before the file is rewritten.
+        let changed = reported && draft != session.data;
         if changed {
             self.persist(session, &draft)?;
             session.data = draft;

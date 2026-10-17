@@ -91,7 +91,8 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - **Local files** (`janela.json`, `biometria.json`, `drive.json`, `autostart.json`) read legacy keys through
   `#[serde(alias = "...")]`, each with a legacy-JSON test. Keep the alias when renaming.
 - Commands that read or write the vault are `#[tauri::command(async)]`: a sync command runs on the main thread and
-  each persist re-seals the whole vault (~120 ms at 22 MB), freezing the window. Lists sent to the webview are paged
+  each persist re-seals the whole vault (~120 ms at 22 MB), freezing the window. `with_session` therefore writes
+  only when the draft differs from what is in memory. Lists sent to the webview are paged
   or bounded (`notes_search` takes `limit` and returns `{total, items}`).
 - **Updater signing**: `plugins.updater.pubkey` in `tauri.conf.json` must match the private key in the
   `TAURI_SIGNING_PRIVATE_KEY` secret. Changing the pubkey without shipping it first under the old key leaves every
