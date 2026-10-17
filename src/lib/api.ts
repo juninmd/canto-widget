@@ -242,6 +242,37 @@ export type RecentGame = { appid: number; name: string; recent_min: number; tota
 /** `has_key` false means only the recent list is unavailable: the UI explains instead of erroring. */
 export type SteamRecent = { items: RecentGame[]; has_key: boolean };
 export type SteamStatus = { configured: boolean; steamid: string; has_key: boolean; name: string };
+/** The WMO groups the Clima tab knows; the catalogue turns each one into a sentence. */
+export type WeatherCondition = "clear" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm";
+export type WeatherPlace = { city: string; country: string; lat: number; lon: number };
+export type WeatherNow = { temp: number; feels: number; condition: WeatherCondition };
+/** Times and dates come already local to the city (`timezone=auto` on the API call). */
+export type WeatherHour = { at: string; temp: number; rain: number; condition: WeatherCondition };
+export type WeatherDay = { date: string; min: number; max: number; rain: number; condition: WeatherCondition };
+export type WeatherForecast = { now: WeatherNow; hours: WeatherHour[]; days: WeatherDay[]; rain_from: string | null };
+export type WeatherView = {
+  place: WeatherPlace | null;
+  forecast: WeatherForecast | null;
+  fetched_at: number;
+  /** pt-BR text when the reading failed; a saved city still comes through with it. */
+  error: string | null;
+};
+
+/** One card in the Leituras tab; `has_image` only says a thumbnail exists (the bytes come by id). */
+export type ReadArticle = {
+  id: string;
+  title: string;
+  url: string;
+  host: string;
+  source: string;
+  /** ms epoch; 0 when the entry carries no date. */
+  published_at: number;
+  summary: string;
+  unread: boolean;
+  has_image: boolean;
+};
+export type ReadFeed = { url: string; label: string; error: string | null };
+export type ReadsView = { feeds: ReadFeed[]; items: ReadArticle[]; fetched_at: number };
 /** The latest release GitHub published for one agent harness; the notes come as markdown. */
 export type HarnessRelease = { tag: string; name: string; published_at: string; url: string; notes: string };
 /** One coding-agent CLI the "Agentes" tab knows: where it is installed here and when it last shipped. */
@@ -460,6 +491,21 @@ export const api = {
 
   /** Coding-agent CLIs: detection is local, the release feed comes from GitHub (30 min floor in Rust). */
   harnessList: (force = false) => invoke<HarnessView[]>("harness_list", { force }),
+
+  /** Clima: the saved city plus the Open-Meteo forecast; Rust keeps it for 30 min. */
+  weatherGet: (force = false) => invoke<WeatherView>("weather_get", { force }),
+  /** Resolves the city name to coordinates and saves only those; a bad name comes back as an error. */
+  weatherSetCity: (city: string) => invoke<WeatherView>("weather_set_city", { city }),
+  weatherClear: () => invoke<WeatherView>("weather_clear"),
+
+  /** Leituras: the saved feeds, newest first; thumbnails and favicons come as `data:` URLs, by id/host. */
+  readsGet: (force = false) => invoke<ReadsView>("reads_get", { force }),
+  /** The address is checked and parsed before it is saved. */
+  readsAdd: (feed: string) => invoke<ReadsView>("reads_add", { feed }),
+  readsRemove: (feed: string) => invoke<ReadsView>("reads_remove", { feed }),
+  readsMark: (id: string, read: boolean) => invoke<ReadsView>("reads_mark", { id, read }),
+  readsThumb: (id: string) => invoke<string | null>("reads_thumb", { id }),
+  readsFavicon: (host: string) => invoke<string | null>("reads_favicon", { host }),
 
   dndGet: () => invoke<DndState>("dnd_get"),
   /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */

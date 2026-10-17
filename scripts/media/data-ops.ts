@@ -144,6 +144,63 @@ export const AGENTS = {
   ],
 };
 
+/** Invented city and forecast: a real one would read as a fact. */
+export const WEATHER = {
+  weather_get: {
+    place: { city: "Aurora", country: "Brasil", lat: -23.5, lon: -46.6 },
+    forecast: {
+      now: { temp: 22.4, feels: 24.1, condition: "cloudy" },
+      hours: [
+        { at: "2026-10-17T10:00", temp: 22.4, rain: 10, condition: "cloudy" },
+        { at: "2026-10-17T11:00", temp: 23.9, rain: 20, condition: "cloudy" },
+        { at: "2026-10-17T12:00", temp: 25.2, rain: 45, condition: "clear" },
+        { at: "2026-10-17T13:00", temp: 26.1, rain: 60, condition: "rain" },
+        { at: "2026-10-17T14:00", temp: 24.8, rain: 80, condition: "rain" },
+        { at: "2026-10-17T15:00", temp: 23.2, rain: 75, condition: "rain" },
+      ],
+      days: [
+        { date: "2026-10-17", min: 17.1, max: 26.1, rain: 80, condition: "rain" },
+        { date: "2026-10-18", min: 16.4, max: 27.0, rain: 20, condition: "clear" },
+        { date: "2026-10-19", min: 15.8, max: 24.3, rain: 10, condition: "cloudy" },
+        { date: "2026-10-20", min: 18.2, max: 28.4, rain: 0, condition: "clear" },
+      ],
+      rain_from: "2026-10-17T13:00",
+    },
+    fetched_at: NOW.getTime(),
+    error: null,
+  },
+};
+
+/** Invented feeds and readings: real headlines would read as facts. */
+export const READS = {
+  reads_thumb: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAKAAAABwCAIAAAAWk+xVAAACLUlEQVR42u3cPU7EMBAG0GWUgmJFRUGBOAE34SychrNwI06AKFZUFDQUgPjxOPb4feWuiDd+TJw4ls+ubm4PUjehCwALYAEsgAWwABbAgAWwAJb9s+mCtrl+vP/qq6e7h/6/58zLhmzXfaUBd6Xtzwx4B9qezG6y9tRteBzAI+p2MAY8hEeeMeBRJJKODHig8TLj+IBH0U1qBfDBXLR0Kt+MtgCrYOXbsXybtwhYBQtg1+dh2wWsgvfO6XjBqSzwuy7jmsAfXRkfKi26+5Tz/cPzl2dsc1fw98WqlOcG/okf41mBfy7HeDLg0/Hit2Z/+JPDqItb89qN2Z90lfLowP8XYjwucCubVOP+V+mGLUaZOUh1PBBw0v1R3m1XzyJu21bUe3mglPcE7tP7Ga30KeLmrUTVF38zGmccP6YedPs3mmecdOQo/8Z+CuO8/5tYYT3G4MapV/5Y5IZ2WOPscT1rC4dhn1WarxdYcY+OwZ9EM9aELLTLzhTzDHnrforvkzXRLNIia7ti2TnCRWY0t5U7a4VlmqEUapdy6J3axqFfahtvuqP2kBx0a59d0K19jkG39pkG3drnu6GtfdsVdGv3QNCtbRx0axtvaGsPyUG3dikH3drGQbe28Ya29pAcdGuX8ka3ifHx8nVQ4GF/mdhOWAAD1gWABbAAFsACWAALYMACWAALYAEsgAUwYAEsgAWwABbAAlgAAxbAAlgAC2ABLIABC2ABLIClQ94APRTF4TG/wIIAAAAASUVORK5CYII=",
+  reads_get: {
+    feeds: [
+      { url: "https://blog.exemplo.test/feed", label: "Blog Exemplo", error: null },
+      { url: "https://texto.exemplo.test/atom", label: "Texto Exemplo", error: null },
+      { url: "https://sumiu.exemplo.test/feed", label: "", error: "o feed respondeu 404" },
+    ],
+    items: [
+      {
+        id: "r1", title: "Como o cache do Cargo decide o que recompilar", url: "https://blog.exemplo.test/cargo",
+        host: "blog.exemplo.test", source: "Blog Exemplo", published_at: NOW.getTime() - 2 * 3_600_000,
+        summary: "O que entra no fingerprint e por que trocar uma flag recompila o mundo.", unread: true, has_image: true,
+      },
+      {
+        id: "r2", title: "Notas sobre escrita técnica curta", url: "https://texto.exemplo.test/curta",
+        host: "texto.exemplo.test", source: "Texto Exemplo", published_at: NOW.getTime() - 6 * 3_600_000,
+        summary: "Frases menores, um exemplo por ideia e o leitor no centro.", unread: true, has_image: false,
+      },
+      {
+        id: "r3", title: "O que o Linux faz quando o disco enche", url: "https://blog.exemplo.test/disco",
+        host: "blog.exemplo.test", source: "Blog Exemplo", published_at: NOW.getTime() - 26 * 3_600_000,
+        summary: "Do ENOSPC no journal ao processo que não consegue nem escrever no log.", unread: false, has_image: false,
+      },
+    ],
+    fetched_at: NOW.getTime(),
+  },
+};
+
 /** Invented games on purpose: a real title with a price and a discount would read as a fact. */
 export const STEAM = {
   steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },

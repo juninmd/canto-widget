@@ -32,10 +32,12 @@ pub mod cmd_health;
 pub mod cmd_mentions;
 pub mod cmd_models;
 pub mod cmd_notes;
+pub mod cmd_reads;
 pub mod cmd_report;
 pub mod cmd_status;
 pub mod cmd_steam;
 pub mod cmd_sync;
+pub mod cmd_weather;
 pub mod commands;
 pub mod crypto;
 pub mod do_not_disturb;
@@ -100,6 +102,7 @@ pub mod paste_plain;
 pub mod plain_text;
 pub mod pr_state;
 pub mod priority;
+pub mod reads;
 pub mod report;
 pub mod review_alert;
 pub mod routine;
@@ -129,6 +132,8 @@ pub mod tray_live;
 pub mod unlock_log;
 pub mod updater;
 pub mod vault;
+pub mod weather;
+pub mod weather_state;
 pub mod window;
 pub mod window_mode;
 pub mod window_state;
@@ -171,6 +176,8 @@ pub fn run() {
             app.manage(status_alert::StatusAlerts::load(&dir));
             app.manage(health_watch::HealthState::default());
             app.manage(harness_cache::HarnessCache::default());
+            app.manage(weather_state::WeatherState::load(&dir));
+            app.manage(cmd_reads::ReadsState::load(&dir));
             app.manage(cmd_models::ModelsLock::default());
             app.manage(cmd_steam::SteamLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
@@ -346,6 +353,15 @@ pub fn run() {
             cmd_report::report_vault,
             cmd_status::api_status,
             cmd_harness::harness_list,
+            cmd_weather::weather_get,
+            cmd_weather::weather_set_city,
+            cmd_weather::weather_clear,
+            cmd_reads::reads_get,
+            cmd_reads::reads_add,
+            cmd_reads::reads_remove,
+            cmd_reads::reads_mark,
+            cmd_reads::reads_thumb,
+            cmd_reads::reads_favicon,
             cmd_health::health_list,
             cmd_health::health_save,
             cmd_health::health_remove,

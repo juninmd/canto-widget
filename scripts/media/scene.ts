@@ -4,7 +4,7 @@ import { CLIPS } from "./data-clip";
 import { seedActivity } from "./data-activity";
 import { seedAgenda } from "./data-agenda";
 import { GITHUB_FIXED, GITLAB_FIXED } from "./data-forge";
-import { AGENTS, HEALTH, MODELS, STATUS } from "./data-ops";
+import { AGENTS, HEALTH, MODELS, READS, STATUS, WEATHER } from "./data-ops";
 import { NOTES, TASKS } from "./data-vault";
 import { openScene, settle, type SceneOptions } from "./stage";
 import { seedVault } from "./vault";
@@ -17,6 +17,8 @@ export const FIXED = {
   ...GITHUB_FIXED,
   ...GITLAB_FIXED,
   ...AGENTS,
+  ...WEATHER,
+  ...READS,
   health_list: HEALTH,
   activity_status: { supported: true, enabled: true },
   drive_status: { configured: true, embedded: true, connected: true, email: "ana@example.com", name: "Ana Exemplo" },

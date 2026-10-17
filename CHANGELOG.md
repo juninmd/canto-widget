@@ -7,12 +7,21 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
-- **Cinco abas de protótipo**: sugestões de próximas features, cada uma numa aba própria, **oculta por padrão** e
-  com dados fictícios — são maquetes, sem backend: nada é buscado, nada é salvo e o rodapé de cada uma diz o que
-  ainda faltaria para existir. **Clima** (agora, próximas horas numa curva e próximos dias, com aviso de chuva),
-  **Hábitos** (checks de hoje, sequência e a semana), **Mercado** (dólar, euro, bitcoin e Ibovespa com a variação
-  do dia), **Snippets** (trechos com etiquetas, busca, cópia em um clique e "colar no app em foco") e **Leituras**
-  (fila de RSS/Atom com o que não foi lido e o tempo de leitura).
+- **Aba Clima**: escreva o nome da cidade uma vez e o Canto guarda só as coordenadas. A aba mostra **agora**, as
+  **próximas horas numa curva** com a chance de chuva, os **próximos dias** e o aviso de **chuva a partir das
+  HH:MM**. Os dados vêm da Open-Meteo, que é aberta e **não pede chave** — nenhuma conta e nenhum endereço seu sai
+  da máquina —, com cache de 30 min. A aba começa desligada, a um clique nos Ajustes.
+- **Aba Leituras (RSS e Atom)**: cole os endereços dos feeds e leia tudo num só lugar, com **contagem de não
+  lidos**, o mais novo primeiro, o **favicon** da origem, a idade e um resumo em cada cartão — e a **miniatura**
+  quando a entrada tem uma. Tudo é baixado pelo Rust e entregue à interface como `data:`, então a janela nunca
+  fala com uma origem remota; só **https** e hosts públicos são aceitos numa imagem. Os cartões abrem no navegador
+  e podem ser marcados como lidos/não lidos; um feed que falha fica visível em vermelho, sem esconder os outros.
+  Sem chave, cache de 15 min, e a lista fica ao lado do cofre (são só endereços públicos).
+
+### Alterado
+
+- **Aba Agentes mais legível**: cada CLI virou um cartão com a inicial, o repositório de onde vem, a última release
+  e as notas de versão num bloco próprio; o comando de instalação ganhou destaque e o botão de copiar.
 
 - **Aba Agentes**: os CLIs de agente mais usados (Claude Code, Codex CLI, Gemini CLI, OpenCode, GitHub Copilot CLI e
   Aider) num só lugar. Cada linha diz se o CLI está instalado nesta máquina — e onde —, mostra a **última release** do

@@ -1,22 +1,11 @@
 // As abas de protótipo também são áreas de texto: os rótulos moram aqui, e não no app.ts, para não deslocar as
 // chaves já traduzidas nos catálogos gerados (scripts/expand-languages.py divide por ordem).
 export const protos = {
-  "protos.tab.weather": "Clima",
   "protos.tab.habits": "Hábitos",
   "protos.tab.market": "Mercado",
   "protos.tab.snippets": "Snippets",
-  "protos.tab.reads": "Leituras",
   "protos.badge": "protótipo",
   "protos.needs": "o que falta: {text}",
-  "protos.weather.now": "agora",
-  "protos.weather.feels": "sensação de {temp} °C",
-  "protos.weather.clear": "céu limpo",
-  "protos.weather.cloudy": "parcialmente nublado",
-  "protos.weather.rain": "chuva",
-  "protos.weather.hours": "próximas horas",
-  "protos.weather.days": "próximos dias",
-  "protos.weather.rainFrom": "chuva a partir das {time}",
-  "protos.weather.needs": "Open-Meteo, que é aberto e sem chave, mais a cidade guardada no cofre e um cache de 30 min",
   "protos.habits.today": "hoje",
   "protos.habits.streak": "{n} dias seguidos",
   "protos.habits.best": "recorde: {n}",
@@ -31,9 +20,4 @@ export const protos = {
   "protos.snippets.paste": "colar no app em foco",
   "protos.snippets.uses": "{n} usos",
   "protos.snippets.needs": "só o cofre; o atalho de colar reusa o app em foco que a Atividade já registra",
-  "protos.reads.unread": "{n} não lidos",
-  "protos.reads.minutes": "{n} min de leitura",
-  "protos.reads.open": "abrir no navegador",
-  "protos.reads.markRead": "marcar como lido",
-  "protos.reads.needs": "RSS/Atom como no Status API, sem chave; a lista e o \"lido\" ficam no cofre",
 } as const;

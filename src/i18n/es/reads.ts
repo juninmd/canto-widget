@@ -1,0 +1,26 @@
+import type { reads as source } from "../pt-BR/reads";
+
+export const reads: Record<keyof typeof source, string> = {
+  "reads.tab": "Lecturas",
+  "reads.loading": "buscando los feeds",
+  "reads.header": "{unread} sin leer de {total}",
+  "reads.empty": "ningún feed todavía",
+  "reads.emptyItems": "nada que leer en los feeds",
+  "reads.add.title": "Añadir un feed",
+  "reads.add.hint": "Pega la dirección RSS o Atom. Canto la comprueba antes de guardar y solo conserva la lista de direcciones.",
+  "reads.add.label": "Dirección del feed",
+  "reads.add.placeholder": "https://ejemplo.com/feed.xml",
+  "reads.add.submit": "añadir",
+  "reads.add.working": "comprobando el feed",
+  "reads.refresh": "actualizar",
+  "reads.refreshTitle": "los feeds se buscan como máximo una vez cada 15 min",
+  "reads.open": "abrir en el navegador",
+  "reads.openTitle": "abrir {title} en el navegador",
+  "reads.markRead": "marcar como leído",
+  "reads.markUnread": "marcar como no leído",
+  "reads.remove": "quitar el feed",
+  "reads.removeTitle": "quitar {label}",
+  "reads.minutes": "{n} min de lectura",
+  "reads.feeds": "feeds",
+  "reads.source": "RSS y Atom, sin clave",
+};

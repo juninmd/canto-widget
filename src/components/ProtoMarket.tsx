@@ -1,5 +1,6 @@
 import { t } from "../i18n";
-import { MARKET, signedPercent, sparkline } from "../lib/protos";
+import { MARKET, signedPercent } from "../lib/protos";
+import { sparkline } from "../lib/sparkline";
 import ProtoFrame from "./ProtoFrame";
 
 /** Prototype: keyless quotes with the day's variation and a small curve; the watchlist would live in the vault. */
