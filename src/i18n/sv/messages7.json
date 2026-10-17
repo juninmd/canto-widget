@@ -72,5 +72,18 @@
   "steam.recent.total": "{time} totalt",
   "steam.row.open": "öppna {name} på Steam",
   "steam.row.discount": "{n}% rabatt",
-  "steam.row.review": "{n}% av recensionerna är positiva"
+  "steam.row.review": "{n}% av recensionerna är positiva",
+  "steam.row.reviews": "{n} recensioner",
+  "steam.row.reviewOne": "{n} recension",
+  "steam.row.saved": "spara {value}",
+  "steam.totalSaved": "{value} sparat totalt",
+  "steam.review.overwhelmingly_positive": "Överväldigande positiv",
+  "steam.review.very_positive": "Mycket positivt",
+  "steam.review.positive": "Positivt",
+  "steam.review.negative": "Negativt",
+  "steam.review.very_negative": "Mycket negativt",
+  "steam.review.overwhelmingly_negative": "Överväldigande negativ",
+  "steam.review.mostly_positive": "Mest positivt",
+  "steam.review.mixed": "Blandat",
+  "steam.review.mostly_negative": "Mest negativt"
 }

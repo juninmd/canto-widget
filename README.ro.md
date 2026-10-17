@@ -144,15 +144,17 @@ respectă limita de rată. Conectați-vă cu un token personal numai pentru citi
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam fără a părăsi widget-ul
 
-Patru sub-file pentru Steam: **oferte pe lista de dorințe** (cea mai mare reducere mai întâi), **cele mai vândute**, **play acum** și
-**catalog ordonat după rating**. Listele publice au nevoie doar de **SteamID64**; o cheie opțională **Steam Web API**
-adaugă cele mai recente cinci jocuri cu timpul lor de joacă. Prețurile vin în reale, fiecare rând deschide pagina magazinului și
-fila începe implicit, la o casetă de selectare distanță în Setări.
+Patru sub-file pentru Steam: **oferte pe lista de dorințe** (cea mai mare reducere mai întâi, fiecare cu ceea ce economisește), **cele mai vândute**
+clasat, **jocați acum** și **catalogul ordonat după rating**. Fiecare rând conține **capsule art**, **recenzia
+scor** cu formularea proprie a lui Steam și câte recenzii contează, prețul tăiat, prețul în reali și ce
+reducerea economisește — iar lista adună economiile totale. Listele publice au nevoie doar de **SteamID64**; an
+opțional **Steam Web API tasta** adaugă cele mai recente cinci jocuri cu timpul lor de joacă. Fila începe implicit,
+la o casetă de selectare distanță în Setări.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ insigne „nou” și „up” timp de o săptămână.
 🌙 **Nu deranjați:** în Setări sau în tavă, opriți alertele de întâlnire, mementouri de sarcini, alerte de stare și fiecare
 notificare de sistem timp de 30 min, 1 h, 2 h, până mâine sau până când îl opriți. În bara de sus apare o lună
 când se termină; un clic îl oprește înapoi. Supraviețuiește unei reporniri și se termină de la sine.
+
+🔔 **Fiecare alertă într-un singur ecran:** clopoțelul din antet (numărează și colorează când ceva este în așteptare) deschide
+alerte pe întreaga fereastră în orice mod: un card pe alertă cu acțiunile sale, **închideți toate** și ce a fost
+rezolvat astăzi sub ele - fără nimic în așteptare, așa mai ajungeți la jurnalul de astăzi. Din andocare, un clic
+încă deschide acea alertă unică deasupra ferestrei normale.
 
 ⌨️ **Totul prin tastatură:** `Alt+1`…`Alt+7` comută filele, `N` creează, `/` caută, `F11` ecran complet, `Alt+L`
 blochează și `?` listează comenzile rapide. `Ctrl+Shift+P` (`Cmd+Shift+P` pe macOS) deschide o **paleta de comenzi** cu fiecare
@@ -235,11 +242,11 @@ acțiune după nume: accesați o filă, o nouă sarcină sau o notă, alăturaț
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Faceți clic pe o alertă în andocare | Maximizat: sarcini și notificări, cu un divizor care poate fi glisat |
+| Faceți clic pe o alertă în andocare | Maximizat: toată fereastra pentru fila deschisă |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Clopoțelul deschide alertele peste toată fereastra |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ acțiune după nume: accesați o filă, o nouă sarcină sau o notă, alăturaț
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: ultimele cinci jocuri jucate, cu ambele timpi de joc |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: cele mai vândute, numerotate | Steam: ultimele cinci jocuri jucate, cu ambele timpi de joc |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | O singură suprapunere de alerte pentru tot ce este în așteptare: întreruperi, întâlniri, sarcini și noi modele AI |
 |---|

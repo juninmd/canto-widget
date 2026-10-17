@@ -144,15 +144,17 @@ ievēro likmes ierobežojumu. Pierakstieties, izmantojot tikai lasāmu personīg
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam, neizejot no logrīka
 
-Četras Steam apakšcilnes: **vēlmju saraksta piedāvājumi** (vispirms lielākā atlaide), **pārdotākie**, **spēlēt tūlīt** un
-**katalogs sakārtots pēc reitinga**. Publiskajiem sarakstiem nepieciešama tikai jūsu **SteamID64**; izvēles **Steam Web API atslēga**
-pievieno piecas jaunākās spēles ar to spēles laiku. Cenas ir reālas, katra rinda atver veikala lapu, un
-cilne sākas pēc noklusējuma, vienas izvēles rūtiņas attālumā sadaļā Iestatījumi.
+Četras Steam apakšcilnes: **vēlmju saraksta piedāvājumi** (vispirms lielākā atlaide, katra ar ietaupījumu), **pārdevēji**
+ierindota, **spēlēt tūlīt** un **katalogu, kas sakārtots pēc vērtējuma**. Katrā rindā ir **kapsulas noformējums**, **pārskats
+punktu** ar paša Steam formulējumu un to atsauksmju skaitu, izsvītroto cenu, cenu reālos un ko
+atlaide ietaupa — un saraksts saskaita kopējo ietaupījumu. Publiskajiem sarakstiem nepieciešama tikai jūsu **SteamID64**; an
+neobligāts **Steam Web API taustiņš** pievieno piecas jaunākās spēles ar to atskaņošanas laiku. Cilne sākas pēc noklusējuma,
+vienu izvēles rūtiņu tālāk sadaļā Iestatījumi.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ nozīmītes "jaunas" un "uz augšu" uz nedēļu.
 🌙 **Netraucēt:** sadaļā Iestatījumi vai paplātē apklusiniet sapulces brīdinājumus, uzdevumu atgādinājumus, statusa brīdinājumus un citus
 sistēmas paziņojums 30 min, 1 h, 2 h, līdz rītdienai vai līdz brīdim, kad to izslēgsiet. Parādās mēness augšējā joslā
 kad tas beidzas; viens klikšķis to atkal izslēdz. Tas pārdzīvo restartēšanu un beidzas pats no sevis.
+
+🔔 **Katrs brīdinājums vienā ekrānā:** zvans galvenē (skaitiet un krāsojiet, ja kaut kas gaida), atver
+brīdinājumi visā logā jebkurā režīmā: viena kartīte katram brīdinājumam ar tā darbībām, **noraidīt visu** un to, kas bija
+šodien tika atrisināts saskaņā ar tiem — nekas nav gaidīts, tādējādi jūs joprojām sasniedzat šodienas žurnālu. No doka — klikšķis
+joprojām atver šo vienu brīdinājumu parastā loga augšpusē.
 
 ⌨️ **Viss, izmantojot tastatūru:** `Alt+1`…`Alt+7` pārslēgt cilnes, `N` veido, `/` meklē, `F11` pilnekrāna režīmu, `Alt+L`
 bloķē un `?` uzskaita īsceļus. `Ctrl+Shift+P` (`Cmd+Shift+P` operētājsistēmā macOS) atver **komandu paleti** ar katru
@@ -235,11 +242,11 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Noklikšķiniet uz brīdinājuma dokā | Maksimāli palielināts: uzdevumi un paziņojumi, ar velkamu sadalītāju |
+| Noklikšķiniet uz brīdinājuma dokā | Maksimizēts: viss atvērtās cilnes logs |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Zvans atver brīdinājumus visā logā |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: pēdējās piecas aizvadītās spēles ar abiem spēles laikiem |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: visvairāk pārdotie, numurēti | Steam: pēdējās piecas aizvadītās spēles ar abiem spēles laikiem |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Viens brīdinājuma pārklājums visam neapstiprinātajam: pārtraukumiem, sanāksmēm, uzdevumiem un jauniem AI modeļiem |
 |---|

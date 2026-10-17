@@ -144,15 +144,17 @@ JSON வடிவமைக்கப்பட்டது அல்லது ச�
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam விட்ஜெட்டை விட்டு வெளியேறாமல்
 
-Steamக்கான நான்கு துணைத் தாவல்கள்: **விரும்பப் பட்டியல் ஒப்பந்தங்கள்** (முதலில் மிகப்பெரிய தள்ளுபடி), ** சிறந்த விற்பனையாளர்கள்**, **இப்போது விளையாடு** மற்றும்
-**மதிப்பீட்டின்படி வரிசைப்படுத்தப்பட்ட பட்டியல்**. பொதுப் பட்டியல்களுக்கு உங்கள் **SteamID64** மட்டுமே தேவை; ஒரு விருப்பமான **Steam Web API விசை**
-அவர்களின் விளையாட்டு நேரங்களுடன் சமீபத்திய ஐந்து கேம்களைச் சேர்க்கிறது. விலைகள் reais இல் வருகின்றன, ஒவ்வொரு வரிசையும் ஸ்டோர் பக்கத்தைத் திறக்கும், மேலும்
-தாவல் இயல்பாகவே தொடங்குகிறது, அமைப்புகளில் ஒரு தேர்வுப்பெட்டி தொலைவில் உள்ளது.
+Steamக்கான நான்கு துணை தாவல்கள்: **விருப்பப்பட்டியல் ஒப்பந்தங்கள்** (முதலில் மிகப்பெரிய தள்ளுபடி, ஒவ்வொன்றும் சேமித்தவை), **சிறந்த விற்பனையாளர்கள்**
+தரவரிசைப்படுத்தப்பட்டது, **இப்போது விளையாடு** மற்றும் **மதிப்பீட்டின்படி வரிசைப்படுத்தப்பட்ட பட்டியல்**. ஒவ்வொரு வரிசையும் ** காப்ஸ்யூல் கலை**, ** மதிப்பாய்வு ஆகியவற்றைக் கொண்டுள்ளது
+ஸ்கோர்** Steam இன் சொந்த வார்த்தைகள் மற்றும் அது எத்தனை மதிப்புரைகளைக் கணக்கிடுகிறது, கிராஸ்-அவுட் விலை, ரியாஸின் விலை மற்றும் என்ன
+தள்ளுபடி சேமிக்கிறது - மற்றும் பட்டியல் மொத்த சேமிப்பைக் கூட்டுகிறது. பொதுப் பட்டியல்களுக்கு உங்கள் **SteamID64** மட்டுமே தேவை; ஒரு
+விருப்பமானது **Steam Web API விசை** அவர்களின் விளையாட்டு நேரங்களுடன் ஐந்து மிக சமீபத்திய கேம்களை சேர்க்கிறது. தாவல் இயல்பாகவே தொடங்குகிறது,
+அமைப்புகளில் ஒரு செக்பாக்ஸ் தொலைவில் உள்ளது.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 🌙 **தொந்தரவு செய்ய வேண்டாம்:** அமைப்புகள் அல்லது தட்டில், அமைதியான சந்திப்பு எச்சரிக்கைகள், பணி நினைவூட்டல்கள், நிலை எச்சரிக்கைகள் மற்றும் ஒவ்வொன்றிலும்
 30 நிமிடம், 1 மணிநேரம், 2 மணிநேரம், நாளை வரை அல்லது அதை அணைக்கும் வரை கணினி அறிவிப்பு. மேல் பட்டியில் ஒரு சந்திரன் காட்டுகிறது
 அது முடிவடையும் போது; ஒரே கிளிக்கில் அது மீண்டும் அணைக்கப்படும். இது மறுதொடக்கம் மற்றும் தானாகவே முடிவடைகிறது.
+
+🔔 **ஒவ்வொரு விழிப்பூட்டலும் ஒரே திரையில்:** தலைப்பில் உள்ள மணி (எதுவும் நிலுவையில் இருக்கும் போது எண்ணி வண்ணம்) திறக்கும்
+எந்த பயன்முறையிலும் முழு சாளரத்திலும் விழிப்பூட்டல்கள்: ஒரு எச்சரிக்கைக்கு ஒரு அட்டை அதன் செயல்களுடன், **அனைத்தையும் நிராகரித்தல்**, மற்றும் என்ன
+அவர்களின் கீழ் இன்று தீர்க்கப்பட்டது - எதுவும் நிலுவையில் இல்லாமல், இன்றைய பதிவை நீங்கள் எப்படி அடைகிறீர்கள். கப்பல்துறையிலிருந்து, ஒரு கிளிக்
+இன்னும் அந்த ஒற்றை எச்சரிக்கையை சாதாரண சாளரத்தின் மேல் திறக்கும்.
 
 ⌨️ **அனைத்தும் விசைப்பலகை மூலம்:** `Alt+1`…`Alt+7` தாவல்களை மாற்றவும், `N` உருவாக்குகிறது, `/` தேடல்கள், `F11` முழுத்திரை, `Alt+L`
 பூட்டுகள் மற்றும் `?` குறுக்குவழிகளை பட்டியலிடுகிறது. `Ctrl+Shift+P` (macOS இல் `Cmd+Shift+P`) ஒரு **கட்டளை தட்டு** ஒவ்வொன்றிலும் திறக்கிறது
@@ -235,11 +242,11 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| கப்பல்துறையில் உள்ள எச்சரிக்கையைக் கிளிக் செய்யவும் | பெரிதாக்கப்பட்டது: இழுத்துச் செல்லக்கூடிய வகுப்பியுடன் கூடிய பணிகள் மற்றும் அறிவிப்புகள் |
+| கப்பல்துறையில் உள்ள எச்சரிக்கையைக் கிளிக் செய்யவும் | பெரிதாக்கப்பட்டது: திறந்த தாவிற்கான முழு சாளரமும் |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| பெல் முழு சாளரத்திலும் விழிப்பூட்டல்களைத் திறக்கும் |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: விளையாடிய கடைசி ஐந்து ஆட்டங்கள், இரண்டு நேரங்களுடனும் |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: அதிக விற்பனையாளர்கள், எண்கள் | Steam: விளையாடிய கடைசி ஐந்து ஆட்டங்கள், இரண்டு விளையாட்டு நேரங்களும் |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | நிலுவையில் உள்ள அனைத்திற்கும் ஒரு எச்சரிக்கை மேலடுக்கு: செயலிழப்புகள், சந்திப்புகள், பணிகள் மற்றும் புதிய AI மாதிரிகள் |
 |---|

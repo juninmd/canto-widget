@@ -144,15 +144,17 @@ menghormati batas tarif. Masuk dengan token pribadi hanya-baca atau dari browser
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam tanpa meninggalkan widget
 
-Empat sub-tab untuk Steam: **penawaran daftar keinginan** (diskon terbesar terlebih dahulu), **penjual teratas**, **main sekarang** dan
-**katalog diurutkan berdasarkan peringkat**. Daftar publik hanya memerlukan **SteamID64**; opsional **Steam Kunci web API**
-menambahkan lima game terbaru dengan waktu bermainnya. Harga masuk reais, setiap baris membuka halaman toko, dan
-tab dimulai secara default, satu kotak centang di Pengaturan.
+Empat sub-tab untuk Steam: **penawaran daftar keinginan** (diskon terbesar terlebih dahulu, masing-masing dengan penghematannya), **penjual teratas**
+diberi peringkat, **main sekarang** dan **katalog diurutkan berdasarkan peringkat**. Setiap baris membawa **seni kapsul**, **ulasan
+skor** dengan kata-kata Steam sendiri dan berapa banyak ulasan yang dihitung, harga yang dicoret, harga dalam reais dan berapa
+diskonnya berhemat — dan daftarnya menjumlahkan total penghematannya. Daftar publik hanya memerlukan **SteamID64**; sebuah
+opsional **Steam Web API key** menambahkan lima game terbaru beserta waktu bermainnya. Tab dimulai secara default,
+satu kotak centang jauhnya di Pengaturan.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ lencana "baru" dan "naik" selama seminggu.
 🌙 **Jangan ganggu:** di Pengaturan atau baki, senyapkan peringatan rapat, pengingat tugas, peringatan status, dan lainnya
 notifikasi sistem selama 30 menit, 1 jam, 2 jam, hingga besok atau hingga Anda mematikannya. Bulan di bilah atas muncul
 kapan itu berakhir; satu klik mematikannya kembali. Ia bertahan jika dimulai ulang dan berakhir dengan sendirinya.
+
+🔔 **Setiap peringatan dalam satu layar:** bel di header (hitung dan warnai ketika ada sesuatu yang tertunda) membuka
+peringatan di seluruh jendela dalam mode apa pun: satu kartu per peringatan dengan tindakannya, **tutup semua**, dan apa yang terjadi
+diselesaikan hari ini di bawah mereka — tanpa ada yang tertunda, begitulah cara Anda masih mencapai catatan hari ini. Dari dok, sekali klik
+masih membuka satu peringatan di atas jendela normal.
 
 ⌨️ **Semuanya menggunakan keyboard:** `Alt+1`…`Alt+7` beralih tab, `N` membuat, `/` penelusuran, `F11` layar penuh, `Alt+L`
 kunci dan `?` mencantumkan pintasan. `Ctrl+Shift+P` (`Cmd+Shift+P` di macOS) membuka **palet perintah** dengan setiap
@@ -235,11 +242,11 @@ Dan **Ikuti sistem**, yang beralih antara terang dan gelap seiring dengan OS. Se
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klik peringatan di dok | Dimaksimalkan: tugas dan notifikasi, dengan pembagi yang dapat diseret |
+| Klik peringatan di dok | Dimaksimalkan: seluruh jendela untuk tab yang terbuka |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Lonceng membuka peringatan di seluruh jendela |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Dan **Ikuti sistem**, yang beralih antara terang dan gelap seiring dengan OS. Se
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: lima pertandingan terakhir yang dimainkan, dengan kedua waktu bermain |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: terlaris, bernomor | Steam: lima pertandingan terakhir dimainkan, dengan kedua waktu bermain |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Satu hamparan peringatan untuk segala hal yang tertunda: pemadaman listrik, rapat, tugas, dan model AI baru |
 |---|

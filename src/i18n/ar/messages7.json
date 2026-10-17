@@ -72,5 +72,18 @@
   "steam.recent.total": "{time} في المجموع",
   "steam.row.open": "افتح {name} على Steam",
   "steam.row.discount": "{n}% خصم",
-  "steam.row.review": "{n}% من المراجعات إيجابية"
+  "steam.row.review": "{n}% من المراجعات إيجابية",
+  "steam.row.reviews": "{n} التعليقات",
+  "steam.row.reviewOne": "{n} مراجعة",
+  "steam.row.saved": "حفظ {value}",
+  "steam.totalSaved": "{value} تم حفظه إجمالاً",
+  "steam.review.overwhelmingly_positive": "إيجابية للغاية",
+  "steam.review.very_positive": "إيجابية للغاية",
+  "steam.review.positive": "إيجابي",
+  "steam.review.negative": "سلبي",
+  "steam.review.very_negative": "سلبي جدا",
+  "steam.review.overwhelmingly_negative": "سلبية للغاية",
+  "steam.review.mostly_positive": "إيجابية في الغالب",
+  "steam.review.mixed": "مختلط",
+  "steam.review.mostly_negative": "سلبية في الغالب"
 }

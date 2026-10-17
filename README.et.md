@@ -144,15 +144,17 @@ austab intressipiirangut. Logige sisse kirjutuskaitstud isikliku loaga või brau
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam vidinast lahkumata
 
-Neli alamvahekaarti Steam jaoks: **sooviloendi pakkumised** (kõigepealt suurim allahindlus), **enimmüüdud**, **mängi kohe** ja
-**hinnangu järgi järjestatud kataloog**. Avalikud loendid vajavad ainult teie **SteamID64**; valikuline **Steam veebivõti API**
-lisab viis viimast mängu koos nende mänguaegadega. Hinnad tulevad reaalides, iga rida avab poe lehe ja
-vahekaart käivitub vaikimisi, seadetes ühe märkeruudu kaugusel.
+Neli alamvahekaarti Steam jaoks: **sooviloendi pakkumised** (kõigepealt suurim allahindlus, millest igaühel on kokkuhoid), **enimmüüdud**
+järjestatud, **mängi kohe** ja **reitingu järgi järjestatud kataloog**. Igal real on **kapsli kujundus**, **ülevaade
+skoor** koos Steam enda sõnastusega ja arvustuste arvuga, läbikriipsutatud hind, hind reaalides ja mis
+allahindlus säästab — ja nimekiri liidab kokku kogusäästu. Avalikud loendid vajavad ainult teie **SteamID64**; an
+valikuline **Steam Veebiklahv API** lisab viis viimast mängu koos nende mänguaegadega. Vahekaart käivitub vaikimisi,
+ühe märkeruudu kaugusel seadetes.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ mudel **saab 10 parima hulka** või **ronib selle sees** (kontrollitakse iga 6 t
 🌙 **Mitte segada:** menüüs Seaded või salves vaigistage koosoleku märguanded, ülesannete meeldetuletused, olekuteated ja kõik
 süsteemi märguanne 30 min, 1 h, 2 h homseni või kuni selle välja lülitate. Kuu ülemisel ribal näitab
 kui see lõpeb; üks klõps lülitab selle uuesti välja. See elab üle taaskäivitamise ja lõpeb iseenesest.
+
+🔔 **Iga märguanne ühel ekraanil:** päises olev kelluke (loendage ja värvige, kui midagi on ootel) avab
+hoiatused kogu aknas mis tahes režiimis: üks kaart hoiatuse kohta koos selle toimingutega, **loobu kõik** ja mis oli
+lahendatud täna nende all — kui midagi pole pooleli, nii jõuad ikka tänase logini. Dokilt klõps
+avab ikkagi selle ühe hoiatuse tavalise akna peal.
 
 ⌨️ **Kõik klaviatuuri abil:** `Alt+1`…`Alt+7` vahekaartide vahetamine, `N` loomine, `/` otsimine, `F11` täisekraan, `Alt+L`
 lukustab ja `?` loetleb otseteed. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS-is) avab **käsupaleti** iga
@@ -235,11 +242,11 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klõpsake dokis märguandel | Maksimaalne: ülesanded ja teatised koos lohistatava jaguriga |
+| Klõpsake dokis märguandel | Maksimeeritud: kogu avatud vahelehe aken |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Kelluke avab hoiatused kogu aknas |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: viimased viis mängitud mängu mõlema mänguajaga |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: enimmüüdud, nummerdatud | Steam: viimased viis mängitud mängu mõlema mänguajaga |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Üks märguannete ülekate kõige ootel oleva kohta: katkestused, koosolekud, ülesanded ja uued AI mudelid |
 |---|

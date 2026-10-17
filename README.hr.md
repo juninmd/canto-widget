@@ -144,15 +144,17 @@ poštuje ograničenje stope. Prijavite se s osobnim tokenom samo za čitanje ili
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam bez napuštanja widgeta
 
-Četiri podkartice za Steam: **ponude s popisa želja** (najprije najveći popust), **najprodavanije**, **igrajte sada** i
-**katalog poredan po ocjeni**. Javni popisi trebaju samo vaše **SteamID64**; izborni **Steam Web API ključ**
-dodaje pet najnovijih igara s njihovim vremenom igranja. Cijene su izražene u realima, svaki redak otvara stranicu trgovine i
-kartica počinje prema zadanim postavkama, jedan potvrdni okvir dalje u Postavkama.
+Četiri podkartice za Steam: **ponude s popisa želja** (najprije najveći popust, svaki s uštedom), **najprodavaniji**
+rangirani, **igraj sada** i **katalog poredan po ocjeni**. Svaki red nosi **capsule art**, **recenziju
+rezultat** s vlastitim tekstom Steam i koliko pregleda broji, prekriženom cijenom, cijenom u realima i što
+popust štedi — a popis zbraja ukupnu uštedu. Javni popisi trebaju samo vaše **SteamID64**; an
+izborni **Steam Web API ključ** dodaje pet najnovijih igara s njihovim vremenima igranja. Kartica počinje prema zadanim postavkama,
+jedan potvrdni okvir u Postavkama.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ model **ulazi u prvih 10** ili se **penje unutar njega** (provjerava se svakih 6
 🌙 **Ne uznemiravaj:** u Postavkama ili traci, utišajte upozorenja o sastancima, podsjetnike na zadatke, upozorenja o statusu i svaki
 obavijest sustava na 30 min, 1 h, 2 h, do sutra ili dok ga ne isključite. Prikazuje se mjesec u gornjoj traci
 kada završi; jedan klik ga ponovno isključuje. Preživi ponovno pokretanje i završi sam od sebe.
+
+🔔 **Svako upozorenje na jednom zaslonu:** zvono u zaglavlju (broji i oboji kada je nešto na čekanju) otvara
+upozorenja preko cijelog prozora u bilo kojem načinu rada: jedna kartica po upozorenju sa svojim radnjama, **odbaci sve** i što je
+riješeno danas pod njima — bez ičega na čekanju, tako još uvijek dolazite do današnjeg dnevnika. S doka, klik
+i dalje otvara to jedno upozorenje na vrhu uobičajenog prozora.
 
 ⌨️ **Sve pomoću tipkovnice:** `Alt+1`…`Alt+7` mijenjanje kartica, `N` kreira, `/` pretraživanja, `F11` cijeli zaslon, `Alt+L`
 zaključava i `?` navodi prečace. `Ctrl+Shift+P` (`Cmd+Shift+P` na macOS-u) otvara **paletu naredbi** sa svakim
@@ -235,11 +242,11 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Kliknite upozorenje na docku | Maksimalno: zadaci i obavijesti, s razdjelnikom koji se može povlačiti |
+| Kliknite upozorenje na docku | Maksimizirano: cijeli prozor za otvorenu karticu |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Zvono otvara upozorenja preko cijelog prozora |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: zadnjih pet igranja, s oba vremena igranja |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: najprodavaniji, numerirani | Steam: zadnjih pet igranja, s oba vremena igranja |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Jedno preklapanje upozorenja za sve što je na čekanju: prekide rada, sastanke, zadatke i nove AI modele |
 |---|

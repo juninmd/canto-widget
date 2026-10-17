@@ -144,15 +144,17 @@ JSON อยู่ในรูปแบบหรือกะทัดรัด �
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam โดยไม่ต้องออกจากวิดเจ็ต
 
-แท็บย่อยสี่แท็บสำหรับ Steam: **ข้อเสนอสิ่งที่อยากได้** (ส่วนลดสูงสุดก่อน) **สินค้าขายดี** **เล่นเลย** และ
-**แคตตาล็อกเรียงลำดับตามการให้คะแนน** รายการสาธารณะต้องการเพียง **SteamID64** ของคุณเท่านั้น ตัวเลือก **Steam เว็บ API คีย์**
-เพิ่มห้าเกมล่าสุดพร้อมเวลาเล่น ราคามาจริงทุกแถวเปิดหน้าร้านและ
-แท็บจะเริ่มต้นโดยค่าเริ่มต้น โดยเหลือช่องทำเครื่องหมายหนึ่งช่องในการตั้งค่า
+แท็บย่อยสี่แท็บสำหรับ Steam: **ข้อเสนอสิ่งที่ปรารถนา** (ส่วนลดมากที่สุดก่อน แต่ละรายการมีส่วนลดที่ประหยัดได้) **สินค้าขายดี**
+จัดอันดับ **เล่นเลย** และ **แค็ตตาล็อกเรียงตามเรตติ้ง** ทุกแถวจะมี **ภาพแคปซูล** และ **รีวิว
+ให้คะแนน** ด้วยถ้อยคำของ Steam เอง และจำนวนบทวิจารณ์ที่นับได้ ราคาที่ขีดฆ่า ราคาเป็นสกุลเงินเรียล และจำนวนเท่าใด
+ส่วนลดที่บันทึกไว้ - และรายการจะรวมการประหยัดทั้งหมด รายการสาธารณะต้องการเพียง **SteamID64** ของคุณเท่านั้น ก
+ตัวเลือก **Steam ปุ่มเว็บ API** เพิ่มห้าเกมล่าสุดพร้อมกับเวลาเล่น แท็บจะเริ่มต้นตามค่าเริ่มต้น
+หนึ่งช่องทำเครื่องหมายในการตั้งค่า
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 🌙 **ห้ามรบกวน:** ในการตั้งค่าหรือถาด ปิดเสียงการแจ้งเตือนการประชุม การแจ้งเตือนงาน การแจ้งเตือนสถานะ และทุก ๆ
 การแจ้งเตือนระบบเป็นเวลา 30 นาที 1 ชั่วโมง 2 ชั่วโมง จนถึงวันพรุ่งนี้หรือจนกว่าคุณจะปิด พระจันทร์ในแถบด้านบนปรากฏขึ้น
 เมื่อมันจบลง; คลิกเพียงครั้งเดียวก็จะปิดอีกครั้ง มันรอดจากการรีสตาร์ทและจบลงด้วยตัวเอง
+
+🔔 **ทุกการแจ้งเตือนในหน้าจอเดียว:** กระดิ่งในส่วนหัว (นับและสีเมื่อมีสิ่งใดรอดำเนินการ) จะเปิดขึ้น
+การแจ้งเตือนทั่วทั้งหน้าต่างในโหมดใดก็ได้: การ์ดหนึ่งใบต่อการแจ้งเตือนพร้อมการดำเนินการ **ยกเลิกทั้งหมด** และสิ่งที่เป็นอยู่
+แก้ไขในวันนี้ภายใต้พวกเขา - โดยไม่ต้องรออะไร นั่นคือวิธีที่คุณยังคงเข้าถึงบันทึกของวันนี้ จากท่าเรือ คลิกเพียงครั้งเดียว
+ยังคงเปิดการแจ้งเตือนเดียวนั้นที่ด้านบนของหน้าต่างปกติ
 
 ⌨️ **ทุกอย่างด้วยแป้นพิมพ์:** `Alt+1`…`Alt+7` สลับแท็บ, `N` สร้าง, `/` การค้นหา, `F11` เต็มหน้าจอ, `Alt+L`
 ล็อคและ `?` แสดงรายการทางลัด `Ctrl+Shift+P` (`Cmd+Shift+P` บน macOS) เปิด **ชุดคำสั่ง** ด้วยทุก ๆ
@@ -235,11 +242,11 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| คลิกการแจ้งเตือนใน Dock | ขยายใหญ่สุด: งานและการแจ้งเตือน พร้อมตัวแบ่งแบบลากได้ |
+| คลิกการแจ้งเตือนใน Dock | ขยายใหญ่สุด: ทั้งหน้าต่างสำหรับแท็บที่เปิด |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| กระดิ่งเปิดการแจ้งเตือนทั่วทั้งหน้าต่าง |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: ห้าเกมล่าสุดที่เล่น โดยทั้งสองเวลาเล่น |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: สินค้าขายดีลำดับที่ | Steam: ห้าเกมล่าสุดที่เล่น โดยทั้งสองเวลาเล่น |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | การแจ้งเตือนซ้อนทับสำหรับทุกสิ่งที่ค้างอยู่: การหยุดทำงาน การประชุม งาน และโมเดล AI ใหม่ |
 |---|

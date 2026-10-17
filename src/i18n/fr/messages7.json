@@ -72,5 +72,18 @@
   "steam.recent.total": "{time} au total",
   "steam.row.open": "ouvrir {name} le Steam",
   "steam.row.discount": "{n} % de réduction",
-  "steam.row.review": "{n} % des avis sont positifs"
+  "steam.row.review": "{n} % des avis sont positifs",
+  "steam.row.reviews": "{n} avis",
+  "steam.row.reviewOne": "{n} avis",
+  "steam.row.saved": "enregistrer {value}",
+  "steam.totalSaved": "{value} économisés au total",
+  "steam.review.overwhelmingly_positive": "Très positif",
+  "steam.review.very_positive": "Très positif",
+  "steam.review.positive": "Positif",
+  "steam.review.negative": "Négatif",
+  "steam.review.very_negative": "Très négatif",
+  "steam.review.overwhelmingly_negative": "Extrêmement négatif",
+  "steam.review.mostly_positive": "Plutôt positif",
+  "steam.review.mixed": "Mixte",
+  "steam.review.mostly_negative": "Plutôt négatif"
 }

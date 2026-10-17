@@ -144,15 +144,17 @@ Windows Hello необов’язковий.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam, не виходячи з віджета
 
-Чотири підвкладки для Steam: **угоди зі списку бажань** (спочатку найбільші знижки), **лідери продажів**, **грати зараз** і
-**каталог впорядкований за рейтингом**. Для публічних списків потрібні лише ваші **SteamID64**; додатковий ключ **Steam Web API ключ**
-додає п'ять останніх ігор із часом їх відтворення. Ціни вказано в реалах, кожен рядок відкриває сторінку магазину, і
-вкладка починається за умовчанням, за один прапорець у налаштуваннях.
+Чотири підвкладки для Steam: **угоди зі списку бажань** (спочатку найбільша знижка, кожна з тим, що вона заощаджує), **лідери продажів**
+рейтинг, **грати зараз** і **каталог, упорядкований за рейтингом**. Кожен рядок містить **капсульне мистецтво**, **огляд
+оцінка** з власним формулюванням Steam і кількістю відгуків, яка нараховується, закресленою ціною, ціною в реалах і що
+знижка економить — і список додає загальну економію. Для публічних списків потрібні лише ваші **SteamID64**; ан
+необов’язковий ключ **Steam Web API ключ** додає п’ять останніх ігор із часом їх відтворення. Вкладка починається за замовчуванням,
+один прапорець у налаштуваннях.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 🌙 **Не турбувати:** у налаштуваннях або на панелі вимикання сповіщень про зустрічі, нагадувань про завдання, сповіщень про стан і кожного
 сповіщення системи на 30 хв, 1 год, 2 год, до завтра або поки ви його не вимкнете. На верхній панелі відображається місяць
 коли закінчується; один клік знову вимикає його. Він переживає перезапуск і закінчується самостійно.
+
+🔔 **Кожне сповіщення на одному екрані:** дзвіночок у заголовку (підрахунок і колір, коли щось очікує) відкриває
+сповіщення по всьому вікну в будь-якому режимі: одна картка на сповіщення з його діями, **закрити все** та те, що було
+вирішено сьогодні під ними — без нічого незавершеного, це те, як ви все ще досягаєте сьогоднішнього журналу. З док-станції клацання
+усе ще відкриває єдине сповіщення поверх звичайного вікна.
 
 ⌨️ **Усе за допомогою клавіатури:** `Alt+1`…`Alt+7` перемикання вкладок, `N` створення, `/` пошук, `F11` на весь екран, `Alt+L`
 блокує, а `?` перелічує ярлики. `Ctrl+Shift+P` (`Cmd+Shift+P` в macOS) відкриває **командну палітру** з кожним
@@ -235,11 +242,11 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Клацніть сповіщення на панелі | Розгорнуто: завдання та сповіщення з розділювачем, який можна перетягнути |
+| Клацніть сповіщення на панелі | Розгорнуто: все вікно для відкритої вкладки |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Дзвінок відкриває оповіщення по всьому вікну |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: останні п’ять зіграних ігор, з обома часами гри |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: лідери продажів, пронумеровані | Steam: останні п’ять зіграних ігор, з обома часами гри |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Єдине накладення сповіщень для всього незавершеного: збоїв, зустрічей, завдань і нових моделей ШІ |
 |---|

@@ -144,15 +144,17 @@ respecteert de tarieflimiet. Meld u aan met een alleen-lezen persoonlijk token o
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam zonder de widget te verlaten
 
-Vier subtabbladen voor Steam: **verlanglijstdeals** (grootste korting eerst), **bestsellers**, **nu spelen** en de
-**catalogus gerangschikt op beoordeling**. De openbare lijsten hebben alleen uw **SteamID64** nodig; een optionele **Steam Web API sleutel**
-voegt de vijf meest recente games toe met hun speeltijden. Prijzen komen in reais, elke rij opent de winkelpagina, en
-het tabblad begint standaard, één selectievakje verwijderd in Instellingen.
+Vier subtabbladen voor Steam: **verlanglijstaanbiedingen** (grootste korting eerst, elk met wat het bespaart), de **bestsellers**
+gerangschikt, **speel nu** en de **catalogus gerangschikt op beoordeling**. Elke rij bevat de **capsulekunst**, de **recensie
+score** met de eigen bewoording van Steam en hoeveel beoordelingen het telt, de doorgestreepte prijs, de prijs in reais en wat
+de korting bespaart – en de lijst telt de totale besparing op. De openbare lijsten hebben alleen uw **SteamID64** nodig; een
+optionele **Steam Web API sleutel** voegt de vijf meest recente games met hun speeltijden toe. Het tabblad begint standaard,
+één selectievakje verwijderd in Instellingen.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ model **komt in de top 10** of **klimt erin** (elke 6 uur gecontroleerd terwijl 
 🌙 **Niet storen:** in Instellingen of in de lade kunt u vergaderingswaarschuwingen, taakherinneringen, statuswaarschuwingen en elke
 systeemmelding gedurende 30 min, 1 uur, 2 uur, tot morgen of totdat u het uitschakelt. Er verschijnt een maan in de bovenste balk
 wanneer het eindigt; met één klik wordt het weer uitgeschakeld. Het overleeft een herstart en eindigt vanzelf.
+
+🔔 **Elke waarschuwing in één scherm:** de bel in de kop (tel en kleur wanneer er iets in behandeling is) opent de
+waarschuwingen over het hele venster in elke modus: één kaart per waarschuwing met zijn acties, **alles negeren** en wat er was
+vandaag onder hen opgelost - zonder dat er nog iets in behandeling is, zo bereik je nog steeds het logboek van vandaag. Vanuit het dock: één klik
+opent nog steeds die ene waarschuwing bovenop het normale venster.
 
 ⌨️ **Alles via toetsenbord:** `Alt+1`…`Alt+7` van tabblad wisselen, `N` maakt, `/` zoekopdrachten, `F11` volledig scherm, `Alt+L`
 vergrendelt en `?` geeft de snelkoppelingen weer. `Ctrl+Shift+P` (`Cmd+Shift+P` op macOS) opent een **opdrachtenpalet** bij elke
@@ -235,11 +242,11 @@ En **Volg-systeem**, dat samen met het besturingssysteem tussen licht en donker 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klik op een waarschuwing in het dock | Gemaximaliseerd: taken en meldingen, met een versleepbare scheidingslijn |
+| Klik op een waarschuwing in het dock | Gemaximaliseerd: het hele venster voor het geopende tabblad |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| De bel opent de waarschuwingen over het hele venster |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ En **Volg-systeem**, dat samen met het besturingssysteem tussen licht en donker 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: de laatste vijf gespeelde wedstrijden, met beide speeltijden |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: de topverkopers, genummerd | Steam: de laatste vijf gespeelde wedstrijden, met beide speeltijden |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Eén waarschuwingsoverlay voor alles wat in behandeling is: storingen, vergaderingen, taken en nieuwe AI-modellen |
 |---|

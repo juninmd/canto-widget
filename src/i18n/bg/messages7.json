@@ -72,5 +72,18 @@
   "steam.recent.total": "Общо {time}",
   "steam.row.open": "отворете {name} на Steam",
   "steam.row.discount": "{n}% отстъпка",
-  "steam.row.review": "{n}% от отзивите са положителни"
+  "steam.row.review": "{n}% от отзивите са положителни",
+  "steam.row.reviews": "{n} отзиви",
+  "steam.row.reviewOne": "{n} преглед",
+  "steam.row.saved": "запази {value}",
+  "steam.totalSaved": "{value} запазени общо",
+  "steam.review.overwhelmingly_positive": "Изключително положителен",
+  "steam.review.very_positive": "Много положително",
+  "steam.review.positive": "Положително",
+  "steam.review.negative": "Отрицателна",
+  "steam.review.very_negative": "Много негативно",
+  "steam.review.overwhelmingly_negative": "Преобладаващо негативно",
+  "steam.review.mostly_positive": "Предимно положително",
+  "steam.review.mixed": "Смесени",
+  "steam.review.mostly_negative": "Предимно отрицателни"
 }

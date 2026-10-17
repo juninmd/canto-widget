@@ -72,5 +72,18 @@
   "steam.recent.total": "{time} মোট",
   "steam.row.open": "Steam এ {name} খুলুন",
   "steam.row.discount": "{n}% ছাড়",
-  "steam.row.review": "{n}% পর্যালোচনা ইতিবাচক"
+  "steam.row.review": "{n}% পর্যালোচনা ইতিবাচক",
+  "steam.row.reviews": "{n} পর্যালোচনা",
+  "steam.row.reviewOne": "{n} পর্যালোচনা",
+  "steam.row.saved": "সংরক্ষণ করুন {value}",
+  "steam.totalSaved": "{value} মোট সংরক্ষিত",
+  "steam.review.overwhelmingly_positive": "অপ্রতিরোধ্যভাবে ইতিবাচক",
+  "steam.review.very_positive": "খুবই ইতিবাচক",
+  "steam.review.positive": "ইতিবাচক",
+  "steam.review.negative": "নেতিবাচক",
+  "steam.review.very_negative": "খুবই নেতিবাচক",
+  "steam.review.overwhelmingly_negative": "অতিমাত্রায় নেতিবাচক",
+  "steam.review.mostly_positive": "বেশিরভাগই ইতিবাচক",
+  "steam.review.mixed": "মিশ্র",
+  "steam.review.mostly_negative": "বেশিরভাগই নেতিবাচক"
 }

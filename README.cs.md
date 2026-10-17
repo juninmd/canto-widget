@@ -144,15 +144,17 @@ respektuje limit sazby. Přihlaste se pomocí osobního tokenu pouze pro čtení
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam aniž byste opustili widget
 
-Čtyři podkarty pro Steam: **nabídky na seznamu přání** (největší sleva jako první), **nejprodávanější**, **hrát hned** a
-**katalog seřazený podle hodnocení**. Veřejné seznamy potřebují pouze vaše **SteamID64**; volitelný klíč **Steam Web API**
-přidává pět nejnovějších her s jejich hracími časy. Ceny jsou uváděny v reálech, každý řádek otevírá stránku obchodu a
-karta se spustí ve výchozím nastavení, o jedno zaškrtávací políčko v Nastavení.
+Čtyři podkarty pro Steam: **nabídky na přání** (největší sleva jako první, každá s tím, co ušetří), **nejprodávanější**
+hodnoceno, **hrát nyní** a **katalog seřazený podle hodnocení**. Každý řádek nese **obrázek kapsle**, **recenze
+skóre** s vlastním zněním Steam a počtem recenzí se počítá, přeškrtnutou cenou, cenou v realech a co
+sleva ušetří — a seznam sečte celkovou úsporu. Veřejné seznamy potřebují pouze vaše **SteamID64**; an
+volitelný **Steam Web API klíč** přidá pět nejnovějších her s jejich hracími časy. Karta se ve výchozím nastavení spustí,
+o jedno zaškrtávací políčko v Nastavení.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ model **vstoupí do top 10** nebo **vstoupí do ní** (kontrolováno každých 6
 🌙 **Nerušit:** v Nastavení nebo na panelu můžete ztišit upozornění na schůzky, připomenutí úkolů, upozornění na stav a další
 systémové upozornění po dobu 30 min, 1 h, 2 h, do zítřka nebo dokud jej nevypnete. Zobrazí se měsíc v horní liště
 když skončí; jedním kliknutím jej opět vypnete. Přežije restart a skončí sám.
+
+🔔 **Každé upozornění na jedné obrazovce:** zvonek v záhlaví (počet a barva, když něco čeká) otevře
+výstrahy přes celé okno v libovolném režimu: jedna karta na výstrahu s jejími akcemi, **zavřít vše** a co bylo
+vyřešeno dnes pod nimi — bez čekání, takto se stále dostanete k dnešnímu protokolu. Z doku, kliknutí
+stále otevře toto jediné upozornění v horní části normálního okna.
 
 ⌨️ **Vše pomocí klávesnice:** `Alt+1`…`Alt+7` přepínání karet, `N` vytváření, `/` vyhledávání, `F11` celá obrazovka, `Alt+L`
 zámky a `?` uvádí seznam zkratek. `Ctrl+Shift+P` (`Cmd+Shift+P` na macOS) otevře **paletu příkazů** s každým
@@ -235,11 +242,11 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klikněte na upozornění v doku | Maximalizováno: úkoly a upozornění, s přetahovatelnou přepážkou |
+| Klikněte na upozornění v doku | Maximalizováno: celé okno pro otevřenou kartu |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Zvonek otevírá upozornění přes celé okno |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: posledních pět odehraných her, s oběma hracími časy |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: nejprodávanější, očíslované | Steam: posledních pět odehraných her, s oběma hracími časy |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Jedno překryvné upozornění pro vše čekající: výpadky, schůzky, úkoly a nové modely umělé inteligence |
 |---|

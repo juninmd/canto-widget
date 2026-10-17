@@ -144,15 +144,17 @@ respecta el límit de tarifa. Inicieu la sessió amb un testimoni personal de no
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam sense sortir del giny
 
-Quatre subpestanyes per a Steam: **ofertes de la llista de desitjos** (el descompte més gran primer), **els més venuts**, **juga ara** i el
-**catàleg ordenat per valoració**. Les llistes públiques només necessiten el vostre **SteamID64**; una clau **Steam Web API opcional**
-afegeix els cinc jocs més recents amb els seus temps de joc. Els preus vénen en reals, cada fila obre la pàgina de la botiga i
-la pestanya comença de manera predeterminada, a una casella de selecció a Configuració.
+Quatre subpestanyes per a Steam: **ofertes de la llista de desitjos** (el descompte més gran primer, cadascuna amb el que estalvia), els **més venuts**
+classificat, **juga ara** i el **catàleg ordenat per puntuació**. Cada fila inclou l'**art de la càpsula**, la **revisió
+puntuació** amb la redacció pròpia de Steam i quantes ressenyes compta, el preu ratllat, el preu en reals i què
+el descompte estalvia, i la llista suma l'estalvi total. Les llistes públiques només necessiten el vostre **SteamID64**; un
+La clau opcional **Steam Web API** afegeix els cinc jocs més recents amb els seus temps de joc. La pestanya comença per defecte,
+una casella de selecció a Configuració.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ insígnies "nous" i "amunt" durant una setmana.
 🌙 **No molestis:** a Configuració o a la safata, silencia les alertes de reunió, recordatoris de tasques, alertes d'estat i cada
 notificació del sistema durant 30 min, 1 h, 2 h, fins demà o fins que el desactiveu. Es mostra una lluna a la barra superior
 quan s'acaba; un clic el torna a apagar. Sobreviu a un reinici i acaba pel seu compte.
+
+🔔 **Totes les alertes en una pantalla:** la campana de la capçalera (comptar i colorear quan hi ha alguna cosa pendent) obre el
+alertes a tota la finestra en qualsevol mode: una targeta per alerta amb les seves accions, **descartar totes** i què va ser
+resolt avui sota ells; sense res pendent, és com encara arribeu al registre d'avui. Des del moll, un clic
+encara obre aquesta alerta única a la part superior de la finestra normal.
 
 ⌨️ **Tot per teclat:** `Alt+1`…`Alt+7` canvi de pestanyes, `N` crea, `/` cerca, `F11` pantalla completa, `Alt+L`
 bloqueja i `?` enumera les dreceres. `Ctrl+Shift+P` (`Cmd+Shift+P` a macOS) obre una **paleta d'ordres** amb cada
@@ -235,11 +242,11 @@ I **Seguir el sistema**, que canvia entre clar i fosc juntament amb el sistema o
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Feu clic a una alerta al moll | Maximitzat: tasques i notificacions, amb un divisor arrossegable |
+| Feu clic a una alerta al moll | Maximitzat: tota la finestra per a la pestanya oberta |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| El timbre obre les alertes a tota la finestra |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ I **Seguir el sistema**, que canvia entre clar i fosc juntament amb el sistema o
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: els últims cinc partits jugats, amb els dos temps de joc |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: els més venuts, numerats | Steam: els últims cinc partits jugats, amb els dos temps de joc |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Una sola superposició d'alerta per a tot el que està pendent: interrupcions, reunions, tasques i nous models d'IA |
 |---|

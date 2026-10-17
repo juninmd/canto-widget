@@ -72,5 +72,18 @@
   "steam.recent.total": "{time} kopā",
   "steam.row.open": "atvērt {name} uz Steam",
   "steam.row.discount": "{n}% atlaide",
-  "steam.row.review": "{n}% atsauksmju ir pozitīvas"
+  "steam.row.review": "{n}% atsauksmju ir pozitīvas",
+  "steam.row.reviews": "{n} atsauksmes",
+  "steam.row.reviewOne": "{n} atsauksme",
+  "steam.row.saved": "saglabāt {value}",
+  "steam.totalSaved": "Kopā saglabātas {value}",
+  "steam.review.overwhelmingly_positive": "Pārsvarā pozitīvi",
+  "steam.review.very_positive": "Ļoti pozitīvi",
+  "steam.review.positive": "Pozitīvi",
+  "steam.review.negative": "Negatīvs",
+  "steam.review.very_negative": "Ļoti negatīvs",
+  "steam.review.overwhelmingly_negative": "Pārsvarā negatīvs",
+  "steam.review.mostly_positive": "Pārsvarā pozitīvi",
+  "steam.review.mixed": "Jaukti",
+  "steam.review.mostly_negative": "Pārsvarā negatīvi"
 }

@@ -144,15 +144,17 @@ przestrzega limitu stawki. Zaloguj się za pomocą tokena osobistego tylko do od
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam bez opuszczania widżetu
 
-Cztery podzakładki dla Steam: **oferty z listy życzeń** (najpierw największy rabat), **najlepiej sprzedające się**, **zagraj teraz** i
-**katalog uporządkowany według ocen**. Listy publiczne wymagają jedynie Twojego **SteamID64**; opcjonalny klucz **Steam Web API**
-dodaje pięć najnowszych gier wraz z czasem ich odtwarzania. Ceny podawane są w realach, każdy wiersz otwiera stronę sklepu i
-karta zaczyna się domyślnie, jedno pole wyboru w Ustawieniach.
+Cztery podzakładki dla Steam: **oferty z listy życzeń** (najpierw największy rabat, każda z tym, co pozwala zaoszczędzić), **najlepiej sprzedające się**
+rankingowe, **zagraj teraz** i **katalog uporządkowany według ocen**. W każdym rzędzie znajduje się **sztuka kapsułki** i **recenzja
+wynik** z własnym sformułowaniem Steam i liczbą recenzji, które to liczy, ceną przekreśloną, ceną w realach i tym, co
+rabat oszczędza — a lista sumuje całkowitą oszczędność. Listy publiczne wymagają jedynie Twojego **SteamID64**; an
+opcjonalny **Steam Web API klucz** dodaje pięć najnowszych gier wraz z czasem ich odtwarzania. Zakładka domyślnie uruchamia się,
+jedno pole wyboru dalej w Ustawieniach.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ odznaki „nowe” i „wyższe” na tydzień.
 🌙 **Nie przeszkadzać:** w Ustawieniach lub w zasobniku wycisz powiadomienia o spotkaniach, przypomnienia o zadaniach, powiadomienia o stanie i wszystkie
 powiadomienie systemu przez 30 min, 1 h, 2 h, do jutra lub do momentu jego wyłączenia. Na górnym pasku widać księżyc
 kiedy to się skończy; jedno kliknięcie wyłącza je ponownie. Przetrwa ponowne uruchomienie i zakończy się samoczynnie.
+
+🔔 **Każdy alert na jednym ekranie:** dzwonek w nagłówku (liczba i kolor, gdy coś jest w toku) otwiera
+alerty w całym oknie w dowolnym trybie: jedna karta na alert z jego działaniami, **odrzuć wszystko** i co było
+rozwiązane dzisiaj w ramach nich — nic nie jest oczekujące, w ten sposób nadal docierasz do dzisiejszego dziennika. Ze stacji dokującej – kliknięcie
+nadal otwiera ten pojedynczy alert na górze normalnego okna.
 
 ⌨️ **Wszystko za pomocą klawiatury:** `Alt+1`…`Alt+7` przełączaj karty, `N` tworzy, `/` wyszukuje, `F11` pełny ekran, `Alt+L`
 blokuje, a `?` wyświetla listę skrótów. `Ctrl+Shift+P` (`Cmd+Shift+P` na macOS) otwiera **paletę poleceń** przy każdym
@@ -235,11 +242,11 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Kliknij alert w doku | Zmaksymalizowane: zadania i powiadomienia, z przeciąganym separatorem |
+| Kliknij alert w doku | Zmaksymalizowane: całe okno otwartej karty |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Dzwonek otwiera alerty na całe okno |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: pięć ostatnich rozegranych meczów, z czasem gry w obu przypadkach |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: bestsellery, numerowane | Steam: pięć ostatnich rozegranych meczów, z czasem gry w obu przypadkach |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Jedna nakładka alertów dla wszystkich oczekujących informacji: awarie, spotkania, zadania i nowe modele AI |
 |---|

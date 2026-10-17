@@ -72,5 +72,18 @@
   "steam.recent.total": "总共 {time}",
   "steam.row.open": "在 Steam 上打开 {name}",
   "steam.row.discount": "{n}% 折扣",
-  "steam.row.review": "{n}% 的评论是正面的"
+  "steam.row.review": "{n}% 的评论是正面的",
+  "steam.row.reviews": "{n} 评论",
+  "steam.row.reviewOne": "{n} 评论",
+  "steam.row.saved": "保存 {value}",
+  "steam.totalSaved": "总共保存了 {value}",
+  "steam.review.overwhelmingly_positive": "压倒性的积极",
+  "steam.review.very_positive": "非常积极",
+  "steam.review.positive": "积极",
+  "steam.review.negative": "阴性",
+  "steam.review.very_negative": "非常消极",
+  "steam.review.overwhelmingly_negative": "压倒性负面",
+  "steam.review.mostly_positive": "大多是积极的",
+  "steam.review.mixed": "混合",
+  "steam.review.mostly_negative": "大多是负面的"
 }

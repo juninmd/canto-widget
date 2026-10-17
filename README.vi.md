@@ -144,15 +144,17 @@ tôn trọng giới hạn tỷ lệ. Đăng nhập bằng mã thông báo cá nh
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam mà không cần rời khỏi tiện ích
 
-Bốn tab phụ dành cho Steam: **ưu đãi trong danh sách yêu thích** (giảm giá lớn nhất trước), **bán chạy nhất**, **chơi ngay** và
-**danh mục được sắp xếp theo xếp hạng**. Danh sách công khai chỉ cần **SteamID64** của bạn; một **Steam khóa Web API tùy chọn**
-thêm năm trò chơi gần đây nhất cùng với thời gian chơi của chúng. Giá được tính bằng reais, mỗi hàng sẽ mở ra trang cửa hàng và
-tab bắt đầu theo mặc định, cách một hộp kiểm trong Cài đặt.
+Bốn tab phụ dành cho Steam: **giao dịch trong danh sách yêu thích** (giảm giá lớn nhất trước, mỗi tab sẽ tiết kiệm được), **sản phẩm bán chạy nhất**
+được xếp hạng, **chơi ngay** và **danh mục được sắp xếp theo xếp hạng**. Mỗi hàng đều có **capsule art**, **review
+ghi điểm** bằng cách diễn đạt của chính Steam và số lượng bài đánh giá được tính, giá bị gạch bỏ, giá bằng reais và giá trị gì
+khoản giảm giá tiết kiệm được - và danh sách cộng tổng số tiền tiết kiệm được. Danh sách công khai chỉ cần **SteamID64** của bạn; một
+tùy chọn **Steam Phím API Web** thêm năm trò chơi gần đây nhất cùng với thời gian chơi của chúng. Tab bắt đầu theo mặc định,
+một hộp kiểm trong Cài đặt.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ huy hiệu "mới" và "lên" trong một tuần.
 🌙 **Không làm phiền:** trong Cài đặt hoặc khay, tắt tiếng cảnh báo cuộc họp, lời nhắc nhiệm vụ, cảnh báo trạng thái và mọi thứ
 thông báo hệ thống trong 30 phút, 1 giờ, 2 giờ, cho đến ngày mai hoặc cho đến khi bạn tắt nó đi. Một mặt trăng ở thanh trên cùng hiển thị
 khi nó kết thúc; một cú nhấp chuột sẽ tắt nó đi. Nó tồn tại khi khởi động lại và tự kết thúc.
+
+🔔 **Mọi cảnh báo trong một màn hình:** chuông trong tiêu đề (đếm và tô màu khi có nội dung đang chờ xử lý) sẽ mở ra
+cảnh báo trên toàn bộ cửa sổ ở bất kỳ chế độ nào: một thẻ cho mỗi cảnh báo với các hành động của nó, **loại bỏ tất cả** và những gì đã được
+đã được giải quyết hôm nay theo chúng - không có gì đang chờ xử lý, đó là cách bạn vẫn đạt được nhật ký của ngày hôm nay. Từ bến tàu, một cú nhấp chuột
+vẫn mở cảnh báo duy nhất đó trên đầu cửa sổ bình thường.
 
 ⌨️ **Mọi thứ bằng bàn phím:** `Alt+1`…`Alt+7` chuyển tab, `N` tạo, `/` tìm kiếm, `F11` toàn màn hình, `Alt+L`
 khóa và `?` liệt kê các phím tắt. `Ctrl+Shift+P` (`Cmd+Shift+P` trên macOS) mở **bảng lệnh** với mọi
@@ -235,11 +242,11 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Nhấp vào cảnh báo trong thanh công cụ | Tối đa hóa: nhiệm vụ và thông báo, với dải phân cách có thể kéo được |
+| Nhấp vào cảnh báo trong thanh công cụ | Tối đa hóa: toàn bộ cửa sổ cho tab đang mở |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Chuông mở cảnh báo trên toàn bộ cửa sổ |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa sáng và t�
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: năm trận đã chơi gần đây nhất, với cả hai thời gian chơi |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: sản phẩm bán chạy nhất, được đánh số | Steam: năm trận đã chơi gần đây nhất, với cả hai thời gian chơi |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Một lớp phủ cảnh báo cho mọi thứ đang chờ xử lý: ngừng hoạt động, cuộc họp, nhiệm vụ và mô hình AI mới |
 |---|

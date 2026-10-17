@@ -72,5 +72,18 @@
   "steam.recent.total": "{time} در مجموع",
   "steam.row.open": "باز کردن {name} در Steam",
   "steam.row.discount": "{n}% تخفیف",
-  "steam.row.review": "{n}% نظرات مثبت است"
+  "steam.row.review": "{n}% نظرات مثبت است",
+  "steam.row.reviews": "{n} نظرات",
+  "steam.row.reviewOne": "{n} بررسی",
+  "steam.row.saved": "ذخیره {value}",
+  "steam.totalSaved": "{value} در کل ذخیره شد",
+  "steam.review.overwhelmingly_positive": "بسیار مثبت است",
+  "steam.review.very_positive": "خیلی مثبته",
+  "steam.review.positive": "مثبت",
+  "steam.review.negative": "منفی",
+  "steam.review.very_negative": "خیلی منفی",
+  "steam.review.overwhelmingly_negative": "به شدت منفی",
+  "steam.review.mostly_positive": "اکثرا مثبته",
+  "steam.review.mixed": "مختلط",
+  "steam.review.mostly_negative": "اکثرا منفی"
 }

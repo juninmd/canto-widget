@@ -144,15 +144,17 @@ JSON בפורמט או קומפקטי, טקסט בשורה אחת, באותיו�
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam מבלי לעזוב את הווידג'ט
 
-ארבע כרטיסיות משנה עבור Steam: **עסקאות רשימת משאלות** (ההנחה הגדולה ביותר תחילה), **מוכרים מובילים**, **שחק עכשיו** וה
-**קטלוג בהזמנה לפי דירוג**. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; מפתח **Steam אינטרנט API אופציונלי**
-מוסיף את חמשת המשחקים האחרונים עם זמני המשחק שלהם. המחירים מגיעים בריאל, כל שורה פותחת את עמוד החנות, ו
-הכרטיסייה מתחילה כברירת מחדל, במרחק של תיבת סימון אחת בהגדרות.
+ארבע כרטיסיות משנה עבור Steam: **עסקאות רשימת משאלות** (ההנחה הגדולה ביותר תחילה, כל אחת מהן מה שהיא חוסכת), **המוכרים הטובים ביותר**
+מדורג, **שחק עכשיו** ו**הקטלוג מסודר לפי דירוג**. כל שורה נושאת את **אמנות הקפסולה**, **הביקורת
+ציון** עם הניסוח של Steam עצמו וכמה ביקורות זה סופר, המחיר המרוחק, המחיר בריאיס ומה
+ההנחה חוסכת - והרשימה מצטברת את החיסכון הכולל. הרשימות הציבוריות זקוקות רק ל-**SteamID64** שלך; an
+אופציונלי **Steam מפתח אינטרנט API** מוסיף את חמשת המשחקים האחרונים עם זמני המשחק שלהם. הכרטיסייה מתחילה כברירת מחדל,
+במרחק תיבת סימון אחת בהגדרות.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 🌙 **אל תפריע:** בהגדרות או במגש, השתקת התראות פגישות, תזכורות משימות, התראות סטטוס וכל
 הודעת מערכת למשך 30 דקות, שעה אחת, שעתיים, עד מחר או עד שתכבה אותה. ירח בסרגל העליון מראה
 מתי זה נגמר; לחיצה אחת מכבה אותו בחזרה. זה שורד הפעלה מחדש ומסתיים לבד.
+
+🔔 **כל התראה במסך אחד:** הפעמון בכותרת (ספירה וצבע כאשר משהו ממתין) פותח את
+התראות על כל החלון בכל מצב: כרטיס אחד לכל התראה עם הפעולות שלו, **בטל הכל**, ומה היה
+נפתרה היום תחתיהם - בלי שום דבר תלוי ועומד, כך אתה עדיין מגיע ליומן של היום. מהרציף, קליק
+עדיין פותח את ההתראה היחידה על גבי החלון הרגיל.
 
 ⌨️ **הכל לפי מקלדת:** `Alt+1`...`Alt+7` מעבר לשוניות, `N` יוצר, `/` חיפושים, `F11` מסך מלא, `Alt+L`
 מנעולים ו`?` מפרט את קיצורי הדרך. `Ctrl+Shift+P` (`Cmd+Shift+P` ב-macOS) פותח **פלטת פקודות** עם כל
@@ -235,11 +242,11 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| לחץ על התראה ברציף | מקסימום: משימות והתראות, עם מפריד הניתן לגרירה |
+| לחץ על התראה ברציף | מקסימום: כל החלון עבור הכרטיסייה הפתוחה |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| הפעמון פותח את ההתראות על כל החלון |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: חמשת המשחקים האחרונים ששיחקו, עם שני זמני המשחק |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: המוכרים המובילים, ממוספרים | Steam: חמשת המשחקים האחרונים ששיחקו, עם שני זמני המשחק |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | שכבת התראה אחת לכל מה שממתין: הפסקות, פגישות, משימות ודגמי AI חדשים |
 |---|

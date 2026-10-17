@@ -72,5 +72,18 @@
   "steam.recent.total": "총 {time}",
   "steam.row.open": "Steam에서 {name} 열기",
   "steam.row.discount": "{n}% 할인",
-  "steam.row.review": "{n}%의 리뷰가 긍정적입니다."
+  "steam.row.review": "{n}%의 리뷰가 긍정적입니다.",
+  "steam.row.reviews": "{n} 리뷰",
+  "steam.row.reviewOne": "{n} 리뷰",
+  "steam.row.saved": "{value} 저장",
+  "steam.totalSaved": "총 {value} 저장됨",
+  "steam.review.overwhelmingly_positive": "압도적으로 긍정적",
+  "steam.review.very_positive": "매우 긍정적",
+  "steam.review.positive": "긍정적",
+  "steam.review.negative": "네거티브",
+  "steam.review.very_negative": "매우 부정적",
+  "steam.review.overwhelmingly_negative": "압도적으로 부정적",
+  "steam.review.mostly_positive": "대부분 긍정적",
+  "steam.review.mixed": "혼합",
+  "steam.review.mostly_negative": "대부분 부정적"
 }

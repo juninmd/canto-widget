@@ -144,15 +144,17 @@ Windows Hello اختیاری است.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam بدون خروج از ویجت
 
-چهار زبانه فرعی برای Steam: **تخفیف های لیست علاقه** (ابتدا بزرگترین تخفیف)، **فروشندگان برتر**، **اکنون بازی کنید** و
-**کاتالوگ به ترتیب رتبه**. لیست های عمومی فقط به **SteamID64** شما نیاز دارند. یک کلید **Steam وب API اختیاری**
-پنج بازی اخیر را با زمان پخش آنها اضافه می کند. قیمت ها به صورت واقعی می آیند، هر ردیف صفحه فروشگاه را باز می کند و
-برگه به طور پیش فرض شروع می شود، یک کادر انتخاب دورتر در تنظیمات.
+چهار زبانه فرعی برای Steam: **تخفیف های لیست آرزوها** (بزرگترین تخفیف در ابتدا، هر کدام با چیزی که پس انداز می کند)، **فروشندگان برتر**
+رتبه بندی شده، **اکنون بازی کنید** و **کاتالوگ به ترتیب رتبه**. هر ردیف دارای **هنر کپسولی**، **بررسی است
+امتیاز** با جمله بندی خود Steam و تعداد نظرات آن، قیمت خط خورده، قیمت واقعی و چه مقدار
+تخفیف باعث صرفه جویی می شود - و فهرست کل پس انداز را جمع می کند. لیست های عمومی فقط به **SteamID64** شما نیاز دارند. یک
+اختیاری **Steam کلید وب API** پنج بازی اخیر را با زمان پخش آنها اضافه می کند. تب به طور پیش فرض شروع می شود،
+یک کادر انتخاب دورتر در تنظیمات.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 🌙 **مزاحم نشوید:** در تنظیمات یا سینی، بی‌صدا کردن هشدارهای جلسه، یادآوری‌های کار، هشدارهای وضعیت و هر
 اعلان سیستم به مدت 30 دقیقه، 1 ساعت، 2 ساعت، تا فردا یا تا زمانی که آن را خاموش کنید. یک ماه در نوار بالا نشان می دهد
 وقتی تمام می شود؛ یک کلیک آن را خاموش می کند. از راه اندازی مجدد جان سالم به در می برد و خود به خود به پایان می رسد.
+
+🔔 **هر هشدار در یک صفحه:** زنگ در هدر (شمارش و رنگ در زمانی که چیزی در انتظار است) باز می شود
+هشدارها در کل پنجره در هر حالت: یک کارت در هر هشدار با اقداماتش، **رد کردن همه**، و آنچه بود
+امروز تحت آنها حل شد - بدون هیچ چیز معلق، اینگونه است که شما هنوز به گزارش امروز می رسید. از بارانداز، یک کلیک
+همچنان آن هشدار واحد را در بالای پنجره معمولی باز می کند.
 
 ⌨️ **همه چیز بر اساس صفحه کلید:** `Alt+1`…`Alt+7` تغییر زبانه ها، `N` ایجاد، `/` جستجو، `F11` تمام صفحه، `Alt+L`
 قفل می کند و `?` میانبرها را فهرست می کند. `Ctrl+Shift+P` (`Cmd+Shift+P` در macOS) یک **پالت فرمان** را با هر
@@ -235,11 +242,11 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| روی یک هشدار در حوض کلیک کنید | حداکثر شده: وظایف و اعلان ها، با یک تقسیم کننده قابل کشیدن |
+| روی یک هشدار در حوض کلیک کنید | حداکثر شده: کل پنجره برای برگه باز |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| زنگ هشدارها را در کل پنجره باز می کند |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: پنج بازی آخر انجام شده، با هر دو زمان بازی |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: فروشندگان برتر، شماره گذاری شده | Steam: پنج بازی آخر انجام شده، با هر دو زمان بازی |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | یک پوشش هشدار برای همه چیز در انتظار: قطع، جلسات، وظایف و مدل‌های جدید هوش مصنوعی |
 |---|

@@ -72,5 +72,18 @@
   "steam.recent.total": "Всего {time}",
   "steam.row.open": "откройте {name} на Steam",
   "steam.row.discount": "Скидка {n}%",
-  "steam.row.review": "{n}% отзывов положительные"
+  "steam.row.review": "{n}% отзывов положительные",
+  "steam.row.reviews": "{n} отзывов",
+  "steam.row.reviewOne": "{n} обзор",
+  "steam.row.saved": "сохранить {value}",
+  "steam.totalSaved": "Всего сохранено {value}",
+  "steam.review.overwhelmingly_positive": "Исключительно позитивный",
+  "steam.review.very_positive": "Очень позитивно",
+  "steam.review.positive": "Позитивный",
+  "steam.review.negative": "Отрицательный",
+  "steam.review.very_negative": "Очень отрицательно",
+  "steam.review.overwhelmingly_negative": "Крайне негативный",
+  "steam.review.mostly_positive": "В основном положительные",
+  "steam.review.mixed": "Смешанный",
+  "steam.review.mostly_negative": "В основном отрицательный"
 }

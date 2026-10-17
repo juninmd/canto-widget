@@ -144,15 +144,17 @@ inaheshimu kikomo cha viwango. Ingia kwa kutumia tokeni ya kibinafsi ya kusoma t
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam bila kuacha wijeti
 
-Vichupo vidogo vinne vya Steam: **orodha ya matamanio** (punguzo kubwa kwanza), **wauzaji wakuu**, **cheza sasa** na
-**katalogi iliyoagizwa kwa ukadiriaji**. Orodha za umma zinahitaji tu **SteamID64** yako; hiari **Steam Mtandao API ufunguo**
-inaongeza michezo mitano ya hivi majuzi zaidi na saa zake za kucheza. Bei huja kwa reais, kila safu hufungua ukurasa wa duka, na
-kichupo kinaanza kwa chaguo-msingi, kisanduku tiki kimoja kipo kwenye Mipangilio.
+Vichupo vidogo vinne vya Steam: **orodha ya matamanio** (punguzo kubwa kwanza, kila moja na kile inachohifadhi), **wauzaji wakuu**
+iliyoorodheshwa, **cheza sasa** na **katalogi iliyopangwa kwa ukadiriaji**. Kila safu hubeba **sanaa ya kibonge**, hakiki **
+alama** ukitumia maneno ya Steam na inathaminiwa hakiki ngapi, bei iliyopitishwa, bei ya reais na bei gani
+punguzo huokoa - na orodha inaongeza jumla ya kuokoa. Orodha za umma zinahitaji tu **SteamID64** yako; na
+hiari **Steam Kitufe API cha Wavuti** huongeza michezo mitano ya hivi majuzi pamoja na saa zake za kucheza. Kichupo kinaanza kwa chaguo-msingi,
+kisanduku kimoja cha kuteua kipo kwenye Mipangilio.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ beji "mpya" na "juu" kwa wiki.
 🌙 **Usisumbue:** katika Mipangilio au trei, nyamaza arifa za mkutano, vikumbusho vya kazi, arifa za hali na kila
 arifa ya mfumo kwa dakika 30, 1 h, 2 h, hadi kesho au hadi uizima. Mwezi kwenye upau wa juu unaonyesha
 inapoisha; mbofyo mmoja huizima. Inasalia kuanza upya na kuishia yenyewe.
+
+🔔 **Kila tahadhari katika skrini moja:** kengele kwenye kichwa (hesabu na rangi wakati kitu chochote kinasubiri) hufungua
+arifa juu ya dirisha zima katika hali yoyote: kadi moja kwa tahadhari na vitendo vyake, **ondoa yote **, na ni nini
+kutatuliwa leo chini yao - bila chochote kinachosubiri, ni jinsi unavyofikia logi ya leo. Kutoka kwenye kizimbani, bonyeza
+bado inafungua arifa hiyo moja juu ya dirisha la kawaida.
 
 ⌨️ **Kila kitu kwa kibodi:** `Alt+1`…`Alt+7` badilisha vichupo, `N` huunda, `/` utafutaji, `F11` skrini nzima, `Alt+L`
 kufuli na `?` kuorodhesha njia za mkato. `Ctrl+Shift+P` (`Cmd+Shift+P` kwenye macOS) hufungua **paleti ya amri** na kila
@@ -235,11 +242,11 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Bofya tahadhari kwenye gati | Imeongezwa: kazi na arifa, na kigawanyaji kinachoweza kukokotwa |
+| Bofya tahadhari kwenye gati | Imeongezwa: dirisha zima la kichupo wazi |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Kengele hufungua arifa kwenye dirisha zima |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: michezo mitano iliyopita iliyochezwa, na saa zote mbili za kucheza |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: wauzaji wakuu, waliopewa nambari | Steam: michezo mitano iliyopita iliyochezwa, na saa zote mbili za kucheza |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Uwekeleaji mmoja wa tahadhari kwa kila kitu kinachosubiri: kukatika, mikutano, kazi na miundo mipya ya AI |
 |---|

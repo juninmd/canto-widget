@@ -1,8 +1,33 @@
-import { test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { shoot } from "./out";
 import { fullScene, openTab } from "./scene";
 import { STEAM } from "./data-ops";
 import { settle } from "./stage";
+
+/** Fake capsules for invented games: `steam_image` answers a gradient derived from the appid, so the
+ *  screenshot shows the layout without borrowing any real cover art. */
+async function steamArt(page: Page) {
+  await page.addInitScript(() => {
+    const w = window as unknown as {
+      __TAURI_INTERNALS__: { invoke: (cmd: string, args?: unknown) => Promise<unknown> };
+    };
+    const base = w.__TAURI_INTERNALS__.invoke;
+    w.__TAURI_INTERNALS__.invoke = async (cmd, args) => {
+      if (cmd !== "steam_image") return base(cmd, args);
+      const url = String((args as { url?: string })?.url ?? "");
+      const appid = Number(url.match(/apps\/(\d+)/)?.[1] ?? 0);
+      const hue = (appid * 47) % 360;
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="231" height="87">` +
+        `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
+        `<stop offset="0" stop-color="hsl(${hue},68%,46%)"/>` +
+        `<stop offset="1" stop-color="hsl(${(hue + 70) % 360},68%,22%)"/>` +
+        `</linearGradient></defs><rect width="231" height="87" fill="url(#g)"/>` +
+        `<circle cx="196" cy="14" r="52" fill="hsl(${(hue + 140) % 360},78%,64%)" opacity="0.3"/></svg>`;
+      return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+    };
+  });
+}
 
 const EVENING = new Date(2026, 9, 9, 17, 40);
 
@@ -59,11 +84,14 @@ test("activity: week, off and a wide window", async ({ browser }) => {
   await shoot(wide, "activity-wide");
 });
 
-test("steam: wishlist deals and the recent games", async ({ browser }) => {
-  const page = await fullScene(browser, { fixed: STEAM });
-  await openTab(page, "Steam");
-  await page.screenshot({ path: "docs/prints/app/86-steam.png", omitBackground: true });
+test("steam: wishlist deals, the ranking and the recent games", async ({ browser }) => {
+  const page = await fullScene(browser, { fixed: STEAM, before: steamArt });
+  await openTab(page, "Steam", 1200);
+  await page.screenshot({ path: "docs/prints/app/87-steam.png", omitBackground: true });
+  await page.getByRole("tab", { name: "em alta" }).click();
+  await settle(page, 900);
+  await page.screenshot({ path: "docs/prints/app/88-steam-em-alta.png", omitBackground: true });
   await page.getByRole("tab", { name: "jogue agora" }).click();
-  await settle(page, 800);
-  await page.screenshot({ path: "docs/prints/app/87-steam-recentes.png", omitBackground: true });
+  await settle(page, 900);
+  await page.screenshot({ path: "docs/prints/app/89-steam-recentes.png", omitBackground: true });
 });

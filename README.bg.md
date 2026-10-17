@@ -144,15 +144,17 @@ JSON форматиран или компактен, текст на един р
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam, без да напускате джаджата
 
-Четири подраздела за Steam: **оферти в списъка с желания** (първо най-голямата отстъпка), **най-продавани**, **играйте сега** и
-**каталог подреден по рейтинг**. Публичните списъци се нуждаят само от вашите **SteamID64**; незадължителен ключ **Steam Web API ключ**
-добавя петте най-нови игри с техните времена за игра. Цените са в реали, всеки ред отваря страницата на магазина и
-разделът започва по подразбиране, на едно квадратче за отметка в Настройки.
+Четири подраздела за Steam: **оферти в списъка с желания** (първо най-голямата отстъпка, всяка с това, което спестява), **най-продаваните**
+класирани, **играйте сега** и **каталогът, подреден по рейтинг**. Всеки ред носи **капсулното изкуство**, **ревюто
+оценка** със собствената формулировка на Steam и колко отзива брои, зачеркнатата цена, цената в реали и какво
+отстъпката спестява — и списъкът събира общото спестяване. Публичните списъци се нуждаят само от вашите **SteamID64**; ан
+по избор **Steam Уеб API ключ** добавя петте най-нови игри с техните времена за игра. Разделът започва по подразбиране,
+едно квадратче за отметка в Настройки.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, Syncthing...), започнете със системата и раз�
 🌙 **Не безпокойте:** в Настройки или в панела, заглушаване на сигнали за срещи, напомняния за задачи, сигнали за състояние и всеки
 системно известие за 30 минути, 1 час, 2 часа, до утре или докато не го изключите. Показва се луна в горната лента
 когато свърши; едно щракване го изключва отново. Оцелява при рестартиране и завършва сам.
+
+🔔 **Всеки сигнал в един екран:** камбанката в заглавката (преброяване и цвят, когато нещо чака) отваря
+предупреждения в целия прозорец във всеки режим: една карта на предупреждение с неговите действия, **отхвърляне на всички** и какво беше
+разрешено днес под тях — без нищо чакащо, това е начинът, по който все още достигате до днешния дневник. От дока, щракване
+все още отваря този единичен сигнал в горната част на нормалния прозорец.
 
 ⌨️ **Всичко чрез клавиатура:** `Alt+1`…`Alt+7` превключване на раздели, `N` създаване, `/` търсения, `F11` цял екран, `Alt+L`
 заключва и `?` изброява преките пътища. `Ctrl+Shift+P` (`Cmd+Shift+P` на macOS) отваря **командна палитра** с всеки
@@ -235,11 +242,11 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Щракнете върху предупреждение в дока | Увеличени: задачи и известия, с плъзгащ се разделител |
+| Щракнете върху предупреждение в дока | Увеличен: целият прозорец за отворения раздел |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Камбанката отваря известията в целия прозорец |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: последните пет изиграни игри, с двете времена за игра |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: най-продаваните, номерирани | Steam: последните пет изиграни игри, с двете времена за игра |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Едно наслагване за предупреждение за всичко чакащо: прекъсвания, срещи, задачи и нови AI модели |
 |---|

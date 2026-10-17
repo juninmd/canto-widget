@@ -227,11 +227,18 @@ export type SteamRow = {
   discount: number;
   /** Positive reviews, 0..=100; null for a game Steam has no review summary for. */
   review: number | null;
-  review_label: string;
+  /** Steam's own bucket, as a token the interface translates ("very_positive"); empty when unknown. */
+  review_key: string;
+  /** How many reviews the percentage is drawn from; 0 when Steam didn't say. */
+  review_count: number;
+  /** What the discount takes off, in cents; 0 when there is none. */
+  saved_cents: number;
+  /** Capsule on Steam's CDN; the row asks `steamImage` for it, so the list stays light. */
+  art: string;
 };
 export type SteamList = { items: SteamRow[]; has_more: boolean };
 /** Both playtimes are minutes, as the Steam Web API reports them. */
-export type RecentGame = { appid: number; name: string; recent_min: number; total_min: number };
+export type RecentGame = { appid: number; name: string; recent_min: number; total_min: number; art: string };
 /** `has_key` false means only the recent list is unavailable: the UI explains instead of erroring. */
 export type SteamRecent = { items: RecentGame[]; has_key: boolean };
 export type SteamStatus = { configured: boolean; steamid: string; has_key: boolean; name: string };
@@ -432,6 +439,8 @@ export const api = {
   /** Top rated games for `term` (empty = the whole store), reviews first. */
   steamCatalog: (term: string, force = false) => invoke<SteamList>("steam_catalog", { term, force }),
   steamRecent: (force = false) => invoke<SteamRecent>("steam_recent", { force }),
+  /** One capsule as a `data:` URL, cached in Rust; empty when Steam has no art for the app. */
+  steamImage: (url: string) => invoke<string>("steam_image", { url }),
 
   dndGet: () => invoke<DndState>("dnd_get"),
   /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */

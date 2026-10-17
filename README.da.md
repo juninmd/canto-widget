@@ -144,15 +144,17 @@ overholder takstgrænsen. Log ind med et skrivebeskyttet personligt token eller 
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam uden at forlade widgetten
 
-Fire underfaner til Steam: **ønskelistetilbud** (største rabat først), **topsælgere**, **spil nu** og
-**katalog sorteret efter vurdering**. De offentlige lister behøver kun din **SteamID64**; en valgfri **Steam Web API nøgle**
-tilføjer de fem seneste spil med deres spilletider. Priserne kommer i reais, hver række åbner butikssiden, og
-fanen starter som standard, et afkrydsningsfelt væk i Indstillinger.
+Fire underfaner til Steam: **ønskelistetilbud** (største rabat først, hver med hvad den sparer), **topsælgere**
+rangeret, **spil nu** og **kataloget sorteret efter vurdering**. Hver række bærer **kapselkunsten**, **anmeldelsen
+score** med Steams egen formulering og hvor mange anmeldelser det tæller, den overstregede pris, prisen i reais og hvad
+rabatten sparer — og listen summerer den samlede besparelse. De offentlige lister behøver kun din **SteamID64**; en
+valgfri **Steam Web API nøgle** tilføjer de fem seneste spil med deres spilletider. Fanen starter som standard,
+ét afkrydsningsfelt væk i Indstillinger.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ model **går ind i top 10** eller **klatrer inden for den** (kontrolleres hver 6
 🌙 **Forstyr ikke:** i Indstillinger eller bakken, dæmp mødeadvarsler, opgavepåmindelser, statusadvarsler og hver
 systembesked i 30 min, 1 t, 2 t, indtil i morgen, eller indtil du slukker det. En måne i den øverste bjælke viser
 når det slutter; et klik slår den fra igen. Den overlever en genstart og ender af sig selv.
+
+🔔 **Hver advarsel på én skærm:** klokken i overskriften (tæller og farve, når noget afventer) åbner
+advarsler over hele vinduet i enhver tilstand: et kort pr. advarsel med dets handlinger, **afvis alle**, og hvad der var
+løst i dag under dem - uden noget afventende, det er sådan, du stadig når dagens log. Fra kajen, et klik
+åbner stadig den enkelte advarsel oven på det normale vindue.
 
 ⌨️ **Alt med tastatur:** `Alt+1`...`Alt+7` skifter fane, `N` opretter, `/` søger, `F11` fuldskærm, `Alt+L`
 låser og `?` viser genvejene. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) åbner en **kommandopalet** med hver
@@ -235,11 +242,11 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klik på en advarsel i docken | Maksimeret: opgaver og meddelelser, med en trækbar skillelinje |
+| Klik på en advarsel i docken | Maksimeret: hele vinduet for den åbne fane |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Klokken åbner alarmerne over hele vinduet |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: de seneste fem spil spillet, med begge spilletider |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: topsælgere, nummereret | Steam: de seneste fem spil spillet, med begge spilletider |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Én advarselsoverlejring for alt afventende: udfald, møder, opgaver og nye AI-modeller |
 |---|

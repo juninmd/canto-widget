@@ -144,15 +144,17 @@ JSON 형식 또는 압축, 한 줄의 텍스트, 대문자 또는 소문자(기�
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam 위젯을 떠나지 않고
 
-Steam에 대한 4개의 하위 탭: **위시리스트 거래**(가장 큰 할인 우선), **최고 판매자**, **지금 플레이** 및
-**등급별로 정렬된 카탈로그**. 공개 목록에는 **SteamID64**만 필요합니다. 선택적 **Steam 웹 API 키**
-최근 5개의 게임을 플레이 시간과 함께 추가합니다. 가격은 레알로 표시되며, 모든 행에서 상점 페이지가 열립니다.
-탭은 기본적으로 설정에서 하나의 확인란으로 시작됩니다.
+Steam에 대한 4개의 하위 탭: **위시리스트 거래**(가장 큰 할인부터, 각각 할인된 금액 포함), **최고 판매자**
+순위, **지금 플레이** 및 **등급순으로 정렬된 카탈로그**. 모든 행에는 **캡슐 아트**, **리뷰가 표시되어 있습니다.
+Steam의 문구와 포함된 리뷰 수, 줄을 그은 가격, 레알 가격 등으로 점수**를 매기세요.
+할인이 절약되고 목록에 총 절약 금액이 합산됩니다. 공개 목록에는 **SteamID64**만 필요합니다. 안
+선택 사항 **Steam 웹 API 키**는 가장 최근 게임 5개를 플레이 시간과 함께 추가합니다. 탭은 기본적으로 시작됩니다.
+설정에서 하나의 확인란을 선택하세요.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 🌙 **방해 금지:** 설정 또는 트레이에서 회의 알림, 작업 알림, 상태 알림 및 모든 알림을 무음으로 설정합니다.
 내일까지 또는 끌 때까지 30분, 1시간, 2시간 동안 시스템 알림을 받습니다. 상단 바에 달이 표시됩니다.
 끝날 때; 한 번의 클릭으로 다시 꺼집니다. 다시 시작해도 유지되고 자체적으로 종료됩니다.
+
+🔔 **한 화면의 모든 알림:** 헤더의 벨(보류 중인 항목의 개수 및 색상)이
+모든 모드에서 전체 창에 대한 알림: 해당 작업이 포함된 알림당 하나의 카드, **모두 해제** 및 내용
+오늘 해결되었습니다. 보류 중인 항목이 없으면 이것이 바로 오늘의 로그에 도달하는 방법입니다. 도크에서 클릭 한 번
+여전히 일반 창 위에 해당 단일 경고가 열립니다.
 
 ⌨️ **키보드로 모든 작업:** `Alt+1`…`Alt+7` 탭 전환, `N` 생성, `/` 검색, `F11` 전체 화면, `Alt+L`
 잠금 및 `?`에 바로가기가 나열되어 있습니다. `Ctrl+Shift+P`(macOS의 경우 `Cmd+Shift+P`)은 모든 명령이 포함된 **명령 팔레트**를 엽니다.
@@ -235,11 +242,11 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| 도크에서 경고를 클릭하세요 | 최대화: 드래그 가능한 구분선이 있는 작업 및 알림 |
+| 도크에서 경고를 클릭하세요 | 최대화: 열린 탭의 전체 창 |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| 벨은 전체 창에 대한 경고를 엽니다 |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: 최근 5경기(두 플레이 시간 포함) |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: 최고 판매자, 번호 매기기 | Steam: 최근 5경기(두 플레이 시간 포함) |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | 중단, 회의, 작업 및 새로운 AI 모델 등 보류 중인 모든 것에 대한 단일 경고 오버레이 |
 |---|

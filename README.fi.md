@@ -144,15 +144,17 @@ noudattaa hintarajaa. Kirjaudu sisään vain luku -tilassa olevalla henkilökoht
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam poistumatta widgetistä
 
-Neljä alavälilehteä Steam: **toivelistatarjoukset** (suurin alennus ensin), **myydyimmät**, **pelaa nyt** ja
-**katalogi luokituksen mukaan**. Julkiset luettelot tarvitsevat vain **SteamID64**; valinnainen **Steam Web API -avain**
-lisää viisi viimeisintä peliä peliaikoineen. Hinnat tulevat realeina, jokainen rivi avaa kaupan sivun ja
-välilehti alkaa oletusarvoisesti yhden valintaruudun päässä asetuksista.
+Neljä alavälilehteä kohteelle Steam: **toivelistatarjoukset** (suurin alennus ensin, jokainen säästöineen), **myydyimmät**
+rankattu, **pelaa nyt** ja **katalogi luokituksen mukaan**. Jokaisella rivillä on **kapselitaide**, **arvostelu
+pisteet** Steam:n omalla sanamuodolla ja kuinka monta arvostelua se laskee, yliviivattu hinta, hinta realeina ja mitä
+alennus säästää — ja lista laskee yhteen kokonaissäästön. Julkiset luettelot tarvitsevat vain **SteamID64**; an
+valinnainen **Steam Web API -näppäin** lisää viisi viimeisintä peliä soittoaikoineen. Välilehti alkaa oletusarvoisesti,
+yhden valintaruudun päässä asetuksista.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ malli **pääsee 10 parhaan joukkoon** tai **kiipeää sen sisällä** (tarkiste
 🌙 **Älä häiritse:** Asetuksissa tai lokerossa, hiljennä kokoushälytykset, tehtävämuistutukset, tilahälytykset ja kaikki
 järjestelmäilmoitus 30 min, 1 h, 2 h, huomiseen asti tai kunnes sammutat sen. Kuu yläpalkissa näyttää
 kun se loppuu; yksi klikkaus sammuttaa sen takaisin. Se selviää uudelleenkäynnistyksestä ja päättyy itsestään.
+
+🔔 **Jokainen hälytys yhdellä näytöllä:** otsikossa oleva kello (laske ja väri, kun jotain odottaa) avaa
+hälytykset koko ikkunassa missä tahansa tilassa: yksi kortti per hälytys toimintoineen, **hylkää kaikki** ja mikä oli
+ratkaistu tänään heidän alaisuudessaan – ilman mitään vireillä, näin pääset edelleen tämän päivän lokiin. Telakasta, napsautus
+avaa silti kyseisen yksittäisen hälytyksen normaalin ikkunan päälle.
 
 ⌨️ **Kaikki näppäimistöllä:** `Alt+1`…`Alt+7` vaihtaa välilehtiä, `N` luo, `/` hakee, `F11` koko näyttö, `Alt+L`
 lukitsee ja `?` luettelee pikakuvakkeet. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS:ssä) avaa **komentopaletin** jokaisella
@@ -235,11 +242,11 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Napsauta hälytystä Dockissa | Maksimoitu: tehtävät ja ilmoitukset vedettävällä jakajalla |
+| Napsauta hälytystä Dockissa | Maksimoitu: koko ikkuna avoimelle välilehdelle |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Kello avaa hälytykset koko ikkunaan |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: viisi viimeistä pelattua peliä, molemmat peliajat |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: eniten myytyjä, numeroitu | Steam: viisi viimeistä pelattua peliä, molemmat peliajat |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Yksi varoituspeitto kaikelle odottavalle: katkokset, kokoukset, tehtävät ja uudet tekoälymallit |
 |---|

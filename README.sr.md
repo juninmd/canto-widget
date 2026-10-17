@@ -144,15 +144,17 @@ Windows Hello опционо.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam без напуштања виџета
 
-Четири подкартице за Steam: **понуде на листи жеља** (прво највећи попуст), **најпродаванији**, **играј одмах** и
-**каталог поређан по рејтингу**. Јавним листама је потребан само ваш **SteamID64**; опциони **Steam Веб API кључ**
-додаје пет најновијих игара са њиховим временом играња. Цене долазе у реалним вредностима, сваки ред отвара страницу продавнице и
-картица почиње подразумевано, једно поље за потврду у подешавањима.
+Четири подкартице за Steam: **понуде на листи жеља** (прво највећи попуст, свака са оним што уштеди), **најпродаванији**
+рангирани, **играј одмах** и **каталог поређан по рејтингу**. Сваки ред носи **уметност капсуле**, **рецензију
+резултат** са сопственом формулацијом Steam и колико рецензија се рачуна, прецртаном ценом, ценом у реалу и шта
+попуст штеди — а листа сабира укупну уштеду. Јавним листама је потребан само ваш **SteamID64**; ан
+опциони **Steam Веб API тастер** додаје пет најновијих игара са њиховим временом играња. Картица подразумевано почиње,
+једно поље за потврду у подешавањима.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ Windows Hello опционо.
 🌙 **Не узнемиравај:** у подешавањима или на траци, утишајте обавештења о састанцима, подсетници за задатке, обавештења о статусу и сваки
 системско обавештење на 30 мин, 1 х, 2 х, до сутра или док га не искључите. Приказује се месец у горњој траци
 када се заврши; једним кликом се поново искључује. Преживљава поновно покретање и завршава се сам.
+
+🔔 **Свако упозорење на једном екрану:** звонце у заглављу (број и боја када је нешто на чекању) отвара
+упозорења преко целог прозора у било ком режиму: једна картица по упозорењу са својим радњама, **одбаци све** и шта је било
+решено данас под њима — без ичега на чекању, тако се и даље стиже до данашњег дневника. Са дока, клик
+и даље отвара то једно упозорење на врху нормалног прозора.
 
 ⌨ **Све помоћу тастатуре:** `Alt+1`…`Alt+7` мења картице, `N` креира, `/` претраге, `F11` цео екран, `Alt+L`
 закључава и `?` наводи пречице. `Ctrl+Shift+P` (`Cmd+Shift+P` на мацОС-у) отвара **командну палету** са сваким
@@ -235,11 +242,11 @@ Windows Hello опционо.
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Кликните на упозорење на доку | Максимално: задаци и обавештења, са разделником који се може превући |
+| Кликните на упозорење на доку | Максимизирано: цео прозор за отворену картицу |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Звоно отвара упозорења преко целог прозора |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ Windows Hello опционо.
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: последњих пет одиграних утакмица, са оба времена играња |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: најпродаванији, нумерисани | Steam: последњих пет одиграних утакмица, са оба времена играња |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Једно преклапање упозорења за све на чекању: прекиде, састанке, задатке и нове АИ моделе |
 |---|

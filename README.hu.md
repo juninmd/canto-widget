@@ -144,15 +144,17 @@ tiszteletben tartja a díjszabást. Jelentkezzen be csak olvasható személyes t
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam a widget elhagyása nélkül
 
-Négy allap a Steam számára: **kívánságlista-ajánlatok** (a legnagyobb kedvezmény először), **legkeresettebb**, **játék most** és a
-**katalógus értékelés szerint rendezve**. A nyilvános listákhoz csak a **SteamID64**; opcionális **Steam Web API kulcs**
-hozzáadja az öt legutóbbi játékot a játékidejükkel. Az árak reálisan jönnek, minden sor megnyitja az üzlet oldalát, és
-a lap alapértelmezés szerint elindul, egy jelölőnégyzettől távolabb a Beállításokban.
+Négy allap a Steam számára: **kívánságlista-ajánlatok** (első a legnagyobb kedvezmény, mindegyik azzal, amit megtakarít), a **legkeresettebb**
+rangsorolt, **játék most** és a **katalógus értékelés szerint rendezve**. Minden sor tartalmazza a **kapszula rajzot**, a **áttekintést
+pontszám** Steam saját megfogalmazásával, és hogy hány vélemény számít, az áthúzott ár, az ár reálban és mi
+a kedvezmény megtakarít – és a lista összeadja a teljes megtakarítást. A nyilvános listákhoz csak a **SteamID64**; an
+opcionális **Steam Web API gomb** hozzáadja az öt legutóbbi játékot a játékidővel együtt. A lap alapértelmezés szerint elindul,
+egy jelölőnégyzet választja el a Beállításokban.
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ a modell **bekerül a legjobb 10-be** vagy **felmászik azon** (6 óránként el
 🌙 **Ne zavarjanak:** a Beállításokban vagy a tálcán elnémíthatja a megbeszélések figyelmeztetéseit, feladatemlékeztetőit, állapotfigyelmeztetéseit és minden
 rendszerértesítés 30 percig, 1 óráig, 2 óráig, holnapig vagy amíg ki nem kapcsolja. A felső sávban egy hold látható
 amikor véget ér; egy kattintás visszakapcsolja. Túlél egy újraindítást és magától véget ér.
+
+🔔 **Minden riasztás egy képernyőn:** a fejlécben lévő csengő (számlálás és színezés, ha valami függőben van) megnyitja a
+riasztások az egész ablakban, bármilyen módban: riasztásonként egy kártya a műveletekkel, **minden elvetése** és mi volt
+ma megoldódott alattuk – nincs függőben semmi, így érheti el a mai naplót. A dokkolóból egy kattintás
+továbbra is ezt az egyetlen figyelmeztetést nyitja meg a normál ablak tetején.
 
 ⌨️ **Minden a billentyűzet segítségével:** `Alt+1`…`Alt+7` lapváltás, `N` létrehozás, `/` keresés, `F11` teljes képernyő, `Alt+L`
 zárolja és a `?` listázza a parancsikonokat. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS-en) megnyit egy **parancspalettát** minden
@@ -235,11 +242,11 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Kattintson egy figyelmeztetésre a dokkban | Maximális: feladatok és értesítések, húzható elválasztóval |
+| Kattintson egy figyelmeztetésre a dokkban | Maximális: a megnyitott lap teljes ablaka |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| A csengő megnyitja a figyelmeztetéseket az egész ablakban |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: az utolsó öt lejátszott meccs, mindkét játékidővel |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: a legkeresettebbek, számozott | Steam: az utolsó öt lejátszott meccs, mindkét játékidővel |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | Egyetlen riasztási fedvény minden függőben lévő dologhoz: leállások, értekezletek, feladatok és új AI-modellek |
 |---|

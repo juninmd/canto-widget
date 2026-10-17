@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { errText, type SteamList } from "../lib/api";
+import { brl } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -14,11 +15,15 @@ type Props = {
   toolbar?: React.ReactNode;
   /** Shown under the list when the source has more rows than it returned. */
   more?: string;
+  /** Numbers the rows: only the "em alta" list is a ranking. */
+  numbered?: boolean;
+  /** Adds up what the discounts save: only meaningful on a wishlist. */
+  totalSaved?: boolean;
   rows?: number;
 };
 
 /** The shape shared by "ofertas", "em alta" and "catálogo": fetch, refresh, banner and the row list. */
-export default function SteamGames({ load, empty, toolbar, more, rows = 8 }: Props) {
+export default function SteamGames({ load, empty, toolbar, more, numbered = false, totalSaved = false, rows = 8 }: Props) {
   const [list, setList] = useState<SteamList | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -48,6 +53,7 @@ export default function SteamGames({ load, empty, toolbar, more, rows = 8 }: Pro
     return error ? <ErrorBanner message={error} onRetry={() => void run(true)} busy={busy} /> : <Skeleton label={t("steam.loading")} rows={rows} />;
   }
 
+  const saved = totalSaved ? list.items.reduce((total, row) => total + row.saved_cents, 0) : 0;
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -62,12 +68,13 @@ export default function SteamGames({ load, empty, toolbar, more, rows = 8 }: Pro
         </button>
       </div>
       {error && <ErrorBanner message={error} onRetry={() => void run(true)} busy={busy} />}
+      {saved > 0 && <p className="text-[11px] text-muted">{t("steam.totalSaved", { value: brl(saved) })}</p>}
       {list.items.length === 0 ? (
         <p className="text-xs text-faint">{empty}</p>
       ) : (
         <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
-          {list.items.map((row) => (
-            <SteamRowItem key={row.appid} row={row} />
+          {list.items.map((row, i) => (
+            <SteamRowItem key={row.appid} row={row} rank={numbered ? i + 1 : undefined} />
           ))}
         </ul>
       )}

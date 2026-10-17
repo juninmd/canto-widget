@@ -144,15 +144,17 @@ JSON ফরম্যাট করা বা কমপ্যাক্ট, এক 
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam উইজেট ছাড়াই
 
-Steam এর জন্য চারটি সাব-ট্যাব: **ইচ্ছা তালিকার ডিল** (প্রথমে সবচেয়ে বড় ছাড়), **শীর্ষ বিক্রেতা**, **এখনই খেলুন** এবং
-**ক্যাটালগ রেটিং দ্বারা আদেশ**. সর্বজনীন তালিকার জন্য শুধুমাত্র আপনার **SteamID64**; একটি ঐচ্ছিক **Steam ওয়েব API কী**
-তাদের খেলার সময়ের সাথে সবচেয়ে সাম্প্রতিক পাঁচটি গেম যোগ করে। দাম reais আসা, প্রতিটি সারি দোকান পাতা খোলে, এবং
-ট্যাবটি ডিফল্টরূপে শুরু হয়, সেটিংসে একটি চেকবক্স দূরে।
+Steam-এর জন্য চারটি সাব-ট্যাব: **ইচ্ছা তালিকার ডিল** (প্রথমে সবচেয়ে বড় ছাড়, প্রতিটি যা সংরক্ষণ করে), **শীর্ষ বিক্রেতা**
+র‍্যাঙ্ক করা হয়েছে, **এখনই খেলুন** এবং **রেটিং অনুসারে অর্ডার করা ক্যাটালগ**। প্রতিটি সারি **ক্যাপসুল আর্ট**, **রিভিউ বহন করে
+স্কোর** Steam এর নিজস্ব শব্দের সাথে এবং এটি কতগুলি পর্যালোচনা গণনা করে, ক্রস-আউট মূল্য, রেইস-এ মূল্য এবং কী
+ডিসকাউন্ট সংরক্ষণ করে - এবং তালিকা মোট সঞ্চয় যোগ করে। সর্বজনীন তালিকার জন্য শুধুমাত্র আপনার **SteamID64**; একটি
+ঐচ্ছিক **Steam ওয়েব API কী** তাদের খেলার সময়ের সাথে সবচেয়ে সাম্প্রতিক পাঁচটি গেম যোগ করে। ট্যাবটি ডিফল্টরূপে শুরু হয়,
+সেটিংসে একটি চেকবক্স দূরে।
 
 </td>
 </tr>
@@ -183,6 +185,11 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 🌙 **বিরক্ত করবেন না:** সেটিংস বা ট্রেতে, নীরব মিটিং সতর্কতা, টাস্ক রিমাইন্ডার, স্ট্যাটাস সতর্কতা এবং প্রতিটি
 আগামীকাল পর্যন্ত বা আপনি এটি বন্ধ না করা পর্যন্ত 30 মিনিট, 1 ঘন্টা, 2 ঘন্টার জন্য সিস্টেম বিজ্ঞপ্তি৷ উপরের বারে একটি চাঁদ দেখায়
 যখন এটি শেষ হয়; একটি ক্লিক এটি বন্ধ করে দেয়। এটি একটি পুনঃসূচনা থেকে বেঁচে থাকে এবং নিজেই শেষ হয়।
+
+🔔 **একটি স্ক্রিনে প্রতিটি সতর্কতা:** শিরোনামের বেল (কিছু মুলতুবি থাকা অবস্থায় গণনা এবং রঙ) খোলে
+যেকোন মোডে পুরো উইন্ডো জুড়ে সতর্কতা: প্রতি সতর্কতার সাথে একটি কার্ড এর ক্রিয়া, **সব খারিজ**, এবং কী ছিল
+তাদের অধীনে আজ সমাধান করা হয়েছে — কিছুই মুলতুবি নেই, এটা আপনি এখনও আজকের লগ পৌঁছানোর কিভাবে. ডক থেকে, একটি ক্লিক করুন
+এখনও সাধারণ উইন্ডোর উপরে সেই একক সতর্কতা খোলে।
 
 ⌨️ **কীবোর্ড দ্বারা সবকিছু:** `Alt+1`…`Alt+7` ট্যাব পাল্টান, `N` তৈরি করে, `/` অনুসন্ধান করে, `F11` পূর্ণস্ক্রীন, `Alt+L`
 লক করে এবং `?` শর্টকাট তালিকা করে। `Ctrl+Shift+P` (macOS এ `Cmd+Shift+P`) প্রতিটির সাথে একটি **কমান্ড প্যালেট** খোলে
@@ -235,11 +242,11 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| ডকে একটি সতর্কতা ক্লিক করুন | সর্বাধিক করা হয়েছে: টাস্ক এবং বিজ্ঞপ্তি, একটি টেনে নেওয়া যায় এমন বিভাজক সহ |
+| ডকে একটি সতর্কতা ক্লিক করুন | সর্বাধিক করা হয়েছে: খোলা ট্যাবের জন্য পুরো উইন্ডো |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| বেল পুরো জানালা জুড়ে সতর্কতা খোলে |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +342,9 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: শেষ পাঁচটি খেলা খেলা হয়েছে, উভয় খেলার সময় সহ |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: শীর্ষ বিক্রেতা, সংখ্যাযুক্ত | Steam: শেষ পাঁচটি খেলা খেলা হয়েছে, উভয় খেলার সময় সহ |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
 | মুলতুবি থাকা সবকিছুর জন্য একটি সতর্কতা ওভারলে: বিভ্রাট, মিটিং, কাজ এবং নতুন এআই মডেল |
 |---|
