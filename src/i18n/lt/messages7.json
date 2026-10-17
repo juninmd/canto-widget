@@ -72,5 +72,19 @@
   "steam.recent.total": "Iš viso {time}",
   "steam.row.open": "atidaryti {name} Steam",
   "steam.row.discount": "{n}% nuolaida",
-  "steam.row.review": "{n}% atsiliepimų yra teigiami"
+  "steam.row.review": "{n}% atsiliepimų yra teigiami",
+  "steam.row.reviews": "{n} atsiliepimai",
+  "steam.row.reviewOne": "{n} apžvalga",
+  "steam.row.saved": "išsaugoti {value}",
+  "steam.totalSaved": "Iš viso išsaugota {value}",
+  "steam.review.overwhelmingly_positive": "Visiškai teigiamas",
+  "steam.review.very_positive": "Labai teigiamas",
+  "steam.review.positive": "Teigiamas",
+  "steam.review.negative": "Neigiamas",
+  "steam.review.very_negative": "Labai neigiamas",
+  "steam.review.overwhelmingly_negative": "Visiškai neigiamas",
+  "steam.loadMore": "įkelti daugiau žaidimų",
+  "steam.review.mostly_positive": "Dažniausiai teigiamas",
+  "steam.review.mixed": "Mišrus",
+  "steam.review.mostly_negative": "Dažniausiai neigiamas"
 }

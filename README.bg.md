@@ -58,7 +58,7 @@ Windows Hello по избор.
 ⏰ **Няма да го пропуснете.** 1 минута преди среща и по време на напомняне джаджата изскача, възпроизвежда звук и
 изпраща известие с **отлагане за 10 минути**.
 
-🪶 **Light.** Tauri v2 (Rust + системният уеб изглед) вместо Electron: 3,5 MB инсталатор.
+🪶 **Лек.** Tauri v2 (Rust + системният уеб изглед) вместо Electron: 3,5 MB инсталатор.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Винаги актуален.** Актуализира от приложението и инсталира само това, което е подписано от собствения ключ на проекта.
@@ -111,7 +111,7 @@ Windows Hello по избор.
 показва необработената маркдаун, която все още е начинът, по който бележките се съхраняват, търсят, синхронизират и експортират. Връзките се отварят с
 `Ctrl`+щракване, само http(s). Поставете, пуснете или прикачете изображения (PNG, JPEG, GIF, WebP до 2 MB), всяко запечатано в собствено
 криптиран файл, показан в бележката и като миниатюри на картата; те остават на тази машина, извън `.canto`
-резервни копия. Обработва хиляди бележки: списъкът е страниран и търсенето обхваща всички тях.
+резервни копия. Обработва хиляди бележки: списъкът е разграфен и търсенето обхваща всички тях.
 
 </td>
 </tr>
@@ -144,15 +144,18 @@ JSON форматиран или компактен, текст на един р
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam, без да напускате джаджата
 
-Четири подраздела за Steam: **оферти в списъка с желания** (първо най-голямата отстъпка), **най-продавани**, **играйте сега** и
-**каталог подреден по рейтинг**. Публичните списъци се нуждаят само от вашите **SteamID64**; незадължителен ключ **Steam Web API ключ**
-добавя петте най-нови игри с техните времена за игра. Цените са в реали, всеки ред отваря страницата на магазина и
-разделът започва по подразбиране, на едно квадратче за отметка в Настройки.
+Четири подраздела за Steam: **оферти в списъка с желания** (първо най-голямата отстъпка, всяка с това, което спестява), **най-продаваните**
+класиран, **играйте сега** (всяка игра Steam отчети за последните две седмици) и **каталогът, подреден по рейтинг**, разпределен
+с **зареди повече**, така че да достигне останалата част от магазина. Всеки ред носи **капсулното изкуство**, **оценката на рецензията**
+със собствената формулировка на Steam и колко прегледа отчита, зачеркнатата цена, цената в реали и какво
+спестява отстъпка — и списъкът събира общото спестяване. Публичните списъци се нуждаят само от вашите **SteamID64**; по избор
+**Steam Web API ключ** добавя скорошните игри с техните часове за игра. Разделът започва по подразбиране, на едно квадратче за отметка
+в Настройки.
 
 </td>
 </tr>
@@ -184,6 +187,11 @@ OneDrive, Syncthing...), започнете със системата и раз�
 системно известие за 30 минути, 1 час, 2 часа, до утре или докато не го изключите. Показва се луна в горната лента
 когато свърши; едно щракване го изключва отново. Оцелява при рестартиране и завършва сам.
 
+🔔 **Всеки сигнал в един екран:** камбанката в заглавката (преброяване и цвят, когато нещо чака) отваря
+предупреждения в целия прозорец във всеки режим: една карта на предупреждение с неговите действия, **отхвърляне на всички** и какво беше
+разрешено днес под тях — без нищо чакащо, това е начинът, по който все още достигате до днешния дневник. От дока, щракване
+все още отваря този единичен сигнал в горната част на нормалния прозорец.
+
 ⌨️ **Всичко чрез клавиатура:** `Alt+1`…`Alt+7` превключване на раздели, `N` създаване, `/` търсения, `F11` цял екран, `Alt+L`
 заключва и `?` изброява преките пътища. `Ctrl+Shift+P` (`Cmd+Shift+P` на macOS) отваря **командна палитра** с всеки
 действие по име: отидете на раздел, нова задача или бележка, присъединете се към следващата среща, копирайте резюмето за деня, превключете кожата, заключване.
@@ -211,7 +219,7 @@ OneDrive, Syncthing...), започнете със системата и раз�
 
 ![Quick capture window: a text field with the hint and the task and note buttons](docs/prints/app/85-captura-rapida.png)
 
-| Първоначално добре дошли | Глобално търсене (`Ctrl+K`) | Самостоятелно хостван раздел GitLab | Сигнал за среща |
+| Първоначално добре дошли | Глобално търсене (`Ctrl+K`) | Самостоятелно хостван раздел GitLab | Предупреждение за среща |
 |---|---|---|---|
 | ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
 
@@ -235,11 +243,11 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Щракнете върху предупреждение в дока | Увеличени: задачи и известия, с плъзгащ се разделител |
+| Щракнете върху предупреждение в дока | Увеличен: целият прозорец за отворения раздел |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Камбанката отваря известията в целия прозорец |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ OneDrive, Syncthing...), започнете със системата и раз�
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: последните пет изиграни игри, с двете времена за игра |
+| Steam: най-продаваните, номерирани | Steam: последните пет изиграни игри, с двете времена за игра |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: каталогът по рейтинг, с "зареди още" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Едно наслагване за предупреждение за всичко чакащо: прекъсвания, срещи, задачи и нови AI модели |
 |---|
@@ -386,7 +398,7 @@ OneDrive, Syncthing...), започнете със системата и раз�
 не може да отчете фокусирания прозорец, така че той остава недостъпен там). Изключено, докато не се включите и първият екран каже какво
 се пази и това, което никога не е.
 
-- **Ден**: поничка по категория с общата сума вътре, чиято легенда скрива категория, промяната спрямо деня
+- **Ден**: поничка по категория с общата сума вътре, чиято легенда крие категория, промяната спрямо деня
 преди и времето на неактивност (без клавиатура или мишка за 2 минути). Под него ежедневна цел с фокус върху кода със своята серия и
 една точка на ден, три акцента (най-дългият участък в едно приложение, превключване на приложения, пиков час), времева линия, където цялата
 ден, бездействието се удължава и най-натоварените приложения споделят една времева ос с маркер „сега“ и списък с приложения

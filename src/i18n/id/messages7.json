@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} totalnya",
   "steam.row.open": "buka {name} di Steam",
   "steam.row.discount": "Diskon {n}%.",
-  "steam.row.review": "{n}% ulasannya positif"
+  "steam.row.review": "{n}% ulasannya positif",
+  "steam.row.reviews": "{n} ulasan",
+  "steam.row.reviewOne": "{n} ulasan",
+  "steam.row.saved": "simpan {value}",
+  "steam.totalSaved": "{value} disimpan total",
+  "steam.review.overwhelmingly_positive": "Sangat positif",
+  "steam.review.very_positive": "Sangat positif",
+  "steam.review.positive": "Positif",
+  "steam.review.negative": "Negatif",
+  "steam.review.very_negative": "Sangat negatif",
+  "steam.review.overwhelmingly_negative": "Sangat negatif",
+  "steam.loadMore": "memuat lebih banyak game",
+  "steam.review.mostly_positive": "Sebagian besar positif",
+  "steam.review.mixed": "Campuran",
+  "steam.review.mostly_negative": "Kebanyakan negatif"
 }

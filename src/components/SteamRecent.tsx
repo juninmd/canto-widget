@@ -5,6 +5,7 @@ import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
 import Skeleton from "./Skeleton";
+import SteamThumb from "./SteamThumb";
 
 /** The last five games played in the previous two weeks; needs the Web API key, so it says so when absent. */
 export default function SteamRecent() {
@@ -67,11 +68,14 @@ export default function SteamRecent() {
                 type="button"
                 onClick={() => void api.openLink(steamUrl(game.appid)).catch(() => {})}
                 title={t("steam.row.open", { name: game.name })}
-                className="canto-hit flex w-full flex-col rounded-lg border border-edge bg-ink/60 px-2.5 py-1.5 text-left hover:bg-hover active:bg-active"
+                className="canto-hit flex w-full items-center gap-2 rounded-lg border border-edge bg-ink/60 p-1.5 text-left hover:bg-hover active:bg-active"
               >
-                <span className="truncate text-sm text-fg">{game.name}</span>
-                <span className="text-[11px] text-faint">
-                  {t("steam.recent.recent", { time: playtime(game.recent_min) })} · {t("steam.recent.total", { time: playtime(game.total_min) })}
+                <SteamThumb art={game.art} name={game.name} />
+                <span className="flex min-w-0 flex-1 flex-col">
+                  <span className="truncate text-sm text-fg">{game.name}</span>
+                  <span className="text-[11px] text-faint">
+                    {t("steam.recent.recent", { time: playtime(game.recent_min) })} · {t("steam.recent.total", { time: playtime(game.total_min) })}
+                  </span>
                 </span>
               </button>
             </li>

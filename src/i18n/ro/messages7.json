@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} în total",
   "steam.row.open": "deschide {name} pe Steam",
   "steam.row.discount": "{n}% reducere",
-  "steam.row.review": "{n}% din recenzii sunt pozitive"
+  "steam.row.review": "{n}% din recenzii sunt pozitive",
+  "steam.row.reviews": "{n} recenzii",
+  "steam.row.reviewOne": "{n} recenzie",
+  "steam.row.saved": "salvează {value}",
+  "steam.totalSaved": "{value} salvat în total",
+  "steam.review.overwhelmingly_positive": "Covârșitor de pozitiv",
+  "steam.review.very_positive": "Foarte pozitiv",
+  "steam.review.positive": "Pozitiv",
+  "steam.review.negative": "Negativ",
+  "steam.review.very_negative": "Foarte negativ",
+  "steam.review.overwhelmingly_negative": "Covârșitor de negativ",
+  "steam.loadMore": "încărcați mai multe jocuri",
+  "steam.review.mostly_positive": "În mare parte pozitiv",
+  "steam.review.mixed": "Mixt",
+  "steam.review.mostly_negative": "În mare parte negative"
 }

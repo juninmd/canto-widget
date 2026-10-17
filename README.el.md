@@ -46,7 +46,7 @@
 <td width="44%" align="center"><img src="docs/prints/readme/tour.gif" alt="Tour through the Tasks, Notes, Clipboard, Agenda and GitHub tabs, the meeting alert and the skins" width="300"></td>
 <td>
 
-Εάν ζείτε ανάμεσα σε συσκέψεις, PRs και μικρές εκκρεμότητες, καταλήγετε να έχετε ανοιχτές πέντε εφαρμογές. Ο Canto τα βάζει όλα
+Εάν ζείτε μεταξύ συσκέψεων, PRs και μικρών εκκρεμών στοιχείων, καταλήγετε να έχετε ανοιχτές πέντε εφαρμογές. Ο Canto τα βάζει όλα
 ένα μέρος.
 
 🔒 **Κρυπτογραφημένο από προεπιλογή.** Argon2id + AES-256-GCM με κύριο κωδικό πρόσβασης. το κλειδί υπάρχει μόνο στη μνήμη RAM.
@@ -58,7 +58,7 @@ Windows Hello προαιρετικό.
 ⏰ **Δεν θα το χάσετε.** 1 λεπτό πριν από μια συνάντηση και την ώρα υπενθύμισης, το γραφικό στοιχείο αναδύεται, αναπαράγει έναν ήχο και
 στέλνει μια ειδοποίηση, με **αναβολή 10 λεπτών**.
 
-🪶 **Light.** Tauri v2 (Rust + the system webview) αντί για Electron: πρόγραμμα εγκατάστασης 3,5 MB.
+🪶 **Light.** Tauri v2 (Rust + η προβολή ιστού συστήματος) αντί για Electron: πρόγραμμα εγκατάστασης 3,5 MB.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Πάντα ενημερωμένο.** Ενημερώνεται μέσα από την εφαρμογή και εγκαθιστά μόνο ό,τι υπογράφεται από το κλειδί του ίδιου του έργου.
@@ -144,15 +144,18 @@ Windows Hello προαιρετικό.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam χωρίς να βγείτε από το γραφικό στοιχείο
 
-Τέσσερις υποκαρτέλες για Steam: **προσφορές λίστας επιθυμιών** (πρώτα η μεγαλύτερη έκπτωση), **κορυφαίες πωλήσεις**, **παίξε τώρα** και
-**κατάλογος με παραγγελία**. Οι δημόσιες λίστες χρειάζονται μόνο το **SteamID64** σας. ένα προαιρετικό κλειδί **Steam Web API**
-προσθέτει τα πέντε πιο πρόσφατα παιχνίδια με τους χρόνους παιχνιδιού τους. Οι τιμές έρχονται σε ρεάλ, κάθε σειρά ανοίγει τη σελίδα καταστήματος και
-η καρτέλα ξεκινά από προεπιλογή, ένα πλαίσιο ελέγχου μακριά στις Ρυθμίσεις.
+Τέσσερις υποκαρτέλες για Steam: **προσφορές λίστας επιθυμιών** (πρώτα η μεγαλύτερη έκπτωση, η καθεμία με ό,τι εξοικονομεί), οι **κορυφαίες πωλήσεις**
+κατάταξη, **παίξτε τώρα** (κάθε παιχνίδι Steam αναφέρει για τις τελευταίες δύο εβδομάδες) και ο **κατάλογος ταξινομημένος κατά βαθμολογία**, σελιδοποιημένος
+με **φόρτωση περισσότερο** ώστε να φτάσει στο υπόλοιπο κατάστημα. Κάθε σειρά φέρει την **καψούρα**, την **παρτιτούρα κριτικής**
+με τη διατύπωση του Steam και πόσες κριτικές μετράει, τη διαγραμμένη τιμή, την τιμή σε ρεάλ και ποια
+Η έκπτωση εξοικονομεί — και η λίστα αθροίζει τη συνολική εξοικονόμηση. Οι δημόσιες λίστες χρειάζονται μόνο το **SteamID64** σας. ένα προαιρετικό
+Το κλειδί **Steam Web API** προσθέτει τα πρόσφατα παιχνίδια με τους χρόνους παιχνιδιού τους. Η καρτέλα ξεκινά από προεπιλογή, ένα πλαίσιο ελέγχου μακριά
+στις Ρυθμίσεις.
 
 </td>
 </tr>
@@ -175,7 +178,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 
 🤖 **Μοντέλα AI** (στη γραμμή καρτελών από προεπιλογή, **χωρίς κλειδί API ή λογαριασμό**): LLM που ταξινομούνται από
 [Artificial Analysis](https://artificialanalysis.ai) **Δείκτης Ευφυΐας**, διαβάστε από τη δημόσια σελίδα του leaderboard,
-με γραμμή βαθμολογίας, δημιουργό, τιμή ανά 1 εκατομμύριο μάρκες και ταχύτητα, με δυνατότητα ταξινόμησης κατά ευφυΐα, τιμή ή ταχύτητα. Φέρνει στο
+με γραμμή βαθμολογίας, δημιουργό, τιμή ανά 1 εκατομμύριο μάρκες και ταχύτητα, με δυνατότητα ταξινόμησης κατά ευφυΐα, τιμή ή ταχύτητα. Φτάνει στο
 τις περισσότερες φορές κάθε 3 ώρες, και το opt-in 🔔 σας ειδοποιεί όταν α
 μοντέλο **μπαίνει στο top 10** ή **σκαρφαλώνει μέσα σε αυτό** (ελέγχεται κάθε 6 ώρες ενώ το θησαυροφυλάκιο είναι ξεκλείδωτο), με
 Σήματα "νέα" και "επάνω" για μια εβδομάδα.
@@ -183,6 +186,11 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 🌙 **Μην ενοχλείτε:** στις Ρυθμίσεις ή στο δίσκο, σίγαση ειδοποιήσεων συσκέψεων, υπενθυμίσεις εργασιών, ειδοποιήσεις κατάστασης και κάθε
 ειδοποίηση συστήματος για 30 λεπτά, 1 ώρα, 2 ώρες, μέχρι αύριο ή μέχρι να την απενεργοποιήσετε. Ένα φεγγάρι στην επάνω μπάρα φαίνεται
 όταν τελειώνει? ένα κλικ το απενεργοποιεί ξανά. Επιβιώνει από μια επανεκκίνηση και τελειώνει μόνο του.
+
+🔔 **Κάθε ειδοποίηση σε μία οθόνη:** το κουδούνι στην κεφαλίδα (μέτρηση και χρώμα όταν οτιδήποτε εκκρεμεί) ανοίγει το
+ειδοποιήσεις σε όλο το παράθυρο σε οποιαδήποτε λειτουργία: μία κάρτα ανά ειδοποίηση με τις ενέργειές της, **παράβλεψη όλων** και τι ήταν
+επιλύθηκε σήμερα βάσει αυτών — χωρίς να υπάρχει τίποτα σε εκκρεμότητα, έτσι θα φτάσετε ακόμα στο σημερινό αρχείο καταγραφής. Από την αποβάθρα, ένα κλικ
+εξακολουθεί να ανοίγει αυτή τη μοναδική ειδοποίηση πάνω από το κανονικό παράθυρο.
 
 ⌨️ **Τα πάντα με πληκτρολόγιο:** `Alt+1`…`Alt+7` εναλλαγή καρτελών, `N` δημιουργία, `/` αναζητήσεις, `F11` σε πλήρη οθόνη, `Alt+L`
 κλειδώνει και `?` παραθέτει τις συντομεύσεις. `Ctrl+Shift+P` (`Cmd+Shift+P` σε macOS) ανοίγει μια **παλέτα εντολών** με κάθε
@@ -235,15 +243,15 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Κάντε κλικ σε μια ειδοποίηση στο dock | Μεγιστοποιημένη: εργασίες και ειδοποιήσεις, με συρόμενο διαχωριστικό |
+| Κάντε κλικ σε μια ειδοποίηση στο dock | Μεγιστοποίηση: ολόκληρο το παράθυρο για την ανοιχτή καρτέλα |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Το κουδούνι ανοίγει τις ειδοποιήσεις σε όλο το παράθυρο |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
-| Μίνι: το μενού λειτουργίας ανοίγει μέσα στο παράθυρο βάσης |
+| Mini: το μενού λειτουργίας ανοίγει μέσα στο παράθυρο βάσης |
 |---|
 | ![The mode menu in the dock window: Mini, Hidden, Normal and Maximized, fully visible beside the alert icons](docs/prints/app/67-modo-mini-menu.png) |
 
@@ -335,9 +343,13 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: τα τελευταία πέντε παιχνίδια που παίχτηκαν, και με τους δύο χρόνους παιχνιδιού |
+| Steam: οι κορυφαίες πωλήσεις, αριθμημένες | Steam: τα τελευταία πέντε παιχνίδια που παίχτηκαν, και με τους δύο χρόνους παιχνιδιού |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: ο κατάλογος ανά βαθμολογία, με "φόρτωση περισσότερο" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Μία επικάλυψη ειδοποίησης για οτιδήποτε εκκρεμεί: διακοπές, συσκέψεις, εργασίες και νέα μοντέλα τεχνητής νοημοσύνης |
 |---|
@@ -345,7 +357,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 
 </details>
 
-| Τα τελικά σημεία μου: πλακίδια με την πιο πρόσφατη καθυστέρηση | Ένα ανοιχτό τελικό σημείο: διάγραμμα λανθάνοντος χρόνου, ρυθμίσεις ορίου και ειδοποίησης | Προσθήκη DNS + έλεγχος πιστοποιητικού |
+| Τα τελικά σημεία μου: πλακίδια με την πιο πρόσφατη καθυστέρηση | Ένα ανοιχτό τελικό σημείο: γράφημα λανθάνοντος χρόνου, ρυθμίσεις ορίου και ειδοποίησης | Προσθήκη DNS + έλεγχος πιστοποιητικού |
 |---|---|---|
 | ![Status API, My endpoints sub-tab: a grid of tiles with latency, recent readings and certificate days](docs/prints/app/76-endpoints-grade.png) | ![An endpoint open over the whole row with the latency chart, the limit line and the stats](docs/prints/app/77-endpoints-aberto.png) | ![The new endpoint form with the DNS + certificate kind selected](docs/prints/app/78-endpoints-novo.png) |
 
@@ -387,7 +399,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 διατηρείται και αυτό που ποτέ δεν είναι.
 
 - **Ημέρα**: ένα ντόνατ ανά κατηγορία με το σύνολο μέσα, του οποίου ο μύθος κρύβει μια κατηγορία, η αλλαγή με την ημέρα
-πριν και τον χρόνο αδράνειας (χωρίς πληκτρολόγιο ή ποντίκι για 2 λεπτά). Κάτω από αυτό, ένας καθημερινός στόχος εστίασης κώδικα με το σερί του και
+πριν και τον χρόνο αδράνειας (χωρίς πληκτρολόγιο ή ποντίκι για 2 λεπτά). Κάτω από αυτό, ένας στόχος καθημερινής εστίασης κώδικα με το σερί του και
 μία κουκκίδα την ημέρα, τρία highlights (μεγαλύτερη έκταση σε μία εφαρμογή, διακόπτες εφαρμογών, ώρα αιχμής), ένα χρονοδιάγραμμα όπου το σύνολο
 ημέρα, η αδράνεια εκτείνεται και οι πιο πολυσύχναστες εφαρμογές μοιράζονται έναν άξονα χρόνου με έναν δείκτη "τώρα" και μια λίστα εφαρμογών
 (πατήστε ένα για να αλλάξετε την κατηγορία του) ή από τις εργασίες στις οποίες έτρεξε το χρονόμετρο εστίασης.
@@ -446,7 +458,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|---|
 | Θόλος | Argon2id (19 MiB, t=2) → AES-256-GCM, ένα νέο nonce σε κάθε εγγραφή, ατομική εγγραφή με `fsync` |
 | Κλειδί | Μόνο RAM, μηδενισμένη στο κλείδωμα. ρυθμιζόμενο αυτόματο κλείδωμα (5 έως 60 λεπτά σε αδράνεια, 15 λεπτά από προεπιλογή) |
-| Δίκτυο | Μόνο η διαδικασία Rust μιλάει στο δίκτυο. η προβολή ιστού δεν έχει απομακρυσμένη προέλευση (CSP) και δεν βλέπει ποτέ διακριτικά |
+| Δίκτυο | μόνο η διαδικασία Rust μιλάει στο δίκτυο. η προβολή ιστού δεν έχει απομακρυσμένη προέλευση (CSP) και δεν βλέπει ποτέ διακριτικά |
 | Google | προαιρετικό, μόνο `calendar.events.readonly`, `directory.readonly` (φωτογραφίες συναδέλφων του χώρου εργασίας στη λίστα προσκεκλημένων) συν προφίλ, OAuth με PKCE και loopback |
 | GitHub | προαιρετικό, κρυπτογραφημένο διακριτικό. τα στοιχεία ανοίγουν μόνο εάν ο σύνδεσμος είναι `https://github.com/` |
 | GitLab | προαιρετική, κρυπτογραφημένη διεύθυνση και διακριτικό. Μόνο `https://`, χωρίς ανακατευθύνσεις, συνδέσεις μόνο από τη διαμορφωμένη παρουσία |
@@ -490,4 +502,4 @@ bun run tauri build                                      # installer for the cur
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Φτιαγμένο με 🦀 Rust, ⚛️ React και ☕ για όσους μένουν μεταξύ συναντήσεων.</sub></div>
+<div align="center"><sub>Made with 🦀 Rust, ⚛️ React και ☕ για όσους μένουν μεταξύ συναντήσεων.</sub></div>

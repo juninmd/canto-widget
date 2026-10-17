@@ -144,15 +144,18 @@ menghormati had kadar. Log masuk dengan token peribadi baca sahaja atau daripada
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam tanpa meninggalkan widget
 
-Empat subtab untuk Steam: **tawaran senarai keinginan** (diskaun terbesar dahulu), **terlaris**, **main sekarang** dan
-**katalog dipesan mengikut rating**. Senarai awam hanya memerlukan **SteamID64** anda; pilihan **Steam Web API kunci**
-menambah lima permainan terbaharu dengan masa permainan mereka. Harga datang dalam reais, setiap baris membuka halaman kedai, dan
-tab bermula secara lalai, hanya satu kotak pilihan dalam Tetapan.
+Empat subtab untuk Steam: **tawaran senarai keinginan** (diskaun terbesar dahulu, setiap satu dengan apa yang jimat), **terlaris**
+berperingkat, **main sekarang** (setiap perlawanan Steam melaporkan selama dua minggu lepas) dan **katalog yang dipesan mengikut rating**, dihalakan halaman
+dengan **muatkan lebih** supaya ia sampai ke seluruh kedai. Setiap baris membawa **seni kapsul**, **skor ulasan**
+dengan perkataan Steam sendiri dan berapa banyak ulasan yang dikira, harga yang dicoret, harga dalam reais dan berapa
+penjimatan diskaun — dan senarai itu menambah jumlah penjimatan. Senarai awam hanya memerlukan **SteamID64** anda; pilihan
+**Steam Web API kunci** menambahkan permainan terbaru dengan masa permainan mereka. Tab bermula secara lalai, satu kotak pilihan lagi
+dalam Tetapan.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ lencana "baharu" dan "atas" selama seminggu.
 🌙 **Jangan ganggu:** dalam Tetapan atau dulang, senyapkan makluman mesyuarat, peringatan tugas, makluman status dan setiap
 pemberitahuan sistem selama 30 minit, 1 jam, 2 jam, sehingga esok atau sehingga anda mematikannya. Bulan di bar atas menunjukkan
 apabila ia berakhir; satu klik mematikannya kembali. Ia bertahan apabila dimulakan semula dan berakhir dengan sendirinya.
+
+🔔 **Setiap makluman dalam satu skrin:** loceng dalam pengepala (kira dan warna apabila ada yang belum selesai) membuka
+makluman pada seluruh tetingkap dalam mana-mana mod: satu kad setiap makluman dengan tindakannya, **tolak semua** dan apa yang
+diselesaikan hari ini di bawah mereka — tanpa menunggu apa-apa, begitulah cara anda masih mencapai log hari ini. Dari dok, satu klik
+masih membuka amaran tunggal itu di atas tetingkap biasa.
 
 ⌨️ **Semuanya mengikut papan kekunci:** `Alt+1`…`Alt+7` tukar tab, `N` mencipta, `/` carian, `F11` skrin penuh, `Alt+L`
 kunci dan `?` menyenaraikan pintasan. `Ctrl+Shift+P` (`Cmd+Shift+P` pada macOS) membuka **palet arahan** dengan setiap
@@ -235,11 +243,11 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klik makluman dalam dok | Dimaksimumkan: tugasan dan pemberitahuan, dengan pembahagi boleh seret |
+| Klik makluman dalam dok | Dimaksimumkan: keseluruhan tetingkap untuk tab terbuka |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Loceng membuka makluman di seluruh tingkap |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: lima perlawanan terakhir dimainkan, dengan kedua-dua masa permainan |
+| Steam: penjual teratas, bernombor | Steam: lima perlawanan terakhir dimainkan, dengan kedua-dua masa permainan |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: katalog mengikut penilaian, dengan "muatkan lagi" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Satu tindanan amaran untuk semua yang belum selesai: gangguan, mesyuarat, tugas dan model AI baharu |
 |---|
@@ -383,7 +395,7 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 
 Tab **Aktiviti** mula disembunyikan (hidupkannya di bawah Tetapan → tab kelihatan). Ia hanya merekodkan nama
 aplikasi terfokus semasa anda menggunakan komputer, dalam fail tempatan tertutup yang tidak pernah mencapai sandaran atau penyegerakan (Wayland
-tidak dapat melaporkan tetingkap fokus, jadi ia kekal tidak tersedia di sana). Matikan sehingga anda ikut serta dan skrin pertama menyatakan apa
+tidak dapat melaporkan tetingkap fokus, jadi ia kekal tidak tersedia di sana). Mati sehingga anda ikut serta dan skrin pertama menyatakan apa
 disimpan dan yang tidak pernah ada.
 
 - **Hari**: donat mengikut kategori dengan jumlah di dalam, yang legendanya menyembunyikan kategori, perubahan terhadap hari itu
@@ -436,7 +448,7 @@ Muat turun pemasang untuk platform anda daripada **[Releases](https://github.com
 > Pemasang belum ditandatangani kod lagi: SmartScreen (Windows) dan Gatekeeper (macOS) memberi amaran pada pelancaran pertama.
 > Kemas kini automatik disahkan terhadap tandatangan projek sendiri sebelum dijalankan.
 
-Manifes sedia dibuat untuk winget dan Homebrew (serta rangka untuk Flatpak, sedang disekat) tinggal di
+Manifes siap sedia untuk winget dan Homebrew (serta rangka untuk Flatpak, sedang disekat) tinggal di
 [`packaging/`](packaging/README.md) — disediakan dan disahkan secara tempatan, tetapi belum diterbitkan kepada mereka
 repositori: penerbitan adalah keputusan dan tindakan manual oleh penyelenggara.
 

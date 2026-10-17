@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} укупно",
   "steam.row.open": "отвори {name} на Steam",
   "steam.row.discount": "{n}% попуста",
-  "steam.row.review": "{n}% рецензија је позитивних"
+  "steam.row.review": "{n}% рецензија је позитивних",
+  "steam.row.reviews": "{n} рецензија",
+  "steam.row.reviewOne": "{n} рецензија",
+  "steam.row.saved": "сачувај {value}",
+  "steam.totalSaved": "{value} укупно сачувано",
+  "steam.review.overwhelmingly_positive": "Изузетно позитивно",
+  "steam.review.very_positive": "Веома позитивно",
+  "steam.review.positive": "Позитивно",
+  "steam.review.negative": "Негативно",
+  "steam.review.very_negative": "Веома негативан",
+  "steam.review.overwhelmingly_negative": "Углавном негативно",
+  "steam.loadMore": "учитајте више игара",
+  "steam.review.mostly_positive": "Углавном позитивно",
+  "steam.review.mixed": "Микед",
+  "steam.review.mostly_negative": "Углавном негативно"
 }

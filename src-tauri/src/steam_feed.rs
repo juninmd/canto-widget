@@ -1,20 +1,25 @@
-//! HTTP for the Steam store and Web API, plus the URLs each sub-tab reads.
+//! HTTP for the Steam store and Web API. The URLs live in `steam_url.rs`; nothing here touches the vault.
 use std::collections::HashMap;
 use std::time::Duration;
 
 use url::Url;
 
-use crate::steam::{RecentGame, SteamRow, COUNTRY, LANGUAGE};
+use crate::steam::{RecentGame, SteamRow};
 use crate::steam_parse as parse;
 use crate::steam_parse::Price;
+use crate::steam_player as player;
+use crate::steam_store;
+use crate::steam_url::{
+    basic_url, is_steam_image, price_url, recent_url, reviews_url, summary_url, vanity_url, wishlist_url,
+};
 
 pub const TIMEOUT_S: u64 = 20;
 /// `appdetails` takes a comma-separated list for one filter at a time; 40 keeps the URL sane.
 const BATCH: usize = 40;
-/// `basic` per app has no batch form, so names are fetched in small parallel waves.
+/// `basic`, the review summaries and the capsules have no batch form, so they go in small parallel waves.
 const WAVE: usize = 6;
-const WEB_API: &str = "https://api.steampowered.com";
-const STORE: &str = "https://store.steampowered.com";
+/// A 231x87 capsule is a few KB; the cap bounds what one cache entry can hold.
+const ART_MAX_BYTES: usize = 96 * 1024;
 const UA: &str = "Mozilla/5.0 (compatible; canto-widget)";
 
 #[derive(Debug, PartialEq)]
@@ -30,64 +35,6 @@ impl FetchError {
             FetchError::Other(e) => e.clone(),
         }
     }
-}
-
-fn store(path: &str, extra: &[(&str, &str)]) -> Url {
-    let mut url = Url::parse(&format!("{STORE}{path}")).expect("base do store");
-    url.query_pairs_mut().extend_pairs([("cc", COUNTRY), ("l", LANGUAGE)].into_iter().chain(extra.iter().copied()));
-    url
-}
-
-fn web(path: &str, query: &[(&str, &str)]) -> Url {
-    let mut url = Url::parse(&format!("{WEB_API}/{path}")).expect("base da web api");
-    url.query_pairs_mut().extend_pairs(query.iter().copied());
-    url
-}
-
-fn joined(ids: &[u32]) -> String {
-    ids.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(",")
-}
-
-pub fn wishlist_url(steamid: &str) -> Url {
-    web("IWishlistService/GetWishlist/v1", &[("steamid", steamid)])
-}
-
-pub fn price_url(ids: &[u32]) -> Url {
-    let mut url = store("/api/appdetails", &[("filters", "price_overview")]);
-    url.query_pairs_mut().append_pair("appids", &joined(ids));
-    url
-}
-
-pub fn basic_url(id: u32) -> Url {
-    let mut url = store("/api/appdetails", &[("filters", "basic")]);
-    url.query_pairs_mut().append_pair("appids", &id.to_string());
-    url
-}
-
-pub fn summary_url(key: &str, steamid: &str) -> Url {
-    web("ISteamUser/GetPlayerSummaries/v2", &[("key", key), ("steamids", steamid)])
-}
-
-pub fn vanity_url(key: &str, name: &str) -> Url {
-    web("ISteamUser/ResolveVanityURL/v1", &[("key", key), ("vanityurl", name)])
-}
-
-pub fn recent_url(key: &str, steamid: &str, count: usize) -> Url {
-    let mut url = web("IPlayerService/GetRecentlyPlayedGames/v1", &[("key", key), ("steamid", steamid)]);
-    url.query_pairs_mut().append_pair("count", &count.to_string());
-    url
-}
-
-pub fn trending_url() -> Url {
-    store("/search/", &[("filter", "globaltopsellers")])
-}
-
-pub fn catalog_url(term: &str) -> Url {
-    let mut url = store("/search/", &[("sort_by", "Reviews_DESC")]);
-    if !term.trim().is_empty() {
-        url.query_pairs_mut().append_pair("term", term.trim());
-    }
-    url
 }
 
 fn client() -> Result<reqwest::blocking::Client, FetchError> {
@@ -109,8 +56,10 @@ fn text(client: &reqwest::blocking::Client, url: &Url) -> Result<String, FetchEr
     let res = client.get(url.clone()).send().map_err(net)?;
     match res.status().as_u16() {
         429 => Err(FetchError::Other("muitas requisições; tente de novo em alguns minutos".into())),
-        s if !(200..300).contains(&s) => Err(FetchError::Other(format!("HTTP {s}"))),
-        _ => res.text().map_err(net),
+        s if (200..300).contains(&s) => res.text().map_err(net),
+        // 404 is what a delisted app answers: not worth the same wording as a real failure.
+        404 => Err(FetchError::Other("jogo não encontrado na loja".into())),
+        s => Err(FetchError::Other(format!("HTTP {s}"))),
     }
 }
 
@@ -118,12 +67,30 @@ fn get(url: &Url) -> Result<String, FetchError> {
     text(&client()?, url)
 }
 
+/// Runs `one` over `ids` in small waves, keeping what answered.
+fn in_waves<T: Send>(
+    ids: &[u32],
+    one: impl Fn(&reqwest::blocking::Client, u32) -> Option<T> + Copy + Send + Sync,
+) -> Result<HashMap<u32, T>, FetchError> {
+    let client = client()?;
+    let mut out = HashMap::new();
+    for chunk in ids.chunks(WAVE) {
+        let client = &client;
+        let found: Vec<(u32, Option<T>)> = std::thread::scope(|scope| {
+            let handles: Vec<_> = chunk.iter().map(|&id| scope.spawn(move || (id, one(client, id)))).collect();
+            handles.into_iter().filter_map(|h| h.join().ok()).collect()
+        });
+        out.extend(found.into_iter().filter_map(|(id, value)| value.map(|v| (id, v))));
+    }
+    Ok(out)
+}
+
 pub fn wishlist(steamid: &str) -> Result<Vec<u32>, FetchError> {
     parse::parse_wishlist(&get(&wishlist_url(steamid))?).map_err(FetchError::Other)
 }
 
 /// Prices for the whole wishlist in chunks, so a long list still costs few requests.
-pub fn prices(ids: &[u32]) -> Result<HashMap<u32, parse::Price>, FetchError> {
+pub fn prices(ids: &[u32]) -> Result<HashMap<u32, Price>, FetchError> {
     let client = client()?;
     let mut out = HashMap::new();
     for chunk in ids.chunks(BATCH) {
@@ -142,43 +109,74 @@ pub fn best_deals(prices: HashMap<u32, Price>) -> Vec<(u32, Price)> {
     on_sale
 }
 
-/// `basic` is one app per request, so a wave of six keeps a short list fast. A missing name only
-/// costs that row its title: the list still loads.
-pub fn names(ids: &[u32]) -> Result<HashMap<u32, String>, FetchError> {
-    let client = client()?;
-    let mut out = HashMap::new();
-    for chunk in ids.chunks(WAVE) {
-        let client = &client;
-        let found: Vec<(u32, Option<String>)> = std::thread::scope(|scope| {
-            let handles: Vec<_> = chunk.iter().map(|&id| scope.spawn(move || (id, name_of(client, id)))).collect();
-            handles.into_iter().filter_map(|h| h.join().ok()).collect()
-        });
-        out.extend(found.into_iter().filter_map(|(id, name)| name.map(|n| (id, n))));
-    }
-    Ok(out)
+/// What a wishlist row needs beyond its price: the title, the capsule and the review summary.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Deal {
+    pub name: String,
+    pub art: String,
+    pub review: Option<u8>,
+    pub review_key: String,
+    pub review_count: u32,
 }
 
-fn name_of(client: &reqwest::blocking::Client, id: u32) -> Option<String> {
-    parse::parse_name(&text(client, &basic_url(id)).ok()?)
+/// Name and capsule per app, one request each in waves. A row Steam skipped simply has no title.
+pub fn basics(ids: &[u32]) -> Result<HashMap<u32, (String, String)>, FetchError> {
+    in_waves(ids, |client, id| parse::parse_basic(&text(client, &basic_url(id)).ok()?))
+}
+
+/// The same, plus the review summary the price feed lacks: one task per app, two small requests.
+pub fn deals_info(ids: &[u32]) -> Result<HashMap<u32, Deal>, FetchError> {
+    in_waves(ids, |client, id| {
+        let (name, art) = parse::parse_basic(&text(client, &basic_url(id)).ok()?)?;
+        let (review, review_key, review_count) = text(client, &reviews_url(id))
+            .ok()
+            .and_then(|body| parse::parse_reviews(&body))
+            .map(|(percent, key, count)| (Some(percent), key, count))
+            .unwrap_or((None, String::new(), 0));
+        Some(Deal { name, art, review, review_key, review_count })
+    })
 }
 
 pub fn search(url: &Url) -> Result<Vec<SteamRow>, FetchError> {
-    Ok(parse::parse_search(&get(url)?))
+    Ok(steam_store::parse_search(&get(url)?))
+}
+
+/// One capsule as a `data:` URL, or an empty string when Steam has none or the download failed.
+/// `account::as_data_url` is what keeps a surprise out: a known raster type, non-empty, within the cap.
+pub fn download_art(url: &str) -> String {
+    if !is_steam_image(url) {
+        return String::new();
+    }
+    let Ok(client) = crate::account::client() else {
+        return String::new();
+    };
+    let Ok(res) = client.get(url).send().and_then(reqwest::blocking::Response::error_for_status) else {
+        return String::new();
+    };
+    let Some(kind) = res.headers().get(reqwest::header::CONTENT_TYPE).and_then(|v| v.to_str().ok()).map(str::to_owned)
+    else {
+        return String::new();
+    };
+    let mut bytes = Vec::new();
+    if std::io::Read::read_to_end(&mut std::io::Read::take(res, ART_MAX_BYTES as u64 + 1), &mut bytes).is_err() {
+        return String::new();
+    }
+    crate::account::as_data_url(&kind, &bytes).unwrap_or_default()
 }
 
 pub fn recent(key: &str, steamid: &str) -> Result<Vec<RecentGame>, FetchError> {
-    Ok(parse::parse_recent(&get(&recent_url(key, steamid, crate::steam::RECENT))?))
+    Ok(player::parse_recent(&get(&recent_url(key, steamid, crate::steam::RECENT))?))
 }
 
 pub fn resolve(key: &str, name: &str) -> Result<String, FetchError> {
     let body = get(&vanity_url(key, name))?;
-    parse::parse_vanity(&body).ok_or_else(|| FetchError::Other("nome de perfil não encontrado no Steam".into()))
+    player::parse_vanity(&body).ok_or_else(|| FetchError::Other("nome de perfil não encontrado no Steam".into()))
 }
 
 /// Doubles as the key check: an answer without a player means the key was refused.
 pub fn persona(key: &str, steamid: &str) -> Result<String, FetchError> {
     let body = get(&summary_url(key, steamid))?;
-    parse::parse_summary(&body)
+    player::parse_summary(&body)
         .ok_or_else(|| FetchError::Other("chave da Steam Web API inválida ou conta não encontrada".into()))
 }
 

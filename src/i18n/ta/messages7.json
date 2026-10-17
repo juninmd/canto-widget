@@ -72,5 +72,19 @@
   "steam.recent.total": "மொத்தம் {time}",
   "steam.row.open": "Steam இல் {name} திற",
   "steam.row.discount": "{n}% தள்ளுபடி",
-  "steam.row.review": "{n}% மதிப்புரைகள் நேர்மறையானவை"
+  "steam.row.review": "{n}% மதிப்புரைகள் நேர்மறையானவை",
+  "steam.row.reviews": "{n} மதிப்புரைகள்",
+  "steam.row.reviewOne": "{n} மதிப்பாய்வு",
+  "steam.row.saved": "{value} சேமி",
+  "steam.totalSaved": "{value} மொத்தம் சேமிக்கப்பட்டது",
+  "steam.review.overwhelmingly_positive": "மிகவும் நேர்மறை",
+  "steam.review.very_positive": "மிகவும் நேர்மறை",
+  "steam.review.positive": "நேர்மறை",
+  "steam.review.negative": "எதிர்மறை",
+  "steam.review.very_negative": "மிகவும் எதிர்மறை",
+  "steam.review.overwhelmingly_negative": "மிகவும் எதிர்மறையானது",
+  "steam.loadMore": "மேலும் கேம்களை ஏற்றவும்",
+  "steam.review.mostly_positive": "பெரும்பாலும் நேர்மறை",
+  "steam.review.mixed": "கலப்பு",
+  "steam.review.mostly_negative": "பெரும்பாலும் எதிர்மறை"
 }

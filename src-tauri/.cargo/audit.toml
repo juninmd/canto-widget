@@ -1,0 +1,14 @@
+# zip 4.6.1 (RUSTSEC-2026-0367, -0368, -0369) reaches the lockfile only through
+# tauri-plugin-updater, which takes `zip` as a Windows-only build dependency. Its one call is
+# `ZipArchive::extract()` on bytes that already passed minisign verification against the project's
+# public key (`Update::install` verifies before `install_inner`), written to a fresh temp dir. The
+# three advisories describe extracting attacker-controlled archives (symlink traversal, SUID/SGID),
+# which that path cannot receive. No tauri-plugin-updater release accepts zip 9 yet (2.13.3, 2.14.0
+# and 3.0.0-alpha.3 all require zip ^4), so there is no upgrade to take; any other advisory still
+# fails the build.
+[advisories]
+ignore = [
+    "RUSTSEC-2026-0367",
+    "RUSTSEC-2026-0368",
+    "RUSTSEC-2026-0369",
+]
