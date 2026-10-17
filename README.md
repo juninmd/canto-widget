@@ -424,6 +424,37 @@ is kept and what never is.
 
 <sub>All screenshots use fictitious data.</sub>
 
+## 🧪 Prototypes: five suggested tabs
+
+Five suggestions, shipped as **prototypes**: they start hidden (one checkbox away in Settings) and are **mockups
+with fictitious data** — no backend, nothing stored, nothing fetched. Each screen says what it would still need, so
+the idea can be judged before it becomes real.
+
+| Weather | Habits |
+|---|---|
+| <img src="docs/prints/app/92-prototipo-clima.png" alt="Weather prototype: 22 °C now, rain from 16:00, the next hours as a curve and the next days"> | <img src="docs/prints/app/93-prototipo-habitos.png" alt="Habits prototype: today's habits with their streaks and a grid of the last seven days"> |
+
+| Market | Snippets |
+|---|---|
+| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> | <img src="docs/prints/app/95-prototipo-snippets.png" alt="Snippets prototype: search, tags, one-click copy and a paste-into-the-focused-app button"> |
+
+| Reads |
+|---|
+| <img src="docs/prints/app/96-prototipo-leituras.png" alt="Reads prototype: a reading queue with what is unread, the reading time and the source"> |
+
+- **Weather** — now, the next hours and the next days, with a rain warning. Would need Open-Meteo (open, keyless),
+  the city kept in the vault and a 30 min cache.
+- **Habits** — today's checks, the streak and the last seven days. Would need only the vault, and the streak could
+  feed the routine alerts that already exist.
+- **Market** — dollar (PTAX), euro, bitcoin and Ibovespa with the day's variation. Would need the Central Bank and
+  CoinGecko, both keyless, with a 15 min cache per quote.
+- **Snippets** — reusable pieces with tags, search, one-click copy and "paste into the focused app". Would need only
+  the vault; the paste shortcut reuses the focused app Activity already records.
+- **Reads** — an RSS/Atom queue with what is unread and the reading time. Would need RSS/Atom as in the Status API,
+  keyless, with the list and the "read" state in the vault.
+
+<sub>All screenshots use fictitious data.</sub>
+
 ## ⚖️ Compared to what's out there
 
 None of the tools researched cover more than two of these fronts at once. Sources and details in

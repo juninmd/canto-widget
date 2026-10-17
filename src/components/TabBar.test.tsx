@@ -80,7 +80,7 @@ test("tabs that don't fit go to a 'mais' menu instead of being cut", () => {
     fireEvent.click(screen.getByRole("button", { name: /mais/ }));
     const menu = screen.getByRole("menu");
     const items = screen.getAllByRole("menuitem").map((i) => i.textContent);
-    expect(items).toHaveLength(9);
+    expect(items).toHaveLength(14);
     expect(items[0]).toContain("Agenda");
     expect(items[0]).toContain("Alt+4");
     expect(menu).toBeDefined();
@@ -140,7 +140,7 @@ test("Esc closes the menu and a click outside does too", () => {
 test("with room for everything there is no 'mais' button", () => {
   render(<Harness />);
   expect(screen.queryByRole("button", { name: /mais/ })).toBeNull();
-  expect(bar()).toHaveLength(12);
+  expect(bar()).toHaveLength(17);
 });
 
 test("opening the menu focuses its first item; only the focused item is a Tab stop", () => {

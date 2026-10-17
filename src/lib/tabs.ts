@@ -7,8 +7,8 @@ const KNOWN_KEY = "canto.knownTabs";
 /** Ajustes can't be hidden: it's the only way back to the other tabs. */
 export const HIDEABLE = TABS.filter((t) => t.id !== "settings");
 
-/** Twelve tabs don't fit the default width; GitLab, Status API, Atividade, Steam and Agentes start hidden, one checkbox away in Ajustes. */
-const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents"];
+/** Seventeen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes and the five prototypes start hidden, one checkbox away in Ajustes. */
+const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "habits", "market", "snippets", "reads"];
 
 /** Nothing saved yet means the default; unknown ids (a tab removed in an update) and corrupt data are ignored. */
 export function parseHidden(raw: string | null): Tab[] {
@@ -22,7 +22,7 @@ export function parseHidden(raw: string | null): Tab[] {
 }
 
 /** Shipped after people could save their hidden list; before `canto.knownTabs` existed, these were the unknown ones. */
-const ADDED_LATER: Tab[] = ["steam", "agents"];
+const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "habits", "market", "snippets", "reads"];
 
 /** A tab hidden by default stays hidden for someone who saved a choice before it existed, instead of crowding their bar. */
 export function hideNewTabs(hidden: Tab[], rawKnown: string | null): Tab[] {

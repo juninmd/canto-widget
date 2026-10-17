@@ -3,7 +3,8 @@ import { mockTauri, type MockOptions } from "../../e2e/mock";
 
 /** One fixed instant for every shot, so "agora", "em 30 min" and the free gaps read the same on each run. */
 export const NOW = new Date(2026, 9, 9, 10, 6, 0);
-export const BASE = "http://localhost:1420";
+/** The dev server of `scripts/media/playwright.config.ts`, in the same port it was told to open. */
+export const BASE = `http://localhost:${Number(process.env.CANTO_MEDIA_PORT ?? 1420)}`;
 
 export type SceneOptions = MockOptions & {
   width?: number;
