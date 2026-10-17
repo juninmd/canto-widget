@@ -33,7 +33,7 @@ Arabic, Hebrew and Persian use right-to-left text. Additional language catalogs 
 The 40 new interface catalogs and 31 new README translations are machine translations and have not been
 reviewed by native speakers. Portuguese and English remain the original interface catalogs. Tray labels and
 notification headings follow the selected language; some integration alert details fall back to English,
-and backend errors remain in Portuguese. Task title syntax keeps the existing Portuguese and English keywords.
+as do the errors the backend returns, in any of the 42 languages. Task title syntax keeps the existing Portuguese and English keywords.
 
 ![Searchable language picker](docs/prints/languages-picker.png)
 ![Arabic interface with right-to-left text](docs/prints/languages-ar.png)
