@@ -1,5 +1,5 @@
-//! UI language on the Rust side: OS notifications and the tray menu follow the choice made in Settings.
-//! Errors returned to the UI stay pt-BR (see AGENTS.md).
+//! UI language on the Rust side: OS notifications, the tray menu and the errors returned to the UI follow
+//! the choice made in Settings.
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 use tauri::menu::MenuItem;
@@ -22,7 +22,12 @@ pub fn tr(pt: &'static str, en: &'static str) -> &'static str {
     translate(catalogs::CODES[LANGUAGE.load(Ordering::Relaxed)], pt, en)
 }
 
-fn translate(code: &str, pt: &'static str, en: &'static str) -> &'static str {
+/// The language in force, for callers that have to look the code up themselves (see `error::AppError::text`).
+pub fn current() -> &'static str {
+    catalogs::CODES[LANGUAGE.load(Ordering::Relaxed)]
+}
+
+pub(crate) fn translate(code: &str, pt: &'static str, en: &'static str) -> &'static str {
     if code == "pt-BR" {
         pt
     } else {

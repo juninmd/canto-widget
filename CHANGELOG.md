@@ -41,6 +41,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Erros no idioma escolhido**: as mensagens de erro que o Rust devolve à interface deixam de ser sempre em
+  português: seguem o idioma escolhido em Ajustes, com o inglês como texto de reserva nos idiomas que ainda não
+  têm tradução — o mesmo critério já usado pela bandeja e pelos avisos.
 - **Tema Glass**: novo tema com estética de vidro translúcido, superfícies semi-transparentes
   com desfoque de fundo (backdrop blur), azul vivo, reflexo especular na borda superior e contraste
   acessível em conformidade com WCAG AA.
