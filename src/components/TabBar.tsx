@@ -6,7 +6,7 @@ import TabMore, { TabBadge } from "./TabMore";
 
 export type Tab =
   | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "steam" | "status" | "models" | "agents"
-  | "weather" | "habits" | "market" | "snippets" | "reads" | "activity" | "settings";
+  | "weather" | "market" | "reads" | "activity" | "settings";
 
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: t("tabs.tasks") },
@@ -20,9 +20,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "models", label: t("tabs.models") },
   { id: "agents", label: t("agents.tab") },
   { id: "weather", label: t("weather.tab") },
-  { id: "habits", label: t("protos.tab.habits") },
   { id: "market", label: t("protos.tab.market") },
-  { id: "snippets", label: t("protos.tab.snippets") },
   { id: "reads", label: t("reads.tab") },
   { id: "activity", label: t("tabs.activity") },
   { id: "settings", label: t("tabs.settings") },

@@ -3,17 +3,13 @@ import { calls, goTab, mockTauri } from "./mock";
 
 const ALL_TABS = [
   "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
-  "weather", "habits", "market", "snippets", "reads", "activity",
+  "weather", "market", "reads", "activity",
 ];
-/** Clima and Leituras are real features now; the three mockups still start hidden. */
+/** Clima and Leituras are real features now; the market mockup still starts hidden. */
 const HIDDEN = ["gitlab", "status", "activity", "steam", "agents", "weather", "reads"];
 
-/** One distinctive line of each mockup, in the order of the tab bar. */
-const MARKERS: [string, string][] = [
-  ["Hábitos", "3 dias seguidos"],
-  ["Mercado", "+0,31% no dia"],
-  ["Snippets", "colar no app em foco"],
-];
+/** One distinctive line of the mockup, in the order of the tab bar. */
+const MARKERS: [string, string][] = [["Mercado", "+0,31% no dia"]];
 
 test("each prototype tab opens with its mockup", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
@@ -26,24 +22,20 @@ test("each prototype tab opens with its mockup", async ({ page }) => {
   }
 });
 
-test("a prototype is a mockup: opening and copying ask nothing from Rust", async ({ page }) => {
+test("a prototype is a mockup: opening it asks nothing from Rust", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
-  await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await mockTauri(page, { hiddenTabs: HIDDEN, knownTabs: ALL_TABS });
   await page.goto("/");
-  await goTab(page, "Snippets");
-  await page.locator("[data-proto-snippet=s3]").getByRole("button", { name: "copiar" }).click();
-  await expect(page.locator("[data-proto-snippet=s3]").getByRole("button", { name: "copiar ✓" })).toBeVisible();
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("select date_trunc");
+  await goTab(page, "Mercado");
   const cmds = (await calls(page)).map((c) => c.cmd);
-  expect(cmds.filter((cmd) => /proto|habit|market|snippet/.test(cmd))).toEqual([]);
+  expect(cmds.filter((cmd) => /proto|market/.test(cmd))).toEqual([]);
 });
 
 test("a prototype starts hidden for someone who saved a choice before it existed", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   await mockTauri(page, { hiddenTabs: ["gitlab"], knownTabs: ["tasks", "notes", "clipboard", "agenda", "github", "gitlab"] });
   await page.goto("/");
-  for (const tab of ["Hábitos", "Mercado", "Snippets"]) {
+  for (const tab of ["Mercado"]) {
     await expect(page.getByRole("tab", { name: tab, exact: true })).toHaveCount(0);
   }
 });

@@ -3,9 +3,9 @@ import { calls, goTab, mockTauri } from "./mock";
 
 const ALL_TABS = [
   "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
-  "weather", "habits", "market", "snippets", "reads", "activity",
+  "weather", "market", "reads", "activity",
 ];
-const HIDDEN = ["gitlab", "status", "activity", "steam", "agents", "habits", "market", "snippets", "weather"];
+const HIDDEN = ["gitlab", "status", "activity", "steam", "agents", "market", "weather"];
 
 const article = (id: string, title: string, unread = true, has_image = false) => ({
   id,

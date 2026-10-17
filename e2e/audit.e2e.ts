@@ -65,12 +65,12 @@ const agents = [
 ];
 
 
-const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Modelos IA", "Steam", "Agentes", "Clima", "Hábitos", "Mercado", "Snippets", "Leituras", "Ajustes"];
+const TABS = ["Tarefas", "Notas", "Clipboard", "Agenda", "GitHub", "Status API", "Modelos IA", "Steam", "Agentes", "Clima", "Mercado", "Leituras", "Ajustes"];
 /** Hidden by default: the sweep shows them and tells the app they were already known, so they don't auto-hide. */
-const HIDDEN_BY_DEFAULT = ["Status API", "Steam", "Agentes", "Clima", "Hábitos", "Mercado", "Snippets", "Leituras"];
+const HIDDEN_BY_DEFAULT = ["Status API", "Steam", "Agentes", "Clima", "Mercado", "Leituras"];
 const ALL_TABS = [
   "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
-  "weather", "habits", "market", "snippets", "reads", "activity",
+  "weather", "market", "reads", "activity",
 ];
 const MIN = 24;
 

@@ -5,6 +5,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Removido
+
+- **Abas de protótipo Hábitos e Snippets**: saíram as duas telas de maquete, os rótulos nos 42 idiomas, os prints e
+  os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
+
 ### Adicionado
 
 - **Aba Clima**: escreva o nome da cidade uma vez e o Canto guarda só as coordenadas. A aba mostra **agora**, as
