@@ -32,7 +32,7 @@ otsitav valija kasutab emakeele nimesid ja automaatrežiim järgib teie peamist 
 Araabia, heebrea ja pärsia keeles kasutatakse paremalt vasakule kirjutatavat teksti. Täiendavad keelekataloogid laaditakse nõudmisel.
 
 40 uut liideste kataloogi ja 31 uut README tõlget on masintõlked ja seda pole olnud
-üle vaadanud emakeelena kõnelejad. Portugali ja inglise keel jäävad algseteks liidesekataloogideks. Salve sildid ja
+üle vaadanud emakeelena kõnelejad. Algseteks liidesekataloogideks jäävad portugali ja inglise keel. Salve sildid ja
 teatiste pealkirjad järgivad valitud keelt; osa integratsioonihoiatuste üksikasju on inglise keeles,
 ja taustaprogrammi vead jäävad portugali keelde. Ülesande pealkirja süntaks säilitab olemasolevad portugali ja inglise keele märksõnad.
 
@@ -58,7 +58,7 @@ Windows Hello valikuline.
 ⏰ **Te ei jää sellest ilma.** 1 minut enne koosolekut ja meeldetuletuse ajal avaneb vidin, esitab heli ja
 saadab märguande **lükka 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + süsteemi veebivaade) Electroni asemel: 3,5 MB installer.
+🪶 **Light.** Tauri v2 (Rust + süsteemi veebivaade) Electron asemel: 3,5 MB installiprogramm.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Alati ajakohane.** Värskendab rakenduse seest ja installib ainult selle, mis on allkirjastatud projekti enda võtmega.
@@ -90,7 +90,7 @@ Liituge järgmise koosolekuga rakendusega `Ctrl+Alt+M` (`Ctrl+Cmd+M` macOS-is). 
 `Ctrl+Alt+Shift+M` (`Ctrl+Cmd+Shift+M` macOS-is); salve menüü jääb kättesaadavaks, kui mõlemad pole saadaval.
 
 Tänased sündmused pärinevad Google kalendrist (kirjutuskaitstud). Minut enne hüppab vidin ekraanile klahviga
-**liituge rakendusega Meet**, esitab heli ja saadab süsteemi teatise olenemata sellest, millisel vahekaardil olete või isegi kui see on peidetud.
+**liituge rakendusega Meet**, esitab heli ja saadab süsteemi teatise olenevalt sellest, millisel vahekaardil olete või isegi kui see on peidetud.
 Igal kaardil on teie vastusega märk (aktsepteeritud, võib-olla, tagasi lükatud, ootel). Klõpsake sündmusel, et näha, kes korraldas
 see, päevakava, iga külaline koos initsiaalidega avatari ja nende vastusega ning manused, nagu Kaksikute märkmed.
 Ülemine rida näitab vähemalt 15-minutilist **järgmist tasuta pesa** (keeldud kutsetest ja kogu päeva kestvatest sündmustest
@@ -144,15 +144,18 @@ austab intressipiirangut. Logige sisse kirjutuskaitstud isikliku loaga või brau
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam vidinast lahkumata
 
-Neli alamvahekaarti Steam jaoks: **sooviloendi pakkumised** (kõigepealt suurim allahindlus), **enimmüüdud**, **mängi kohe** ja
-**hinnangu järgi järjestatud kataloog**. Avalikud loendid vajavad ainult teie **SteamID64**; valikuline **Steam veebivõti API**
-lisab viis viimast mängu koos nende mänguaegadega. Hinnad tulevad reaalides, iga rida avab poe lehe ja
-vahekaart käivitub vaikimisi, seadetes ühe märkeruudu kaugusel.
+Neli alamvahekaarti Steam jaoks: **sooviloendi pakkumised** (kõigepealt suurim allahindlus, millest igaühel on kokkuhoid), **enimmüüdud**
+järjestatud, **mängige kohe** (iga mäng Steam kajastab viimase kahe nädala jooksul) ja **reitingu järgi järjestatud kataloog**, lehel
+**laadige rohkem**, et see jõuaks ülejäänud poodi. Igal real on **kapsli kujundus**, **ülevaate skoor**
+Steam enda sõnastusega ja arvustuste arvuga, läbikriipsutatud hinnaga, reaalides oleva hinnaga ja
+allahindlussäästu — ja loend liidab kogu säästu. Avalikud loendid vajavad ainult teie **SteamID64**; valikuline
+**Steam Veebiklahv API** lisab hiljutised mängud koos nende mänguaegadega. Vaikimisi algab vahekaart ühe märkeruudu kaugusel
+jaotises Seaded.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ mudel **saab 10 parima hulka** või **ronib selle sees** (kontrollitakse iga 6 t
 🌙 **Mitte segada:** menüüs Seaded või salves vaigistage koosoleku märguanded, ülesannete meeldetuletused, olekuteated ja kõik
 süsteemi märguanne 30 min, 1 h, 2 h homseni või kuni selle välja lülitate. Kuu ülemisel ribal näitab
 kui see lõpeb; üks klõps lülitab selle uuesti välja. See elab üle taaskäivitamise ja lõpeb iseenesest.
+
+🔔 **Iga märguanne ühel ekraanil:** päises olev kelluke (loendage ja värvige, kui midagi on ootel) avab
+hoiatused kogu aknas mis tahes režiimis: üks kaart hoiatuse kohta koos selle toimingutega, **loobu kõik** ja mis oli
+lahendatud täna nende all — kui midagi pole pooleli, nii jõuad ikka tänase logini. Dokilt klõps
+avab ikkagi selle ühe hoiatuse tavalise akna peal.
 
 ⌨️ **Kõik klaviatuuri abil:** `Alt+1`…`Alt+7` vahekaartide vahetamine, `N` loomine, `/` otsimine, `F11` täisekraan, `Alt+L`
 lukustab ja `?` loetleb otseteed. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS-is) avab **käsupaleti** iga
@@ -235,11 +243,11 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klõpsake dokis märguandel | Maksimaalne: ülesanded ja teatised koos lohistatava jaguriga |
+| Klõpsake dokis märguandel | Maksimeeritud: kogu avatud vahelehe aken |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Kelluke avab hoiatused kogu aknas |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -299,7 +307,7 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](docs/prints/app/81-aba-mencoes.png) |
 
-| Parool muudetud, üks fail on ootel | Päeva kokkuvõte |
+| Parool muudetud, üks fail ootel | Päeva kokkuvõte |
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](docs/prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](docs/prints/app/32-resumo-do-dia.png) |
 
@@ -335,9 +343,13 @@ Ja **Jälgi süsteemi**, mis lülitub koos OS-iga heleda ja tumeda vahel. Kõik 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: viimased viis mängitud mängu mõlema mänguajaga |
+| Steam: enimmüüdud, nummerdatud | Steam: viimased viis mängitud mängu mõlema mänguajaga |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: kataloog hinnangute järgi koos "laadimisega rohkem" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Üks märguannete ülekate kõige ootel oleva kohta: katkestused, koosolekud, ülesanded ja uued AI mudelid |
 |---|
@@ -391,7 +403,7 @@ enne ja jõudeaeg (2 minutit ei klaviatuuri ega hiirt). Selle all on igapäevane
 üks punkt päevas, kolm esiletõstmist (pikim osa ühes rakenduses, rakenduste lülitid, tipptund), ajaskaala, kus
 päeval, tühikäik venib ja kõige aktiivsemad rakendused jagavad ühte ajatelge, millel on marker "nüüd" ja rakenduste loend
 (puudutage ühte, et muuta selle kategooriat) või ülesannetest, mida fookuse taimer käivitas.
-- **Nädal**: virnastatud veerud päevas keskmise joone ja punktiga iga päeva all, mis täitis eesmärgi, tunni soojuskaart
+- **Nädal**: virnastatud veerud päevas keskmise joone ja punktiga iga eesmärgi täitnud päeva all, tunni soojuskaart
 oma tipuga ja samad nimekirjad terveks nädalaks.
 - **Paigutus ja nahad**: vaikeaknas üks veerg, kaks, kui see on lai (maksimeeritud); igal nahal on oma
 kategooria värvid, kontrollitud kontrastsust. Päeva kõrval olev menüü kopeerib selle tekstina.
@@ -400,7 +412,7 @@ kategooria värvid, kontrollitud kontrastsust. Päeva kõrval olev menüü kopee
 
 ## ⚖️ Võrreldes sellega, mis seal on
 
-Ükski uuritud tööriist ei hõlma korraga rohkem kui kahte neist rindest. Allikad ja üksikasjad sisse
+Ükski uuritud tööriist ei hõlma korraga rohkem kui kahte neist rinnetest. Allikad ja üksikasjad sisse
 [docs/benchmark.md](docs/benchmark.md).
 
 | | Ülesanded + meeldetuletus | Märkmed | Lõikelaud | Koosolekud | GitHub | Kohalik krüptimine vaikimisi |
@@ -444,8 +456,8 @@ hoidlad: avaldamine on hooldaja käsitsi tehtud otsus ja tegevus.
 
 | Kiht | Kaitse |
 |---|---|
-| Vault | Argon2id (19 MiB, t = 2) → AES-256-GCM, värske nonce igal kirjutamisel, aatomi kirjutamine `fsync` |
-| Võti | Ainult RAM, lukustatud nulliga; konfigureeritav automaatne lukustus (5 kuni 60 min tühikäigul, vaikimisi 15 min) |
+| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, värske nonce igal kirjutamisel, aatomi kirjutamine `fsync` |
+| Võti | Ainult RAM, lukustatud nulliga; konfigureeritav automaatne lukustus (5–60 min tühikäigul, vaikimisi 15 min) |
 | Võrk | ainult protsess Rust räägib võrguga; veebivaatel puudub kauglähtekoht (CSP) ja see ei näe kunagi märke |
 | Google | valikuline, ainult `calendar.events.readonly`, `directory.readonly` (Külaliste loendis on tööruumi kolleegide fotod) pluss profiil, OAuth koos PKCE ja loopbackiga |
 | GitHub | valikuline krüptitud žetoon; üksused avanevad ainult siis, kui link on `https://github.com/` |

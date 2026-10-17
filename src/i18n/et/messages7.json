@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} kokku",
   "steam.row.open": "avatud {name} Steam",
   "steam.row.discount": "{n}% soodsam",
-  "steam.row.review": "{n}% arvustustest on positiivsed"
+  "steam.row.review": "{n}% arvustustest on positiivsed",
+  "steam.row.reviews": "{n} arvustust",
+  "steam.row.reviewOne": "{n} arvustus",
+  "steam.row.saved": "salvesta {value}",
+  "steam.totalSaved": "{value} salvestatud kokku",
+  "steam.review.overwhelmingly_positive": "Valdavalt positiivne",
+  "steam.review.very_positive": "Väga positiivne",
+  "steam.review.positive": "Positiivne",
+  "steam.review.negative": "Negatiivne",
+  "steam.review.very_negative": "Väga negatiivne",
+  "steam.review.overwhelmingly_negative": "Valdavalt negatiivne",
+  "steam.loadMore": "laadige rohkem mänge",
+  "steam.review.mostly_positive": "Enamasti positiivne",
+  "steam.review.mixed": "Segatud",
+  "steam.review.mostly_negative": "Enamasti negatiivne"
 }

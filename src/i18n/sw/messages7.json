@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} kwa jumla",
   "steam.row.open": "fungua {name} kwenye Steam",
   "steam.row.discount": "Punguzo la {n}%.",
-  "steam.row.review": "{n}% ya maoni ni chanya"
+  "steam.row.review": "{n}% ya maoni ni chanya",
+  "steam.row.reviews": "{n} ukaguzi",
+  "steam.row.reviewOne": "{n} ukaguzi",
+  "steam.row.saved": "hifadhi {value}",
+  "steam.totalSaved": "{value} imehifadhiwa kwa jumla",
+  "steam.review.overwhelmingly_positive": "Chanya kwa wingi",
+  "steam.review.very_positive": "Chanya sana",
+  "steam.review.positive": "Chanya",
+  "steam.review.negative": "Hasi",
+  "steam.review.very_negative": "hasi sana",
+  "steam.review.overwhelmingly_negative": "Mbaya kupita kiasi",
+  "steam.loadMore": "pakia michezo zaidi",
+  "steam.review.mostly_positive": "Mara nyingi chanya",
+  "steam.review.mixed": "Imechanganywa",
+  "steam.review.mostly_negative": "Mara nyingi hasi"
 }

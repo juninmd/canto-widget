@@ -144,15 +144,18 @@ respekterer takstgrensen. Logg på med et skrivebeskyttet personlig token eller 
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam uten å forlate widgeten
 
-Fire underfaner for Steam: **ønskelistetilbud** (største rabatt først), **toppselgere**, **spill nå** og
-**katalogen sortert etter vurdering**. De offentlige listene trenger bare din **SteamID64**; en valgfri **Steam Web API nøkkel**
-legger til de fem siste spillene med spilletidene deres. Prisene kommer i reais, hver rad åpner butikksiden, og
-fanen starter som standard, én avmerkingsboks unna i Innstillinger.
+Fire underfaner for Steam: **ønskelistetilbud** (største rabatt først, hver med det den sparer), **toppselgerne**
+rangert, **spill nå** (hvert spill Steam rapporterer de siste to ukene) og **katalogen sortert etter rangering**, sidesøkt
+med **last mer** så den når resten av butikken. Hver rad har **kapselkunst**, **anmeldelsesresultatet**
+med Steams egen ordlyd og hvor mange anmeldelser den teller, prisen som er krysset ut, prisen i reais og hva
+rabattbesparelser - og listen summerer den totale besparelsen. De offentlige listene trenger bare din **SteamID64**; en valgfri
+**Steam Web API nøkkel** legger til de siste spillene med spilletidene deres. Fanen starter som standard, én avmerkingsboks unna
+i Innstillinger.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ modellen **kommer inn i topp 10** eller **klatrer innenfor den** (kontrolleres h
 🌙 **Ikke forstyrr:** i innstillingene eller skuffen, slå av møtevarsler, oppgavepåminnelser, statusvarsler og hver
 systemvarsling i 30 min, 1 t, 2 t, til i morgen eller til du slår den av. En måne i den øverste linjen viser
 når det slutter; ett klikk slår den av igjen. Den overlever en omstart og slutter av seg selv.
+
+🔔 **Hvert varsel på én skjerm:** bjellen i overskriften (tell og farge når noe venter) åpner
+varsler over hele vinduet i alle moduser: ett kort per varsel med handlingene, **avvis alle**, og hva som var
+løst i dag under dem — uten at noe venter, er det slik du fortsatt når dagens logg. Fra kaien, et klikk
+åpner fortsatt det ene varselet på toppen av det vanlige vinduet.
 
 ⌨️ **Alt med tastatur:** `Alt+1`...`Alt+7` bytt fane, `N` oppretter, `/` søker, `F11` fullskjerm, `Alt+L`
 låser og `?` viser snarveiene. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) åpner en **kommandopalett** med hver
@@ -235,11 +243,11 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klikk på et varsel i dokken | Maksimert: oppgaver og varsler, med en trekkbar skillelinje |
+| Klikk på et varsel i dokken | Maksimert: hele vinduet for den åpne fanen |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Klokken åpner varslene over hele vinduet |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ Og **Følg system**, som bytter mellom lys og mørk sammen med OS. Alle passerer
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: de siste fem kampene spilt, med begge spilletid |
+| Steam: bestselgerne, nummerert | Steam: de siste fem kampene spilt, med begge spilletid |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: katalogen etter vurdering, med "last mer" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Ett varseloverlegg for alt som venter: avbrudd, møter, oppgaver og nye AI-modeller |
 |---|
@@ -400,7 +412,7 @@ kategorifarger, sjekket for kontrast. Menyen ved siden av dagen kopierer den som
 
 ## ⚖️ Sammenlignet med det som finnes der ute
 
-Ingen av verktøyene som forskes på dekker mer enn to av disse frontene samtidig. Kilder og detaljer i
+Ingen av verktøyene som undersøkes dekker mer enn to av disse frontene samtidig. Kilder og detaljer i
 [docs/benchmark.md](docs/benchmark.md).
 
 | | Oppgaver + påminnelse | Merknader | Utklippstavle | Møter | GitHub | Lokal kryptering som standard |
@@ -428,7 +440,7 @@ Last ned installasjonsprogrammet for plattformen din fra **[Releases](https://gi
 | 🍎 macOS | `.dmg` for Apple Silicon eller Intel |
 | 🐧 Linux | `.AppImage`, `.deb` eller `.rpm` |
 
-1. Ved første kjøring oppretter du **hovedpassordet**. Det er ingen gjenoppretting: mist passordet, mist dataene.
+1. Ved første kjøring oppretter du **hovedpassordet**. Det er ingen gjenoppretting: mister passordet, mister dataene.
 2. `Ctrl+Alt+Space` (`Cmd+Shift+Space` på macOS) viser og skjuler widgeten.
 3. Ferdig. Når en ny versjon sendes, varsler Canto deg, og **Innstillinger → Oppdateringer** oppdateres med ett klikk.
 
@@ -444,13 +456,13 @@ repositories: publisering er en manuell beslutning og handling av vedlikeholdere
 
 | Lag | Beskyttelse |
 |---|---|
-| Hvelv | Argon2id (19 MiB, t=2) → AES-256-GCM, en fersk nonce på hver skriving, atomskriving med `fsync` |
+| Hvelv | Argon2id (19 MiB, t=2) → AES-256-GCM, en ny nonce på hver skriving, atomskriving med `fsync` |
 | Nøkkel | Kun RAM, nullstilt på lås; konfigurerbar autolås (5 til 60 min inaktiv, 15 min som standard) |
 | Nettverk | bare Rust-prosessen snakker med nettverket; webvisningen har ingen ekstern opprinnelse (CSP) og ser aldri tokens |
-| Google | valgfritt, kun `calendar.events.readonly`, `directory.readonly` (Arbeidsmiljøkollegers bilder i gjestelisten) pluss profil, OAuth med PKCE og loopback |
+| Google | valgfritt, kun `calendar.events.readonly`, `directory.readonly` (Arbeidsområde-kollegers bilder i gjestelisten) pluss profil, OAuth med PKCE og loopback |
 | GitHub | valgfritt, kryptert token; elementer åpnes bare hvis lenken er `https://github.com/` |
-| GitLab | valgfri, kryptert adresse og token; Kun `https://`, ingen omdirigeringer, kun lenker fra den konfigurerte forekomsten |
-| Oppdateringer | installerer bare en pakke signert med prosjektets nøkkel; en tuklet nedlasting forkastes før den kjøres |
+| GitLab | valgfri, kryptert adresse og token; Bare `https://`, ingen omdirigeringer, kun lenker fra den konfigurerte forekomsten |
+| Oppdateringer | installerer kun en pakke signert med prosjektets nøkkel; en tuklet nedlasting forkastes før den kjøres |
 
 Full modell, sikkerhetskopiering, slå sammen på tvers av maskiner og hvor hver fil bor: [docs/seguranca.md](docs/seguranca.md).
 Har du funnet en feil? [SECURITY.md](SECURITY.md).
@@ -469,7 +481,7 @@ Har du funnet en feil? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Utvikling
 
-Forutsetninger: [Bun](https://bun.sh) ≥ 1,2, stabil Rust ≥ 1,85 og
+Forutsetninger: [Bun](https://bun.sh) ≥ 1.2, stabil Rust ≥ 1.85 og
 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) for systemet ditt.
 
 ```bash

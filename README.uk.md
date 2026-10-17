@@ -31,7 +31,7 @@ Canto пропонує **42 мови інтерфейсу**, кожна зі с�
 засіб вибору з можливістю пошуку використовує назви рідною мовою, а автоматичний режим відповідає вашій основній системній мові.
 Арабська, іврит і перська використовують текст справа наліво. Додаткові мовні каталоги завантажуються на вимогу.
 
-40 нових каталогів інтерфейсів і 31 новий переклад README є машинним перекладом і не були
+40 нових каталогів інтерфейсів і 31 новий переклад README є машинними перекладами, і такими не були
 рецензували носії мови. Португальська та англійська мови залишаються оригінальними каталогами інтерфейсу. Етикетки для лотків і
 заголовки повідомлень слідують за вибраною мовою; деякі деталі сповіщень інтеграції повертаються англійською мовою,
 і серверні помилки залишаються португальською мовою. Синтаксис назви завдання зберігає наявні ключові слова португальською та англійською мовами.
@@ -58,7 +58,7 @@ Windows Hello необов’язковий.
 ⏰ **Ви не пропустите.** За 1 хвилину до зустрічі та під час нагадування віджет з’являється, відтворює звук і
 надсилає сповіщення з **відкласти на 10 хв**.
 
-🪶 **Light.** Tauri v2 (Rust + веб-перегляд системи) замість Electron: інсталятор 3,5 МБ.
+🪶 **Легкий.** Tauri v2 (Rust + веб-перегляд системи) замість Electron: інсталятор розміром 3,5 МБ.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Завжди в актуальному стані.** Оновлення з програми та встановлює лише те, що підписане власним ключем проекту.
@@ -135,7 +135,7 @@ Windows Hello необов’язковий.
 ### 🐙 Ваш GitHub з першого погляду
 
 **Мій запит на перевірку**, призначений мені, PRs і проблеми, які я відкрив, із значком PR або проблемою та тим, хто відкрив
-це. Чернетки, PRs **очікує на ваш перегляд** і PRs **зупинено** на тиждень виділяються, і кожен PR містить невелику
+це. Чернетки, PRs **очікує на ваш перегляд** і PRs **заблоковано** на тиждень виділяються, і кожен PR містить невелику
 **Значок CI** (пройшов, не пройшов, працює чи не CI) з перевірок головного коміту. Коли хтось **просить вас
 переглянути**, сповіщає вас сповіщення ОС (за умовчанням увімкнено, вимкніть у налаштуваннях). Фільтрувати за текстом, `repo:` чи `label:`, лише PRs або лише проблеми, сортувати за оновленням, створенням чи коментарями та
 прокрутіть за допомогою **показати більше**. Перейдіть у режим перегляду **Коментарі**, щоб побачити таблицю **Каталогу коментаторів** усіх, хто прокоментував ваш PRs (аватарки, значки людей і ботів, кількість коментарів, пошук, фільтр ботів, прогресивне розбиття на сторінки) та їхні коментарі. Також підтримує **GitLab.com і GitLab** з 5-хвилинним кеш-пам’яттю, що
@@ -144,15 +144,18 @@ Windows Hello необов’язковий.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam, не виходячи з віджета
 
-Чотири підвкладки для Steam: **угоди зі списку бажань** (спочатку найбільші знижки), **лідери продажів**, **грати зараз** і
-**каталог впорядкований за рейтингом**. Для публічних списків потрібні лише ваші **SteamID64**; додатковий ключ **Steam Web API ключ**
-додає п'ять останніх ігор із часом їх відтворення. Ціни вказано в реалах, кожен рядок відкриває сторінку магазину, і
-вкладка починається за умовчанням, за один прапорець у налаштуваннях.
+Чотири підвкладки для Steam: **угоди зі списку бажань** (спочатку найбільша знижка, кожна з тим, що вона заощаджує), **лідери продажів**
+рейтинг, **грати зараз** (кожна гра Steam звітів за останні два тижні) і **каталог, упорядкований за рейтингом**, розгорнутий
+з **завантажте більше**, щоб він досяг решти магазину. Кожен рядок містить **картинку капсули**, **оцінку відгуку**
+з власним формулюванням Steam і кількістю оглядів, викресленою ціною, ціною в реалах і що
+знижка економить — і список додає загальну економію. Для публічних списків потрібні лише ваші **SteamID64**; необов'язковий
+**Steam Web API ключ** додає останні ігри з часом їх відтворення. Вкладка починається за умовчанням, на відстані одного прапорця
+у налаштуваннях.
 
 </td>
 </tr>
@@ -173,7 +176,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 Також є 🎙️ **Зустрічі**, підвкладка Порядку денного поруч зі списком і днем: нотатки Джеміні та стенограми з
 останні два тижні, а також стенограми `.vtt`, `.srt`, `.txt` та `.md` з локальної папки, очищені та доступні для пошуку.
 
-🤖 **Моделі штучного інтелекту** (на панелі вкладок за замовчуванням, **немає ключа API або облікового запису**): магістратури, упорядковані за
+🤖 **Моделі штучного інтелекту** (на панелі вкладок за замовчуванням, **немає ключа API або облікового запису**): магістратури, класифіковані за
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, читайте на його публічній сторінці таблиці лідерів,
 із шкалою результатів, творцем, ціною за 1 млн токенів і швидкістю, сортування за інтелектом, ціною або швидкістю. Він отримує о
 найчастіше кожні 3 години, і опція 🔔 сповістить вас, коли a
@@ -183,6 +186,11 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 🌙 **Не турбувати:** у налаштуваннях або на панелі вимикання сповіщень про зустрічі, нагадувань про завдання, сповіщень про стан і кожного
 сповіщення системи на 30 хв, 1 год, 2 год, до завтра або поки ви його не вимкнете. На верхній панелі відображається місяць
 коли закінчується; один клік знову вимикає його. Він переживає перезапуск і закінчується самостійно.
+
+🔔 **Кожне сповіщення на одному екрані:** дзвіночок у заголовку (підрахунок і колір, коли щось очікує) відкриває
+сповіщення по всьому вікну в будь-якому режимі: одна картка на сповіщення з його діями, **закрити все** та те, що було
+вирішено сьогодні під ними — без нічого незавершеного, це те, як ви все ще досягаєте сьогоднішнього журналу. З док-станції клацання
+усе ще відкриває єдине сповіщення поверх звичайного вікна.
 
 ⌨️ **Усе за допомогою клавіатури:** `Alt+1`…`Alt+7` перемикання вкладок, `N` створення, `/` пошук, `F11` на весь екран, `Alt+L`
 блокує, а `?` перелічує ярлики. `Ctrl+Shift+P` (`Cmd+Shift+P` в macOS) відкриває **командну палітру** з кожним
@@ -194,7 +202,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 <tr>
 <td align="center"><img src="docs/prints/app/01-tarefas.png" alt="Default skin" width="200"><br><b>За замовчуванням</b></td>
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
-<td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
+<td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Дракула</b></td>
 <td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Скло</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
@@ -235,11 +243,11 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Клацніть сповіщення на панелі | Розгорнуто: завдання та сповіщення з розділювачем, який можна перетягнути |
+| Клацніть сповіщення на панелі | Розгорнуто: все вікно для відкритої вкладки |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Дзвінок відкриває оповіщення по всьому вікну |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: останні п’ять зіграних ігор, з обома часами гри |
+| Steam: лідери продажів, пронумеровані | Steam: останні п’ять зіграних ігор, з обома часами гри |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: каталог за рейтингом, з «завантажити ще» |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Єдине накладення сповіщень для всього незавершеного: збоїв, зустрічей, завдань і нових моделей ШІ |
 |---|
@@ -345,11 +357,11 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 
 </details>
 
-| Мої кінцеві точки: плитки з останньою затримкою | Відкрита кінцева точка: діаграма затримки, налаштування ліміту та сповіщень | Додавання DNS + перевірка сертифіката |
+| Мої кінцеві точки: плитки з останньою затримкою | Відкрита кінцева точка: діаграма затримки, налаштування обмежень і попереджень | Додавання DNS + перевірка сертифіката |
 |---|---|---|
 | ![Status API, My endpoints sub-tab: a grid of tiles with latency, recent readings and certificate days](docs/prints/app/76-endpoints-grade.png) | ![An endpoint open over the whole row with the latency chart, the limit line and the stats](docs/prints/app/77-endpoints-aberto.png) | ![The new endpoint form with the DNS + certificate kind selected](docs/prints/app/78-endpoints-novo.png) |
 
-| Порядок денний на будь-який день: стрілки попереднього та наступного, вибір дати та кнопка повернення до сьогоднішнього дня |
+| Порядок денний на будь-який день: стрілки попередній і наступний, вибір дати та кнопка повернення до сьогоднішнього дня |
 |---|
 | ![Agenda tab on tomorrow with the day stepper, the first meeting and the day in one line](docs/prints/app/75-agenda-dia.png) |
 
@@ -357,7 +369,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 |---|---|---|
 | ![Tasks tab with a card for the next task, its timer and estimate, and the list split into pending and done](docs/prints/app/72-tarefas-agora.png) | ![GitHub tab with reviews, my PRs, failed CI and my issues counted above the lists](docs/prints/app/73-github-resumo.png) | ![GitLab tab with the same summary strip, without CI](docs/prints/app/74-gitlab-resumo.png) |
 
-| Перейти до таймера, закріпленого під кожною вкладкою | Порядок денний на день, завдання поруч із нарадами |
+| Таймер фокусування, закріплений під кожною вкладкою | Порядок денний на день, завдання поруч із нарадами |
 |---|---|
 | ![Task list with estimates, the time spent on each and a bar pinned at the bottom counting the task in focus](docs/prints/app/47-tarefas-foco.png) | ![Agenda Today view: the meeting in progress with time left and a conflict warning, then the day in one line with meeting time, free time and conflicts](docs/prints/app/54-agenda-hoje.png) |
 
@@ -393,12 +405,12 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 (торкніться одного, щоб змінити його категорію) або із завдань, на яких запустився таймер фокусування.
 - **Тиждень**: накопичені стовпці на день із середньою лінією та крапкою під кожним днем, який досяг мети, година теплової карти
 з вашим піком, і однакові списки на весь тиждень.
-- **Макет і скіни**: один стовпець у вікні за замовчуванням, два, якщо воно широке (розгорнуте); у кожної шкіри вона своя
+- **Макет і скіни**: один стовпець у вікні за замовчуванням, два, якщо воно широке (розгорнуте); кожна шкіра має своє
 категорія кольорів, перевірена на контраст. Меню поруч із днем ​​копіює його як текст.
 
 <sub>Усі знімки екрана використовують вигадані дані.</sub>
 
-## ⚖️ Порівняно з тим, що є
+## ⚖️ Порівняно з тим, що там
 
 Жоден із досліджених інструментів не охоплює більше двох із цих фронтів одночасно. Джерела та подробиці в
 [docs/benchmark.md](docs/benchmark.md).
@@ -420,7 +432,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 
 ## ⬇️ Встановити
 
-Завантажте інсталятор для вашої платформи з **[Releases](https://github.com/juninmd/canto-widget/releases)**:
+Завантажте програму встановлення для вашої платформи з **[Releases](https://github.com/juninmd/canto-widget/releases)**:
 
 | Система | Файл |
 |---|---|
@@ -444,7 +456,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 
 | Шар | Захист |
 |---|---|
-| Сховище | Argon2id (19 MiB, t=2) → AES-256-GCM, свіжий nonce під час кожного запису, атомарний запис із `fsync` |
+| Сховище | Argon2id (19 MiB, t=2) → AES-256-GCM, свіжий nonce під час кожного запису, атомарний запис за допомогою `fsync` |
 | Ключ | Лише оперативна пам'ять, обнулена при блокуванні; настроюване автоматичне блокування (від 5 до 60 хвилин бездіяльності, 15 хвилин за замовчуванням) |
 | Мережа | тільки процес Rust спілкується з мережею; веб-перегляд не має віддаленого джерела (CSP) і ніколи не бачить жетони |
 | Google | необов’язково, лише `calendar.events.readonly`, `directory.readonly` (фотографії колег по робочому простору в списку гостей) плюс профіль, OAuth з PKCE і loopback |
@@ -469,7 +481,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 
 ## 🛠️ Розвиток
 
-Передумови: [Bun](https://bun.sh) ≥ 1.2, стабільний Rust ≥ 1.85 і
+Передумови: [Bun](https://bun.sh) ≥ 1.2, стабільний Rust ≥ 1.85 та
 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) для вашої системи.
 
 ```bash
@@ -490,4 +502,4 @@ bun run tauri build                                      # installer for the cur
 
 [MIT](LICENSE) © Антоніо Карлос
 
-<div align="center"><sub>Made with 🦀 Rust, ⚛️ React і ☕ для тих, хто живе між зустрічами.</sub></div>
+<div align="center"><sub>Створено за допомогою 🦀 Rust, ⚛️ React та ☕ для тих, хто живе між зустрічами.</sub></div>

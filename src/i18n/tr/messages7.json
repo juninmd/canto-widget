@@ -72,5 +72,19 @@
   "steam.recent.total": "Toplamda {time}",
   "steam.row.open": "{name}'yi Steam'de aç",
   "steam.row.discount": "{n}% indirim",
-  "steam.row.review": "İncelemelerin %{n} kadarı olumlu"
+  "steam.row.review": "İncelemelerin %{n} kadarı olumlu",
+  "steam.row.reviews": "{n} incelemeler",
+  "steam.row.reviewOne": "{n} incelemesi",
+  "steam.row.saved": "{value} kaydet",
+  "steam.totalSaved": "Toplamda {value} kaydedildi",
+  "steam.review.overwhelmingly_positive": "Son derece olumlu",
+  "steam.review.very_positive": "Çok olumlu",
+  "steam.review.positive": "Olumlu",
+  "steam.review.negative": "Negatif",
+  "steam.review.very_negative": "Çok olumsuz",
+  "steam.review.overwhelmingly_negative": "Son derece olumsuz",
+  "steam.loadMore": "daha fazla oyun yükle",
+  "steam.review.mostly_positive": "Çoğunlukla olumlu",
+  "steam.review.mixed": "Karışık",
+  "steam.review.mostly_negative": "Çoğunlukla olumsuz"
 }

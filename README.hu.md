@@ -58,7 +58,7 @@ Windows Hello opcionális.
 ⏰ **Nem fogsz lemaradni.** 1 perccel a megbeszélés előtt és az emlékeztető idején a widget felugrik, lejátszik egy hangot és
 értesítést küld, **szundi 10 perc**.
 
-🪶 **Light.** Tauri v2 (Rust + a rendszer webnézete) Electron helyett: 3,5 MB-os telepítő.
+🪶 **Light.** Tauri v2 (Rust + a rendszer webnézete) a Electron helyett: 3,5 MB-os telepítő.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Mindig naprakész.** Az alkalmazáson belül frissít, és csak azt telepíti, amit a projekt saját kulcsa aláírt.
@@ -90,8 +90,8 @@ Csatlakozzon a következő megbeszéléshez a következővel: `Ctrl+Alt+M` (`Ctr
 `Ctrl+Alt+Shift+M` (`Ctrl+Cmd+Shift+M` macOS-en); a tálca menü elérhető marad, ha mindkettő nem elérhető.
 
 A mai események a Google Naptárból származnak (csak olvasható). Egy perccel azelőtt a widget a következővel ugrik a képernyőre
-**csatlakozik a Meet**-hoz, hangot ad le és rendszerértesítést küld, függetlenül attól, hogy melyik lapon van, vagy ha rejtve van.
-Minden kártyán egy jelvény látható a válaszoddal (elfogadva, esetleg, elutasítva, várakozva). Kattintson az eseményre, hogy megtudja, ki szervezte
+**csatlakozik a Meet**-hoz, hangot ad le, és rendszerértesítést küld, függetlenül attól, hogy melyik lapon van, vagy ha rejtve van.
+Minden kártyán egy jelvény látható a válaszoddal (elfogadva, esetleg, elutasítva, vár). Kattintson az eseményre, hogy megtudja, ki szervezte
 ez, a napirend, minden vendég kezdőbetűs avatarral és válaszukkal, valamint mellékletekkel, például Ikrek jegyzeteivel.
 A felső sorban a **következő ingyenes idő** legalább 15 perce látható (az elutasított meghívók és az egész napos események nem
 szám), és az egymást átfedő események **konfliktus** jelvényt kapnak a másik esemény megnevezésével. A **Ma** nézet a folyamatban lévő értekezletre (még hátralévő idő, csatlakozási gomb, összecsapásra figyelmeztetés) vagy a következőre vezet, majd **a nap egy sorban** (az értekezletek, feladatok és szabadidő a munkaidőn keresztül, az értekezletek, a szabadidő és a konfliktusok számlálásával) és egy idővonal, ahol az értekezletek, a feladatok egy időponttal és a szabad hézagok már sorakoznak a feladaton, hogy összeillessze a s ga istime.
@@ -144,15 +144,18 @@ tiszteletben tartja a díjszabást. Jelentkezzen be csak olvasható személyes t
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam a widget elhagyása nélkül
 
-Négy allap a Steam számára: **kívánságlista-ajánlatok** (a legnagyobb kedvezmény először), **legkeresettebb**, **játék most** és a
-**katalógus értékelés szerint rendezve**. A nyilvános listákhoz csak a **SteamID64**; opcionális **Steam Web API kulcs**
-hozzáadja az öt legutóbbi játékot a játékidejükkel. Az árak reálisan jönnek, minden sor megnyitja az üzlet oldalát, és
-a lap alapértelmezés szerint elindul, egy jelölőnégyzettől távolabb a Beállításokban.
+Négy allap a Steam számára: **kívánságlista-ajánlatok** (első a legnagyobb kedvezmény, mindegyik azzal, amit megtakarít), a **legkeresettebb**
+rangsorolt, **játssz most** (minden játék Steam jelentése az elmúlt két hétről) és a **katalógus értékelés szerint rendezve**, lapozva
+a **tölts be többet**, hogy elérje az üzlet többi részét. Minden sor tartalmazza a **kapszula festményt**, a **áttekintési pontszámot**
+Steam saját megfogalmazásával, és hány véleményt számít, az áthúzott árral, reálban kifejezett árral és
+kedvezményes megtakarítások — és a lista összeadja a teljes megtakarítást. A nyilvános listákhoz csak a **SteamID64**; egy opcionális
+**Steam Web API kulcs** hozzáadja a legutóbbi játékokat a játékidővel együtt. A lap alapértelmezés szerint egy jelölőnégyzettől távolabb indul
+a Beállításokban.
 
 </td>
 </tr>
@@ -180,9 +183,14 @@ leggyakrabban 3 óránként, és az opt-in 🔔 értesíti Önt, ha a
 a modell **bekerül a legjobb 10-be** vagy **felmászik azon** (6 óránként ellenőrzik, amíg a páncélszekrény nincs zárolva),
 "új" és "feljebb" jelvények egy hétig.
 
-🌙 **Ne zavarjanak:** a Beállításokban vagy a tálcán elnémíthatja a megbeszélések figyelmeztetéseit, feladatemlékeztetőit, állapotfigyelmeztetéseit és minden
+🌙 **Ne zavarjanak:** a Beállításokban vagy a tálcán, elnémíthatja a megbeszélések figyelmeztetéseit, feladatemlékeztetőit, állapotfigyelmeztetéseit és minden
 rendszerértesítés 30 percig, 1 óráig, 2 óráig, holnapig vagy amíg ki nem kapcsolja. A felső sávban egy hold látható
 amikor véget ér; egy kattintás visszakapcsolja. Túlél egy újraindítást és magától véget ér.
+
+🔔 **Minden riasztás egy képernyőn:** a fejlécben lévő csengő (számlálás és színezés, ha valami függőben van) megnyitja a
+riasztások az egész ablakban, bármilyen módban: riasztásonként egy kártya a műveletekkel, **minden elvetése** és mi volt
+ma megoldódott alattuk – nincs függőben semmi, így érheti el a mai naplót. A dokkolóból egy kattintás
+továbbra is ezt az egyetlen figyelmeztetést nyitja meg a normál ablak tetején.
 
 ⌨️ **Minden a billentyűzet segítségével:** `Alt+1`…`Alt+7` lapváltás, `N` létrehozás, `/` keresés, `F11` teljes képernyő, `Alt+L`
 zárolja és a `?` listázza a parancsikonokat. `Ctrl+Shift+P` (`Cmd+Shift+P` macOS-en) megnyit egy **parancspalettát** minden
@@ -235,11 +243,11 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Kattintson egy figyelmeztetésre a dokkban | Maximális: feladatok és értesítések, húzható elválasztóval |
+| Kattintson egy figyelmeztetésre a dokkban | Maximális: a megnyitott lap teljes ablaka |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| A csengő megnyitja a figyelmeztetéseket az egész ablakban |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: az utolsó öt lejátszott meccs, mindkét játékidővel |
+| Steam: a legkeresettebbek, számozott | Steam: az utolsó öt lejátszott meccs, mindkét játékidővel |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: a katalógus értékelés szerint, a "tölts be többet" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Egyetlen riasztási fedvény minden függőben lévő dologhoz: leállások, értekezletek, feladatok és új AI-modellek |
 |---|
@@ -390,7 +402,7 @@ megtartják, és amit soha.
 előtt és az üresjárati idő (2 percig nincs billentyűzet vagy egér). Alatta napi kód-fókusz cél a sorozatával és
 napi egy pont, három kiemelés (leghosszabb szakasz egy alkalmazásban, alkalmazásváltások, csúcsidő), egy idővonal, ahol az egész
 nap, az üresjárat megnyúlik, és a legforgalmasabb alkalmazások egy időtengelyen osztoznak a "most" jelölővel és az alkalmazások listájával
-(koppintson az egyikre a kategória módosításához) vagy azon feladatok közül, amelyeken a fókuszidőzítő fut.
+(koppintson az egyikre a kategória módosításához), vagy azon feladatok közül, amelyeken a fókuszidőzítő fut.
 - **Hét**: halmozott oszlopok naponta az átlagos vonallal és egy ponttal minden nap alatt, amely elérte a célt, óra hőtérkép
 a csúcsoddal, és ugyanazokkal a listákkal egész hétre.
 - **Elrendezés és felületek**: egy oszlop az alapértelmezett ablakban, kettő, ha széles (maximális); minden bőrnek megvan a maga
@@ -413,7 +425,7 @@ A vizsgált eszközök egyike sem fed le egyszerre kettőnél több frontot. For
 | MeetingBar | — | — | — | ✅ | — | n/a |
 | Gitify | — | — | — | — | ✅ | n/a |
 
-<sub>✅ natív · ➖ részleges, bővítményen keresztül vagy opcionális · — nincs · ? közzé nem tett · n/a nem tárol felhasználói adatokat</sub>
+<sub>✅ natív · ➖ részleges, kiterjesztéssel vagy opcionális · — nincs · ? közzé nem tett · n/a nem tárol felhasználói adatokat</sub>
 
 Amit a benchmark hozott ide: **időpont a feladat címében** (Todoist/TickTick), **riasztás elhalasztása**
 (TickTick) és **vágólap, amely tiszteletben tartja a jelszókezelőket** (CopyQ/Ditto).
@@ -444,7 +456,7 @@ adattárak: a közzététel a fenntartó kézi döntése és tevékenysége.
 
 | Réteg | Védelem |
 |---|---|
-| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, minden írásnál friss, atomi írás `fsync` |
+| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, minden írásnál friss nonce, atomi írás `fsync` |
 | Kulcs | Csak RAM, zároláskor nullázva; konfigurálható automatikus zárolás (5–60 perc üresjárat, alapértelmezés szerint 15 perc) |
 | Hálózat | csak a Rust folyamat beszél a hálózattal; a webnézetnek nincs távoli eredete (CSP), és soha nem lát tokeneket |
 | Google | opcionális, csak `calendar.events.readonly`, `directory.readonly` (Munkaterületi kollégák fényképei a vendéglistában) plusz profil, OAuth PKCE és loopback |
@@ -490,4 +502,4 @@ kap egy SemVer címkét, generált kiadási megjegyzéseket és párhuzamosan é
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Készült: 🦀 Rust, ⚛️ React és ☕ azok számára, akik a találkozások között élnek.</sub></div>
+<div align="center"><sub>Készült: 🦀 Rust, ⚛️ React és ☕ azoknak, akik találkozások között élnek.</sub></div>

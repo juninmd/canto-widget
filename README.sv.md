@@ -94,7 +94,7 @@ Dagens händelser kommer från Google Kalender (skrivskyddad). En minut innan ho
 Varje kort visar ett märke med ditt svar (accepterat, kanske, avslagit, väntar). Klicka på evenemanget för att se vem som organiserade
 det, agendan, varje gäst med en initialavatar och deras svar, och bilagor, som Tvillingarnas anteckningar.
 Den översta raden talar om för dig **nästa gratis slot** på minst 15 minuter (avvisade inbjudningar och heldagsevenemang gör det inte
-räknas), och händelser som överlappar får ett **konflikt**-märke som namnger den andra händelsen. Vyn **Idag** leder med mötet som pågår (tid kvar, gå med-knapp, kollisionsvarning) eller nästa, sedan **dagen på en rad** (möten, uppgifter och ledig tid över hela arbetstiden, med mötestid, ledig tid och konflikter räknade) och en tidslinje där möten, uppgifter med en tid och de fria luckorna är rader för sig själva: vad som redan finns för att få plats, en uppgift som redan finns kvar.
+räknas), och händelser som överlappar får ett **konflikt**-märke som namnger den andra händelsen. Vyn **Idag** leder med mötet som pågår (tid kvar, gå med-knapp, kollisionsvarning) eller nästa, sedan **dagen på en rad** (möten, uppgifter och ledig tid över hela arbetstiden, med mötestid, ledig tid och konflikter räknade) och en tidslinje där möten, uppgifter med en tid och de fria luckorna är rader för sig själva: vad som redan finns kvar för att få plats, en uppgift som redan finns kvar.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -105,7 +105,7 @@ räknas), och händelser som överlappar får ett **konflikt**-märke som namnge
 
 ### 🗒️ Anteckningar som kort
 
-Sökbara kort med `#tags`, nål upptill och ett-klick-taggfilter; varje kort visar början på noten **återgiven** (titlar, checklistor, kod, länkar), inte råmarkering. En **WYSIWYG-redigerare** med en kompakt
+Sökbara kort med `#tags`, nåla till toppen och ett-klick-taggfilter; varje kort visar början på noten **återgiven** (titlar, checklistor, kod, länkar), inte råmarkering. En **WYSIWYG-redigerare** med en kompakt
 formateringsstapel (fet, kursiv, kod, rubrik, listor, checklistor du markerar direkt i texten, kodblock med syntax
 markering, länkar, bilder) och markdown-genvägar medan du skriver (`# `, `- `, `[ ] `, ` ``` `); en **MD**-växling
 visar den råa markdown, som fortfarande är hur anteckningar lagras, söks, synkroniseras och exporteras. Länkar öppnas med
@@ -137,22 +137,25 @@ känslig.
 **Recension begärd från mig**, tilldelad till mig, PRs och frågor jag öppnade, med en PR eller ärendeikon och vem som öppnade
 det. Utkast, PRs **väntar på din recension** och PRs **stoppad** i en vecka sticker ut, och varje PR har en liten
 **CI-märke** (godkänd, misslyckad, igång eller ingen CI) från sina huvudbevakningskontroller. När någon **begär din
-recension**, säger ett OS-meddelande till dig (på som standard, stäng av det i Inställningar). Filtrera efter text, `repo:` eller `label:`, PRs endast eller endast problem, sortera efter uppdatering, skapande eller kommentarer, och
+recension**, berättar en OS-avisering (på som standard, stäng av den i Inställningar). Filtrera efter text, `repo:` eller `label:`, PRs endast eller endast problem, sortera efter uppdatering, skapande eller kommentarer, och
 scrolla med **visa mer**. Växla till vyn **Kommentarer** för att se en **Kommentarkatalog**-rutnät med alla som kommenterat din PRs (avatarer, mänskliga vs bot-märken, antal kommentarer, sökning, botfilter, progressiv paginering) och deras kommentarer. Stöder även **GitLab.com och självvärd GitLab**, med en 5-minuters cache som
 respekterar taxegränsen. Logga in med en skrivskyddad personlig token eller från webbläsaren (enhetsflöde).
 
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam utan att lämna widgeten
 
-Fyra underflikar för Steam: **önskeerbjudanden** (största rabatten först), **bästsäljare**, **spela nu** och
-**katalogen sorterad efter betyg**. De offentliga listorna behöver bara din **SteamID64**; en valfri **Steam webbnyckel API**
-lägger till de fem senaste spelen med deras speltider. Priserna kommer i reais, varje rad öppnar butikssidan, och
-fliken startar som standard, en kryssruta bort i Inställningar.
+Fyra underflikar för Steam: **önskeerbjudanden** (största rabatten först, var och en med vad den sparar), **bästsäljarna**
+rankad, **spela nu** (varje spel Steam rapporterar de senaste två veckorna) och **katalogen sorterad efter betyg**, sökt
+med **ladda mer** så den når resten av butiken. Varje rad har **kapselkonsten**, **recensionspoängen**
+med Steams egen formulering och hur många recensioner det räknas, det överstrukna priset, priset i reais och vad
+rabattbesparingar - och listan summerar det totala sparandet. De offentliga listorna behöver bara din **SteamID64**; en valfri
+**Steam Web API nyckel** lägger till de senaste spelen med deras speltider. Fliken startar som standard, en kryssruta bort
+i Inställningar.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ modell **går in i topp 10** eller **klättrar inom den** (kontrolleras var 6:e 
 🌙 **Stör ej:** i Inställningar eller facket, tysta mötesvarningar, uppgiftspåminnelser, statusvarningar och varje
 systemavisering i 30 min, 1 h, 2 h, tills imorgon eller tills du stänger av den. En måne i den översta fältet visar
 när det tar slut; ett klick stänger av den igen. Den överlever en omstart och slutar av sig själv.
+
+🔔 **Varje varning på en skärm:** klockan i rubriken (räkning och färg när något väntar) öppnar
+varningar över hela fönstret i valfritt läge: ett kort per varning med dess åtgärder, **avvisa alla** och vad som var
+löst i dag under dem — utan att något väntar, det är hur du fortfarande når dagens logg. Från kajen, ett klick
+öppnar fortfarande den enda varningen ovanpå det vanliga fönstret.
 
 ⌨️ **Allt med tangentbord:** `Alt+1`...`Alt+7` byter flikar, `N` skapar, `/` söker, `F11` helskärm, `Alt+L`
 låser och `?` listar genvägarna. `Ctrl+Shift+P` (`Cmd+Shift+P` på macOS) öppnar en **kommandopalett** med varje
@@ -235,11 +243,11 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klicka på en varning i dockan | Maximerad: uppgifter och meddelanden, med en dragbar avdelare |
+| Klicka på en varning i dockan | Maximerad: hela fönstret för den öppna fliken |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Klockan öppnar varningarna över hela fönstret |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: de senaste fem spelade matcherna, med båda speltiderna |
+| Steam: toppsäljarna, numrerade | Steam: de senaste fem spelade matcherna, med båda speltiderna |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: katalogen efter betyg, med "ladda in mer" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | En varningsöverlagring för allt som väntar: avbrott, möten, uppgifter och nya AI-modeller |
 |---|
@@ -433,7 +445,7 @@ Ladda ner installationsprogrammet för din plattform från **[Releases](https://
 3. Klart. När en ny version skickas meddelar Canto dig och **Inställningar → Uppdateringar** uppdateras med ett klick.
 
 > [!OBS]
-> Installationsprogrammen är inte kodsignerade än: SmartScreen (Windows) och Gatekeeper (macOS) varnar vid första lanseringen.
+> Installationsprogrammen är inte kodsignerade ännu: SmartScreen (Windows) och Gatekeeper (macOS) varnar vid första lanseringen.
 > Automatiska uppdateringar verifieras mot projektets egen signatur innan de körs.
 
 Färdiga manifest för winget och Homebrew (plus ett skelett för Flatpak, för närvarande blockerad) bor i
@@ -444,7 +456,7 @@ arkiv: publicering är ett manuellt beslut och åtgärd av underhållaren.
 
 | Lager | Skydd |
 |---|---|
-| Valv | Argon2id (19 MiB, t=2) → AES-256-GCM, en ny nonce på varje skriv, atomär skrivning med `fsync` |
+| Valv | Argon2id (19 MiB, t=2) → AES-256-GCM, en ny nonce på varje skrivning, atomic skrivning med `fsync` |
 | Nyckel | Endast RAM, nollställt vid lås; konfigurerbart autolås (5 till 60 min tomgång, 15 min som standard) |
 | Nätverk | endast Rust-processen pratar med nätverket; webbvyn har inget fjärrursprung (CSP) och ser aldrig tokens |
 | Google | valfritt, endast `calendar.events.readonly`, `directory.readonly` (Arbetsplatskollegornas foton i gästlistan) plus profil, OAuth med PKCE och loopback |

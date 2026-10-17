@@ -72,5 +72,19 @@
   "steam.recent.total": "कुल मिलाकर {time}",
   "steam.row.open": "{name} को Steam पर खोलें",
   "steam.row.discount": "{n}% छूट",
-  "steam.row.review": "{n}% समीक्षाएँ सकारात्मक हैं"
+  "steam.row.review": "{n}% समीक्षाएँ सकारात्मक हैं",
+  "steam.row.reviews": "{n} समीक्षाएँ",
+  "steam.row.reviewOne": "{n} समीक्षा",
+  "steam.row.saved": "{value} सहेजें",
+  "steam.totalSaved": "{value} कुल मिलाकर सहेजा गया",
+  "steam.review.overwhelmingly_positive": "अत्यधिक सकारात्मक",
+  "steam.review.very_positive": "बहुत सकारात्मक",
+  "steam.review.positive": "सकारात्मक",
+  "steam.review.negative": "नकारात्मक",
+  "steam.review.very_negative": "बहुत नकारात्मक",
+  "steam.review.overwhelmingly_negative": "अत्यधिक नकारात्मक",
+  "steam.loadMore": "अधिक गेम लोड करें",
+  "steam.review.mostly_positive": "अधिकतर सकारात्मक",
+  "steam.review.mixed": "मिश्रित",
+  "steam.review.mostly_negative": "अधिकतर नकारात्मक"
 }

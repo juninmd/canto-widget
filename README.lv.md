@@ -49,7 +49,7 @@ un aizmugursistēmas kļūdas paliek portugāļu valodā. Uzdevuma nosaukuma sin
 Ja dzīvojat starp sapulcēm, PRs un maziem neapstiprinātiem vienumiem, tiks atvērtas piecas lietotnes. Canto ievieto visu
 viena vieta.
 
-🔒 **Šifrēts pēc noklusējuma.** Argon2id + AES-256-GCM ar galveno paroli; atslēga vienmēr pastāv tikai RAM.
+🔒 **Pēc noklusējuma šifrēts.** Argon2id + AES-256-GCM ar galveno paroli; atslēga vienmēr pastāv tikai RAM.
 Windows Hello nav obligāta.
 
 🏠 **Jūsu dati paliek pie jums.** Nulle telemetrijas, nulles servera, nav nepieciešams konts. Dublējums ir viens šifrēts
@@ -58,7 +58,7 @@ Windows Hello nav obligāta.
 ⏰ **Jūs to nepalaidīsit garām.** 1 minūti pirms sapulces un atgādinājuma laikā logrīks tiek parādīts, atskaņo skaņu un
 nosūta paziņojumu ar **atlikt 10 min**.
 
-🪶 **Light.** Tauri v2 (Rust + sistēmas tīmekļa skats), nevis Electron: 3,5 MB instalēšanas programma.
+🪶 **Light.** Tauri v2 (Rust + sistēmas tīmekļa skats) Electron vietā: 3,5 MB instalēšanas programma.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **Vienmēr atjaunināts.** Atjaunina no lietotnes un instalē tikai to, kas ir parakstīts ar paša projekta atslēgu.
@@ -144,15 +144,18 @@ ievēro likmes ierobežojumu. Pierakstieties, izmantojot tikai lasāmu personīg
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam, neizejot no logrīka
 
-Četras Steam apakšcilnes: **vēlmju saraksta piedāvājumi** (vispirms lielākā atlaide), **pārdotākie**, **spēlēt tūlīt** un
-**katalogs sakārtots pēc reitinga**. Publiskajiem sarakstiem nepieciešama tikai jūsu **SteamID64**; izvēles **Steam Web API atslēga**
-pievieno piecas jaunākās spēles ar to spēles laiku. Cenas ir reālas, katra rinda atver veikala lapu, un
-cilne sākas pēc noklusējuma, vienas izvēles rūtiņas attālumā sadaļā Iestatījumi.
+Četras Steam apakšcilnes: **vēlmju saraksta piedāvājumi** (vispirms lielākā atlaide, katra ar ietaupījumu), **pārdevēji**
+ranžēts, **spēlē tagad** (katras spēles Steam ziņo par pēdējām divām nedēļām) un **katalogs sakārtots pēc vērtējuma**, lappuse
+ar **ielādēt vairāk**, lai tas sasniegtu pārējo veikalu. Katrā rindā ir **kapsulas noformējums**, **pārskata rezultāts**
+ar paša Steam formulējumu un to atsauksmju skaitu, izsvītroto cenu, cenu reālos un
+atlaides ietaupījumi — un saraksts saskaita kopējo ietaupījumu. Publiskajiem sarakstiem nepieciešama tikai jūsu **SteamID64**; neobligāts
+**Steam Web API taustiņš** pievieno jaunākās spēles ar to atskaņošanas laiku. Cilne sākas pēc noklusējuma, vienas izvēles rūtiņas attālumā
+sadaļā Iestatījumi.
 
 </td>
 </tr>
@@ -183,6 +186,11 @@ nozīmītes "jaunas" un "uz augšu" uz nedēļu.
 🌙 **Netraucēt:** sadaļā Iestatījumi vai paplātē apklusiniet sapulces brīdinājumus, uzdevumu atgādinājumus, statusa brīdinājumus un citus
 sistēmas paziņojums 30 min, 1 h, 2 h, līdz rītdienai vai līdz brīdim, kad to izslēgsiet. Parādās mēness augšējā joslā
 kad tas beidzas; viens klikšķis to atkal izslēdz. Tas pārdzīvo restartēšanu un beidzas pats no sevis.
+
+🔔 **Katrs brīdinājums vienā ekrānā:** zvans galvenē (skaitiet un krāsojiet, ja kaut kas gaida), atver
+brīdinājumi visā logā jebkurā režīmā: viena kartīte katram brīdinājumam ar tā darbībām, **noraidīt visu** un to, kas bija
+šodien tika atrisināts saskaņā ar tiem — nekas nav gaidīts, tādējādi jūs joprojām sasniedzat šodienas žurnālu. No doka — klikšķis
+joprojām atver šo vienu brīdinājumu parastā loga augšpusē.
 
 ⌨️ **Viss, izmantojot tastatūru:** `Alt+1`…`Alt+7` pārslēgt cilnes, `N` veido, `/` meklē, `F11` pilnekrāna režīmu, `Alt+L`
 bloķē un `?` uzskaita īsceļus. `Ctrl+Shift+P` (`Cmd+Shift+P` operētājsistēmā macOS) atver **komandu paleti** ar katru
@@ -235,11 +243,11 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Noklikšķiniet uz brīdinājuma dokā | Maksimāli palielināts: uzdevumi un paziņojumi, ar velkamu sadalītāju |
+| Noklikšķiniet uz brīdinājuma dokā | Maksimizēts: viss atvērtās cilnes logs |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Zvans atver brīdinājumus visā logā |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,11 +343,15 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: pēdējās piecas aizvadītās spēles ar abiem spēles laikiem |
-|---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| Steam: visvairāk pārdotie, numurēti | Steam: pēdējās piecas aizvadītās spēles ar abiem spēles laikiem |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
-| Viens brīdinājuma pārklājums visam neapstiprinātajam: pārtraukumiem, sanāksmēm, uzdevumiem un jauniem AI modeļiem |
+| Steam: katalogs pēc vērtējuma ar "ielādēt vairāk" |
+|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+
+| Viens brīdinājuma pārklājums visam gaidāmajam: pārtraukumiem, sanāksmēm, uzdevumiem un jauniem AI modeļiem |
 |---|
 | ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
 
@@ -381,19 +393,19 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|---|---|
 | ![Activity tab on the week view: stacked columns per day with the average line and a dot under each day that met the goal, then the hour heat map](docs/prints/app/69-atividade-semana.png) | ![Activity tab turned off: what is kept and what never is, then the button to turn tracking on](docs/prints/app/70-atividade-desligada.png) | ![Activity tab on a wide window: summary and goal on the left, timeline and lists on the right](docs/prints/app/71-atividade-janela-larga.png) |
 
-Cilne **Darbības** tiek paslēpta (ieslēdziet to sadaļā Iestatījumi → redzamās cilnes). Tas ieraksta tikai nosaukumu
+Cilne **Aktivitāte** tiek paslēpta (ieslēdziet to sadaļā Iestatījumi → redzamās cilnes). Tas ieraksta tikai nosaukumu
 fokusēta lietojumprogramma, kamēr izmantojat datoru, slēgtā lokālā failā, kas nekad nesasniedz dublējumu vai sinhronizāciju (Wayland
 nevar ziņot par fokusēto logu, tāpēc tas tur nav pieejams). Izslēgts, līdz izvēlaties, un pirmajā ekrānā tiek parādīts, kas
 tiek paturēts un kas nekad netiek.
 
 - **Diena**: virtulis pēc kategorijas ar kopējo iekšpusi, kura leģenda slēpj kategoriju, izmaiņas dienā
-pirms un dīkstāves laiks (2 minūtes bez tastatūras vai peles). Zem tā ikdienas koda fokusa mērķis ar savu sēriju un
+pirms un dīkstāves laiks (2 minūtes bez tastatūras vai peles). Zem tā ikdienas koda fokusa mērķis ar tā sēriju un
 viens punkts dienā, trīs svarīgākie momenti (garākais posms vienā lietotnē, lietotņu slēdži, maksimālā stunda), laika skala, kurā viss
 dienā, dīkstāve ilgst, un noslogotākajām lietotnēm ir viena laika ass ar marķieri "tagad" un lietojumprogrammu sarakstu
 (pieskarieties vienam, lai mainītu tā kategoriju) vai uzdevumiem, kurus darbojās fokusa taimeris.
 - **Nedēļa**: sakrautas kolonnas dienā ar vidējo līniju un punktu zem katras dienas, kas sasniedza mērķi, stundu siltuma karte
 ar savu maksimumu, un tie paši saraksti visai nedēļai.
-- **Izkārtojums un apvalki**: viena kolonna noklusējuma logā, divas, ja tas ir plats (maksimāls); katrai ādai ir savs
+- **Izkārtojums un apvalki**: viena kolonna noklusējuma logā, divas, ja tas ir plats (maksimizēts); katrai ādai ir savs
 kategorijas krāsas, pārbaudīts kontrasts. Izvēlne blakus dienai to kopē kā tekstu.
 
 <sub>Visos ekrānuzņēmumos tiek izmantoti fiktīvi dati.</sub>
@@ -444,9 +456,9 @@ repozitoriji: publicēšana ir uzturētāja manuāls lēmums un darbība.
 
 | Slānis | Aizsardzība |
 |---|---|
-| Velve | Argon2id (19 MiB, t=2) → AES-256-GCM, jauns raksts katrā rakstīšanas reizē, atomu rakstīšana ar `fsync` |
+| Velve | Argon2id (19 MiB, t=2) → AES-256-GCM, jauns ieraksts katrā rakstīšanas reizē, atomu rakstīšana ar `fsync` |
 | Atslēga | Tikai operatīvā atmiņa, bloķēta nulle; konfigurējama automātiskā bloķēšana (5 līdz 60 min dīkstāve, 15 min pēc noklusējuma) |
-| Tīkls | tikai Rust process runā ar tīklu; tīmekļa skatam nav attālās izcelsmes (CSP), un tas nekad neredz marķierus |
+| Tīkls | tikai process Rust sazinās ar tīklu; tīmekļa skatam nav attālās izcelsmes (CSP), un tas nekad neredz marķierus |
 | Google | pēc izvēles, tikai `calendar.events.readonly`, `directory.readonly` (Darbvietas kolēģu fotogrāfijas viesu sarakstā) plus profils, OAuth ar PKCE un cilpu |
 | GitHub | neobligāts, šifrēts marķieris; vienumi tiek atvērti tikai tad, ja saite ir `https://github.com/` |
 | GitLab | izvēles, šifrēta adrese un marķieris; Tikai `https://`, bez novirzīšanas, saites tikai no konfigurētās instances |
@@ -483,11 +495,11 @@ bun run tauri build                                      # installer for the cur
 Tīmekļa skati tiek izveidoti pēc Rust stāvokļa, un tekne ir inicializēta, tāpēc startēšanas IPC izsaukumi nevar veikt iestatīšanu.
 
 Katrs PR palaiž CI operētājsistēmās Windows, macOS un Linux. Parastās `fix`, `feat` un laužošās saistības ir apvienotas `main`
-iegūstiet SemVer tagu, ģenerētas izlaiduma piezīmes un parakstītus instalētājus, kas izveidoti paralēli; laidiens tiek publicēts pēc verifikācijas (sīkāka informācija
+iegūstiet SemVer tagu, ģenerētas izlaiduma piezīmes un parakstītus instalētājus, kas izveidoti paralēli; laidiens tiek publicēts pēc pārbaudes (sīkāka informācija ir
 [CONTRIBUTING.md](CONTRIBUTING.md#publicar-uma-versão)).
 
 ## 📄 Licence
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Izgatavots ar 🦀 Rust, ⚛️ React un ☕ tiem, kas dzīvo starp tikšanās reizēm.</sub></div>
+<div align="center"><sub>Izgatavots ar 🦀 Rust, ⚛️ React un ☕ tiem, kas dzīvo starp sapulcēm.</sub></div>

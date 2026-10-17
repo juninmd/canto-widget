@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} yhteensä",
   "steam.row.open": "avaa {name} Steam",
   "steam.row.discount": "{n}% alennus",
-  "steam.row.review": "{n}% arvosteluista on myönteisiä"
+  "steam.row.review": "{n}% arvosteluista on myönteisiä",
+  "steam.row.reviews": "{n} arvostelua",
+  "steam.row.reviewOne": "{n} arvostelu",
+  "steam.row.saved": "tallenna {value}",
+  "steam.totalSaved": "{value} tallennettu yhteensä",
+  "steam.review.overwhelmingly_positive": "Ylivoimaisen positiivista",
+  "steam.review.very_positive": "Erittäin positiivinen",
+  "steam.review.positive": "Positiivinen",
+  "steam.review.negative": "Negatiivinen",
+  "steam.review.very_negative": "Erittäin negatiivinen",
+  "steam.review.overwhelmingly_negative": "Ylivoimaisesti negatiivinen",
+  "steam.loadMore": "lataa lisää pelejä",
+  "steam.review.mostly_positive": "Pääosin positiivista",
+  "steam.review.mixed": "Sekoitettu",
+  "steam.review.mostly_negative": "Enimmäkseen negatiivista"
 }

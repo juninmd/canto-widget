@@ -17,12 +17,15 @@ pub const LANGUAGE: &str = "portuguese";
 /// How many rows each list shows: one widget pane, not a storefront.
 pub const DEALS: usize = 12;
 pub const TRENDING: usize = 25;
-pub const CATALOG: usize = 25;
-pub const RECENT: usize = 5;
+/// The store answers 50 rows per search page, and `start` only moves in 50s.
+pub const CATALOG_PAGE: usize = 50;
+/// Everything Steam reports for the last two weeks, within a bound the pane can scroll.
+pub const RECENT: usize = 30;
 /// Fresh enough to skip the network; the "atualizar" button bypasses it.
 pub const TTL_MS: i64 = 5 * 60_000;
-/// The catalog keys on free text, so the cache is capped like the forge's; the oldest entry goes.
-const MAX_ENTRIES: usize = 32;
+/// The catalog keys on free text and every capsule is an entry, so the cache is capped; the oldest
+/// entry goes. Big enough for a list plus the covers it is showing.
+const MAX_ENTRIES: usize = 64;
 
 /// Deliberately not `Debug`: it holds the Web API key.
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -76,7 +79,14 @@ pub struct SteamRow {
     pub discount: u32,
     /// Positive reviews, 0..=100; `None` for a game Steam has no review summary for.
     pub review: Option<u8>,
-    pub review_label: String,
+    /// Steam's own bucket, as a token the interface translates ("very_positive"); empty when unknown.
+    pub review_key: String,
+    /// How many reviews the percentage is drawn from; 0 when Steam didn't say.
+    pub review_count: u32,
+    /// What the discount takes off, in cents; 0 when there is none.
+    pub saved_cents: u32,
+    /// Capsule image on Steam's CDN. The UI asks `steam_image` for it per row, so the list stays light.
+    pub art: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -92,6 +102,8 @@ pub struct RecentGame {
     pub name: String,
     pub recent_min: u32,
     pub total_min: u32,
+    /// Capsule on Steam's CDN; the row asks `steam_image` for it.
+    pub art: String,
 }
 
 /// `has_key` is false when no Web API key was pasted: only this list needs one, so the UI explains

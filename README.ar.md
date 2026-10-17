@@ -58,7 +58,7 @@ Windows Hello اختياري.
 ⏰ **لن تفوتك.** قبل دقيقة واحدة من الاجتماع وفي وقت التذكير، تنبثق الأداة، وتقوم بتشغيل صوت و
 يرسل إشعارًا يتضمن **غفوة لمدة 10 دقائق**.
 
-🪶 **Light.** Tauri v2 (Rust + عرض ويب النظام) بدلاً من Electron: أداة تثبيت بحجم 3.5 ميجابايت.
+🪶 **Light.** Tauri v2 (Rust + عرض ويب النظام) بدلاً من Electron: أداة تثبيت بحجم 3.5 ميغابايت.
 [Measured numbers](docs/benchmark.md#footprint-medido).
 
 🔄 **محدث دائمًا.** التحديثات من داخل التطبيق وتثبيت فقط ما تم توقيعه بواسطة مفتاح المشروع الخاص.
@@ -94,7 +94,7 @@ Windows Hello اختياري.
 تعرض كل بطاقة شارة بإجابتك (مقبولة، ربما، مرفوضة، في انتظار). انقر فوق الحدث لمعرفة من قام بتنظيمه
 ذلك، وجدول الأعمال، وكل ضيف مع الصورة الرمزية للأحرف الأولى وإجابته، والمرفقات، مثل ملاحظات الجوزاء.
 يخبرك السطر العلوي بـ **الفتحة المجانية التالية** التي لا تقل عن 15 دقيقة (لا يتم الإبلاغ عن الدعوات المرفوضة والأحداث التي تستمر طوال اليوم)
-العد)، والأحداث المتداخلة تحصل على شارة **تعارض** تسمي الحدث الآخر. يؤدي عرض **اليوم** إلى بدء الاجتماع (الوقت المتبقي، زر الانضمام، تحذير الصدام) أو العرض التالي، ثم **اليوم في سطر واحد** (الاجتماعات والمهام ووقت الفراغ عبر ساعات العمل، مع حساب وقت الاجتماع ووقت الفراغ والتعارضات) ومخطط زمني واحد حيث تكون الاجتماعات والمهام ذات الوقت والفجوات الحرة عبارة عن صفوف خاصة بها: تعرض الفجوة لتناسب مهمة غير محددة بوقت، وما تم تجاوزه بالفعل.
+العد)، والأحداث المتداخلة تحصل على شارة **تعارض** تسمي الحدث الآخر. يؤدي عرض **اليوم** إلى بدء الاجتماع (الوقت المتبقي، زر الانضمام، تحذير الصدام) أو العرض التالي، ثم **اليوم في سطر واحد** (الاجتماعات والمهام ووقت الفراغ عبر ساعات العمل، مع احتساب وقت الاجتماع ووقت الفراغ والتعارضات) ومخطط زمني واحد حيث تكون الاجتماعات والمهام ذات الوقت والفجوات الحرة عبارة عن صفوف خاصة بها: تعرض الفجوة لتناسب مهمة غير محددة بوقت، وما تم تجاوزه بالفعل.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -144,15 +144,18 @@ Windows Hello اختياري.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam دون مغادرة القطعة
 
-أربع علامات تبويب فرعية لـ Steam: **صفقات قائمة الرغبات** (الخصم الأكبر أولاً)، **الأكثر مبيعًا**، **العب الآن** و
-**الكتالوج مرتبة حسب التصنيف**. القوائم العامة تحتاج فقط إلى **SteamID64**; مفتاح **Steam ويب API اختياري**
-يضيف أحدث خمس ألعاب مع أوقات اللعب الخاصة بهم. الأسعار تأتي بالريال، كل صف يفتح صفحة المتجر، و
-تبدأ علامة التبويب بشكل افتراضي، على بعد مربع اختيار واحد في الإعدادات.
+أربع علامات تبويب فرعية لـ Steam: **صفقات قائمة الرغبات** (الخصم الأكبر أولاً، كل منها بما توفره)، **الأكثر مبيعًا**
+مرتبة، **العب الآن** (كل لعبة Steam تقدم تقريرًا خلال الأسبوعين الماضيين) و **الكتالوج مرتب حسب التصنيف**، مقسم إلى صفحات
+مع **تحميل المزيد** حتى يصل إلى بقية المتجر. يحتوي كل صف على **صورة الكبسولة** و**نتيجة المراجعة**
+مع صياغة Steam الخاصة وعدد المراجعات التي يتم احتسابها، والسعر المشطوب، والسعر بالريال وما هو
+يحفظ الخصم - وتضيف القائمة إجمالي التوفير. القوائم العامة تحتاج فقط إلى **SteamID64**; اختياري
+يضيف مفتاح **Steam الويب API** أحدث الألعاب وأوقات اللعب الخاصة بها. تبدأ علامة التبويب بشكل افتراضي، على بعد خانة اختيار واحدة
+في الإعدادات.
 
 </td>
 </tr>
@@ -163,7 +166,7 @@ Windows Hello اختياري.
 
 تغيير كلمة المرور الرئيسية، Windows Hello، `.canto` النسخ الاحتياطي، مجلد متزامن مع الدمج التلقائي (Dropbox،
 OneDrive، Syncthing...)، ابدأ بالنظام وقسم **التحديثات**، مع **الإصدار المثبت** و
-**أحدث ما تم نشره** جنبًا إلى جنب وزر للتحديث وإعادة التشغيل.
+**أحدث المنشورات** جنبًا إلى جنب وزر للتحديث وإعادة التشغيل.
 
 </td>
 <td><img src="docs/prints/app/18-atualizacoes.png" alt="Settings showing installed version, latest published version and the update button"></td>
@@ -184,9 +187,14 @@ OneDrive، Syncthing...)، ابدأ بالنظام وقسم **التحديثات
 إشعار النظام لمدة 30 دقيقة، ساعة واحدة، ساعتين، حتى الغد أو حتى تقوم بإيقاف تشغيله. يظهر القمر في الشريط العلوي
 عندما ينتهي؛ نقرة واحدة تؤدي إلى إيقاف تشغيله. إنه ينجو من إعادة التشغيل وينتهي من تلقاء نفسه.
 
+🔔 **كل تنبيه في شاشة واحدة:** يفتح الجرس الموجود في الرأس (العد واللون عند وجود أي شيء معلق)
+تنبيهات على النافذة بأكملها في أي وضع: بطاقة واحدة لكل تنبيه مع إجراءاته، **تجاهل الكل**، وما كان
+تم حلها اليوم بموجبها - مع عدم وجود أي شيء معلق، فهذه هي الطريقة التي لا تزال تصل بها إلى سجل اليوم. من قفص الاتهام، نقرة واحدة
+لا يزال يفتح هذا التنبيه الفردي أعلى النافذة العادية.
+
 ⌨️ **كل شيء عن طريق لوحة المفاتيح:** `Alt+1`...`Alt+7` تبديل علامات التبويب، `N` إنشاء، `/` عمليات بحث، `F11` ملء الشاشة، `Alt+L`
 الأقفال و`?` يسرد الاختصارات. `Ctrl+Shift+P` (`Cmd+Shift+P` على نظام التشغيل macOS) يفتح **لوحة الأوامر** مع كل
-الإجراء بالاسم: انتقل إلى علامة تبويب، أو مهمة أو ملاحظة جديدة، وانضم إلى الاجتماع التالي، وانسخ ملخص اليوم، وقم بتبديل المظهر، والقفل.
+الإجراء بالاسم: انتقل إلى علامة تبويب أو مهمة أو ملاحظة جديدة، وانضم إلى الاجتماع التالي، وانسخ ملخص اليوم، وقم بتبديل المظهر، والقفل.
 
 ## 🎨 ستة جلود
 
@@ -235,11 +243,11 @@ OneDrive، Syncthing...)، ابدأ بالنظام وقسم **التحديثات
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| انقر فوق تنبيه في قفص الاتهام | الحد الأقصى: المهام والإشعارات، مع مقسم قابل للسحب |
+| انقر فوق تنبيه في قفص الاتهام | مكبر: النافذة بأكملها لعلامة التبويب المفتوحة |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| الجرس يفتح التنبيهات على كامل النافذة |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ OneDrive، Syncthing...)، ابدأ بالنظام وقسم **التحديثات
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: آخر خمس مباريات تم لعبها، مع كلا وقتي اللعب |
+| Steam: الأكثر مبيعًا، مرقمة | Steam: آخر خمس مباريات تم لعبها، مع كلا وقتي اللعب |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: الكتالوج حسب التصنيف، مع "تحميل المزيد" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | تراكب تنبيه واحد لكل شيء معلق: الانقطاعات والاجتماعات والمهام ونماذج الذكاء الاصطناعي الجديدة |
 |---|
@@ -444,7 +456,7 @@ OneDrive، Syncthing...)، ابدأ بالنظام وقسم **التحديثات
 
 | طبقة | الحماية |
 |---|---|
-| قبو | Argon2id (19 MiB, t=2) → AES-256-GCM، رقم نونس جديد عند كل كتابة، كتابة ذرية باستخدام `fsync` |
+| قبو | Argon2id (19 MiB, t=2) → AES-256-GCM، نونس جديد في كل كتابة، كتابة ذرية باستخدام `fsync` |
 | مفتاح | ذاكرة الوصول العشوائي (RAM) فقط، مثبتة على القفل؛ قفل تلقائي قابل للتكوين (من 5 إلى 60 دقيقة في وضع الخمول، و15 دقيقة بشكل افتراضي) |
 | الشبكة | فقط عملية Rust تتحدث إلى الشبكة؛ لا يحتوي عرض الويب على أصل بعيد (CSP) ولا يرى الرموز المميزة |
 | Google | اختياري، فقط `calendar.events.readonly`، `directory.readonly` (صور زملاء العمل في قائمة الضيوف) بالإضافة إلى الملف الشخصي، OAuth مع PKCE والاسترجاع |

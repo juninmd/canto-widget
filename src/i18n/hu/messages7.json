@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} összesen",
   "steam.row.open": "{name} megnyitása Steam",
   "steam.row.discount": "{n}% kedvezmény",
-  "steam.row.review": "A vélemények {n}%-a pozitív"
+  "steam.row.review": "A vélemények {n}%-a pozitív",
+  "steam.row.reviews": "{n} vélemény",
+  "steam.row.reviewOne": "{n} vélemény",
+  "steam.row.saved": "mentés {value}",
+  "steam.totalSaved": "{value} összesen mentve",
+  "steam.review.overwhelmingly_positive": "Elsöprően pozitív",
+  "steam.review.very_positive": "Nagyon pozitív",
+  "steam.review.positive": "Pozitív",
+  "steam.review.negative": "Negatív",
+  "steam.review.very_negative": "Nagyon negatív",
+  "steam.review.overwhelmingly_negative": "Elsöprően negatív",
+  "steam.loadMore": "tölts be több játékot",
+  "steam.review.mostly_positive": "Többnyire pozitív",
+  "steam.review.mixed": "Vegyes",
+  "steam.review.mostly_negative": "Többnyire negatív"
 }

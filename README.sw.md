@@ -33,7 +33,7 @@ Kiarabu, Kiebrania na Kiajemi hutumia maandishi kutoka kulia kwenda kushoto. Kat
 
 Katalogi mpya 40 za kiolesura na tafsiri 31 mpya za README ni tafsiri za mashine na hazijafanywa
 kukaguliwa na wazungumzaji asilia. Kireno na Kiingereza zinasalia kuwa katalogi za kiolesura asili. Maandiko ya tray na
-vichwa vya arifa hufuata lugha iliyochaguliwa; baadhi ya maelezo ya arifa ya muunganisho yanarudi kwa Kiingereza,
+vichwa vya arifa hufuata lugha iliyochaguliwa; baadhi ya maelezo ya tahadhari ya muunganisho yanarudi kwa Kiingereza,
 na makosa ya nyuma yanasalia kwa Kireno. Sintaksia ya kichwa cha kazi huweka maneno msingi ya Kireno na Kiingereza yaliyopo.
 
 ![Searchable language picker](docs/prints/languages-picker.png)
@@ -49,7 +49,7 @@ na makosa ya nyuma yanasalia kwa Kireno. Sintaksia ya kichwa cha kazi huweka man
 Ikiwa unaishi kati ya mikutano, PRs na vipengee vidogo vinavyosubiri, utaishia na programu tano zimefunguliwa. Canto inaweka yote ndani
 sehemu moja.
 
-🔒 **Imesimbwa kwa chaguo-msingi.** Argon2id + AES-256-GCM yenye nenosiri kuu; ufunguo huwapo tu kwenye RAM.
+🔒 **Imesimbwa kwa chaguomsingi.** Argon2id + AES-256-GCM yenye nenosiri kuu; ufunguo huwapo tu kwenye RAM.
 Windows Hello hiari.
 
 🏠 **Data yako itasalia nawe.** Telemetry sifuri, seva sifuri, hakuna akaunti inayohitajika. Hifadhi rudufu ni moja iliyosimbwa
@@ -91,9 +91,9 @@ Jiunge na mkutano unaofuata na `Ctrl+Alt+M` (`Ctrl+Cmd+M` kwenye macOS). Usajili
 
 Matukio ya leo yanatoka Google Kalenda (kusoma-tu). Dakika moja kabla, wijeti inaruka kwenye skrini na
 **jiunge na Meet**, hucheza sauti na kutuma arifa ya mfumo, kwa kichupo kipi umewasha au hata ikiwa imefichwa.
-Kila kadi inaonyesha beji na jibu lako (imekubaliwa, labda, imekataliwa, inasubiri). Bofya tukio ili kuona ni nani aliyepanga
+Kila kadi inaonyesha beji na jibu lako (imekubaliwa, labda, imekataliwa, inangoja). Bofya tukio ili kuona ni nani aliyepanga
 hiyo, ajenda, kila mgeni aliye na avatar ya mwanzo na jibu lake, na viambatisho, kama maelezo ya Gemini.
-Mstari wa juu unakuambia **nafasi inayofuata ya bila malipo** inayofuata ya angalau dakika 15 (mialiko iliyokataliwa na matukio ya siku nzima hayafanyiki.
+Mstari wa juu unakuambia **nafasi inayofuata ya bila malipo** ya angalau dakika 15 (mialiko iliyokataliwa na matukio ya siku nzima hayafanyiki.
 count), na matukio yanayopishana hupata beji ya **migogoro** inayotaja tukio lingine. Mwonekano wa **Leo** unaongoza mkutano ukiendelea (muda uliosalia, kitufe cha kujiunga, onyo la mgongano) au unaofuata, kisha **siku katika mstari mmoja** (mikutano, majukumu na muda wa bure katika saa za kazi, wakati wa mkutano, muda wa bure na mizozo ikihesabiwa) na rekodi moja ya matukio ambapo mikutano, majukumu yaliyo na muda na mapengo yasiyolipishwa ni safu mlalo zenyewe: pengo ambalo tayari limetolewa ili kutosheleza jambo ambalo halijaisha.
 
 </td>
@@ -144,15 +144,18 @@ inaheshimu kikomo cha viwango. Ingia kwa kutumia tokeni ya kibinafsi ya kusoma t
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam bila kuacha wijeti
 
-Vichupo vidogo vinne vya Steam: **orodha ya matamanio** (punguzo kubwa kwanza), **wauzaji wakuu**, **cheza sasa** na
-**katalogi iliyoagizwa kwa ukadiriaji**. Orodha za umma zinahitaji tu **SteamID64** yako; hiari **Steam Mtandao API ufunguo**
-inaongeza michezo mitano ya hivi majuzi zaidi na saa zake za kucheza. Bei huja kwa reais, kila safu hufungua ukurasa wa duka, na
-kichupo kinaanza kwa chaguo-msingi, kisanduku tiki kimoja kipo kwenye Mipangilio.
+Vichupo vidogo vinne vya Steam: **orodha ya matamanio** (punguzo kubwa kwanza, kila moja na kile inachohifadhi), **wauzaji wakuu**
+iliyoorodheshwa, **cheza sasa** (kila mchezo Steam inaripoti kwa wiki mbili zilizopita) na **katalogi iliyopangwa kwa ukadiriaji**, iliyo ukurasa
+ikiwa na **pakia zaidi** ili ifike kwenye duka lingine. Kila safu mlalo hubeba **sanaa ya kibonge**, **alama ya ukaguzi**
+na maneno ya Steam na inathaminiwa na hakiki ngapi, bei iliyovuka, bei katika reais na nini
+punguzo huokoa - na orodha inaongeza jumla ya uokoaji. Orodha za umma zinahitaji tu **SteamID64** yako; chaguo
+**Steam Kitufe API cha Wavuti** huongeza michezo ya hivi majuzi pamoja na saa zake za kucheza. Kichupo kinaanza kwa chaguomsingi, kisanduku cha kuteua kimoja kikiwa mbali
+katika Mipangilio.
 
 </td>
 </tr>
@@ -175,14 +178,19 @@ wiki mbili zilizopita, pamoja na `.vtt`, `.srt`, `.txt` na `.md` nakala kutoka k
 
 🤖 **Miundo ya AI** (kwenye upau wa kichupo kwa chaguomsingi, **hakuna API ufunguo au akaunti**): LLM zimeorodheshwa kwa
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, iliyosomwa kutoka kwa ukurasa wake wa ubao wa wanaoongoza wa umma,
-kwa upau wa alama, mtayarishi, bei kwa kila tokeni na kasi ya 1M, inaweza kupangwa kwa akili, bei au kasi. Inachukua saa
-mara nyingi zaidi kila baada ya saa 3, na chaguo la kuingia 🔔 hukuarifu wakati a
+kwa upau wa alama, mtayarishi, bei kwa kila tokeni na kasi ya 1M, inaweza kupangwa kulingana na akili, bei au kasi. Inachukua saa
+mara nyingi zaidi kila baada ya saa 3, na kuchagua kuingia 🔔 hukuarifu wakati a
 modeli ** inaingia 10 za juu** au **inapanda ndani yake** (inaangaliwa kila baada ya saa 6 wakati kuba imefunguliwa), na
 beji "mpya" na "juu" kwa wiki.
 
 🌙 **Usisumbue:** katika Mipangilio au trei, nyamaza arifa za mkutano, vikumbusho vya kazi, arifa za hali na kila
 arifa ya mfumo kwa dakika 30, 1 h, 2 h, hadi kesho au hadi uizima. Mwezi kwenye upau wa juu unaonyesha
 inapoisha; mbofyo mmoja huizima. Inasalia kuanza upya na kuishia yenyewe.
+
+🔔 **Kila tahadhari katika skrini moja:** kengele kwenye kichwa (hesabu na rangi wakati kitu chochote kinasubiri) hufungua
+arifa juu ya dirisha zima katika hali yoyote: kadi moja kwa tahadhari na vitendo vyake, **ondoa yote **, na ni nini
+kutatuliwa leo chini yao - bila chochote kinachosubiri, ni jinsi unavyofikia logi ya leo. Kutoka kwenye kizimbani, bonyeza
+bado inafungua arifa hiyo moja juu ya dirisha la kawaida.
 
 ⌨️ **Kila kitu kwa kibodi:** `Alt+1`…`Alt+7` badilisha vichupo, `N` huunda, `/` utafutaji, `F11` skrini nzima, `Alt+L`
 kufuli na `?` kuorodhesha njia za mkato. `Ctrl+Shift+P` (`Cmd+Shift+P` kwenye macOS) hufungua **paleti ya amri** na kila
@@ -235,11 +243,11 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Bofya tahadhari kwenye gati | Imeongezwa: kazi na arifa, na kigawanyaji kinachoweza kukokotwa |
+| Bofya tahadhari kwenye gati | Imeongezwa: dirisha zima la kichupo wazi |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Kengele hufungua arifa kwenye dirisha zima |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: michezo mitano iliyopita iliyochezwa, na saa zote mbili za kucheza |
+| Steam: wauzaji wakuu, waliopewa nambari | Steam: michezo mitano iliyopita iliyochezwa, na saa zote mbili za kucheza |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: katalogi kwa kukadiria, yenye "pakia zaidi" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Uwekeleaji mmoja wa tahadhari kwa kila kitu kinachosubiri: kukatika, mikutano, kazi na miundo mipya ya AI |
 |---|
@@ -345,7 +357,7 @@ Na **Fuata mfumo**, ambao hubadilisha kati ya mwanga na giza pamoja na OS. Wote 
 
 </details>
 
-| Vidokezo vyangu: vigae vilivyo na latency ya hivi punde | Mwisho ulio wazi: chati ya kusubiri, kikomo na mipangilio ya arifa | Inaongeza DNS + ukaguzi wa cheti |
+| Vidokezo vyangu: vigae vilivyo na latency ya hivi punde | Mwisho ulio wazi: chati ya muda, kikomo na mipangilio ya arifa | Inaongeza DNS + ukaguzi wa cheti |
 |---|---|---|
 | ![Status API, My endpoints sub-tab: a grid of tiles with latency, recent readings and certificate days](docs/prints/app/76-endpoints-grade.png) | ![An endpoint open over the whole row with the latency chart, the limit line and the stats](docs/prints/app/77-endpoints-aberto.png) | ![The new endpoint form with the DNS + certificate kind selected](docs/prints/app/78-endpoints-novo.png) |
 
@@ -400,7 +412,7 @@ rangi za kategoria, zimeangaliwa ili kutofautisha. Menyu iliyo karibu na siku in
 
 ## ⚖️ Ikilinganishwa na kile kilichopo
 
-Hakuna zana yoyote iliyofanyiwa utafiti inayofunika zaidi ya nyanja hizi mbili kwa wakati mmoja. Vyanzo na maelezo ndani
+Hakuna zana yoyote iliyofanyiwa utafiti inayofunika zaidi ya sehemu hizi mbili kwa wakati mmoja. Vyanzo na maelezo ndani
 [docs/benchmark.md](docs/benchmark.md).
 
 | | Majukumu + ukumbusho | Vidokezo | Ubao wa kunakili | Mikutano | GitHub | Usimbaji fiche wa ndani kwa chaguomsingi |
@@ -416,7 +428,7 @@ Hakuna zana yoyote iliyofanyiwa utafiti inayofunika zaidi ya nyanja hizi mbili k
 <sub>✅ asili · ➖ kiasi, kupitia kiendelezi au hiari · — hakuna · ? haijachapishwa · n/a haihifadhi data ya mtumiaji</sub>
 
 Kile ambacho kielelezo kilileta hapa: **wakati sawa katika kichwa cha kazi** (Todoist/TickTick), **ahirisha arifa**
-(TikaTika) na **ubao klipu unaoheshimu wasimamizi wa nenosiri** (CopyQ/Ditto).
+(TikaJibu) na **ubao wa kunakili unaoheshimu wasimamizi wa nenosiri** (CopyQ/Ditto).
 
 ## ⬇️ Sakinisha
 
@@ -444,7 +456,7 @@ hazina: uchapishaji ni uamuzi wa mwongozo na hatua ya mtunzaji.
 
 | Tabaka | Ulinzi |
 |---|---|
-| Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, nonce mpya kwa kila maandishi, andika atomiki kwa `fsync` |
+| Vault | Argon2id (MiB 19, t=2) → AES-256-GCM, nonce mpya kwa kila maandishi, andika atomiki kwa `fsync` |
 | Ufunguo | RAM pekee, sifuri kwenye kufuli; kufuli kiotomatiki inayoweza kusanidiwa (dakika 5 hadi 60 bila kufanya kitu, dakika 15 kwa chaguo-msingi) |
 | Mtandao | mchakato wa Rust pekee ndio huzungumza na mtandao; mwonekano wa wavuti hauna asili ya mbali (CSP) na hauoni ishara kamwe |
 | Google | kwa hiari, `calendar.events.readonly` pekee, `directory.readonly` (picha za wafanyakazi wenzako katika orodha ya wageni) pamoja na wasifu, OAuth na PKCE na loopback |
@@ -452,7 +464,7 @@ hazina: uchapishaji ni uamuzi wa mwongozo na hatua ya mtunzaji.
 | GitLab | hiari, anwani iliyosimbwa na ishara; `https://` pekee, hakuna uelekezaji kwingine, viungo kutoka kwa mfano uliosanidiwa pekee |
 | Taarifa | inasakinisha tu kifurushi kilichotiwa saini na ufunguo wa mradi; upakuaji ulioharibiwa hutupwa kabla ya kuendeshwa |
 
-Muundo kamili, hifadhi rudufu, unganisha kwenye mashine na mahali ambapo kila faili huishi: [docs/seguranca.md](docs/seguranca.md).
+Muundo kamili, chelezo, unganisha kwenye mashine zote na mahali ambapo kila faili huishi: [docs/seguranca.md](docs/seguranca.md).
 Umepata dosari? [SECURITY.md](SECURITY.md).
 
 ## 📚 Nyaraka
@@ -469,7 +481,7 @@ Umepata dosari? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Maendeleo
 
-Masharti: [Bun](https://bun.sh) ≥ 1.2, Rust thabiti ≥ 1.85 na
+Masharti: [Bun](https://bun.sh) ≥ 1.2, thabiti Rust ≥ 1.85 na
 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) kwa mfumo wako.
 
 ```bash
@@ -490,4 +502,4 @@ pata lebo ya SemVer, madokezo ya kutolewa yaliyotolewa na visakinishi vilivyotiw
 
 [MIT](LICENSE) © Antonio Carlos
 
-<div align="center"><sub>Imetengenezwa kwa 🦀 Rust, ⚛️ React na ☕ kwa wale wanaoishi kati ya mikutano.</sub></div>
+<div align="center"><sub>Imetengenezwa na 🦀 Rust, ⚛️ React na ☕ kwa wale wanaoishi kati ya mikutano.</sub></div>

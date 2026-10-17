@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} בסך הכל",
   "steam.row.open": "פתח את {name} ב-Steam",
   "steam.row.discount": "{n}% הנחה",
-  "steam.row.review": "{n}% מהביקורות חיוביות"
+  "steam.row.review": "{n}% מהביקורות חיוביות",
+  "steam.row.reviews": "{n} ביקורות",
+  "steam.row.reviewOne": "{n} סקירה",
+  "steam.row.saved": "שמור {value}",
+  "steam.totalSaved": "{value} נשמר בסך הכל",
+  "steam.review.overwhelmingly_positive": "חיובי באופן גורף",
+  "steam.review.very_positive": "חיובי מאוד",
+  "steam.review.positive": "חיובי",
+  "steam.review.negative": "שלילי",
+  "steam.review.very_negative": "מאוד שלילי",
+  "steam.review.overwhelmingly_negative": "שלילי באופן גורף",
+  "steam.loadMore": "לטעון עוד משחקים",
+  "steam.review.mostly_positive": "בעיקר חיובי",
+  "steam.review.mixed": "מעורב",
+  "steam.review.mostly_negative": "בעיקר שלילי"
 }

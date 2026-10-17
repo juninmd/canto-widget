@@ -72,5 +72,19 @@
   "steam.recent.total": "Всього {time}",
   "steam.row.open": "відкрити {name} на Steam",
   "steam.row.discount": "Знижка {n}%.",
-  "steam.row.review": "{n}% відгуків позитивні"
+  "steam.row.review": "{n}% відгуків позитивні",
+  "steam.row.reviews": "{n} відгуків",
+  "steam.row.reviewOne": "{n} огляд",
+  "steam.row.saved": "зберегти {value}",
+  "steam.totalSaved": "Загалом збережено {value}",
+  "steam.review.overwhelmingly_positive": "Надзвичайно позитивний",
+  "steam.review.very_positive": "Дуже позитивно",
+  "steam.review.positive": "Позитивний",
+  "steam.review.negative": "Негативний",
+  "steam.review.very_negative": "Дуже негативно",
+  "steam.review.overwhelmingly_negative": "Переважно негативно",
+  "steam.loadMore": "завантажити більше ігор",
+  "steam.review.mostly_positive": "Переважно позитивні",
+  "steam.review.mixed": "змішаний",
+  "steam.review.mostly_negative": "Переважно негативні"
 }

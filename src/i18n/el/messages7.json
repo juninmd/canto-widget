@@ -72,5 +72,19 @@
   "steam.recent.total": "{time} συνολικά",
   "steam.row.open": "άνοιγμα {name} σε Steam",
   "steam.row.discount": "{n}% έκπτωση",
-  "steam.row.review": "{n}% των κριτικών είναι θετικές"
+  "steam.row.review": "{n}% των κριτικών είναι θετικές",
+  "steam.row.reviews": "{n} κριτικές",
+  "steam.row.reviewOne": "{n} κριτική",
+  "steam.row.saved": "αποθήκευση {value}",
+  "steam.totalSaved": "{value} αποθηκεύτηκε συνολικά",
+  "steam.review.overwhelmingly_positive": "Συντριπτικά θετικά",
+  "steam.review.very_positive": "Πολύ θετικό",
+  "steam.review.positive": "Θετική",
+  "steam.review.negative": "Αρνητικό",
+  "steam.review.very_negative": "Πολύ αρνητικό",
+  "steam.review.overwhelmingly_negative": "Συντριπτικά αρνητικό",
+  "steam.loadMore": "φορτώστε περισσότερα παιχνίδια",
+  "steam.review.mostly_positive": "Κυρίως θετικά",
+  "steam.review.mixed": "Μικτή",
+  "steam.review.mostly_negative": "Κυρίως αρνητικά"
 }

@@ -94,7 +94,7 @@ Acara hari ini berasal dari Kalender Google (hanya baca). Satu menit sebelumnya,
 Setiap kartu menunjukkan lencana dengan jawaban Anda (diterima, mungkin, ditolak, menunggu). Klik acara tersebut untuk melihat siapa yang menyelenggarakannya
 itu, agendanya, setiap tamu dengan inisial avatar dan jawabannya, serta lampirannya, seperti catatan Gemini.
 Baris paling atas memberi tahu Anda **slot gratis berikutnya** setidaknya 15 menit (undangan yang ditolak dan acara sepanjang hari tidak
-count), dan acara yang tumpang tindih akan mendapatkan lencana **konflik** yang memberi nama acara lainnya. Tampilan **Hari ini** mengarah ke rapat yang sedang berlangsung (waktu tersisa, tombol gabung, peringatan bentrok) atau tampilan berikutnya, lalu **hari dalam satu baris** (rapat, tugas, dan waktu luang sepanjang jam kerja, dengan waktu rapat, waktu luang, dan konflik dihitung) dan satu garis waktu yang berisi rapat, tugas dengan waktu, dan jeda kosong: sebuah jeda menawarkan untuk menyesuaikan tugas yang belum waktunya, dan apa yang sudah terlampaui.
+count), dan acara yang tumpang tindih akan mendapatkan lencana **konflik** yang memberi nama acara lainnya. Tampilan **Hari ini** dimulai dengan rapat yang sedang berlangsung (waktu tersisa, tombol gabung, peringatan bentrok) atau tampilan berikutnya, lalu **hari dalam satu baris** (rapat, tugas, dan waktu luang sepanjang jam kerja, dengan waktu rapat, waktu luang, dan konflik dihitung) dan satu garis waktu tempat rapat, tugas dengan waktu, dan jeda kosong adalah barisnya sendiri: jeda menawarkan untuk menyesuaikan tugas yang belum waktunya, dan apa yang sudah terlampaui.
 
 </td>
 <td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
@@ -144,15 +144,18 @@ menghormati batas tarif. Masuk dengan token pribadi hanya-baca atau dari browser
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/86-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with discount badges, crossed-out original prices and the new price in reais"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
 <td>
 
 ### 🎮 Steam tanpa meninggalkan widget
 
-Empat sub-tab untuk Steam: **penawaran daftar keinginan** (diskon terbesar terlebih dahulu), **penjual teratas**, **main sekarang** dan
-**katalog diurutkan berdasarkan peringkat**. Daftar publik hanya memerlukan **SteamID64**; opsional **Steam Kunci web API**
-menambahkan lima game terbaru dengan waktu bermainnya. Harga masuk reais, setiap baris membuka halaman toko, dan
-tab dimulai secara default, satu kotak centang di Pengaturan.
+Empat sub-tab untuk Steam: **penawaran daftar keinginan** (diskon terbesar terlebih dahulu, masing-masing dengan penghematannya), **penjual teratas**
+diberi peringkat, **main sekarang** (setiap game Steam melaporkan selama dua minggu terakhir) dan **katalog diurutkan berdasarkan peringkat**, diberi halaman
+dengan **memuat lebih banyak** sehingga menjangkau seluruh toko. Setiap baris membawa **seni kapsul**, **skor ulasan**
+dengan kata-kata Steam sendiri dan berapa banyak ulasan yang dihitung, harga yang dicoret, harga dalam reais dan berapa
+penghematan diskon — dan daftarnya menjumlahkan total penghematan. Daftar publik hanya memerlukan **SteamID64**; sebuah opsional
+**Steam Kunci web API** menambahkan game terbaru dengan waktu bermainnya. Tab dimulai secara default, hanya berjarak satu kotak centang
+di Pengaturan.
 
 </td>
 </tr>
@@ -184,7 +187,12 @@ lencana "baru" dan "naik" selama seminggu.
 notifikasi sistem selama 30 menit, 1 jam, 2 jam, hingga besok atau hingga Anda mematikannya. Bulan di bilah atas muncul
 kapan itu berakhir; satu klik mematikannya kembali. Ia bertahan jika dimulai ulang dan berakhir dengan sendirinya.
 
-⌨️ **Semuanya menggunakan keyboard:** `Alt+1`…`Alt+7` beralih tab, `N` membuat, `/` penelusuran, `F11` layar penuh, `Alt+L`
+🔔 **Setiap peringatan dalam satu layar:** bel di header (hitung dan warnai ketika ada sesuatu yang tertunda) membuka
+peringatan di seluruh jendela dalam mode apa pun: satu kartu per peringatan dengan tindakannya, **tutup semua**, dan apa yang terjadi
+diselesaikan hari ini di bawah mereka — tanpa ada yang tertunda, begitulah cara Anda masih mencapai catatan hari ini. Dari dok, sekali klik
+masih membuka satu peringatan di atas jendela normal.
+
+⌨️ **Semuanya dengan keyboard:** `Alt+1`…`Alt+7` beralih tab, `N` membuat, `/` penelusuran, `F11` layar penuh, `Alt+L`
 kunci dan `?` mencantumkan pintasan. `Ctrl+Shift+P` (`Cmd+Shift+P` di macOS) membuka **palet perintah** dengan setiap
 tindakan berdasarkan nama: buka tab, tugas atau catatan baru, bergabung ke rapat berikutnya, salin ringkasan hari itu, ganti kulit, kunci.
 
@@ -235,11 +243,11 @@ Dan **Ikuti sistem**, yang beralih antara terang dan gelap seiring dengan OS. Se
 |---|---|
 | ![The mode icon in the header opens a menu with Mini, Hidden, Normal and Maximized](docs/prints/app/62-modos-menu.png) | ![The edge dock: one colored bar per pending alert, with icons on hover and the text of the one under the pointer](docs/prints/app/63-modo-mini.png) |
 
-| Klik peringatan di dok | Dimaksimalkan: tugas dan notifikasi, dengan pembagi yang dapat diseret |
+| Klik peringatan di dok | Dimaksimalkan: seluruh jendela untuk tab yang terbuka |
 |---|---|
-| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list on the left, a draggable divider and the notifications column on the right: pending alerts with their actions and what was resolved today](docs/prints/app/65-modo-maximizado.png) |
+| ![The normal window opens with the meeting alert on top: join Meet, snooze and close](docs/prints/app/64-aviso-em-foco.png) | ![Fullscreen with the task list across the whole window and a bell in the header counting the pending alerts](docs/prints/app/65-modo-maximizado.png) |
 
-| The bell opens the alerts over the whole window |
+| Lonceng membuka peringatan di seluruh jendela |
 |---|
 | ![Pending alerts as cards with their actions over the whole window, "dismiss all" and, below, what was resolved today](docs/prints/app/86-avisos.png) |
 
@@ -335,9 +343,13 @@ Dan **Ikuti sistem**, yang beralih antara terang dan gelap seiring dengan OS. Se
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: lima pertandingan terakhir yang dimainkan, dengan kedua waktu bermain |
+| Steam: terlaris, bernomor | Steam: lima pertandingan terakhir dimainkan, dengan kedua waktu bermain |
+|---|---|
+| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+
+| Steam: katalog berdasarkan peringkat, dengan "muat lebih banyak" |
 |---|
-| ![Steam tab, play now sub-tab: five fictitious games with the time in the last two weeks and the total time](docs/prints/app/87-steam-recentes.png) |
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
 
 | Satu hamparan peringatan untuk segala hal yang tertunda: pemadaman listrik, rapat, tugas, dan model AI baru |
 |---|
@@ -444,9 +456,9 @@ repositori: penerbitan adalah keputusan dan tindakan manual oleh pengelola.
 
 | Lapisan | Perlindungan |
 |---|---|
-| Gudang | Argon2id (19 MiB, t=2) → AES-256-GCM, nonce baru pada setiap penulisan, penulisan atomik dengan `fsync` |
+| Gudang | Argon2id (19 MiB, t=2) → AES-256-GCM, nilai baru pada setiap penulisan, penulisan atom dengan `fsync` |
 | Kunci | Hanya RAM, memusatkan perhatian pada kunci; kunci otomatis yang dapat dikonfigurasi (5 hingga 60 menit menganggur, 15 menit secara default) |
-| Jaringan | hanya proses Rust yang berkomunikasi dengan jaringan; tampilan web tidak memiliki asal jarak jauh (CSP) dan tidak pernah melihat token |
+| Jaringan | hanya proses Rust yang berbicara ke jaringan; tampilan web tidak memiliki asal jarak jauh (CSP) dan tidak pernah melihat token |
 | Google | opsional, hanya `calendar.events.readonly`, `directory.readonly` (Foto rekan kerja di daftar tamu) ditambah profil, OAuth dengan PKCE dan loopback |
 | GitHub | opsional, token terenkripsi; item hanya terbuka jika linknya `https://github.com/` |
 | GitLab | opsional, alamat dan token terenkripsi; `https://` saja, tidak ada pengalihan, tautan hanya dari instance yang dikonfigurasi |
@@ -469,7 +481,7 @@ Menemukan cacat? [SECURITY.md](SECURITY.md).
 
 ## 🛠️ Perkembangan
 
-Prasyarat: [Bun](https://bun.sh) ≥ 1.2, Rust stabil ≥ 1.85 dan
+Prasyarat: [Bun](https://bun.sh) ≥ 1.2, stabil Rust ≥ 1.85 dan
 [Tauri v2 dependencies](https://v2.tauri.app/start/prerequisites/) untuk sistem Anda.
 
 ```bash

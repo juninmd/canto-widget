@@ -72,5 +72,19 @@
   "steam.recent.total": "celkem {time}",
   "steam.row.open": "otevřít {name} na Steam",
   "steam.row.discount": "{n}% sleva",
-  "steam.row.review": "{n}% recenzí je pozitivních"
+  "steam.row.review": "{n}% recenzí je pozitivních",
+  "steam.row.reviews": "{n} recenzí",
+  "steam.row.reviewOne": "{n} recenze",
+  "steam.row.saved": "uložit {value}",
+  "steam.totalSaved": "Celkem uloženo {value}",
+  "steam.review.overwhelmingly_positive": "Převážně pozitivní",
+  "steam.review.very_positive": "Velmi pozitivní",
+  "steam.review.positive": "Pozitivní",
+  "steam.review.negative": "Negativní",
+  "steam.review.very_negative": "Velmi negativní",
+  "steam.review.overwhelmingly_negative": "Převážně negativní",
+  "steam.loadMore": "načíst více her",
+  "steam.review.mostly_positive": "Většinou pozitivní",
+  "steam.review.mixed": "Smíšené",
+  "steam.review.mostly_negative": "Většinou negativní"
 }
