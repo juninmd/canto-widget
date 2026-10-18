@@ -244,7 +244,7 @@ export type SteamRecent = { items: RecentGame[]; has_key: boolean };
 export type SteamStatus = { configured: boolean; steamid: string; has_key: boolean; name: string };
 /** The WMO groups the Clima tab knows; the catalogue turns each one into a sentence. */
 export type WeatherCondition = "clear" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm";
-export type WeatherPlace = { city: string; country: string; lat: number; lon: number };
+export type WeatherPlace = { city: string; admin1: string; country: string; lat: number; lon: number };
 export type WeatherNow = { temp: number; feels: number; condition: WeatherCondition };
 /** Times and dates come already local to the city (`timezone=auto` on the API call). */
 export type WeatherHour = { at: string; temp: number; rain: number; condition: WeatherCondition };
@@ -494,8 +494,10 @@ export const api = {
 
   /** Clima: the saved city plus the Open-Meteo forecast; Rust keeps it for 30 min. */
   weatherGet: (force = false) => invoke<WeatherView>("weather_get", { force }),
-  /** Resolves the city name to coordinates and saves only those; a bad name comes back as an error. */
-  weatherSetCity: (city: string) => invoke<WeatherView>("weather_set_city", { city }),
+  /** Every candidate Open-Meteo returns, so the user picks the city instead of trusting the first match. */
+  weatherSearch: (query: string) => invoke<WeatherPlace[]>("weather_search", { query }),
+  /** Saves the chosen coordinates; the names come along as display text. */
+  weatherSetPlace: (place: WeatherPlace) => invoke<WeatherView>("weather_set_place", { place }),
   weatherClear: () => invoke<WeatherView>("weather_clear"),
 
   /** Leituras: the saved feeds, newest first; thumbnails and favicons come as `data:` URLs, by id/host. */

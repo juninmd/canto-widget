@@ -9,7 +9,7 @@ let view: WeatherView;
 
 const EMPTY: WeatherView = { place: null, forecast: null, fetched_at: 0, error: null };
 const SAVED: WeatherView = {
-  place: { city: "São Paulo", country: "Brasil", lat: -23.5, lon: -46.6 },
+  place: { city: "São Paulo", admin1: "São Paulo", country: "Brasil", lat: -23.5, lon: -46.6 },
   forecast: {
     now: { temp: 22.4, feels: 24.1, condition: "cloudy" },
     hours: [
@@ -30,9 +30,6 @@ mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
     calls.push({ cmd, args });
     if (cmd === "weather_get") return Promise.resolve(view);
-    if (cmd === "weather_set_city") {
-      return Promise.reject("configuração: cidade não encontrada: Xyz");
-    }
     if (cmd === "weather_clear") return Promise.resolve(EMPTY);
     return Promise.resolve(null);
   },
@@ -51,14 +48,11 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-test("without a city the tab asks for one and reports a name it cannot resolve", async () => {
+test("without a city the tab hands the screen over to the search", async () => {
   await show();
   expect(screen.getByText("Escolher a cidade")).toBeTruthy();
   expect(screen.getByText(/Open-Meteo, que é aberta/)).toBeTruthy();
-  await act(async () => fireEvent.change(screen.getByLabelText("Cidade"), { target: { value: "Xyz" } }));
-  await act(async () => fireEvent.click(screen.getByRole("button", { name: "buscar" })));
-  expect(calls.find((c) => c.cmd === "weather_set_city")?.args).toEqual({ city: "Xyz" });
-  expect(screen.getByRole("alert").textContent).toContain("cidade não encontrada");
+  expect(screen.getByLabelText("Cidade")).toBeTruthy();
 });
 
 test("with a city the card shows now, the hours, the days and the rain window", async () => {

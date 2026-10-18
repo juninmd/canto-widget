@@ -38,7 +38,41 @@ test("the weather tab shows the city, the hours, the days and the rain window", 
   await expect(page.getByText("dados: Open-Meteo")).toBeVisible();
 });
 
-test("without a city the tab asks for one and only sends the name", async ({ page }) => {
+test("without a city the tab searches and offers the candidates before saving one", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 700 });
+  await mockTauri(page, {
+    hiddenTabs: HIDDEN,
+    knownTabs: ALL_TABS,
+    fixed: {
+      weather_get: { place: null, forecast: null, fetched_at: 0, error: null },
+      // "Londres" really is the name of several cities: the first match alone would have picked Argentina.
+      weather_search: [
+        { city: "Londres", admin1: "Inglaterra", country: "Reino Unido", lat: 51.5074, lon: -0.1278 },
+        { city: "Londres", admin1: "Catamarca", country: "Argentina", lat: -27.0, lon: -67.0 },
+      ],
+    },
+  });
+  await page.goto("/");
+  await goTab(page, "Clima");
+  await expect(page.getByText("Escolher a cidade")).toBeVisible();
+  await page.getByRole("textbox", { name: "Cidade" }).fill("Londres");
+  await page.getByRole("button", { name: "buscar" }).click();
+
+  // Only the typed name leaves, and only once the user picks a city are coordinates saved.
+  const searched = (await calls(page)).find((c) => c.cmd === "weather_search");
+  expect(searched?.args).toEqual({ query: "Londres" });
+  expect((await calls(page)).some((c) => c.cmd === "weather_set_place")).toBe(false);
+
+  await expect(page.getByText("Londres · Inglaterra, Reino Unido")).toBeVisible();
+  await expect(page.getByText("Londres · Catamarca, Argentina")).toBeVisible();
+  await page.getByRole("button", { name: /Reino Unido/ }).click();
+  const saved = (await calls(page)).find((c) => c.cmd === "weather_set_place");
+  expect(saved?.args).toEqual({
+    place: { city: "Londres", admin1: "Inglaterra", country: "Reino Unido", lat: 51.5074, lon: -0.1278 },
+  });
+});
+
+test("the city field is a usable text field, not the 18px checkbox box", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   await mockTauri(page, {
     hiddenTabs: HIDDEN,
@@ -47,11 +81,12 @@ test("without a city the tab asks for one and only sends the name", async ({ pag
   });
   await page.goto("/");
   await goTab(page, "Clima");
-  await expect(page.getByText("Escolher a cidade")).toBeVisible();
-  await page.getByRole("textbox", { name: "Cidade" }).fill("Recife");
-  await page.getByRole("button", { name: "buscar" }).click();
-  const call = (await calls(page)).find((c) => c.cmd === "weather_set_city");
-  expect(call?.args).toEqual({ city: "Recife" });
+  const field = page.getByRole("textbox", { name: "Cidade" });
+  await field.fill("Londres");
+  // `.canto-box` is the checkbox style (1.125rem square): on the city field it hid what was typed.
+  const box = (await field.boundingBox())!;
+  expect(box.width).toBeGreaterThan(150);
+  expect(box.height).toBeGreaterThan(22);
 });
 
 test("atualizar asks Rust to bypass the 30 min cache", async ({ page }) => {

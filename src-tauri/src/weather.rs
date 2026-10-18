@@ -13,10 +13,15 @@ const HOURS: u8 = 12;
 const DAYS: u8 = 5;
 /// Rain from this probability on is worth a line on the card.
 pub const RAIN_CHANCE: u8 = 50;
+/// Enough candidates to disambiguate ("Londres" has a dozen), few enough to stay a list on the card.
+const MATCHES: u8 = 8;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Place {
     pub city: String,
+    /// State or region, so two cities with the same name can be told apart; empty when the API omits it.
+    #[serde(default)]
+    pub admin1: String,
     pub country: String,
     pub lat: f64,
     pub lon: f64,
@@ -93,6 +98,8 @@ struct RawPlace {
     latitude: f64,
     longitude: f64,
     #[serde(default)]
+    admin1: Option<String>,
+    #[serde(default)]
     country: Option<String>,
 }
 
@@ -136,16 +143,24 @@ struct RawDaily {
     weather_code: Vec<u8>,
 }
 
-/// The first match, which is the best one: Open-Meteo ranks by population and relevance.
-pub fn parse_place(body: &[u8]) -> Option<Place> {
-    let geo: RawGeo = serde_json::from_slice(body).ok()?;
-    let first = geo.results.into_iter().next()?;
-    Some(Place {
-        city: first.name,
-        country: first.country.unwrap_or_default(),
-        lat: first.latitude,
-        lon: first.longitude,
-    })
+/// Every match the API sent, in its own order (ranked by population and relevance). Rows that would not survive
+/// `clean_place` are dropped here, so the UI never offers a city the backend would refuse to save.
+pub fn parse_places(body: &[u8]) -> Vec<Place> {
+    let Ok(geo) = serde_json::from_slice::<RawGeo>(body) else {
+        return Vec::new();
+    };
+    geo.results
+        .into_iter()
+        .filter_map(|raw| {
+            clean_place(Place {
+                city: raw.name,
+                admin1: raw.admin1.unwrap_or_default(),
+                country: raw.country.unwrap_or_default(),
+                lat: raw.latitude,
+                lon: raw.longitude,
+            })
+        })
+        .collect()
 }
 
 /// A forecast without the current reading or without hours is not worth a card.
@@ -234,12 +249,44 @@ pub fn clean_city(name: &str) -> Option<String> {
     ok.then(|| city.to_string())
 }
 
-pub fn geocode(city: &str) -> Result<Place, String> {
+/// Optional display text the API may omit (state, country): trimmed, bounded, no control characters.
+fn clean_optional(value: &str) -> Option<String> {
+    let trimmed = value.trim();
+    (trimmed.chars().count() <= MAX_CITY && !trimmed.chars().any(|c| c.is_control())).then(|| trimmed.to_string())
+}
+
+/// Everything but the coordinates is display text, and the chosen place comes back from the webview: a city name
+/// is required and the coordinates have to be a real point on Earth, so a bad payload is refused instead of saved.
+pub fn clean_place(place: Place) -> Option<Place> {
+    let on_earth = place.lat.is_finite()
+        && place.lon.is_finite()
+        && (-90.0..=90.0).contains(&place.lat)
+        && (-180.0..=180.0).contains(&place.lon);
+    if !on_earth {
+        return None;
+    }
+    Some(Place {
+        city: clean_city(&place.city)?,
+        admin1: clean_optional(&place.admin1)?,
+        country: clean_optional(&place.country)?,
+        lat: place.lat,
+        lon: place.lon,
+    })
+}
+
+/// Open-Meteo ranks "Londres" without the language by population, which puts Argentina and Mexico above the
+/// United Kingdom and leaves no way to pick. The language localises the names and lifts the city people mean.
+pub fn search(query: &str) -> Result<Vec<Place>, String> {
     let client = client()?;
-    let url = reqwest::Url::parse_with_params(GEOCODE, [("name", city), ("count", "1"), ("format", "json")])
-        .map_err(|e| e.to_string())?;
+    let language = crate::lang::current().split('-').next().unwrap_or("en").to_string();
+    let matches = MATCHES.to_string();
+    let url = reqwest::Url::parse_with_params(
+        GEOCODE,
+        [("name", query), ("count", &matches), ("format", "json"), ("language", &language)],
+    )
+    .map_err(|e| e.to_string())?;
     let body = body(&client, url)?;
-    parse_place(&body).ok_or_else(|| format!("cidade não encontrada: {city}"))
+    Ok(parse_places(&body))
 }
 
 pub fn forecast(place: &Place) -> Result<Forecast, String> {

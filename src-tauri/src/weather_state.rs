@@ -74,7 +74,9 @@ mod tests {
     use crate::weather::{Condition, Day, Hour, Now};
 
     fn place() -> Place {
-        Place { city: "São Paulo".into(), country: "Brasil".into(), lat: -23.5, lon: -46.6 }
+        Place {
+            city: "São Paulo".into(), admin1: "São Paulo".into(), country: "Brasil".into(), lat: -23.5, lon: -46.6
+        }
     }
 
     fn forecast(temp: f64) -> Forecast {

@@ -37,6 +37,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Escolher a cidade no Clima**: o campo de busca herdava o estilo da caixa de seleção (`canto-box`), que tem
+  18 px por 18 px — dava para digitar, mas não para ver o que se digitava. O campo volta a ser um campo de texto
+  de verdade, e a busca passa a **mostrar os candidatos com estado e país** para você escolher: antes ela aceitava
+  o primeiro resultado e "Londres" ia parar na Argentina, sem como corrigir. O mesmo campo errado saiu da aba
+  **Leituras**, que o escondia atrás do "+".
 - **Fechamento ao abrir no Windows**: as janelas só carregam depois de inicializar os estados do Rust e a
   bandeja, evitando o encerramento provocado por comandos da interface durante a inicialização.
 - **Trancar com falha**: se o Rust não conseguir trancar o cofre, a tela avisa e relê o estado real em vez de fingir

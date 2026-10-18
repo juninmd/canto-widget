@@ -174,15 +174,16 @@ in Settings.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: 22 °C now, rain from 13:00, the next hours as a curve and the next four days"></td>
+<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: 22 °C now, rain from 13:00, the next hours as a curve and the next four days"><img src="docs/prints/app/97-clima-busca.png" alt="Weather tab picking a city: the search field with 'Londres' typed and three candidates, each with its state and country"></td>
 <td>
 
 ### 🌤️ The weather without leaving the widget
 
-Type the city name once and Canto keeps only its coordinates: **now**, the **next hours as a curve** with the rain
-chance, the **next days** and the **rain window** ("rain from 13:00"). Open-Meteo, which is open and
-**keyless** — no account, no address of yours leaving the machine — and a 30-minute cache. The tab starts off by
-default, one checkbox away in Settings.
+**Type the city name and pick it from the list**: "Londres" is the name of cities in England, Argentina and Mexico,
+so Canto offers every match with its **state and country** and keeps only the coordinates of the one you chose.
+Then it shows **now**, the **next hours as a curve** with the rain chance, the **next days** and the **rain
+window** ("rain from 13:00"). Open-Meteo, which is open and **keyless** — no account, no address of yours leaving
+the machine — and a 30-minute cache. The tab starts off by default, one checkbox away in Settings.
 
 </td>
 </tr>
