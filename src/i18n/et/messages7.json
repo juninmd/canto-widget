@@ -87,6 +87,7 @@
   "steam.review.mixed": "Segatud",
   "steam.review.mostly_negative": "Enamasti negatiivne",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Agendid",
   "agents.loading": "agentide kontrollimine",
   "agents.header": "{installed}/{total} installitud",

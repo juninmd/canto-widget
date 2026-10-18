@@ -2,6 +2,7 @@ export const steam = {
   "steam.loading": "conectando à Steam",
   "steam.noKey": "sem chave",
   "steam.region": "região da loja",
+  "steam.watch": "avisar quando o preço cair",
   "steam.disconnect": "desconectar",
   "steam.connect.title": "Conectar à Steam",
   "steam.connect.hint":

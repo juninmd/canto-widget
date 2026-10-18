@@ -87,6 +87,7 @@
   "steam.review.mixed": "מעורב",
   "steam.review.mostly_negative": "בעיקר שלילי",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "סוכנים",
   "agents.loading": "בודקים את הסוכנים",
   "agents.header": "{installed} מתוך {total} מותקן",

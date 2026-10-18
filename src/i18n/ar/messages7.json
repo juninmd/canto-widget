@@ -87,6 +87,7 @@
   "steam.review.mixed": "مختلط",
   "steam.review.mostly_negative": "سلبية في الغالب",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "الوكلاء",
   "agents.loading": "فحص الوكلاء",
   "agents.header": "تم تثبيت {installed} من {total}",

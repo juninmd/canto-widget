@@ -87,6 +87,7 @@
   "steam.review.mixed": "Микед",
   "steam.review.mostly_negative": "Углавном негативно",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Агенти",
   "agents.loading": "провера агената",
   "agents.header": "{installed} од {total} инсталиран",

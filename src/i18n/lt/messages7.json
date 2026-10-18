@@ -87,6 +87,7 @@
   "steam.review.mixed": "Mišrus",
   "steam.review.mostly_negative": "Dažniausiai neigiamas",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Agentai",
   "agents.loading": "tikrindamas agentus",
   "agents.header": "Įdiegta {installed} iš {total}",

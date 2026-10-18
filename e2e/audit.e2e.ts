@@ -102,7 +102,7 @@ for (const density of ["compacta", "padrao"]) {
           github_status: { connected: true, login: "voce", source: "token", device_flow: false }, github_lists: lists,
           my_pr_alerts_get: { ci: true, stalled: true, stalled_hours: 48, mentions: true }, review_alerts_get: true,
           activity_status: { supported: true, enabled: false },
-          steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br" },
+          steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br", watching: false },
           steam_image: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
           steam_deals: {
             has_more: true,

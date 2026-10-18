@@ -203,7 +203,7 @@ export const READS = {
 
 /** Invented games on purpose: a real title with a price and a discount would read as a fact. */
 export const STEAM = {
-  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br" },
+  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br", watching: false },
   steam_deals: {
     has_more: true,
     currency: "BRL",

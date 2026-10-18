@@ -87,6 +87,7 @@
   "steam.review.mixed": "مختلط",
   "steam.review.mostly_negative": "اکثرا منفی",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "عوامل",
   "agents.loading": "بررسی عوامل",
   "agents.header": "{installed} از {total} نصب شده است",

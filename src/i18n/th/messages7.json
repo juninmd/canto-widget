@@ -87,6 +87,7 @@
   "steam.review.mixed": "ผสม",
   "steam.review.mostly_negative": "ส่วนใหญ่เป็นลบ",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "ตัวแทน",
   "agents.loading": "ตรวจสอบตัวแทน",
   "agents.header": "ติดตั้ง {installed} จาก {total} แล้ว",

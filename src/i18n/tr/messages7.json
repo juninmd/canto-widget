@@ -87,6 +87,7 @@
   "steam.review.mixed": "Karışık",
   "steam.review.mostly_negative": "Çoğunlukla olumsuz",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Temsilciler",
   "agents.loading": "acenteleri kontrol etmek",
   "agents.header": "{installed} / {total} yüklü",

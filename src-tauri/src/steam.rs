@@ -62,6 +62,8 @@ pub struct SteamStatus {
     pub name: String,
     /// The effective region code, so the picker opens on what the lists are actually reading.
     pub region: String,
+    /// Whether the price alerts are on; filled in by the command, which has the sealed state.
+    pub watching: bool,
 }
 
 pub fn status(cfg: Option<&SteamConfig>) -> SteamStatus {
@@ -73,6 +75,7 @@ pub fn status(cfg: Option<&SteamConfig>) -> SteamStatus {
         has_key: !cfg.api_key.is_empty(),
         name: cfg.name,
         region,
+        watching: false,
     }
 }
 

@@ -87,6 +87,7 @@
   "steam.review.mixed": "混合",
   "steam.review.mostly_negative": "大多是负面的",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "代理商",
   "agents.loading": "检查代理",
   "agents.header": "已安装 {total} 的 {installed}",

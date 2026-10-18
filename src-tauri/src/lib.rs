@@ -114,6 +114,7 @@ pub mod status_derived;
 pub mod status_feed;
 pub mod status_live;
 pub mod steam;
+pub mod steam_alert;
 pub mod steam_feed;
 pub mod steam_lists;
 pub mod steam_parse;
@@ -191,6 +192,7 @@ pub fn run() {
             app.manage(alert_log::AlertLog::default());
             app.manage(fullscreen_guard::FullscreenHold::load(&dir));
             app.manage(task_reminder::ReminderLead::default());
+            app.manage(steam_alert::SteamAlerts::default());
             app.manage(updater::PendingUpdate::default());
             app.manage(window_state::WindowState::load(&dir));
             global_shortcuts::register(app.handle())?;
@@ -201,6 +203,7 @@ pub fn run() {
             tray_live::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
+            steam_alert::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
             health_watch::watch(app.handle().clone());
             models_alert::watch(app.handle().clone());
@@ -381,6 +384,7 @@ pub fn run() {
             cmd_steam::steam_catalog,
             cmd_steam::steam_recent,
             cmd_steam::steam_image,
+            steam_alert::steam_watch_set,
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,
             do_not_disturb::dnd_clear,

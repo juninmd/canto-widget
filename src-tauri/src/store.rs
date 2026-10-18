@@ -116,6 +116,11 @@ pub fn steam_path(dir: &Path) -> PathBuf {
     dir.join("steam.json")
 }
 
+/// The price alerts choice and the last price seen for each wishlist game.
+pub fn steam_deals_path(dir: &Path) -> PathBuf {
+    dir.join("steam_ofertas.json")
+}
+
 pub fn settings_path(dir: &Path) -> PathBuf {
     dir.join("settings.json")
 }

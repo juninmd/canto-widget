@@ -87,6 +87,7 @@
   "steam.review.mixed": "Mješoviti",
   "steam.review.mostly_negative": "Uglavnom negativno",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Agenti",
   "agents.loading": "provjeravajući agente",
   "agents.header": "{installed} of {total} installed",

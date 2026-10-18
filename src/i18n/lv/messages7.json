@@ -87,6 +87,7 @@
   "steam.review.mixed": "Jaukti",
   "steam.review.mostly_negative": "Pārsvarā negatīvi",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Aģenti",
   "agents.loading": "pārbaudot aģentus",
   "agents.header": "{installed} no {total} instalēta",

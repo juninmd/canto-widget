@@ -87,6 +87,7 @@
   "steam.review.mixed": "Blandet",
   "steam.review.mostly_negative": "For det meste negativt",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Agenter",
   "agents.loading": "tjekker agenterne",
   "agents.header": "{installed} af {total} installeret",

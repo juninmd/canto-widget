@@ -36,11 +36,20 @@ mock.module("@tauri-apps/api/core", () => ({
     if (fail && cmd.startsWith("steam_")) return Promise.reject(fail);
     switch (cmd) {
       case "steam_connect":
-        status = { configured: true, steamid: String(args.steamId), has_key: Boolean(args.apiKey), name: "", region: "br" };
+        status = {
+          configured: true,
+          steamid: String(args.steamId),
+          has_key: Boolean(args.apiKey),
+          name: "",
+          region: "br",
+          watching: false,
+        };
         return Promise.resolve(status);
       case "steam_disconnect":
-        status = { configured: false, steamid: "", has_key: false, name: "", region: "br" };
+        status = { configured: false, steamid: "", has_key: false, name: "", region: "br", watching: false };
         return Promise.resolve(status);
+      case "steam_watch_set":
+        return Promise.resolve(Boolean(args.enabled));
       case "steam_region_set":
         status = { ...status, region: String(args.region) };
         deals = { ...deals, currency: String(args.region) === "us" ? "USD" : "BRL" };
@@ -92,7 +101,7 @@ beforeEach(() => {
   calls.length = 0;
   fail = "";
   failStatus = "";
-  status = { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br" };
+  status = { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br", watching: false };
   deals = {
     has_more: false,
     currency: "BRL",
@@ -143,7 +152,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 test("an unconnected tab asks for the SteamID and connects", async () => {
-  status = { configured: false, steamid: "", has_key: false, name: "", region: "br" };
+  status = { configured: false, steamid: "", has_key: false, name: "", region: "br", watching: false };
   await show();
   expect(screen.getByText("Conectar à Steam")).toBeTruthy();
   fireEvent.change(screen.getByLabelText("SteamID64, link do perfil ou nome de perfil"), {
@@ -299,6 +308,23 @@ test("a keyless account can paste the Web API key later, without reconnecting", 
     apiKey: "chave-nova",
   });
   expect(screen.queryByLabelText("Chave da Steam Web API (opcional)")).toBeNull();
+});
+
+test("the bell turns the wishlist price alerts on and off", async () => {
+  await show();
+  const bell = () => screen.getByRole("button", { name: "avisar quando o preço cair" });
+  expect(bell().getAttribute("aria-pressed")).toBe("false");
+
+  await click(bell());
+  expect(calls.find((c) => c.cmd === "steam_watch_set")?.args).toEqual({ enabled: true });
+  expect(bell().getAttribute("aria-pressed")).toBe("true");
+
+  await click(bell());
+  expect(calls.filter((c) => c.cmd === "steam_watch_set").map((c) => c.args)).toEqual([
+    { enabled: true },
+    { enabled: false },
+  ]);
+  expect(bell().getAttribute("aria-pressed")).toBe("false");
 });
 
 test("desconectar forgets the account and goes back to the form", async () => {

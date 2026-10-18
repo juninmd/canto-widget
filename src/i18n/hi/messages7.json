@@ -87,6 +87,7 @@
   "steam.review.mixed": "मिश्रित",
   "steam.review.mostly_negative": "अधिकतर नकारात्मक",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "एजेंट",
   "agents.loading": "एजेंटों की जांच",
   "agents.header": "{total} में से {installed} स्थापित",

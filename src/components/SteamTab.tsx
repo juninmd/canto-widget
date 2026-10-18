@@ -5,6 +5,7 @@ import { profileUrl, REGIONS } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
+import { BellIcon } from "./Icons";
 import Skeleton from "./Skeleton";
 import SteamCatalog from "./SteamCatalog";
 import SteamConnect from "./SteamConnect";
@@ -73,6 +74,16 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
     }
   }
 
+  /** The alerts live in Rust, so a hidden webview still rings; here it is only the switch. */
+  async function toggleWatch() {
+    if (!status) return;
+    try {
+      setStatus({ ...status, watching: await api.steamWatch(!status.watching) });
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
   if (!status) {
     return error ? <ErrorBanner message={error} onRetry={() => void load()} /> : <Skeleton label={t("steam.loading")} />;
   }
@@ -93,6 +104,18 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
             </option>
           ))}
         </select>
+        <button
+          type="button"
+          onClick={() => void toggleWatch()}
+          aria-pressed={status.watching}
+          aria-label={t("steam.watch")}
+          title={t("steam.watch")}
+          className={`grid size-6 shrink-0 place-items-center rounded-md hover:bg-edge ${
+            status.watching ? "text-accent-text" : "text-faint hover:text-fg"
+          }`}
+        >
+          <BellIcon on={status.watching} />
+        </button>
         <button
           type="button"
           onClick={() => void api.openLink(profileUrl(status.steamid)).catch(() => {})}

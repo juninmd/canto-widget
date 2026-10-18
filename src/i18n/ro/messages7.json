@@ -87,6 +87,7 @@
   "steam.review.mixed": "Mixt",
   "steam.review.mostly_negative": "În mare parte negative",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "agents.tab": "Agenți",
   "agents.loading": "verificarea agentilor",
   "agents.header": "{installed} din {total} instalat",

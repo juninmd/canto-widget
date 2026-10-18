@@ -4,6 +4,7 @@ export const steam: Record<keyof typeof source, string> = {
   "steam.loading": "connecting to Steam",
   "steam.noKey": "no key",
   "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "steam.disconnect": "disconnect",
   "steam.connect.title": "Connect to Steam",
   "steam.connect.hint":

@@ -243,7 +243,14 @@ export type RecentGame = { appid: number; name: string; recent_min: number; tota
 /** `has_key` false means only the recent list is unavailable: the UI explains instead of erroring. */
 export type SteamRecent = { items: RecentGame[]; has_key: boolean };
 /** `region` is the storefront in use ("br", "us"...), already resolved from the language. */
-export type SteamStatus = { configured: boolean; steamid: string; has_key: boolean; name: string; region: string };
+export type SteamStatus = {
+  configured: boolean;
+  steamid: string;
+  has_key: boolean;
+  name: string;
+  region: string;
+  watching: boolean;
+};
 /** The WMO groups the Clima tab knows; the catalogue turns each one into a sentence. */
 export type WeatherCondition = "clear" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm";
 export type WeatherPlace = { city: string; admin1: string; country: string; lat: number; lon: number };
@@ -484,6 +491,8 @@ export const api = {
   steamDisconnect: () => invoke<SteamStatus>("steam_disconnect"),
   /** The storefront the prices, the wording and the currency come from; drops the cached lists. */
   steamRegion: (region: string) => invoke<SteamStatus>("steam_region_set", { region }),
+  /** Opt-in OS notifications when a wishlist game gets cheaper; answers the value now in effect. */
+  steamWatch: (enabled: boolean) => invoke<boolean>("steam_watch_set", { enabled }),
   /** Wishlist deals, biggest discount first; `page` starts at 0. */
   steamDeals: (page = 0, force = false) => invoke<SteamList>("steam_deals", { page, force }),
   steamTrending: (force = false) => invoke<SteamList>("steam_trending", { force }),

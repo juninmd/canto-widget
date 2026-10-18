@@ -21,8 +21,9 @@ const row = (appid: number, name: string, price: string, extra: Record<string, u
 const ONE_PIXEL = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 export const STEAM_FIXED = {
-  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br" },
+  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br", watching: false },
   steam_image: ONE_PIXEL,
+  steam_watch_set: true,
   steam_deals: {
     has_more: true,
     currency: "BRL",
@@ -82,7 +83,7 @@ test("ofertas pages through the wishlist and the region picker switches the stor
     knownTabs: ALL_TABS,
     fixed: {
       ...STEAM_FIXED,
-      steam_region_set: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "us" },
+      steam_region_set: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "us", watching: false },
     },
   });
   await page.goto("/");
@@ -90,6 +91,12 @@ test("ofertas pages through the wishlist and the region picker switches the stor
 
   const picker = page.getByLabel("região da loja");
   await expect(picker).toHaveValue("br");
+  const bell = page.getByRole("button", { name: "avisar quando o preço cair" });
+  await expect(bell).toHaveAttribute("aria-pressed", "false");
+  await bell.click();
+  const watch = (await calls(page)).find((c) => c.cmd === "steam_watch_set");
+  expect(watch?.args).toEqual({ enabled: true });
+  await expect(bell).toHaveAttribute("aria-pressed", "true");
   await page.getByRole("button", { name: "ver mais jogos" }).click();
   const more = (await calls(page)).filter((c) => c.cmd === "steam_deals").at(-1);
   expect(more?.args).toEqual({ page: 1, force: false });
@@ -109,7 +116,7 @@ test("a keyless account pastes the Web API key from the header", async ({ page }
     knownTabs: ALL_TABS,
     fixed: {
       ...STEAM_FIXED,
-      steam_status: { configured: true, steamid: "76561190000000000", has_key: false, name: "Ana Exemplo", region: "br" },
+      steam_status: { configured: true, steamid: "76561190000000000", has_key: false, name: "Ana Exemplo", region: "br", watching: false },
     },
   });
   await page.goto("/");
@@ -128,8 +135,8 @@ test("an unconnected Steam tab asks for the SteamID and connects", async ({ page
     knownTabs: ALL_TABS,
     fixed: {
       ...STEAM_FIXED,
-      steam_status: { configured: false, steamid: "", has_key: false, name: "", region: "br" },
-      steam_connect: { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br" },
+      steam_status: { configured: false, steamid: "", has_key: false, name: "", region: "br", watching: false },
+      steam_connect: { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br", watching: false },
     },
   });
   await page.goto("/");
