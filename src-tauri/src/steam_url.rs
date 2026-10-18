@@ -67,12 +67,48 @@ pub fn recent_url(key: &str, steamid: &str, count: usize) -> Url {
     url
 }
 
+/// The whole library, free games included when they were played: the Web API omits them otherwise.
+pub fn owned_url(key: &str, steamid: &str) -> Url {
+    web(
+        "IPlayerService/GetOwnedGames/v1",
+        &[
+            ("key", key),
+            ("steamid", steamid),
+            ("include_appinfo", "1"),
+            ("include_played_free_games", "1"),
+            ("skip_unvetted_apps", "0"),
+        ],
+    )
+}
+
+/// The store's own capsule path for an app. Deterministic, so a library of hundreds of games costs no
+/// extra request; the one Steam has no capsule for keeps the initial where the art would be.
+pub fn capsule_url(appid: u32) -> String {
+    format!("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/capsule_231x87.jpg")
+}
+
 pub fn trending_url(region: &Region) -> Url {
     store("/search/", &[("filter", "globaltopsellers")], region)
 }
 
-pub fn catalog_url(term: &str, page: usize, region: &Region) -> Url {
-    let mut url = store("/search/", &[("sort_by", "Reviews_DESC")], region);
+/// The store's own sort tokens the catalog offers. "Biggest discount" is not one of Steam's sorts, so
+/// the wishlist keeps that honour; these are the three the store does answer.
+pub fn catalog_sort(sort: &str) -> Option<&'static str> {
+    match sort {
+        "reviews" => Some("Reviews_DESC"),
+        "price" => Some("Price_ASC"),
+        "new" => Some("Released_DESC"),
+        _ => None,
+    }
+}
+
+/// `only_sale` asks the store for what is discounted right now (`specials=1`).
+pub fn catalog_url(term: &str, page: usize, region: &Region, sort: &str, only_sale: bool) -> Url {
+    let mut extra: Vec<(&str, &str)> = vec![("sort_by", sort)];
+    if only_sale {
+        extra.push(("specials", "1"));
+    }
+    let mut url = store("/search/", &extra, region);
     let mut query = url.query_pairs_mut();
     if page > 0 {
         query.append_pair("start", &(page * crate::steam::CATALOG_PAGE).to_string());

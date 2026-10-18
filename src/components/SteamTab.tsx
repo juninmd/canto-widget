@@ -10,11 +10,12 @@ import Skeleton from "./Skeleton";
 import SteamCatalog from "./SteamCatalog";
 import SteamConnect from "./SteamConnect";
 import SteamDeals from "./SteamDeals";
+import SteamLibraryTab from "./SteamLibraryTab";
 import SteamRecent from "./SteamRecent";
 import SteamTrending from "./SteamTrending";
 import SubTabs from "./SubTabs";
 
-type Sub = "deals" | "trending" | "recent" | "catalog";
+type Sub = "deals" | "trending" | "recent" | "library" | "catalog";
 
 /** Steam: the wishlist deals, the top sellers, the last games played and the catalog by rating. */
 export default function SteamTab({ onError }: { onError: (m: string) => void }) {
@@ -23,6 +24,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
   const [sub, setSub] = useState<Sub>("deals");
   const [key, setKey] = useState("");
   const [addingKey, setAddingKey] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -45,6 +47,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
       // The form belonged to the account that just left; the next one starts with a clean header.
       setKey("");
       setAddingKey(false);
+      setConfirming(false);
     } catch (e) {
       onError(errText(e));
     }
@@ -137,14 +140,36 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
             {t("steam.noKey")}
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => void disconnect()}
-          className="canto-hit shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
-        >
-          {t("steam.disconnect")}
-        </button>
+        {!confirming && (
+          <button
+            type="button"
+            onClick={() => setConfirming(true)}
+            className="canto-hit shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
+          >
+            {t("steam.disconnect")}
+          </button>
+        )}
       </div>
+      {confirming && (
+        <div role="alert" className="flex items-center gap-2 rounded-lg border border-line bg-ink px-2.5 py-1.5 text-xs">
+          <span className="min-w-0 flex-1 text-fg">{t("steam.disconnect.ask")}</span>
+          <button
+            type="button"
+            autoFocus
+            onClick={() => setConfirming(false)}
+            className="canto-hit shrink-0 rounded-md bg-edge px-2 text-fg hover:bg-active"
+          >
+            {t("steam.disconnect.cancel")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void disconnect()}
+            className="canto-hit shrink-0 rounded-md border border-danger/60 px-2 font-semibold text-danger hover:bg-danger/10"
+          >
+            {t("steam.disconnect")}
+          </button>
+        </div>
+      )}
       {addingKey && !status.has_key && (
         <form onSubmit={addKey} className="flex gap-1">
           <input
@@ -173,6 +198,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
           { key: "deals", label: t("steam.sub.deals") },
           { key: "trending", label: t("steam.sub.trending") },
           { key: "recent", label: t("steam.sub.recent") },
+          { key: "library", label: t("steam.sub.library") },
           { key: "catalog", label: t("steam.sub.catalog") },
         ]}
       />
@@ -180,6 +206,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
         {sub === "deals" && <SteamDeals />}
         {sub === "trending" && <SteamTrending />}
         {sub === "recent" && <SteamRecent />}
+        {sub === "library" && <SteamLibraryTab />}
         {sub === "catalog" && <SteamCatalog />}
       </div>
     </div>

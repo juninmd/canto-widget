@@ -17,13 +17,15 @@ export function gameTitle(row: { appid: number; name: string }): string {
   return row.name.trim() || `#${Math.trunc(row.appid)}`;
 }
 
-/** Minutes as Steam reports them, written the short way ("2 h 15 min"); under an hour stays in minutes. */
+/** Minutes as Steam reports them, written the short way ("2 h 15 min"); under an hour stays in minutes.
+ *  The hours carry the language's thousands separator, since a library adds up to four digits. */
 export function playtime(minutes: number): string {
   const total = Math.max(0, Math.trunc(minutes));
   if (total < 60) return `${total} min`;
   const hours = Math.floor(total / 60);
   const rest = total % 60;
-  return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
+  const written = new Intl.NumberFormat(LOCALE).format(hours);
+  return rest === 0 ? `${written} h` : `${written} h ${rest} min`;
 }
 
 /** Cents in the region's currency, written the way the chosen language writes money ("R$ 45,00").

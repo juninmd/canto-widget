@@ -26,3 +26,22 @@ fn a_wishlist_with_nothing_on_sale_gives_no_deals() {
     prices.insert(1u32, Price { discount: 0, final_cents: 100, ..Default::default() });
     assert!(best_deals(prices).is_empty());
 }
+
+#[test]
+fn only_a_rate_limit_is_worth_trying_again() {
+    assert!(retryable(&FetchError::Busy("muitas requisições".into())));
+    assert!(!retryable(&FetchError::Network("offline".into())));
+    assert!(!retryable(&FetchError::Other("jogo não encontrado na loja".into())));
+    assert!(!retryable(&FetchError::Other("HTTP 500".into())));
+    // And the wording the user reads does not change with the new variant.
+    assert!(FetchError::Busy("muitas requisições".into()).message().contains("muitas requisições"));
+}
+
+#[test]
+fn a_wishlist_past_the_bound_is_scanned_up_to_it() {
+    let many: Vec<u32> = (0..crate::steam::WISHLIST_SCAN as u32 + 250).collect();
+    assert_eq!(scan_ids(&many).len(), crate::steam::WISHLIST_SCAN);
+    assert_eq!(scan_ids(&many)[0], 0, "the scan keeps the head of the list, not a random slice");
+    let small = vec![1, 2, 3];
+    assert_eq!(scan_ids(&small), &small[..], "a list inside the bound is untouched");
+}

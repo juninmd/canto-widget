@@ -347,9 +347,9 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
-| Steam: மதிப்பீட்டின்படி பட்டியல், "மேலும் ஏற்று" |
-|---|
-| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+| Steam: மதிப்பீட்டின்படி பட்டியல், "மேலும் ஏற்று" | | Steam: the library, most played first, with a search box |
+|---|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) | ![Steam tab, library sub-tab: fictitious owned games most played first, with capsule art, the total hours of each and a summary line above, plus a search box and a load more button](docs/prints/app/98-steam-biblioteca.png) |
 
 | நிலுவையில் உள்ள அனைத்திற்கும் ஒரு எச்சரிக்கை மேலடுக்கு: செயலிழப்புகள், சந்திப்புகள், பணிகள் மற்றும் புதிய AI மாதிரிகள் |
 |---|

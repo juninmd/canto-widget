@@ -31,3 +31,20 @@ fn the_persona_name_doubles_as_the_key_check() {
     assert_eq!(parse_summary(r#"{"response":{"players":[{"personaname":"Ana"}]}}"#).as_deref(), Some("Ana"));
     assert_eq!(parse_summary(r#"{"response":{"players":[]}}"#), None);
 }
+
+#[test]
+fn the_library_keeps_the_name_and_the_total_playtime_of_every_game() {
+    let json = r#"{"response":{"game_count":3,"games":[
+        {"appid":620,"name":"Portal 2","playtime_forever":4000,"playtime_2weeks":120,"img_icon_url":"abc"},
+        {"appid":400,"name":"Portal","playtime_forever":900},
+        {"appid":730,"name":"","playtime_forever":10},
+        {"appid":0,"name":"Sem appid","playtime_forever":5}
+    ]}}"#;
+    let games = parse_owned(json);
+    assert_eq!(games.len(), 2, "a game without a name or an appid has nothing to show");
+    assert_eq!(games[0].name, "Portal 2");
+    assert_eq!((games[0].appid, games[0].total_min), (620, 4000));
+    assert!(games[0].art.is_empty(), "the capsule is built by the command, not reported here");
+    assert_eq!(parse_owned(r#"{"response":{}}"#).len(), 0, "a private profile is an empty library");
+    assert!(parse_owned("nada").is_empty());
+}

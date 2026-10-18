@@ -44,6 +44,9 @@ pub struct Price {
     pub final_formatted: String,
     #[serde(default)]
     pub initial_formatted: String,
+    /// Steam answers an empty array, not a price, for an app that is free; that is this case.
+    #[serde(default)]
+    pub is_free: bool,
 }
 
 impl Price {
@@ -53,6 +56,15 @@ impl Price {
             self.initial.saturating_sub(self.final_cents).min(u32::MAX as i64) as u32
         } else {
             0
+        }
+    }
+
+    /// What the price is called: a free app carries no formatted price at all, so the wording is ours.
+    pub fn wording(&self) -> String {
+        if self.is_free {
+            crate::lang::tr("Grátis", "Free").to_string()
+        } else {
+            self.final_formatted.clone()
         }
     }
 }
@@ -77,7 +89,14 @@ pub fn parse_prices(json: &str) -> HashMap<u32, Price> {
     map.into_iter()
         .filter(|(_, e)| e.success)
         .filter_map(|(id, e)| {
-            let price = serde_json::from_value::<PriceData>(e.data).ok()?.price_overview?;
+            // A free app answers `[]` instead of a price overview; anything else with no overview is
+            // an app the store no longer prices, and is left out.
+            let priced = e.data.as_array().is_some_and(|list| list.is_empty());
+            let price = if priced {
+                Price { is_free: true, ..Default::default() }
+            } else {
+                serde_json::from_value::<PriceData>(e.data).ok()?.price_overview?
+            };
             Some((id.parse::<u32>().ok()?, price))
         })
         .collect()

@@ -6,7 +6,7 @@ use tauri::{AppHandle, Manager};
 
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
-use crate::steam::{self, SteamConfig, SteamList, SteamRecent, SteamStatus};
+use crate::steam::{self, SteamConfig, SteamLibrary, SteamList, SteamRecent, SteamStatus};
 use crate::steam_feed as feed;
 use crate::steam_id::{self, SteamId};
 use crate::steam_lists as lists;
@@ -148,18 +148,27 @@ pub async fn steam_trending(app: AppHandle, force: bool) -> Result<SteamList> {
 }
 
 #[tauri::command]
-pub async fn steam_catalog(app: AppHandle, term: String, page: usize, force: bool) -> Result<SteamList> {
+pub async fn steam_catalog(
+    app: AppHandle,
+    term: String,
+    page: usize,
+    sort: String,
+    only_sale: bool,
+    force: bool,
+) -> Result<SteamList> {
     if term.chars().count() > 100 || page > 500 {
         return Err(AppError::Config("busca inválida".into()));
     }
+    let order =
+        crate::steam_url::catalog_sort(&sort).ok_or_else(|| AppError::Config("ordenação desconhecida".into()))?;
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
         let region = steam::region_of(&connected(&state)?);
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        let key = format!("catalog:{}:{page}:{}", region.code, term.trim().to_lowercase());
-        state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term, page, &region))
+        let key = format!("catalog:{}:{page}:{sort}:{only_sale}:{}", region.code, term.trim().to_lowercase());
+        state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term, page, &region, order, only_sale))
     })
     .await
 }
@@ -169,12 +178,34 @@ pub async fn steam_recent(app: AppHandle, force: bool) -> Result<SteamRecent> {
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
         let cfg = connected(&state)?;
-        let region = steam::region_of(&cfg);
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        let key = format!("recent:{}:{}", cfg.steamid, region.code);
-        state.steam.get_or(&key, force, now_ms(), || lists::recent(&cfg, &region))
+        let key = format!("recent:{}", cfg.steamid);
+        state.steam.get_or(&key, force, now_ms(), || lists::recent(&cfg))
+    })
+    .await
+}
+
+/// The library, filtered by `term` and paged in Rust: a big account is thousands of games, and the
+/// pane cannot hold them.
+#[tauri::command]
+pub async fn steam_library(app: AppHandle, term: String, page: usize, force: bool) -> Result<SteamLibrary> {
+    if term.chars().count() > 100 || page > 500 {
+        return Err(AppError::Config("busca inválida".into()));
+    }
+    crate::blocking::run(move || {
+        let state = app.state::<AppState>();
+        let cfg = connected(&state)?;
+        if cfg.api_key.is_empty() {
+            return Ok(lists::library_without_key());
+        }
+        state.touch();
+        let lock = app.state::<SteamLock>();
+        let _guard = lock.0.lock().unwrap();
+        let key = format!("library:{}:{}", cfg.steamid, term.trim().to_lowercase());
+        let games = state.steam.get_or(&key, force, now_ms(), || lists::library(&cfg, &term))?;
+        Ok(lists::library_page(&games, page))
     })
     .await
 }

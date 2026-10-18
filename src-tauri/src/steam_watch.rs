@@ -15,6 +15,9 @@ pub struct SteamWatch {
     /// The storefront the prices were read from; empty for a state written before the picker existed.
     #[serde(default)]
     pub region: String,
+    /// The account those prices belong to: another account's wishlist is another baseline.
+    #[serde(default)]
+    pub steamid: String,
     /// In cents, in that storefront's currency.
     #[serde(default)]
     pub prices: HashMap<u32, i64>,
@@ -28,21 +31,24 @@ pub struct Drop {
     pub now: i64,
 }
 
-/// What a scan is allowed to write back: the storefront and the prices it has just read. The switch
-/// belongs to the user and is never part of it, so a scan cannot revert a click that happened while
-/// the wishlist was being fetched.
+/// What a scan is allowed to write back: whose wishlist it read, from which storefront, and the
+/// prices it has just seen. The switch belongs to the user and is never part of it, so a scan cannot
+/// revert a click that happened while the wishlist was being fetched.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Baseline {
     pub region: String,
+    pub steamid: String,
     pub prices: HashMap<u32, i64>,
 }
 
 /// What got cheaper since the last scan, and the prices to remember next time. Cents from another
-/// storefront are another currency, and a first scan has nothing to compare with: both only record.
-pub fn drops(state: &SteamWatch, prices: &HashMap<u32, Price>, region: &str) -> (Vec<Drop>, Baseline) {
-    // Switching store must not read BRL cents as if they were dollars.
+/// storefront are another currency, another account is another wishlist, and a first scan has nothing
+/// to compare with: all three only record.
+pub fn drops(state: &SteamWatch, prices: &HashMap<u32, Price>, region: &str, steamid: &str) -> (Vec<Drop>, Baseline) {
+    // Switching store or account must not read one set of cents as if it were the other.
     let none = HashMap::new();
-    let seen = if state.region == region { &state.prices } else { &none };
+    let comparable = state.region == region && state.steamid == steamid;
+    let seen = if comparable { &state.prices } else { &none };
     let mut fresh = HashMap::with_capacity(prices.len());
     let mut fell = Vec::new();
     for (id, price) in prices {
@@ -53,17 +59,17 @@ pub fn drops(state: &SteamWatch, prices: &HashMap<u32, Price>, region: &str) -> 
     }
     // The biggest fall leads; the appid last so the order never flips between runs.
     fell.sort_by(|a, b| (b.was - b.now).cmp(&(a.was - a.now)).then_with(|| a.appid.cmp(&b.appid)));
-    (fell, Baseline { region: region.to_string(), prices: fresh })
+    (fell, Baseline { region: region.to_string(), steamid: steamid.to_string(), prices: fresh })
 }
 
 /// The toast for one game: the store's own price string, so no money is reformatted here. The title
 /// carries the wording, which Rust translates; a game has no wording to translate.
 pub fn message(name: &str, price: &Price) -> (String, String) {
     let title = crate::lang::tr("Ficou mais barato na lista de desejos", "Cheaper on your wishlist");
-    let body = if price.discount > 0 {
-        format!("{name} · -{}% · {}", price.discount, price.final_formatted)
+    let body = if price.discount > 0 && !price.is_free {
+        format!("{name} · -{}% · {}", price.discount, price.wording())
     } else {
-        format!("{name} · {}", price.final_formatted)
+        format!("{name} · {}", price.wording())
     };
     (title.to_string(), body)
 }

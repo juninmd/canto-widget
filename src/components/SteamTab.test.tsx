@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import type { SteamList, SteamRecent, SteamRow, SteamStatus } from "../lib/api";
+import type { SteamLibrary, SteamList, SteamRecent, SteamRow, SteamStatus } from "../lib/api";
 
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 let status: SteamStatus;
@@ -11,6 +11,8 @@ let trending: SteamList;
 let catalog: SteamList;
 let moreCatalog: SteamList;
 let recent: SteamRecent;
+let library: SteamLibrary;
+let moreLibrary: SteamLibrary;
 let fail = "";
 let failStatus = "";
 
@@ -62,6 +64,8 @@ mock.module("@tauri-apps/api/core", () => ({
         return Promise.resolve(Number(args.page ?? 0) === 0 ? catalog : moreCatalog);
       case "steam_recent":
         return Promise.resolve(recent);
+      case "steam_library":
+        return Promise.resolve(Number(args.page ?? 0) === 0 ? library : moreLibrary);
       default:
         return Promise.resolve(null);
     }
@@ -148,6 +152,21 @@ beforeEach(() => {
     ],
     has_key: false,
   };
+  library = {
+    has_key: true,
+    total: 3,
+    minutes: 4000,
+    items: [
+      { appid: 620, name: "Portal 2", total_min: 3000, art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/620/capsule_231x87.jpg" },
+      { appid: 400, name: "Portal", total_min: 600, art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/400/capsule_231x87.jpg" },
+    ],
+  };
+  moreLibrary = {
+    has_key: true,
+    total: 3,
+    minutes: 4000,
+    items: [{ appid: 440, name: "Team Fortress 2", total_min: 400, art: "" }],
+  };
 });
 afterEach(cleanup);
 
@@ -218,13 +237,29 @@ test("jogue agora explains the missing key, and with a key it lists both playtim
 test("o catálogo searches with the term that was typed", async () => {
   await show();
   await click(screen.getByRole("tab", { name: "catálogo" }));
-  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([{ term: "", page: 0, force: false }]);
+  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
+    { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
+  ]);
   fireEvent.change(screen.getByTestId("steam-search"), { target: { value: "portal" } });
   await click(screen.getByRole("button", { name: "buscar no catálogo" }));
   expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
-    { term: "", page: 0, force: false },
-    { term: "portal", page: 0, force: false },
+    { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
+    { term: "portal", page: 0, sort: "reviews", onlySale: false, force: false },
   ]);
+});
+
+test("o catálogo pede outra busca quando o filtro ou a ordem mudam", async () => {
+  await show();
+  await click(screen.getByRole("tab", { name: "catálogo" }));
+  const last = () => calls.filter((c) => c.cmd === "steam_catalog").at(-1)?.args;
+
+  fireEvent.click(screen.getByRole("checkbox", { name: "só em promoção" }));
+  await act(async () => {});
+  expect(last()).toEqual({ term: "", page: 0, sort: "reviews", onlySale: true, force: false });
+
+  fireEvent.change(screen.getByLabelText("ordenar"), { target: { value: "price" } });
+  await act(async () => {});
+  expect(last()).toEqual({ term: "", page: 0, sort: "price", onlySale: true, force: false });
 });
 
 test("o catálogo pages through the rest of the store and appends what comes", async () => {
@@ -233,8 +268,8 @@ test("o catálogo pages through the rest of the store and appends what comes", a
   expect(rows()).toEqual(["413150"]);
   await click(screen.getByRole("button", { name: "ver mais jogos" }));
   expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
-    { term: "", page: 0, force: false },
-    { term: "", page: 1, force: false },
+    { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
+    { term: "", page: 1, sort: "reviews", onlySale: false, force: false },
   ]);
   expect(rows()).toEqual(["413150", "620"]);
   expect(screen.queryByRole("button", { name: "ver mais jogos" })).toBeNull();
@@ -315,6 +350,7 @@ test("disconnecting leaves the key form closed for the next account", async () =
   await click(screen.getByRole("button", { name: "sem chave" }));
   expect(screen.getByLabelText("Chave da Steam Web API (opcional)")).toBeTruthy();
   await click(screen.getByRole("button", { name: "desconectar" }));
+  await click(screen.getByRole("button", { name: "desconectar" }));
   // The form was for the account that left: reconnecting must not bring it back open.
   status = { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br", watching: false };
   fireEvent.change(screen.getByLabelText("SteamID64, link do perfil ou nome de perfil"), {
@@ -341,11 +377,51 @@ test("the bell turns the wishlist price alerts on and off", async () => {
   expect(bell().getAttribute("aria-pressed")).toBe("false");
 });
 
-test("desconectar forgets the account and goes back to the form", async () => {
+test("a biblioteca lista os mais jogados, diz o que está mostrando, filtra e pagina", async () => {
   await show();
+  await click(screen.getByRole("tab", { name: "biblioteca" }));
+  expect(calls.filter((c) => c.cmd === "steam_library").map((c) => c.args)).toEqual([
+    { term: "", page: 0, force: false },
+  ]);
+  expect(rows()).toEqual(["620", "400"]);
+  expect(screen.getByText("mostrando 2 de 3 jogos · 66 h 40 min jogados")).toBeTruthy();
+  expect(screen.getByText("50 h no total")).toBeTruthy();
+
+  await click(screen.getByRole("button", { name: "ver mais jogos" }));
+  expect(rows()).toEqual(["620", "400", "440"]);
+  expect(screen.queryByRole("button", { name: "ver mais jogos" })).toBeNull();
+
+  fireEvent.change(screen.getByTestId("steam-library-search"), { target: { value: "portal 2" } });
+  await click(screen.getByRole("button", { name: "buscar na biblioteca" }));
+  expect(calls.filter((c) => c.cmd === "steam_library").map((c) => c.args).at(-1)).toEqual({
+    term: "portal 2",
+    page: 0,
+    force: false,
+  });
+});
+
+test("a biblioteca sem chave explica em vez de listar vazio", async () => {
+  library = { items: [], total: 0, minutes: 0, has_key: false };
+  await show();
+  await click(screen.getByRole("tab", { name: "biblioteca" }));
+  expect(screen.getByText(/adicione a chave da Steam Web API para ver a sua biblioteca/)).toBeTruthy();
+  expect(rows()).toEqual([]);
+});
+
+test("desconectar pergunta antes e só então esquece a conta", async () => {
+  await show();
+  await click(screen.getByRole("button", { name: "desconectar" }));
+  expect(calls.some((c) => c.cmd === "steam_disconnect")).toBe(false);
+  expect(screen.getByRole("alert").textContent).toContain("desconectar a conta?");
+
+  await click(screen.getByRole("button", { name: "cancelar" }));
+  expect(calls.some((c) => c.cmd === "steam_disconnect")).toBe(false);
+
+  await click(screen.getByRole("button", { name: "desconectar" }));
   await click(screen.getByRole("button", { name: "desconectar" }));
   expect(calls.some((c) => c.cmd === "steam_disconnect")).toBe(true);
   expect(screen.getByText("Conectar à Steam")).toBeTruthy();
+  expect(screen.queryByRole("alert")).toBeNull();
 });
 
 test("a failed list keeps the retry banner on screen", async () => {

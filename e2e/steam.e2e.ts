@@ -52,6 +52,25 @@ export const STEAM_FIXED = {
       },
     ],
   },
+  steam_library: {
+    has_key: true,
+    total: 2,
+    minutes: 4000,
+    items: [
+      {
+        appid: 900005,
+        name: "Vento Valley",
+        total_min: 3000,
+        art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900005/capsule_231x87.jpg",
+      },
+      {
+        appid: 900006,
+        name: "Orca Bay",
+        total_min: 1000,
+        art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900006/capsule_231x87.jpg",
+      },
+    ],
+  },
 };
 
 test("the Steam tab shows the deals with art, score, price and what they save", async ({ page }) => {
@@ -73,7 +92,14 @@ test("the Steam tab shows the deals with art, score, price and what they save", 
   await page.getByRole("tab", { name: "catálogo" }).click();
   await expect(page.getByRole("button", { name: "ver mais jogos" })).toBeVisible();
   const catalog = (await calls(page)).filter((c) => c.cmd === "steam_catalog").at(-1);
-  expect(catalog?.args).toEqual({ term: "", page: 0, force: false });
+  expect(catalog?.args).toEqual({ term: "", page: 0, sort: "reviews", onlySale: false, force: false });
+
+  await page.getByRole("tab", { name: "biblioteca" }).click();
+  await expect(page.getByText("2 jogos · 66 h 40 min jogados")).toBeVisible();
+  await expect(page.locator("[data-steam]").first()).toContainText("Vento Valley");
+  await expect(page.locator("[data-steam]").first()).toContainText("50 h no total");
+  const library = (await calls(page)).filter((c) => c.cmd === "steam_library").at(-1);
+  expect(library?.args).toEqual({ term: "", page: 0, force: false });
 });
 
 test("ofertas pages through the wishlist and the region picker switches the store", async ({ page }) => {

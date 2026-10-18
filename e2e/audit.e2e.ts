@@ -74,6 +74,11 @@ const ALL_TABS = [
 ];
 const MIN = 24;
 
+/** Sub-tabs a tab opens on top of the first one, so the sweep visits every reachable pane. */
+const SUB_TABS: Record<string, string[]> = {
+  Steam: ["em alta", "jogue agora", "biblioteca", "catálogo"],
+};
+
 /** Buttons, tabs and selects under 24 CSS px (WCAG 2.5.8), skipping what is not on screen. */
 async function smallTargets(page: Page): Promise<string[]> {
   return page.evaluate((min) => {
@@ -122,6 +127,18 @@ for (const density of ["compacta", "padrao"]) {
               },
             ],
           },
+          steam_recent: { has_key: true, items: [] },
+          steam_trending: { has_more: false, currency: "BRL", items: [] },
+          steam_catalog: { has_more: false, currency: "BRL", items: [] },
+          steam_library: {
+            has_key: true,
+            total: 2,
+            minutes: 4000,
+            items: [
+              { appid: 900002, name: "Maré Profunda", total_min: 3000, art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900002/capsule_231x87.jpg" },
+              { appid: 900003, name: "Nimbus Racer", total_min: 1000, art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900003/capsule_231x87.jpg" },
+            ],
+          },
           harness_list: agents,
           weather_get: {
             place: { city: "Aurora", country: "Brasil", lat: -23.5, lon: -46.6 },
@@ -150,6 +167,12 @@ for (const density of ["compacta", "padrao"]) {
       await goTab(page, tab);
       await page.waitForTimeout(500);
       expect(await smallTargets(page)).toEqual([]);
+      // A tab with sub-tabs is only swept on the one it opens on; the others are just as reachable.
+      for (const sub of SUB_TABS[tab] ?? []) {
+        await page.getByRole("tab", { name: sub, exact: true }).click();
+        await page.waitForTimeout(300);
+        expect(await smallTargets(page), `${tab} › ${sub}`).toEqual([]);
+      }
     });
   }
 }
