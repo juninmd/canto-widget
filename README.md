@@ -451,27 +451,19 @@ is kept and what never is.
 
 <sub>All screenshots use fictitious data.</sub>
 
-## 🧪 Prototypes: three suggested tabs
+## 🧪 Prototypes: one suggested tab
 
-**Clima** and **Leituras** started here, were picked and are now real features (up the page). These three are still
-**prototypes**: they start hidden (one checkbox away in Settings) and are **mockups with fictitious data** — no
-backend, nothing stored, nothing fetched. Each screen says what it would still need, so the idea can be judged
-before it becomes real.
+**Clima** and **Leituras** started here, were picked and are now real features (up the page); **Hábitos** and
+**Snippets** were dropped. **Mercado** is still a **prototype**: it starts hidden (one checkbox away in Settings)
+and is a **mockup with fictitious data** — no backend, nothing stored, nothing fetched. The screen says what it
+would still need, so the idea can be judged before it becomes real.
 
-| Habits | Market |
-|---|---|
-| <img src="docs/prints/app/93-prototipo-habitos.png" alt="Habits prototype: today's habits with their streaks and a grid of the last seven days"> | <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> |
-
-| Snippets |
+| Market |
 |---|
-| <img src="docs/prints/app/95-prototipo-snippets.png" alt="Snippets prototype: search, tags, one-click copy and a paste-into-the-focused-app button"> |
+| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> |
 
-- **Habits** — today's checks, the streak and the last seven days. Would need only the vault, and the streak could
-  feed the routine alerts that already exist.
-- **Market** — dollar (PTAX), euro, bitcoin and Ibovespa with the day's variation. Would need the Central Bank and
-  CoinGecko, both keyless, with a 15 min cache per quote.
-- **Snippets** — reusable pieces with tags, search, one-click copy and "paste into the focused app". Would need only
-  the vault; the paste shortcut reuses the focused app Activity already records.
+- **Market** — dollar (PTAX), euro, bitcoin, Ibovespa and the world's main indexes with the day's variation. Would
+  need the Central Bank, CoinGecko and CNBC, all keyless, with a 15 min cache per quote.
 
 <sub>All screenshots use fictitious data.</sub>
 
