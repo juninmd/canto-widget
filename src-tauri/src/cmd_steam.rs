@@ -6,8 +6,9 @@ use tauri::{AppHandle, Manager};
 
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
-use crate::steam::{self, SteamConfig, SteamId, SteamList, SteamRecent, SteamStatus};
+use crate::steam::{self, SteamConfig, SteamList, SteamRecent, SteamStatus};
 use crate::steam_feed as feed;
+use crate::steam_id::{self, SteamId};
 use crate::steam_lists as lists;
 use crate::steam_region;
 use crate::vault::AppState;
@@ -54,7 +55,7 @@ pub async fn steam_connect(app: AppHandle, steam_id: String, api_key: String) ->
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
         let key = api_key.trim().to_string();
-        let typed = steam::classify(&steam_id).ok_or_else(|| {
+        let typed = steam_id::classify(&steam_id).ok_or_else(|| {
             AppError::Config("informe o SteamID64 (17 dígitos), o link do perfil ou o nome de perfil".into())
         })?;
         let steamid = match typed {

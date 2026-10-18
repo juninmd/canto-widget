@@ -1,11 +1,10 @@
 //! Opt-in OS notifications when a game on the wishlist gets cheaper. Rung from Rust so a hidden
 //! webview still gets them, and only while the vault is open: the last prices are sealed. Off by
-//! default, like the activity log.
+//! default, like the activity log. What to ring about is decided in `steam_watch.rs`.
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
 
-use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 
 use crate::error::{AppError, Result};
@@ -14,6 +13,7 @@ use crate::steam::{region_of, SteamConfig};
 use crate::steam_feed as feed;
 use crate::steam_parse::Price;
 use crate::steam_region::Region;
+use crate::steam_watch::{drops, message, Drop, SteamWatch};
 use crate::store;
 use crate::vault::AppState;
 
@@ -24,52 +24,6 @@ const POLL: Duration = Duration::from_secs(60);
 pub const CHECK_MS: i64 = 30 * 60_000;
 /// After a failure with no answer (offline), so the watcher doesn't retry every minute.
 const RETRY: Duration = Duration::from_secs(15 * 60);
-
-/// Deliberately not `Debug`: it travels sealed.
-#[derive(Default, Clone, Serialize, Deserialize)]
-pub struct SteamWatch {
-    #[serde(default)]
-    pub watching: bool,
-    /// The last price seen for each wishlist app, in cents: what a later price is compared against.
-    #[serde(default)]
-    pub prices: HashMap<u32, i64>,
-}
-
-/// One game that got cheaper since the last scan.
-#[derive(Debug, Clone, PartialEq)]
-pub struct Drop {
-    pub appid: u32,
-    pub was: i64,
-    pub now: i64,
-}
-
-/// What got cheaper since the last scan, and the prices to remember next time. The first scan only
-/// records: nothing rings for a price the game already had before the alerts were turned on.
-pub fn drops(seen: &HashMap<u32, i64>, prices: &HashMap<u32, Price>) -> (Vec<Drop>, HashMap<u32, i64>) {
-    let mut fresh = HashMap::with_capacity(prices.len());
-    let mut fell = Vec::new();
-    for (id, price) in prices {
-        fresh.insert(*id, price.final_cents);
-        if let Some(was) = seen.get(id).copied().filter(|was| price.final_cents < *was) {
-            fell.push(Drop { appid: *id, was, now: price.final_cents });
-        }
-    }
-    // The biggest fall leads; the appid last so the order never flips between runs.
-    fell.sort_by(|a, b| (b.was - b.now).cmp(&(a.was - a.now)).then_with(|| a.appid.cmp(&b.appid)));
-    (fell, fresh)
-}
-
-/// The toast for one game: the store's own price string, so no money is reformatted here. The
-/// title carries the wording, which Rust translates; a game has no wording to translate.
-pub fn message(name: &str, price: &Price) -> (String, String) {
-    let title = crate::lang::tr("Ficou mais barato na lista de desejos", "Cheaper on your wishlist");
-    let body = if price.discount > 0 {
-        format!("{name} · -{}% · {}", price.discount, price.final_formatted)
-    } else {
-        format!("{name} · {}", price.final_formatted)
-    };
-    (title.to_string(), body)
-}
 
 #[derive(Default)]
 struct Inner {
