@@ -17,7 +17,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   preço e o desconto — mesmo com a janela escondida, porque quem varre é o Rust. A primeira varredura só anota:
   nada toca para um preço que o jogo já tinha antes de você ligar os avisos. Desligado por padrão; o estado (a
   escolha e o último preço de cada jogo) viaja selado, é lido a cada 30 min com o cofre aberto e some da memória ao
-  trancar.
+  trancar. Um jogo que fica gratuito não toca: a loja não informa preço nenhum para ele, então não há
+  queda para comparar.
 - **Loja Steam da sua região**: um seletor no cabeçalho da aba escolhe a loja — Brasil, Estados Unidos, Euro ou
   Reino Unido. Preços, moeda e o texto das análises passam a vir dela, e a economia de cada oferta é escrita na
   moeda escolhida. O padrão segue o idioma da interface (português abre no Brasil), a escolha fica guardada com a

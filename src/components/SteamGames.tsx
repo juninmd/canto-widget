@@ -78,7 +78,9 @@ export default function SteamGames({
     return error ? <ErrorBanner message={error} onRetry={() => void run(true)} busy={busy} /> : <Skeleton label={t("steam.loading")} rows={rows} />;
   }
 
-  const saved = totalSaved ? list.items.reduce((total, row) => total + row.saved_cents, 0) : 0;  return (
+  const saved = totalSaved ? list.items.reduce((total, row) => total + row.saved_cents, 0) : 0;
+
+  return (
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="flex items-center gap-2">
         {toolbar && <div className="min-w-0 flex-1">{toolbar}</div>}

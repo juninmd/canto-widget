@@ -37,12 +37,19 @@ struct Inner {
 pub struct SteamAlerts(Mutex<Inner>);
 
 impl SteamAlerts {
+    /// Drops the RAM copy. Also called on every locked tick, so nothing lingers; the timer restarts
+    /// with it, which is what makes an unlock look at the prices again.
     pub fn forget(&self) {
         *self.0.lock().unwrap() = Inner::default();
     }
 
     fn with<T>(&self, state: &AppState, f: impl FnOnce(&mut SteamWatch) -> T) -> Result<T> {
         let mut inner = self.0.lock().unwrap();
+        if !state.is_unlocked() {
+            // The key that opens the file is gone, so nothing of it may stay in RAM either.
+            *inner = Inner::default();
+            return Err(AppError::Locked);
+        }
         if inner.watch.is_none() {
             let path = store::steam_deals_path(&state.dir);
             // An unreadable file is a lost baseline, not a reason to stop: the next scan rebuilds it.
@@ -78,19 +85,29 @@ impl SteamAlerts {
         self.0.lock().unwrap().checked_at = now;
     }
 
+    /// Whether the alerts are on right now. The switch is the user's and can move while the wishlist
+    /// is being fetched, so the scan re-reads it before ringing.
+    fn on(&self) -> bool {
+        self.0.lock().unwrap().watch.as_ref().is_some_and(|watch| watch.watching)
+    }
+
     /// One scan: rings for what got cheaper and remembers the prices it saw. Answers whether the
     /// store answered at all, so a failure only pushes the next try back.
     fn scan(&self, app: &AppHandle, state: &AppState, cfg: &SteamConfig) -> bool {
         let region = region_of(cfg);
         let Ok(ids) = feed::wishlist(&cfg.steamid) else { return false };
         let Ok(prices) = feed::prices(&ids, &region) else { return false };
-        let seen = self.0.lock().unwrap().watch.as_ref().map(|w| w.prices.clone()).unwrap_or_default();
-        let (fell, fresh) = drops(&seen, &prices);
-        // Always keep the new prices: otherwise the next scan would ring for what this one saw.
-        if fresh != seen {
-            let _ = self.with(state, |watch| watch.prices = fresh).and_then(|()| self.flush(state));
+        let current = self.0.lock().unwrap().watch.clone().unwrap_or_default();
+        let (fell, next) = drops(&current, &prices, region.code);
+        // Always keep what this scan saw: otherwise the next one would ring for a price already there.
+        if next.prices != current.prices || next.region != current.region {
+            let written = self.with(state, |watch| {
+                watch.region = next.region;
+                watch.prices = next.prices;
+            });
+            let _ = written.and_then(|()| self.flush(state));
         }
-        if !fell.is_empty() {
+        if !fell.is_empty() && self.on() {
             self.ring(app, &region, &fell, &prices);
         }
         true

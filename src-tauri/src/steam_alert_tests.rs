@@ -26,7 +26,7 @@ fn the_switch_is_sealed_and_survives_a_restart_and_a_password_change() {
 }
 
 #[test]
-fn nothing_is_kept_in_ram_while_the_vault_is_locked() {
+fn a_locked_vault_answers_no_and_drops_what_was_in_ram() {
     let dir = std::env::temp_dir().join(format!("canto-steam-forget-{}-{}", std::process::id(), now_ms()));
     let st = AppState::new(dir);
     st.create("senha").unwrap();
@@ -34,12 +34,11 @@ fn nothing_is_kept_in_ram_while_the_vault_is_locked() {
     alerts.set_watching(&st, true).unwrap();
     assert!(alerts.watching(&st));
 
-    // What the watcher does on every tick with the vault locked.
-    alerts.forget();
+    // Asking while locked must not answer from the copy the open vault left behind.
     st.lock();
-    assert!(!alerts.watching(&st), "a locked vault answers for the default, not for the file");
-
+    assert!(!alerts.watching(&st), "a locked vault answers no");
+    // And that same copy was dropped, so the file is what gets read again after the unlock.
     st.unlock("senha").unwrap();
-    assert!(SteamAlerts::default().watching(&st), "the file was there all along");
+    assert!(alerts.watching(&st), "the file was there all along");
     let _ = std::fs::remove_dir_all(&st.dir);
 }

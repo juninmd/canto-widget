@@ -153,8 +153,9 @@ ranked, **play now** (every game Steam reports for the last two weeks) and the *
 with **load more** so it reaches the rest of the store. Every row carries the **capsule art**, the **review score**
 with Steam's own wording and how many reviews it counts, the crossed-out price, the price of the storefront you pick
 and what the discount saves — and the list adds up the total saving. The **region picker** in the header chooses the
-store (Brasil, United States, Euro, United Kingdom): prices, wording and currency follow it, and it defaults to the
-one your language implies. The **bell** turns on price alerts for your wishlist: a game that got cheaper rings an OS
+store (Brasil, United States, Euro, United Kingdom): prices, wording and currency follow it, and it starts on the
+one your language implies, keeping whatever you pick afterwards. The **bell** turns on price alerts for your
+wishlist: a game that got cheaper rings an OS
 notification, and nothing rings for a price it already had before you turned them on. The public lists only need your
 **SteamID64**; an optional **Steam Web API key**, pasteable from the header at any time, adds the recent games with
 their playtimes. The tab starts off by default, one checkbox away in Settings.
