@@ -140,7 +140,7 @@ function AddFeed({ onAdded }: { onAdded: (view: ReadsView) => void }) {
           value={feed}
           onChange={(e) => setFeed(e.target.value)}
           placeholder={t("reads.add.placeholder")}
-          className="canto-box min-w-0 flex-1 rounded-md border border-edge bg-panel px-2 py-1 text-xs text-fg"
+          className="canto-field min-w-0 flex-1 px-2 py-1 text-xs"
         />
         <button type="submit" disabled={working || feed.trim() === ""} className={`${LINK} font-semibold text-accent-text`}>
           {working ? t("reads.add.working") : t("reads.add.submit")}

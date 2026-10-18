@@ -71,13 +71,62 @@ fn every_wmo_group_lands_in_a_condition() {
 }
 
 #[test]
-fn the_first_geocoding_result_wins() {
-    let body = br#"{"results":[{"name":"Sao Paulo","latitude":-23.5,"longitude":-46.6,"country":"Brasil"},
-      {"name":"Sao Paulo do Potengi","latitude":-5.9,"longitude":-35.7,"country":"Brasil"}]}"#;
-    let place = parse_place(body).unwrap();
-    assert_eq!(place, Place { city: "Sao Paulo".into(), country: "Brasil".into(), lat: -23.5, lon: -46.6 });
-    assert_eq!(parse_place(br#"{"generationtime_ms":0.1}"#), None);
-    assert_eq!(parse_place(b"nao json"), None);
+fn every_geocoding_match_comes_back_with_its_state() {
+    let body = br#"{"results":[
+      {"name":"Londres","latitude":-27.0,"longitude":-67.0,"admin1":"Catamarca","country":"Argentina"},
+      {"name":"London","latitude":51.5,"longitude":-0.1,"admin1":"England","country":"United Kingdom"}]}"#;
+    let places = parse_places(body);
+    assert_eq!(places.len(), 2, "the second candidate is what lets the user pick the right city");
+    assert_eq!(
+        places[1],
+        Place {
+            city: "London".into(),
+            admin1: "England".into(),
+            country: "United Kingdom".into(),
+            lat: 51.5,
+            lon: -0.1
+        }
+    );
+    assert_eq!(parse_places(br#"{"generationtime_ms":0.1}"#), Vec::new());
+    assert_eq!(parse_places(b"nao json"), Vec::new());
+}
+
+#[test]
+fn a_match_that_is_not_a_point_on_earth_is_dropped_before_it_reaches_the_ui() {
+    let body = br#"{"results":[
+      {"name":"Nowhere","latitude":95.0,"longitude":0.0,"country":"Brasil"},
+      {"name":"Sao Paulo","latitude":-23.5,"longitude":-46.6,"country":"Brasil"}]}"#;
+    let places = parse_places(body);
+    assert_eq!(places.len(), 1);
+    assert_eq!(places[0].city, "Sao Paulo");
+}
+
+#[test]
+fn a_saved_place_is_validated_like_any_other_value_from_the_webview() {
+    let ok = Place {
+        city: " São Paulo ".into(),
+        admin1: " São Paulo ".into(),
+        country: " Brasil ".into(),
+        lat: -23.5,
+        lon: -46.6,
+    };
+    let clean = clean_place(ok.clone()).unwrap();
+    assert_eq!(clean.city, "São Paulo");
+    assert_eq!(clean.admin1, "São Paulo");
+    assert_eq!(clean.country, "Brasil");
+
+    let bad = |place: Place| assert_eq!(clean_place(place.clone()), None, "{place:?}");
+    bad(Place { city: "".into(), ..ok.clone() });
+    bad(Place { city: "a\u{1}b".into(), ..ok.clone() });
+    bad(Place { city: "x".repeat(MAX_CITY + 1), ..ok.clone() });
+    bad(Place { lat: 90.5, ..ok.clone() });
+    bad(Place { lon: -180.5, ..ok.clone() });
+    bad(Place { lat: f64::NAN, ..ok.clone() });
+    // The API omits the state for plenty of cities, so an empty one is fine.
+    assert_eq!(
+        clean_place(Place { admin1: String::new(), country: String::new(), ..ok }).map(|p| (p.admin1, p.country)),
+        Some((String::new(), String::new()))
+    );
 }
 
 #[test]

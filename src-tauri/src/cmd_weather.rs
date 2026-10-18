@@ -44,14 +44,21 @@ pub async fn weather_get(app: AppHandle, force: bool) -> WeatherView {
     })
 }
 
-/// The name is validated here and resolved by Open-Meteo; the coordinates are what get saved, so a rename
-/// upstream never moves the card to another city.
+/// The typed name is validated here and resolved by Open-Meteo, which answers with several candidates: the
+/// first match alone sent "Londres" to Argentina with no way to correct it.
 #[tauri::command]
-pub async fn weather_set_city(app: AppHandle, city: String) -> Result<WeatherView> {
-    let city = weather::clean_city(&city).ok_or_else(|| AppError::Config("cidade inválida".into()))?;
+pub async fn weather_search(query: String) -> Result<Vec<Place>> {
+    let query = weather::clean_city(&query).ok_or_else(|| AppError::Config("cidade inválida".into()))?;
+    run(move || weather::search(&query).map_err(AppError::Config)).await
+}
+
+/// The chosen candidate: the coordinates are what get saved, so a rename upstream never moves the card to
+/// another city. Everything else is display text and is validated like any other value from the webview.
+#[tauri::command]
+pub async fn weather_set_place(app: AppHandle, place: Place) -> Result<WeatherView> {
+    let place = weather::clean_place(place).ok_or_else(|| AppError::Config("cidade inválida".into()))?;
     run(move || {
         let state = app.state::<WeatherState>();
-        let place = weather::geocode(&city).map_err(AppError::Config)?;
         state.set_place(Some(place))?;
         let forecast = state.forecast(true, now_ms(), weather::forecast);
         Ok(view(&state, forecast))
