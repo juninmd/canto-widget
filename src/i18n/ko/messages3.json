@@ -76,6 +76,8 @@
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "닫기",
+  "alert.closeAll": "close all",
+  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "하루 요약",
   "alert.modelNew": "새 모델",
   "alert.silence": "음소거",

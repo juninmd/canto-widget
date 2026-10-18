@@ -76,6 +76,8 @@
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "bezárni",
+  "alert.closeAll": "close all",
+  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "nap összefoglalója",
   "alert.modelNew": "új modell",
   "alert.silence": "néma",

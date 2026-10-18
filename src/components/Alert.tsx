@@ -45,6 +45,12 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
     [hide],
   );
 
+  // The whole queue at once, like the notifications screen: one call to Rust, every card leaves here.
+  const closeAll = useCallback(() => {
+    void api.alertCloseAll();
+    items.forEach((e) => hide(e.id));
+  }, [items, hide]);
+
   // A sound only for an alert that wasn't on screen yet; the list refreshes whenever another one arrives.
   useEffect(() => {
     const fresh = items.some((e) => !seen.current.has(e.id));
@@ -86,6 +92,7 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
           event={event}
           onDismiss={(outcome) => dismiss(event.id, outcome)}
           onHide={() => hide(event.id)}
+          onCloseAll={items.length > 1 ? closeAll : undefined}
           onCompleted={onCompleted}
           onOpenModels={onOpenModels}
         />

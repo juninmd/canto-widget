@@ -76,6 +76,8 @@
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "dichtbij",
+  "alert.closeAll": "close all",
+  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "samenvatting van de dag",
   "alert.modelNew": "nieuw model",
   "alert.silence": "dempen",

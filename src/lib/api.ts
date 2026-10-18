@@ -414,6 +414,8 @@ export const api = {
   alertPayload: () => invoke<AgendaItem[]>("alert_payload"),
   /** No outcome means plain "closed"; Rust records it for the notifications column. */
   alertClose: (id: string, outcome?: AlertOutcome) => invoke<void>("alert_close", { id, outcome }),
+  /** "Fechar todos" on the overlay: the whole queue goes in one call, and each one is still logged. */
+  alertCloseAll: (outcome?: AlertOutcome) => invoke<void>("alert_close_all", { outcome }),
   alertLog: () => invoke<ResolvedAlert[]>("alert_log"),
   mainShow: () => invoke<void>("main_show"),
   alertSnooze: (id: string, minutes: number) => invoke<void>("alert_snooze", { id, minutes }),

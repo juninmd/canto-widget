@@ -67,10 +67,50 @@ test("dismissing one alert leaves the others and tells Rust which one", async ({
   await ring(page);
 
   const dialog = page.getByRole("alertdialog");
-  await dialog.getByRole("button", { name: "fechar" }).click();
+  await dialog.getByRole("button", { name: "fechar", exact: true }).click();
   await expect(dialog.getByRole("group", { name: "avisos pendentes" }).getByRole("button")).toHaveCount(2);
   const close = (await calls(page)).find((c) => c.cmd === "alert_close");
   expect(close?.args).toEqual({ id: "status:exemplo" });
+});
+
+test("fechar todos fecha a fila inteira de uma vez", async ({ page }) => {
+  await mockTauri(page, { fixed: { alert_payload: fakeAlerts() } });
+  await ring(page);
+
+  const dialog = page.getByRole("alertdialog");
+  await expect(dialog.getByRole("group", { name: "avisos pendentes" }).getByRole("button")).toHaveCount(3);
+  // O chevron colado ao "fechar" abre a única outra saída: fechar a fila inteira.
+  await dialog.getByRole("button", { name: "mais opções de fechar" }).click();
+  await dialog.getByRole("menuitem", { name: "fechar todos" }).click();
+  await expect(page.getByRole("alertdialog")).toHaveCount(0);
+  expect((await calls(page)).some((c) => c.cmd === "alert_close_all")).toBe(true);
+
+  // The queue really is empty: ringing again must not bring the three closed ones back.
+  await page.evaluate(() => (window as unknown as { __E2E_EMIT__: (event: string) => void }).__E2E_EMIT__("canto://alert"));
+  await expect(page.getByRole("alertdialog")).toHaveCount(0);
+});
+
+test("a descrição do aviso é renderizada como markdown", async ({ page }) => {
+  const mention = {
+    id: "mention:github:acme/atlas#9",
+    title: "Retry do lote estoura o timeout",
+    start: "",
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://github.com/acme/atlas/pull/9",
+    organizer: "acme/atlas",
+    tag: "github",
+    description: "@marina: **achei** o problema\n\n- o backoff é fixo\n\n`lib/retry.rs`",
+  };
+  await mockTauri(page, { fixed: { alert_payload: [mention] } });
+  await ring(page);
+
+  const dialog = page.getByRole("alertdialog");
+  await expect(dialog.locator("strong")).toHaveText("achei");
+  await expect(dialog.locator("li")).toHaveCount(1);
+  await expect(dialog.locator("code")).toHaveText("lib/retry.rs");
 });
 
 test("a mention names the person who wrote it, with their photo", async ({ page }) => {

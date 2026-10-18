@@ -53,6 +53,13 @@ pub fn all(current: &Option<AgendaItem>, pending: &VecDeque<AgendaItem>) -> Vec<
     current.iter().chain(pending.iter()).cloned().collect()
 }
 
+/// Everything pending, in arrival order, leaving nothing behind: the overlay's "fechar todos".
+pub fn drain(current: &mut Option<AgendaItem>, pending: &mut VecDeque<AgendaItem>) -> Vec<AgendaItem> {
+    let shown = current.take();
+    let waiting: Vec<AgendaItem> = pending.drain(..).collect();
+    shown.into_iter().chain(waiting).collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -133,5 +140,17 @@ mod tests {
         }
         let listed: Vec<_> = all(&current, &pending).into_iter().map(|e| e.id).collect();
         assert_eq!(listed, ["a", "b"]);
+    }
+
+    #[test]
+    fn draining_takes_the_shown_and_the_waiting_ones_and_leaves_nothing() {
+        let (mut current, mut pending) = (None, VecDeque::new());
+        for id in ["a", "b", "c"] {
+            push(&mut current, &mut pending, event(id));
+        }
+        let taken: Vec<_> = drain(&mut current, &mut pending).into_iter().map(|e| e.id).collect();
+        assert_eq!(taken, ["a", "b", "c"], "the shown alert comes first, then the queue");
+        assert!(current.is_none() && pending.is_empty(), "nothing is left to ring");
+        assert!(drain(&mut current, &mut pending).is_empty(), "draining again is harmless");
     }
 }

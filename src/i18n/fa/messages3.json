@@ -76,6 +76,8 @@
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "بستن",
+  "alert.closeAll": "close all",
+  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "خلاصه روز",
   "alert.modelNew": "مدل جدید",
   "alert.silence": "بی صدا",
