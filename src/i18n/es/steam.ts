@@ -23,7 +23,6 @@ export const steam: Record<keyof typeof source, string> = {
   "steam.refresh": "actualizar",
   "steam.loadMore": "ver más juegos",
   "steam.deals.empty": "ninguna oferta en tu lista de deseos ahora mismo",
-  "steam.deals.more": "hay más ofertas en tu lista de deseos",
   "steam.trending.empty": "Steam no devolvió los más vendidos ahora",
   "steam.catalog.empty": "ningún juego para esta búsqueda",
   "steam.catalog.search": "buscar en el catálogo",

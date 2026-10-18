@@ -7,6 +7,16 @@ export function steamUrl(appid: number): string {
   return `https://store.steampowered.com/app/${Math.trunc(appid)}/`;
 }
 
+/** Where the header's persona name opens: the profile behind the SteamID64 or a vanity link. */
+export function profileUrl(steamid: string): string {
+  return `https://steamcommunity.com/profiles/${steamid.replace(/[^\d]/g, "")}/`;
+}
+
+/** What a row is called: Steam occasionally omits the title, and the appid still says which game it is. */
+export function gameTitle(row: { appid: number; name: string }): string {
+  return row.name.trim() || `#${Math.trunc(row.appid)}`;
+}
+
 /** Minutes as Steam reports them, written the short way ("2 h 15 min"); under an hour stays in minutes. */
 export function playtime(minutes: number): string {
   const total = Math.max(0, Math.trunc(minutes));

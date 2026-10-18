@@ -38,6 +38,29 @@ fn a_recent_list_without_a_key_says_so_instead_of_calling_out() {
 }
 
 #[test]
+fn the_wishlist_deals_are_paged_twelve_at_a_time() {
+    let scan: Vec<(u32, Price)> = (0..25u32).map(|id| (id, Price { discount: 50, ..Default::default() })).collect();
+    let ids = |page: usize| page_of(&scan, page).0.iter().map(|(id, _)| *id).collect::<Vec<u32>>();
+
+    assert_eq!(ids(0), (0..12).collect::<Vec<u32>>());
+    assert_eq!(ids(1), (12..24).collect::<Vec<u32>>());
+    assert_eq!(ids(2), vec![24], "the last page keeps what is left");
+    assert!(page_of(&scan, 0).1);
+    assert!(page_of(&scan, 1).1);
+    assert!(!page_of(&scan, 2).1, "a short page ends the list");
+    assert!(page_of(&scan, 3).0.is_empty());
+    assert!(!page_of(&[], 0).1, "an empty wishlist promises nothing");
+}
+
+#[test]
+fn an_empty_scan_asks_the_store_for_nothing() {
+    // No title to fetch, so this never leaves the process.
+    let page = deals_page(&[], 0, &br()).unwrap();
+    assert!(page.items.is_empty() && !page.has_more);
+    assert_eq!(page.currency, "BRL");
+}
+
+#[test]
 fn a_fetch_failure_becomes_the_message_the_user_reads() {
     let offline = failed(FetchError::Network("offline".into())).to_string();
     assert!(offline.contains("sem conexão com a Steam"), "{offline}");

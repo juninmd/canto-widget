@@ -484,8 +484,8 @@ export const api = {
   steamDisconnect: () => invoke<SteamStatus>("steam_disconnect"),
   /** The storefront the prices, the wording and the currency come from; drops the cached lists. */
   steamRegion: (region: string) => invoke<SteamStatus>("steam_region_set", { region }),
-  /** Wishlist deals, biggest discount first. */
-  steamDeals: (force = false) => invoke<SteamList>("steam_deals", { force }),
+  /** Wishlist deals, biggest discount first; `page` starts at 0. */
+  steamDeals: (page = 0, force = false) => invoke<SteamList>("steam_deals", { page, force }),
   steamTrending: (force = false) => invoke<SteamList>("steam_trending", { force }),
   /** Top rated games for `term` (empty = the whole store), reviews first; `page` starts at 0. */
   steamCatalog: (term: string, page = 0, force = false) => invoke<SteamList>("steam_catalog", { term, page, force }),

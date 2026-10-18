@@ -104,7 +104,10 @@ pub fn steam_region_set(app: AppHandle, region: String) -> Result<SteamStatus> {
 }
 
 #[tauri::command]
-pub async fn steam_deals(app: AppHandle, force: bool) -> Result<SteamList> {
+pub async fn steam_deals(app: AppHandle, page: usize, force: bool) -> Result<SteamList> {
+    if page > 500 {
+        return Err(AppError::Config("busca inválida".into()));
+    }
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
         let cfg = connected(&state)?;
@@ -113,7 +116,10 @@ pub async fn steam_deals(app: AppHandle, force: bool) -> Result<SteamList> {
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
         let key = format!("deals:{}:{}", cfg.steamid, region.code);
-        state.steam.get_or(&key, force, now_ms(), || lists::deals(&cfg, &region))
+        // The wishlist scan is the expensive half, so it is what the cache holds; the page is sliced
+        // out of it, and only that page asks for titles, capsules and scores.
+        let scan = state.steam.get_or(&key, force, now_ms(), || lists::scan(&cfg, &region))?;
+        lists::deals_page(&scan, page, &region)
     })
     .await
 }

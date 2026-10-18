@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type SteamStatus } from "../lib/api";
 import { requestRefresh } from "../lib/refreshEvent";
-import { REGIONS } from "../lib/steam";
+import { profileUrl, REGIONS } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -20,6 +20,9 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
   const [status, setStatus] = useState<SteamStatus | null>(null);
   const [error, setError] = useState("");
   const [sub, setSub] = useState<Sub>("deals");
+  const [key, setKey] = useState("");
+  const [addingKey, setAddingKey] = useState(false);
+  const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -53,6 +56,23 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
     }
   }
 
+  /** The key is optional and can arrive later: a keyless account keeps its SteamID and gains "jogue agora". */
+  async function addKey(e: React.FormEvent) {
+    e.preventDefault();
+    if (!status) return;
+    setBusy(true);
+    try {
+      setStatus(await api.steamConnect(status.steamid, key));
+      setKey("");
+      setAddingKey(false);
+      requestRefresh("steam");
+    } catch (err) {
+      onError(errText(err));
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (!status) {
     return error ? <ErrorBanner message={error} onRetry={() => void load()} /> : <Skeleton label={t("steam.loading")} />;
   }
@@ -73,10 +93,24 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
             </option>
           ))}
         </select>
-        <span className="min-w-0 flex-1 truncate text-right" title={status.steamid}>
+        <button
+          type="button"
+          onClick={() => void api.openLink(profileUrl(status.steamid)).catch(() => {})}
+          title={status.steamid}
+          className="canto-hit min-w-0 flex-1 truncate text-right hover:text-fg"
+        >
           {status.name || status.steamid}
-        </span>
-        {!status.has_key && <span className="shrink-0 rounded bg-edge px-1.5">{t("steam.noKey")}</span>}
+        </button>
+        {!status.has_key && (
+          <button
+            type="button"
+            onClick={() => setAddingKey((open) => !open)}
+            title={t("steam.connect.keyLabel")}
+            className="canto-hit shrink-0 rounded bg-edge px-1.5 hover:text-fg"
+          >
+            {t("steam.noKey")}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => void disconnect()}
@@ -85,6 +119,26 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
           {t("steam.disconnect")}
         </button>
       </div>
+      {addingKey && !status.has_key && (
+        <form onSubmit={addKey} className="flex gap-1">
+          <input
+            type="password"
+            autoComplete="off"
+            aria-label={t("steam.connect.keyLabel")}
+            placeholder={t("steam.connect.keyPlaceholder")}
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            className="canto-field min-w-0 flex-1 px-2 py-1 text-xs"
+          />
+          <button
+            type="submit"
+            disabled={busy || !key.trim()}
+            className="canto-hit min-h-7 shrink-0 rounded-lg border border-edge px-2 text-xs text-muted hover:bg-hover hover:text-fg disabled:opacity-40"
+          >
+            {busy ? t("steam.connect.working") : t("steam.connect.submit")}
+          </button>
+        </form>
+      )}
       <SubTabs
         label={t("steam.sub.label")}
         value={sub}

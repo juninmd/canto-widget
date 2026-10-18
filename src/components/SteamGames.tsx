@@ -13,8 +13,6 @@ type Props = {
   empty: string;
   /** Rendered above the list, like the catalog's search box. */
   toolbar?: React.ReactNode;
-  /** Shown under the list when the source has more rows than it returned. */
-  more?: string;
   /** Numbers the rows: only the "em alta" list is a ranking. */
   numbered?: boolean;
   /** Adds up what the discounts save: only meaningful on a wishlist. */
@@ -29,7 +27,6 @@ export default function SteamGames({
   load,
   empty,
   toolbar,
-  more,
   numbered = false,
   totalSaved = false,
   loadMore,
@@ -115,7 +112,6 @@ export default function SteamGames({
           {t("steam.loadMore")}
         </button>
       )}
-      {list.has_more && more && <p className="text-[11px] text-faint">{more}</p>}
     </div>
   );
 }

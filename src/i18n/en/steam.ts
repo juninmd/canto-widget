@@ -23,7 +23,6 @@ export const steam: Record<keyof typeof source, string> = {
   "steam.refresh": "refresh",
   "steam.loadMore": "load more games",
   "steam.deals.empty": "no deal on your wishlist right now",
-  "steam.deals.more": "there are more deals on your wishlist",
   "steam.trending.empty": "Steam returned no top sellers right now",
   "steam.catalog.empty": "no game for this search",
   "steam.catalog.search": "search the catalog",

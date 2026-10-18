@@ -6,6 +6,7 @@ import type { SteamList, SteamRecent, SteamRow, SteamStatus } from "../lib/api";
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 let status: SteamStatus;
 let deals: SteamList;
+let moreDeals: SteamList;
 let trending: SteamList;
 let catalog: SteamList;
 let moreCatalog: SteamList;
@@ -45,7 +46,7 @@ mock.module("@tauri-apps/api/core", () => ({
         deals = { ...deals, currency: String(args.region) === "us" ? "USD" : "BRL" };
         return Promise.resolve(status);
       case "steam_deals":
-        return Promise.resolve(deals);
+        return Promise.resolve(Number(args.page ?? 0) === 0 ? deals : moreDeals);
       case "steam_trending":
         return Promise.resolve(trending);
       case "steam_catalog":
@@ -125,6 +126,7 @@ beforeEach(() => {
     has_more: false,
     currency: "BRL",
   };
+  moreDeals = { items: [game(440, "Team Fortress 2", "Grátis")], has_more: false, currency: "BRL" };
   recent = {
     items: [
       {
@@ -232,7 +234,10 @@ test("o catálogo pages through the rest of the store and appends what comes", a
 test("atualizar asks Rust to force the fetch and clicking the row opens the store", async () => {
   await show();
   await click(screen.getByRole("button", { name: "atualizar" }));
-  expect(calls.filter((c) => c.cmd === "steam_deals").map((c) => c.args)).toEqual([{ force: false }, { force: true }]);
+  expect(calls.filter((c) => c.cmd === "steam_deals").map((c) => c.args)).toEqual([
+    { page: 0, force: false },
+    { page: 0, force: true },
+  ]);
   await click(screen.getByRole("button", { name: /Portal 2/ }));
   expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://store.steampowered.com/app/620/" });
 });
@@ -252,6 +257,48 @@ test("the store region picker asks Rust for it and the lists reload from the oth
   // The cached lists belonged to the other store, so the tab refetches the one on screen.
   expect(calls.filter((c) => c.cmd === "steam_deals").length).toBeGreaterThan(1);
   expect(screen.getByText(/economize US\$ 45,00/)).toBeTruthy();
+});
+
+test("ofertas pages through the wishlist without rescanning what is already listed", async () => {
+  deals = { ...deals, has_more: true };
+  await show();
+  expect(rows()).toEqual(["620", "400"]);
+  await click(screen.getByRole("button", { name: "ver mais jogos" }));
+  expect(calls.filter((c) => c.cmd === "steam_deals").map((c) => c.args)).toEqual([
+    { page: 0, force: false },
+    { page: 1, force: false },
+  ]);
+  expect(rows()).toEqual(["620", "400", "440"]);
+  expect(screen.queryByRole("button", { name: "ver mais jogos" })).toBeNull();
+});
+
+test("a row Steam has no title for falls back to the appid instead of inventing a name", async () => {
+  deals = { ...deals, items: [game(900999, "", "R$ 9,99")] };
+  await show();
+  expect(screen.getByText("#900999")).toBeTruthy();
+  expect(screen.queryByText(/jogo 900999/)).toBeNull();
+});
+
+test("the persona name opens the profile behind the SteamID64", async () => {
+  status = { ...status, name: "Ana Exemplo" };
+  await show();
+  await click(screen.getByRole("button", { name: "Ana Exemplo" }));
+  expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({
+    url: "https://steamcommunity.com/profiles/76561190000000000/",
+  });
+});
+
+test("a keyless account can paste the Web API key later, without reconnecting", async () => {
+  await show();
+  expect(screen.queryByLabelText("Chave da Steam Web API (opcional)")).toBeNull();
+  await click(screen.getByRole("button", { name: "sem chave" }));
+  fireEvent.change(screen.getByLabelText("Chave da Steam Web API (opcional)"), { target: { value: "chave-nova" } });
+  await click(screen.getByRole("button", { name: "conectar" }));
+  expect(calls.find((c) => c.cmd === "steam_connect")?.args).toEqual({
+    steamId: "76561190000000000",
+    apiKey: "chave-nova",
+  });
+  expect(screen.queryByLabelText("Chave da Steam Web API (opcional)")).toBeNull();
 });
 
 test("desconectar forgets the account and goes back to the form", async () => {

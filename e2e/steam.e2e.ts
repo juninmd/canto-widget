@@ -75,6 +75,52 @@ test("the Steam tab shows the deals with art, score, price and what they save", 
   expect(catalog?.args).toEqual({ term: "", page: 0, force: false });
 });
 
+test("ofertas pages through the wishlist and the region picker switches the store", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 700 });
+  await mockTauri(page, {
+    hiddenTabs: ["gitlab", "status", "activity"],
+    knownTabs: ALL_TABS,
+    fixed: {
+      ...STEAM_FIXED,
+      steam_region_set: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "us" },
+    },
+  });
+  await page.goto("/");
+  await goTab(page, "Steam");
+
+  const picker = page.getByLabel("região da loja");
+  await expect(picker).toHaveValue("br");
+  await page.getByRole("button", { name: "ver mais jogos" }).click();
+  const more = (await calls(page)).filter((c) => c.cmd === "steam_deals").at(-1);
+  expect(more?.args).toEqual({ page: 1, force: false });
+
+  await picker.selectOption("us");
+  const region = (await calls(page)).find((c) => c.cmd === "steam_region_set");
+  expect(region?.args).toEqual({ region: "us" });
+  // The lists on screen belonged to the other store, so they are refetched.
+  const reloads = (await calls(page)).filter((c) => c.cmd === "steam_deals").length;
+  expect(reloads).toBeGreaterThan(2);
+});
+
+test("a keyless account pastes the Web API key from the header", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 700 });
+  await mockTauri(page, {
+    hiddenTabs: ["gitlab", "status", "activity"],
+    knownTabs: ALL_TABS,
+    fixed: {
+      ...STEAM_FIXED,
+      steam_status: { configured: true, steamid: "76561190000000000", has_key: false, name: "Ana Exemplo", region: "br" },
+    },
+  });
+  await page.goto("/");
+  await goTab(page, "Steam");
+  await page.getByRole("button", { name: "sem chave" }).click();
+  await page.getByLabel("Chave da Steam Web API (opcional)").fill("chave-nova");
+  await page.getByRole("button", { name: "conectar", exact: true }).click();
+  const key = (await calls(page)).find((c) => c.cmd === "steam_connect");
+  expect(key?.args).toEqual({ steamId: "76561190000000000", apiKey: "chave-nova" });
+});
+
 test("an unconnected Steam tab asks for the SteamID and connects", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
   await mockTauri(page, {
@@ -90,7 +136,7 @@ test("an unconnected Steam tab asks for the SteamID and connects", async ({ page
   await goTab(page, "Steam");
   await expect(page.getByText("Conectar à Steam")).toBeVisible();
   await page.getByLabel("SteamID64, link do perfil ou nome de perfil").fill("76561190000000000");
-  await page.getByRole("button", { name: "conectar" }).click();
+  await page.getByRole("button", { name: "conectar", exact: true }).click();
   await expect(page.getByRole("tab", { name: "ofertas" })).toBeVisible();
   const connect = (await calls(page)).find((c) => c.cmd === "steam_connect");
   expect(connect?.args).toEqual({ steamId: "76561190000000000", apiKey: "" });
