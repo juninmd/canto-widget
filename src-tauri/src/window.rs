@@ -109,6 +109,21 @@ pub fn take_alert(app: &tauri::AppHandle, id: &str) -> Option<AgendaItem> {
     removed.0
 }
 
+/// Drops every pending alert at once — the overlay's "fechar todos" — and hides the window.
+pub fn take_all_alerts(app: &tauri::AppHandle) -> Vec<AgendaItem> {
+    let Some(state) = app.try_state::<crate::vault::AppState>() else { return Vec::new() };
+    let drained = {
+        let mut current = state.alert.lock().unwrap();
+        let queue = queue(app);
+        let mut pending = queue.0.lock().unwrap();
+        alert_queue::drain(&mut current, &mut pending)
+    };
+    if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
+        let _ = win.hide();
+    }
+    drained
+}
+
 /// Managed on first use so the queue needs no setup in `lib.rs`; a second `manage` is a no-op.
 fn queue(app: &tauri::AppHandle) -> tauri::State<'_, alert_queue::AlertQueue> {
     app.manage(alert_queue::AlertQueue::default());

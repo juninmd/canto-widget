@@ -18,6 +18,7 @@ pub mod clip_os;
 pub mod clip_transform;
 pub mod clip_watch;
 pub mod clipboard;
+pub mod cmd_alerts;
 pub mod cmd_backup;
 pub mod cmd_biometric;
 pub mod cmd_drive;
@@ -293,13 +294,14 @@ pub fn run() {
             cmd_extras::transcript_read,
             cmd_extras::agenda_today,
             cmd_gemini::gemini_docs,
-            cmd_extras::alert_open,
-            cmd_extras::alert_payload,
-            cmd_extras::alert_close,
+            cmd_alerts::alert_open,
+            cmd_alerts::alert_payload,
+            cmd_alerts::alert_close,
+            cmd_alerts::alert_close_all,
             alert_log::alert_log,
             fullscreen_guard::fullscreen_hold_get,
             fullscreen_guard::fullscreen_hold_set,
-            cmd_extras::main_show,
+            cmd_alerts::main_show,
             snooze::alert_snooze,
             cmd_extras::open_link,
             autostart::autostart_status,

@@ -9,10 +9,10 @@ use crate::clip_watch::ClipWatch;
 use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
+use crate::store;
 use crate::transcripts::{self, TranscriptMeta, TranscriptSettings};
 use crate::trash::Removed;
 use crate::vault::AppState;
-use crate::{store, window};
 
 #[derive(Serialize)]
 pub struct ClipList {
@@ -159,32 +159,6 @@ pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_resul
 /// Kept here for existing callers; the logic lives in `google_token`.
 pub(crate) fn google_token(state: &AppState) -> Result<String> {
     crate::google_token::fresh(state)
-}
-
-#[tauri::command]
-pub fn alert_open(app: tauri::AppHandle, event: AgendaItem) -> Result<()> {
-    if !app.state::<crate::meeting_alert::Alerted>().first(&event) {
-        return Ok(());
-    }
-    window::open_alert(&app, event).map_err(|e| AppError::Io(e.to_string()))
-}
-
-#[tauri::command]
-pub fn alert_payload(app: tauri::AppHandle) -> Vec<AgendaItem> {
-    window::alert_list(&app)
-}
-
-/// The alert window's way to bring the widget up (e.g. "abrir aba Modelos"); an alert alone never does.
-#[tauri::command]
-pub fn main_show(app: tauri::AppHandle) -> Result<()> {
-    window::show(&app).map_err(|e| AppError::Io(e.to_string()))
-}
-
-#[tauri::command]
-pub fn alert_close(app: tauri::AppHandle, id: String, outcome: Option<crate::alert_log::Outcome>) {
-    if let Some(item) = window::take_alert(&app, &id) {
-        crate::alert_log::record(&app, item, outcome.unwrap_or(crate::alert_log::Outcome::Closed));
-    }
 }
 
 #[tauri::command]

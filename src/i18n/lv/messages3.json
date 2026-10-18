@@ -76,6 +76,8 @@
   "notif.dismissFailed": "Could not dismiss {n} alert(s).",
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "aizveriet",
+  "alert.closeAll": "close all",
+  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "dienas kopsavilkums",
   "alert.modelNew": "jauns modelis",
   "alert.silence": "izslēgt skaņu",

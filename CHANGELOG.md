@@ -12,6 +12,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **"Fechar todos" na janela de avisos**: quando a fila de avisos passa de um, a janela do alerta ganha **fechar
+  todos** no canto, ao lado da régua. Antes era um clique em "fechar" por aviso, com a janela ficando aberta até o
+  último; agora a fila inteira sai numa chamada só (o Rust derruba a fila de uma vez, e cada aviso continua deixando
+  o seu registro na lista de resolvidos do dia).
 - **Catálogo da Steam com filtros**: além da busca, a seção ganhou **só em promoção** e a escolha da ordem —
   melhor avaliados, menor preço ou mais recentes. São os três critérios que a própria loja aceita; "maior
   desconto" não é um deles, então essa ordem continua sendo a da lista de desejos.
@@ -43,6 +47,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **O texto dos avisos em markdown**: a caixa de detalhes da janela de avisos passa a renderizar markdown — negrito,
+  listas, código e **links que abrem no navegador** — em vez de mostrar tudo como texto corrido. O que vem de uma
+  menção do GitHub/GitLab é markdown de verdade, então é ali que a mudança aparece. Uma quebra de linha sozinha
+  continua sendo uma quebra, para o resumo do dia seguir linha a linha.
 - **Varredura da lista de desejos com limites**: a varredura de preços passou a ter um teto de jogos por vez e a
   esperar antes de repetir um pedido que a Steam recusou por excesso de requisições, em vez de desistir na primeira
   resposta 429. O alerta de preço também passou a guardar **de qual conta** são os preços: trocar de conta não

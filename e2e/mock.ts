@@ -89,6 +89,13 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
           if (gone) resolved.unshift({ item: gone, outcome: String(args.outcome ?? "closed"), at: Date.now() });
           return null;
         }
+        if (cmd === "alert_close_all" && pending) {
+          // Rust drains the whole queue and logs each one; the mock has to do the same, or the closed
+          // alerts would come back on the next read and the e2e would prove nothing.
+          for (const gone of pending) resolved.unshift({ item: gone, outcome: String(args.outcome ?? "closed"), at: Date.now() });
+          pending = [];
+          return null;
+        }
         if (cmd === "alert_payload" && pending) return pending;
         if (cmd === "alert_log") return resolved;
         if (cmd in fixed) return fixed[cmd];

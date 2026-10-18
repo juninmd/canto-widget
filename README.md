@@ -239,7 +239,10 @@ when it ends; one click turns it back off. It survives a restart and ends on its
 🔔 **Every alert in one screen:** the bell in the header (count and colour when anything is pending) opens the
 alerts over the whole window in any mode: one card per alert with its actions, **dismiss all**, and what was
 resolved today under them — with nothing pending, it is how you still reach today's log. From the dock, a click
-still opens that single alert on top of the normal window.
+still opens that single alert on top of the normal window. The pop-up that rings for one alert shows the whole queue
+as mini cards, and with more than one waiting its **close** button grows a chevron that closes the whole queue at
+once — the same split the snooze button uses. In that pop-up, what the alert says renders **markdown** (a mention or a
+service writes markdown), with its links opening in the browser.
 
 ⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
 locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
@@ -402,7 +405,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | One alert overlay for everything pending: outages, meetings, tasks and new AI models |
 |---|
-| ![Alert overlay with mini cards for a service outage, a meeting starting and a new model; the outage is detailed with its state, since when and the status page button](docs/prints/app/51-avisos-pendentes.png) |
+| ![Alert overlay with mini cards for a service outage, a meeting and a task reminder; the outage is detailed with its state, since when and the status page button, and the close button carries a chevron that closes the whole queue](docs/prints/app/51-avisos-pendentes.png) |
 
 </details>
 

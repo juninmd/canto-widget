@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hour, people, status as agendaStatus, tally } from "../lib/agenda";
 import { kindOf, levelLabel, prLabel, toneOf } from "../lib/alerts";
+import { block, inlineMarkdown, type Render } from "../lib/markdown";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import AlertGuests from "./AlertGuests";
@@ -21,6 +22,23 @@ function Box({ label, children }: { label: string; children: ReactNode }) {
 
 function Chip({ children, tone }: { children: ReactNode; tone?: string }) {
   return <span className={`rounded-full bg-edge px-2 py-0.5 text-[11px] ${tone ?? "text-fg"}`}>{children}</span>;
+}
+
+/** What a mention or a service writes: rendered as markdown (bold, lists, code) with its links openable. */
+function Description({ text }: { text: string }) {
+  const render: Render = {
+    text: (plain) => plain,
+    link: (href, children, key) => (
+      <button key={key} type="button" onClick={() => void api.openLink(href)} className="break-all text-left text-accent-text underline decoration-dotted">
+        {children}
+      </button>
+    ),
+  };
+  return (
+    <div className="space-y-1 break-words text-xs text-fg">
+      {inlineMarkdown.lexer(text).filter((tok) => tok.type !== "space").map((tok, i) => block(tok, render, `d${i}`))}
+    </div>
+  );
 }
 
 /** What the selected alert says, laid out for a wide, short card: heading, chips, then up to two boxes. */
@@ -73,7 +91,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
       </div>
       <div className={`grid min-h-0 flex-1 content-start gap-2.5 ${kind === "meeting" ? "grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)]" : "grid-cols-1 grid-rows-[minmax(0,auto)]"}`}>
         <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
-          {event.description && <p className="whitespace-pre-line break-words text-xs text-fg">{event.description}</p>}
+          {event.description && <Description text={event.description} />}
           {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
           {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
           {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}

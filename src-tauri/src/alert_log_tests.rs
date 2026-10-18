@@ -41,13 +41,17 @@ fn outcomes_travel_as_lowercase_words() {
 
 #[test]
 fn closing_and_snoozing_both_leave_a_trace() {
-    let close = include_str!("cmd_extras.rs");
+    let close = include_str!("cmd_alerts.rs");
     // "\n}" and not "\n}\n": a Windows checkout has CRLF line endings.
     let body = &close[close.find("pub fn alert_close(").unwrap()..];
     assert!(
         body[..body.find("\n}").unwrap()].contains("alert_log::record"),
         "a closed alert would vanish from the log"
     );
+    // "fechar todos" drops a whole queue at once: each one still has to leave its trace.
+    let all = &close[close.find("pub fn alert_close_all(").unwrap()..];
+    let all = &all[..all.find("\n}").unwrap()];
+    assert!(all.contains("take_all_alerts") && all.contains("alert_log::record"), "the batch close must log too");
     let snooze = include_str!("snooze.rs");
     assert!(snooze.contains("Outcome::Snoozed"), "a snoozed alert would vanish from the log");
 }
