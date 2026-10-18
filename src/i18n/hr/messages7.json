@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Uglavnom pozitivno",
   "steam.review.mixed": "Mješoviti",
   "steam.review.mostly_negative": "Uglavnom negativno",
+  "steam.region": "store region",
   "agents.tab": "Agenti",
   "agents.loading": "provjeravajući agente",
   "agents.header": "{installed} of {total} installed",

@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "பெரும்பாலும் நேர்மறை",
   "steam.review.mixed": "கலப்பு",
   "steam.review.mostly_negative": "பெரும்பாலும் எதிர்மறை",
+  "steam.region": "store region",
   "agents.tab": "முகவர்கள்",
   "agents.loading": "முகவர்களை சரிபார்க்கிறது",
   "agents.header": "{total} இல் {installed} நிறுவப்பட்டது",

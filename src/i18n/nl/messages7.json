@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Meestal positief",
   "steam.review.mixed": "Gemengd",
   "steam.review.mostly_negative": "Meestal negatief",
+  "steam.region": "store region",
   "agents.tab": "Agenten",
   "agents.loading": "het controleren van de agenten",
   "agents.header": "{installed} van {total} geïnstalleerd",

@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "إيجابية في الغالب",
   "steam.review.mixed": "مختلط",
   "steam.review.mostly_negative": "سلبية في الغالب",
+  "steam.region": "store region",
   "agents.tab": "الوكلاء",
   "agents.loading": "فحص الوكلاء",
   "agents.header": "تم تثبيت {installed} من {total}",

@@ -3,6 +3,7 @@ import type { steam as source } from "../pt-BR/steam";
 export const steam: Record<keyof typeof source, string> = {
   "steam.loading": "conectando con Steam",
   "steam.noKey": "sin clave",
+  "steam.region": "región de la tienda",
   "steam.disconnect": "desconectar",
   "steam.connect.title": "Conectar con Steam",
   "steam.connect.hint":

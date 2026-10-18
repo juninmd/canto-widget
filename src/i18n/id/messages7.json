@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Sebagian besar positif",
   "steam.review.mixed": "Campuran",
   "steam.review.mostly_negative": "Kebanyakan negatif",
+  "steam.region": "store region",
   "agents.tab": "Agen",
   "agents.loading": "memeriksa agen",
   "agents.header": "{installed} dari {total} terpasang",

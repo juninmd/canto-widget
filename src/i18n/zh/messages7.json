@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "大多是积极的",
   "steam.review.mixed": "混合",
   "steam.review.mostly_negative": "大多是负面的",
+  "steam.region": "store region",
   "agents.tab": "代理商",
   "agents.loading": "检查代理",
   "agents.header": "已安装 {total} 的 {installed}",

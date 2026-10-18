@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Plutôt positif",
   "steam.review.mixed": "Mixte",
   "steam.review.mostly_negative": "Plutôt négatif",
+  "steam.region": "store region",
   "agents.tab": "Agents",
   "agents.loading": "vérifier les agents",
   "agents.header": "{installed} sur {total} installé",

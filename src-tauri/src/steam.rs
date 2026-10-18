@@ -10,11 +10,7 @@ use crate::error::Result;
 use crate::store::{self, STEAM_AAD};
 use crate::vault::AppState;
 
-/// The store is read in BRL and Portuguese: prices and review labels come already localized, so they
-/// are never re-formatted here.
-pub const COUNTRY: &str = "BR";
-pub const LANGUAGE: &str = "portuguese";
-/// How many rows each list shows: one widget pane, not a storefront.
+/// How many rows each list shows: one widget pane, not a storefront. A page, on the wishlist too.
 pub const DEALS: usize = 12;
 pub const TRENDING: usize = 25;
 /// The store answers 50 rows per search page, and `start` only moves in 50s.
@@ -38,6 +34,14 @@ pub struct SteamConfig {
     /// Persona name from the last successful connect, shown in the header.
     #[serde(default)]
     pub name: String,
+    /// The storefront chosen in the tab ("br", "us"...); empty means "derive it from the language".
+    #[serde(default)]
+    pub region: String,
+}
+
+/// The storefront the configuration means: the chosen one, or the one the UI language implies.
+pub fn region_of(cfg: &SteamConfig) -> crate::steam_region::Region {
+    crate::steam_region::effective(&cfg.region, crate::lang::code())
 }
 
 impl AppState {
@@ -56,15 +60,19 @@ pub struct SteamStatus {
     pub steamid: String,
     pub has_key: bool,
     pub name: String,
+    /// The effective region code, so the picker opens on what the lists are actually reading.
+    pub region: String,
 }
 
 pub fn status(cfg: Option<&SteamConfig>) -> SteamStatus {
     let cfg = cfg.cloned().unwrap_or_default();
+    let region = region_of(&cfg).code.to_string();
     SteamStatus {
         configured: !cfg.steamid.is_empty(),
         steamid: cfg.steamid,
         has_key: !cfg.api_key.is_empty(),
         name: cfg.name,
+        region,
     }
 }
 
@@ -93,6 +101,8 @@ pub struct SteamRow {
 pub struct SteamList {
     pub items: Vec<SteamRow>,
     pub has_more: bool,
+    /// ISO 4217 of the region the prices came from; the interface formats the savings with it.
+    pub currency: String,
 }
 
 /// A game played in the last two weeks, newest first.

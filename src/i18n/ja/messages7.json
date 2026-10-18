@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "ほとんどがポジティブ",
   "steam.review.mixed": "混合",
   "steam.review.mostly_negative": "ほとんどが否定的",
+  "steam.region": "store region",
   "agents.tab": "エージェント",
   "agents.loading": "エージェントをチェックする",
   "agents.header": "{installed}/{total} がインストールされました",

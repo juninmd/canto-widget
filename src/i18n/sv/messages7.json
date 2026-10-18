@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Mest positivt",
   "steam.review.mixed": "Blandat",
   "steam.review.mostly_negative": "Mest negativt",
+  "steam.region": "store region",
   "agents.tab": "Agenter",
   "agents.loading": "kontrollerar agenterna",
   "agents.header": "{installed} av {total} har installerats",

@@ -118,6 +118,7 @@ pub mod steam_feed;
 pub mod steam_lists;
 pub mod steam_parse;
 pub mod steam_player;
+pub mod steam_region;
 pub mod steam_review;
 pub mod steam_store;
 pub mod steam_url;
@@ -374,6 +375,7 @@ pub fn run() {
             cmd_steam::steam_status,
             cmd_steam::steam_connect,
             cmd_steam::steam_disconnect,
+            cmd_steam::steam_region_set,
             cmd_steam::steam_deals,
             cmd_steam::steam_trending,
             cmd_steam::steam_catalog,

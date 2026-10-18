@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Переважно позитивні",
   "steam.review.mixed": "змішаний",
   "steam.review.mostly_negative": "Переважно негативні",
+  "steam.region": "store region",
   "agents.tab": "Агенти",
   "agents.loading": "перевірка агентів",
   "agents.header": "Встановлено {installed} з {total}",

@@ -17,9 +17,14 @@ pub fn english() -> bool {
     LANGUAGE.load(Ordering::Relaxed) != 1
 }
 
+/// The chosen language's catalog code, for anything that has to match the interface.
+pub fn code() -> &'static str {
+    catalogs::CODES[LANGUAGE.load(Ordering::Relaxed)]
+}
+
 /// Built-in catalogs keep native notification labels offline.
 pub fn tr(pt: &'static str, en: &'static str) -> &'static str {
-    translate(catalogs::CODES[LANGUAGE.load(Ordering::Relaxed)], pt, en)
+    translate(code(), pt, en)
 }
 
 /// The language in force, for callers that have to look the code up themselves (see `error::AppError::text`).

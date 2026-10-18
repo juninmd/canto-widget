@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "اکثرا مثبته",
   "steam.review.mixed": "مختلط",
   "steam.review.mostly_negative": "اکثرا منفی",
+  "steam.region": "store region",
   "agents.tab": "عوامل",
   "agents.loading": "بررسی عوامل",
   "agents.header": "{installed} از {total} نصب شده است",

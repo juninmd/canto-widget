@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Pārsvarā pozitīvi",
   "steam.review.mixed": "Jaukti",
   "steam.review.mostly_negative": "Pārsvarā negatīvi",
+  "steam.region": "store region",
   "agents.tab": "Aģenti",
   "agents.loading": "pārbaudot aģentus",
   "agents.header": "{installed} no {total} instalēta",

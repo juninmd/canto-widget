@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Többnyire pozitív",
   "steam.review.mixed": "Vegyes",
   "steam.review.mostly_negative": "Többnyire negatív",
+  "steam.region": "store region",
   "agents.tab": "Ügynökök",
   "agents.loading": "az ügynökök ellenőrzése",
   "agents.header": "{installed} / {total} telepítve",

@@ -21,10 +21,11 @@ const row = (appid: number, name: string, price: string, extra: Record<string, u
 const ONE_PIXEL = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 export const STEAM_FIXED = {
-  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },
+  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br" },
   steam_image: ONE_PIXEL,
   steam_deals: {
     has_more: true,
+    currency: "BRL",
     items: [
       row(900001, "Aurora Drift", "R$ 14,99", {
         original: "R$ 59,99",
@@ -36,8 +37,8 @@ export const STEAM_FIXED = {
       }),
     ],
   },
-  steam_trending: { has_more: false, items: [row(900002, "Nimbus Racer", "R$ 89,90", { review: 88, review_count: 250 })] },
-  steam_catalog: { has_more: true, items: [row(900003, "Maré Profunda", "R$ 24,99", { review: 97, review_count: 1 })] },
+  steam_trending: { has_more: false, currency: "BRL", items: [row(900002, "Nimbus Racer", "R$ 89,90", { review: 88, review_count: 250 })] },
+  steam_catalog: { has_more: true, currency: "BRL", items: [row(900003, "Maré Profunda", "R$ 24,99", { review: 97, review_count: 1 })] },
   steam_recent: {
     has_key: true,
     items: [
@@ -81,8 +82,8 @@ test("an unconnected Steam tab asks for the SteamID and connects", async ({ page
     knownTabs: ALL_TABS,
     fixed: {
       ...STEAM_FIXED,
-      steam_status: { configured: false, steamid: "", has_key: false, name: "" },
-      steam_connect: { configured: true, steamid: "76561190000000000", has_key: false, name: "" },
+      steam_status: { configured: false, steamid: "", has_key: false, name: "", region: "br" },
+      steam_connect: { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br" },
     },
   });
   await page.goto("/");

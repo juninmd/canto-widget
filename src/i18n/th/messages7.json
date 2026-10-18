@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "ส่วนใหญ่เป็นเชิงบวก",
   "steam.review.mixed": "ผสม",
   "steam.review.mostly_negative": "ส่วนใหญ่เป็นลบ",
+  "steam.region": "store region",
   "agents.tab": "ตัวแทน",
   "agents.loading": "ตรวจสอบตัวแทน",
   "agents.header": "ติดตั้ง {installed} จาก {total} แล้ว",

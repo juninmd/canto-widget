@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Предимно положително",
   "steam.review.mixed": "Смесени",
   "steam.review.mostly_negative": "Предимно отрицателни",
+  "steam.region": "store region",
   "agents.tab": "Агенти",
   "agents.loading": "проверка на агентите",
   "agents.header": "{installed} от {total} инсталиран",

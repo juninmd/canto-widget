@@ -1,15 +1,17 @@
 //! Every Steam URL the widget reads, and the one check that keeps a capsule on Steam's own CDNs.
 use url::Url;
 
-use crate::steam::{COUNTRY, LANGUAGE};
+use crate::steam_region::Region;
 
 const WEB_API: &str = "https://api.steampowered.com";
 const STORE: &str = "https://store.steampowered.com";
 
-/// The store is always read in BRL and Portuguese, so prices and wording come already localized.
-fn store(path: &str, extra: &[(&str, &str)]) -> Url {
+/// The store is read in the chosen region's country and language, so prices and wording come
+/// already localized to it.
+fn store(path: &str, extra: &[(&str, &str)], region: &Region) -> Url {
     let mut url = Url::parse(&format!("{STORE}{path}")).expect("base do store");
-    url.query_pairs_mut().extend_pairs([("cc", COUNTRY), ("l", LANGUAGE)].into_iter().chain(extra.iter().copied()));
+    url.query_pairs_mut()
+        .extend_pairs([("cc", region.country), ("l", region.language)].into_iter().chain(extra.iter().copied()));
     url
 }
 
@@ -27,22 +29,22 @@ pub fn wishlist_url(steamid: &str) -> Url {
     web("IWishlistService/GetWishlist/v1", &[("steamid", steamid)])
 }
 
-pub fn price_url(ids: &[u32]) -> Url {
-    let mut url = store("/api/appdetails", &[("filters", "price_overview")]);
+pub fn price_url(ids: &[u32], region: &Region) -> Url {
+    let mut url = store("/api/appdetails", &[("filters", "price_overview")], region);
     url.query_pairs_mut().append_pair("appids", &joined(ids));
     url
 }
 
-pub fn basic_url(id: u32) -> Url {
-    let mut url = store("/api/appdetails", &[("filters", "basic")]);
+pub fn basic_url(id: u32, region: &Region) -> Url {
+    let mut url = store("/api/appdetails", &[("filters", "basic")], region);
     url.query_pairs_mut().append_pair("appids", &id.to_string());
     url
 }
 
 /// The price feed carries no reviews, so a wishlist row asks the store's own summary for them: a
 /// couple of hundred bytes with the percentage, the bucket and the count.
-pub fn reviews_url(id: u32) -> Url {
-    let mut url = store(&format!("/appreviews/{id}"), &[("language", "all")]);
+pub fn reviews_url(id: u32, region: &Region) -> Url {
+    let mut url = store(&format!("/appreviews/{id}"), &[("language", "all")], region);
     let mut query = url.query_pairs_mut();
     query.append_pair("json", "1");
     query.append_pair("purchase_type", "all");
@@ -65,12 +67,12 @@ pub fn recent_url(key: &str, steamid: &str, count: usize) -> Url {
     url
 }
 
-pub fn trending_url() -> Url {
-    store("/search/", &[("filter", "globaltopsellers")])
+pub fn trending_url(region: &Region) -> Url {
+    store("/search/", &[("filter", "globaltopsellers")], region)
 }
 
-pub fn catalog_url(term: &str, page: usize) -> Url {
-    let mut url = store("/search/", &[("sort_by", "Reviews_DESC")]);
+pub fn catalog_url(term: &str, page: usize, region: &Region) -> Url {
+    let mut url = store("/search/", &[("sort_by", "Reviews_DESC")], region);
     let mut query = url.query_pairs_mut();
     if page > 0 {
         query.append_pair("start", &(page * crate::steam::CATALOG_PAGE).to_string());

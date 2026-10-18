@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Většinou pozitivní",
   "steam.review.mixed": "Smíšené",
   "steam.review.mostly_negative": "Většinou negativní",
+  "steam.region": "store region",
   "agents.tab": "Agenti",
   "agents.loading": "kontrola agentů",
   "agents.header": "{installed} z {total} nainstalováno",

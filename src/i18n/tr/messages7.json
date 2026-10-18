@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Çoğunlukla olumlu",
   "steam.review.mixed": "Karışık",
   "steam.review.mostly_negative": "Çoğunlukla olumsuz",
+  "steam.region": "store region",
   "agents.tab": "Temsilciler",
   "agents.loading": "acenteleri kontrol etmek",
   "agents.header": "{installed} / {total} yüklü",

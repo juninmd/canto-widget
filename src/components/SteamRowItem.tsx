@@ -1,12 +1,12 @@
 import { api, type SteamRow } from "../lib/api";
-import { brl, count, reviewLabelKey, reviewTone, steamUrl } from "../lib/steam";
+import { count, money, reviewLabelKey, reviewTone, steamUrl } from "../lib/steam";
 import { t } from "../i18n";
 import SteamThumb from "./SteamThumb";
 
 const TONE = { good: "text-accent-text", mixed: "text-warn", bad: "text-danger", "": "text-faint" };
 
 /** One game: capsule, title, how the reviews read, and what it costs — with what the discount saves. */
-export default function SteamRowItem({ row, rank }: { row: SteamRow; rank?: number }) {
+export default function SteamRowItem({ row, rank, currency }: { row: SteamRow; rank?: number; currency: string }) {
   const reviews = count(row.review_count);
   const label = reviewLabelKey(row.review_key);
   return (
@@ -48,7 +48,7 @@ export default function SteamRowItem({ row, rank }: { row: SteamRow; rank?: numb
               {row.original && <s className="text-faint">{row.original}</s>}
               <span className="font-semibold text-accent-text">{row.price}</span>
               {row.saved_cents > 0 && (
-                <span className="text-[11px] text-muted">{t("steam.row.saved", { value: brl(row.saved_cents) })}</span>
+                <span className="text-[11px] text-muted">{t("steam.row.saved", { value: money(row.saved_cents, currency) })}</span>
               )}
             </span>
           )}

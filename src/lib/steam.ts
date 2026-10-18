@@ -16,10 +16,20 @@ export function playtime(minutes: number): string {
   return rest === 0 ? `${hours} h` : `${hours} h ${rest} min`;
 }
 
-/** Cents as reais, in the chosen language ("R$ 45,00"); the store is always read in BRL. */
-export function brl(cents: number): string {
-  return new Intl.NumberFormat(LOCALE, { style: "currency", currency: "BRL" }).format(Math.max(0, Math.trunc(cents)) / 100);
+/** Cents in the region's currency, written the way the chosen language writes money ("R$ 45,00").
+ * The code comes from Rust, but it is still checked: `Intl` throws on anything that isn't ISO 4217. */
+export function money(cents: number, currency: string): string {
+  const code = /^[A-Z]{3}$/.test(currency) ? currency : "USD";
+  return new Intl.NumberFormat(LOCALE, { style: "currency", currency: code }).format(Math.max(0, Math.trunc(cents)) / 100);
 }
+
+/** The storefronts Rust can read, each named the way that store names itself, with its symbol. */
+export const REGIONS = [
+  { code: "br", label: "Brasil · R$" },
+  { code: "us", label: "United States · $" },
+  { code: "eu", label: "Euro · €" },
+  { code: "gb", label: "United Kingdom · £" },
+] as const;
 
 /** How a score reads at a glance: most reviews positive, mixed, or mostly negative. */
 export type ReviewTone = "good" | "mixed" | "bad" | "";

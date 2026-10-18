@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Mara nyingi chanya",
   "steam.review.mixed": "Imechanganywa",
   "steam.review.mostly_negative": "Mara nyingi hasi",
+  "steam.region": "store region",
   "agents.tab": "Mawakala",
   "agents.loading": "kuangalia mawakala",
   "agents.header": "{installed} kati ya {total} imesakinishwa",

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type SteamStatus } from "../lib/api";
+import { requestRefresh } from "../lib/refreshEvent";
+import { REGIONS } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -41,6 +43,16 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
     }
   }
 
+  async function chooseRegion(region: string) {
+    try {
+      setStatus(await api.steamRegion(region));
+      // Rust dropped the cached lists with the other store's prices; the ones on screen go too.
+      requestRefresh("steam");
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
   if (!status) {
     return error ? <ErrorBanner message={error} onRetry={() => void load()} /> : <Skeleton label={t("steam.loading")} />;
   }
@@ -48,8 +60,20 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <div className="flex items-center justify-end gap-1 text-[11px] text-faint">
-        <span className="min-w-0 truncate" title={status.steamid}>
+      <div className="flex items-center gap-1 text-[11px] text-faint">
+        <select
+          aria-label={t("steam.region")}
+          value={status.region}
+          onChange={(e) => void chooseRegion(e.target.value)}
+          className="canto-hit shrink-0 rounded border border-edge bg-ink px-1 py-0.5 text-[11px] text-muted"
+        >
+          {REGIONS.map((region) => (
+            <option key={region.code} value={region.code}>
+              {region.label}
+            </option>
+          ))}
+        </select>
+        <span className="min-w-0 flex-1 truncate text-right" title={status.steamid}>
           {status.name || status.steamid}
         </span>
         {!status.has_key && <span className="shrink-0 rounded bg-edge px-1.5">{t("steam.noKey")}</span>}

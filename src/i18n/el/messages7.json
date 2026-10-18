@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Κυρίως θετικά",
   "steam.review.mixed": "Μικτή",
   "steam.review.mostly_negative": "Κυρίως αρνητικά",
+  "steam.region": "store region",
   "agents.tab": "Πράκτορες",
   "agents.loading": "ελέγχοντας τους πράκτορες",
   "agents.header": "Εγκαταστάθηκε {installed} από {total}",

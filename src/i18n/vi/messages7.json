@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Chủ yếu là tích cực",
   "steam.review.mixed": "Hỗn hợp",
   "steam.review.mostly_negative": "Chủ yếu là tiêu cực",
+  "steam.region": "store region",
   "agents.tab": "Đại lý",
   "agents.loading": "kiểm tra đại lý",
   "agents.header": "{installed} trong số {total} đã cài đặt",

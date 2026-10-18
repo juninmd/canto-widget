@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "বেশিরভাগই ইতিবাচক",
   "steam.review.mixed": "মিশ্র",
   "steam.review.mostly_negative": "বেশিরভাগই নেতিবাচক",
+  "steam.region": "store region",
   "agents.tab": "এজেন্ট",
   "agents.loading": "এজেন্টদের পরীক্ষা করা হচ্ছে",
   "agents.header": "{total} এর মধ্যে {installed} ইনস্টল করা হয়েছে",

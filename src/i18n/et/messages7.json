@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Enamasti positiivne",
   "steam.review.mixed": "Segatud",
   "steam.review.mostly_negative": "Enamasti negatiivne",
+  "steam.region": "store region",
   "agents.tab": "Agendid",
   "agents.loading": "agentide kontrollimine",
   "agents.header": "{installed}/{total} installitud",

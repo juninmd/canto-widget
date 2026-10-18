@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Pääosin positiivista",
   "steam.review.mixed": "Sekoitettu",
   "steam.review.mostly_negative": "Enimmäkseen negatiivista",
+  "steam.region": "store region",
   "agents.tab": "Agentit",
   "agents.loading": "agenttien tarkastus",
   "agents.header": "{installed} / {total} asennettu",

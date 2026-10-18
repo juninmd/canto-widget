@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Dažniausiai teigiamas",
   "steam.review.mixed": "Mišrus",
   "steam.review.mostly_negative": "Dažniausiai neigiamas",
+  "steam.region": "store region",
   "agents.tab": "Agentai",
   "agents.loading": "tikrindamas agentus",
   "agents.header": "Įdiegta {installed} iš {total}",

@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { brl, count, mergeGames, playtime, reviewLabelKey, reviewTone, steamUrl } from "./steam";
+import { count, mergeGames, money, playtime, reviewLabelKey, reviewTone, steamUrl } from "./steam";
 import type { SteamRow } from "./api";
 
 test("a row opens the store page of its app", () => {
@@ -22,12 +22,21 @@ test("a negative or fractional playtime is clamped to a whole number", () => {
   expect(playtime(90.7)).toBe("1 h 30 min");
 });
 
-test("cents are written as reais, never below zero", () => {
-  // Intl separates "R$" from the number with a non-breaking space.
-  expect(brl(4500)).toBe("R$\u00a045,00");
-  expect(brl(123456)).toBe("R$\u00a01.234,56");
-  expect(brl(0)).toBe("R$\u00a00,00");
-  expect(brl(-10)).toBe("R$\u00a00,00");
+test("cents are written in the region's currency, never below zero", () => {
+  // Intl separates the symbol from the number with a non-breaking space.
+  expect(money(4500, "BRL")).toBe("R$\u00a045,00");
+  expect(money(123456, "BRL")).toBe("R$\u00a01.234,56");
+  expect(money(0, "BRL")).toBe("R$\u00a00,00");
+  expect(money(-10, "BRL")).toBe("R$\u00a00,00");
+  expect(money(4500, "USD")).toBe("US$\u00a045,00");
+  expect(money(4500, "EUR")).toBe("€\u00a045,00");
+});
+
+test("a currency the interface cannot read falls back instead of throwing", () => {
+  // Intl throws a RangeError on anything that isn't an ISO 4217 code; the field comes from Rust.
+  expect(money(4500, "")).toBe("US$\u00a045,00");
+  expect(money(4500, "reais")).toBe("US$\u00a045,00");
+  expect(money(4500, "brl")).toBe("US$\u00a045,00");
 });
 
 test("a score reads at a glance from Steam's own bucket", () => {

@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "בעיקר חיובי",
   "steam.review.mixed": "מעורב",
   "steam.review.mostly_negative": "בעיקר שלילי",
+  "steam.region": "store region",
   "agents.tab": "סוכנים",
   "agents.loading": "בודקים את הסוכנים",
   "agents.header": "{installed} מתוך {total} מותקן",

@@ -87,6 +87,7 @@
   "steam.review.mostly_positive": "Углавном позитивно",
   "steam.review.mixed": "Микед",
   "steam.review.mostly_negative": "Углавном негативно",
+  "steam.region": "store region",
   "agents.tab": "Агенти",
   "agents.loading": "провера агената",
   "agents.header": "{installed} од {total} инсталиран",
