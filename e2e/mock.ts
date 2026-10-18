@@ -58,6 +58,16 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       my_pr_alerts_get: { ci: false, stalled: false, stalled_hours: 48, mentions: false },
       models_get: o.models ?? { alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
       steam_status: o.steam ?? { configured: false, steamid: "", has_key: false, name: "" },
+      // Real rows, so the sweep and the specs see a card and not an empty list.
+      market_get: {
+        quotes: [
+          { symbol: "USD/BRL", label: "Dólar", value: 5.0826, change: 0.6038, decimals: 4 },
+          { symbol: "BTC/BRL", label: "Bitcoin", value: 411553, change: -0.51, decimals: 0 },
+          { symbol: "IBOV", label: "Ibovespa", value: 205430.33, change: 0.54, decimals: 2 },
+        ],
+        fetched_at: 1_700_000_000_000,
+        error: null,
+      },
       ...o.fixed,
     };
     let pending = Array.isArray(fixed.alert_payload) ? [...(fixed.alert_payload as { id: string }[])] : null;

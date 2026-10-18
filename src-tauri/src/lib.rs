@@ -29,6 +29,7 @@ pub mod cmd_github_lists;
 pub mod cmd_gitlab;
 pub mod cmd_harness;
 pub mod cmd_health;
+pub mod cmd_market;
 pub mod cmd_mentions;
 pub mod cmd_models;
 pub mod cmd_notes;
@@ -75,6 +76,8 @@ pub mod hello;
 #[cfg(target_os = "macos")]
 pub mod hello_mac;
 pub mod lang;
+pub mod market;
+pub mod market_state;
 pub mod meet;
 pub mod meeting_alert;
 pub mod mention_alerts;
@@ -178,6 +181,7 @@ pub fn run() {
             app.manage(harness_cache::HarnessCache::default());
             app.manage(weather_state::WeatherState::load(&dir));
             app.manage(cmd_reads::ReadsState::load(&dir));
+            app.manage(market_state::MarketState::new());
             app.manage(cmd_models::ModelsLock::default());
             app.manage(cmd_steam::SteamLock::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
@@ -356,6 +360,7 @@ pub fn run() {
             cmd_weather::weather_get,
             cmd_weather::weather_set_city,
             cmd_weather::weather_clear,
+            cmd_market::market_get,
             cmd_reads::reads_get,
             cmd_reads::reads_add,
             cmd_reads::reads_remove,

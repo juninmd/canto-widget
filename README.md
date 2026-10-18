@@ -187,6 +187,20 @@ default, one checkbox away in Settings.
 </td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/94-mercado.png" alt="Market tab: quotes with the label, the number and the day's variation, in green and red, and the sources in the footnote"></td>
+<td>
+
+### 📈 The market, without a token and without leaving the widget
+
+**The dollar and the euro** straight from the Central Bank's daily series, **bitcoin** in reais from CoinGecko and
+**the world's main indexes** — Ibovespa, S&amp;P 500, Nasdaq, Dow Jones, Nikkei, DAX, FTSE 100, CAC 40, Hang Seng
+and Shanghai — in a single request to CNBC. Every row carries the day's variation, and the whole reading is cached
+for 15 minutes; a source that fails leaves the last reading on screen, marked as stale. **No account, no API key,
+no token**: the tab starts off by default, one checkbox away in Settings.
+
+</td>
+</tr>
+<tr>
 <td>
 
 ### 📰 An RSS/Atom reader with thumbnails
@@ -451,19 +465,12 @@ is kept and what never is.
 
 <sub>All screenshots use fictitious data.</sub>
 
-## 🧪 Prototypes: one suggested tab
+## 🧪 Prototypes: none left
 
-**Clima** and **Leituras** started here, were picked and are now real features (up the page); **Hábitos** and
-**Snippets** were dropped. **Mercado** is still a **prototype**: it starts hidden (one checkbox away in Settings)
-and is a **mockup with fictitious data** — no backend, nothing stored, nothing fetched. The screen says what it
-would still need, so the idea can be judged before it becomes real.
-
-| Market |
-|---|
-| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> |
-
-- **Market** — dollar (PTAX), euro, bitcoin, Ibovespa and the world's main indexes with the day's variation. Would
-  need the Central Bank, CoinGecko and CNBC, all keyless, with a 15 min cache per quote.
+Four of the five ideas that started here are real features now (**Clima**, **Leituras**, **Agentes** and
+**Mercado**, up the page) and two were dropped (**Hábitos** and **Snippets**). The mechanism stays for the next
+idea: a prototype tab starts hidden, is a **mockup with fictitious data** — no backend, nothing stored, nothing
+fetched — and says on screen what it would still need, so the idea can be judged before it becomes real.
 
 <sub>All screenshots use fictitious data.</sub>
 

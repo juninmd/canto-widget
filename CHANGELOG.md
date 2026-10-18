@@ -12,6 +12,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Mercado**: cotações de verdade, sem chave nenhuma — **dólar e euro** na série diária do Banco Central,
+  **bitcoin** em reais no CoinGecko e **as principais bolsas do mundo** (Ibovespa, S&amp;P 500, Nasdaq, Dow Jones,
+  Nikkei, DAX, FTSE 100, CAC 40, Hang Seng e Xangai) numa requisição só à CNBC. Cada linha traz a variação do dia,
+  a leitura é cacheada por 15 min e uma fonte que falha deixa a última leitura na tela, marcada como antiga. A aba
+  era um protótipo e estreia escondida, a um clique nos Ajustes.
 - **Aba Clima**: escreva o nome da cidade uma vez e o Canto guarda só as coordenadas. A aba mostra **agora**, as
   **próximas horas numa curva** com a chance de chuva, os **próximos dias** e o aviso de **chuva a partir das
   HH:MM**. Os dados vêm da Open-Meteo, que é aberta e **não pede chave** — nenhuma conta e nenhum endereço seu sai
