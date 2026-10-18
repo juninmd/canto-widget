@@ -258,6 +258,15 @@ export type WeatherView = {
   error: string | null;
 };
 
+/** One line of the Mercado card: the number and the day's variation, formatted by the UI in the user's locale. */
+export type MarketQuote = { symbol: string; label: string; value: number; change: number; decimals: number };
+export type MarketView = {
+  quotes: MarketQuote[];
+  fetched_at: number;
+  /** pt-BR text when the reading failed; the last good quotes still come through with it. */
+  error: string | null;
+};
+
 /** One card in the Leituras tab; `has_image` only says a thumbnail exists (the bytes come by id). */
 export type ReadArticle = {
   id: string;
@@ -497,6 +506,9 @@ export const api = {
   /** Resolves the city name to coordinates and saves only those; a bad name comes back as an error. */
   weatherSetCity: (city: string) => invoke<WeatherView>("weather_set_city", { city }),
   weatherClear: () => invoke<WeatherView>("weather_clear"),
+
+  /** Mercado: the keyless quotes (Central Bank, CoinGecko, CNBC); Rust keeps them for 15 min. */
+  marketGet: (force = false) => invoke<MarketView>("market_get", { force }),
 
   /** Leituras: the saved feeds, newest first; thumbnails and favicons come as `data:` URLs, by id/host. */
   readsGet: (force = false) => invoke<ReadsView>("reads_get", { force }),

@@ -20,7 +20,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "models", label: t("tabs.models") },
   { id: "agents", label: t("agents.tab") },
   { id: "weather", label: t("weather.tab") },
-  { id: "market", label: t("protos.tab.market") },
+  { id: "market", label: t("market.tab") },
   { id: "reads", label: t("reads.tab") },
   { id: "activity", label: t("tabs.activity") },
   { id: "settings", label: t("tabs.settings") },
