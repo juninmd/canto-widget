@@ -251,6 +251,10 @@ export type SteamStatus = {
   region: string;
   watching: boolean;
 };
+/** A game the player owns; only the total playtime is kept here. */
+export type OwnedGame = { appid: number; name: string; total_min: number; art: string };
+/** `total`/`minutes` cover every match, not just the paged `items`; `has_key` false means no Web API key. */
+export type SteamLibrary = { items: OwnedGame[]; total: number; minutes: number; has_key: boolean };
 /** The WMO groups the Clima tab knows; the catalogue turns each one into a sentence. */
 export type WeatherCondition = "clear" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm";
 export type WeatherPlace = { city: string; admin1: string; country: string; lat: number; lon: number };
@@ -499,6 +503,8 @@ export const api = {
   /** Top rated games for `term` (empty = the whole store), reviews first; `page` starts at 0. */
   steamCatalog: (term: string, page = 0, force = false) => invoke<SteamList>("steam_catalog", { term, page, force }),
   steamRecent: (force = false) => invoke<SteamRecent>("steam_recent", { force }),
+  /** Every owned game, most played first, filtered by `term` and paged by 100; `page` starts at 0. */
+  steamLibrary: (term = "", page = 0, force = false) => invoke<SteamLibrary>("steam_library", { term, page, force }),
   /** One capsule as a `data:` URL, cached in Rust; empty when Steam has no art for the app. */
   steamImage: (url: string) => invoke<string>("steam_image", { url }),
 

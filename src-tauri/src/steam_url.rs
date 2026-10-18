@@ -67,6 +67,26 @@ pub fn recent_url(key: &str, steamid: &str, count: usize) -> Url {
     url
 }
 
+/// The whole library, free games included when they were played: the Web API omits them otherwise.
+pub fn owned_url(key: &str, steamid: &str) -> Url {
+    web(
+        "IPlayerService/GetOwnedGames/v1",
+        &[
+            ("key", key),
+            ("steamid", steamid),
+            ("include_appinfo", "1"),
+            ("include_played_free_games", "1"),
+            ("skip_unvetted_apps", "0"),
+        ],
+    )
+}
+
+/// The store's own capsule path for an app. Deterministic, so a library of hundreds of games costs no
+/// extra request; the one Steam has no capsule for keeps the initial where the art would be.
+pub fn capsule_url(appid: u32) -> String {
+    format!("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/capsule_231x87.jpg")
+}
+
 pub fn trending_url(region: &Region) -> Url {
     store("/search/", &[("filter", "globaltopsellers")], region)
 }

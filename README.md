@@ -148,8 +148,9 @@ respects the rate limit. Sign in with a read-only personal token or from the bro
 
 ### 🎮 Steam without leaving the widget
 
-Four sub-tabs for Steam: **wishlist deals** (biggest discount first, each with what it saves), the **top sellers**
-ranked, **play now** (every game Steam reports for the last two weeks) and the **catalog ordered by rating**, paged
+Five sub-tabs for Steam: **wishlist deals** (biggest discount first, each with what it saves), the **top sellers**
+ranked, **play now** (every game Steam reports for the last two weeks), the **library** (every game you own, most
+played first, with the total hours and a search box) and the **catalog ordered by rating**, paged
 with **load more** so it reaches the rest of the store. Every row carries the **capsule art**, the **review score**
 with Steam's own wording and how many reviews it counts, the crossed-out price, the price of the storefront you pick
 and what the discount saves — and the list adds up the total saving. The **region picker** in the header chooses the
@@ -157,8 +158,8 @@ store (Brasil, United States, Euro, United Kingdom): prices, wording and currenc
 one your language implies, keeping whatever you pick afterwards. The **bell** turns on price alerts for your
 wishlist: a game that got cheaper rings an OS
 notification, and nothing rings for a price it already had before you turned them on. The public lists only need your
-**SteamID64**; an optional **Steam Web API key**, pasteable from the header at any time, adds the recent games with
-their playtimes. The tab starts off by default, one checkbox away in Settings.
+**SteamID64**; an optional **Steam Web API key**, pasteable from the header at any time, adds **play now** and the
+**library**. The tab starts off by default, one checkbox away in Settings.
 
 </td>
 </tr>
@@ -393,9 +394,9 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|
 | ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
 
-| Steam: the catalog by rating, with "load more" |
-|---|
-| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) |
+| Steam: the catalog by rating, with "load more" | Steam: the library, most played first, with a search box |
+|---|---|
+| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) | ![Steam tab, library sub-tab: fictitious owned games most played first, with capsule art, the total hours of each and a summary line above, plus a search box and a load more button](docs/prints/app/98-steam-biblioteca.png) |
 
 | One alert overlay for everything pending: outages, meetings, tasks and new AI models |
 |---|

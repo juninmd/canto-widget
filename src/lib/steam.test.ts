@@ -15,6 +15,9 @@ test("a playtime over an hour is written in hours and minutes", () => {
   expect(playtime(60)).toBe("1 h");
   expect(playtime(135)).toBe("2 h 15 min");
   expect(playtime(4000)).toBe("66 h 40 min");
+  // A library adds up to four digits, so the hours are grouped the way the language writes numbers.
+  expect(playtime(60 * 1234)).toBe("1.234 h");
+  expect(playtime(60 * 1234 + 5)).toBe("1.234 h 5 min");
 });
 
 test("a negative or fractional playtime is clamped to a whole number", () => {

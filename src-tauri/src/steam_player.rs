@@ -1,8 +1,8 @@
-//! Pure parsers for what the Steam Web API answers about a player: the games played, a vanity name
-//! resolved and the persona behind a SteamID64.
+//! Pure parsers for what the Steam Web API answers about a player: the games played, the library, a
+//! vanity name resolved and the persona behind a SteamID64.
 use serde::Deserialize;
 
-use crate::steam::RecentGame;
+use crate::steam::{OwnedGame, RecentGame};
 
 #[derive(Deserialize, Default)]
 struct RecentResponse {
@@ -41,6 +41,46 @@ pub fn parse_recent(json: &str) -> Vec<RecentGame> {
             recent_min: g.minutes_2weeks,
             total_min: g.playtime_forever,
             // The Web API reports no capsule; the command fills it from the store.
+            art: String::new(),
+        })
+        .collect()
+}
+
+#[derive(Deserialize, Default)]
+struct OwnedResponse {
+    #[serde(default)]
+    response: OwnedItems,
+}
+
+#[derive(Deserialize, Default)]
+struct OwnedItems {
+    #[serde(default)]
+    games: Vec<OwnedRaw>,
+}
+
+#[derive(Deserialize, Default)]
+struct OwnedRaw {
+    #[serde(default)]
+    appid: u32,
+    #[serde(default)]
+    name: String,
+    #[serde(default)]
+    playtime_forever: u32,
+}
+
+/// `{"response":{}}` is a private profile, not an error: the library is then simply empty.
+pub fn parse_owned(json: &str) -> Vec<OwnedGame> {
+    let parsed: OwnedResponse = serde_json::from_str(json).unwrap_or_default();
+    parsed
+        .response
+        .games
+        .into_iter()
+        .filter(|g| g.appid != 0 && !g.name.is_empty())
+        .map(|g| OwnedGame {
+            appid: g.appid,
+            name: g.name,
+            total_min: g.playtime_forever,
+            // The command fills the capsule: it is built from the appid, not reported by the API.
             art: String::new(),
         })
         .collect()

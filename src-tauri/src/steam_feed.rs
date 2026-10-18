@@ -4,14 +4,14 @@ use std::time::Duration;
 
 use url::Url;
 
-use crate::steam::{RecentGame, SteamRow};
+use crate::steam::{OwnedGame, RecentGame, SteamRow};
 use crate::steam_parse as parse;
 use crate::steam_parse::Price;
 use crate::steam_player as player;
 use crate::steam_region::Region;
 use crate::steam_store;
 use crate::steam_url::{
-    basic_url, is_steam_image, price_url, recent_url, reviews_url, summary_url, vanity_url, wishlist_url,
+    basic_url, is_steam_image, owned_url, price_url, recent_url, reviews_url, summary_url, vanity_url, wishlist_url,
 };
 
 pub const TIMEOUT_S: u64 = 20;
@@ -167,6 +167,10 @@ pub fn download_art(url: &str) -> String {
 
 pub fn recent(key: &str, steamid: &str) -> Result<Vec<RecentGame>, FetchError> {
     Ok(player::parse_recent(&get(&recent_url(key, steamid, crate::steam::RECENT))?))
+}
+
+pub fn owned(key: &str, steamid: &str) -> Result<Vec<OwnedGame>, FetchError> {
+    Ok(player::parse_owned(&get(&owned_url(key, steamid))?))
 }
 
 pub fn resolve(key: &str, name: &str) -> Result<String, FetchError> {

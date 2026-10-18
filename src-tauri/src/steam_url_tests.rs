@@ -79,6 +79,24 @@ fn the_web_api_urls_carry_the_key_and_the_account() {
 }
 
 #[test]
+fn the_library_asks_for_names_and_for_free_games_that_were_played() {
+    let url = owned_url("chave", "76561190000000000");
+    assert!(url.path().ends_with("/GetOwnedGames/v1"));
+    assert_eq!(param(&url, "key").as_deref(), Some("chave"));
+    assert_eq!(param(&url, "steamid").as_deref(), Some("76561190000000000"));
+    assert_eq!(param(&url, "include_appinfo").as_deref(), Some("1"), "without it the names do not come");
+    assert_eq!(param(&url, "include_played_free_games").as_deref(), Some("1"));
+    assert_eq!(param(&url, "skip_unvetted_apps").as_deref(), Some("0"));
+}
+
+#[test]
+fn the_capsule_path_is_deterministic_and_stays_on_steams_own_cdn() {
+    let url = capsule_url(620);
+    assert!(url.ends_with("/steam/apps/620/capsule_231x87.jpg"), "{url}");
+    assert!(is_steam_image(&url), "a built URL still has to pass the check the webview's URLs pass");
+}
+
+#[test]
 fn a_capsule_url_from_the_webview_only_ever_reaches_steams_own_cdns() {
     for ok in [
         "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/620/capsule_231x87.jpg?t=1",

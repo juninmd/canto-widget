@@ -250,4 +250,19 @@ export const STEAM = {
       { appid: 900034, name: "Lumen Cove", recent_min: 12, total_min: 96, art: steamArtUrl(900034) },
     ],
   },
+  steam_library: {
+    has_key: true,
+    total: 412,
+    minutes: 128_400,
+    items: [
+      { appid: 900030, name: "Aurora Drift", total_min: 42_100, art: steamArtUrl(900030) },
+      { appid: 900012, name: "Basalto", total_min: 28_640, art: steamArtUrl(900012) },
+      { appid: 900033, name: "Forja Tática", total_min: 19_320, art: steamArtUrl(900033) },
+      { appid: 900020, name: "Quill Chronicles", total_min: 15_860, art: steamArtUrl(900020) },
+      { appid: 900011, name: "Lumen Cove", total_min: 12_405, art: steamArtUrl(900011) },
+      { appid: 900003, name: "Nimbus Racer", total_min: 9_780, art: steamArtUrl(900003) },
+      { appid: 900005, name: "Papiro Quest", total_min: 7_250, art: steamArtUrl(900005) },
+      { appid: 900002, name: "Maré Profunda", total_min: 5_120, art: steamArtUrl(900002) },
+    ],
+  },
 };

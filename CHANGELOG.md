@@ -12,6 +12,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Biblioteca da Steam**: uma quinta sub-aba lista **todos os jogos que a conta tem**, do mais jogado para o menos,
+  com capa, o **tempo total** de cada um e uma linha de resumo que diz quantos jogos e quantas horas a lista soma.
+  Tem **busca por nome** e pagina de 100 em 100, como o catálogo, então uma conta de mil jogos continua navegável.
+  Precisa da chave da Steam Web API, como o "jogue agora".
 - **Alertas de queda de preço na Steam**: um sino no cabeçalho da aba liga os avisos da lista de desejos. Quando um
   jogo fica mais barato do que a última vez que o Canto olhou, chega uma notificação do sistema com o nome, o novo
   preço e o desconto — mesmo com a janela escondida, porque quem varre é o Rust. A primeira varredura só anota:
@@ -36,6 +40,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Sub-abas da Steam roláveis**: com cinco seções, a régua estourava a largura da janela e cortava a última; agora
+  ela rola na horizontal. O tempo de jogo também passa a usar o separador de milhar do idioma ("2.140 h"), que só
+  aparecia em contas grandes.
 - **Ofertas da Steam paginadas**: a lista terminava num aviso ("há mais ofertas na sua lista de desejos") que não
   levava a lugar nenhum. Agora ela pagina como o catálogo, com **ver mais jogos** e sem reler a lista de desejos a
   cada página.

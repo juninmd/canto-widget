@@ -84,7 +84,7 @@ test("activity: week, off and a wide window", async ({ browser }) => {
   await shoot(wide, "activity-wide");
 });
 
-test("steam: wishlist deals, the ranking and the recent games", async ({ browser }) => {
+test("steam: wishlist deals, the ranking, the recent games, the library and the catalog", async ({ browser }) => {
   const page = await fullScene(browser, { fixed: STEAM, before: steamArt });
   await openTab(page, "Steam", 1200);
   await page.screenshot({ path: "docs/prints/app/87-steam.png", omitBackground: true });
@@ -94,6 +94,9 @@ test("steam: wishlist deals, the ranking and the recent games", async ({ browser
   await page.getByRole("tab", { name: "jogue agora" }).click();
   await settle(page, 900);
   await page.screenshot({ path: "docs/prints/app/89-steam-recentes.png", omitBackground: true });
+  await page.getByRole("tab", { name: "biblioteca" }).click();
+  await settle(page, 900);
+  await page.screenshot({ path: "docs/prints/app/98-steam-biblioteca.png", omitBackground: true });
   await page.getByRole("tab", { name: "catálogo" }).click();
   await settle(page, 900);
   await page.screenshot({ path: "docs/prints/app/90-steam-catalogo.png", omitBackground: true });

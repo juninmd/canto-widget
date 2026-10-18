@@ -385,6 +385,7 @@ pub fn run() {
             cmd_steam::steam_trending,
             cmd_steam::steam_catalog,
             cmd_steam::steam_recent,
+            cmd_steam::steam_library,
             cmd_steam::steam_image,
             steam_alert::steam_watch_set,
             do_not_disturb::dnd_get,

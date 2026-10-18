@@ -10,11 +10,12 @@ import Skeleton from "./Skeleton";
 import SteamCatalog from "./SteamCatalog";
 import SteamConnect from "./SteamConnect";
 import SteamDeals from "./SteamDeals";
+import SteamLibraryTab from "./SteamLibraryTab";
 import SteamRecent from "./SteamRecent";
 import SteamTrending from "./SteamTrending";
 import SubTabs from "./SubTabs";
 
-type Sub = "deals" | "trending" | "recent" | "catalog";
+type Sub = "deals" | "trending" | "recent" | "library" | "catalog";
 
 /** Steam: the wishlist deals, the top sellers, the last games played and the catalog by rating. */
 export default function SteamTab({ onError }: { onError: (m: string) => void }) {
@@ -173,6 +174,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
           { key: "deals", label: t("steam.sub.deals") },
           { key: "trending", label: t("steam.sub.trending") },
           { key: "recent", label: t("steam.sub.recent") },
+          { key: "library", label: t("steam.sub.library") },
           { key: "catalog", label: t("steam.sub.catalog") },
         ]}
       />
@@ -180,6 +182,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
         {sub === "deals" && <SteamDeals />}
         {sub === "trending" && <SteamTrending />}
         {sub === "recent" && <SteamRecent />}
+        {sub === "library" && <SteamLibraryTab />}
         {sub === "catalog" && <SteamCatalog />}
       </div>
     </div>

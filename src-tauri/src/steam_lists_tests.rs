@@ -32,9 +32,58 @@ fn a_full_catalog_page_promises_more_and_a_short_one_ends_the_list() {
 
 #[test]
 fn a_recent_list_without_a_key_says_so_instead_of_calling_out() {
-    let view = recent(&SteamConfig::default(), &br()).unwrap();
+    let view = recent(&SteamConfig::default()).unwrap();
     assert!(!view.has_key);
     assert!(view.items.is_empty());
+}
+
+/// One owned game, the way the Web API reports it (before the capsule is built).
+fn owned(appid: u32, name: &str, total_min: u32) -> OwnedGame {
+    OwnedGame { appid, name: name.into(), total_min, art: String::new() }
+}
+
+#[test]
+fn the_library_puts_the_most_played_first_and_counts_everything_it_matched() {
+    let games = library_games(vec![owned(1, "Alpha", 100), owned(2, "Beta", 900), owned(3, "Gama", 100)], "");
+    assert_eq!(games.iter().map(|g| g.appid).collect::<Vec<u32>>(), vec![2, 1, 3], "900 first, then the tie by name");
+    assert_eq!(games[0].art, crate::steam_url::capsule_url(2), "the capsule is built from the appid");
+    assert!(crate::steam_url::is_steam_image(&games[0].art));
+    assert_eq!(
+        (library_page(&games, 0).total, library_page(&games, 0).minutes, library_page(&games, 0).has_key),
+        (3, 1100, true)
+    );
+
+    let filtered = library_games(vec![owned(1, "Alpha", 100), owned(2, "Betamax", 900)], "BETA");
+    assert_eq!(filtered.len(), 1, "the search is case-insensitive");
+    assert_eq!(filtered[0].appid, 2);
+    assert_eq!(library_page(&filtered, 0).minutes, 900, "the total follows the search");
+}
+
+#[test]
+fn the_library_pages_by_hundred_keeping_the_most_played_in_front() {
+    let many: Vec<OwnedGame> =
+        (1..=steam::LIBRARY as u32 + 5).map(|id| owned(id, &format!("Jogo {id:04}"), id)).collect();
+    let games = library_games(many, "");
+    let first = library_page(&games, 0);
+    assert_eq!(first.items.len(), steam::LIBRARY);
+    assert_eq!(first.total as usize, steam::LIBRARY + 5, "the pane can always say how many there are");
+    assert_eq!(first.items[0].appid, steam::LIBRARY as u32 + 5, "the most played leads the first page");
+    assert_eq!(first.items.last().unwrap().appid, 6);
+
+    let last = library_page(&games, 1);
+    assert_eq!(last.items.len(), 5, "the rest is a short page");
+    assert_eq!(last.items[0].appid, 5);
+    assert!(library_page(&games, 9).items.is_empty());
+}
+
+#[test]
+fn a_library_without_a_key_says_so_instead_of_calling_out() {
+    let view = library_without_key();
+    assert!(!view.has_key);
+    assert_eq!((view.total, view.minutes), (0, 0));
+    assert!(view.items.is_empty());
+    // And the fetch never happens: an account with no key gets an empty list, without asking Steam.
+    assert!(library(&SteamConfig::default(), "portal").unwrap().is_empty());
 }
 
 #[test]

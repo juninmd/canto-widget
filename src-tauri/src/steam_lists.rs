@@ -3,7 +3,9 @@
 use url::Url;
 
 use crate::error::{AppError, Result};
-use crate::steam::{self, RecentGame, SteamConfig, SteamList, SteamRecent, SteamRow, DEALS, TRENDING};
+use crate::steam::{
+    self, OwnedGame, RecentGame, SteamConfig, SteamLibrary, SteamList, SteamRecent, SteamRow, DEALS, TRENDING,
+};
 use crate::steam_feed::{self as feed, FetchError};
 use crate::steam_parse::Price;
 use crate::steam_region::Region;
@@ -85,19 +87,57 @@ pub fn deals_page(scan: &[(u32, Price)], page: usize, region: &Region) -> Result
     Ok(SteamList { items, has_more, currency: region.currency.to_string() })
 }
 
-pub fn recent(cfg: &SteamConfig, region: &Region) -> Result<SteamRecent> {
+pub fn recent(cfg: &SteamConfig) -> Result<SteamRecent> {
     if cfg.api_key.is_empty() {
         return Ok(SteamRecent { items: Vec::new(), has_key: false });
     }
     let mut games: Vec<RecentGame> = feed::recent(&cfg.api_key, &cfg.steamid).map_err(failed)?;
     games.truncate(steam::RECENT);
-    // The Web API reports no capsule: it comes from the store, and a failure there only costs the art.
-    let ids: Vec<u32> = games.iter().map(|g| g.appid).collect();
-    let art = feed::basics(&ids, region).unwrap_or_default();
+    // The Web API reports no capsule; the store's own path is deterministic, so no request is needed.
     for game in &mut games {
-        game.art = art.get(&game.appid).map(|(_, url)| url.clone()).unwrap_or_default();
+        game.art = crate::steam_url::capsule_url(game.appid);
     }
     Ok(SteamRecent { items: games, has_key: true })
+}
+
+/// The library, filtered by name and most played first. The whole match comes back, so the command
+/// can page it; the capsule is built here, from the appid, so no request per game.
+pub fn library_games(games: Vec<OwnedGame>, term: &str) -> Vec<OwnedGame> {
+    let needle = term.trim().to_lowercase();
+    let mut matching: Vec<OwnedGame> =
+        games.into_iter().filter(|game| needle.is_empty() || game.name.to_lowercase().contains(&needle)).collect();
+    // Most played first; the name breaks the tie so the page never shuffles between runs.
+    matching.sort_by(|a, b| b.total_min.cmp(&a.total_min).then_with(|| a.name.cmp(&b.name)));
+    for game in &mut matching {
+        game.art = crate::steam_url::capsule_url(game.appid);
+    }
+    matching
+}
+
+/// One page of that list. `total` and `minutes` cover every match, so the pane can say what it shows.
+pub fn library_page(games: &[OwnedGame], page: usize) -> SteamLibrary {
+    let items: Vec<OwnedGame> = games.iter().skip(page * steam::LIBRARY).take(steam::LIBRARY).cloned().collect();
+    SteamLibrary {
+        items,
+        total: games.len() as u32,
+        minutes: games.iter().map(|game| game.total_min).sum(),
+        has_key: true,
+    }
+}
+
+/// Without a Web API key the library is unavailable, exactly like the recent games. The command
+/// answers with this instead of an error, so the pane can explain.
+pub fn library_without_key() -> SteamLibrary {
+    SteamLibrary { items: Vec::new(), total: 0, minutes: 0, has_key: false }
+}
+
+/// The whole filtered library. A keyless account gets an empty list; the command answers with
+/// `library_without_key` in that case, so the interface never sees an empty list as an error.
+pub fn library(cfg: &SteamConfig, term: &str) -> Result<Vec<OwnedGame>> {
+    if cfg.api_key.is_empty() {
+        return Ok(Vec::new());
+    }
+    Ok(library_games(feed::owned(&cfg.api_key, &cfg.steamid).map_err(failed)?, term))
 }
 
 #[cfg(test)]

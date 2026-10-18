@@ -17,6 +17,8 @@ pub const TRENDING: usize = 25;
 pub const CATALOG_PAGE: usize = 50;
 /// Everything Steam reports for the last two weeks, within a bound the pane can scroll.
 pub const RECENT: usize = 30;
+/// A library can be thousands of games; one pane shows this many, the most played first.
+pub const LIBRARY: usize = 100;
 /// Fresh enough to skip the network; the "atualizar" button bypasses it.
 pub const TTL_MS: i64 = 5 * 60_000;
 /// The catalog keys on free text and every capsule is an entry, so the cache is capped; the oldest
@@ -124,6 +126,26 @@ pub struct RecentGame {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SteamRecent {
     pub items: Vec<RecentGame>,
+    pub has_key: bool,
+}
+
+/// A game the player owns. Only the total playtime is kept: the two-week figure belongs to "jogue agora".
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct OwnedGame {
+    pub appid: u32,
+    pub name: String,
+    pub total_min: u32,
+    /// Capsule on Steam's CDN; built from the appid, so a whole library needs no extra request.
+    pub art: String,
+}
+
+/// `items` is a page of the library, most played first; `total` is how many games matched the search
+/// and `minutes` how long they add up to, so the pane can say what it is showing.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct SteamLibrary {
+    pub items: Vec<OwnedGame>,
+    pub total: u32,
+    pub minutes: u32,
     pub has_key: bool,
 }
 
