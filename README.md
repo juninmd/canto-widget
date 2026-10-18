@@ -143,7 +143,7 @@ respects the rate limit. Sign in with a read-only personal token or from the bro
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in reais and what each deal saves"></td>
+<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in the chosen store's currency, what each deal saves, the region picker and the price-alert bell in the header"></td>
 <td>
 
 ### 🎮 Steam without leaving the widget
@@ -151,10 +151,14 @@ respects the rate limit. Sign in with a read-only personal token or from the bro
 Four sub-tabs for Steam: **wishlist deals** (biggest discount first, each with what it saves), the **top sellers**
 ranked, **play now** (every game Steam reports for the last two weeks) and the **catalog ordered by rating**, paged
 with **load more** so it reaches the rest of the store. Every row carries the **capsule art**, the **review score**
-with Steam's own wording and how many reviews it counts, the crossed-out price, the price in reais and what the
-discount saves — and the list adds up the total saving. The public lists only need your **SteamID64**; an optional
-**Steam Web API key** adds the recent games with their playtimes. The tab starts off by default, one checkbox away
-in Settings.
+with Steam's own wording and how many reviews it counts, the crossed-out price, the price of the storefront you pick
+and what the discount saves — and the list adds up the total saving. The **region picker** in the header chooses the
+store (Brasil, United States, Euro, United Kingdom): prices, wording and currency follow it, and it starts on the
+one your language implies, keeping whatever you pick afterwards. The **bell** turns on price alerts for your
+wishlist: a game that got cheaper rings an OS
+notification, and nothing rings for a price it already had before you turned them on. The public lists only need your
+**SteamID64**; an optional **Steam Web API key**, pasteable from the header at any time, adds the recent games with
+their playtimes. The tab starts off by default, one checkbox away in Settings.
 
 </td>
 </tr>

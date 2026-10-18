@@ -30,7 +30,9 @@ pub fn parse_wishlist(json: &str) -> Result<Vec<u32>, String> {
     Ok(parsed.response.items.into_iter().map(|i| i.appid).collect())
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Deserialize)]
+/// Serialized only into the RAM cache: the scan behind the deals is cached as a whole, so paging
+/// never re-reads the wishlist.
+#[derive(Debug, Clone, Default, PartialEq, Deserialize, serde::Serialize)]
 pub struct Price {
     #[serde(default, rename = "discount_percent")]
     pub discount: u32,

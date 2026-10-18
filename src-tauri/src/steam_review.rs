@@ -1,5 +1,6 @@
 //! Steam's nine review buckets, spelled the way the interface reads them. The store words each bucket
-//! itself, in the store's language: since every request asks for Portuguese, that wording is stable.
+//! itself, in the store's language: the wordings of the languages the region picker asks for are
+//! mapped here, and any other wording simply yields no bucket.
 use serde::Deserialize;
 
 /// The tokens the interface translates, in Steam's order (best to worst).
@@ -19,19 +20,19 @@ pub fn is_bucket(key: &str) -> bool {
     BUCKETS.contains(&key)
 }
 
-/// Steam's own Portuguese wording to the token; a wording we don't know yields no bucket, and the row
-/// then shows only the percentage.
+/// Steam's own wording to the token, in Portuguese and in English; a wording we don't know yields no
+/// bucket, and the row then shows only the percentage.
 pub fn bucket(wording: &str) -> String {
     let key = match wording.trim() {
-        "Extremamente positivas" => "overwhelmingly_positive",
-        "Muito positivas" => "very_positive",
-        "Positivas" => "positive",
-        "Praticamente positivas" => "mostly_positive",
-        "Neutras" => "mixed",
-        "Praticamente negativas" => "mostly_negative",
-        "Negativas" => "negative",
-        "Muito negativas" => "very_negative",
-        "Extremamente negativas" => "overwhelmingly_negative",
+        "Extremamente positivas" | "Overwhelmingly Positive" => "overwhelmingly_positive",
+        "Muito positivas" | "Very Positive" => "very_positive",
+        "Positivas" | "Positive" => "positive",
+        "Praticamente positivas" | "Mostly Positive" => "mostly_positive",
+        "Neutras" | "Mixed" => "mixed",
+        "Praticamente negativas" | "Mostly Negative" => "mostly_negative",
+        "Negativas" | "Negative" => "negative",
+        "Muito negativas" | "Very Negative" => "very_negative",
+        "Extremamente negativas" | "Overwhelmingly Negative" => "overwhelmingly_negative",
         _ => "",
     };
     if is_bucket(key) {

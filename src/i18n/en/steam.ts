@@ -3,6 +3,8 @@ import type { steam as source } from "../pt-BR/steam";
 export const steam: Record<keyof typeof source, string> = {
   "steam.loading": "connecting to Steam",
   "steam.noKey": "no key",
+  "steam.region": "store region",
+  "steam.watch": "alert when the price drops",
   "steam.disconnect": "disconnect",
   "steam.connect.title": "Connect to Steam",
   "steam.connect.hint":
@@ -22,7 +24,6 @@ export const steam: Record<keyof typeof source, string> = {
   "steam.refresh": "refresh",
   "steam.loadMore": "load more games",
   "steam.deals.empty": "no deal on your wishlist right now",
-  "steam.deals.more": "there are more deals on your wishlist",
   "steam.trending.empty": "Steam returned no top sellers right now",
   "steam.catalog.empty": "no game for this search",
   "steam.catalog.search": "search the catalog",

@@ -10,11 +10,7 @@ use crate::error::Result;
 use crate::store::{self, STEAM_AAD};
 use crate::vault::AppState;
 
-/// The store is read in BRL and Portuguese: prices and review labels come already localized, so they
-/// are never re-formatted here.
-pub const COUNTRY: &str = "BR";
-pub const LANGUAGE: &str = "portuguese";
-/// How many rows each list shows: one widget pane, not a storefront.
+/// How many rows each list shows: one widget pane, not a storefront. A page, on the wishlist too.
 pub const DEALS: usize = 12;
 pub const TRENDING: usize = 25;
 /// The store answers 50 rows per search page, and `start` only moves in 50s.
@@ -38,6 +34,14 @@ pub struct SteamConfig {
     /// Persona name from the last successful connect, shown in the header.
     #[serde(default)]
     pub name: String,
+    /// The storefront chosen in the tab ("br", "us"...); empty means "derive it from the language".
+    #[serde(default)]
+    pub region: String,
+}
+
+/// The storefront the configuration means: the chosen one, or the one the UI language implies.
+pub fn region_of(cfg: &SteamConfig) -> crate::steam_region::Region {
+    crate::steam_region::effective(&cfg.region, crate::lang::code())
 }
 
 impl AppState {
@@ -56,15 +60,22 @@ pub struct SteamStatus {
     pub steamid: String,
     pub has_key: bool,
     pub name: String,
+    /// The effective region code, so the picker opens on what the lists are actually reading.
+    pub region: String,
+    /// Whether the price alerts are on; filled in by the command, which has the sealed state.
+    pub watching: bool,
 }
 
 pub fn status(cfg: Option<&SteamConfig>) -> SteamStatus {
     let cfg = cfg.cloned().unwrap_or_default();
+    let region = region_of(&cfg).code.to_string();
     SteamStatus {
         configured: !cfg.steamid.is_empty(),
         steamid: cfg.steamid,
         has_key: !cfg.api_key.is_empty(),
         name: cfg.name,
+        region,
+        watching: false,
     }
 }
 
@@ -93,6 +104,8 @@ pub struct SteamRow {
 pub struct SteamList {
     pub items: Vec<SteamRow>,
     pub has_more: bool,
+    /// ISO 4217 of the region the prices came from; the interface formats the savings with it.
+    pub currency: String,
 }
 
 /// A game played in the last two weeks, newest first.
@@ -112,43 +125,6 @@ pub struct RecentGame {
 pub struct SteamRecent {
     pub items: Vec<RecentGame>,
     pub has_key: bool,
-}
-
-pub enum SteamId {
-    Id(String),
-    /// A vanity name: only the Web API can resolve it, so a key is required.
-    Vanity(String),
-}
-
-/// Accepts a SteamID64, a `steamcommunity.com` link or a bare vanity name.
-pub fn classify(input: &str) -> Option<SteamId> {
-    let text = input.trim().trim_end_matches('/');
-    if text.is_empty() {
-        return None;
-    }
-    let body = text.split_once("://").map_or(text, |(_, rest)| rest);
-    let body = body.trim_start_matches("www.");
-    let path = body.strip_prefix("steamcommunity.com").unwrap_or(body);
-    let parts: Vec<&str> = path.trim_start_matches('/').split('/').filter(|s| !s.is_empty()).collect();
-    match parts.as_slice() {
-        ["profiles", id] => is_steamid(id).then(|| SteamId::Id((*id).to_string())),
-        ["id", name] => is_vanity(name).then(|| SteamId::Vanity((*name).to_string())),
-        [only] if is_steamid(only) => Some(SteamId::Id((*only).to_string())),
-        // A run of digits that is not a valid id is a mistyped id, never a vanity name.
-        [only] if !only.bytes().all(|b| b.is_ascii_digit()) => {
-            is_vanity(only).then(|| SteamId::Vanity((*only).to_string()))
-        }
-        _ => None,
-    }
-}
-
-/// Every SteamID64 is 17 digits and starts with 7656119.
-pub fn is_steamid(text: &str) -> bool {
-    text.len() == 17 && text.starts_with("7656119") && text.bytes().all(|b| b.is_ascii_digit())
-}
-
-fn is_vanity(text: &str) -> bool {
-    !text.is_empty() && text.len() <= 64 && text.chars().all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-')
 }
 
 struct Cached {

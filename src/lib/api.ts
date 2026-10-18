@@ -217,7 +217,7 @@ export type ModelsView = {
   error: string | null;
 };
 
-/** A game on any Steam list; `price` and `original` come from Steam already localized in BRL. */
+/** A game on any Steam list; `price` and `original` come from Steam already localized to the region. */
 export type SteamRow = {
   appid: number;
   name: string;
@@ -236,12 +236,21 @@ export type SteamRow = {
   /** Capsule on Steam's CDN; the row asks `steamImage` for it, so the list stays light. */
   art: string;
 };
-export type SteamList = { items: SteamRow[]; has_more: boolean };
+/** `currency` is the ISO 4217 code of the storefront the prices came from. */
+export type SteamList = { items: SteamRow[]; has_more: boolean; currency: string };
 /** Both playtimes are minutes, as the Steam Web API reports them. */
 export type RecentGame = { appid: number; name: string; recent_min: number; total_min: number; art: string };
 /** `has_key` false means only the recent list is unavailable: the UI explains instead of erroring. */
 export type SteamRecent = { items: RecentGame[]; has_key: boolean };
-export type SteamStatus = { configured: boolean; steamid: string; has_key: boolean; name: string };
+/** `region` is the storefront in use ("br", "us"...), already resolved from the language. */
+export type SteamStatus = {
+  configured: boolean;
+  steamid: string;
+  has_key: boolean;
+  name: string;
+  region: string;
+  watching: boolean;
+};
 /** The WMO groups the Clima tab knows; the catalogue turns each one into a sentence. */
 export type WeatherCondition = "clear" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm";
 export type WeatherPlace = { city: string; admin1: string; country: string; lat: number; lon: number };
@@ -480,8 +489,12 @@ export const api = {
   /** Returns the saved status; a bad id, a bad key or a bare vanity name without a key is rejected. */
   steamConnect: (steamId: string, apiKey: string) => invoke<SteamStatus>("steam_connect", { steamId, apiKey }),
   steamDisconnect: () => invoke<SteamStatus>("steam_disconnect"),
-  /** Wishlist deals, biggest discount first. */
-  steamDeals: (force = false) => invoke<SteamList>("steam_deals", { force }),
+  /** The storefront the prices, the wording and the currency come from; drops the cached lists. */
+  steamRegion: (region: string) => invoke<SteamStatus>("steam_region_set", { region }),
+  /** Opt-in OS notifications when a wishlist game gets cheaper; answers the value now in effect. */
+  steamWatch: (enabled: boolean) => invoke<boolean>("steam_watch_set", { enabled }),
+  /** Wishlist deals, biggest discount first; `page` starts at 0. */
+  steamDeals: (page = 0, force = false) => invoke<SteamList>("steam_deals", { page, force }),
   steamTrending: (force = false) => invoke<SteamList>("steam_trending", { force }),
   /** Top rated games for `term` (empty = the whole store), reviews first; `page` starts at 0. */
   steamCatalog: (term: string, page = 0, force = false) => invoke<SteamList>("steam_catalog", { term, page, force }),

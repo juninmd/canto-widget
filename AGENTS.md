@@ -56,6 +56,9 @@ src-tauri/src/
   alert_log.rs                    in-memory log of what became of each alert today (never on disk)
   meeting_alert.rs, task_reminder.rs   meeting alerts and task reminders rung from Rust (hidden webviews sleep)
   status_feed.rs, status_live.rs, status_alert.rs   Status API feeds, live Statuspage state, opt-in outage alerts
+  steam_lists.rs, cmd_steam.rs   the four Steam sub-tabs and their commands; steam_store.rs/steam_url.rs read the
+                                 store, steam_region.rs picks the storefront, steam_review.rs words the buckets
+  steam_alert.rs                  opt-in OS alert when a wishlist game gets cheaper (last prices sealed)
 src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)
 ```
 

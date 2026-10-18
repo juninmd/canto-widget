@@ -8,42 +8,58 @@ fn param(url: &Url, name: &str) -> Option<String> {
     query(url).into_iter().find(|(k, _)| k == name).map(|(_, v)| v)
 }
 
+fn br() -> Region {
+    crate::steam_region::parse("br").unwrap()
+}
+
+fn us() -> Region {
+    crate::steam_region::parse("us").unwrap()
+}
+
 #[test]
-fn every_store_url_asks_for_brazilian_prices_in_portuguese() {
-    for url in [trending_url(), catalog_url("", 0), price_url(&[620]), basic_url(620), reviews_url(620)] {
-        assert_eq!(param(&url, "cc").as_deref(), Some("BR"), "{url}");
-        assert_eq!(param(&url, "l").as_deref(), Some("portuguese"), "{url}");
+fn every_store_url_asks_for_the_country_and_language_of_the_chosen_region() {
+    for (region, country, language) in [(br(), "BR", "portuguese"), (us(), "US", "english")] {
+        for url in [
+            trending_url(&region),
+            catalog_url("", 0, &region),
+            price_url(&[620], &region),
+            basic_url(620, &region),
+            reviews_url(620, &region),
+        ] {
+            assert_eq!(param(&url, "cc").as_deref(), Some(country), "{url}");
+            assert_eq!(param(&url, "l").as_deref(), Some(language), "{url}");
+        }
     }
 }
 
 #[test]
 fn the_trending_list_is_the_global_top_sellers() {
-    let url = trending_url();
+    let url = trending_url(&br());
     assert!(url.path().ends_with("/search/"));
     assert_eq!(param(&url, "filter").as_deref(), Some("globaltopsellers"));
 }
 
 #[test]
 fn the_catalog_sorts_by_reviews_and_pages_by_50() {
-    assert_eq!(param(&catalog_url("", 0), "sort_by").as_deref(), Some("Reviews_DESC"));
-    assert_eq!(param(&catalog_url("", 0), "term"), None, "an empty search is left out");
-    assert_eq!(param(&catalog_url("  portal 2 ", 0), "term").as_deref(), Some("portal 2"));
-    assert_eq!(param(&catalog_url("", 0), "start"), None, "the first page is the default");
-    assert_eq!(param(&catalog_url("", 1), "start").as_deref(), Some("50"));
-    assert_eq!(param(&catalog_url("", 3), "start").as_deref(), Some("150"));
+    assert_eq!(param(&catalog_url("", 0, &br()), "sort_by").as_deref(), Some("Reviews_DESC"));
+    assert_eq!(param(&catalog_url("", 0, &br()), "term"), None, "an empty search is left out");
+    assert_eq!(param(&catalog_url("  portal 2 ", 0, &br()), "term").as_deref(), Some("portal 2"));
+    assert_eq!(param(&catalog_url("", 0, &br()), "start"), None, "the first page is the default");
+    assert_eq!(param(&catalog_url("", 1, &br()), "start").as_deref(), Some("50"));
+    assert_eq!(param(&catalog_url("", 3, &br()), "start").as_deref(), Some("150"));
 }
 
 #[test]
 fn the_appdetails_batch_joins_the_appids_with_one_filter() {
-    let url = price_url(&[620, 730, 400]);
+    let url = price_url(&[620, 730, 400], &br());
     assert_eq!(param(&url, "appids").as_deref(), Some("620,730,400"));
     assert_eq!(param(&url, "filters").as_deref(), Some("price_overview"));
-    assert_eq!(param(&basic_url(620), "filters").as_deref(), Some("basic"));
+    assert_eq!(param(&basic_url(620, &br()), "filters").as_deref(), Some("basic"));
 }
 
 #[test]
 fn the_review_summary_asks_for_the_summary_only_and_counts_every_language() {
-    let url = reviews_url(620);
+    let url = reviews_url(620, &br());
     assert_eq!(param(&url, "num_per_page").as_deref(), Some("0"), "no review bodies, just the summary");
     assert_eq!(param(&url, "language").as_deref(), Some("all"));
     assert_eq!(param(&url, "json").as_deref(), Some("1"));
@@ -56,6 +72,7 @@ fn the_web_api_urls_carry_the_key_and_the_account() {
     assert_eq!(param(&recent, "key").as_deref(), Some("chave"));
     assert_eq!(param(&recent, "steamid").as_deref(), Some("76561190000000000"));
     assert_eq!(param(&recent, "count").as_deref(), Some("5"));
+    assert!(param(&recent, "cc").is_none(), "the Web API has no storefront");
     assert_eq!(param(&wishlist_url("76561190000000000"), "steamid").as_deref(), Some("76561190000000000"));
     assert_eq!(param(&vanity_url("k", "gabe"), "vanityurl").as_deref(), Some("gabe"));
     assert_eq!(param(&summary_url("k", "76561190000000000"), "steamids").as_deref(), Some("76561190000000000"));

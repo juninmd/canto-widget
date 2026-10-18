@@ -5,27 +5,7 @@ use crate::store;
 const T0: i64 = 1_790_000_000_000;
 
 fn cfg(steamid: &str, api_key: &str, name: &str) -> SteamConfig {
-    SteamConfig { steamid: steamid.into(), api_key: api_key.into(), name: name.into() }
-}
-
-#[test]
-fn a_steamid64_a_profile_link_and_a_vanity_name_are_told_apart() {
-    let id = "76561190000000000";
-    assert!(matches!(classify(id), Some(SteamId::Id(v)) if v == id));
-    assert!(matches!(classify(&format!("https://steamcommunity.com/profiles/{id}/")), Some(SteamId::Id(v)) if v == id));
-    assert!(matches!(classify(&format!("steamcommunity.com/profiles/{id}")), Some(SteamId::Id(v)) if v == id));
-    assert!(matches!(classify("www.steamcommunity.com/id/gabe/"), Some(SteamId::Vanity(v)) if v == "gabe"));
-    assert!(matches!(classify("gabe"), Some(SteamId::Vanity(v)) if v == "gabe"));
-}
-
-#[test]
-fn a_typed_value_that_is_not_a_profile_is_refused() {
-    assert!(classify("   ").is_none());
-    assert!(classify("7656119").is_none(), "too short");
-    assert!(classify("12345678901234567").is_none(), "not a 7656119 prefix");
-    assert!(classify("nome com espaço").is_none());
-    assert!(classify("https://steamcommunity.com/app/620").is_none());
-    assert!(classify(&"a".repeat(65)).is_none(), "vanity names stop at 64");
+    SteamConfig { steamid: steamid.into(), api_key: api_key.into(), name: name.into(), region: String::new() }
 }
 
 #[test]
@@ -37,11 +17,21 @@ fn the_status_says_whether_a_key_came_with_the_account() {
     assert!(!status(Some(&cfg("76561190000000000", "", ""))).has_key);
 }
 
+#[test]
+fn the_status_names_the_storefront_the_lists_are_reading() {
+    // The interface runs in pt-BR under test, and an empty choice falls back to it.
+    assert_eq!(status(Some(&cfg("76561190000000000", "", ""))).region, "br");
+    let chosen = SteamConfig { region: "us".into(), ..cfg("76561190000000000", "", "") };
+    assert_eq!(status(Some(&chosen)).region, "us", "the stored choice wins over the language");
+    let dropped = SteamConfig { region: "atlantis".into(), ..cfg("76561190000000000", "", "") };
+    assert_eq!(status(Some(&dropped)).region, "br", "a region we no longer ship falls back");
+}
+
 /// A counting fetch: each call hands `get_or` a fresh closure over the shared counter.
 fn count(calls: &std::cell::Cell<u32>) -> impl FnMut() -> Result<SteamList> + '_ {
     || {
         calls.set(calls.get() + 1);
-        Ok(SteamList { items: Vec::new(), has_more: false })
+        Ok(SteamList { items: Vec::new(), has_more: false, currency: String::new() })
     }
 }
 
@@ -75,7 +65,7 @@ fn a_failed_fetch_is_not_cached() {
     cache
         .get_or("trending", false, T0, || {
             calls.set(calls.get() + 1);
-            Ok(SteamList { items: Vec::new(), has_more: false })
+            Ok(SteamList { items: Vec::new(), has_more: false, currency: String::new() })
         })
         .unwrap();
     assert_eq!(calls.get(), 2, "the next try goes back to the network");
@@ -117,5 +107,5 @@ fn the_connection_is_sealed_on_disk_and_survives_a_password_change() {
 fn an_older_file_without_the_key_field_still_loads() {
     let older: SteamConfig = serde_json::from_str(r#"{"steamid":"76561190000000000"}"#).unwrap();
     assert_eq!(older.steamid, "76561190000000000");
-    assert!(older.api_key.is_empty() && older.name.is_empty());
+    assert!(older.api_key.is_empty() && older.name.is_empty() && older.region.is_empty());
 }

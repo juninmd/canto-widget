@@ -8,6 +8,7 @@ use crate::steam::{RecentGame, SteamRow};
 use crate::steam_parse as parse;
 use crate::steam_parse::Price;
 use crate::steam_player as player;
+use crate::steam_region::Region;
 use crate::steam_store;
 use crate::steam_url::{
     basic_url, is_steam_image, price_url, recent_url, reviews_url, summary_url, vanity_url, wishlist_url,
@@ -90,11 +91,11 @@ pub fn wishlist(steamid: &str) -> Result<Vec<u32>, FetchError> {
 }
 
 /// Prices for the whole wishlist in chunks, so a long list still costs few requests.
-pub fn prices(ids: &[u32]) -> Result<HashMap<u32, Price>, FetchError> {
+pub fn prices(ids: &[u32], region: &Region) -> Result<HashMap<u32, Price>, FetchError> {
     let client = client()?;
     let mut out = HashMap::new();
     for chunk in ids.chunks(BATCH) {
-        out.extend(parse::parse_prices(&text(&client, &price_url(chunk))?));
+        out.extend(parse::parse_prices(&text(&client, &price_url(chunk, region))?));
     }
     Ok(out)
 }
@@ -120,15 +121,15 @@ pub struct Deal {
 }
 
 /// Name and capsule per app, one request each in waves. A row Steam skipped simply has no title.
-pub fn basics(ids: &[u32]) -> Result<HashMap<u32, (String, String)>, FetchError> {
-    in_waves(ids, |client, id| parse::parse_basic(&text(client, &basic_url(id)).ok()?))
+pub fn basics(ids: &[u32], region: &Region) -> Result<HashMap<u32, (String, String)>, FetchError> {
+    in_waves(ids, |client, id| parse::parse_basic(&text(client, &basic_url(id, region)).ok()?))
 }
 
 /// The same, plus the review summary the price feed lacks: one task per app, two small requests.
-pub fn deals_info(ids: &[u32]) -> Result<HashMap<u32, Deal>, FetchError> {
+pub fn deals_info(ids: &[u32], region: &Region) -> Result<HashMap<u32, Deal>, FetchError> {
     in_waves(ids, |client, id| {
-        let (name, art) = parse::parse_basic(&text(client, &basic_url(id)).ok()?)?;
-        let (review, review_key, review_count) = text(client, &reviews_url(id))
+        let (name, art) = parse::parse_basic(&text(client, &basic_url(id, region)).ok()?)?;
+        let (review, review_key, review_count) = text(client, &reviews_url(id, region))
             .ok()
             .and_then(|body| parse::parse_reviews(&body))
             .map(|(percent, key, count)| (Some(percent), key, count))

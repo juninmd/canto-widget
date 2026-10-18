@@ -1,6 +1,8 @@
 export const steam = {
   "steam.loading": "conectando à Steam",
   "steam.noKey": "sem chave",
+  "steam.region": "região da loja",
+  "steam.watch": "avisar quando o preço cair",
   "steam.disconnect": "desconectar",
   "steam.connect.title": "Conectar à Steam",
   "steam.connect.hint":
@@ -20,7 +22,6 @@ export const steam = {
   "steam.refresh": "atualizar",
   "steam.loadMore": "ver mais jogos",
   "steam.deals.empty": "nenhuma oferta na sua lista de desejos agora",
-  "steam.deals.more": "há mais ofertas na sua lista de desejos",
   "steam.trending.empty": "a Steam não devolveu os mais vendidos agora",
   "steam.catalog.empty": "nenhum jogo para essa busca",
   "steam.catalog.search": "buscar no catálogo",

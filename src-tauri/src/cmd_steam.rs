@@ -1,26 +1,35 @@
-//! Steam commands: the connection (SteamID64 plus an optional Web API key), the four lists and the
-//! capsules. The list shapes live in `steam_lists.rs`.
+//! Steam commands: the connection (SteamID64, an optional Web API key and the storefront), the four
+//! lists and the capsules. The list shapes live in `steam_lists.rs`.
 use std::sync::Mutex;
 
 use tauri::{AppHandle, Manager};
 
 use crate::error::{AppError, Result};
 use crate::model::now_ms;
-use crate::steam::{self, SteamConfig, SteamId, SteamList, SteamRecent, SteamStatus};
+use crate::steam::{self, SteamConfig, SteamList, SteamRecent, SteamStatus};
 use crate::steam_feed as feed;
+use crate::steam_id::{self, SteamId};
 use crate::steam_lists as lists;
+use crate::steam_region;
 use crate::vault::AppState;
 
 /// Serializes connects and disconnects against a list fetch, so a reply can't land after the account changed.
 #[derive(Default)]
 pub struct SteamLock(pub Mutex<()>);
 
-fn connected(state: &AppState) -> Result<SteamConfig> {
+pub(crate) fn connected(state: &AppState) -> Result<SteamConfig> {
     let cfg = state.steam_config()?.unwrap_or_default();
     if cfg.steamid.is_empty() {
         return Err(AppError::Config("conecte uma conta Steam primeiro".into()));
     }
     Ok(cfg)
+}
+
+/// The account status plus the price-alert switch, which lives in its own sealed file.
+pub fn status_with_watch(app: &AppHandle, state: &AppState, cfg: Option<&SteamConfig>) -> SteamStatus {
+    let mut status = steam::status(cfg);
+    status.watching = status.configured && app.state::<crate::steam_alert::SteamAlerts>().watching(state);
+    status
 }
 
 #[tauri::command]
@@ -30,7 +39,8 @@ pub async fn steam_status(app: AppHandle) -> Result<SteamStatus> {
         if !state.is_unlocked() {
             return Ok(steam::status(None));
         }
-        Ok(steam::status(state.steam_config()?.as_ref()))
+        let cfg = state.steam_config()?;
+        Ok(status_with_watch(&app, &state, cfg.as_ref()))
     })
     .await
 }
@@ -45,7 +55,7 @@ pub async fn steam_connect(app: AppHandle, steam_id: String, api_key: String) ->
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
         let key = api_key.trim().to_string();
-        let typed = steam::classify(&steam_id).ok_or_else(|| {
+        let typed = steam_id::classify(&steam_id).ok_or_else(|| {
             AppError::Config("informe o SteamID64 (17 dígitos), o link do perfil ou o nome de perfil".into())
         })?;
         let steamid = match typed {
@@ -57,11 +67,14 @@ pub async fn steam_connect(app: AppHandle, steam_id: String, api_key: String) ->
         };
         // With a key the same call validates it and brings the persona name for the header.
         let name = if key.is_empty() { String::new() } else { feed::persona(&key, &steamid).map_err(lists::failed)? };
-        let cfg = SteamConfig { steamid, api_key: key, name };
+        // The storefront outlives a reconnection: it is a preference, not part of the account.
+        let previous = state.steam_config()?.unwrap_or_default();
+        let region = steam::region_of(&previous);
+        let cfg = SteamConfig { steamid, api_key: key, name, region: region.code.to_string() };
         state.save_steam(&cfg)?;
         state.steam.clear();
         state.touch();
-        Ok(steam::status(Some(&cfg)))
+        Ok(status_with_watch(&app, &state, Some(&cfg)))
     })
     .await
 }
@@ -74,20 +87,48 @@ pub fn steam_disconnect(app: AppHandle) -> Result<SteamStatus> {
     }
     let lock = app.state::<SteamLock>();
     let _guard = lock.0.lock().unwrap();
-    state.save_steam(&SteamConfig::default())?;
+    let previous = state.steam_config()?.unwrap_or_default();
+    state.save_steam(&SteamConfig { region: previous.region, ..Default::default() })?;
     state.steam.clear();
-    Ok(steam::status(None))
+    Ok(status_with_watch(&app, &state, None))
+}
+
+/// The storefront the prices, the wording and the currency come from. Every list is dropped, since
+/// the cached ones belong to the store that answered before.
+#[tauri::command(async)]
+pub fn steam_region_set(app: AppHandle, region: String) -> Result<SteamStatus> {
+    let state = app.state::<AppState>();
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
+    let chosen = steam_region::parse(&region).ok_or_else(|| AppError::Config("região da loja desconhecida".into()))?;
+    let lock = app.state::<SteamLock>();
+    let _guard = lock.0.lock().unwrap();
+    let mut cfg = connected(&state)?;
+    cfg.region = chosen.code.to_string();
+    state.save_steam(&cfg)?;
+    state.steam.clear();
+    state.touch();
+    Ok(status_with_watch(&app, &state, Some(&cfg)))
 }
 
 #[tauri::command]
-pub async fn steam_deals(app: AppHandle, force: bool) -> Result<SteamList> {
+pub async fn steam_deals(app: AppHandle, page: usize, force: bool) -> Result<SteamList> {
+    if page > 500 {
+        return Err(AppError::Config("busca inválida".into()));
+    }
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
         let cfg = connected(&state)?;
+        let region = steam::region_of(&cfg);
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        state.steam.get_or(&format!("deals:{}", cfg.steamid), force, now_ms(), || lists::deals(&cfg))
+        let key = format!("deals:{}:{}", cfg.steamid, region.code);
+        // The wishlist scan is the expensive half, so it is what the cache holds; the page is sliced
+        // out of it, and only that page asks for titles, capsules and scores.
+        let scan = state.steam.get_or(&key, force, now_ms(), || lists::scan(&cfg, &region))?;
+        lists::deals_page(&scan, page, &region)
     })
     .await
 }
@@ -96,11 +137,12 @@ pub async fn steam_deals(app: AppHandle, force: bool) -> Result<SteamList> {
 pub async fn steam_trending(app: AppHandle, force: bool) -> Result<SteamList> {
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
-        connected(&state)?;
+        let region = steam::region_of(&connected(&state)?);
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        state.steam.get_or("trending", force, now_ms(), lists::trending)
+        let key = format!("trending:{}", region.code);
+        state.steam.get_or(&key, force, now_ms(), || lists::trending(&region))
     })
     .await
 }
@@ -112,12 +154,12 @@ pub async fn steam_catalog(app: AppHandle, term: String, page: usize, force: boo
     }
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
-        connected(&state)?;
+        let region = steam::region_of(&connected(&state)?);
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        let key = format!("catalog:{page}:{}", term.trim().to_lowercase());
-        state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term, page))
+        let key = format!("catalog:{}:{page}:{}", region.code, term.trim().to_lowercase());
+        state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term, page, &region))
     })
     .await
 }
@@ -127,10 +169,12 @@ pub async fn steam_recent(app: AppHandle, force: bool) -> Result<SteamRecent> {
     crate::blocking::run(move || {
         let state = app.state::<AppState>();
         let cfg = connected(&state)?;
+        let region = steam::region_of(&cfg);
         state.touch();
         let lock = app.state::<SteamLock>();
         let _guard = lock.0.lock().unwrap();
-        state.steam.get_or(&format!("recent:{}", cfg.steamid), force, now_ms(), || lists::recent(&cfg))
+        let key = format!("recent:{}:{}", cfg.steamid, region.code);
+        state.steam.get_or(&key, force, now_ms(), || lists::recent(&cfg, &region))
     })
     .await
 }

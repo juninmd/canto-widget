@@ -203,9 +203,10 @@ export const READS = {
 
 /** Invented games on purpose: a real title with a price and a discount would read as a fact. */
 export const STEAM = {
-  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo" },
+  steam_status: { configured: true, steamid: "76561190000000000", has_key: true, name: "Ana Exemplo", region: "br", watching: false },
   steam_deals: {
     has_more: true,
+    currency: "BRL",
     items: [
       steamGame(900001, "Aurora Drift", "R$ 14,99", "R$ 59,99", 75, 91, "very_positive", 12345, 4500),
       steamGame(900002, "Maré Profunda", "R$ 9,99", "R$ 39,99", 75, 89, "very_positive", 8420, 3000),
@@ -217,6 +218,7 @@ export const STEAM = {
   },
   steam_trending: {
     has_more: false,
+    currency: "BRL",
     items: [
       steamGame(900010, "Vento Valley", "Grátis", "", 0, 96, "overwhelmingly_positive", 412300),
       steamGame(900011, "Lumen Cove", "R$ 89,90", "", 0, 94, "very_positive", 98120),
@@ -228,6 +230,7 @@ export const STEAM = {
   },
   steam_catalog: {
     has_more: true,
+    currency: "BRL",
     items: [
       steamGame(900020, "Quill Chronicles", "R$ 59,90", "", 0, 98, "overwhelmingly_positive", 210450),
       steamGame(900021, "Orca Bay", "R$ 34,99", "", 0, 97, "overwhelmingly_positive", 133900),

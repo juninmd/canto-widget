@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { errText, type SteamList } from "../lib/api";
-import { brl, mergeGames } from "../lib/steam";
+import { mergeGames, money } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -13,8 +13,6 @@ type Props = {
   empty: string;
   /** Rendered above the list, like the catalog's search box. */
   toolbar?: React.ReactNode;
-  /** Shown under the list when the source has more rows than it returned. */
-  more?: string;
   /** Numbers the rows: only the "em alta" list is a ranking. */
   numbered?: boolean;
   /** Adds up what the discounts save: only meaningful on a wishlist. */
@@ -29,7 +27,6 @@ export default function SteamGames({
   load,
   empty,
   toolbar,
-  more,
   numbered = false,
   totalSaved = false,
   loadMore,
@@ -60,7 +57,9 @@ export default function SteamGames({
     setLoadingMore(true);
     try {
       const next = await loadMore();
-      setList((prev) => (prev ? { items: mergeGames(prev.items, next.items), has_more: next.has_more } : next));
+      setList((prev) =>
+        prev ? { items: mergeGames(prev.items, next.items), has_more: next.has_more, currency: next.currency } : next,
+      );
       setError("");
     } catch (e) {
       setError(errText(e));
@@ -80,6 +79,7 @@ export default function SteamGames({
   }
 
   const saved = totalSaved ? list.items.reduce((total, row) => total + row.saved_cents, 0) : 0;
+
   return (
     <div className="flex h-full min-h-0 flex-col gap-2">
       <div className="flex items-center gap-2">
@@ -94,13 +94,13 @@ export default function SteamGames({
         </button>
       </div>
       {error && <ErrorBanner message={error} onRetry={() => void run(true)} busy={busy} />}
-      {saved > 0 && <p className="text-[11px] text-muted">{t("steam.totalSaved", { value: brl(saved) })}</p>}
+      {saved > 0 && <p className="text-[11px] text-muted">{t("steam.totalSaved", { value: money(saved, list.currency) })}</p>}
       {list.items.length === 0 ? (
         <p className="text-xs text-faint">{empty}</p>
       ) : (
         <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
           {list.items.map((row, i) => (
-            <SteamRowItem key={row.appid} row={row} rank={numbered ? i + 1 : undefined} />
+            <SteamRowItem key={row.appid} row={row} rank={numbered ? i + 1 : undefined} currency={list.currency} />
           ))}
         </ul>
       )}
@@ -114,7 +114,6 @@ export default function SteamGames({
           {t("steam.loadMore")}
         </button>
       )}
-      {list.has_more && more && <p className="text-[11px] text-faint">{more}</p>}
     </div>
   );
 }

@@ -2,7 +2,8 @@ use super::*;
 
 #[test]
 fn the_stores_own_wording_maps_to_the_nine_buckets() {
-    // The wordings Steam actually prints in Portuguese, captured from the store's search page.
+    // The wordings Steam actually prints, captured from the store's search page in both languages
+    // the region picker can ask for.
     for (wording, key) in [
         ("Extremamente positivas", "overwhelmingly_positive"),
         ("Muito positivas", "very_positive"),
@@ -14,7 +15,17 @@ fn the_stores_own_wording_maps_to_the_nine_buckets() {
         ("Muito negativas", "very_negative"),
         ("Extremamente negativas", "overwhelmingly_negative"),
         ("  Muito positivas  ", "very_positive"),
-        ("Very Positive", ""),
+        ("Overwhelmingly Positive", "overwhelmingly_positive"),
+        ("Very Positive", "very_positive"),
+        ("Positive", "positive"),
+        ("Mostly Positive", "mostly_positive"),
+        ("Mixed", "mixed"),
+        ("Mostly Negative", "mostly_negative"),
+        ("Negative", "negative"),
+        ("Very Negative", "very_negative"),
+        ("Overwhelmingly Negative", "overwhelmingly_negative"),
+        (" Very Positive ", "very_positive"),
+        ("Sehr positiv", ""),
         ("", ""),
     ] {
         assert_eq!(bucket(wording), key, "{wording}");

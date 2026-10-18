@@ -12,6 +12,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alertas de queda de preço na Steam**: um sino no cabeçalho da aba liga os avisos da lista de desejos. Quando um
+  jogo fica mais barato do que a última vez que o Canto olhou, chega uma notificação do sistema com o nome, o novo
+  preço e o desconto — mesmo com a janela escondida, porque quem varre é o Rust. A primeira varredura só anota:
+  nada toca para um preço que o jogo já tinha antes de você ligar os avisos. Desligado por padrão; o estado (a
+  escolha e o último preço de cada jogo) viaja selado, é lido a cada 30 min com o cofre aberto e some da memória ao
+  trancar. Um jogo que fica gratuito não toca: a loja não informa preço nenhum para ele, então não há
+  queda para comparar.
+- **Loja Steam da sua região**: um seletor no cabeçalho da aba escolhe a loja — Brasil, Estados Unidos, Euro ou
+  Reino Unido. Preços, moeda e o texto das análises passam a vir dela, e a economia de cada oferta é escrita na
+  moeda escolhida. O padrão segue o idioma da interface (português abre no Brasil), a escolha fica guardada com a
+  conta e sobrevive a desconectar e reconectar.
 - **Aba Clima**: escreva o nome da cidade uma vez e o Canto guarda só as coordenadas. A aba mostra **agora**, as
   **próximas horas numa curva** com a chance de chuva, os **próximos dias** e o aviso de **chuva a partir das
   HH:MM**. Os dados vêm da Open-Meteo, que é aberta e **não pede chave** — nenhuma conta e nenhum endereço seu sai
@@ -25,6 +36,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Ofertas da Steam paginadas**: a lista terminava num aviso ("há mais ofertas na sua lista de desejos") que não
+  levava a lugar nenhum. Agora ela pagina como o catálogo, com **ver mais jogos** e sem reler a lista de desejos a
+  cada página.
 - **Aba Agentes mais legível**: cada CLI virou um cartão com a inicial, o repositório de onde vem, a última release
   e as notas de versão num bloco próprio; o comando de instalação ganhou destaque e o botão de copiar.
 
@@ -34,6 +48,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   **pronto para copiar**. O Canto só copia: nada é instalado nem executado por ele. A lista de releases é pública,
   não precisa de conta nem de chave, e fica 30 min em memória antes de consultar o GitHub de novo. A aba começa
   desligada, a um clique nos Ajustes.
+- **Aba Steam**: o nome da conta no cabeçalho virou um atalho para o perfil, e quem não tem a chave da Web API pode
+  colá-la ali mesmo, sem desconectar e reconectar a conta.
 
 ### Corrigido
 
@@ -42,6 +58,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   de verdade, e a busca passa a **mostrar os candidatos com estado e país** para você escolher: antes ela aceitava
   o primeiro resultado e "Londres" ia parar na Argentina, sem como corrigir. O mesmo campo errado saiu da aba
   **Leituras**, que o escondia atrás do "+".
+- **Jogo sem título na Steam**: quando a loja não devolvia o nome de um jogo em promoção, a linha mostrava um texto
+  fixo em português ("jogo 900999"). Agora ela mostra o appid do jogo, que não depende do idioma e não finge ser um
+  título.
 - **Fechamento ao abrir no Windows**: as janelas só carregam depois de inicializar os estados do Rust e a
   bandeja, evitando o encerramento provocado por comandos da interface durante a inicialização.
 - **Trancar com falha**: se o Rust não conseguir trancar o cofre, a tela avisa e relê o estado real em vez de fingir

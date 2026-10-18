@@ -5,58 +5,71 @@ use url::Url;
 use crate::error::{AppError, Result};
 use crate::steam::{self, RecentGame, SteamConfig, SteamList, SteamRecent, SteamRow, DEALS, TRENDING};
 use crate::steam_feed::{self as feed, FetchError};
+use crate::steam_parse::Price;
+use crate::steam_region::Region;
 
 pub fn failed(e: FetchError) -> AppError {
     AppError::Steam(e.message())
 }
 
 /// One search page, trimmed to what a pane shows.
-pub fn list(url: &Url, take: usize) -> Result<SteamList> {
+pub fn list(url: &Url, take: usize, region: &Region) -> Result<SteamList> {
     let mut items = feed::search(url).map_err(failed)?;
     let has_more = items.len() > take;
     items.truncate(take);
-    Ok(SteamList { items, has_more })
+    Ok(SteamList { items, has_more, currency: region.currency.to_string() })
 }
 
 /// A store search page: a full page means the store probably has more, a short one is the last.
-pub fn paged(mut items: Vec<SteamRow>) -> SteamList {
+pub fn paged(mut items: Vec<SteamRow>, region: &Region) -> SteamList {
     let has_more = items.len() >= steam::CATALOG_PAGE;
     items.truncate(steam::CATALOG_PAGE);
-    SteamList { items, has_more }
+    SteamList { items, has_more, currency: region.currency.to_string() }
 }
 
-pub fn trending() -> Result<SteamList> {
-    list(&crate::steam_url::trending_url(), TRENDING)
+pub fn trending(region: &Region) -> Result<SteamList> {
+    list(&crate::steam_url::trending_url(region), TRENDING, region)
 }
 
-pub fn catalog(term: &str, page: usize) -> Result<SteamList> {
-    Ok(paged(feed::search(&crate::steam_url::catalog_url(term, page)).map_err(failed)?))
+pub fn catalog(term: &str, page: usize, region: &Region) -> Result<SteamList> {
+    Ok(paged(feed::search(&crate::steam_url::catalog_url(term, page, region)).map_err(failed)?, region))
 }
 
-/// The wishlist is scanned whole for discounts; only the best few get their title, capsule and score.
-pub fn deals(cfg: &SteamConfig) -> Result<SteamList> {
+/// The whole wishlist scan for discounts, best deal first. Cached as one list so paging through the
+/// deals never scans the wishlist twice.
+pub fn scan(cfg: &SteamConfig, region: &Region) -> Result<Vec<(u32, Price)>> {
     let ids = feed::wishlist(&cfg.steamid).map_err(failed)?;
     if ids.is_empty() {
-        return Ok(SteamList { items: Vec::new(), has_more: false });
+        return Ok(Vec::new());
     }
-    let prices = feed::prices(&ids).map_err(failed)?;
-    let on_sale = feed::best_deals(prices);
-    let has_more = on_sale.len() > DEALS;
-    let top: Vec<u32> = on_sale.iter().take(DEALS).map(|(id, _)| *id).collect();
-    let info = feed::deals_info(&top).map_err(failed)?;
-    let items = on_sale
-        .iter()
-        .take(DEALS)
+    Ok(feed::best_deals(feed::prices(&ids, region).map_err(failed)?))
+}
+
+/// One page of the scan, and whether anything is left after it.
+pub fn page_of(scan: &[(u32, Price)], page: usize) -> (Vec<(u32, Price)>, bool) {
+    let start = page * DEALS;
+    let slice: Vec<(u32, Price)> = scan.iter().skip(start).take(DEALS).cloned().collect();
+    (slice, scan.len() > start + DEALS)
+}
+
+/// One page of that scan. A row Steam has no title for keeps its price and its link: only the title
+/// is missing, and the interface falls back to the appid.
+pub fn deals_page(scan: &[(u32, Price)], page: usize, region: &Region) -> Result<SteamList> {
+    let (slice, has_more) = page_of(scan, page);
+    let top: Vec<u32> = slice.iter().map(|(id, _)| *id).collect();
+    let info = feed::deals_info(&top, region).map_err(failed)?;
+    let items = slice
+        .into_iter()
         .map(|(id, price)| {
-            let deal = info.get(id).cloned().unwrap_or_else(|| feed::Deal {
-                name: format!("jogo {id}"),
+            let deal = info.get(&id).cloned().unwrap_or_else(|| feed::Deal {
+                name: String::new(),
                 art: String::new(),
                 review: None,
                 review_key: String::new(),
                 review_count: 0,
             });
             SteamRow {
-                appid: *id,
+                appid: id,
                 name: deal.name,
                 price: price.final_formatted.clone(),
                 original: price.initial_formatted.clone(),
@@ -69,10 +82,10 @@ pub fn deals(cfg: &SteamConfig) -> Result<SteamList> {
             }
         })
         .collect();
-    Ok(SteamList { items, has_more })
+    Ok(SteamList { items, has_more, currency: region.currency.to_string() })
 }
 
-pub fn recent(cfg: &SteamConfig) -> Result<SteamRecent> {
+pub fn recent(cfg: &SteamConfig, region: &Region) -> Result<SteamRecent> {
     if cfg.api_key.is_empty() {
         return Ok(SteamRecent { items: Vec::new(), has_key: false });
     }
@@ -80,7 +93,7 @@ pub fn recent(cfg: &SteamConfig) -> Result<SteamRecent> {
     games.truncate(steam::RECENT);
     // The Web API reports no capsule: it comes from the store, and a failure there only costs the art.
     let ids: Vec<u32> = games.iter().map(|g| g.appid).collect();
-    let art = feed::basics(&ids).unwrap_or_default();
+    let art = feed::basics(&ids, region).unwrap_or_default();
     for game in &mut games {
         game.art = art.get(&game.appid).map(|(_, url)| url.clone()).unwrap_or_default();
     }
