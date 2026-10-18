@@ -33,8 +33,9 @@ pub fn trending(region: &Region) -> Result<SteamList> {
     list(&crate::steam_url::trending_url(region), TRENDING, region)
 }
 
-pub fn catalog(term: &str, page: usize, region: &Region) -> Result<SteamList> {
-    Ok(paged(feed::search(&crate::steam_url::catalog_url(term, page, region)).map_err(failed)?, region))
+pub fn catalog(term: &str, page: usize, region: &Region, sort: &str, only_sale: bool) -> Result<SteamList> {
+    let query = crate::steam_url::catalog_url(term, page, region, sort, only_sale);
+    Ok(paged(feed::search(&query).map_err(failed)?, region))
 }
 
 /// The whole wishlist scan for discounts, best deal first. Cached as one list so paging through the
@@ -73,7 +74,7 @@ pub fn deals_page(scan: &[(u32, Price)], page: usize, region: &Region) -> Result
             SteamRow {
                 appid: id,
                 name: deal.name,
-                price: price.final_formatted.clone(),
+                price: price.wording(),
                 original: price.initial_formatted.clone(),
                 discount: price.discount,
                 review: deal.review,

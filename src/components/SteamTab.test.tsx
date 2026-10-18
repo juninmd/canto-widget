@@ -237,13 +237,29 @@ test("jogue agora explains the missing key, and with a key it lists both playtim
 test("o catálogo searches with the term that was typed", async () => {
   await show();
   await click(screen.getByRole("tab", { name: "catálogo" }));
-  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([{ term: "", page: 0, force: false }]);
+  expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
+    { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
+  ]);
   fireEvent.change(screen.getByTestId("steam-search"), { target: { value: "portal" } });
   await click(screen.getByRole("button", { name: "buscar no catálogo" }));
   expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
-    { term: "", page: 0, force: false },
-    { term: "portal", page: 0, force: false },
+    { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
+    { term: "portal", page: 0, sort: "reviews", onlySale: false, force: false },
   ]);
+});
+
+test("o catálogo pede outra busca quando o filtro ou a ordem mudam", async () => {
+  await show();
+  await click(screen.getByRole("tab", { name: "catálogo" }));
+  const last = () => calls.filter((c) => c.cmd === "steam_catalog").at(-1)?.args;
+
+  fireEvent.click(screen.getByRole("checkbox", { name: "só em promoção" }));
+  await act(async () => {});
+  expect(last()).toEqual({ term: "", page: 0, sort: "reviews", onlySale: true, force: false });
+
+  fireEvent.change(screen.getByLabelText("ordenar"), { target: { value: "price" } });
+  await act(async () => {});
+  expect(last()).toEqual({ term: "", page: 0, sort: "price", onlySale: true, force: false });
 });
 
 test("o catálogo pages through the rest of the store and appends what comes", async () => {
@@ -252,8 +268,8 @@ test("o catálogo pages through the rest of the store and appends what comes", a
   expect(rows()).toEqual(["413150"]);
   await click(screen.getByRole("button", { name: "ver mais jogos" }));
   expect(calls.filter((c) => c.cmd === "steam_catalog").map((c) => c.args)).toEqual([
-    { term: "", page: 0, force: false },
-    { term: "", page: 1, force: false },
+    { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
+    { term: "", page: 1, sort: "reviews", onlySale: false, force: false },
   ]);
   expect(rows()).toEqual(["413150", "620"]);
   expect(screen.queryByRole("button", { name: "ver mais jogos" })).toBeNull();
@@ -334,6 +350,7 @@ test("disconnecting leaves the key form closed for the next account", async () =
   await click(screen.getByRole("button", { name: "sem chave" }));
   expect(screen.getByLabelText("Chave da Steam Web API (opcional)")).toBeTruthy();
   await click(screen.getByRole("button", { name: "desconectar" }));
+  await click(screen.getByRole("button", { name: "desconectar" }));
   // The form was for the account that left: reconnecting must not bring it back open.
   status = { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br", watching: false };
   fireEvent.change(screen.getByLabelText("SteamID64, link do perfil ou nome de perfil"), {
@@ -391,11 +408,20 @@ test("a biblioteca sem chave explica em vez de listar vazio", async () => {
   expect(rows()).toEqual([]);
 });
 
-test("desconectar forgets the account and goes back to the form", async () => {
+test("desconectar pergunta antes e só então esquece a conta", async () => {
   await show();
+  await click(screen.getByRole("button", { name: "desconectar" }));
+  expect(calls.some((c) => c.cmd === "steam_disconnect")).toBe(false);
+  expect(screen.getByRole("alert").textContent).toContain("desconectar a conta?");
+
+  await click(screen.getByRole("button", { name: "cancelar" }));
+  expect(calls.some((c) => c.cmd === "steam_disconnect")).toBe(false);
+
+  await click(screen.getByRole("button", { name: "desconectar" }));
   await click(screen.getByRole("button", { name: "desconectar" }));
   expect(calls.some((c) => c.cmd === "steam_disconnect")).toBe(true);
   expect(screen.getByText("Conectar à Steam")).toBeTruthy();
+  expect(screen.queryByRole("alert")).toBeNull();
 });
 
 test("a failed list keeps the retry banner on screen", async () => {

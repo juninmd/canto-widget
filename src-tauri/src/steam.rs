@@ -19,6 +19,9 @@ pub const CATALOG_PAGE: usize = 50;
 pub const RECENT: usize = 30;
 /// A library can be thousands of games; one pane shows this many, the most played first.
 pub const LIBRARY: usize = 100;
+/// How many wishlist entries one scan prices. Steam takes 40 per request, so this is 25 requests; a
+/// longer list is truncated rather than turned into a flood, and Steam itself is the way to narrow it.
+pub const WISHLIST_SCAN: usize = 1000;
 /// Fresh enough to skip the network; the "atualizar" button bypasses it.
 pub const TTL_MS: i64 = 5 * 60_000;
 /// The catalog keys on free text and every capsule is an entry, so the cache is capped; the oldest

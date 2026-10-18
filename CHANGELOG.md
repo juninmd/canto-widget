@@ -12,6 +12,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Catálogo da Steam com filtros**: além da busca, a seção ganhou **só em promoção** e a escolha da ordem —
+  melhor avaliados, menor preço ou mais recentes. São os três critérios que a própria loja aceita; "maior
+  desconto" não é um deles, então essa ordem continua sendo a da lista de desejos.
 - **Biblioteca da Steam**: uma quinta sub-aba lista **todos os jogos que a conta tem**, do mais jogado para o menos,
   com capa, o **tempo total** de cada um e uma linha de resumo que diz quantos jogos e quantas horas a lista soma.
   Tem **busca por nome** e pagina de 100 em 100, como o catálogo, então uma conta de mil jogos continua navegável.
@@ -21,8 +24,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   preço e o desconto — mesmo com a janela escondida, porque quem varre é o Rust. A primeira varredura só anota:
   nada toca para um preço que o jogo já tinha antes de você ligar os avisos. Desligado por padrão; o estado (a
   escolha e o último preço de cada jogo) viaja selado, é lido a cada 30 min com o cofre aberto e some da memória ao
-  trancar. Um jogo que fica gratuito não toca: a loja não informa preço nenhum para ele, então não há
-  queda para comparar.
+  trancar. Um jogo que fica gratuito toca como a maior queda de todas: a loja não informa preço nenhum para ele,
+  então o aviso diz "Grátis".
 - **Loja Steam da sua região**: um seletor no cabeçalho da aba escolhe a loja — Brasil, Estados Unidos, Euro ou
   Reino Unido. Preços, moeda e o texto das análises passam a vir dela, e a economia de cada oferta é escrita na
   moeda escolhida. O padrão segue o idioma da interface (português abre no Brasil), a escolha fica guardada com a
@@ -40,6 +43,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Varredura da lista de desejos com limites**: a varredura de preços passou a ter um teto de jogos por vez e a
+  esperar antes de repetir um pedido que a Steam recusou por excesso de requisições, em vez de desistir na primeira
+  resposta 429. O alerta de preço também passou a guardar **de qual conta** são os preços: trocar de conta não
+  compara a lista nova com os preços da anterior, como já acontecia ao trocar de loja.
+- **Desconectar a Steam pergunta antes**: o botão no cabeçalho abre uma confirmação (a chave da Web API sai do cofre
+  no processo), com cancelar do lado.
 - **Sub-abas da Steam roláveis**: com cinco seções, a régua estourava a largura da janela e cortava a última; agora
   ela rola na horizontal. O tempo de jogo também passa a usar o separador de milhar do idioma ("2.140 h"), que só
   aparecia em contas grandes.

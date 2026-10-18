@@ -500,8 +500,10 @@ export const api = {
   /** Wishlist deals, biggest discount first; `page` starts at 0. */
   steamDeals: (page = 0, force = false) => invoke<SteamList>("steam_deals", { page, force }),
   steamTrending: (force = false) => invoke<SteamList>("steam_trending", { force }),
-  /** Top rated games for `term` (empty = the whole store), reviews first; `page` starts at 0. */
-  steamCatalog: (term: string, page = 0, force = false) => invoke<SteamList>("steam_catalog", { term, page, force }),
+  /** Top rated games for `term` (empty = the whole store). `sort` is "reviews", "price" or "new";
+   *  `onlySale` asks the store for what is discounted now. `page` starts at 0. */
+  steamCatalog: (term = "", page = 0, sort = "reviews", onlySale = false, force = false) =>
+    invoke<SteamList>("steam_catalog", { term, page, sort, onlySale, force }),
   steamRecent: (force = false) => invoke<SteamRecent>("steam_recent", { force }),
   /** Every owned game, most played first, filtered by `term` and paged by 100; `page` starts at 0. */
   steamLibrary: (term = "", page = 0, force = false) => invoke<SteamLibrary>("steam_library", { term, page, force }),

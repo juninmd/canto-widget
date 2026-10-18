@@ -21,7 +21,7 @@ fn every_store_url_asks_for_the_country_and_language_of_the_chosen_region() {
     for (region, country, language) in [(br(), "BR", "portuguese"), (us(), "US", "english")] {
         for url in [
             trending_url(&region),
-            catalog_url("", 0, &region),
+            catalog_url("", 0, &region, "Reviews_DESC", false),
             price_url(&[620], &region),
             basic_url(620, &region),
             reviews_url(620, &region),
@@ -41,12 +41,32 @@ fn the_trending_list_is_the_global_top_sellers() {
 
 #[test]
 fn the_catalog_sorts_by_reviews_and_pages_by_50() {
-    assert_eq!(param(&catalog_url("", 0, &br()), "sort_by").as_deref(), Some("Reviews_DESC"));
-    assert_eq!(param(&catalog_url("", 0, &br()), "term"), None, "an empty search is left out");
-    assert_eq!(param(&catalog_url("  portal 2 ", 0, &br()), "term").as_deref(), Some("portal 2"));
-    assert_eq!(param(&catalog_url("", 0, &br()), "start"), None, "the first page is the default");
-    assert_eq!(param(&catalog_url("", 1, &br()), "start").as_deref(), Some("50"));
-    assert_eq!(param(&catalog_url("", 3, &br()), "start").as_deref(), Some("150"));
+    assert_eq!(param(&catalog_url("", 0, &br(), "Reviews_DESC", false), "sort_by").as_deref(), Some("Reviews_DESC"));
+    assert_eq!(param(&catalog_url("", 0, &br(), "Reviews_DESC", false), "term"), None, "an empty search is left out");
+    assert_eq!(
+        param(&catalog_url("  portal 2 ", 0, &br(), "Reviews_DESC", false), "term").as_deref(),
+        Some("portal 2")
+    );
+    assert_eq!(
+        param(&catalog_url("", 0, &br(), "Reviews_DESC", false), "start"),
+        None,
+        "the first page is the default"
+    );
+    assert_eq!(param(&catalog_url("", 1, &br(), "Reviews_DESC", false), "start").as_deref(), Some("50"));
+    assert_eq!(param(&catalog_url("", 3, &br(), "Reviews_DESC", false), "start").as_deref(), Some("150"));
+}
+
+#[test]
+fn the_catalog_offers_the_sorts_the_store_answers_and_can_ask_for_only_specials() {
+    for (asked, token) in [("reviews", "Reviews_DESC"), ("price", "Price_ASC"), ("new", "Released_DESC")] {
+        assert_eq!(catalog_sort(asked), Some(token), "{asked}");
+        assert_eq!(param(&catalog_url("", 0, &br(), token, false), "sort_by").as_deref(), Some(token));
+    }
+    assert_eq!(catalog_sort("discount"), None, "the store has no biggest-discount sort; the wishlist does");
+    assert_eq!(catalog_sort(""), None);
+
+    assert_eq!(param(&catalog_url("", 0, &br(), "Price_ASC", true), "specials").as_deref(), Some("1"));
+    assert_eq!(param(&catalog_url("", 0, &br(), "Price_ASC", false), "specials"), None);
 }
 
 #[test]

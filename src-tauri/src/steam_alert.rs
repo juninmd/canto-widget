@@ -98,11 +98,13 @@ impl SteamAlerts {
         let Ok(ids) = feed::wishlist(&cfg.steamid) else { return false };
         let Ok(prices) = feed::prices(&ids, &region) else { return false };
         let current = self.0.lock().unwrap().watch.clone().unwrap_or_default();
-        let (fell, next) = drops(&current, &prices, region.code);
+        let (fell, next) = drops(&current, &prices, region.code, &cfg.steamid);
         // Always keep what this scan saw: otherwise the next one would ring for a price already there.
-        if next.prices != current.prices || next.region != current.region {
+        let stale = next.prices != current.prices || next.region != current.region || next.steamid != current.steamid;
+        if stale {
             let written = self.with(state, |watch| {
                 watch.region = next.region;
+                watch.steamid = next.steamid;
                 watch.prices = next.prices;
             });
             let _ = written.and_then(|()| self.flush(state));

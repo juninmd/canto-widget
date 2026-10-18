@@ -24,6 +24,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
   const [sub, setSub] = useState<Sub>("deals");
   const [key, setKey] = useState("");
   const [addingKey, setAddingKey] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
 
   const load = useCallback(async () => {
@@ -46,6 +47,7 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
       // The form belonged to the account that just left; the next one starts with a clean header.
       setKey("");
       setAddingKey(false);
+      setConfirming(false);
     } catch (e) {
       onError(errText(e));
     }
@@ -138,14 +140,36 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
             {t("steam.noKey")}
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => void disconnect()}
-          className="canto-hit shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
-        >
-          {t("steam.disconnect")}
-        </button>
+        {!confirming && (
+          <button
+            type="button"
+            onClick={() => setConfirming(true)}
+            className="canto-hit shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
+          >
+            {t("steam.disconnect")}
+          </button>
+        )}
       </div>
+      {confirming && (
+        <div role="alert" className="flex items-center gap-2 rounded-lg border border-line bg-ink px-2.5 py-1.5 text-xs">
+          <span className="min-w-0 flex-1 text-fg">{t("steam.disconnect.ask")}</span>
+          <button
+            type="button"
+            autoFocus
+            onClick={() => setConfirming(false)}
+            className="canto-hit shrink-0 rounded-md bg-edge px-2 text-fg hover:bg-active"
+          >
+            {t("steam.disconnect.cancel")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void disconnect()}
+            className="canto-hit shrink-0 rounded-md border border-danger/60 px-2 font-semibold text-danger hover:bg-danger/10"
+          >
+            {t("steam.disconnect")}
+          </button>
+        </div>
+      )}
       {addingKey && !status.has_key && (
         <form onSubmit={addKey} className="flex gap-1">
           <input

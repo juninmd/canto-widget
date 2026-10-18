@@ -26,6 +26,8 @@ const UA: &str = "Mozilla/5.0 (compatible; canto-widget)";
 #[derive(Debug, PartialEq)]
 pub enum FetchError {
     Network(String),
+    /// Steam answered 429: the same request is worth one more try after a wait.
+    Busy(String),
     Other(String),
 }
 
@@ -33,9 +35,16 @@ impl FetchError {
     pub fn message(&self) -> String {
         match self {
             FetchError::Network(e) => format!("sem conexão com a Steam: {e}"),
+            FetchError::Busy(e) => e.clone(),
             FetchError::Other(e) => e.clone(),
         }
     }
+}
+
+/// Whether trying the same request again could work: only a rate limit, never a missing game or a
+/// broken answer.
+pub fn retryable(error: &FetchError) -> bool {
+    matches!(error, FetchError::Busy(_))
 }
 
 fn client() -> Result<reqwest::blocking::Client, FetchError> {
@@ -56,11 +65,29 @@ fn net(e: reqwest::Error) -> FetchError {
 fn text(client: &reqwest::blocking::Client, url: &Url) -> Result<String, FetchError> {
     let res = client.get(url.clone()).send().map_err(net)?;
     match res.status().as_u16() {
-        429 => Err(FetchError::Other("muitas requisições; tente de novo em alguns minutos".into())),
+        429 => Err(FetchError::Busy("muitas requisições; tente de novo em alguns minutos".into())),
         s if (200..300).contains(&s) => res.text().map_err(net),
         // 404 is what a delisted app answers: not worth the same wording as a real failure.
         404 => Err(FetchError::Other("jogo não encontrado na loja".into())),
         s => Err(FetchError::Other(format!("HTTP {s}"))),
+    }
+}
+
+/// Waits between the two extra tries the wishlist scan gives a rate limit.
+const BACKOFF_SECS: [u64; 2] = [2, 5];
+
+/// The sequential scan is the one that can trip a rate limit (a wishlist is many requests in a row),
+/// so it is the one that waits and tries that same chunk again.
+fn text_patiently(client: &reqwest::blocking::Client, url: &Url) -> Result<String, FetchError> {
+    let mut attempt = 0;
+    loop {
+        match text(client, url) {
+            Err(e) if retryable(&e) && attempt < BACKOFF_SECS.len() => {
+                std::thread::sleep(Duration::from_secs(BACKOFF_SECS[attempt]));
+                attempt += 1;
+            }
+            answer => return answer,
+        }
     }
 }
 
@@ -90,12 +117,17 @@ pub fn wishlist(steamid: &str) -> Result<Vec<u32>, FetchError> {
     parse::parse_wishlist(&get(&wishlist_url(steamid))?).map_err(FetchError::Other)
 }
 
+/// The ids one scan prices: a wishlist past the bound is truncated instead of turning into a flood.
+pub fn scan_ids(ids: &[u32]) -> &[u32] {
+    &ids[..ids.len().min(crate::steam::WISHLIST_SCAN)]
+}
+
 /// Prices for the whole wishlist in chunks, so a long list still costs few requests.
 pub fn prices(ids: &[u32], region: &Region) -> Result<HashMap<u32, Price>, FetchError> {
     let client = client()?;
     let mut out = HashMap::new();
-    for chunk in ids.chunks(BATCH) {
-        out.extend(parse::parse_prices(&text(&client, &price_url(chunk, region))?));
+    for chunk in scan_ids(ids).chunks(BATCH) {
+        out.extend(parse::parse_prices(&text_patiently(&client, &price_url(chunk, region))?));
     }
     Ok(out)
 }

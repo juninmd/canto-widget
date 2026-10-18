@@ -9,17 +9,33 @@ fn the_wishlist_gives_appids_and_a_private_one_gives_none() {
 }
 
 #[test]
-fn prices_keep_the_discount_and_skip_free_or_failed_apps() {
+fn prices_keep_the_discount_and_tell_a_free_app_from_one_without_a_price() {
     let json = r#"{
         "620":{"success":true,"data":{"price_overview":{"currency":"BRL","initial":3399,"final":1699,"discount_percent":50,"final_formatted":"R$ 16,99"}}},
         "730":{"success":true,"data":[]},
         "400":{"success":false}
     }"#;
     let prices = parse_prices(json);
-    assert_eq!(prices.len(), 1);
+    assert_eq!(prices.len(), 2, "a free app is reported; a failed entry is not");
     let price = &prices[&620];
     assert_eq!((price.discount, price.final_cents, price.final_formatted.as_str()), (50, 1699, "R$ 16,99"));
     assert_eq!(price.saved_cents(), 1700);
+    assert!(!price.is_free && price.wording() == "R$ 16,99");
+
+    let free = &prices[&730];
+    assert!(free.is_free, "`[]` is Steam's answer for an app that is free");
+    assert_eq!((free.final_cents, free.saved_cents()), (0, 0), "a free app is worth nothing and saves nothing");
+    assert_eq!(free.wording(), "Grátis", "no formatted price comes with it, so the wording is ours");
+    assert!(!prices.contains_key(&400), "a failed entry has nothing to show");
+}
+
+#[test]
+fn a_hundred_percent_discount_is_not_the_same_as_being_free() {
+    // Steam does send a price overview with `final: 0` for a giveaway; that one keeps its own wording.
+    let json = r#"{"620":{"success":true,"data":{"price_overview":{"initial":3399,"final":0,"discount_percent":100,"final_formatted":"R$ 0,00"}}}}"#;
+    let price = &parse_prices(json)[&620];
+    assert!(!price.is_free);
+    assert_eq!((price.wording().as_str(), price.saved_cents()), ("R$ 0,00", 3399));
 }
 
 #[test]
