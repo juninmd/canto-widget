@@ -42,6 +42,9 @@ export default function SteamTab({ onError }: { onError: (m: string) => void }) 
   async function disconnect() {
     try {
       setStatus(await api.steamDisconnect());
+      // The form belonged to the account that just left; the next one starts with a clean header.
+      setKey("");
+      setAddingKey(false);
     } catch (e) {
       onError(errText(e));
     }

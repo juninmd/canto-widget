@@ -310,6 +310,20 @@ test("a keyless account can paste the Web API key later, without reconnecting", 
   expect(screen.queryByLabelText("Chave da Steam Web API (opcional)")).toBeNull();
 });
 
+test("disconnecting leaves the key form closed for the next account", async () => {
+  await show();
+  await click(screen.getByRole("button", { name: "sem chave" }));
+  expect(screen.getByLabelText("Chave da Steam Web API (opcional)")).toBeTruthy();
+  await click(screen.getByRole("button", { name: "desconectar" }));
+  // The form was for the account that left: reconnecting must not bring it back open.
+  status = { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br", watching: false };
+  fireEvent.change(screen.getByLabelText("SteamID64, link do perfil ou nome de perfil"), {
+    target: { value: "76561190000000000" },
+  });
+  await click(screen.getByRole("button", { name: "conectar" }));
+  expect(screen.queryByLabelText("Chave da Steam Web API (opcional)")).toBeNull();
+});
+
 test("the bell turns the wishlist price alerts on and off", async () => {
   await show();
   const bell = () => screen.getByRole("button", { name: "avisar quando o preço cair" });
