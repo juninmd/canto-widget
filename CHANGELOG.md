@@ -12,6 +12,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Clima com céu animado e mais detalhes**: o cartão de cima agora é um céu que acompanha o tempo — azul limpo,
+  noite estrelada, chuva, neve, neblina, trovoada com relâmpago —, com gotas e flocos caindo, nuvens passando e um
+  ícone desenhado e animado para cada condição (tudo parado quando o sistema pede menos movimento). Abaixo: **umidade,
+  vento com a direção, índice UV, nascer e pôr do sol** e a chance de chuva de hoje; as **próximas 24 horas** numa
+  curva suave que rola de lado, com ícone e chance de chuva (as horas depois do pôr do sol ganham a lua); e **sete
+  dias**, cada um com uma barra de mínima a máxima dentro da faixa da semana. O horário da última leitura aparece
+  no rodapé.
+- **Escolher a cidade ficou mais fácil**: os resultados aparecem **enquanto você digita** (setas e Enter funcionam,
+  com `combobox` e lista acessíveis), as **últimas cidades** e uma fileira de **cidades populares** entram com um
+  clique — sem buscar —, e **trocar de cidade** abre o seletor sem esquecer a atual, com **voltar** (o "esquecer a
+  cidade" mudou para dentro dele). Uma busca de uma letra não sai, e uma resposta lenta nunca sobrescreve a mais nova.
 - **"Fechar todos" na janela de avisos**: quando a fila de avisos passa de um, a janela do alerta ganha **fechar
   todos** no canto, ao lado da régua. Antes era um clique em "fechar" por aviso, com a janela ficando aberta até o
   último; agora a fila inteira sai numa chamada só (o Rust derruba a fila de uma vez, e cada aviso continua deixando

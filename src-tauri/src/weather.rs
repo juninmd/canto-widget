@@ -9,8 +9,8 @@ const TIMEOUT_S: u64 = 15;
 /// Long enough for "São Paulo" and short enough not to be a payload.
 pub const MAX_CITY: usize = 64;
 /// The card shows a window of the API's answer; asking for less keeps the payload small.
-const HOURS: u8 = 12;
-const DAYS: u8 = 5;
+const HOURS: u8 = 24;
+const DAYS: u8 = 7;
 /// Rain from this probability on is worth a line on the card.
 pub const RAIN_CHANCE: u8 = 50;
 /// Enough candidates to disambiguate ("Londres" has a dozen), few enough to stay a list on the card.
@@ -57,6 +57,13 @@ pub struct Now {
     pub temp: f64,
     pub feels: f64,
     pub condition: Condition,
+    /// Relative humidity in percent.
+    pub humidity: u8,
+    /// Wind speed in km/h and the direction it blows *from*, in degrees.
+    pub wind: f64,
+    pub wind_dir: u16,
+    /// Night changes the sky and the icons; an API that omits it reads as day.
+    pub is_day: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -75,6 +82,10 @@ pub struct Day {
     pub max: f64,
     pub rain: u8,
     pub condition: Condition,
+    /// ISO local times of the sun, empty when the API omits them (polar day and night).
+    pub sunrise: String,
+    pub sunset: String,
+    pub uv: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -115,6 +126,14 @@ struct RawCurrent {
     temperature_2m: f64,
     apparent_temperature: f64,
     weather_code: u8,
+    #[serde(default)]
+    relative_humidity_2m: Option<f64>,
+    #[serde(default)]
+    wind_speed_10m: Option<f64>,
+    #[serde(default)]
+    wind_direction_10m: Option<f64>,
+    #[serde(default)]
+    is_day: Option<u8>,
 }
 
 #[derive(Deserialize)]
@@ -141,6 +160,12 @@ struct RawDaily {
     precipitation_probability_max: Vec<Option<u8>>,
     #[serde(default)]
     weather_code: Vec<u8>,
+    #[serde(default)]
+    sunrise: Vec<Option<String>>,
+    #[serde(default)]
+    sunset: Vec<Option<String>>,
+    #[serde(default)]
+    uv_index_max: Vec<Option<f64>>,
 }
 
 /// Every match the API sent, in its own order (ranked by population and relevance). Rows that would not survive
@@ -203,6 +228,9 @@ pub fn parse_forecast(body: &[u8]) -> Option<Forecast> {
                         max: *daily.temperature_2m_max.get(i)?,
                         rain: daily.precipitation_probability_max.get(i).copied().flatten().unwrap_or(0),
                         condition: condition(*daily.weather_code.get(i)?),
+                        sunrise: daily.sunrise.get(i).cloned().flatten().unwrap_or_default(),
+                        sunset: daily.sunset.get(i).cloned().flatten().unwrap_or_default(),
+                        uv: daily.uv_index_max.get(i).copied().flatten().filter(|uv| uv.is_finite()).unwrap_or(0.0),
                     })
                 })
                 .collect()
@@ -213,11 +241,19 @@ pub fn parse_forecast(body: &[u8]) -> Option<Forecast> {
             temp: current.temperature_2m,
             feels: current.apparent_temperature,
             condition: condition(current.weather_code),
+            humidity: percent(current.relative_humidity_2m),
+            wind: current.wind_speed_10m.filter(|w| w.is_finite()).unwrap_or(0.0).max(0.0),
+            wind_dir: current.wind_direction_10m.filter(|d| d.is_finite()).map_or(0, |d| d.rem_euclid(360.0) as u16),
+            is_day: current.is_day.unwrap_or(1) != 0,
         },
         rain_from: hours.iter().find(|h| h.rain >= RAIN_CHANCE).map(|h| h.at.clone()),
         hours,
         days,
     })
+}
+
+fn percent(value: Option<f64>) -> u8 {
+    value.filter(|v| v.is_finite()).map_or(0, |v| v.clamp(0.0, 100.0).round() as u8)
 }
 
 pub fn client() -> Result<reqwest::blocking::Client, String> {
@@ -296,9 +332,17 @@ pub fn forecast(place: &Place) -> Result<Forecast, String> {
         [
             ("latitude", place.lat.to_string()),
             ("longitude", place.lon.to_string()),
-            ("current", "temperature_2m,apparent_temperature,weather_code".into()),
+            (
+                "current",
+                "temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,wind_speed_10m,wind_direction_10m,is_day"
+                    .into(),
+            ),
             ("hourly", "temperature_2m,precipitation_probability,weather_code".into()),
-            ("daily", "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max".into()),
+            (
+                "daily",
+                "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max"
+                    .into(),
+            ),
             ("timezone", "auto".into()),
             ("forecast_hours", HOURS.to_string()),
             ("forecast_days", DAYS.to_string()),

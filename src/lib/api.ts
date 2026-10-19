@@ -258,10 +258,30 @@ export type SteamLibrary = { items: OwnedGame[]; total: number; minutes: number;
 /** The WMO groups the Clima tab knows; the catalogue turns each one into a sentence. */
 export type WeatherCondition = "clear" | "cloudy" | "fog" | "drizzle" | "rain" | "snow" | "storm";
 export type WeatherPlace = { city: string; admin1: string; country: string; lat: number; lon: number };
-export type WeatherNow = { temp: number; feels: number; condition: WeatherCondition };
+export type WeatherNow = {
+  temp: number;
+  feels: number;
+  condition: WeatherCondition;
+  /** Percent. */
+  humidity: number;
+  /** km/h, and the direction it blows from in degrees. */
+  wind: number;
+  wind_dir: number;
+  is_day: boolean;
+};
 /** Times and dates come already local to the city (`timezone=auto` on the API call). */
 export type WeatherHour = { at: string; temp: number; rain: number; condition: WeatherCondition };
-export type WeatherDay = { date: string; min: number; max: number; rain: number; condition: WeatherCondition };
+export type WeatherDay = {
+  date: string;
+  min: number;
+  max: number;
+  rain: number;
+  condition: WeatherCondition;
+  /** ISO local times; empty when the sun does not rise or set that day. */
+  sunrise: string;
+  sunset: string;
+  uv: number;
+};
 export type WeatherForecast = { now: WeatherNow; hours: WeatherHour[]; days: WeatherDay[]; rain_from: string | null };
 export type WeatherView = {
   place: WeatherPlace | null;

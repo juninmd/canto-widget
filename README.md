@@ -181,16 +181,22 @@ in Settings.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: 22 °C now, rain from 13:00, the next hours as a curve and the next four days"><img src="docs/prints/app/97-clima-busca.png" alt="Weather tab picking a city: the search field with 'Londres' typed and three candidates, each with its state and country"></td>
+<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: an animated sky card with 22 °C, the condition drawn as an icon, today's range, the rain warning and tiles for humidity, wind, UV, sunrise, sunset and today's rain chance"><img src="docs/prints/app/93-clima-previsao.png" alt="Weather tab scrolled: the next 24 hours as a smooth curve with icons and rain chance, and seven days with a min-to-max bar each"><img src="docs/prints/app/97-clima-busca.png" alt="Picking a city: results listed while typing, each with its state and country, the first one highlighted"><img src="docs/prints/app/99-clima-cidades.png" alt="Picking a city before typing: popular cities as one-click chips"></td></td>
 <td>
 
 ### 🌤️ The weather without leaving the widget
 
-**Type the city name and pick it from the list**: "Londres" is the name of cities in England, Argentina and Mexico,
-so Canto offers every match with its **state and country** and keeps only the coordinates of the one you chose.
-Then it shows **now**, the **next hours as a curve** with the rain chance, the **next days** and the **rain
-window** ("rain from 13:00"). Open-Meteo, which is open and **keyless** — no account, no address of yours leaving
-the machine — and a 30-minute cache. The tab starts off by default, one checkbox away in Settings.
+**A sky that matches the weather**: the card behind the temperature turns into clear blue, a starry night, rain,
+snow, fog or a storm with lightning — falling drops and flakes, drifting clouds, a drawn and animated icon for
+each condition (all of it still when your system asks for less motion). Under it: **humidity, wind with its
+direction, UV index, sunrise, sunset** and today's rain chance, the **next 24 hours as a smooth curve** and **seven
+days** with a min-to-max bar each, so the days compare at a glance; "rain from 13:00" when it is coming.
+
+**Choosing the city takes seconds**: results appear **while you type** (arrows and Enter work), the cities you
+picked before and a row of **popular ones are one click away**, and "Londres" still lists England, Argentina and
+Mexico with their **state and country**. Canto keeps only the coordinates of the one you chose; "change city"
+keeps the current one until you pick another. Open-Meteo, which is open and **keyless** — no account, no address
+of yours leaving the machine — and a 30-minute cache. The tab starts off by default, one checkbox away in Settings.
 
 </td>
 </tr>

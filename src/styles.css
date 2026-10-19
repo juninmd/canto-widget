@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./noteEditor.css";
+@import "./weather.css";
 
 /* Skin padrão. Cada skin abaixo só redefine estes tokens. */
 :root,

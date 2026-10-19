@@ -25,12 +25,15 @@ mock.module("@tauri-apps/api/core", () => ({
 
 const { default: WeatherCity } = await import("./WeatherCity");
 
-async function show() {
-  render(<WeatherCity onSaved={(view) => saved.push(view)} />);
+async function show(props: { onBack?: () => void } = {}) {
+  render(<WeatherCity onSaved={(view) => saved.push(view)} {...props} />);
 }
 
+const field = () => screen.getByRole("combobox", { name: "Cidade" });
+const wait = (ms: number) => act(async () => void (await new Promise((r) => setTimeout(r, ms))));
+
 async function type(value: string) {
-  await act(async () => fireEvent.change(screen.getByLabelText("Cidade"), { target: { value } }));
+  await act(async () => fireEvent.change(field(), { target: { value } }));
 }
 
 async function search() {
@@ -43,7 +46,10 @@ beforeEach(() => {
   results = [];
   failure = "";
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  localStorage.removeItem("canto.weather.recent");
+});
 
 test("the search sends the typed name and nothing else", async () => {
   results = [LONDON];
@@ -58,23 +64,64 @@ test("every candidate is offered with its state, so two cities of the same name 
   await show();
   await type("Londres");
   await search();
-  expect(screen.getByText("Londres · Inglaterra, Reino Unido")).toBeTruthy();
-  expect(screen.getByText("Londres · Catamarca, Argentina")).toBeTruthy();
+  const options = screen.getAllByRole("option");
+  expect(options.map((o) => o.textContent)).toEqual(["LondresInglaterra, Reino Unido›", "LondresCatamarca, Argentina›"]);
   expect(calls.some((c) => c.cmd === "weather_set_place")).toBe(false);
 });
 
-test("picking a candidate saves its coordinates, not its name", async () => {
+test("picking a candidate saves its coordinates, not its name, and remembers the pick", async () => {
   results = [LONDON, CATAMARCA];
   await show();
   await type("Londres");
   await search();
-  await act(async () => fireEvent.click(screen.getByRole("button", { name: /Reino Unido/ })));
+  await act(async () => fireEvent.click(screen.getByRole("option", { name: /Reino Unido/ })));
   expect(calls.find((c) => c.cmd === "weather_set_place")?.args).toEqual({ place: LONDON });
   expect(saved).toHaveLength(1);
   expect(saved[0].place).toEqual(LONDON);
+  expect(JSON.parse(localStorage.getItem("canto.weather.recent")!)).toEqual([LONDON]);
 });
 
-test("a single match is saved without a second click", async () => {
+test("the results appear while typing, after a pause, and a single match is not saved on its own", async () => {
+  results = [{ city: "Franca", admin1: "São Paulo", country: "Brasil", lat: -20.5, lon: -47.4 }];
+  await show();
+  await type("Fr");
+  expect(calls).toHaveLength(0);
+  await wait(450);
+  expect(calls.map((c) => c.cmd)).toEqual(["weather_search"]);
+  expect(screen.getByRole("option", { name: /Franca/ })).toBeTruthy();
+  expect(calls.some((c) => c.cmd === "weather_set_place")).toBe(false);
+});
+
+test("one letter is not searched and clearing the field drops the list", async () => {
+  results = [LONDON];
+  await show();
+  await type("L");
+  await wait(450);
+  expect(calls).toHaveLength(0);
+  await type("Lo");
+  await wait(450);
+  expect(screen.getAllByRole("option")).toHaveLength(1);
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "limpar a busca" })));
+  expect(screen.queryByRole("option")).toBeNull();
+  expect((field() as HTMLInputElement).value).toBe("");
+});
+
+test("arrow keys move through the list and Enter picks the highlighted city", async () => {
+  results = [LONDON, CATAMARCA];
+  await show();
+  await type("Londres");
+  await search();
+  expect(field().getAttribute("aria-activedescendant")).toBe("wx-opt-0");
+  await act(async () => fireEvent.keyDown(field(), { key: "ArrowDown" }));
+  expect(screen.getByRole("option", { name: /Argentina/ }).getAttribute("aria-selected")).toBe("true");
+  await act(async () => fireEvent.keyDown(field(), { key: "ArrowDown" }));
+  expect(screen.getByRole("option", { name: /Reino Unido/ }).getAttribute("aria-selected")).toBe("true");
+  await act(async () => fireEvent.keyDown(field(), { key: "ArrowUp" }));
+  await act(async () => fireEvent.keyDown(field(), { key: "Enter" }));
+  expect(calls.find((c) => c.cmd === "weather_set_place")?.args).toEqual({ place: CATAMARCA });
+});
+
+test("a single match of an explicit search is saved without a second click", async () => {
   results = [{ city: "Franca", admin1: "São Paulo", country: "Brasil", lat: -20.5, lon: -47.4 }];
   await show();
   await type("Franca");
@@ -99,7 +146,7 @@ test("a failed search is reported and leaves no candidate behind", async () => {
   await type("Londres");
   await search();
   expect(screen.getByRole("alert").textContent).toBe("sem resposta da Open-Meteo");
-  expect(screen.queryByText(/Inglaterra/)).toBeNull();
+  expect(screen.queryByRole("option")).toBeNull();
 });
 
 test("a city the API did not give a state for still shows its country", async () => {
@@ -107,5 +154,36 @@ test("a city the API did not give a state for still shows its country", async ()
   await show();
   await type("Franca");
   await search();
-  expect(screen.getByText("Franca · Brasil")).toBeTruthy();
+  expect(screen.getAllByRole("option")[0].textContent).toContain("Brasil");
+});
+
+test("before typing, a popular city is one click away and saves its fixed coordinates", async () => {
+  await show();
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "Recife" })));
+  expect(calls).toHaveLength(1);
+  expect(calls[0]).toEqual({
+    cmd: "weather_set_place",
+    args: { place: { city: "Recife", admin1: "PE", country: "Brasil", lat: -8.0476, lon: -34.877 } },
+  });
+});
+
+test("the cities picked before come first and the popular row hides while typing", async () => {
+  localStorage.setItem("canto.weather.recent", JSON.stringify([LONDON]));
+  await show();
+  expect(screen.getByText("recentes")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Londres" })).toBeTruthy();
+  expect(screen.getByText("cidades populares")).toBeTruthy();
+  await type("Lo");
+  expect(screen.queryByText("cidades populares")).toBeNull();
+  expect(screen.queryByText("recentes")).toBeNull();
+});
+
+test("voltar only exists when there is a saved city to go back to", async () => {
+  let back = 0;
+  await show({ onBack: () => back++ });
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: /voltar/ })));
+  expect(back).toBe(1);
+  cleanup();
+  await show();
+  expect(screen.queryByRole("button", { name: /voltar/ })).toBeNull();
 });
