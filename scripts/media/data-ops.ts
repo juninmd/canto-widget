@@ -141,6 +141,7 @@ export const AGENTS = {
     agent("opencode", "OpenCode", "npm", "npm install -g opencode-ai", false, null),
     agent("copilot", "GitHub Copilot CLI", "npm", "npm install -g @github/copilot", true,
       agentRelease("v1.2.7", 16, "## O que mudou\n\n- pedidos em lote no mesmo repositório\n")),
+    agent("aider", "Aider", "pipx", "pipx install aider-chat", false, null),
   ],
 };
 

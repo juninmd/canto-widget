@@ -79,7 +79,8 @@ test("lists the agents with the installed count, the release and the notes", asy
   expect(screen.getByText("instalado")).toBeTruthy();
   expect(screen.getByText("não instalado")).toBeTruthy();
   expect(screen.getByText("encontrado em C:\\Users\\ana\\bin\\codex.cmd")).toBeTruthy();
-  expect(screen.getByText(/última versão v0\.163\.0/)).toBeTruthy();
+  expect(screen.getByTitle("última versão v0.163.0").textContent).toBe("v0.163.0");
+  expect(screen.getByText(/publicada há \d+ d/)).toBeTruthy();
   expect(screen.getByText(/O que mudou/)).toBeTruthy();
   expect(screen.getByText(/• corrige o modo plano/)).toBeTruthy();
 });
@@ -112,7 +113,7 @@ test("one harness failing still shows the others, and a missing release says so"
   views = [row("claude", "Claude Code", { release: release("v2.1.302") }), row("crush", "Crush", { error: "sem resposta do GitHub" })];
   await show();
   expect(screen.getByText("0 de 2 instalados")).toBeTruthy();
-  expect(screen.getByText(/última versão v2\.1\.302/)).toBeTruthy();
+  expect(screen.getByTitle("última versão v2.1.302").textContent).toBe("v2.1.302");
   expect(screen.getByRole("alert").textContent).toBe("sem resposta do GitHub");
   expect(screen.getByText("sem release publicada no GitHub")).toBeTruthy();
 });
@@ -132,4 +133,18 @@ test("nothing is executed from the tab: the footer says the command is only copi
   await show();
   expect(screen.getByText(/nada é instalado pelo Canto/)).toBeTruthy();
   expect(calls.map((c) => c.cmd).some((c) => /run|exec|install/.test(c))).toBe(false);
+});
+
+test("each agent gets its provider mark, an unknown one falls back to its initial, and the bar follows the count", async () => {
+  views = [row("claude", "Claude Code", { installed: true }), row("gemini", "Gemini CLI"), row("novo", "Novo CLI")];
+  await show();
+  const marks = (id: string) => document.querySelector(`[data-agent=${id}] [data-provider]`);
+  expect(marks("claude")?.getAttribute("data-provider")).toBe("claude");
+  expect(marks("claude")?.querySelector("svg")).toBeTruthy();
+  expect(marks("gemini")?.querySelector("linearGradient")).toBeTruthy();
+  expect(marks("novo")?.getAttribute("data-provider")).toBe("unknown");
+  expect(marks("novo")?.textContent).toBe("N");
+  const bar = screen.getByRole("progressbar");
+  expect(bar.getAttribute("aria-valuenow")).toBe("1");
+  expect(bar.getAttribute("aria-valuemax")).toBe("3");
 });

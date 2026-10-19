@@ -45,7 +45,8 @@ test("the Agentes tab shows the installed CLI, the release notes and the install
   await expect(page.getByText("1 de 2 instalados")).toBeVisible();
   const installed = page.locator("[data-agent=claude]");
   await expect(installed).toContainText("instalado");
-  await expect(installed).toContainText("última versão v2.1.302");
+  await expect(installed.getByTitle("última versão v2.1.302")).toHaveText("v2.1.302");
+  await expect(installed.locator("[data-provider=claude] svg")).toBeVisible();
   await expect(installed).toContainText("corrige o modo plano");
   await expect(installed.locator("code")).toHaveCount(0);
   const missing = page.locator("[data-agent=aider]");

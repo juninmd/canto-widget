@@ -166,13 +166,14 @@ is the biggest drop of all. The public lists only need your
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/90-agentes.png" alt="Agents tab: fictitious installed CLIs with the latest version, the release date and a summary of what changed"></td>
+<td><img src="docs/prints/app/90-agentes.png" alt="Agents tab: provider logos with an installed count and progress bar, then one card per CLI with the latest version, its age and a summary of what changed"><img src="docs/prints/app/91-agentes-claro.png" alt="Agents tab on the light skin with all six CLIs installed"></td>
 <td>
 
 ### 🤖 The agent CLIs, installed or not
 
 The coding-agent harnesses in one list: **Claude Code**, **Codex CLI**, **Gemini CLI**, **OpenCode**,
-**GitHub Copilot CLI** and **Aider**. Each row says whether the CLI is installed **on this machine** (and where),
+**GitHub Copilot CLI** and **Aider**, each with its **provider logo** and brand color. A header strip shows how many
+are installed as a row of logos and a progress bar. Each card says whether the CLI is installed **on this machine** (and where),
 shows the **latest GitHub release** with its date and a summary of what changed, and — when the CLI is missing —
 brings the **install command ready to copy**. Canto only copies: **nothing is installed or executed** by the
 widget. Public data, no account or key, with a 30-minute cache. The tab starts off by default, one checkbox away

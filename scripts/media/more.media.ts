@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import { shoot } from "./out";
 import { fullScene, openTab } from "./scene";
-import { STEAM } from "./data-ops";
+import { AGENTS, STEAM } from "./data-ops";
 import { settle } from "./stage";
 
 /** Fake capsules for invented games: `steam_image` answers a gradient derived from the appid, so the
@@ -106,4 +106,11 @@ test("agentes: the installed CLIs with their latest release", async ({ browser }
   const page = await fullScene(browser);
   await openTab(page, "Agentes");
   await page.screenshot({ path: "docs/prints/app/90-agentes.png", omitBackground: true });
+});
+
+test("agentes: every provider mark, installed, on the light skin", async ({ browser }) => {
+  const all = AGENTS.harness_list.map((a) => ({ ...a, installed: true, path: `D:\\tools\\bin\\${a.id}.cmd` }));
+  const page = await fullScene(browser, { skin: "claro", fixed: { harness_list: all } });
+  await openTab(page, "Agentes");
+  await page.screenshot({ path: "docs/prints/app/91-agentes-claro.png", omitBackground: true });
 });

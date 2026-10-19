@@ -63,6 +63,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Ofertas da Steam paginadas**: a lista terminava num aviso ("há mais ofertas na sua lista de desejos") que não
   levava a lugar nenhum. Agora ela pagina como o catálogo, com **ver mais jogos** e sem reler a lista de desejos a
   cada página.
+- **Aba Agentes com os logos dos providers**: cada CLI ganhou o ícone da sua marca (Claude, Codex, Gemini, OpenCode,
+  Copilot e Aider) num cartão com a cor do provider, o indicador de instalado com brilho e a versão como etiqueta,
+  seguida de há quanto tempo foi publicada. O topo ganhou uma faixa com os logos (apagados quando o CLI não está
+  instalado) e uma barra de progresso; um agente novo, que a interface ainda não conhece, cai para a inicial.
 - **Aba Agentes mais legível**: cada CLI virou um cartão com a inicial, o repositório de onde vem, a última release
   e as notas de versão num bloco próprio; o comando de instalação ganhou destaque e o botão de copiar.
 
