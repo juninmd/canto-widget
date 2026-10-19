@@ -1,7 +1,9 @@
 import { api, type HarnessView } from "../lib/api";
 import { releaseDate, releaseSummary } from "../lib/agents";
 import { useCopied } from "../lib/useCopied";
+import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
+import ProviderIcon, { providerColor } from "./ProviderIcon";
 
 const LINK = "canto-hit min-h-[24px] shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
 
@@ -22,31 +24,49 @@ export default function AgentRow({ view, onError }: { view: HarnessView; onError
   }
 
   return (
-    <li data-agent={view.id} className="rounded-xl border border-edge/60 bg-panel/40 p-2">
-      <div className="flex items-start gap-2">
-        <span
-          aria-hidden="true"
-          className="grid size-6 shrink-0 place-items-center rounded-lg bg-accent/15 text-[11px] font-bold text-accent-text"
-        >
-          {view.name.slice(0, 1).toUpperCase()}
-        </span>
+    <li
+      data-agent={view.id}
+      className="relative shrink-0 overflow-hidden rounded-xl border border-edge/60 bg-panel/40 p-2 pl-3 transition-colors hover:bg-panel/70"
+    >
+      <span
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-[3px]"
+        style={{ background: view.installed ? providerColor(view.id) : "transparent" }}
+      />
+      <div className="flex items-start gap-2.5">
+        <ProviderIcon id={view.id} name={view.name} size={34} dim={!view.installed} />
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-xs font-semibold text-fg">{view.name}</span>
             <span
-              className={`ml-auto shrink-0 rounded-full px-1.5 text-[9px] uppercase ${
+              className={`ml-auto flex shrink-0 items-center gap-1 rounded-full px-1.5 text-[9px] uppercase ${
                 view.installed ? "bg-accent/15 text-accent-text" : "bg-edge text-faint"
               }`}
             >
+              <span
+                aria-hidden="true"
+                className={`size-1.5 rounded-full ${view.installed ? "bg-accent shadow-[0_0_6px_var(--color-accent)]" : "bg-faint/60"}`}
+              />
               {t(view.installed ? "agents.installed" : "agents.notInstalled")}
             </span>
           </div>
           <div className="truncate text-[10px] text-faint">{view.repo}</div>
           <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[10px]">
-            <span className="min-w-0 truncate tabular-nums text-muted">
-              {release ? t("agents.release", { tag: release.tag }) : t("agents.releaseNone")}
-              {date && <span className="text-faint"> · {date}</span>}
-            </span>
+            {release ? (
+              <>
+                <span
+                  title={t("agents.release", { tag: release.tag })}
+                  className="shrink-0 rounded-md bg-edge/70 px-1.5 py-px font-mono text-[10px] tabular-nums text-fg"
+                >
+                  {release.tag}
+                </span>
+                <span className="min-w-0 truncate text-faint" title={date}>
+                  {t("agents.released", { ago: timeAgo(release.published_at) })}
+                </span>
+              </>
+            ) : (
+              <span className="min-w-0 truncate text-muted">{t("agents.releaseNone")}</span>
+            )}
             <button
               type="button"
               aria-label={t("agents.open")}
@@ -79,7 +99,7 @@ export default function AgentRow({ view, onError }: { view: HarnessView; onError
                 <code className="min-w-0 flex-1 truncate rounded-lg bg-edge/60 px-1.5 py-1 text-[10px] text-fg">
                   {view.install_command}
                 </code>
-                <button type="button" onClick={() => void copy()} className={LINK}>
+                <button type="button" onClick={() => void copy()} className={`${LINK} text-[10px] text-muted`}>
                   {copied === view.id ? t("agents.copied") : t("agents.copy")}
                 </button>
               </div>
