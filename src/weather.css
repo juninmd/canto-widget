@@ -1,0 +1,318 @@
+/* Aba Clima: o céu do cartão e os ícones animados. Todo movimento fica sob no-preference (WCAG 2.3.3). */
+
+.wx-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: #fff;
+  background: var(--wx-sky, linear-gradient(160deg, #1d4ed8, #0369a1));
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+  box-shadow: 0 10px 30px -12px rgb(0 0 0 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.18);
+}
+.wx-hero[data-sky="clear"] {
+  --wx-sky: radial-gradient(circle at 85% 8%, rgb(253 224 71 / 0.55), transparent 42%), linear-gradient(160deg, #1d4ed8, #0369a1);
+}
+.wx-hero[data-sky="cloudy"] {
+  --wx-sky: linear-gradient(160deg, #334155, #475569 60%, #5b6b82);
+}
+.wx-hero[data-sky="fog"] {
+  --wx-sky: linear-gradient(170deg, #475569, #5b6b82 55%, #64748b);
+}
+.wx-hero[data-sky="drizzle"] {
+  --wx-sky: linear-gradient(160deg, #1e3a5f, #35577a 60%, #4a6b8a);
+}
+.wx-hero[data-sky="rain"] {
+  --wx-sky: linear-gradient(160deg, #0f2540, #1e3a5f 55%, #2b4a6e);
+}
+.wx-hero[data-sky="snow"] {
+  --wx-sky: linear-gradient(160deg, #3b4a63, #55667f 60%, #64748b);
+}
+.wx-hero[data-sky="storm"] {
+  --wx-sky: linear-gradient(160deg, #0f0f2a, #2a2760 55%, #1e1b4b);
+}
+.wx-hero[data-night="true"][data-sky="clear"] {
+  --wx-sky: radial-gradient(circle at 85% 10%, rgb(226 232 240 / 0.28), transparent 38%), linear-gradient(170deg, #020617, #1e1b4b 60%, #1e3a8a);
+}
+.wx-hero[data-night="true"]:not([data-sky="clear"])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom, rgb(2 6 23 / 0.5), rgb(2 6 23 / 0.35));
+}
+
+.wx-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+.wx-drop,
+.wx-flake,
+.wx-star,
+.wx-cloud,
+.wx-fog {
+  position: absolute;
+  left: var(--x);
+}
+.wx-drop {
+  top: -14%;
+  width: 1.5px;
+  height: 16px;
+  border-radius: 2px;
+  background: linear-gradient(to bottom, transparent, rgb(186 230 253 / 0.85));
+  opacity: 0.55;
+}
+.wx-flake {
+  top: -6%;
+  width: var(--s);
+  height: var(--s);
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.8;
+}
+.wx-star {
+  top: var(--y);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.7;
+}
+.wx-cloud {
+  top: var(--y);
+  width: 150px;
+  height: 46px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.13);
+  filter: blur(10px);
+  transform: translateX(-30%);
+}
+.wx-fog {
+  top: var(--y);
+  width: 130%;
+  height: 26px;
+  left: -15%;
+  border-radius: 999px;
+  background: rgb(226 232 240 / 0.16);
+  filter: blur(12px);
+}
+.wx-flash {
+  position: absolute;
+  inset: 0;
+  background: rgb(199 210 254 / 0.55);
+  opacity: 0;
+}
+
+/* Cartões abaixo do céu: entram em sequência, cada um um passo depois do anterior. */
+.wx-glass {
+  border: 1px solid var(--color-edge);
+  background: color-mix(in srgb, var(--color-ink) 70%, transparent);
+  border-radius: 0.875rem;
+}
+.wx-range {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--color-edge);
+}
+.wx-range > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--from);
+  width: var(--span);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #38bdf8, #fbbf24 70%, #fb923c);
+}
+.wx-icon {
+  overflow: visible;
+}
+.wx-icon .wx-sun,
+.wx-icon .wx-ray-ring,
+.wx-icon .wx-drift,
+.wx-icon .wx-fall,
+.wx-icon .wx-bolt,
+.wx-icon .wx-slide,
+.wx-icon .wx-twinkle {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wx-drop {
+    animation: wx-rain 0.9s linear var(--d) infinite;
+  }
+  .wx-flake {
+    animation: wx-snow 7s linear var(--d) infinite;
+  }
+  .wx-star {
+    animation: wx-twinkle 3.2s ease-in-out var(--d) infinite;
+  }
+  .wx-cloud {
+    animation: wx-pass 26s linear var(--d) infinite;
+  }
+  .wx-fog {
+    animation: wx-fog 14s ease-in-out var(--d) infinite alternate;
+  }
+  .wx-flash {
+    animation: wx-flash 7s linear infinite;
+  }
+  .wx-icon .wx-ray-ring {
+    animation: wx-turn 24s linear infinite;
+  }
+  .wx-icon .wx-sun {
+    animation: wx-pulse 4s ease-in-out infinite alternate;
+  }
+  .wx-icon .wx-drift {
+    animation: wx-drift 6s ease-in-out infinite alternate;
+  }
+  .wx-icon .wx-fall {
+    animation: wx-fall 1.3s ease-in var(--d, 0s) infinite;
+  }
+  .wx-icon .wx-bolt {
+    animation: wx-bolt 3.4s linear infinite;
+  }
+  .wx-icon .wx-slide {
+    animation: wx-slide 3.6s ease-in-out var(--d, 0s) infinite alternate;
+  }
+  .wx-icon .wx-twinkle {
+    animation: wx-twinkle 2.6s ease-in-out var(--d, 0s) infinite;
+  }
+  .wx-rise {
+    animation: wx-rise 420ms var(--ease-entrar) calc(var(--i, 0) * 70ms) backwards;
+  }
+  .wx-draw {
+    stroke-dasharray: 1;
+    animation: wx-draw 1100ms ease-out 200ms backwards;
+  }
+  .wx-area {
+    animation: wx-fade-in 900ms ease-out 500ms backwards;
+  }
+  .wx-spin {
+    animation: wx-turn 0.9s linear infinite;
+  }
+  .wx-pick {
+    transition: transform 140ms var(--ease-entrar), background-color 140ms var(--ease-entrar);
+  }
+  .wx-pick:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes wx-rain {
+  to {
+    transform: translateY(340px) translateX(-14px);
+  }
+}
+@keyframes wx-snow {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(14px, 260px);
+  }
+  100% {
+    transform: translate(-6px, 560px);
+  }
+}
+@keyframes wx-twinkle {
+  50% {
+    opacity: 0.15;
+  }
+}
+@keyframes wx-pass {
+  to {
+    transform: translateX(380%);
+  }
+}
+@keyframes wx-fog {
+  to {
+    transform: translateX(9%);
+  }
+}
+@keyframes wx-flash {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  93% {
+    opacity: 0.9;
+  }
+  95% {
+    opacity: 0.1;
+  }
+  96% {
+    opacity: 0.7;
+  }
+  99% {
+    opacity: 0;
+  }
+}
+@keyframes wx-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes wx-pulse {
+  to {
+    transform: scale(1.06);
+  }
+}
+@keyframes wx-drift {
+  to {
+    transform: translateX(3px);
+  }
+}
+@keyframes wx-fall {
+  0% {
+    transform: translateY(-4px);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(9px);
+    opacity: 0;
+  }
+}
+@keyframes wx-bolt {
+  0%,
+  60%,
+  100% {
+    opacity: 1;
+  }
+  64% {
+    opacity: 0.25;
+  }
+  68% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 0.4;
+  }
+}
+@keyframes wx-slide {
+  to {
+    transform: translateX(4px);
+  }
+}
+@keyframes wx-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes wx-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes wx-fade-in {
+  from {
+    opacity: 0;
+  }
+}

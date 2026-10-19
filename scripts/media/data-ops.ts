@@ -146,25 +146,38 @@ export const AGENTS = {
 };
 
 /** Invented city and forecast: a real one would read as a fact. */
+const SKY = ["cloudy", "cloudy", "clear", "clear", "cloudy", "clear", "clear", "cloudy"] as const;
+const WEATHER_HOURS = Array.from({ length: 24 }, (_, i) => {
+  const hour = (10 + i) % 24;
+  return {
+    at: `2026-10-${17 + Math.floor((10 + i) / 24)}T${String(hour).padStart(2, "0")}:00`,
+    temp: Math.round((22.4 + 4 * Math.sin(((i - 2) / 24) * Math.PI * 2)) * 10) / 10,
+    rain: i >= 3 && i <= 6 ? 45 + i * 6 : 5 + (i % 4) * 5,
+    condition: i >= 3 && i <= 6 ? "rain" : SKY[Math.floor(i / 3)],
+  };
+});
+const WEATHER_DAYS = [
+  [17.1, 26.1, 80, "rain", 8.4], [16.4, 27.0, 20, "clear", 9.1], [15.8, 24.3, 10, "cloudy", 6.2],
+  [18.2, 28.4, 0, "clear", 10.3], [19.0, 29.5, 5, "clear", 11.2], [17.5, 25.0, 65, "rain", 4.1],
+  [16.0, 23.8, 40, "cloudy", 5.0],
+] as const;
+
 export const WEATHER = {
   weather_get: {
-    place: { city: "Aurora", country: "Brasil", lat: -23.5, lon: -46.6 },
+    place: { city: "Aurora", admin1: "Vale Azul", country: "Brasil", lat: -23.5, lon: -46.6 },
     forecast: {
-      now: { temp: 22.4, feels: 24.1, condition: "cloudy" },
-      hours: [
-        { at: "2026-10-17T10:00", temp: 22.4, rain: 10, condition: "cloudy" },
-        { at: "2026-10-17T11:00", temp: 23.9, rain: 20, condition: "cloudy" },
-        { at: "2026-10-17T12:00", temp: 25.2, rain: 45, condition: "clear" },
-        { at: "2026-10-17T13:00", temp: 26.1, rain: 60, condition: "rain" },
-        { at: "2026-10-17T14:00", temp: 24.8, rain: 80, condition: "rain" },
-        { at: "2026-10-17T15:00", temp: 23.2, rain: 75, condition: "rain" },
-      ],
-      days: [
-        { date: "2026-10-17", min: 17.1, max: 26.1, rain: 80, condition: "rain" },
-        { date: "2026-10-18", min: 16.4, max: 27.0, rain: 20, condition: "clear" },
-        { date: "2026-10-19", min: 15.8, max: 24.3, rain: 10, condition: "cloudy" },
-        { date: "2026-10-20", min: 18.2, max: 28.4, rain: 0, condition: "clear" },
-      ],
+      now: { temp: 22.4, feels: 24.1, condition: "cloudy", humidity: 71, wind: 12.6, wind_dir: 135, is_day: true },
+      hours: WEATHER_HOURS,
+      days: WEATHER_DAYS.map(([min, max, rain, condition, uv], i) => ({
+        date: `2026-10-${17 + i}`,
+        min,
+        max,
+        rain,
+        condition,
+        uv,
+        sunrise: `2026-10-${17 + i}T05:${40 - i}`,
+        sunset: `2026-10-${17 + i}T18:${12 + i}`,
+      })),
       rain_from: "2026-10-17T13:00",
     },
     fetched_at: NOW.getTime(),

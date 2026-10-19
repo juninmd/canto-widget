@@ -143,12 +143,12 @@ for (const density of ["compacta", "padrao"]) {
           weather_get: {
             place: { city: "Aurora", country: "Brasil", lat: -23.5, lon: -46.6 },
             forecast: {
-              now: { temp: 22.4, feels: 24.1, condition: "cloudy" },
+              now: { temp: 22.4, feels: 24.1, condition: "cloudy", humidity: 71, wind: 12.6, wind_dir: 90, is_day: true },
               hours: [
                 { at: "2026-10-17T10:00", temp: 22.4, rain: 10, condition: "cloudy" },
                 { at: "2026-10-17T11:00", temp: 25.2, rain: 70, condition: "rain" },
               ],
-              days: [{ date: "2026-10-17", min: 16.4, max: 27, rain: 80, condition: "rain" }],
+              days: [{ date: "2026-10-17", min: 16.4, max: 27, rain: 80, condition: "rain", sunrise: "2026-10-17T05:40", sunset: "2026-10-17T18:12", uv: 8.4 }],
               rain_from: "2026-10-17T11:00",
             },
             fetched_at: now,

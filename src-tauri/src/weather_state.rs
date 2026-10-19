@@ -81,9 +81,26 @@ mod tests {
 
     fn forecast(temp: f64) -> Forecast {
         Forecast {
-            now: Now { temp, feels: temp, condition: Condition::Clear },
+            now: Now {
+                temp,
+                feels: temp,
+                condition: Condition::Clear,
+                humidity: 50,
+                wind: 10.0,
+                wind_dir: 90,
+                is_day: true,
+            },
             hours: vec![Hour { at: "2026-10-17T10:00".into(), temp, rain: 0, condition: Condition::Clear }],
-            days: vec![Day { date: "2026-10-17".into(), min: temp, max: temp, rain: 0, condition: Condition::Clear }],
+            days: vec![Day {
+                date: "2026-10-17".into(),
+                min: temp,
+                max: temp,
+                rain: 0,
+                condition: Condition::Clear,
+                sunrise: String::new(),
+                sunset: String::new(),
+                uv: 0.0,
+            }],
             rain_from: None,
         }
     }
