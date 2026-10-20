@@ -93,12 +93,14 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
   }
 
   const count = (id: Tab) => attention[id] ?? 0;
-  const hidden = tabs.map((tab, i) => ({ tab, i })).filter(({ i }) => !shown.includes(i));
+  // `shown` holds indices of the previous list until the layout effect re-measures: one past the end crashes the window.
+  const kept = shown.filter((i) => i < tabs.length);
+  const hidden = tabs.map((tab, i) => ({ tab, i })).filter(({ i }) => !kept.includes(i));
 
   return (
     <div ref={row} className="relative flex shrink-0 items-center gap-0.5 px-3 pb-1 pt-1.5 text-xs">
       <nav role="tablist" aria-label={t("tabs.label")} onKeyDown={onKeyDown} className="flex min-w-0 gap-0.5">
-        {shown.map((i) => {
+        {kept.map((i) => {
           const tab = tabs[i];
           return (
             <button

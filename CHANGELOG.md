@@ -5,6 +5,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Desativar abas em Ajustes** não faz mais a janela inteira sumir: a barra de abas lia a lista antiga por um
+  instante e derrubava a tela.
+
 ### Removido
 
 - **Abas de protótipo Hábitos e Snippets**: saíram as duas telas de maquete, os rótulos nos 42 idiomas, os prints e

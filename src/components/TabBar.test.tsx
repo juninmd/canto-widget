@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from "bun:test";
 import { useState } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import TabBar, { type Tab } from "./TabBar";
+import TabBar, { TABS, type Tab } from "./TabBar";
 
 function Harness() {
   const [current, setCurrent] = useState<Tab>("tasks");
@@ -200,4 +200,11 @@ test("a tab with pending items shows a badge that says how many", () => {
   render(<TabBar current="tasks" onChange={() => {}} attention={{ github: 3, notes: 0 }} />);
   expect(screen.getByRole("tab", { name: "GitHub pendências: 3" })).toBeDefined();
   expect(screen.getByRole("tab", { name: "Notas" })).toBeDefined();
+});
+
+test("hiding tabs in Ajustes keeps the bar on screen instead of crashing the whole window", () => {
+  const { rerender } = render(<TabBar current="settings" onChange={() => {}} tabs={TABS} />);
+  const fewer = TABS.filter((tab) => tab.id === "tasks" || tab.id === "settings");
+  rerender(<TabBar current="settings" onChange={() => {}} tabs={fewer} />);
+  expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Tarefas", "Ajustes"]);
 });
