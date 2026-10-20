@@ -17,6 +17,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aviso de PR mais direto**: o pop-up de pull request e de menção diz o tipo, o repositório e há quanto tempo numa
+  linha só, traz o motivo (atribuído, CI falhou, aprovado...) num selo colorido e mostra quem abriu o PR com avatar.
+  O bloco "detalhes" só aparece quando tem algo a dizer, e "fechar" ficou mais discreto para não competir com
+  "abrir PR".
+
 - **Clima com céu animado e mais detalhes**: o cartão de cima agora é um céu que acompanha o tempo — azul limpo,
   noite estrelada, chuva, neve, neblina, trovoada com relâmpago —, com gotas e flocos caindo, nuvens passando e um
   ícone desenhado e animado para cada condição (tudo parado quando o sistema pede menos movimento). Abaixo: **umidade,

@@ -291,6 +291,25 @@ test("a sender without a photo falls back to initials and one without a name sho
   expect(document.querySelector("[data-sender]")!.textContent).toContain("ana");
 });
 
+test("an assignment says why it rang, where and when in one line, and who opened it, with no empty box", async () => {
+  await show([
+    {
+      ...failingCi,
+      id: "pr:assigned:acme/atlas#12",
+      start: new Date(Date.now() - 3 * 60_000).toISOString(),
+      description: "",
+      tag: "assigned",
+      sender: { name: "", login: "dependabot[bot]", avatar: "" },
+    },
+  ]);
+  const eyebrow = document.querySelector("[data-eyebrow]") as HTMLElement;
+  expect(eyebrow.textContent).toContain("acme/atlas#12");
+  expect(eyebrow.textContent).toContain("há 3 min");
+  expect(document.querySelector("[data-reason]")!.textContent).toBe("atribuído a você");
+  expect(document.querySelector("[data-sender]")!.textContent).toContain("dependabot[bot]");
+  expect(screen.queryByText("detalhes")).toBeNull();
+});
+
 const approved: AgendaItem = {
   ...failingCi,
   id: "pr:approved:acme/atlas#12",

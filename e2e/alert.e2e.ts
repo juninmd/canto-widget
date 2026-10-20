@@ -194,6 +194,32 @@ test("an approved PR names who approved it, with their photo, and a conflict ran
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
 });
 
+test("an assigned PR says why, where and when in one line, and who opened it", async ({ page }) => {
+  const assigned = {
+    id: "pr:assigned:acme/detect-wifi#252",
+    title: "build(deps): bump firebase-bom from 35.0.0 to 35.0.2",
+    start: new Date(Date.now() - 3 * 60_000).toISOString(),
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://github.com/acme/detect-wifi/pull/252",
+    organizer: "acme/detect-wifi#252",
+    description: "",
+    tag: "assigned",
+    sender: { name: "", login: "dependabot[bot]", avatar: "" },
+  };
+  await mockTauri(page, { fixed: { alert_payload: [assigned] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert.locator("[data-eyebrow]")).toContainText("acme/detect-wifi#252");
+  await expect(alert.locator("[data-reason]")).toHaveText("atribuído a você");
+  await expect(alert.locator("[data-sender]")).toContainText("dependabot[bot]");
+  await expect(alert.getByText("detalhes")).toHaveCount(0);
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});
+
 test("the morning summary lists what is waiting and only offers to close", async ({ page }) => {
   const digest = {
     id: "digest:morning:2026-10-12",
