@@ -20,6 +20,9 @@ pub struct ForgeItem {
     pub is_pr: bool,
     pub draft: bool,
     pub author: String,
+    /// A PR/MR that can't merge until its conflicts are resolved. GitLab lists say it; GitHub's search doesn't, so
+    /// there it stays false and the CI batch (`github_prs_checks`) fills it in.
+    pub conflict: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
@@ -188,6 +191,7 @@ pub(crate) fn item(number: u64, created: &str, updated: &str, comments: u64) -> 
         is_pr: false,
         draft: false,
         author: "octocat".into(),
+        conflict: false,
     }
 }
 

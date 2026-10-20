@@ -11,6 +11,8 @@ export type ForgeItem = {
   is_pr: boolean;
   draft: boolean;
   author: string;
+  /** Can't merge until conflicts are resolved; absent on boards cached before it existed. */
+  conflict?: boolean;
 };
 /**
  * `total` is the forge's count; `items` only carries the pages loaded so far.

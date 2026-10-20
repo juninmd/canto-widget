@@ -3,7 +3,7 @@ import { api, type PrComment } from "../lib/api";
 import { freshness, isFiltered, visibleSections, type Forge } from "../lib/forge";
 import type { ForgeListsState } from "../lib/useForgeLists";
 import { useMentions } from "../lib/useMentions";
-import type { CiMap } from "../lib/forgeChecks";
+import type { CiMap, ConflictMap } from "../lib/forgeChecks";
 import { fetchInBatches, groupCommenters, prsWithComments, type EnrichedComment } from "../lib/prCommenters";
 import { timeAgo } from "../lib/time";
 import { clockLabel } from "../lib/clockLabel";
@@ -19,14 +19,14 @@ import Skeleton from "./Skeleton";
 import Spinner from "./Spinner";
 import SubTabs from "./SubTabs";
 
-type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; onDisconnect: () => void };
+type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; conflicts?: ConflictMap; onDisconnect: () => void };
 
 type Sub = "lists" | "mentions";
 
 const BTN = "canto-hit inline-flex min-h-[24px] items-center gap-1 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active disabled:opacity-60";
 
 /** Connected forge: header, subtabs (lists vs mentions), PR/issue lists or commenters catalog. */
-export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDisconnect }: Props) {
+export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflicts, onDisconnect }: Props) {
   const { lists } = gh;
   const fresh = lists ? freshness(lists) : null;
   const [sub, setSub] = useState<Sub>("lists");
@@ -183,6 +183,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, onDiscon
                       loadingMore={gh.loadingMore === key}
                       onMore={() => void gh.more(key)}
                       ci={ci}
+                      conflicts={conflicts}
                     />
                   ))}
               </div>

@@ -203,6 +203,7 @@ fn item(b: RawItem) -> Option<ForgeItem> {
         is_pr: b.pull_request.is_some(),
         draft: b.draft.unwrap_or(false),
         author: b.user.map(|u| u.login).unwrap_or_default(),
+        conflict: false,
     })
 }
 

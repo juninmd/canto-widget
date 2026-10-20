@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "masalah",
   "forge.item.draft": "draf",
+  "forge.item.conflict": "konflik",
+  "forge.item.conflictTitle": "ada konflik merge dengan branch dasar: selesaikan sebelum merge",
   "forge.item.waiting": "menunggu {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} jam",

@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "въпрос",
   "forge.item.draft": "чернова",
+  "forge.item.conflict": "конфликт",
+  "forge.item.conflictTitle": "има конфликти при сливане с основния клон: разрешете ги преди сливане",
   "forge.item.waiting": "чакам {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} ч",

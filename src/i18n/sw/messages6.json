@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "suala",
   "forge.item.draft": "rasimu",
+  "forge.item.conflict": "mgongano",
+  "forge.item.conflictTitle": "ina migongano ya kuunganisha na tawi la msingi: itatue kabla ya kuunganisha",
   "forge.item.waiting": "kusubiri {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

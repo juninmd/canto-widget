@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problema",
   "forge.item.draft": "bozza",
+  "forge.item.conflict": "conflitto",
+  "forge.item.conflictTitle": "ha conflitti di merge con il branch base: risolvili prima di unire",
   "forge.item.waiting": "aspettando {wait}",
   "forge.item.waitDays": "{n}d",
   "forge.item.waitHours": "{n} h",

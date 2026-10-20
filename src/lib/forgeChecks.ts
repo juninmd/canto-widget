@@ -5,6 +5,8 @@ export const MAX_CHECKED = 20;
 const ORDER: ForgeSection[] = ["review_requested", "assigned", "my_prs"];
 
 export type CiMap = Record<string, ChecksStatus>;
+/** GitHub's search has no merge state: the CI batch brings it, keyed like `CiMap`. */
+export type ConflictMap = Record<string, boolean>;
 
 export const checkKey = (repo: string, number: number) => `${repo}#${number}`;
 
@@ -30,5 +32,13 @@ export function applyChecks(prev: CiMap, results: PrChecks[]): CiMap {
   if (results.length === 0) return prev;
   const next = { ...prev };
   for (const r of results) next[checkKey(r.repo, r.number)] = r.status;
+  return next;
+}
+
+/** Same rule as `applyChecks`: a PR the batch left out keeps what was last known. */
+export function applyConflicts(prev: ConflictMap, results: PrChecks[]): ConflictMap {
+  if (results.length === 0) return prev;
+  const next = { ...prev };
+  for (const r of results) next[checkKey(r.repo, r.number)] = r.conflict === true;
   return next;
 }

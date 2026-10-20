@@ -159,6 +159,8 @@ export const integrations = {
   "forge.item.pr": "PR",
   "forge.item.issue": "issue",
   "forge.item.draft": "rascunho",
+  "forge.item.conflict": "conflito",
+  "forge.item.conflictTitle": "tem conflito de merge com a branch base: resolva antes de mesclar",
   "forge.item.waiting": "aguardando há {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

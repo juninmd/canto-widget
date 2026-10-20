@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "ongelma",
   "forge.item.draft": "luonnos",
+  "forge.item.conflict": "ristiriita",
+  "forge.item.conflictTitle": "on yhdistämisristiriitoja perushaaran kanssa: ratkaise ne ennen yhdistämistä",
   "forge.item.waiting": "odottaa {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

@@ -40,6 +40,22 @@ fn an_mr_keeps_its_gitlab_reference_and_old_style_draft_flag() {
 }
 
 #[test]
+fn an_mr_with_conflicts_is_flagged_whichever_field_the_instance_sends() {
+    let mr = |extra: serde_json::Value| {
+        let mut v = serde_json::json!({ "iid": 1, "web_url": format!("{BASE}/g/p/-/merge_requests/1") });
+        v.as_object_mut().unwrap().extend(extra.as_object().unwrap().clone());
+        item(BASE, true, serde_json::from_value(v).unwrap()).unwrap()
+    };
+    assert!(mr(serde_json::json!({ "has_conflicts": true })).conflict, "older instances");
+    assert!(mr(serde_json::json!({ "detailed_merge_status": "conflict" })).conflict);
+    assert!(!mr(serde_json::json!({ "detailed_merge_status": "mergeable" })).conflict);
+    let issue = serde_json::from_value(
+        serde_json::json!({ "iid": 2, "web_url": format!("{BASE}/g/p/-/issues/2"), "has_conflicts": true }),
+    );
+    assert!(!item(BASE, false, issue.unwrap()).unwrap().conflict, "an issue never conflicts");
+}
+
+#[test]
 fn links_off_the_configured_instance_are_dropped() {
     let evil = [
         "https://gitlab.acme.io.evil.com/g/p/-/issues/1",

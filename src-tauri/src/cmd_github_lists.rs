@@ -73,7 +73,7 @@ pub async fn github_pr_checks(app: tauri::AppHandle, repo: String, number: u64) 
     run(move || {
         let cred = token(&app)?;
         let cache = &app.state::<AppState>().forges.checks;
-        github_checks::status_for(cache, &GithubChecks::new(&cred)?, &pr, now_ms())
+        github_checks::status_for(cache, &GithubChecks::new(&cred)?, &pr, now_ms()).map(|(status, _)| status)
     })
     .await
 }

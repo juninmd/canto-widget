@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "sorun",
   "forge.item.draft": "taslak",
+  "forge.item.conflict": "çakışma",
+  "forge.item.conflictTitle": "temel dalla birleştirme çakışmaları var: birleştirmeden önce çözün",
   "forge.item.waiting": "{wait} bekleniyor",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} sa",

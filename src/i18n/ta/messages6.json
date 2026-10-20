@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "பிரச்சினை",
   "forge.item.draft": "வரைவு",
+  "forge.item.conflict": "முரண்பாடு",
+  "forge.item.conflictTitle": "அடிப்படை கிளையுடன் இணைப்பு முரண்பாடுகள் உள்ளன: இணைப்பதற்கு முன் தீர்க்கவும்",
   "forge.item.waiting": "{wait}க்காக காத்திருக்கிறது",
   "forge.item.waitDays": "{n} டி",
   "forge.item.waitHours": "{n} ம",

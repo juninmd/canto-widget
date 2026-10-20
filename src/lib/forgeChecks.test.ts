@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { ForgeItem, ForgeList, ForgeLists } from "./api";
-import { applyChecks, checkKey, MAX_CHECKED, prsToCheck } from "./forgeChecks";
+import { applyChecks, applyConflicts, checkKey, MAX_CHECKED, prsToCheck } from "./forgeChecks";
 
 const pr = (number: number, extra: Partial<ForgeItem> = {}): ForgeItem => ({
   repo: "acme/atlas",
@@ -51,4 +51,11 @@ test("results update the map and keep what the batch left out", () => {
   const next = applyChecks(prev, [{ repo: "acme/atlas", number: 1, status: "success" }]);
   expect(next).toEqual({ "acme/atlas#1": "success", "acme/atlas#2": "failure" });
   expect(applyChecks(prev, [])).toBe(prev);
+});
+
+test("conflicts follow the batch too, and a PR it left out keeps its last state", () => {
+  const prev = { "acme/atlas#1": true, "acme/atlas#2": true };
+  const next = applyConflicts(prev, [{ repo: "acme/atlas", number: 1, status: "success", conflict: false }]);
+  expect(next).toEqual({ "acme/atlas#1": false, "acme/atlas#2": true });
+  expect(applyConflicts(prev, [])).toBe(prev);
 });

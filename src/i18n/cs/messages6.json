@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problém",
   "forge.item.draft": "návrh",
+  "forge.item.conflict": "konflikt",
+  "forge.item.conflictTitle": "má konflikty při slučování se základní větví: vyřešte je před sloučením",
   "forge.item.waiting": "čekání na {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

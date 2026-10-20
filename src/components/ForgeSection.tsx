@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { api, type ChecksStatus, type ForgeItem, type ForgeList, type ForgeSection as ForgeSectionKey } from "../lib/api";
 import type { Forge } from "../lib/forge";
-import { checkKey, type CiMap } from "../lib/forgeChecks";
+import { checkKey, type CiMap, type ConflictMap } from "../lib/forgeChecks";
 import { daysSince, timeAgo } from "../lib/time";
 import { loadSnoozes, oldestFirst, overdue, snoozeUntil, waitHours, waitLabel } from "../lib/reviewRadar";
 import { t, type MessageKey } from "../i18n";
@@ -18,9 +18,11 @@ type Props = {
   onMore: () => void;
   /** CI badges loaded in batch (GitHub); a PR missing here keeps the "ver CI" link. */
   ci?: CiMap;
+  /** Merge conflicts the GitHub CI batch found; GitLab items already carry `conflict`. */
+  conflicts?: ConflictMap;
 };
 
-export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts }: Props) {
   const rest = list.total - list.items.length;
   const radar = section === "review_requested";
   const [snoozed, setSnoozed] = useState(loadSnoozes);
@@ -55,6 +57,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
               forge={forge}
               waiting={radar}
               ci={ci?.[checkKey(it.repo, it.number)]}
+              conflict={it.is_pr && (it.conflict === true || conflicts?.[checkKey(it.repo, it.number)] === true)}
               onSnooze={radar ? () => setSnoozed(snoozeUntil(it.url)) : undefined}
             />
           ))}
@@ -75,8 +78,8 @@ export default function ForgeSection({ title, section, forge, list, login, filte
 }
 
 const STALE_DAYS = 7;
-type RowProps = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; onSnooze?: () => void };
-function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
+type RowProps = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; onSnooze?: () => void };
+function Row({ item, login, forge, waiting, ci, conflict, onSnooze }: RowProps) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? waitHours(item) : null;
@@ -98,7 +101,7 @@ function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
         type="button"
         onClick={() => void api.openLink(item.url)}
         title={item.url}
-        className="flex w-full gap-2.5 rounded-xl border border-edge bg-ink/60 p-2.5 text-left transition-colors hover:border-line hover:bg-ink"
+        className={`flex w-full gap-2.5 rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
       >
         <span className={`mt-0.5 shrink-0 ${item.draft ? "text-faint" : "text-accent-text"}`} aria-label={kind} role="img">
           {item.is_pr ? <PullIcon /> : <IssueIcon />}
@@ -106,6 +109,11 @@ function Row({ item, login, forge, waiting, ci, onSnooze }: RowProps) {
         <span className="min-w-0 flex-1">
           <span className="line-clamp-2 text-sm text-fg">{item.title}</span>
           <span className="mt-0.5 flex gap-2 text-[11px] text-muted">
+            {conflict && (
+              <span className="shrink-0 font-medium text-danger" title={t("forge.item.conflictTitle")}>
+                ⚠ {t("forge.item.conflict")}
+              </span>
+            )}
             {item.is_pr && ci && <CiPill status={ci} />}
             <span className="truncate">{item.reference}</span>
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}

@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "tema",
   "forge.item.draft": "esborrany",
+  "forge.item.conflict": "conflicte",
+  "forge.item.conflictTitle": "té conflictes de fusió amb la branca base: resol-los abans de fusionar",
   "forge.item.waiting": "esperant {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

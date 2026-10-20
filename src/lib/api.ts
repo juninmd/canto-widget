@@ -180,7 +180,7 @@ export type GuestPhotos = { photos: Record<string, string>; needs_consent: boole
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type PrRef = { repo: string; number: number };
-export type PrChecks = PrRef & { status: ChecksStatus };
+export type PrChecks = PrRef & { status: ChecksStatus; conflict?: boolean };
 export type PrComment = {
   id: number;
   author: string;

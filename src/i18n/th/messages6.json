@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "ปัญหา",
   "forge.item.draft": "ร่าง",
+  "forge.item.conflict": "ข้อขัดแย้ง",
+  "forge.item.conflictTitle": "มีข้อขัดแย้งในการรวมกับสาขาหลัก: แก้ไขก่อนรวม",
   "forge.item.waiting": "กำลังรอ {wait}",
   "forge.item.waitDays": "{n} ง",
   "forge.item.waitHours": "{n} ชม",
