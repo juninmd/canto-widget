@@ -7,6 +7,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Cliques bloqueados por uma janela invisível no canto da tela**: o pop-up de avisos ficava aberto e transparente
+  quando o último aviso saía só da tela (ou era fechado pelo widget), o dock do modo mini continuava largo quando o
+  menu de modos ou o mouse saíam para outro app, a captura rápida ficava por cima depois de perder o foco, e um erro
+  de desenho deixava qualquer janela vazia e transparente. Agora a janela vazia se esconde, o dock encolhe, a captura
+  fecha ao perder o foco e um erro mostra um painel com "tentar de novo" e "fechar".
 - **Desativar abas em Ajustes** não faz mais a janela inteira sumir: a barra de abas lia a lista antiga por um
   instante e derrubava a tela.
 

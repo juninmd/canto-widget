@@ -17,6 +17,14 @@ export default function AlertWindow() {
     };
   }, []);
 
+  // An empty overlay is still a transparent window on top of the corner: it must not stay up eating clicks.
+  useEffect(() => {
+    if (alerts.length > 0) return;
+    void api.alertSettle().then((left) => {
+      if (left?.length) setAlerts(left);
+    }, () => {});
+  }, [alerts.length]);
+
   return (
     <div className="relative h-screen">
       <Alert

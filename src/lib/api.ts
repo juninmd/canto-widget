@@ -434,6 +434,8 @@ export const api = {
   alertPayload: () => invoke<AgendaItem[]>("alert_payload"),
   /** No outcome means plain "closed"; Rust records it for the notifications column. */
   alertClose: (id: string, outcome?: AlertOutcome) => invoke<void>("alert_close", { id, outcome }),
+  /** The overlay has no card left: Rust hides its window, or returns what is still pending. */
+  alertSettle: () => invoke<AgendaItem[]>("alert_settle"),
   /** "Fechar todos" on the overlay: the whole queue goes in one call, and each one is still logged. */
   alertCloseAll: (outcome?: AlertOutcome) => invoke<void>("alert_close_all", { outcome }),
   alertLog: () => invoke<ResolvedAlert[]>("alert_log"),

@@ -42,6 +42,13 @@ mod tests {
     }
 
     #[test]
+    fn capture_hides_when_it_loses_focus() {
+        let lib = include_str!("lib.rs");
+        let at = lib.find("WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW").expect("blur arm");
+        assert!(lib[at..at + 200].contains("win.hide()"), "a forgotten capture pop-up must not stay on top");
+    }
+
+    #[test]
     fn capture_window_is_declared_hidden_and_allowed() {
         let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
         let windows = conf["app"]["windows"].as_array().unwrap();

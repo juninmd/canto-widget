@@ -92,6 +92,24 @@ test("opening the mode menu makes room for it", () => {
   expect(last().height).toBeGreaterThanOrEqual(300);
 });
 
+test("clicking another app closes the mode menu so the wide dock window shrinks back", () => {
+  render(<MiniRail alerts={[daily]} mode="mini" onOpen={() => {}} onMode={() => {}} />);
+  fireEvent.pointerEnter(rail());
+  fireEvent.click(screen.getByRole("button", { name: "trocar modo do canto" }));
+  expect(last().width).toBe(340);
+  act(() => void window.dispatchEvent(new Event("blur")));
+  expect(screen.queryByRole("menu")).toBeNull();
+  expect(last().width).toBe(24);
+});
+
+test("the pointer leaving the window collapses the dock even without a pointerleave on it", () => {
+  render(<MiniRail alerts={[daily, ci]} mode="mini" onOpen={() => {}} onMode={() => {}} />);
+  fireEvent.pointerEnter(screen.getByRole("button", { name: "abrir Daily" }));
+  expect(last().width).toBe(300);
+  fireEvent.mouseLeave(document.documentElement);
+  expect(last().width).toBe(24);
+});
+
 test("with nothing pending the dock is a single quiet handle that still switches mode", () => {
   const picked: string[] = [];
   render(<MiniRail alerts={[]} mode="mini" onOpen={() => {}} onMode={(m) => picked.push(m)} />);

@@ -48,8 +48,18 @@ export default function ModeSwitcher({ mode, onPick, menuClassName = "absolute r
         onOpenChange?.(false);
       }
     };
+    // A click on another app never reaches this document: losing focus closes the menu too, or the window
+    // kept large for it stays on screen, transparent, over whatever is under it.
+    const blur = () => {
+      setOpen(false);
+      onOpenChange?.(false);
+    };
     document.addEventListener("pointerdown", away);
-    return () => document.removeEventListener("pointerdown", away);
+    window.addEventListener("blur", blur);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      window.removeEventListener("blur", blur);
+    };
   }, [open, onOpenChange]);
 
   function onKeyDown(e: React.KeyboardEvent) {

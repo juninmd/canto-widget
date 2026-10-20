@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import AlertWindow from "./AlertWindow";
 import CaptureWindow from "./CaptureWindow";
+import WindowBoundary from "./components/WindowBoundary";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
 import { LANGUAGE } from "./i18n";
@@ -23,6 +24,8 @@ const windowParams = new URLSearchParams(location.search);
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    {windowParams.has("alert") ? <AlertWindow /> : windowParams.has("capture") ? <CaptureWindow /> : <App />}
+    <WindowBoundary>
+      {windowParams.has("alert") ? <AlertWindow /> : windowParams.has("capture") ? <CaptureWindow /> : <App />}
+    </WindowBoundary>
   </React.StrictMode>,
 );

@@ -99,14 +99,15 @@ pub fn take_alert(app: &tauri::AppHandle, id: &str) -> Option<AgendaItem> {
         let queue = queue(app);
         let mut pending = queue.0.lock().unwrap();
         let removed = alert_queue::remove(&mut current, &mut pending, id);
-        (removed, current.is_none())
-    };
-    if removed.1 {
-        if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
-            let _ = win.hide();
+        // Hidden under the lock: an alert ringing in between must not be hidden right after it showed.
+        if current.is_none() {
+            hide_alert_window(app);
         }
-    }
-    removed.0
+        removed
+    };
+    // Closed from the widget, the overlay still lists it; next time it shows, the stale card must be gone.
+    let _ = app.emit(ALERT_EVENT, ());
+    removed
 }
 
 /// Drops every pending alert at once — the overlay's "fechar todos" — and hides the window.
@@ -116,12 +117,32 @@ pub fn take_all_alerts(app: &tauri::AppHandle) -> Vec<AgendaItem> {
         let mut current = state.alert.lock().unwrap();
         let queue = queue(app);
         let mut pending = queue.0.lock().unwrap();
+        hide_alert_window(app);
         alert_queue::drain(&mut current, &mut pending)
     };
+    let _ = app.emit(ALERT_EVENT, ());
+    drained
+}
+
+/// The overlay found nothing to show: a transparent, always-on-top window with no card would swallow the clicks
+/// meant for whatever is under the corner, so it hides unless Rust still holds an alert (then the list returns).
+pub fn settle_alert(app: &tauri::AppHandle) -> Vec<AgendaItem> {
+    let Some(state) = app.try_state::<crate::vault::AppState>() else {
+        hide_alert_window(app);
+        return Vec::new();
+    };
+    let current = state.alert.lock().unwrap();
+    let list = alert_queue::all(&current, &queue(app).0.lock().unwrap());
+    if list.is_empty() {
+        hide_alert_window(app);
+    }
+    list
+}
+
+fn hide_alert_window(app: &tauri::AppHandle) {
     if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
         let _ = win.hide();
     }
-    drained
 }
 
 /// Managed on first use so the queue needs no setup in `lib.rs`; a second `manage` is a no-op.
@@ -159,6 +180,22 @@ mod tests {
         let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
         let alert = conf["app"]["windows"].as_array().unwrap().iter().find(|w| w["label"] == super::ALERT_WINDOW);
         assert_eq!(alert.unwrap()["focusable"], false, "the pop-up window must not be activated when shown");
+    }
+
+    #[test]
+    fn the_alert_window_hides_while_the_queue_is_still_locked() {
+        let src = include_str!("window.rs");
+        for f in ["fn take_alert(", "fn take_all_alerts(", "fn settle_alert("] {
+            let body = &src[src.find(f).unwrap()..];
+            let body = &body[..body.find("\n}\n").unwrap()];
+            let locked = &body[body.find("alert.lock()").unwrap()..];
+            assert!(
+                locked.contains("hide_alert_window("),
+                "{f} must hide under the lock, or an alert ringing in between ends up hidden"
+            );
+        }
+        let caps = include_str!("lib.rs");
+        assert!(caps.contains("cmd_alerts::alert_settle"), "the empty overlay needs a way to hide its window");
     }
 
     #[test]
