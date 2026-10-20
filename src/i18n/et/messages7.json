@@ -121,12 +121,8 @@
   "agents.hint": "käsk ainult kopeeritakse: Canto ei installi midagi",
   "agents.source": "GitHub väljalaset",
   "protos.tab.market": "Market",
-  "protos.badge": "prototype",
-  "protos.needs": "what is missing: {text}",
   "protos.market.quotes": "quotes",
   "protos.market.change": "{n}% today",
-  "protos.market.watchlist": "watchlist",
-  "protos.market.needs": "the Central Bank (PTAX) and CoinGecko, both keyless, with a 15 min cache per quote",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",
@@ -193,5 +189,9 @@
   "weather.rainToday": "rain today",
   "weather.today": "today",
   "weather.highLow": "high {max}° · low {min}°",
-  "weather.updated": "updated at {time}"
+  "weather.updated": "updated at {time}",
+  "protos.market.usd": "Dollar",
+  "protos.market.eur": "Euro",
+  "protos.market.loading": "checking the quotes",
+  "protos.market.source": "data: Yahoo Finance"
 }

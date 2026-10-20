@@ -162,6 +162,25 @@ const WEATHER_DAYS = [
   [16.0, 23.8, 40, "cloudy", 5.0],
 ] as const;
 
+/** Invented quotes: the curves only have to look like a trading day. */
+const curve = (from: number, steps: number[]) => steps.reduce<number[]>((acc, d) => [...acc, acc[acc.length - 1] * (1 + d / 100)], [from]);
+const WAVE = [0.2, -0.1, 0.3, 0.15, -0.2, 0.1, 0.25, -0.05, 0.1, -0.15, 0.2, 0.05];
+const quote = (symbol: string, previous: number, sign: number) => {
+  const points = curve(previous, WAVE.map((d) => d * sign));
+  const price = points[points.length - 1];
+  return { symbol, price, change: ((price - previous) / previous) * 100, points };
+};
+export const MARKET = {
+  market_get: {
+    quotes: [
+      quote("USD/BRL", 5.4, 1), quote("EUR/BRL", 5.89, -0.4), quote("BTC/USD", 116900, 2.2),
+      quote("IBOV", 133100, -0.9), quote("S&P 500", 6410, 0.6), quote("NASDAQ", 21300, 1.1),
+    ],
+    fetched_at: Date.UTC(2026, 9, 17, 13, 30),
+    error: null,
+  },
+};
+
 export const WEATHER = {
   weather_get: {
     place: { city: "Aurora", admin1: "Vale Azul", country: "Brasil", lat: -23.5, lon: -46.6 },

@@ -1,4 +1,4 @@
-import { signedPercent } from "../lib/protos";
+import { signedPercent } from "../lib/market";
 
 /** The day's variation as a tinted pill with its arrow; up and down keep their colors whatever the skin's accent. */
 export default function MarketDelta({ change, label }: { change: number; label?: string }) {

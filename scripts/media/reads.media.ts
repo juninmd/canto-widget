@@ -2,11 +2,11 @@ import { test } from "@playwright/test";
 import { fullScene, openTab } from "./scene";
 
 const SHOTS: [string, string][] = [
-  ["Mercado", "94-prototipo-mercado"],
+  ["Mercado", "94-mercado"],
   ["Leituras", "96-leituras"],
 ];
 
-test("leituras e o protótipo de mercado", async ({ browser }) => {
+test("leituras e o mercado", async ({ browser }) => {
   const page = await fullScene(browser);
   for (const [tab, name] of SHOTS) {
     await openTab(page, tab);
