@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "kwestie",
   "forge.item.draft": "ontwerp",
+  "forge.item.conflict": "conflict",
+  "forge.item.conflictTitle": "heeft mergeconflicten met de basisbranch: los ze op voor het mergen",
   "forge.item.waiting": "wachten op {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} u",

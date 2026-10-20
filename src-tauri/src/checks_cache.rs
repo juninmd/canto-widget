@@ -1,5 +1,5 @@
 //! CI status of PR heads kept in RAM, so a list refresh doesn't spend three API calls per PR every time.
-//! Two layers: `repo#n` → head sha (a new push shows up within `HEAD_TTL_MS`) and `repo@sha` → status.
+//! Two layers: `repo#n` → head sha and merge conflict (a new push shows up within `HEAD_TTL_MS`) and `repo@sha` → status.
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -18,9 +18,16 @@ pub fn ttl(status: ChecksStatus) -> i64 {
     }
 }
 
+/// What `pulls/{n}` says about a PR's head: the sha its CI runs on and whether it conflicts with the base.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Head {
+    pub sha: String,
+    pub conflict: bool,
+}
+
 #[derive(Default)]
 struct Inner {
-    heads: HashMap<String, (String, i64)>,
+    heads: HashMap<String, (Head, i64)>,
     checks: HashMap<String, (ChecksStatus, i64)>,
     /// Bumped by forget/clear: a reply that left before a disconnect or lock must not land afterwards.
     generation: u64,
@@ -36,9 +43,9 @@ impl ChecksCache {
         self.inner.lock().unwrap().generation
     }
 
-    pub fn head(&self, key: &str, now: i64) -> Option<String> {
+    pub fn head(&self, key: &str, now: i64) -> Option<Head> {
         let g = self.inner.lock().unwrap();
-        g.heads.get(key).filter(|(_, at)| now - at < HEAD_TTL_MS).map(|(sha, _)| sha.clone())
+        g.heads.get(key).filter(|(_, at)| now - at < HEAD_TTL_MS).map(|(head, _)| head.clone())
     }
 
     pub fn status(&self, key: &str, now: i64) -> Option<ChecksStatus> {
@@ -46,10 +53,10 @@ impl ChecksCache {
         g.checks.get(key).filter(|(s, at)| now - at < ttl(*s)).map(|(s, _)| *s)
     }
 
-    pub fn put_head(&self, generation: u64, key: String, sha: String, now: i64) {
+    pub fn put_head(&self, generation: u64, key: String, head: Head, now: i64) {
         let mut g = self.inner.lock().unwrap();
         if g.generation == generation {
-            g.heads.insert(key, (sha, now));
+            g.heads.insert(key, (head, now));
             bound(&mut g.heads, now, |_| HEAD_TTL_MS);
         }
     }

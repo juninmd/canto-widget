@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problemet",
   "forge.item.draft": "utkast",
+  "forge.item.conflict": "konflikt",
+  "forge.item.conflictTitle": "har merge-konflikter med basisgrenen: løs dem før merge",
   "forge.item.waiting": "venter på {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} t",

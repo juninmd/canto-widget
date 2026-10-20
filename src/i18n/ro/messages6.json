@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problema",
   "forge.item.draft": "draft",
+  "forge.item.conflict": "conflict",
+  "forge.item.conflictTitle": "are conflicte de îmbinare cu ramura de bază: rezolvă-le înainte de îmbinare",
   "forge.item.waiting": "astept {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

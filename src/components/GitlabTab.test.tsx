@@ -199,3 +199,14 @@ test("'incluir concluídas' asks Rust for the done to-dos too and tags them", as
   const doneRow = screen.getByText("Já resolvido").closest("li") as HTMLElement;
   expect(within(doneRow).queryByRole("button", { name: /marcar como/ }), "a done to-do has nothing to mark").toBeNull();
 });
+
+test("an MR the list says has conflicts is flagged right away, with no extra request", async () => {
+  responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
+  const clean = { ...mr, number: 13, reference: "acme/api!13", url: "https://gitlab.acme.io/acme/api/-/merge_requests/13" };
+  responses.gitlab_lists = () =>
+    Promise.resolve({ assigned: empty, my_prs: { total: 2, items: [{ ...mr, conflict: true }, clean] }, review_requested: empty, my_issues: empty });
+  await mount();
+  const flagged = screen.getAllByText(/conflito/);
+  expect(flagged).toHaveLength(1);
+  expect(flagged[0].closest("li")?.textContent).toContain("acme/api!12");
+});

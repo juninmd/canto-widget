@@ -256,6 +256,22 @@ test("PRs get their CI badge in one batch after the list, without a click", asyn
   expect(screen.queryByText("ver CI")).toBeNull();
 });
 
+test("a PR with a merge conflict is flagged once the batch finds it, and only that PR", async () => {
+  responses.github_status = connected;
+  const other = { ...item, number: 7, reference: "octo/canto#7", url: "https://github.com/octo/canto/pull/7" };
+  responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 2, items: [item, other] } }));
+  responses.github_prs_checks = () =>
+    Promise.resolve([
+      { repo: "octo/canto", number: 42, status: "success", conflict: true },
+      { repo: "octo/canto", number: 7, status: "success", conflict: false },
+    ]);
+  await mount();
+  const flagged = screen.getAllByText(/conflito/);
+  expect(flagged).toHaveLength(1);
+  expect(flagged[0].getAttribute("title")).toBe("tem conflito de merge com a branch base: resolva antes de mesclar");
+  expect(flagged[0].closest("li")?.textContent).toContain(item.reference);
+});
+
 test("ver CI stays as the fallback for a PR the batch left out, and asks on click only", async () => {
   responses.github_status = connected;
   responses.github_lists = () => Promise.resolve(lists({ my_prs: { total: 1, items: [item] } }));

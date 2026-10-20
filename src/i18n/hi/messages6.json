@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "मुद्दा",
   "forge.item.draft": "ड्राफ्ट",
+  "forge.item.conflict": "कॉन्फ़्लिक्ट",
+  "forge.item.conflictTitle": "बेस ब्रांच के साथ मर्ज कॉन्फ़्लिक्ट हैं: मर्ज से पहले इन्हें हल करें",
   "forge.item.waiting": "{wait} की प्रतीक्षा में",
   "forge.item.waitDays": "{n} डी",
   "forge.item.waitHours": "{n} एच",

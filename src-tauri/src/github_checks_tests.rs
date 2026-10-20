@@ -1,6 +1,6 @@
 use super::*;
 use crate::checks_cache::{FINAL_TTL_MS, HEAD_TTL_MS, RUNNING_TTL_MS};
-use std::sync::atomic::AtomicU32;
+use std::sync::atomic::{AtomicBool, AtomicU32};
 
 fn run(status: &str, conclusion: Option<&str>) -> CheckRun {
     CheckRun { status: status.into(), conclusion: conclusion.map(Into::into) }
@@ -54,6 +54,7 @@ fn pick_drops_bad_input_repeats_and_caps_the_batch() {
 
 struct Fake {
     sha: Mutex<String>,
+    conflict: AtomicBool,
     signals: fn() -> Result<Signals>,
     heads: AtomicU32,
     calls: AtomicU32,
@@ -61,14 +62,20 @@ struct Fake {
 
 impl Fake {
     fn new(signals: fn() -> Result<Signals>) -> Self {
-        Fake { sha: Mutex::new("a".repeat(40)), signals, heads: AtomicU32::new(0), calls: AtomicU32::new(0) }
+        Fake {
+            sha: Mutex::new("a".repeat(40)),
+            conflict: AtomicBool::new(false),
+            signals,
+            heads: AtomicU32::new(0),
+            calls: AtomicU32::new(0),
+        }
     }
 }
 
 impl ChecksApi for Fake {
-    fn head_sha(&self, _: &str, _: u64) -> Result<String> {
+    fn head(&self, _: &str, _: u64) -> Result<Head> {
         self.heads.fetch_add(1, Ordering::SeqCst);
-        Ok(self.sha.lock().unwrap().clone())
+        Ok(Head { sha: self.sha.lock().unwrap().clone(), conflict: self.conflict.load(Ordering::SeqCst) })
     }
     fn signals(&self, _: &str, _: &str) -> Result<Signals> {
         self.calls.fetch_add(1, Ordering::SeqCst);
@@ -87,8 +94,8 @@ fn busy() -> Result<Signals> {
 #[test]
 fn a_refresh_within_the_ttl_spends_no_calls() {
     let (cache, api) = (ChecksCache::default(), Fake::new(green));
-    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), 0).unwrap(), ChecksStatus::Success);
-    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap(), ChecksStatus::Success);
+    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), 0).unwrap(), (ChecksStatus::Success, false));
+    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap(), (ChecksStatus::Success, false));
     assert_eq!((api.heads.load(Ordering::SeqCst), api.calls.load(Ordering::SeqCst)), (1, 1));
 }
 
@@ -131,4 +138,24 @@ fn a_batch_keeps_input_order_and_stops_at_the_rate_limit() {
     let limited = Fake::new(|| Err(AppError::RateLimited { message: "limite".into(), reset_at: 0 }));
     assert!(statuses(&ChecksCache::default(), &limited, &prs, 0).is_empty());
     assert!(limited.calls.load(Ordering::SeqCst) <= PARALLEL as u32, "no new PR starts after the limit");
+}
+
+#[test]
+fn a_conflict_rides_along_with_the_ci_badge_and_clears_on_the_next_head_check() {
+    let (cache, api) = (ChecksCache::default(), Fake::new(green));
+    api.conflict.store(true, Ordering::SeqCst);
+    let got = statuses(&cache, &api, &[pr("o/r", 1)], 0);
+    assert_eq!((got[0].status, got[0].conflict), (ChecksStatus::Success, true));
+    api.conflict.store(false, Ordering::SeqCst);
+    assert!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap().1, "cached with the head");
+    assert!(!status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS + 1).unwrap().1, "resolved after a fresh look");
+    assert_eq!(api.calls.load(Ordering::SeqCst), 1, "the CI of the same sha is still cached");
+}
+
+#[test]
+fn only_a_dirty_merge_state_is_a_conflict() {
+    assert!(conflicted("dirty"));
+    for state in ["clean", "unknown", "blocked", "behind", "unstable", "draft", ""] {
+        assert!(!conflicted(state), "{state}");
+    }
 }

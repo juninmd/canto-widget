@@ -1,10 +1,10 @@
-//! CI status of the PRs in the GitHub lists. The search API has no head sha, so each PR costs a
-//! `pulls/{n}` call, then the check runs (Actions, apps) and the legacy commit statuses of that sha.
+//! CI status and merge conflicts of the PRs in the GitHub lists. The search API has neither, so each PR costs a
+//! `pulls/{n}` call (head sha and `mergeable_state`), then the check runs (Actions, apps) and the legacy commit statuses of that sha.
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
 
-use crate::checks_cache::ChecksCache;
+use crate::checks_cache::{ChecksCache, Head};
 use crate::cmd_github::FORGE;
 use crate::error::{AppError, Result};
 use crate::forge::{checks_from_github, valid_repo_path, ChecksStatus};
@@ -25,6 +25,8 @@ pub struct PrChecks {
     pub repo: String,
     pub number: u64,
     pub status: ChecksStatus,
+    /// The PR can't merge until someone resolves conflicts with its base.
+    pub conflict: bool,
 }
 
 /// `status` is queued/in_progress/completed/...; `conclusion` only arrives once completed.
@@ -72,6 +74,11 @@ pub fn combine(s: &Signals) -> ChecksStatus {
     }
 }
 
+/// GitHub says "dirty" once it found a conflict with the base; "unknown" while it is still computing.
+pub fn conflicted(mergeable_state: &str) -> bool {
+    mergeable_state == "dirty"
+}
+
 /// Webview input: valid `owner/repo` and number only, no repeats, at most `MAX_PRS`.
 pub fn pick(prs: Vec<PrRef>) -> Vec<PrRef> {
     let mut out: Vec<PrRef> = Vec::new();
@@ -87,32 +94,35 @@ pub fn pick(prs: Vec<PrRef>) -> Vec<PrRef> {
 }
 
 pub trait ChecksApi: Sync {
-    fn head_sha(&self, repo: &str, number: u64) -> Result<String>;
+    fn head(&self, repo: &str, number: u64) -> Result<Head>;
+    fn head_sha(&self, repo: &str, number: u64) -> Result<String> {
+        Ok(self.head(repo, number)?.sha)
+    }
     fn signals(&self, repo: &str, sha: &str) -> Result<Signals>;
 }
 
-/// Served from the cache when the head sha and its status are still fresh; zero calls in the common refresh.
-pub fn status_for(cache: &ChecksCache, api: &impl ChecksApi, pr: &PrRef, now: i64) -> Result<ChecksStatus> {
+/// Served from the cache when the head and its status are still fresh; zero calls in the common refresh.
+pub fn status_for(cache: &ChecksCache, api: &impl ChecksApi, pr: &PrRef, now: i64) -> Result<(ChecksStatus, bool)> {
     let generation = cache.generation();
     let head_key = format!("{FORGE}|{}#{}", pr.repo, pr.number);
-    let sha = match cache.head(&head_key, now) {
-        Some(sha) => sha,
+    let head = match cache.head(&head_key, now) {
+        Some(head) => head,
         None => {
-            let sha = api.head_sha(&pr.repo, pr.number)?;
-            if sha.len() != 40 || !sha.chars().all(|c| c.is_ascii_hexdigit()) {
+            let head = api.head(&pr.repo, pr.number)?;
+            if head.sha.len() != 40 || !head.sha.chars().all(|c| c.is_ascii_hexdigit()) {
                 return Err(AppError::Github("resposta inesperada: sha inválido".into()));
             }
-            cache.put_head(generation, head_key, sha.clone(), now);
-            sha
+            cache.put_head(generation, head_key, head.clone(), now);
+            head
         }
     };
-    let key = format!("{FORGE}|{}@{sha}", pr.repo);
+    let key = format!("{FORGE}|{}@{}", pr.repo, head.sha);
     if let Some(status) = cache.status(&key, now) {
-        return Ok(status);
+        return Ok((status, head.conflict));
     }
-    let status = combine(&api.signals(&pr.repo, &sha)?);
+    let status = combine(&api.signals(&pr.repo, &head.sha)?);
     cache.put_status(generation, key, status, now);
-    Ok(status)
+    Ok((status, head.conflict))
 }
 
 /// A few PRs at a time; a PR that fails is left out (the row keeps its "ver CI" link), and the rate limit stops the rest.
@@ -137,12 +147,17 @@ pub fn statuses(cache: &ChecksCache, api: &impl ChecksApi, prs: &[PrRef], now: i
     });
     let mut found = found.into_inner().unwrap();
     found.sort_by_key(|(i, _)| *i);
-    found.into_iter().map(|(i, status)| PrChecks { repo: prs[i].repo.clone(), number: prs[i].number, status }).collect()
+    found
+        .into_iter()
+        .map(|(i, (status, conflict))| PrChecks { repo: prs[i].repo.clone(), number: prs[i].number, status, conflict })
+        .collect()
 }
 
 #[derive(Deserialize)]
 struct PullDetail {
     head: PullHead,
+    #[serde(default)]
+    mergeable_state: String,
 }
 
 #[derive(Deserialize)]
@@ -180,8 +195,9 @@ impl<'a> GithubChecks<'a> {
 }
 
 impl ChecksApi for GithubChecks<'_> {
-    fn head_sha(&self, repo: &str, number: u64) -> Result<String> {
-        Ok(self.get::<PullDetail>(&format!("{API}/repos/{repo}/pulls/{number}"))?.head.sha)
+    fn head(&self, repo: &str, number: u64) -> Result<Head> {
+        let pull: PullDetail = self.get(&format!("{API}/repos/{repo}/pulls/{number}"))?;
+        Ok(Head { sha: pull.head.sha, conflict: conflicted(&pull.mergeable_state) })
     }
 
     fn signals(&self, repo: &str, sha: &str) -> Result<Signals> {

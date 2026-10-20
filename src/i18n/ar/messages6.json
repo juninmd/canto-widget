@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "قضية",
   "forge.item.draft": "مشروع",
+  "forge.item.conflict": "تعارض",
+  "forge.item.conflictTitle": "يوجد تعارض دمج مع الفرع الأساسي: احلّه قبل الدمج",
   "forge.item.waiting": "في انتظار {wait}",
   "forge.item.waitDays": "{n} د",
   "forge.item.waitHours": "{n} ح",

@@ -394,6 +394,14 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|---|
 | ![GitHub tab where each PR shows a CI badge: passed, running and failed](docs/prints/app/35-ci-no-card.png) | ![Settings with the switch to be notified when someone requests your review on GitHub](docs/prints/app/36-ajustes-revisao.png) |
 
+<table>
+<tr><th>Merge conflict on GitHub</th><th>Merge conflict on GitLab</th></tr>
+<tr>
+<td><img src="docs/prints/app/100-github-conflito.png" alt="GitHub tab where the PR with a merge conflict gets a red border and a conflict badge next to its CI"></td>
+<td><img src="docs/prints/app/101-gitlab-conflito.png" alt="GitLab tab where the MR with a merge conflict gets the same red border and conflict badge"></td>
+</tr>
+</table>
+
 | Note images as thumbnails | WYSIWYG note editor |
 |---|---|
 | ![Notes list where cards show their attached images as thumbnails under the text](docs/prints/app/41-notas-miniaturas.png) | ![Note editor with the formatting bar, a heading, a checklist, a SQL block and an attached sketch](docs/prints/app/42-notas-editor.png) |

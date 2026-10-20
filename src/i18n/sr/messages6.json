@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "питање",
   "forge.item.draft": "нацрт",
+  "forge.item.conflict": "конфликт",
+  "forge.item.conflictTitle": "има конфликте спајања са основном граном: решите их пре спајања",
   "forge.item.waiting": "чекам {wait}",
   "forge.item.waitDays": "{n} д",
   "forge.item.waitHours": "{n} ч",

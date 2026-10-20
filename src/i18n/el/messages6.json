@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "θέμα",
   "forge.item.draft": "προσχέδιο",
+  "forge.item.conflict": "σύγκρουση",
+  "forge.item.conflictTitle": "έχει συγκρούσεις συγχώνευσης με τον βασικό κλάδο: επιλύστε τις πριν τη συγχώνευση",
   "forge.item.waiting": "αναμονή για {wait}",
   "forge.item.waitDays": "{n} δ",
   "forge.item.waitHours": "{n} h",

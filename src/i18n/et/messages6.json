@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "küsimus",
   "forge.item.draft": "mustand",
+  "forge.item.conflict": "konflikt",
+  "forge.item.conflictTitle": "on põhiharuga ühendamiskonfliktid: lahenda need enne ühendamist",
   "forge.item.waiting": "ootab {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

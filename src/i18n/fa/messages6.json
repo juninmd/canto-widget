@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "موضوع",
   "forge.item.draft": "پیش نویس",
+  "forge.item.conflict": "تداخل",
+  "forge.item.conflictTitle": "با شاخه پایه تداخل ادغام دارد: پیش از ادغام آن را رفع کنید",
   "forge.item.waiting": "در انتظار {wait}",
   "forge.item.waitDays": "{n} د",
   "forge.item.waitHours": "{n} ساعت",

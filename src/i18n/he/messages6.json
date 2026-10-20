@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "נושא",
   "forge.item.draft": "טיוטה",
+  "forge.item.conflict": "התנגשות",
+  "forge.item.conflictTitle": "יש התנגשויות מיזוג עם ענף הבסיס: יש לפתור אותן לפני המיזוג",
   "forge.item.waiting": "מחכה ל{wait}",
   "forge.item.waitDays": "{n} ד",
   "forge.item.waitHours": "{n} ש",

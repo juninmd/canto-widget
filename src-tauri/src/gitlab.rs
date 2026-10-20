@@ -200,6 +200,7 @@ pub(crate) fn item(base: &str, is_mr: bool, b: RawItem) -> Option<ForgeItem> {
         is_pr: is_mr,
         draft: b.draft || b.work_in_progress,
         author: b.author.map(|u| u.username).unwrap_or_default(),
+        conflict: is_mr && (b.has_conflicts || b.detailed_merge_status == "conflict"),
     })
 }
 

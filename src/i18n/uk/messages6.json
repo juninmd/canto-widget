@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "питання",
   "forge.item.draft": "проект",
+  "forge.item.conflict": "конфлікт",
+  "forge.item.conflictTitle": "є конфлікти злиття з базовою гілкою: розв’яжіть їх перед злиттям",
   "forge.item.waiting": "чекаю на {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} год",

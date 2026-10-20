@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "jautājums",
   "forge.item.draft": "melnraksts",
+  "forge.item.conflict": "konflikts",
+  "forge.item.conflictTitle": "ir sapludināšanas konflikti ar bāzes zaru: atrisiniet tos pirms sapludināšanas",
   "forge.item.waiting": "gaida {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

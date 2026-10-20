@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "vấn đề",
   "forge.item.draft": "dự thảo",
+  "forge.item.conflict": "xung đột",
+  "forge.item.conflictTitle": "có xung đột merge với nhánh gốc: hãy giải quyết trước khi merge",
   "forge.item.waiting": "đang chờ {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

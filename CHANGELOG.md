@@ -26,6 +26,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   linha só, traz o motivo (atribuído, CI falhou, aprovado...) num selo colorido e mostra quem abriu o PR com avatar.
   O bloco "detalhes" só aparece quando tem algo a dizer, e "fechar" ficou mais discreto para não competir com
   "abrir PR".
+- **PR/MR com conflito de merge em destaque** nas abas GitHub e GitLab: o cartão ganha borda vermelha e o selo
+  **⚠ conflito** enquanto houver conflito com a branch base a resolver. No GitLab vem da própria lista; no GitHub,
+  da mesma consulta que já traz o selo de CI, sem chamada extra.
 
 - **Clima com céu animado e mais detalhes**: o cartão de cima agora é um céu que acompanha o tempo — azul limpo,
   noite estrelada, chuva, neve, neblina, trovoada com relâmpago —, com gotas e flocos caindo, nuvens passando e um

@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problème",
   "forge.item.draft": "brouillon",
+  "forge.item.conflict": "conflit",
+  "forge.item.conflictTitle": "a des conflits de fusion avec la branche de base : résolvez-les avant de fusionner",
   "forge.item.waiting": "en attente de {wait}",
   "forge.item.waitDays": "{n} j",
   "forge.item.waitHours": "{n} heures",

@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "সমস্যা",
   "forge.item.draft": "খসড়া",
+  "forge.item.conflict": "কনফ্লিক্ট",
+  "forge.item.conflictTitle": "বেস ব্রাঞ্চের সাথে মার্জ কনফ্লিক্ট আছে: মার্জের আগে সমাধান করুন",
   "forge.item.waiting": "{wait} এর জন্য অপেক্ষা করছি",
   "forge.item.waitDays": "{n} ঘ",
   "forge.item.waitHours": "{n} ঘন্টা",

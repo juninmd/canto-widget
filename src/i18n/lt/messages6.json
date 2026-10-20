@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problema",
   "forge.item.draft": "juodraštis",
+  "forge.item.conflict": "konfliktas",
+  "forge.item.conflictTitle": "yra suliejimo konfliktų su pagrindine šaka: išspręskite prieš suliejant",
   "forge.item.waiting": "laukia {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} val",

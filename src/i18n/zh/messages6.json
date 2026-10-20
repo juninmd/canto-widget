@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "问题",
   "forge.item.draft": "草案",
+  "forge.item.conflict": "冲突",
+  "forge.item.conflictTitle": "与基础分支存在合并冲突：合并前请先解决",
   "forge.item.waiting": "等待 {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} 小时",

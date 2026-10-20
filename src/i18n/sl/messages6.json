@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "vprašanje",
   "forge.item.draft": "osnutek",
+  "forge.item.conflict": "konflikt",
+  "forge.item.conflictTitle": "ima konflikte združevanja z osnovno vejo: razrešite jih pred združitvijo",
   "forge.item.waiting": "čakam na {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

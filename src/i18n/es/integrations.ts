@@ -161,6 +161,8 @@ export const integrations: Record<keyof typeof source, string> = {
   "forge.item.pr": "PR",
   "forge.item.issue": "issue",
   "forge.item.draft": "borrador",
+  "forge.item.conflict": "conflicto",
+  "forge.item.conflictTitle": "tiene conflictos de merge con la rama base: resuélvelos antes de fusionar",
   "forge.item.waiting": "esperando {wait}",
   "forge.item.waitDays": "{n} d",
   "forge.item.waitHours": "{n} h",

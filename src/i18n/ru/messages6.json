@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "выпуск",
   "forge.item.draft": "проект",
+  "forge.item.conflict": "конфликт",
+  "forge.item.conflictTitle": "есть конфликты слияния с базовой веткой: разрешите их перед слиянием",
   "forge.item.waiting": "жду {wait}",
   "forge.item.waitDays": "{n} д",
   "forge.item.waitHours": "{n} ч.",

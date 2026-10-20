@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "problem",
   "forge.item.draft": "projekt",
+  "forge.item.conflict": "konflikt",
+  "forge.item.conflictTitle": "ma konflikty scalania z gałęzią bazową: rozwiąż je przed scaleniem",
   "forge.item.waiting": "czekam na {wait}",
   "forge.item.waitDays": "{n} zm",
   "forge.item.waitHours": "{n} godz",

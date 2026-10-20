@@ -34,6 +34,8 @@
   "forge.item.pr": "PR",
   "forge.item.issue": "문제",
   "forge.item.draft": "초안",
+  "forge.item.conflict": "충돌",
+  "forge.item.conflictTitle": "기본 브랜치와 병합 충돌이 있습니다: 병합 전에 해결하세요",
   "forge.item.waiting": "{wait}을 기다리고 있습니다",
   "forge.item.waitDays": "{n} 디",
   "forge.item.waitHours": "{n} 시간",
