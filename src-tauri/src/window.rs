@@ -184,7 +184,8 @@ mod tests {
 
     #[test]
     fn the_alert_window_hides_while_the_queue_is_still_locked() {
-        let src = include_str!("window.rs");
+        // A Windows checkout has CRLF line ends.
+        let src = include_str!("window.rs").replace('\r', "");
         for f in ["fn take_alert(", "fn take_all_alerts(", "fn settle_alert("] {
             let body = &src[src.find(f).unwrap()..];
             let body = &body[..body.find("\n}\n").unwrap()];
