@@ -494,9 +494,10 @@ would still need, so the idea can be judged before it becomes real.
 
 | Market |
 |---|
-| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> |
+| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: the dollar in the spotlight with a smooth area chart, and dollar, euro, bitcoin and Ibovespa as cards with the day's variation and a mini chart"> |
 
-- **Market** — dollar (PTAX), euro, bitcoin, Ibovespa and the world's main indexes with the day's variation. Would
+- **Market** — dollar (PTAX), euro, bitcoin, Ibovespa and the world's main indexes with the day's variation: one
+  quote in the spotlight with a smooth area chart, the rest as cards with a mini chart (click one to spotlight it). Would
   need the Central Bank, CoinGecko and CNBC, all keyless, with a 15 min cache per quote.
 
 <sub>All screenshots use fictitious data.</sub>

@@ -5,6 +5,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Mercado com cara nova**: a cotação em destaque ganhou um cartão grande com o valor, a variação do dia numa
+  pílula com seta e uma curva suave com área degradê que se desenha ao abrir; as quatro cotações viram cartões em
+  grade com mini gráfico, e **clicar num cartão leva a curva dele para o destaque**. Alta e baixa usam as cores de
+  sucesso e perigo do tema, então continuam legíveis em qualquer skin. Segue protótipo com dados fictícios.
+
 ### Corrigido
 
 - **Cliques bloqueados por uma janela invisível no canto da tela**: o pop-up de avisos ficava aberto e transparente
