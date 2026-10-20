@@ -5,11 +5,12 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 const calls: string[] = [];
 const emitted: { event: string; payload?: unknown }[] = [];
 let payload: unknown[] = [];
+let pending: unknown[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
     calls.push(cmd);
-    return Promise.resolve(cmd === "alert_payload" ? payload : null);
+    return Promise.resolve(cmd === "alert_payload" ? payload : cmd === "alert_settle" ? pending : null);
   },
 }));
 const listeners: Record<string, () => void> = {};
@@ -44,6 +45,7 @@ beforeEach(() => {
   calls.length = 0;
   emitted.length = 0;
   payload = [];
+  pending = [];
 });
 afterEach(cleanup);
 
@@ -54,6 +56,27 @@ test("reads the pending alerts without needing an unlocked vault", async () => {
   expect(screen.getByRole("alertdialog")).toBeTruthy();
   expect(calls).toEqual(expect.arrayContaining(["alert_payload"]));
   expect(calls.some((c) => c.startsWith("vault_"))).toBe(false);
+});
+
+test("an overlay left with no card asks Rust to hide its invisible window", async () => {
+  payload = [alert("task:t1")];
+  render(<AlertWindow />);
+  await settle();
+  calls.length = 0;
+  fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  await settle();
+  expect(screen.queryByRole("alertdialog")).toBeNull();
+  expect(calls).toEqual(expect.arrayContaining(["alert_close", "alert_settle"]));
+});
+
+test("an alert Rust still holds comes back instead of leaving an empty window up", async () => {
+  payload = [alert("task:t1")];
+  render(<AlertWindow />);
+  await settle();
+  pending = [alert("status:s1", { title: "GitHub fora do ar" })];
+  fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  await settle();
+  expect(screen.getByRole("alertdialog")).toBeTruthy();
 });
 
 test("rings again when Rust announces another alert", async () => {

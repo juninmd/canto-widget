@@ -267,6 +267,10 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|
 | ![Task reminder with a snooze button split in two: the main value and a dropdown with 1, 5 and 10 minutes](docs/prints/app/58-adiar-opcoes.png) |
 
+| A window that fails shows itself instead of blocking clicks invisibly |
+|---|
+| ![The alert window after a rendering error: a solid panel with the error, "try again" and "close"](docs/prints/app/100-janela-com-erro.png) |
+
 | টাস্ক রিমাইন্ডার | মাস্টার পাসওয়ার্ড পরিবর্তন করুন | স্থিতি API (অপ্ট-ইন ট্যাব) | ভাষা: ইংরেজি, পর্তুগিজ বা স্প্যানিশ |
 |---|---|---|---|
 | ![Reminder with complete and snooze](docs/prints/app/08-lembrete-tarefa.png) | ![Password change form](docs/prints/app/13-trocar-senha.png) | ![Status API as a grid of mini cards: down, degraded, maintenance and operational services, with a bell to get notified, Magalu Cloud included](docs/prints/app/29-status-api.png) | ![Settings in English with the language picker: automatic, Português (Brasil), English](docs/prints/app/30-idioma-ingles.png) |

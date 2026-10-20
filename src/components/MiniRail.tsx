@@ -55,6 +55,21 @@ export default function MiniRail({ alerts, mode, onOpen, onMode }: Props) {
     void api.windowMiniResize(width, height).catch(() => {});
   }, [width, height]);
   useEffect(() => () => clearTimeout(leave.current), []);
+  // The pointer can leave the OS window without a pointerleave (the dock resized under it, another app took
+  // focus): collapsing then keeps the wide, mostly transparent dock from covering the screen's right edge.
+  useEffect(() => {
+    const collapse = () => {
+      clearTimeout(leave.current);
+      setHover(false);
+      setRow(null);
+    };
+    window.addEventListener("blur", collapse);
+    document.documentElement.addEventListener("mouseleave", collapse);
+    return () => {
+      window.removeEventListener("blur", collapse);
+      document.documentElement.removeEventListener("mouseleave", collapse);
+    };
+  }, []);
 
   const enter = (id: string | null) => {
     clearTimeout(leave.current);

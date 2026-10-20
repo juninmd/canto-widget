@@ -18,6 +18,12 @@ pub fn alert_payload(app: AppHandle) -> Vec<AgendaItem> {
     window::alert_list(&app)
 }
 
+/// The overlay ran out of cards: hides its window unless an alert is still pending, which it then gets back.
+#[tauri::command]
+pub fn alert_settle(app: AppHandle) -> Vec<AgendaItem> {
+    window::settle_alert(&app)
+}
+
 /// The alert window's way to bring the widget up (e.g. "abrir aba Modelos"); an alert alone never does.
 #[tauri::command]
 pub fn main_show(app: AppHandle) -> Result<()> {

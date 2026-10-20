@@ -298,6 +298,7 @@ pub fn run() {
             cmd_alerts::alert_payload,
             cmd_alerts::alert_close,
             cmd_alerts::alert_close_all,
+            cmd_alerts::alert_settle,
             alert_log::alert_log,
             fullscreen_guard::fullscreen_hold_get,
             fullscreen_guard::fullscreen_hold_set,
@@ -400,6 +401,10 @@ pub fn run() {
             // Closing hides the widget; quitting for real only from the tray.
             tauri::WindowEvent::CloseRequested { api, .. } => {
                 api.prevent_close();
+                let _ = win.hide();
+            }
+            // Quick capture is a transient pop-up: left behind on top of other apps it covers what is under it.
+            tauri::WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW => {
                 let _ = win.hide();
             }
             tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {

@@ -96,7 +96,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
           pending = [];
           return null;
         }
-        if (cmd === "alert_payload" && pending) return pending;
+        if ((cmd === "alert_payload" || cmd === "alert_settle") && pending) return pending;
         if (cmd === "alert_log") return resolved;
         if (cmd in fixed) return fixed[cmd];
         if (cmd === "note_image_get") return o.images?.[String(args.id)] ?? Promise.reject("imagem indisponível");
