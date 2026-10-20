@@ -2,7 +2,7 @@
 //! in, and a GitLab pipeline that broke on their merge request.
 use std::collections::HashMap;
 
-use crate::calendar::AgendaItem;
+use crate::calendar::{AgendaItem, Sender};
 use crate::forge::{ForgeItem, ForgeList};
 use crate::gitlab_todos::Mention;
 use crate::notification::PR_PREFIX;
@@ -14,14 +14,6 @@ pub fn others_only(mut list: ForgeList, login: &str) -> ForgeList {
     list.items.retain(|i| !i.author.eq_ignore_ascii_case(login));
     list.total = list.total.saturating_sub((before - list.items.len()) as u64);
     list
-}
-
-fn noun(item: &ForgeItem) -> &'static str {
-    match (item.is_pr, item.reference.contains('!')) {
-        (false, _) => "issue",
-        (true, true) => "MR",
-        (true, false) => "PR",
-    }
 }
 
 fn summary(tag: &str, title: String, lines: Vec<String>) -> AgendaItem {
@@ -58,21 +50,12 @@ pub fn assigned_events(fresh: &[&ForgeItem], en: bool) -> Vec<AgendaItem> {
             fresh.iter().map(|i| format!("{} {}", i.reference, i.title)).collect(),
         )];
     }
+    // The pill already says why it rang; who opened it rides as the sender, so the box below stays empty.
     fresh
         .iter()
         .map(|i| {
-            let (n, by) = (noun(i), if i.author.is_empty() { String::new() } else { format!(" @{}", i.author) });
-            let description = match en {
-                true => format!(
-                    "This {n} was assigned to you; opened by{}.",
-                    if by.is_empty() { " someone".into() } else { by }
-                ),
-                false => format!(
-                    "Este {n} foi atribuído a você; aberto por{}.",
-                    if by.is_empty() { " alguém".into() } else { by }
-                ),
-            };
-            AgendaItem { description, ..base(i, "assigned") }
+            let sender = (!i.author.is_empty()).then(|| Sender { login: i.author.clone(), ..Default::default() });
+            AgendaItem { sender, start: i.created_at.clone(), ..base(i, "assigned") }
         })
         .collect()
 }

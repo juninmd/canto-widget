@@ -18,15 +18,14 @@ fn what_i_assigned_to_myself_is_no_news() {
 }
 
 #[test]
-fn an_assignment_names_the_kind_and_who_opened_it_and_a_burst_is_one_summary() {
-    let (pr, issue) = (thread(7, "ana", true), thread(8, "", false));
+fn an_assignment_names_who_opened_it_and_when_and_a_burst_is_one_summary() {
+    let (pr, issue) =
+        (ForgeItem { created_at: "2026-10-12T09:00:00Z".into(), ..thread(7, "ana", true) }, thread(8, "", false));
     let out = assigned_events(&[&pr, &issue], false);
     assert_eq!((out[0].id.as_str(), out[0].tag.as_str()), ("pr:assigned:o/r#7", "assigned"));
-    assert_eq!(out[0].description, "Este PR foi atribuído a você; aberto por @ana.");
-    assert_eq!(out[1].description, "Este issue foi atribuído a você; aberto por alguém.");
-    assert_eq!(assigned_events(&[&pr], true)[0].description, "This PR was assigned to you; opened by @ana.");
-    let mr = ForgeItem { reference: "g/p!3".into(), ..thread(3, "bia", true) };
-    assert!(assigned_events(&[&mr], false)[0].description.starts_with("Este MR"));
+    assert_eq!(out[0].sender.as_ref().map(|s| s.login.as_str()), Some("ana"));
+    assert_eq!(out[0].start, "2026-10-12T09:00:00Z");
+    assert_eq!((out[0].description.as_str(), out[1].sender.as_ref()), ("", None));
 
     let many: Vec<ForgeItem> = (1..=4).map(|n| thread(n, "ana", true)).collect();
     let refs: Vec<&ForgeItem> = many.iter().collect();

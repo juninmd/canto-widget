@@ -24,6 +24,16 @@ function Chip({ children, tone }: { children: ReactNode; tone?: string }) {
   return <span className={`rounded-full bg-edge px-2 py-0.5 text-[11px] ${tone ?? "text-fg"}`}>{children}</span>;
 }
 
+/** Why the alert rang, in its tone, ahead of everything else it says. */
+function Reason({ tone, children }: { tone: (typeof TONE)[keyof typeof TONE]; children: ReactNode }) {
+  return (
+    <span data-reason className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${tone.card} ${tone.text}`}>
+      <span aria-hidden="true" className={`size-1.5 rounded-full ${tone.dot}`} />
+      {children}
+    </span>
+  );
+}
+
 /** What a mention or a service writes: rendered as markdown (bold, lists, code) with its links openable. */
 function Description({ text }: { text: string }) {
   const render: Render = {
@@ -48,55 +58,67 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
   const attendees = event.attendees ?? [];
   const guests = tally(attendees);
   const soon = agendaStatus(event).label;
+  const forge = kind === "pr" || kind === "mention";
+  // A box that would only hold its label is noise; meetings always keep theirs for the prep notes.
+  const detailed = kind === "meeting" || !!event.description || !!event.location || (event.attachments ?? []).length > 0;
 
   return (
     <>
-      <p className={`text-[11px] uppercase tracking-widest ${tone.text}`}>{t(`alert.kind.${kind}`)}</p>
+      {forge ? (
+        <>
+          <p data-eyebrow className="flex min-w-0 items-center gap-1.5 font-mono text-[11px] text-muted">
+            <span className={`shrink-0 uppercase tracking-widest ${tone.text}`}>{t(`alert.kind.${kind}`)}</span>
+            {[event.organizer, event.start && timeAgo(event.start)].filter(Boolean).map((part) => (
+              <span key={part} className="truncate before:mr-1.5 before:text-faint before:content-['·']">
+                {part}
+              </span>
+            ))}
+          </p>
+          <div>
+            <Reason tone={tone}>
+              {kind === "pr" ? prLabel(event.tag) : event.tag === "gitlab" ? "GitLab" : "GitHub"}
+            </Reason>
+          </div>
+        </>
+      ) : (
+        <p className={`text-[11px] uppercase tracking-widest ${tone.text}`}>{t(`alert.kind.${kind}`)}</p>
+      )}
       <h1 className="line-clamp-2 text-xl font-semibold leading-tight">{event.title}</h1>
-      {(kind === "mention" || kind === "pr") && event.sender && <SenderLine sender={event.sender} />}
-      <div className="flex flex-wrap gap-1.5">
-        {kind === "status" && (
-          <>
-            <Chip tone={tone.text}>{levelLabel(event.tag)}</Chip>
-            {event.start && <Chip>{t("alert.since", { time: hour(event) })}</Chip>}
-            {event.start && <Chip>{timeAgo(event.start)}</Chip>}
-          </>
-        )}
-        {kind === "model" && (
-          <>
-            {event.tag && <Chip tone={tone.text}>{event.tag}</Chip>}
-            {event.organizer && <Chip>{event.organizer}</Chip>}
-          </>
-        )}
-        {kind === "pr" && (
-          <>
-            <Chip tone={tone.text}>{prLabel(event.tag)}</Chip>
-            {event.organizer && <Chip>{event.organizer}</Chip>}
-            {event.tag === "stalled" && event.start && <Chip>{timeAgo(event.start)}</Chip>}
-          </>
-        )}
-        {kind === "mention" && (
-          <>
-            <Chip tone={tone.text}>{event.tag === "gitlab" ? "GitLab" : "GitHub"}</Chip>
-            {event.organizer && <Chip>{event.organizer}</Chip>}
-          </>
-        )}
-        {(kind === "meeting" || kind === "task") && (
-          <>
-            <Chip tone={tone.text}>{hour(event)}</Chip>
-            {kind === "meeting" && soon && <Chip>{soon}</Chip>}
-            {event.meet && <Chip>Meet</Chip>}
-          </>
-        )}
-      </div>
+      {forge && event.sender && <SenderLine sender={event.sender} />}
+      {!forge && (
+        <div className="flex flex-wrap gap-1.5">
+          {kind === "status" && (
+            <>
+              <Chip tone={tone.text}>{levelLabel(event.tag)}</Chip>
+              {event.start && <Chip>{t("alert.since", { time: hour(event) })}</Chip>}
+              {event.start && <Chip>{timeAgo(event.start)}</Chip>}
+            </>
+          )}
+          {kind === "model" && (
+            <>
+              {event.tag && <Chip tone={tone.text}>{event.tag}</Chip>}
+              {event.organizer && <Chip>{event.organizer}</Chip>}
+            </>
+          )}
+          {(kind === "meeting" || kind === "task") && (
+            <>
+              <Chip tone={tone.text}>{hour(event)}</Chip>
+              {kind === "meeting" && soon && <Chip>{soon}</Chip>}
+              {event.meet && <Chip>Meet</Chip>}
+            </>
+          )}
+        </div>
+      )}
       <div className={`grid min-h-0 flex-1 content-start gap-2.5 ${kind === "meeting" ? "grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)]" : "grid-cols-1 grid-rows-[minmax(0,auto)]"}`}>
-        <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
-          {event.description && <Description text={event.description} />}
-          {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
-          {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
-          {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}
-          {kind === "pr" && <AlertJobs jobs={event.attachments ?? []} />}
-        </Box>
+        {detailed && (
+          <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
+            {event.description && <Description text={event.description} />}
+            {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
+            {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
+            {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}
+            {kind === "pr" && <AlertJobs jobs={event.attachments ?? []} />}
+          </Box>
+        )}
         {kind === "meeting" && (
           <Box label={t("alert.guests")}>
             {attendees.length > 0 && (

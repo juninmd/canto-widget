@@ -303,6 +303,10 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 |---|
 | ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
 
+| PR assigned to me |
+|---|
+| ![PR assigned to me](docs/prints/app/95-aviso-pr-atribuido.png) |
+
 | Dienas kopsavilkuma brīdinājums | Dienas kopsavilkuma iestatījums |
 |---|---|
 | ![Day summary pop-up listing the meetings, open tasks, review requests and unread mentions waiting](docs/prints/app/83-aviso-resumo-do-dia.png) | ![Settings: day summary switch, the hour it starts at and a working-days switch](docs/prints/app/84-ajustes-resumo-do-dia.png) |

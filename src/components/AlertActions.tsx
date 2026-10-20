@@ -110,7 +110,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
       )}
       {(kind === "meeting" || kind === "task") && <SnoozeButton onSnooze={snooze} />}
       {onCloseAll ? <CloseWithAll onClose={() => onDismiss()} onCloseAll={onCloseAll} open={menu} setOpen={setMenu} /> : (
-        <button type="button" onClick={() => onDismiss()} title="Esc" className="rounded-lg bg-edge px-3 py-2 text-sm text-muted">
+        <button type="button" onClick={() => onDismiss()} title="Esc" className="rounded-lg px-3 py-2 text-sm text-muted hover:bg-edge hover:text-fg">
           {t("alert.close")}
         </button>
       )}

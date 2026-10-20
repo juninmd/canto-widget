@@ -360,7 +360,11 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | More alerts about my own work |
 |---|
-| ![Pop-up for an approved pull request showing the reviewer's name and what they wrote; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+| ![Pop-up for an approved pull request: kind, repository and number in one line, the reviewer's name and what they wrote, and an "aprovado" pill; the strip also lists a conflict, which ranks first](docs/prints/app/82-aviso-pr-aprovado.png) |
+
+| PR assigned to me |
+|---|
+| ![Pop-up for a PR assigned to me: kind, repository, number and "há 3 min" in one line, who opened it with initials, an "atribuído a você" pill and no empty details box](docs/prints/app/95-aviso-pr-atribuido.png) |
 
 | Day summary alert | Day summary setting |
 |---|---|
