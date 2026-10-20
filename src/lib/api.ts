@@ -291,6 +291,15 @@ export type WeatherView = {
   error: string | null;
 };
 
+/** One Mercado quote; `points` run from the previous close to the live price. */
+export type MarketQuote = { symbol: string; price: number; change: number; points: number[] };
+export type MarketView = {
+  quotes: MarketQuote[];
+  fetched_at: number;
+  /** Set when the reading failed; the last good quotes still come through with it. */
+  error: string | null;
+};
+
 /** One card in the Leituras tab; `has_image` only says a thumbnail exists (the bytes come by id). */
 export type ReadArticle = {
   id: string;
@@ -536,6 +545,9 @@ export const api = {
 
   /** Coding-agent CLIs: detection is local, the release feed comes from GitHub (30 min floor in Rust). */
   harnessList: (force = false) => invoke<HarnessView[]>("harness_list", { force }),
+
+  /** Mercado: Yahoo Finance quotes; Rust keeps them for 15 min. */
+  marketGet: (force = false) => invoke<MarketView>("market_get", { force }),
 
   /** Clima: the saved city plus the Open-Meteo forecast; Rust keeps it for 30 min. */
   weatherGet: (force = false) => invoke<WeatherView>("weather_get", { force }),

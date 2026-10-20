@@ -5,6 +5,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Mercado deixou de ser protótipo e mostra cotações reais**: dólar e euro contra o real, bitcoin, Ibovespa,
+  S&P 500 e Nasdaq, com a variação do dia sobre o fechamento anterior, vindos do Yahoo Finance (sem chave, buscados
+  pelo Rust e guardados na memória por 15 min; ↻ força uma nova leitura). A cotação em destaque ganhou um cartão
+  grande com o valor, a variação numa pílula com seta e a curva do pregão com área em degradê que se desenha ao
+  abrir; as demais viram cartões em grade com mini gráfico, e **clicar num cartão leva a curva dele para o
+  destaque**. Uma falha mostra o motivo com "tentar de novo" e mantém as últimas cotações na tela. Alta e baixa
+  usam as cores de sucesso e perigo do tema. Saíram o selo de protótipo, a lista de acompanhamento fictícia e o
+  mecanismo de abas de protótipo.
+
 ### Corrigido
 
 - **Cliques bloqueados por uma janela invisível no canto da tela**: o pop-up de avisos ficava aberto e transparente

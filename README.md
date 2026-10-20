@@ -485,19 +485,17 @@ is kept and what never is.
 
 <sub>All screenshots use fictitious data.</sub>
 
-## 🧪 Prototypes: one suggested tab
+## 📈 Market
 
-**Clima** and **Leituras** started here, were picked and are now real features (up the page); **Hábitos** and
-**Snippets** were dropped. **Mercado** is still a **prototype**: it starts hidden (one checkbox away in Settings)
-and is a **mockup with fictitious data** — no backend, nothing stored, nothing fetched. The screen says what it
-would still need, so the idea can be judged before it becomes real.
+**Mercado** started as a prototype and now shows **live quotes**: dollar and euro against the real, bitcoin,
+Ibovespa, S&P 500 and Nasdaq, each with the day's variation against the previous close. One quote sits in the
+spotlight with a smooth area chart of the session; the rest are cards with a mini chart (click one to spotlight
+it). The data comes from Yahoo Finance's public chart endpoint, keyless and fetched by Rust, kept in memory for
+15 min (↻ forces a new reading); nothing is stored. It starts hidden, one checkbox away in Settings.
 
 | Market |
 |---|
-| <img src="docs/prints/app/94-prototipo-mercado.png" alt="Market prototype: dollar, euro, bitcoin and Ibovespa with the day's variation and a small curve"> |
-
-- **Market** — dollar (PTAX), euro, bitcoin, Ibovespa and the world's main indexes with the day's variation. Would
-  need the Central Bank, CoinGecko and CNBC, all keyless, with a 15 min cache per quote.
+| <img src="docs/prints/app/94-mercado.png" alt="Market tab: the dollar in the spotlight with a smooth area chart, and dollar, euro, bitcoin, Ibovespa, S&P 500 and Nasdaq as cards with the day's variation and a mini chart"> |
 
 <sub>All screenshots use fictitious data.</sub>
 
