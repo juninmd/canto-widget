@@ -47,9 +47,11 @@ fn authorization_url_uses_pkce_s256_and_minimum_scope() {
 }
 
 #[test]
-fn google_login_only_serves_the_agenda_and_does_not_touch_drive() {
-    // The backup is now a local file; requesting any Drive scope would be unused access.
+fn google_login_reads_drive_metadata_only_and_the_calendar_read_only() {
+    // The Drive tab lists files and opens them in the browser: their contents are never in reach.
     let url = authorize_url("id", "http://127.0.0.1:1", &Pkce::new());
-    assert!(!url.contains("auth%2Fdrive"), "{url}");
+    assert!(url.contains("auth%2Fdrive.metadata.readonly"), "{url}");
+    assert!(!url.contains("auth%2Fdrive+") && !url.contains("auth%2Fdrive.file"), "{url}");
+    assert!(url.contains("auth%2Fgmail.modify") && url.contains("auth%2Ftasks"), "{url}");
     assert!(!url.contains("calendar+") && !url.contains("calendar&"), "agenda must be read-only: {url}");
 }

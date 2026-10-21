@@ -1,0 +1,42 @@
+use super::*;
+
+fn raw(json: &str) -> RawMessage {
+    serde_json::from_str(json).unwrap()
+}
+
+#[test]
+fn a_metadata_message_becomes_a_mail_linking_its_thread() {
+    let mail = raw(r#"{
+        "id": "18c2a", "threadId": "18c29", "snippet": "Ajustei a cláusula, n&#39;est&quot;a",
+        "internalDate": "1792500000000",
+        "payload": {"headers": [{"name": "Subject", "value": "Contrato revisado"},
+                                {"name": "from", "value": "\"Marina Lopes\" <marina@exemplo.com>"}]}
+    }"#)
+    .into_mail();
+    assert_eq!(mail.id, "18c2a");
+    assert_eq!(mail.from, "Marina Lopes");
+    assert_eq!(mail.subject, "Contrato revisado");
+    assert_eq!(mail.snippet, "Ajustei a cláusula, n'est\"a");
+    assert_eq!(mail.date, 1_792_500_000_000);
+    assert_eq!(mail.link, "https://mail.google.com/mail/u/0/#inbox/18c29");
+}
+
+#[test]
+fn a_message_without_headers_or_a_safe_thread_still_has_a_link() {
+    let mail = raw(r#"{"id": "abc", "threadId": "../x"}"#).into_mail();
+    assert_eq!((mail.from.as_str(), mail.subject.as_str(), mail.date), ("", "", 0));
+    assert_eq!(mail.link, "https://mail.google.com/mail/u/0/#inbox/abc");
+}
+
+#[test]
+fn the_sender_is_the_display_name_or_the_bare_address() {
+    assert_eq!(sender_name("Banco Aurora <fatura@aurora.exemplo>"), "Banco Aurora");
+    assert_eq!(sender_name("\"Equipe Vértice\" <time@vertice.exemplo>"), "Equipe Vértice");
+    assert_eq!(sender_name("<so@endereco.exemplo>"), "so@endereco.exemplo");
+    assert_eq!(sender_name("ana@exemplo.com"), "ana@exemplo.com");
+}
+
+#[test]
+fn marking_read_refuses_an_id_that_could_reach_another_path() {
+    assert!(mark_read("token", "../labels").is_err());
+}

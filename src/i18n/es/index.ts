@@ -9,7 +9,8 @@ import { reads } from "./reads";
 import { protos } from "./protos";
 import { steam } from "./steam";
 import { tasks } from "./tasks";
+import { google } from "./google";
 import { weather } from "./weather";
 
-export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads };
+export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...google };
 export const messages = es;
