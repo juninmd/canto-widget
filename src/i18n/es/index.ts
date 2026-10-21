@@ -10,6 +10,7 @@ import { protos } from "./protos";
 import { steam } from "./steam";
 import { tasks } from "./tasks";
 import { weather } from "./weather";
+import { uiModelsActivity } from "./uiModelsActivity";
 
-export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads };
+export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity };
 export const messages = es;

@@ -101,3 +101,12 @@ test("password, backup and sync sit under a 'Zona sensível' heading, one level 
   expect(within(zone).getByRole("heading", { level: 4, name: "Pasta sincronizada" })).toBeTruthy();
   expect(screen.getByRole("heading", { level: 3, name: "Zona sensível" })).toBeTruthy();
 });
+
+test("the search field stays stuck to the top of the scroller while the groups scroll", async () => {
+  await mount();
+  const bar = document.querySelector("[data-settings-search]")!;
+  expect(bar.className).toContain("sticky");
+  expect(bar.className).toContain("top-0");
+  expect(bar.contains(screen.getByLabelText("buscar ajuste"))).toBe(true);
+  expect(bar.parentElement!.className).toContain("overflow-y-auto");
+});

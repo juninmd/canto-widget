@@ -44,6 +44,15 @@ export default function ActivityTimeline({ spans, allSpans, idle, apps, dayStart
             {spans.map((s) => (
               <span key={`${s.app}-${s.start}`} title={tip(s.app, s)} className={`absolute inset-y-0 min-w-[2px] ${CATEGORY_COLOR[categoryOf(s.app)]}`} style={place(s.start, s.end)} />
             ))}
+            {idle.map((a) => (
+              <span
+                key={`idle-${a.start}`}
+                data-idle-gap
+                title={`${t("activity.idle")} ${clockOf(a.start)}–${clockOf(a.end)} (${secsLabel(a.end - a.start)})`}
+                className="absolute inset-y-0 min-w-[2px] border-x border-dashed border-line"
+                style={{ ...place(a.start, a.end), backgroundImage: HATCH }}
+              />
+            ))}
           </div>
           {idle.length > 0 && (
             <>

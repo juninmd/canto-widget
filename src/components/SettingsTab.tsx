@@ -75,7 +75,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto pr-1 text-sm">
-      <div>
+      <div data-settings-search className="sticky top-0 z-10 -mb-1 bg-panel/95 px-0.5 pb-1 pt-0.5 backdrop-blur">
         <input
           type="search"
           value={query}

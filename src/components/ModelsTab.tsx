@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type ModelsView } from "../lib/api";
-import { nextSort, sortModels, type ModelSort } from "../lib/models";
+import { SORTS, sortModels, type ModelSort } from "../lib/models";
 import { timeAgo } from "../lib/time";
 import { LOCALE, t } from "../i18n";
 import { BellIcon } from "./Icons";
@@ -53,7 +53,6 @@ export default function ModelsTab() {
   const rows = sortModels(view.models, sort);
   const max = Math.max(0, ...view.models.map((m) => m.score));
   const nextAt = new Date(view.next_fetch_at).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
-  const sortName = t(`models.sort.${sort}`);
   const bell = view.alerts ? t("models.alertOff") : t("models.alertOn");
   const problem = error || view.error;
 
@@ -71,14 +70,20 @@ export default function ModelsTab() {
         </span>
       </div>
       <div className="flex items-center justify-between gap-2 text-[11px]">
-        <button
-          type="button"
-          onClick={() => setSort(nextSort(sort))}
-          aria-label={t("models.sortLabel", { sort: sortName })}
-          className="min-h-[24px] rounded-md bg-edge px-2 text-fg hover:bg-edge/70"
-        >
-          ↕ {sortName}
-        </button>
+        <div role="group" aria-label={t("uima.sortBy")} className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <span className="text-faint">{t("uima.sortBy")}</span>
+          {SORTS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              aria-pressed={sort === k}
+              onClick={() => setSort(k)}
+              className={`canto-hit min-h-[24px] rounded-full border px-2.5 capitalize ${sort === k ? "border-accent bg-accent font-semibold text-on-accent" : "border-edge text-muted hover:bg-hover hover:text-fg"}`}
+            >
+              {t(`models.sort.${k}`)}
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           onClick={() => void toggleAlerts()}
@@ -104,9 +109,9 @@ export default function ModelsTab() {
         {rows.length === 0 ? (
           <p className="text-xs text-faint">{t("models.empty")}</p>
         ) : (
-          <ol className="flex flex-col">
+          <ol className="flex flex-col gap-2">
             {rows.map((r) => (
-              <ModelItem key={r.id} row={r} max={max} />
+              <ModelItem key={r.id} row={r} max={max} sort={sort} />
             ))}
           </ol>
         )}

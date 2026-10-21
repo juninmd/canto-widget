@@ -44,9 +44,14 @@ export default function ActivityGoal({ codeSecs, goalMin, streakDays, days, edit
       )}
       {goalSecs > 0 ? (
         <>
-          <div className="flex items-baseline justify-between gap-2 text-xs">
-            <span className="font-mono tabular-nums text-fg">{t("activity.goalOf", { time: secsLabel(codeSecs), goal: goalText(goalMin) })}</span>
-            <span className={done ? "text-ok" : "text-muted"}>{done ? t("activity.goalDone") : t("activity.goalLeft", { time: secsLabel(goalSecs - codeSecs) })}</span>
+          <div className="flex items-center justify-between gap-2">
+            <span className="flex items-baseline gap-1.5 font-mono tabular-nums">
+              <b className="text-lg font-bold text-fg">{secsLabel(codeSecs)}</b>
+              <span className="text-xs text-muted">{t("uima.goalOf", { goal: goalText(goalMin) })}</span>
+            </span>
+            <span data-goal-pill className={`rounded-full px-2.5 py-0.5 text-[11.5px] font-semibold ${done ? "bg-ok/15 text-ok" : "bg-hover text-muted"}`}>
+              {done ? t("activity.goalDone") : t("activity.goalLeft", { time: secsLabel(goalSecs - codeSecs) })}
+            </span>
           </div>
           <div role="progressbar" aria-label={t("activity.goalLabel")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(pct)} className="h-2 overflow-hidden rounded-full bg-edge">
             <span className={`block h-full rounded-full motion-safe:transition-[width] motion-safe:duration-500 ${done ? "bg-ok" : "bg-accent"}`} style={{ width: `${pct}%` }} />
