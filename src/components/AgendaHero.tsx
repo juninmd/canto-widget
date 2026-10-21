@@ -3,6 +3,7 @@ import { duration } from "../lib/agendaFree";
 import { hour, status } from "../lib/agenda";
 import { heroOf } from "../lib/agendaRail";
 import { t } from "../i18n";
+import AgendaRing from "./AgendaRing";
 
 type Props = { items: AgendaItem[]; now: Date; /** False on other days: "in 1h30" would be measured from a made-up clock. */ relative?: boolean; clashes: Map<string, string[]>; onDetails: (id: string) => void };
 
@@ -22,25 +23,29 @@ export default function AgendaHero({ items, now, relative = true, clashes, onDet
   const e = hero.item;
   const live = hero.kind === "now";
   const other = clashes.get(e.id)?.[0];
+  const endsIn = live ? t("agenda.hero.endsIn", { duration: duration(hero.left) }) : "";
+  const guests = e.guests ?? 0;
   return (
     <section aria-label={live ? t("agenda.hero.now") : t("agenda.hero.next")} className={`rounded-2xl border p-3 ${live ? "border-accent bg-accent/10" : "border-edge bg-ink/60"}`}>
-      <p className={`flex justify-between gap-2 text-[11px] font-semibold uppercase tracking-wide ${live ? "text-accent-text" : "text-muted"}`}>
-        <span>{live ? t("agenda.hero.now") : t("agenda.hero.next")}</span>
-        <span>{live ? t("agenda.hero.endsIn", { duration: duration(hero.left) }) : relative ? status(e, now).label : ""}</span>
-      </p>
-      <h2 className="mt-1 text-base font-semibold leading-tight text-fg">{e.title}</h2>
-      <p className="flex flex-wrap gap-x-2 text-xs text-muted">
-        <span className="font-mono tabular-nums">{hour(e)}</span>
-        {e.location && <span className="truncate">{e.location}</span>}
-      </p>
-      {live && (
-        <div role="progressbar" aria-label={t("agenda.hero.progress")} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(hero.pct * 100)} className="mt-2 h-1.5 overflow-hidden rounded-full bg-edge">
-          <div className="h-full rounded-full bg-accent" style={{ width: `${hero.pct * 100}%` }} />
+      <div className="flex items-start gap-3">
+        {live && <AgendaRing left={hero.left} pct={hero.pct} label={endsIn} />}
+        <div className="min-w-0 flex-1">
+          <p className={`flex justify-between gap-2 text-[11px] font-semibold uppercase tracking-wide ${live ? "text-accent-text" : "text-muted"}`}>
+            <span>{live ? t("agenda.hero.now") : t("agenda.hero.next")}</span>
+            <span>{live ? endsIn : relative ? status(e, now).label : ""}</span>
+          </p>
+          <h2 className="mt-1 text-base font-semibold leading-tight text-fg">{e.title}</h2>
+          <p className="flex flex-wrap gap-x-2 text-xs text-muted">
+            <span className="font-mono tabular-nums">{hour(e)}</span>
+            {e.location && <span className="truncate">{e.location}</span>}
+            {guests > 0 && <span>{guests === 1 ? t("agenda.guests.one") : t("agenda.guests.other", { n: guests })}</span>}
+          </p>
         </div>
-      )}
+      </div>
       {other && (
-        <p role="alert" className="mt-2 rounded-lg bg-danger/15 px-2 py-1 text-xs text-danger">
-          ⚠ {t("agenda.conflictWith", { titles: other })}
+        <p role="alert" className="mt-2 inline-flex max-w-full items-center gap-1 rounded-full bg-danger/15 px-2.5 py-0.5 text-xs text-danger">
+          <span aria-hidden="true">⚠</span>
+          <span className="truncate">{t("agenda.conflictWith", { titles: other })}</span>
         </p>
       )}
       <div className="mt-2 flex flex-wrap items-center gap-2">

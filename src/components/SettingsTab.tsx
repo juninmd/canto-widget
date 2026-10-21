@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { GROUPS, loadOpenGroups, saveOpenGroups, sectionMatches, type GroupId, type SectionId } from "../lib/settingsGroups";
 import BackupSection from "./BackupSection";
 import SyncSection from "./SyncSection";
+import ClipSection from "./ClipSection";
 import GoogleSection from "./GoogleSection";
 import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
@@ -62,6 +63,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     google: <GoogleSection onError={onError} />,
     backup: <BackupSection onError={onError} />,
     sync: <SyncSection onError={onError} />,
+    clipboard: <ClipSection onError={onError} />,
     window: <WindowSection onError={onError} />,
     autostart: <AutostartSection onError={onError} />,
     shortcuts: <ShortcutsSection onOpen={onShowShortcuts} />,

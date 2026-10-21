@@ -10,7 +10,8 @@ import { protos } from "./protos";
 import { steam } from "./steam";
 import { tasks } from "./tasks";
 import { uiForgeStatus } from "./uiForgeStatus";
+import { uiClipAgenda } from "./uiClipAgenda";
 import { weather } from "./weather";
 import { uiModelsActivity } from "./uiModelsActivity";
 
-export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity, ...uiForgeStatus };
+export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda };

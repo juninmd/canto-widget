@@ -20,7 +20,7 @@ export default function ClipTransforms({ modes, onPick }: { modes: ClipMode[]; o
       className="mt-1 flex flex-wrap gap-1"
     >
       {modes.map((m) => (
-        <button key={m} type="button" onClick={() => onPick(m)} className="rounded bg-edge px-1.5 py-0.5 text-[11px] text-muted hover:text-fg">
+        <button key={m} type="button" onClick={() => onPick(m)} className="canto-hit rounded-md bg-edge px-2 text-[11px] text-muted hover:text-fg">
           {LABEL[m]()}
         </button>
       ))}
