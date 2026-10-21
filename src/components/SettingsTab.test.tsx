@@ -26,6 +26,10 @@ async function mount() {
         onError={() => {}}
         hiddenTabs={[]}
         onHiddenTabs={() => {}}
+        layout="horizontal"
+        onLayout={() => {}}
+        pinned={false}
+        onPinned={() => {}}
         reminderLead={5}
         onReminderLead={() => {}}
         onShowShortcuts={() => shortcuts++}

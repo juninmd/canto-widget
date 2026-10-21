@@ -23,6 +23,7 @@ import ShortcutsSection from "./ShortcutsSection";
 import SettingsGroup from "./SettingsGroup";
 import { SensitiveZone } from "./SettingsSection";
 import type { Tab } from "./TabBar";
+import type { TabLayout } from "../lib/tabLayout";
 import type { LeadMinutes } from "../lib/reminderLead";
 import { t } from "../i18n";
 
@@ -30,12 +31,16 @@ type Props = {
   onError: (m: string) => void;
   hiddenTabs: Tab[];
   onHiddenTabs: (hidden: Tab[]) => void;
+  layout: TabLayout;
+  onLayout: (layout: TabLayout) => void;
+  pinned: boolean;
+  onPinned: (pinned: boolean) => void;
   reminderLead: LeadMinutes;
   onReminderLead: (lead: LeadMinutes) => void;
   onShowShortcuts: () => void;
 };
 
-export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminderLead, onReminderLead, onShowShortcuts }: Props) {
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout, onLayout, pinned, onPinned, reminderLead, onReminderLead, onShowShortcuts }: Props) {
   const [open, setOpen] = useState<GroupId[]>(loadOpenGroups);
   const [query, setQuery] = useState("");
   const searching = query.trim() !== "";
@@ -44,7 +49,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
     skin: <SkinPicker />,
     density: <DensityPicker />,
     language: <LanguagePicker />,
-    tabs: <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />,
+    tabs: <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} layout={layout} onLayout={onLayout} pinned={pinned} onPinned={onPinned} />,
     reminders: <RemindersSection lead={reminderLead} onChange={onReminderLead} />,
     digest: <DigestSection onError={onError} />,
     dnd: <DoNotDisturbSection onError={onError} />,

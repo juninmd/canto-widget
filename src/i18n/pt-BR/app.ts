@@ -303,4 +303,16 @@ export const app = {
   "capture.hint": "Enter: tarefa · Ctrl+Enter: nota · Esc: fechar",
   "capture.close": "fechar",
   "shortcuts.capture": "captura rápida de tarefa ou nota, de qualquer app",
+
+  "tabs.group.day": "Meu dia",
+  "tabs.group.code": "Código",
+  "tabs.group.explore": "Explorar",
+  "tabs.rail.pin": "manter a barra aberta",
+  "tabs.rail.unpin": "recolher a barra",
+  "settings.tabs.layout": "Layout das abas",
+  "settings.tabs.horizontal": "Horizontal",
+  "settings.tabs.horizontalHint": "Abas no topo; o que não cabe vai para “mais”.",
+  "settings.tabs.vertical": "Vertical",
+  "settings.tabs.verticalHint": "Barra lateral com todas as abas, em grupos.",
+  "settings.tabs.pin": "manter a barra lateral aberta (senão ela abre ao passar o mouse)",
 } as const;

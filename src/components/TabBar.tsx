@@ -8,6 +8,7 @@ export type Tab =
   | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "steam" | "status" | "models" | "agents"
   | "weather" | "market" | "reads" | "activity" | "settings";
 
+/** Grouped as the vertical bar shows them; Alt+1 to Alt+4 stay on the four oldest tabs. */
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: t("tabs.tasks") },
   { id: "notes", label: t("tabs.notes") },
@@ -15,19 +16,19 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "agenda", label: t("tabs.agenda") },
   { id: "github", label: "GitHub" },
   { id: "gitlab", label: "GitLab" },
-  { id: "steam", label: "Steam" },
   { id: "status", label: t("tabs.status") },
-  { id: "models", label: t("tabs.models") },
   { id: "agents", label: t("agents.tab") },
+  { id: "models", label: t("tabs.models") },
+  { id: "activity", label: t("tabs.activity") },
   { id: "weather", label: t("weather.tab") },
   { id: "market", label: t("protos.tab.market") },
+  { id: "steam", label: "Steam" },
   { id: "reads", label: t("reads.tab") },
-  { id: "activity", label: t("tabs.activity") },
   { id: "settings", label: t("tabs.settings") },
 ];
 
 export const panelId = (tab: Tab) => `panel-${tab}`;
-const tabId = (tab: Tab) => `aba-${tab}`;
+export const tabId = (tab: Tab) => `aba-${tab}`;
 
 /** WAI-ARIA APG tabs pattern: one Tab stop, arrows/Home/End switch tabs. */
 type Props = {

@@ -308,4 +308,16 @@ export const app: Record<keyof typeof source, string> = {
   "capture.hint": "Enter: tarea · Ctrl+Enter: nota · Esc: cerrar",
   "capture.close": "cerrar",
   "shortcuts.capture": "captura rápida de una tarea o nota, desde cualquier app",
+
+  "tabs.group.day": "Mi día",
+  "tabs.group.code": "Código",
+  "tabs.group.explore": "Explorar",
+  "tabs.rail.pin": "mantener la barra abierta",
+  "tabs.rail.unpin": "contraer la barra",
+  "settings.tabs.layout": "Diseño de las pestañas",
+  "settings.tabs.horizontal": "Horizontal",
+  "settings.tabs.horizontalHint": "Pestañas arriba; lo que no cabe va a «más».",
+  "settings.tabs.vertical": "Vertical",
+  "settings.tabs.verticalHint": "Barra lateral con todas las pestañas, en grupos.",
+  "settings.tabs.pin": "mantener la barra lateral abierta (si no, se abre al pasar el ratón)",
 };

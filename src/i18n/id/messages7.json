@@ -193,5 +193,16 @@
   "protos.market.usd": "Dollar",
   "protos.market.eur": "Euro",
   "protos.market.loading": "checking the quotes",
-  "protos.market.source": "data: Yahoo Finance"
+  "protos.market.source": "data: Yahoo Finance",
+  "tabs.group.day": "My day",
+  "tabs.group.code": "Code",
+  "tabs.group.explore": "Explore",
+  "tabs.rail.pin": "keep the bar open",
+  "tabs.rail.unpin": "collapse the bar",
+  "settings.tabs.layout": "Tab layout",
+  "settings.tabs.horizontal": "Horizontal",
+  "settings.tabs.horizontalHint": "Tabs on top; what does not fit goes to “more”.",
+  "settings.tabs.vertical": "Vertical",
+  "settings.tabs.verticalHint": "Side bar with every tab, in groups.",
+  "settings.tabs.pin": "keep the side bar open (otherwise it opens on hover)"
 }

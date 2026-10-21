@@ -39,9 +39,11 @@ import StatusTab from "./components/StatusTab";
 import ModelsTab from "./components/ModelsTab";
 import ActivityTab from "./components/ActivityTab";
 import { useHiddenTabs, visibleTabs } from "./lib/tabs";
+import { useTabLayout } from "./lib/tabLayout";
 import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
+import TabRail from "./components/TabRail";
 import FocusBar from "./components/FocusBar";
 import { focusStore } from "./lib/focus";
 import AppHeader from "./components/AppHeader";
@@ -65,6 +67,7 @@ export default function App() {
 function Canto() {
   const [hiddenTabs, setHiddenTabs] = useHiddenTabs();
   const tabs = visibleTabs(hiddenTabs);
+  const { layout, setLayout, pinned, setPinned } = useTabLayout();
   const [tab, setTab] = useState<Tab>(() => tabs[0].id);
   // Cleared on every manual tab switch so a stale jump doesn't re-seed a tab's search later.
   const [jumpQuery, setJumpQuery] = useState("");
@@ -351,64 +354,74 @@ function Canto() {
       ) : !status.unlocked ? (
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-          <TabBar current={tab} onChange={changeTab} tabs={tabs} />
-          {focused && (
-            <FocusedAlert
-              event={focused}
-              onGone={drop}
-              onSettled={refreshAlerts}
-              onCompleted={() => setTasksVersion((v) => v + 1)}
-              onOpenModels={() => changeTab("models")}
-            />
+        <div className={`flex min-h-0 min-w-0 flex-1 ${layout === "vertical" ? "flex-row" : "flex-col"}`}>
+          {layout === "vertical" ? (
+            <TabRail current={tab} onChange={changeTab} tabs={tabs} pinned={pinned} onPinned={setPinned} />
+          ) : (
+            <TabBar current={tab} onChange={changeTab} tabs={tabs} />
           )}
-          <main
-            id={panelId(tab)}
-            key={tab}
-            role="tabpanel"
-            aria-labelledby={`aba-${tab}`}
-            className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
-          >
-            {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
-            {tab === "notes" && (
-              <NotesTab
-                today={today}
-                agenda={agenda.items}
-                privacy={privacy}
-                initialQuery={jumpQuery}
-                querySeq={jumpSeq}
-                onOpenTasks={() => changeTab("tasks")}
-                onOpenAgenda={() => changeTab("agenda")}
-                onError={setError}
-                note={noteDraft}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {focused && (
+              <FocusedAlert
+                event={focused}
+                onGone={drop}
+                onSettled={refreshAlerts}
+                onCompleted={() => setTasksVersion((v) => v + 1)}
+                onOpenModels={() => changeTab("models")}
               />
             )}
-            {tab === "clipboard" && (
-              <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
-            )}
-            {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={openSettings} onBooked={(message) => notify({ message })} />}
-            {tab === "github" && <GithubTab onError={setError} />}
-            {tab === "gitlab" && <GitlabTab onError={setError} />}
-            {tab === "steam" && <SteamTab onError={setError} />}
-            {tab === "status" && <StatusTab />}
-            {tab === "models" && <ModelsTab />}
-            {tab === "agents" && <AgentsTab onError={setError} />}
-            {tab === "weather" && <WeatherTab />}
-            {tab === "market" && <MarketTab />}
-            {tab === "reads" && <ReadsTab onError={setError} />}
-            {tab === "activity" && <ActivityTab today={today} onError={setError} />}
-            {tab === "settings" && (
-              <SettingsTab
-                onError={setError}
-                hiddenTabs={hiddenTabs}
-                onHiddenTabs={setHiddenTabs}
-                reminderLead={reminderLead}
-                onReminderLead={setReminderLead}
-                onShowShortcuts={() => setHelpOpen(true)}
-              />
-            )}
-          </main>
-          <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
+            <main
+              id={panelId(tab)}
+              key={tab}
+              role="tabpanel"
+              aria-labelledby={`aba-${tab}`}
+              className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
+            >
+              {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
+              {tab === "notes" && (
+                <NotesTab
+                  today={today}
+                  agenda={agenda.items}
+                  privacy={privacy}
+                  initialQuery={jumpQuery}
+                  querySeq={jumpSeq}
+                  onOpenTasks={() => changeTab("tasks")}
+                  onOpenAgenda={() => changeTab("agenda")}
+                  onError={setError}
+                  note={noteDraft}
+                />
+              )}
+              {tab === "clipboard" && (
+                <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
+              )}
+              {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={openSettings} onBooked={(message) => notify({ message })} />}
+              {tab === "github" && <GithubTab onError={setError} />}
+              {tab === "gitlab" && <GitlabTab onError={setError} />}
+              {tab === "steam" && <SteamTab onError={setError} />}
+              {tab === "status" && <StatusTab />}
+              {tab === "models" && <ModelsTab />}
+              {tab === "agents" && <AgentsTab onError={setError} />}
+              {tab === "weather" && <WeatherTab />}
+              {tab === "market" && <MarketTab />}
+              {tab === "reads" && <ReadsTab onError={setError} />}
+              {tab === "activity" && <ActivityTab today={today} onError={setError} />}
+              {tab === "settings" && (
+                <SettingsTab
+                  onError={setError}
+                  hiddenTabs={hiddenTabs}
+                  onHiddenTabs={setHiddenTabs}
+                  layout={layout}
+                  onLayout={setLayout}
+                  pinned={pinned}
+                  onPinned={setPinned}
+                  reminderLead={reminderLead}
+                  onReminderLead={setReminderLead}
+                  onShowShortcuts={() => setHelpOpen(true)}
+                />
+              )}
+            </main>
+            <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
+          </div>
         </div>
       )}
     </div>
