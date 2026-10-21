@@ -57,8 +57,8 @@ test("lists the ranking with rank, creator, badges, score, price and speed", asy
   expect(screen.getByText("Intelligence Index · 187 modelos")).toBeTruthy();
   expect(screen.getByText("atualizado há 2 h")).toBeTruthy();
   expect(names()).toEqual(["a", "n", "o", "b"]);
-  expect(screen.getByText("#1").className).toContain("text-accent");
-  expect(screen.getByText("#4").className).not.toContain("text-accent");
+  expect(screen.getByTitle("posição 1 no ranking").className).toContain("bg-accent");
+  expect(screen.getByTitle("posição 4 no ranking").className).not.toContain("text-accent");
   expect(screen.getByText("Lumen Labs")).toBeTruthy();
   expect(screen.getByText("novo")).toBeTruthy();
   expect(screen.getByText("subiu")).toBeTruthy();
@@ -68,17 +68,38 @@ test("lists the ranking with rank, creator, badges, score, price and speed", asy
   expect(screen.getByText("sem preço")).toBeTruthy();
 });
 
-test("the sort toggle cycles price (cheapest first) and speed (fastest first)", async () => {
+test("the sort chips pick price (cheapest first) and speed (fastest first) and mark the active one", async () => {
   await show();
-  const sortButton = () => screen.getByRole("button", { name: /ordenar por/ });
-  expect(sortButton().textContent).toContain("inteligência");
-  await act(async () => fireEvent.click(sortButton()));
-  expect(sortButton().textContent).toContain("preço");
+  const chip = (name: string) => screen.getByRole("button", { name });
+  expect(chip("inteligência").getAttribute("aria-pressed")).toBe("true");
+  expect(chip("preço").getAttribute("aria-pressed")).toBe("false");
+  await act(async () => fireEvent.click(chip("preço")));
+  expect(chip("preço").getAttribute("aria-pressed")).toBe("true");
+  expect(chip("inteligência").getAttribute("aria-pressed")).toBe("false");
   expect(names()).toEqual(["b", "n", "a", "o"]);
-  await act(async () => fireEvent.click(sortButton()));
+  await act(async () => fireEvent.click(chip("velocidade")));
   expect(names()).toEqual(["n", "a", "o", "b"]);
-  await act(async () => fireEvent.click(sortButton()));
+  await act(async () => fireEvent.click(chip("inteligência")));
   expect(names()).toEqual(["a", "n", "o", "b"]);
+});
+
+test("the metric being sorted by is highlighted in each row", async () => {
+  await show();
+  const row = (id: string) => document.querySelector(`[data-model="${id}"]`)!;
+  expect(screen.getByText("73,2").className).toContain("text-accent-text");
+  expect(screen.getByText("143 tok/s").className).not.toContain("text-accent-text");
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "preço" })));
+  expect(screen.getByText("$3,44 / 1M tokens").className).toContain("text-accent-text");
+  expect(screen.getByText("73,2").className).not.toContain("text-accent-text");
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "velocidade" })));
+  expect(row("a").textContent).toContain("143 tok/s");
+  expect(screen.getByText("143 tok/s").className).toContain("text-accent-text");
+});
+
+test("only the leader's rank block takes the accent fill", async () => {
+  await show();
+  expect(screen.getByTitle("posição 1 no ranking").className).toContain("bg-accent text-on-accent");
+  expect(screen.getByTitle("posição 2 no ranking").className).not.toContain("text-on-accent");
 });
 
 test("the bell turns top-10 alerts on and off", async () => {

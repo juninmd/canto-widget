@@ -100,3 +100,19 @@ test("tracking off explains what is kept before asking to turn it on", async ({ 
   await expect(page.getByText(/título de janela/)).toBeVisible();
   await expect(page.getByRole("button", { name: "Ativar coleta" })).toBeVisible();
 });
+
+test("the idle stretch shows hatched inside the whole-day strip and the goal wears a pill", async ({ page }) => {
+  await open(page, 420);
+  const gap = page.locator("[data-idle-gap]");
+  await expect(gap).toHaveCount(1);
+  expect((await gap.boundingBox())!.width).toBeGreaterThan(8);
+  await expect(page.locator("[data-goal-pill]")).toContainText(/faltam|Meta cumprida/);
+});
+
+test("the week highlights today's column and labels the totals", async ({ page }) => {
+  await open(page, 420);
+  await page.getByRole("button", { name: "Semana" }).click();
+  const today = page.locator("[data-today]");
+  await expect(today).toHaveCount(1);
+  await expect(today).toContainText("6h54");
+});

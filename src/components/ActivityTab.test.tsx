@@ -152,11 +152,14 @@ test("the previous day is one tap away, and an empty day says so", async () => {
 
 test("the goal compares code time with the chosen goal, and the choice is remembered", async () => {
   await turnOn();
-  expect(screen.getByText(/2h de 4h/)).toBeTruthy();
-  expect(screen.getByText("faltam 2h")).toBeTruthy();
+  expect(screen.getByText("de 4h")).toBeTruthy();
+  const pill = document.querySelector("[data-goal-pill]")!;
+  expect(pill.textContent).toBe("faltam 2h");
+  expect(pill.className).toContain("rounded-full");
   await click(screen.getByRole("button", { name: "Ajustar" }));
   await click(screen.getByRole("button", { name: "2h" }));
   expect(screen.getByText("Meta cumprida")).toBeTruthy();
+  expect(document.querySelector("[data-goal-pill]")!.className).toContain("text-ok");
   expect(localStorage.getItem("canto.activity.goalMin")).toBe("120");
   await click(screen.getByRole("button", { name: "sem meta" }));
   expect(screen.getByText(/Sem meta definida/)).toBeTruthy();
@@ -220,4 +223,23 @@ test("refresh asks Rust for the week again", async () => {
   const before = calls.filter((c) => c.cmd === "activity_summary").length;
   await menuItem("Atualizar agora");
   expect(calls.filter((c) => c.cmd === "activity_summary").length).toBe(before + 7);
+});
+
+test("the idle stretch is hatched inside the whole-day strip, not only on its own row", async () => {
+  await turnOn();
+  const gap = document.querySelector("[data-idle-gap]")!;
+  expect(gap).toBeTruthy();
+  expect(gap.getAttribute("title")).toContain("Parado");
+  expect(gap.getAttribute("title")).toContain("(30 min)");
+  expect(gap.parentElement!.className).toContain("overflow-hidden");
+});
+
+test("the week chart labels each day's total and highlights today", async () => {
+  await turnOn();
+  await click(screen.getByRole("button", { name: "Semana" }));
+  const chart = screen.getByRole("img", { name: "Tempo ativo por dia, últimos 7 dias" });
+  const todayCol = chart.querySelectorAll("[data-today]");
+  expect(todayCol).toHaveLength(1);
+  expect(todayCol[0].textContent).toContain("2h30");
+  expect(todayCol[0].querySelector("title")!.textContent).toContain("(hoje)");
 });

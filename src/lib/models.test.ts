@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { ModelRow } from "./api";
-import { barWidth, formatPrice, formatScore, formatSpeed, nextSort, sortModels } from "./models";
+import { barWidth, formatPrice, formatScore, formatSpeed, sortModels } from "./models";
 
 const row = (id: string, rank: number, price: number | null, speed: number | null): ModelRow => ({
   id,
@@ -15,12 +15,6 @@ const row = (id: string, rank: number, price: number | null, speed: number | nul
 
 const rows = [row("c", 3, 0.5, 300), row("a", 1, 10, null), row("b", 2, null, 90), row("d", 4, 0.5, 90)];
 const ids = (list: ModelRow[]) => list.map((r) => r.id);
-
-test("the sort cycles intelligence, price, speed and back", () => {
-  expect(nextSort("intelligence")).toBe("price");
-  expect(nextSort("price")).toBe("speed");
-  expect(nextSort("speed")).toBe("intelligence");
-});
 
 test("intelligence follows the rank", () => {
   expect(ids(sortModels(rows, "intelligence"))).toEqual(["a", "b", "c", "d"]);
