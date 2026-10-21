@@ -259,6 +259,26 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 |---|
 | ![On a narrow window the last tabs go to a more menu instead of being cut; the open tab always stays on the bar](docs/prints/app/66-abas-mais.png) |
 
+| Vertical tabs: every tab in reach, in groups | Settings > Appearance: pick the tab layout |
+|---|---|
+| ![The vertical tab bar opened over the window: My day, Code and Explore groups, Settings at the bottom](docs/prints/app/102-abas-verticais.png) | ![Tab layout in Settings: two previews, Horizontal and Vertical, and a checkbox to keep the side bar open](docs/prints/app/103-abas-layout-ajustes.png) |
+
+| Tasks: progress ring, priority chips, a menu for the rest | Notes: tag chips with counts, list or grid |
+|---|---|
+| ![Tasks with a progress ring, Todas/Alta/Média/Baixa chips, a more-actions menu and priority pills](docs/prints/app/104-tarefas-refresh.png) | ![Notes with a tag chip row, Pinned and Recent sections and a list/grid toggle](docs/prints/app/105-notas-tags.png) |
+
+| Clipboard: type chips and cards by kind | Agenda: one control row and a countdown ring |
+|---|---|
+| ![Clipboard with a lock badge, chips by type with counts and cards with a colored type tile](docs/prints/app/113-clipboard-chips.png) | ![Agenda with a single control row and a countdown ring on the meeting in progress](docs/prints/app/114-agenda-anel.png) |
+
+| GitHub: the numbers are filters | Status API: services by severity |
+|---|---|
+| ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](docs/prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](docs/prints/app/111-status-servicos.png) |
+
+| Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
+|---|---|---|
+| ![My endpoints worst first, with state pills, a plus-address button and the add form](docs/prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](docs/prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](docs/prints/app/107-atividade-meta.png) |
+
 | بازی‌ها و تمام صفحه: هشدارها منتظر می‌مانند تا شما را ترک کنید |
 |---|
 | ![Settings with the Games and full screen option: wait for full screen to end before alerting, so a pop-up or toast never minimizes a game](docs/prints/app/68-ajustes-tela-cheia.png) |

@@ -7,6 +7,42 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Abas na vertical ou na horizontal, à sua escolha**: em Ajustes > Aparência, "Layout das abas" troca a barra de
+  cima por uma barra lateral com todas as abas, em grupos (Meu dia, Código, Explorar) e Ajustes no fim. Ela mostra só
+  os ícones, abre por cima do conteúdo ao passar o mouse ou navegar pelo teclado, e pode ficar aberta. As setas
+  seguem a direção da barra (cima e baixo na vertical) e o padrão continua horizontal. As abas passaram a seguir a
+  ordem dos grupos; Alt+1 a Alt+4 não mudam.
+- **Tarefas mais limpas e rápidas de filtrar**: o progresso virou um anel com "2 de 6", a prioridade é um seletor em
+  chips (Todas, Alta, Média, Baixa), "resumo do dia", "puxar pendências" e "limpar concluídas" foram para um menu
+  "⋯", e as concluídas ficam recolhidas atrás de um cabeçalho com a contagem. A prioridade aparece como etiqueta
+  colorida na linha, e os chips "hora", "!alta", "!média" e "!baixa" sob o campo inserem o trecho que o parser já
+  entende, então ninguém precisa decorar a sintaxe.
+- **Notas filtráveis por tag e em lista ou grade**: uma fileira de chips com a contagem faz a mesma busca de digitar
+  `#tag`, os cards ficam em "Fixadas" e "Recentes", e um alternador mostra os cards em duas colunas, lembrado entre
+  as sessões. A busca sem resultado diz o que fazer.
+- **Clipboard filtra por tipo com chips e contagem**: Todos, Link, Cor, JSON... no lugar do seletor. O limite de
+  fixados foi para Ajustes > Dados e contas, "limpar" ficou no menu "···" (ainda com a confirmação) e o aviso de
+  privacidade virou um selo de cadeado. Cada cartão ganhou o ícone colorido do tipo, os fixados vêm primeiro e clicar
+  no cartão copia.
+- **Agenda com os controles numa linha só**: Hoje/Reuniões, dia anterior/data/próximo, atualizar e o menu "···"
+  (testar aviso, antecedência, última atualização) dividem uma linha, e a reunião em andamento ganhou um anel de
+  contagem regressiva com os minutos que faltam.
+- **GitHub e GitLab: os quatro números do topo filtram a lista**: toque em revisões, meus PRs, CI falhou ou minhas
+  issues para ver só aquele grupo, e de novo para voltar. A ordenação virou um menu compacto, "atualizar" um ícone e
+  "desconectar" foi para o menu "⋯", ainda com a confirmação. O CI aparece como selo colorido, "aguardando há N d"
+  fica vermelho a partir de 2 dias, os títulos das seções ficam fixos e "adiar 4 h" e "ver CI" aparecem ao passar o
+  mouse ou focar.
+- **Status API: serviços por gravidade e endpoints com o que importa primeiro**: quem caiu vem primeiro, com resumo
+  ("N com problema · M operacionais"), barra proporcional, filtros com contagem e o estado escrito num selo. Em "meus
+  endpoints", "+ endereço" fica ao lado das abas, selos resumem fora/lentos/a vencer e os piores sobem. Tocar num
+  serviço continua abrindo os incidentes, e adicionar endereço, gráfico de latência, verificar agora e remover seguem
+  como antes.
+- **Modelos IA com chips de ordenação e posição em destaque**: Inteligência, Preço e Velocidade ficam sempre à vista,
+  a métrica escolhida acende em cada linha e o líder ganha o bloco em destaque.
+- **Atividade com a meta de foco em pílula**: o tempo de código aparece grande com "faltam N min" (ou "Meta
+  cumprida"), as pausas aparecem hachuradas na faixa do dia e a semana marca a coluna de hoje.
+- **Busca fixa em Ajustes**: o campo de busca acompanha a rolagem.
+
 - **Mercado deixou de ser protótipo e mostra cotações reais**: dólar e euro contra o real, bitcoin, Ibovespa,
   S&P 500 e Nasdaq, com a variação do dia sobre o fechamento anterior, vindos do Yahoo Finance (sem chave, buscados
   pelo Rust e guardados na memória por 15 min; ↻ força uma nova leitura). A cotação em destaque ganhou um cartão
