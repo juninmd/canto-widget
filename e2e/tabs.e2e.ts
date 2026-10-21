@@ -94,7 +94,7 @@ test.describe("vertical layout", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 420, height: 580 });
     await mockTauri(page);
-    await page.addInitScript(() => localStorage.setItem("canto.tabLayout", "vertical"));
+    await page.addInitScript(() => localStorage.getItem("canto.tabLayout") ?? localStorage.setItem("canto.tabLayout", "vertical"));
     await page.goto("/");
   });
 
