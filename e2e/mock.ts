@@ -100,6 +100,8 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
         if ((cmd === "alert_payload" || cmd === "alert_settle") && pending) return pending;
         if (cmd === "alert_log") return resolved;
         if (cmd in fixed) return fixed[cmd];
+        // Like a fresh install: no Google login, so the Google Tasks section stays out of the Tasks tab.
+        if (cmd === "gtasks_list" || cmd === "gmail_summary") return Promise.reject("entre com o Google para ver a agenda");
         if (cmd === "note_image_get") return o.images?.[String(args.id)] ?? Promise.reject("imagem indisponível");
         if (cmd === "note_image_save") return "e2e0";
         if (cmd === "tasks_for_day") return tasks().filter((t) => t.day === args.day);

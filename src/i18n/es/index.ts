@@ -12,8 +12,9 @@ import { tasks } from "./tasks";
 import { uiForgeStatus } from "./uiForgeStatus";
 import { uiClipAgenda } from "./uiClipAgenda";
 import { uiTasksNotes } from "./uiTasksNotes";
+import { google } from "./google";
 import { weather } from "./weather";
 import { uiModelsActivity } from "./uiModelsActivity";
 
-export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes };
+export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google };
 export const messages = es;

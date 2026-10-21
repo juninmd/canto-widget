@@ -2,6 +2,7 @@ import { t } from "../i18n";
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import SummaryPanel from "./SummaryPanel";
+import GoogleTasksSection from "./GoogleTasksSection";
 import TaskRow from "./TaskRow";
 import TaskNow from "./TaskNow";
 import { pickNow } from "../lib/nowTask";
@@ -223,6 +224,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           <EmptyState icon={<ChecklistIcon />}>{t("tasks.emptyPriority")}</EmptyState>
         )}
       </ul>
+      <GoogleTasksSection today={today} onError={onError} />
     </div>
   );
 }

@@ -218,6 +218,45 @@ the vault (it is only public addresses). The tab starts off by default.
 <tr>
 <td>
 
+### 📬 Gmail without opening the inbox
+
+The **Gmail** tab shows the inbox's **unread count** and the unread mail **Gmail itself marked as important**,
+each with **open in Gmail**, **mark as read** and **make it a task** (it lands in Google Tasks). Turn on **alert
+only important mail** and a system notification rings for each new important message; the rest only counts.
+It uses the same Google sign-in as the Agenda, and the token stays in the vault.
+
+</td>
+<td><img src="docs/prints/app/102-gmail.png" alt="Gmail tab: 27 unread, three important messages with sender, subject, snippet and the open, mark-as-read and make-it-a-task actions"></td>
+</tr>
+<tr>
+<td>
+
+### 📂 Drive files one click away
+
+The **Drive** tab lists your **recent**, **starred** or **shared with me** files, searchable by name, each with
+its kind, who edited it last and an **open** button that goes to the browser. Canto only reads file
+**metadata** (`drive.metadata.readonly`): contents never reach it. Google Keep has no API for personal accounts,
+so the quick capture goes to **Google Tasks** instead.
+
+</td>
+<td><img src="docs/prints/app/103-drive.png" alt="Drive tab: search box, recent/starred/shared filters and a list of documents, sheets, slides and a PDF with who edited them and an open button"></td>
+</tr>
+<tr>
+<td>
+
+### ☑️ Google Tasks under your day
+
+Signed in to Google, the **Tasks** tab gains a **Google Tasks** section under the day's tasks: the open tasks of
+your default list with their due day (late ones in red), a field that **adds straight to Google Tasks** and a
+box to check one off. It folds to its header, and without a Google login it does not show at all. The Gmail and
+Drive tabs start hidden, one checkbox away in Settings.
+
+</td>
+<td><img src="docs/prints/app/104-google-tarefas.png" alt="Tasks tab with the Google Tasks section below the day's tasks: a capture field and three open tasks, one of them late"></td>
+</tr>
+<tr>
+<td>
+
 ### ⚙️ Settings and automatic updates
 
 Master password change, Windows Hello, `.canto` backup, a synced folder with automatic merge (Dropbox,
@@ -568,7 +607,7 @@ repositories: publishing is a manual decision and action by the maintainer.
 | Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, a fresh nonce on every write, atomic write with `fsync` |
 | Key | RAM only, zeroed on lock; configurable auto-lock (5 to 60 min idle, 15 min by default) |
 | Network | only the Rust process talks to the network; the webview has no remote origin (CSP) and never sees tokens |
-| Google | optional, only `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list) plus profile, OAuth with PKCE and loopback |
+| Google | optional: `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list), `gmail.modify` (unread count, important mail, mark as read), `tasks` and `drive.metadata.readonly` (file names, never contents) plus profile, OAuth with PKCE and loopback |
 | GitHub | optional, encrypted token; items only open if the link is `https://github.com/` |
 | GitLab | optional, encrypted address and token; `https://` only, no redirects, links only from the configured instance |
 | Updates | only installs a package signed by the project's key; a tampered download is discarded before running |

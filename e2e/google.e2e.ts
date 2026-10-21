@@ -1,0 +1,49 @@
+import { expect, test } from "@playwright/test";
+import { calls, goTab, mockTauri } from "./mock";
+
+const ALL_TABS = [
+  "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
+  "weather", "market", "reads", "activity", "gmail", "gdrive",
+];
+
+const GOOGLE = {
+  gmail_summary: {
+    unread: 27,
+    important: [{ id: "m1", from: "Marina Lopes", subject: "Contrato revisado", snippet: "Consegue assinar?", date: Date.now(), link: "https://mail.google.com/mail/u/0/#inbox/t1" }],
+  },
+  gmail_alerts_get: false,
+  gtasks_list: [{ id: "g1", title: "Renovar seguro do carro", due: "" }],
+  gtasks_add: { id: "g2", title: "Enviar proposta", due: "" },
+  gdrive_list: [
+    { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: new Date().toISOString(), starred: true, editor: "" },
+  ],
+};
+
+test("Gmail, Drive and Google Tasks work from their tabs", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 700 });
+  await mockTauri(page, { hiddenTabs: [], knownTabs: ALL_TABS, fixed: GOOGLE });
+  await page.goto("/");
+  await expect(page.getByText("Renovar seguro do carro")).toBeVisible();
+  await page.getByLabel("adicionar no Google Tarefas…").fill("Enviar proposta");
+  await page.getByLabel("adicionar no Google Tarefas…").press("Enter");
+  await expect.poll(async () => (await calls(page)).find((c) => c.cmd === "gtasks_add")?.args).toEqual({ title: "Enviar proposta" });
+
+  await goTab(page, "Gmail");
+  await expect(page.getByText("27", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "marcar como lido" }).click();
+  await expect(page.getByText("Contrato revisado")).toHaveCount(0);
+
+  await goTab(page, "Drive");
+  await page.getByRole("button", { name: "abrir" }).click();
+  await expect.poll(async () => (await calls(page)).find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://docs.google.com/document/d/d1/edit" });
+});
+
+test("the Google tabs start hidden and the Tasks tab has no Google section without a login", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 700 });
+  await mockTauri(page, { hiddenTabs: ["gitlab"], knownTabs: ["tasks", "notes", "clipboard", "agenda", "github", "gitlab"] });
+  await page.goto("/");
+  await expect(page.getByRole("tablist").first()).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Gmail", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("tab", { name: "Drive", exact: true })).toHaveCount(0);
+  await expect(page.getByText("Google Tarefas")).toHaveCount(0);
+});

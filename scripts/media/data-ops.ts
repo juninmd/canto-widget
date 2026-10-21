@@ -181,6 +181,33 @@ export const MARKET = {
   },
 };
 
+const at = (iso: string) => Date.parse(`${iso}-03:00`);
+/** Invented people and companies; the links only have to look like Google's. */
+export const GOOGLE = {
+  gmail_summary: {
+    unread: 27,
+    important: [
+      { id: "m1", from: "Marina Lopes", subject: "Contrato revisado: falta só a sua assinatura", snippet: "Ajustei a cláusula 4 como combinamos, consegue assinar até sexta?", date: at("2026-10-09T09:42"), link: "https://mail.google.com/mail/u/0/#inbox/t1" },
+      { id: "m2", from: "Banco Aurora", subject: "Fatura de outubro fechada: R$ 1.284,90", snippet: "Vencimento em 28/10. Pague pelo app ou pelo código de barras.", date: at("2026-10-09T08:15"), link: "https://mail.google.com/mail/u/0/#inbox/t2" },
+      { id: "m3", from: "Equipe Vértice", subject: "Deploy de produção às 18h", snippet: "Janela de 30 min. Quem tiver PR pendente, mergeia até 17h.", date: at("2026-10-08T16:05"), link: "https://mail.google.com/mail/u/0/#inbox/t3" },
+    ],
+  },
+  gmail_alerts_get: true,
+  gtasks_list: [
+    { id: "g1", title: "Renovar seguro do carro", due: "2026-10-07" },
+    { id: "g2", title: "Comprar presente da Lia", due: "2026-10-11" },
+    { id: "g3", title: "Agendar revisão do notebook", due: "" },
+  ],
+  gdrive_list: [
+    { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: "2026-10-09T09:20:00-03:00", starred: true, editor: "" },
+    { id: "d2", name: "Orçamento casa 2026", kind: "sheet", link: "https://docs.google.com/spreadsheets/d/d2/edit", modified: "2026-10-08T20:10:00-03:00", starred: true, editor: "" },
+    { id: "d3", name: "Apresentação Kickoff Vértice", kind: "slide", link: "https://docs.google.com/presentation/d/d3/edit", modified: "2026-10-08T11:30:00-03:00", starred: false, editor: "Rafael Prado" },
+    { id: "d4", name: "Contrato de prestação v3.pdf", kind: "pdf", link: "https://drive.google.com/file/d/d4/view", modified: "2026-10-09T08:40:00-03:00", starred: false, editor: "Marina Lopes" },
+    { id: "d5", name: "Notas da retro de setembro", kind: "doc", link: "https://docs.google.com/document/d/d5/edit", modified: "2026-10-06T17:00:00-03:00", starred: false, editor: "" },
+    { id: "d6", name: "Controle de horas", kind: "sheet", link: "https://docs.google.com/spreadsheets/d/d6/edit", modified: "2026-10-05T08:45:00-03:00", starred: true, editor: "" },
+  ],
+};
+
 export const WEATHER = {
   weather_get: {
     place: { city: "Aurora", admin1: "Vale Azul", country: "Brasil", lat: -23.5, lon: -46.6 },

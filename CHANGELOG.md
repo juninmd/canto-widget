@@ -5,6 +5,19 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
+  nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
+  que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
+  opcional **só dos importantes** toca uma notificação do sistema para cada e-mail importante novo (checado a cada
+  2 min). A aba **Drive** lista arquivos recentes, com estrela ou compartilhados comigo, com busca por nome e
+  abertura no navegador, lendo só os metadados. A aba **Tarefas** ganha a seção **Google Tarefas**, com as tarefas
+  abertas da lista padrão, a data (vencidas em vermelho), captura direto no Google e concluir com um clique; sem
+  login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
+  ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
+  novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
+
 ### Alterado
 
 - **Abas na vertical ou na horizontal, à sua escolha**: em Ajustes > Aparência, "Layout das abas" troca a barra de
