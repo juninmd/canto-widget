@@ -3,7 +3,7 @@ import { t } from "../i18n";
 import { api } from "../lib/api";
 import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
 import { REPEAT_LABEL } from "../lib/reminders";
-import { nextPriority, PRIORITY_DOT, PRIORITY_LABEL } from "../lib/priority";
+import { nextPriority, PRIORITY_DOT, PRIORITY_LABEL, PRIORITY_PILL } from "../lib/priority";
 import RepeatControl from "./RepeatControl";
 import { CHIP } from "./chip";
 import { ClockIcon, PullIcon } from "./Icons";
@@ -138,9 +138,17 @@ export function TaskMeta({ task }: { task: Task }) {
   const subtasks = task.subtasks && task.subtasks.length > 0;
   const running = useRunning()?.id === task.id;
   const focused = running || !!task.estimate_min || (task.tracked_secs ?? 0) >= 60;
-  if (!timed && !subtasks && !task.pr_url && !focused) return null;
+  if (!task.priority && !timed && !subtasks && !task.pr_url && !focused) return null;
   return (
     <span className="mt-1 flex flex-wrap items-center gap-1">
+      {task.priority && (
+        <span
+          title={t("priority.dot", { label: PRIORITY_LABEL[task.priority] })}
+          className={`inline-flex h-5 shrink-0 items-center rounded-md px-1.5 text-[11px] font-medium capitalize ${PRIORITY_PILL[task.priority]}`}
+        >
+          {PRIORITY_LABEL[task.priority]}
+        </span>
+      )}
       {timed && (
         <span
           className={`${CHIP} tabular-nums`}
