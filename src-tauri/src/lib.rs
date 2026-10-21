@@ -42,6 +42,7 @@ pub mod cmd_steam;
 pub mod cmd_sync;
 pub mod cmd_weather;
 pub mod commands;
+pub mod contacts;
 pub mod crypto;
 pub mod do_not_disturb;
 pub mod drive;
@@ -110,6 +111,7 @@ pub mod password;
 pub mod paste_plain;
 pub mod plain_text;
 pub mod pr_state;
+pub mod prefs;
 pub mod priority;
 pub mod reads;
 pub mod report;
@@ -184,6 +186,7 @@ pub fn run() {
             let dir = app.path().app_data_dir()?;
             std::fs::create_dir_all(&dir)?;
             app.manage(AppState::new(dir.clone()));
+            app.manage(prefs::PrefsLock::default());
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
@@ -380,6 +383,9 @@ pub fn run() {
             cmd_google::gtasks_add,
             cmd_google::gtasks_complete,
             cmd_google::gdrive_list,
+            cmd_google::contacts_list,
+            prefs::prefs_get,
+            prefs::prefs_set,
             gmail_alert::gmail_alerts_get,
             gmail_alert::gmail_alerts_set,
             cmd_weather::weather_get,

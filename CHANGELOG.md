@@ -7,6 +7,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Contatos, com a sua agenda do Google**: a People API, somente leitura (`contacts.readonly`), com o mesmo
+  login da Agenda. Mostra o total de contatos, busca ao digitar (nome, empresa, cargo, e-mail ou telefone, sem
+  ligar para acentos), filtros com contagem (Todos, Favoritos, Com e-mail, Com telefone), seções de A a Z com
+  avatar em iniciais e, ao abrir um contato, copiar e-mail ou telefone com um clique e abrir no Google Contatos.
+  Começa oculta, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar o
+  escopo novo, e a **People API** precisa estar ativa no projeto do Google Cloud.
+
 - **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
   nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
   que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
@@ -17,6 +24,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
   ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
   novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
+
+### Corrigido
+
+- **A atualização não apaga mais as abas que você deixou visíveis.** A escolha das abas (e o layout) só ficava no
+  armazenamento da webview, que pode voltar vazio depois de uma atualização, e então voltava o padrão. Agora ela
+  também é gravada em `preferencias.json`, ao lado do cofre, e restaurada na abertura quando a webview perdeu a
+  cópia; quando as duas existem, vale a da webview. Quem já usa a versão com a correção fica protegido da próxima
+  atualização em diante.
+- **O filtro "buscar ajuste" não cobre mais o menu das abas**: a barra lateral expandida passou a ficar acima do
+  campo fixo de busca de Ajustes.
 
 ### Alterado
 

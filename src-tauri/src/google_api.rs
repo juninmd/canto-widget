@@ -1,4 +1,4 @@
-//! Shared HTTP plumbing for Gmail, Google Tasks and Drive: one client and one reading of Google's refusals.
+//! Shared HTTP plumbing for Gmail, Google Tasks, Drive and Contacts: one client and one reading of Google's refusals.
 use std::time::Duration;
 
 use reqwest::blocking::{Client, RequestBuilder};
@@ -26,8 +26,8 @@ pub fn refusal(service: &str, status: u16, body: &str) -> AppError {
     {
         return AppError::Config(
             crate::lang::tr(
-                "reconecte o Google em Ajustes para liberar Gmail, Tarefas e Drive",
-                "reconnect Google in Settings to allow Gmail, Tasks and Drive",
+                "reconecte o Google em Ajustes para liberar Gmail, Tarefas, Drive e Contatos",
+                "reconnect Google in Settings to allow Gmail, Tasks, Drive and Contacts",
             )
             .into(),
         );

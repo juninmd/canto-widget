@@ -1,10 +1,10 @@
 {
   "google.connect.title": "Connect your Google account",
-  "google.connect.hint": "One sign-in for Agenda, Gmail, Google Tasks and Drive. The token stays in Canto's vault and never reaches this screen.",
+  "google.connect.hint": "One sign-in for Agenda, Gmail, Google Tasks, Drive and Contacts. The token stays in Canto's vault and never reaches this screen.",
   "google.connect.button": "Sign in with Google",
   "google.connect.busy": "finish signing in in the browser…",
   "google.reconnect.title": "A permission is missing",
-  "google.reconnect.hint": "Your account was connected before these integrations. Sign in again to allow Gmail, Google Tasks and Drive.",
+  "google.reconnect.hint": "Your account was connected before these integrations. Sign in again to allow Gmail, Google Tasks, Drive and Contacts.",
   "google.reconnect.button": "Reconnect Google",
   "google.refresh": "refresh",
   "google.fetching": "checking Google",

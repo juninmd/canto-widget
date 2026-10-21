@@ -53,5 +53,7 @@ fn google_login_reads_drive_metadata_only_and_the_calendar_read_only() {
     assert!(url.contains("auth%2Fdrive.metadata.readonly"), "{url}");
     assert!(!url.contains("auth%2Fdrive+") && !url.contains("auth%2Fdrive.file"), "{url}");
     assert!(url.contains("auth%2Fgmail.modify") && url.contains("auth%2Ftasks"), "{url}");
+    // The address book is read-only: the editing scope would let a bug rewrite the user's contacts.
+    assert!(url.contains("auth%2Fcontacts.readonly") && !url.contains("auth%2Fcontacts+"), "{url}");
     assert!(!url.contains("calendar+") && !url.contains("calendar&"), "agenda must be read-only: {url}");
 }

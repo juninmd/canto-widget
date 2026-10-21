@@ -32,7 +32,7 @@ test("the next meeting is the earliest one not over yet that has a call link", (
 function ctx(over: Partial<PaletteContext> = {}): PaletteContext {
   const noop = () => {};
   return {
-    tabs: TABS.filter((t) => !["gitlab", "gmail", "gdrive"].includes(t.id)),
+    tabs: TABS.filter((t) => !["gitlab", "gmail", "gdrive", "contacts"].includes(t.id)),
     privacy: false,
     nextMeeting: null,
     goTab: noop,

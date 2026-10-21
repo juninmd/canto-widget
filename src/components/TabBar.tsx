@@ -6,7 +6,7 @@ import TabMore, { TabBadge } from "./TabMore";
 
 export type Tab =
   | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "steam" | "status" | "models" | "agents"
-  | "weather" | "market" | "reads" | "activity" | "gmail" | "gdrive" | "settings";
+  | "weather" | "market" | "reads" | "activity" | "gmail" | "gdrive" | "contacts" | "settings";
 
 /** Grouped as the vertical bar shows them; Alt+1 to Alt+4 stay on the four oldest tabs. */
 export const TABS: { id: Tab; label: string }[] = [
@@ -16,6 +16,7 @@ export const TABS: { id: Tab; label: string }[] = [
   { id: "agenda", label: t("tabs.agenda") },
   { id: "gmail", label: "Gmail" },
   { id: "gdrive", label: "Drive" },
+  { id: "contacts", label: t("contacts.tab") },
   { id: "github", label: "GitHub" },
   { id: "gitlab", label: "GitLab" },
   { id: "status", label: t("tabs.status") },

@@ -37,6 +37,7 @@ import ReadsTab from "./components/ReadsTab";
 import MarketTab from "./components/MarketTab";
 import GmailTab from "./components/GmailTab";
 import GDriveTab from "./components/GDriveTab";
+import ContactsTab from "./components/ContactsTab";
 import StatusTab from "./components/StatusTab";
 import ModelsTab from "./components/ModelsTab";
 import ActivityTab from "./components/ActivityTab";
@@ -407,6 +408,7 @@ function Canto() {
               {tab === "market" && <MarketTab />}
               {tab === "gmail" && <GmailTab onNotice={(message) => notify({ message })} />}
               {tab === "gdrive" && <GDriveTab />}
+              {tab === "contacts" && <ContactsTab onNotice={(message) => notify({ message })} />}
               {tab === "reads" && <ReadsTab onError={setError} />}
               {tab === "activity" && <ActivityTab today={today} onError={setError} />}
               {tab === "settings" && (

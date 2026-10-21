@@ -198,6 +198,20 @@ export const GOOGLE = {
     { id: "g2", title: "Comprar presente da Lia", due: "2026-10-11" },
     { id: "g3", title: "Agendar revisão do notebook", due: "" },
   ],
+  contacts_list: {
+    total: 9,
+    items: [
+      { id: "c1", name: "Ana Beatriz Souza", emails: ["ana.souza@example.com"], phones: ["+55 11 91234-0001"], org: "Estúdio Aurora", title: "Designer", starred: true, link: "https://contacts.google.com/person/c1" },
+      { id: "c2", name: "Álvaro Teixeira", emails: ["alvaro@example.com"], phones: [], org: "Banco Aurora", title: "Gerente de contas", starred: false, link: "https://contacts.google.com/person/c2" },
+      { id: "c3", name: "Bruno Carvalho", emails: ["bruno@example.com", "bruno.c@example.org"], phones: ["+55 21 98888-0002"], org: "Vértice", title: "Tech lead", starred: true, link: "https://contacts.google.com/person/c3" },
+      { id: "c4", name: "Carla Mendes", emails: [], phones: ["+55 31 97777-0003"], org: "", title: "", starred: false, link: "https://contacts.google.com/person/c4" },
+      { id: "c5", name: "Marina Lopes", emails: ["marina@example.com"], phones: ["+55 11 95555-0004"], org: "Vértice", title: "Diretora", starred: true, link: "https://contacts.google.com/person/c5" },
+      { id: "c6", name: "Rafael Prado", emails: ["rafael@example.com"], phones: [], org: "Vértice", title: "", starred: false, link: "https://contacts.google.com/person/c6" },
+      { id: "c7", name: "Sofia Nogueira", emails: ["sofia@example.com"], phones: ["+55 41 96666-0005"], org: "Clínica Vale Azul", title: "Dentista", starred: false, link: "https://contacts.google.com/person/c7" },
+      { id: "c8", name: "Tiago Ribeiro", emails: ["tiago@example.com"], phones: [], org: "", title: "", starred: false, link: "https://contacts.google.com/person/c8" },
+      { id: "c9", name: "Zélia Andrade", emails: [], phones: ["+55 11 94444-0006"], org: "Condomínio Nimbus", title: "Síndica", starred: false, link: "https://contacts.google.com/person/c9" },
+    ],
+  },
   gdrive_list: [
     { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: "2026-10-09T09:20:00-03:00", starred: true, editor: "" },
     { id: "d2", name: "Orçamento casa 2026", kind: "sheet", link: "https://docs.google.com/spreadsheets/d/d2/edit", modified: "2026-10-08T20:10:00-03:00", starred: true, editor: "" },

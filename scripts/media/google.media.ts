@@ -5,9 +5,10 @@ const SHOTS: [string, string][] = [
   ["Gmail", "102-gmail"],
   ["Drive", "103-drive"],
   ["Tarefas", "104-google-tarefas"],
+  ["Contatos", "115-contatos"],
 ];
 
-test("gmail, drive e google tarefas", async ({ browser }) => {
+test("gmail, drive, google tarefas e contatos", async ({ browser }) => {
   const page = await fullScene(browser);
   for (const [tab, name] of SHOTS) {
     await openTab(page, tab);
