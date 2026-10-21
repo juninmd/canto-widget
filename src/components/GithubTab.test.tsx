@@ -91,7 +91,8 @@ test("expired token shows as an error in the tab, without breaking the rest", as
   responses.github_lists = () => Promise.reject("github: token expirado ou revogado; conecte de novo");
   await mount();
   expect(screen.getByRole("alert").textContent).toContain("token expirado");
-  expect(screen.getByText("desconectar")).toBeTruthy();
+  expect(screen.getByRole("button", { name: "mais ações" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "atualizar" })).toBeTruthy();
 });
 
 test("the card names who opened it only when it isn't me, and marks PR vs issue", async () => {
@@ -158,14 +159,40 @@ test("sort and order go to the search, so 500 issues come back in the order aske
   responses.github_lists = () => Promise.resolve(lists());
   await mount();
   await act(async () => {
-    fireEvent.change(screen.getByLabelText("ordenar por"), { target: { value: "comments" } });
+    fireEvent.click(screen.getByRole("button", { name: "ordenar por: atualização" }));
   });
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: /ordem decrescente/ }));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "comentários" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "ordenar por: comentários" }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("menuitem", { name: /ordem decrescente/ }));
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
   const last = calls.filter((c) => c.cmd === "github_lists").at(-1)?.args as { filter: { sort: string; order: string } };
   expect([last.filter.sort, last.filter.order]).toEqual(["comments", "asc"]);
+  expect(screen.getByRole("button", { name: "ordenar por: comentários" }).textContent).toContain("↑");
+});
+
+test("sorting and the text filter live on one row with the kind chips, behind a single sort button", async () => {
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists());
+  await mount();
+  expect(screen.queryByLabelText("ordenar por")).toBeNull();
+  const row = screen.getByRole("search").parentElement as HTMLElement;
+  expect(within(row).getByRole("group", { name: "Tipo" })).toBeTruthy();
+  expect(within(row).getByRole("button", { name: "ordenar por: atualização" })).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(within(row).getByRole("button", { name: "ordenar por: atualização" }));
+  });
+  const menu = screen.getByRole("menu", { name: "ordenação" });
+  expect(within(menu).getAllByRole("menuitemradio").map((o) => o.textContent)).toEqual(["✓atualização", "criação", "comentários"]);
+  expect(within(menu).getByRole("menuitemradio", { name: "atualização" }).getAttribute("aria-checked")).toBe("true");
+  fireEvent.keyDown(menu, { key: "Escape" });
+  expect(screen.queryByRole("menu")).toBeNull();
 });
 
 test("opening the tab uses the cache; only atualizar forces a trip to GitHub", async () => {
@@ -174,7 +201,7 @@ test("opening the tab uses the cache; only atualizar forces a trip to GitHub", a
   await mount();
   expect((calls.find((c) => c.cmd === "github_lists")?.args as { force: boolean }).force).toBe(false);
   await act(async () => {
-    fireEvent.click(screen.getByText("atualizar"));
+    fireEvent.click(screen.getByRole("button", { name: "atualizar" }));
   });
   expect((calls.filter((c) => c.cmd === "github_lists").at(-1)?.args as { force: boolean }).force).toBe(true);
 });

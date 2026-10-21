@@ -1,0 +1,22 @@
+// Textos do refinamento das telas GitHub/GitLab (resumo clicável, ordenação compacta) e Status API.
+export const uiForgeStatus = {
+  "uiForge.more": "mais ações",
+  "uiForge.sortButton": "ordenar por: {sort}",
+  "uiForge.sortMenu": "ordenação",
+  "uiForge.tileTitle": "mostrar só {label}; toque de novo para ver tudo",
+  "uiForge.focusEmpty": "nada neste recorte com o filtro atual",
+  "uiStatus.filter.label": "filtrar serviços por estado",
+  "uiStatus.filter.all": "Todos",
+  "uiStatus.filter.problems": "Com problema",
+  "uiStatus.filter.ok": "Operacionais",
+  "uiStatus.filter.maintenance": "Manutenção",
+  "uiStatus.filter.empty": "nenhum serviço neste filtro",
+  "uiStatus.bar": "{down} fora do ar, {warn} instáveis, {maint} em manutenção, {ok} operacionais",
+  "uiStatus.add": "+ endereço",
+  "uiStatus.emptyAdd": "adicionar endpoint",
+  "uiStatus.pills.label": "resumo dos endpoints",
+  "uiStatus.pill.down": "{n} fora",
+  "uiStatus.pill.slow": "{n} lentos",
+  "uiStatus.pill.cert": "{n} a vencer",
+  "uiStatus.count": "{n} endpoints",
+} as const;

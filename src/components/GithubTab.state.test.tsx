@@ -97,13 +97,17 @@ test("disconnecting asks inline first and only the confirmation drops the token"
     render(<GithubTab onError={() => {}} />);
   });
   await settle();
-  fireEvent.click(screen.getByRole("button", { name: "desconectar" }));
+  expect(screen.queryByText("desconectar")).toBeNull();
+  const openMenu = () => fireEvent.click(screen.getByRole("button", { name: "mais ações" }));
+  openMenu();
+  fireEvent.click(screen.getByRole("menuitem", { name: "desconectar" }));
   expect(screen.getByText("desconectar esta conta?")).toBeTruthy();
   expect(count("github_disconnect")).toBe(0);
   fireEvent.click(screen.getByRole("button", { name: "cancelar" }));
-  expect(screen.getByRole("button", { name: "desconectar" })).toBeTruthy();
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "mais ações" }));
   expect(count("github_disconnect")).toBe(0);
-  fireEvent.click(screen.getByRole("button", { name: "desconectar" }));
+  openMenu();
+  fireEvent.click(screen.getByRole("menuitem", { name: "desconectar" }));
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "sim, desconectar" }));
   });

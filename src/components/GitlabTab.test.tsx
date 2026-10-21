@@ -92,8 +92,9 @@ test("GitLab doesn't offer sorting by comments, which its API can't do", async (
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.com" });
   responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   await mount();
-  const options = [...(screen.getByLabelText("ordenar por") as HTMLSelectElement).options].map((o) => o.value);
-  expect(options).toEqual(["updated", "created"]);
+  fireEvent.click(screen.getByRole("button", { name: "ordenar por: atualização" }));
+  const options = screen.getAllByRole("menuitemradio").map((o) => o.textContent?.replace("✓", ""));
+  expect(options).toEqual(["atualização", "criação"]);
   expect(screen.getByRole("button", { name: "MRs" })).toBeTruthy();
 });
 
