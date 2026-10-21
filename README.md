@@ -318,6 +318,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![On a narrow window the last tabs go to a more menu instead of being cut; the open tab always stays on the bar](docs/prints/app/66-abas-mais.png) |
 
+| Vertical tabs: every tab in reach, in groups | Settings > Appearance: pick the tab layout |
+|---|---|
+| ![The vertical tab bar opened over the window: My day, Code and Explore groups, Settings at the bottom](docs/prints/app/102-abas-verticais.png) | ![Tab layout in Settings: two previews, Horizontal and Vertical, and a checkbox to keep the side bar open](docs/prints/app/103-abas-layout-ajustes.png) |
+
 | Games and full screen: alerts wait until you leave |
 |---|
 | ![Settings with the Games and full screen option: wait for full screen to end before alerting, so a pop-up or toast never minimizes a game](docs/prints/app/68-ajustes-tela-cheia.png) |

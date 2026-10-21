@@ -18,7 +18,7 @@ type Props = {
 export default function TabsSection({ hidden, onChange, layout, onLayout, pinned, onPinned }: Props) {
   const shown = HIDEABLE.filter((t) => !hidden.includes(t.id)).length;
   return (
-    <>
+    <div className="flex flex-col gap-3">
       <SettingsSection title={t("settings.tabs.layout")}>
         <TabLayoutPicker layout={layout} onLayout={onLayout} pinned={pinned} onPinned={onPinned} />
       </SettingsSection>
@@ -44,6 +44,6 @@ export default function TabsSection({ hidden, onChange, layout, onLayout, pinned
         </div>
         <p className="text-[11px] text-faint">{t("settings.tabs.hint")}</p>
       </SettingsSection>
-    </>
+    </div>
   );
 }

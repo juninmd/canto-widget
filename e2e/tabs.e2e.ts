@@ -115,7 +115,7 @@ test.describe("vertical layout", () => {
     await expect(tab.getByText("Notas")).toBeVisible();
     await page.mouse.move(300, 300);
     await expect(tab.getByText("Notas")).toBeHidden();
-    await page.getByRole("button", { name: "manter a barra aberta" }).click();
+    await page.getByRole("button", { name: "manter aberta" }).click();
     await page.mouse.move(300, 300);
     await expect(tab.getByText("Notas")).toBeVisible();
   });

@@ -56,10 +56,10 @@ test("Ajustes stays last, after the groups", () => {
 
 test("the pin button toggles and says what it will do", () => {
   render(<Harness />);
-  const pin = screen.getByRole("button", { name: "manter a barra aberta" });
+  const pin = screen.getByRole("button", { name: "manter aberta" });
   expect(pin.getAttribute("aria-pressed")).toBe("false");
   fireEvent.click(pin);
-  expect(screen.getByRole("button", { name: "recolher a barra" }).getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByRole("button", { name: "recolher barra" }).getAttribute("aria-pressed")).toBe("true");
 });
 
 test("hidden tabs leave the rail", () => {
