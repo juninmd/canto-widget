@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 let status: () => Promise<unknown>;
 let watched: string[] = [];
@@ -80,7 +80,7 @@ test("atualizar forces a fresh fetch instead of the cache", async () => {
   await show();
   calls.length = 0;
   await act(async () => {
-    fireEvent.click(screen.getByText("atualizar"));
+    fireEvent.click(screen.getByRole("button", { name: "atualizar" }));
   });
   expect(calls.find((c) => c.cmd === "api_status")?.args).toEqual({ force: true });
 });
@@ -103,16 +103,110 @@ test("a live outage from Statuspage is highlighted with its description even wit
   expect(screen.getByText(/Partial System Outage/)).toBeTruthy();
 });
 
-test("services are mini cards in a grid, and the header counts what is wrong", async () => {
+test("services are a single column with a labeled state pill, and the header counts what is wrong", async () => {
   const down = { ...aws, id: "npm", label: "npm", live: { indicator: "major", description: "Partial System Outage" } };
   const fine = { ...aws, id: "github", label: "GitHub", live: { indicator: "none", description: "All Systems Operational" } };
   status = () => Promise.resolve([down, fine]);
   await show();
-  expect(document.querySelector(".grid.grid-cols-2")).toBeTruthy();
+  expect(document.querySelector(".grid-cols-2")).toBeNull();
   expect(screen.getByText("npm").closest("section")?.getAttribute("data-level")).toBe("down");
   expect(screen.getByText("fora do ar")).toBeTruthy();
+  expect(screen.getByText("operacional")).toBeTruthy();
   expect(screen.getByText("GitHub").closest("section")?.getAttribute("data-level")).toBe("ok");
   expect(screen.getByText("1 com problema · 1 operacionais")).toBeTruthy();
+});
+
+const live = (indicator: string) => ({ indicator, description: indicator });
+const sections = () => [...document.querySelectorAll("section")].map((s) => s.querySelector(".font-semibold")?.textContent);
+
+test("services are sorted by severity: down, degraded or recent, maintenance, ok", async () => {
+  const recent = { ...claude, id: "recent", label: "Recente", items: [{ ...claude.items[0], published_at: Date.now() - 60_000 }] };
+  status = () =>
+    Promise.resolve([
+      { ...aws, id: "ok1", label: "Ok A", live: live("none") },
+      { ...aws, id: "mnt", label: "Manutenção X", live: live("maintenance") },
+      { ...aws, id: "deg", label: "Instável", live: live("minor") },
+      recent,
+      { ...aws, id: "dn", label: "Fora", live: live("critical") },
+      { ...aws, id: "ok2", label: "Ok B", live: live("none") },
+    ]);
+  await show();
+  expect(sections()).toEqual(["Fora", "Recente", "Instável", "Manutenção X", "Ok A", "Ok B"]);
+});
+
+test("a summary bar shows the states in proportion, and the filter chips carry the counts", async () => {
+  status = () =>
+    Promise.resolve([
+      { ...aws, id: "dn", label: "Fora", live: live("major") },
+      { ...aws, id: "deg", label: "Instável", live: live("minor") },
+      { ...aws, id: "mnt", label: "Obras", live: live("maintenance") },
+      { ...aws, id: "a", label: "A", live: live("none") },
+      { ...aws, id: "b", label: "B", live: live("none") },
+    ]);
+  await show();
+  expect(screen.getByRole("img", { name: "1 fora do ar, 1 instáveis, 1 em manutenção, 2 operacionais" })).toBeTruthy();
+  const chips = screen.getByRole("group", { name: "filtrar serviços por estado" });
+  expect(within(chips).getAllByRole("button").map((b) => b.textContent)).toEqual(["Todos5", "Com problema2", "Operacionais2", "Manutenção1"]);
+  expect(within(chips).getByRole("button", { name: /Todos/ }).getAttribute("aria-pressed")).toBe("true");
+});
+
+test("a filter chip narrows the list and pressing 'Todos' brings it back", async () => {
+  status = () =>
+    Promise.resolve([
+      { ...aws, id: "dn", label: "Fora", live: live("major") },
+      { ...aws, id: "mnt", label: "Obras", live: live("maintenance") },
+      { ...aws, id: "a", label: "A", live: live("none") },
+    ]);
+  await show();
+  const chip = (name: RegExp) => screen.getByRole("button", { name });
+  fireEvent.click(chip(/Com problema/));
+  expect(sections()).toEqual(["Fora"]);
+  expect(chip(/Com problema/).getAttribute("aria-pressed")).toBe("true");
+  fireEvent.click(chip(/Manutenção/));
+  expect(sections()).toEqual(["Obras"]);
+  fireEvent.click(chip(/Operacionais/));
+  expect(sections()).toEqual(["A"]);
+  fireEvent.click(chip(/Todos/));
+  expect(sections()).toEqual(["Fora", "Obras", "A"]);
+});
+
+test("a filter with nothing in it says so", async () => {
+  status = () => Promise.resolve([{ ...aws, id: "a", label: "A", live: live("none") }]);
+  await show();
+  fireEvent.click(screen.getByRole("button", { name: /Manutenção/ }));
+  expect(screen.getByText("nenhum serviço neste filtro")).toBeTruthy();
+});
+
+test("the bell is its own button: it never opens the incidents, and opening never toggles the alert", async () => {
+  const fine = { ...claude, id: "github", label: "GitHub", live: live("none") };
+  status = () => Promise.resolve([fine]);
+  await show();
+  const bell = screen.getByRole("button", { name: "avisar quando GitHub cair ou ficar instável" });
+  const expand = screen.getByRole("button", { name: /GitHub/, expanded: false });
+  expect(expand.contains(bell)).toBe(false);
+  await act(async () => {
+    fireEvent.click(bell);
+  });
+  expect(screen.queryByText(/Elevated latency/)).toBeNull();
+  calls.length = 0;
+  await act(async () => {
+    fireEvent.click(expand);
+  });
+  expect(screen.getByText(/Elevated latency/)).toBeTruthy();
+  expect(calls.some((c) => c.cmd === "status_alerts_set")).toBe(false);
+});
+
+test("the refresh and 'atualizado' controls share the row of the sub-tabs, and '+ endereço' replaces them on the other one", async () => {
+  await show();
+  const tabs = screen.getByRole("tablist", { name: "visão do status" });
+  const row = tabs.parentElement as HTMLElement;
+  expect(within(row).getByRole("button", { name: "atualizar" })).toBeTruthy();
+  expect(within(row).getByText(/atualizado/)).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("tab", { name: "meus endpoints" }));
+  });
+  expect(within(row).getByRole("button", { name: "+ endereço" })).toBeTruthy();
+  expect(within(row).queryByRole("button", { name: "atualizar" })).toBeNull();
 });
 
 test("the bell turns notifications on and off for a service with live status", async () => {

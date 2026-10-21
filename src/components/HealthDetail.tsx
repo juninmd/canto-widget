@@ -24,7 +24,7 @@ export default function HealthDetail({ view, busy, onClose, onChange, onCheck, o
   const days = certDays(samples);
   const set = (patch: Partial<HealthEndpoint>) => onChange({ ...e, ...patch });
   return (
-    <section aria-label={e.name} className="col-span-2 flex flex-col gap-2.5 rounded-xl border border-edge border-t-[3px] bg-panel p-3">
+    <section aria-label={e.name} className="flex flex-col gap-2.5 rounded-xl border border-edge border-t-[3px] bg-panel p-3">
       <button type="button" aria-expanded onClick={onClose} aria-label={t("health.collapse", { name: e.name })} className="canto-hit flex w-full items-center gap-2 text-left">
         <span className="min-w-0 flex-1">
           <b className="block text-sm [overflow-wrap:anywhere]">{e.name}</b>

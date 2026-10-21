@@ -20,7 +20,7 @@ export default function HealthForm({ onSave, onCancel }: { onSave: (e: HealthEnd
   }
 
   return (
-    <form onSubmit={submit} aria-label={t("health.newTitle")} className="col-span-2 flex flex-col gap-2 rounded-xl border border-accent bg-panel p-3 text-xs text-muted">
+    <form onSubmit={submit} aria-label={t("health.newTitle")} className="flex flex-col gap-2 rounded-xl border border-accent bg-panel p-3 text-xs text-muted">
       <div role="group" aria-label={t("health.field.kind")} className="flex">
         {KINDS.map((k, i) => (
           <button
