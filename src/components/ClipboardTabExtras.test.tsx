@@ -59,7 +59,7 @@ test("a skeleton shows instead of the empty state until the first list answers",
 
 async function openClear() {
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "mais ações do clipboard" }));
+    fireEvent.click(screen.getByRole("button", { name: "ações do clipboard" }));
   });
   await act(async () => {
     fireEvent.click(screen.getByRole("menuitem", { name: "Limpar histórico…" }));

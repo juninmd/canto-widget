@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { MoreIcon } from "./Icons";
 
-export type MenuAction = { label: string; onSelect: () => void; danger?: boolean; disabled?: boolean };
+export type MenuAction = { label: string; title?: string; onSelect: () => void; danger?: boolean; disabled?: boolean };
 
 const ICON_BUTTON = "canto-hit grid h-[28px] w-[28px] shrink-0 place-items-center rounded-lg text-muted hover:bg-hover hover:text-fg active:bg-active";
 const ITEM = "canto-hit flex min-h-[32px] w-full items-center rounded-lg px-2.5 text-left text-[12.5px] hover:bg-hover active:bg-active disabled:opacity-50";
@@ -57,6 +57,7 @@ export default function ClipAgendaMenu({ label, actions, footer }: { label: stri
               type="button"
               role="menuitem"
               disabled={a.disabled}
+              title={a.title}
               onClick={() => {
                 close();
                 a.onSelect();

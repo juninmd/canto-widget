@@ -67,9 +67,11 @@ test("without a Google account the empty state offers Ajustes; with one it just 
   expect(screen.queryByRole("button", { name: "Abrir Ajustes" })).toBeNull();
 });
 
-test("the header says when the agenda was last fetched", async () => {
+test("the menu and the refresh button say when the agenda was last fetched", async () => {
   render(<AgendaTab agenda={agenda({ items: [meeting], fetchedAt: new Date(2026, 8, 18, 9, 7).getTime() })} today={TODAY} onError={() => {}} />);
   await settle();
+  expect(screen.getByRole("button", { name: "atualizar" }).getAttribute("title")).toContain("atualizado às 09:07");
+  fireEvent.click(screen.getByRole("button", { name: "ações da agenda" }));
   expect(screen.getByText(/atualizado às 09:07/)).toBeTruthy();
 });
 

@@ -43,7 +43,7 @@ afterEach(cleanup);
 test("clear lives in the more-actions menu, which announces itself and closes on Escape", async () => {
   await show();
   expect(screen.queryByRole("button", { name: "limpar" })).toBeNull();
-  const more = screen.getByRole("button", { name: "mais ações do clipboard" });
+  const more = screen.getByRole("button", { name: "ações do clipboard" });
   expect(more.getAttribute("aria-haspopup")).toBe("menu");
   expect(more.getAttribute("aria-expanded")).toBe("false");
   await act(async () => {
@@ -63,7 +63,7 @@ test("the menu's clear entry is off when there is nothing to remove", async () =
   items = [clip("c3", "fixado", true)];
   await show();
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "mais ações do clipboard" }));
+    fireEvent.click(screen.getByRole("button", { name: "ações do clipboard" }));
   });
   expect((screen.getByRole("menuitem", { name: "Limpar histórico…" }) as HTMLButtonElement).disabled).toBe(true);
 });
