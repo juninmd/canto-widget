@@ -13,8 +13,8 @@ type Props = {
 };
 
 // The rail opens over the content on hover or focus, so the labels cost no width until someone wants them.
-const OPEN = "group-hover/rail:w-[178px] group-focus-within/rail:w-[178px] group-data-[pinned=true]/rail:w-[178px]";
-const SHOWN = "hidden group-hover/rail:inline group-focus-within/rail:inline group-data-[pinned=true]/rail:inline";
+const OPEN = "group-hover/rail:w-[178px] group-has-[:focus-visible]/rail:w-[178px] group-data-[pinned=true]/rail:w-[178px]";
+const SHOWN = "hidden group-hover/rail:inline group-has-[:focus-visible]/rail:inline group-data-[pinned=true]/rail:inline";
 
 /** The vertical twin of TabBar: the same WAI-ARIA tabs pattern with up/down arrows, and every tab always in reach. */
 export default function TabRail({ current, onChange, tabs, pinned, onPinned }: Props) {
@@ -104,7 +104,7 @@ export default function TabRail({ current, onChange, tabs, pinned, onPinned }: P
                     <span className={`${SHOWN} truncate text-[10px] font-semibold uppercase tracking-widest text-faint`}>
                       {t(`tabs.group.${heading}`)}
                     </span>
-                    <span className="h-px flex-1 bg-edge group-hover/rail:hidden group-focus-within/rail:hidden group-data-[pinned=true]/rail:hidden" />
+                    <span className="h-px flex-1 bg-edge group-hover/rail:hidden group-has-[:focus-visible]/rail:hidden group-data-[pinned=true]/rail:hidden" />
                   </div>
                 )}
                 {tabButton(tab)}

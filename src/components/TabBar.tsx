@@ -100,7 +100,7 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
 
   return (
     <div ref={row} className="relative flex shrink-0 items-center gap-0.5 px-3 pb-1 pt-1.5 text-xs">
-      <nav role="tablist" aria-label={t("tabs.label")} onKeyDown={onKeyDown} className="flex min-w-0 gap-0.5">
+      <nav role="tablist" aria-orientation="horizontal" aria-label={t("tabs.label")} onKeyDown={onKeyDown} className="flex min-w-0 gap-0.5">
         {kept.map((i) => {
           const tab = tabs[i];
           return (

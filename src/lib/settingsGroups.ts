@@ -23,7 +23,7 @@ const KEYWORDS: Record<SectionId, string> = {
   skin: "tema skin cor cores aparência theme color appearance",
   density: "densidade compacto espaçamento tamanho density compact spacing size",
   language: "idioma língua português inglês language english",
-  tabs: "abas esconder ocultar tabs hide",
+  tabs: "abas esconder ocultar tabs hide layout vertical horizontal lateral barra",
   reminders: "lembrete lembretes antecedência reminders lead",
   digest: "resumo do dia manhã bom dia reuniões tarefas revisões menções digest summary morning",
   dnd: "não perturbe silêncio silenciar foco do not disturb silence mute",
