@@ -500,6 +500,7 @@ Een fout gevonden? [SECURITY.md](SECURITY.md).
 | Document | Wat zit erin |
 |---|---|
 | 📖 [User guide](docs/uso.md) | tabbladen, terugkerende taken, snelkoppelingen, skins, toegankelijkheid, venster, updates en begin met het systeem |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda en GitHub (persoonlijke token- of apparaatstroom) |
 | 🛡️ [Security and data](docs/seguranca.md) | bedreigingsmodel, `.canto` back-up, samenvoegen, wachtwoord wijzigen, bestanden op schijf |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify en volumetests |

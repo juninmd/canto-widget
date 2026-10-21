@@ -500,6 +500,7 @@ Vai atradāt trūkumu? [SECURITY.md](SECURITY.md).
 | Dokuments | Kas tajā ir |
 |---|---|
 | 📖 [User guide](docs/uso.md) | cilnes, periodiski uzdevumi, saīsnes, apvalki, pieejamība, logs, atjauninājumi un sāciet ar sistēmu |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google darba kārtība un GitHub (personīgā pilnvara vai ierīces plūsma) |
 | 🛡️ [Security and data](docs/seguranca.md) | draudu modelis, `.canto` dublēšana, sapludināšana, paroles maiņa, faili diskā |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify un skaļuma testi |

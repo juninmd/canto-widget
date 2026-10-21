@@ -1,10 +1,10 @@
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { TOGGLE_LABEL } from "../lib/platform";
+import { IS_MOBILE, TOGGLE_LABEL } from "../lib/platform";
 import { PALETTE_KEYS } from "../lib/shortcuts";
 import type { Mode } from "../lib/windowMode";
 import { t } from "../i18n";
 import DndIndicator from "./DndIndicator";
-import { BellIcon, ExpandIcon, EyeIcon, EyeOffIcon, HelpIcon, LockIcon, MinimizeIcon, ShrinkIcon } from "./Icons";
+import { BellIcon, ExpandIcon, EyeIcon, EyeOffIcon, HelpIcon, LockIcon, MinimizeIcon, SearchIcon, ShrinkIcon } from "./Icons";
 import ModeSwitcher from "./ModeSwitcher";
 
 type Props = {
@@ -17,6 +17,8 @@ type Props = {
   /** Opens the alerts screen; the bell is the only way in, so it shows even with nothing pending. */
   onBell: () => void;
   onHelp: () => void;
+  /** Opens the global search; a phone has no Ctrl+K, so the header carries the way in. */
+  onSearch: () => void;
   onLock: () => void;
   onTogglePrivacy: () => void;
   onPickMode: (mode: Mode) => void;
@@ -24,7 +26,7 @@ type Props = {
   onError: (message: string) => void;
 };
 
-const BUTTON = "canto-hit grid size-7 place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active";
+const BUTTON = `canto-hit grid ${IS_MOBILE ? "size-10" : "size-7"} place-items-center rounded-lg hover:bg-hover hover:text-fg active:bg-active`;
 
 /** The title bar. It is a container: the lock label gives way below ~384 px so the buttons never push the drag area out. */
 export default function AppHeader(p: Props) {
@@ -70,21 +72,27 @@ export default function AppHeader(p: Props) {
                 </span>
               )}
             </button>
-            <button
-              type="button"
-              onClick={p.onHelp}
-              aria-label={t("app.shortcuts")}
-              title={t("app.shortcuts.title", { keys: PALETTE_KEYS.join("+") })}
-              className={BUTTON}
-            >
-              <HelpIcon />
-            </button>
+            {IS_MOBILE ? (
+              <button type="button" onClick={p.onSearch} aria-label={t("palette.globalSearch")} className={BUTTON}>
+                <SearchIcon />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={p.onHelp}
+                aria-label={t("app.shortcuts")}
+                title={t("app.shortcuts.title", { keys: PALETTE_KEYS.join("+") })}
+                className={BUTTON}
+              >
+                <HelpIcon />
+              </button>
+            )}
             <button
               type="button"
               onClick={p.onLock}
               aria-label={t("app.lock")}
               title={t("app.lock.title")}
-              className="canto-hit inline-flex h-7 items-center gap-1.5 rounded-lg px-2 hover:bg-hover hover:text-fg active:bg-active"
+              className={`canto-hit inline-flex ${IS_MOBILE ? "h-10" : "h-7"} items-center gap-1.5 rounded-lg px-2 hover:bg-hover hover:text-fg active:bg-active`}
             >
               <LockIcon />
               <span className="hidden @[24rem]:inline">{t("app.lock")}</span>
@@ -101,26 +109,30 @@ export default function AppHeader(p: Props) {
             </button>
           </>
         )}
-        <ModeSwitcher mode={p.mode} onPick={p.onPickMode} />
-        <button
-          type="button"
-          onClick={p.onToggleFullscreen}
-          aria-pressed={fullscreen}
-          aria-label={fullscreen ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
-          title={fullscreen ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
-          className={BUTTON}
-        >
-          {fullscreen ? <ShrinkIcon /> : <ExpandIcon />}
-        </button>
-        <button
-          type="button"
-          onClick={() => void getCurrentWindow().hide()}
-          className={BUTTON}
-          title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
-          aria-label={t("app.hide")}
-        >
-          <MinimizeIcon />
-        </button>
+        {!IS_MOBILE && (
+          <>
+            <ModeSwitcher mode={p.mode} onPick={p.onPickMode} />
+            <button
+              type="button"
+              onClick={p.onToggleFullscreen}
+              aria-pressed={fullscreen}
+              aria-label={fullscreen ? t("app.fullscreen.exit") : t("app.fullscreen.enter")}
+              title={fullscreen ? t("app.fullscreen.exitTitle") : t("app.fullscreen.enterTitle")}
+              className={BUTTON}
+            >
+              {fullscreen ? <ShrinkIcon /> : <ExpandIcon />}
+            </button>
+            <button
+              type="button"
+              onClick={() => void getCurrentWindow().hide()}
+              className={BUTTON}
+              title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
+              aria-label={t("app.hide")}
+            >
+              <MinimizeIcon />
+            </button>
+          </>
+        )}
       </div>
     </header>
   );

@@ -2,6 +2,7 @@
 //! the matching global shortcut, and the taskbar badge (review-requested PRs/MRs + open tasks + unread mentions).
 use std::time::Duration;
 
+#[cfg(desktop)]
 use tauri::menu::MenuItem;
 use tauri::{AppHandle, Manager, State};
 use time::format_description::well_known::Rfc3339;
@@ -18,6 +19,7 @@ const TICK: Duration = Duration::from_secs(90);
 const LOOKAHEAD_MS: i64 = 6 * 60 * 60 * 1000;
 
 /// Kept in `AppHandle` state so the background thread and the tray's menu-click handler share it.
+#[cfg(desktop)]
 pub struct JoinMenuItem(pub MenuItem<tauri::Wry>);
 
 #[tauri::command]
@@ -82,6 +84,10 @@ pub fn refresh_join_label(app: &AppHandle) {
     update_menu(app, meeting.as_ref());
 }
 
+#[cfg(not(desktop))]
+fn update_menu(_app: &AppHandle, _meeting: Option<&AgendaItem>) {}
+
+#[cfg(desktop)]
 fn update_menu(app: &AppHandle, meeting: Option<&AgendaItem>) {
     let Some(item) = app.try_state::<JoinMenuItem>() else { return };
     let (text, enabled) = match meeting {

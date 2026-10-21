@@ -500,6 +500,7 @@ Našli jste chybu? [SECURITY.md](SECURITY.md).
 | Dokument | Co je v něm |
 |---|---|
 | 📖 [User guide](docs/uso.md) | karty, opakující se úlohy, zástupce, vzhledy, usnadnění, okna, aktualizace a start se systémem |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda a GitHub (osobní token nebo tok zařízení) |
 | 🛡️ [Security and data](docs/seguranca.md) | model ohrožení, `.canto` zálohování, sloučení, změna hesla, soubory na disku |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify a objemové testy |

@@ -500,6 +500,7 @@ Trobeu un defecte? [SECURITY.md](SECURITY.md).
 | Document | Què hi ha dins |
 |---|---|
 | 📖 [User guide](docs/uso.md) | pestanyes, tasques recurrents, dreceres, aspectes, accessibilitat, finestra, actualitzacions i començar amb el sistema |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda i GitHub (token personal o flux de dispositiu) |
 | 🛡️ [Security and data](docs/seguranca.md) | model d'amenaça, `.canto` còpia de seguretat, fusió, canvi de contrasenya, fitxers al disc |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify i proves de volum |

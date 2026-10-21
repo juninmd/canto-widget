@@ -500,6 +500,7 @@ Ați găsit un defect? [SECURITY.md](SECURITY.md).
 | Document | Ce este în el |
 |---|---|
 | 📖 [User guide](docs/uso.md) | file, sarcini recurente, comenzi rapide, skinuri, accesibilitate, fereastră, actualizări și începe cu sistemul |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda și GitHub (jeton personal sau flux de dispozitiv) |
 | 🛡️ [Security and data](docs/seguranca.md) | model de amenințare, `.canto` backup, îmbinare, schimbarea parolei, fișiere de pe disc |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify și teste de volum |

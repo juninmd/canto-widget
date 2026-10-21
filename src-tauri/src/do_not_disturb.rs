@@ -6,6 +6,7 @@ use std::sync::Mutex;
 use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
+#[cfg(desktop)]
 use tauri::menu::MenuItem;
 use tauri::{AppHandle, Emitter, Manager, State};
 
@@ -16,6 +17,7 @@ use crate::model::now_ms;
 const FILE: &str = "nao_perturbe.json";
 pub const EVENT: &str = "canto://dnd";
 pub const TRAY_ITEM_ID: &str = "dnd";
+#[cfg(desktop)]
 const TRAY_MS: i64 = 60 * 60 * 1000;
 /// "Until tomorrow" chosen late at night still fits; anything longer is a bad value, not a choice.
 pub const MAX_AHEAD_MS: i64 = 48 * 60 * 60 * 1000;
@@ -102,6 +104,7 @@ pub fn quiet(app: &AppHandle) -> bool {
     silenced(app.try_state::<DoNotDisturb>().as_deref(), now_ms())
 }
 
+#[cfg(desktop)]
 pub struct DndMenuItem(pub MenuItem<tauri::Wry>);
 
 pub fn tray_label(state: DndState) -> &'static str {
@@ -116,9 +119,10 @@ pub fn current(app: &AppHandle) -> DndState {
     app.try_state::<DoNotDisturb>().map_or(OFF, |d| d.state_at(now_ms()))
 }
 
-pub fn refresh_tray(app: &AppHandle) {
-    if let Some(item) = app.try_state::<DndMenuItem>() {
-        let _ = item.0.set_text(tray_label(current(app)));
+pub fn refresh_tray(_app: &AppHandle) {
+    #[cfg(desktop)]
+    if let Some(item) = _app.try_state::<DndMenuItem>() {
+        let _ = item.0.set_text(tray_label(current(_app)));
     }
 }
 
@@ -134,6 +138,7 @@ fn apply(app: &AppHandle, quiet: Option<Quiet>) -> Result<DndState> {
     Ok(state)
 }
 
+#[cfg(desktop)]
 pub fn tray_toggle(app: &AppHandle) {
     let next = (!current(app).active).then(|| Quiet { until_ms: Some(now_ms() + TRAY_MS) });
     if let Err(e) = apply(app, next) {

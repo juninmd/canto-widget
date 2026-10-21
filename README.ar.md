@@ -500,6 +500,7 @@ OneDrive، Syncthing...)، ابدأ بالنظام وقسم **التحديثات
 | وثيقة | ما فيه |
 |---|---|
 | 📖 [User guide](docs/uso.md) | علامات التبويب والمهام المتكررة والاختصارات والجلود وإمكانية الوصول والنافذة والتحديثات والبدء بالنظام |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google جدول الأعمال و GitHub (الرمز الشخصي أو تدفق الجهاز) |
 | 🛡️ [Security and data](docs/seguranca.md) | نموذج التهديد، `.canto` النسخ الاحتياطي، الدمج، تغيير كلمة المرور، الملفات الموجودة على القرص |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist، TickTick، Obsidian، Joplin، Raycast، PowerToys، CopyQ، Ditto، MeetingBar، Gitify واختبارات مستوى الصوت |

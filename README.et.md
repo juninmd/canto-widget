@@ -500,6 +500,7 @@ Leidsid vea? [SECURITY.md](SECURITY.md).
 | Dokument | Mis selles on |
 |---|---|
 | 📖 [User guide](docs/uso.md) | vahelehed, korduvad ülesanded, otseteed, nahad, juurdepääsetavus, aken, värskendused ja alustage süsteemiga |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google päevakord ja GitHub (isiklik luba või seadme voog) |
 | 🛡️ [Security and data](docs/seguranca.md) | ohumudel, `.canto` varundamine, ühendamine, parooli muutmine, failid kettal |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify ja helitugevuse testid |

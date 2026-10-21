@@ -1,4 +1,6 @@
-use tauri::{Manager, State};
+#[cfg(desktop)]
+use tauri::Manager;
+use tauri::State;
 
 use crate::biometric;
 use crate::error::{AppError, Result};
@@ -40,7 +42,14 @@ mod platform {
 #[cfg(not(any(windows, target_os = "macos")))]
 use platform::{available, create, delete, NAME, VAULT};
 
+/// Mobile has no always-on-top window to step aside from.
+#[cfg(not(desktop))]
+fn without_always_on_top<T>(_app: &tauri::AppHandle, f: impl FnOnce() -> T) -> T {
+    f()
+}
+
 /// The system prompt opens behind an "always on top" window; release it during the gesture.
+#[cfg(desktop)]
 fn without_always_on_top<T>(app: &tauri::AppHandle, f: impl FnOnce() -> T) -> T {
     let win = app.get_webview_window("main");
     let always_on_top = app.state::<crate::window_state::WindowState>().cfg().always_on_top;

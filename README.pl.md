@@ -500,6 +500,7 @@ Znalazłeś wadę? [SECURITY.md](SECURITY.md).
 | Dokument | Co w tym jest |
 |---|---|
 | 📖 [User guide](docs/uso.md) | zakładki, zadania cykliczne, skróty, skórki, dostępność, okno, aktualizacje i start z systemem |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google program i GitHub (przepływ tokena osobistego lub urządzenia) |
 | 🛡️ [Security and data](docs/seguranca.md) | model zagrożenia, kopia zapasowa `.canto`, scalanie, zmiana hasła, pliki na dysku |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify i testy wolumenowe |

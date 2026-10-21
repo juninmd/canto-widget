@@ -16,6 +16,7 @@ import ClipKindChips, { type KindFilter } from "./ClipKindChips";
 import ClipAgendaMenu from "./ClipAgendaMenu";
 import { useCopied } from "../lib/useCopied";
 import { useWindowVisible } from "../lib/useWindowVisible";
+import { IS_MOBILE } from "../lib/platform";
 import { ClipboardIcon, SearchIcon } from "./Icons";
 
 type Props = { privacy: boolean; initialQuery?: string; querySeq?: number; onError: (m: string) => void };
@@ -71,6 +72,16 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, visibleWindow]);
+
+  // A phone has no background watcher: what was copied elsewhere is picked up when the tab is on screen.
+  useEffect(() => {
+    if (!IS_MOBILE || !visibleWindow) return;
+    void api
+      .clipCapture()
+      .then(() => reload(query))
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleWindow]);
 
   const undoable = useUndo(onError, () => reload());
   // The clipboard watcher brings in new items every 2.5s: they slide in at the top.

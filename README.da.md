@@ -500,6 +500,7 @@ Har du fundet en fejl? [SECURITY.md](SECURITY.md).
 | Dokument | Hvad er der i det |
 |---|---|
 | 📖 [User guide](docs/uso.md) | faner, tilbagevendende opgaver, genveje, skins, tilgængelighed, vindue, opdateringer og start med systemet |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google dagsorden og GitHub (personligt token eller enhedsflow) |
 | 🛡️ [Security and data](docs/seguranca.md) | trusselmodel, `.canto` backup, fletning, ændring af adgangskode, filer på disk |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify og volumentest |

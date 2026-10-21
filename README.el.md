@@ -500,6 +500,7 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 | Έγγραφο | Τι έχει |
 |---|---|
 | 📖 [User guide](docs/uso.md) | καρτέλες, επαναλαμβανόμενες εργασίες, συντομεύσεις, εμφανίσεις, προσβασιμότητα, παράθυρο, ενημερώσεις και έναρξη με το σύστημα |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google ατζέντα και GitHub (προσωπικό διακριτικό ή ροή συσκευής) |
 | 🛡️ [Security and data](docs/seguranca.md) | μοντέλο απειλής, `.canto` αντίγραφο ασφαλείας, συγχώνευση, αλλαγή κωδικού πρόσβασης, αρχεία στο δίσκο |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify και δοκιμές όγκου |

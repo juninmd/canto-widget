@@ -500,6 +500,7 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 | ஆவணம் | இதில் என்ன இருக்கிறது |
 |---|---|
 | 📖 [User guide](docs/uso.md) | தாவல்கள், தொடர்ச்சியான பணிகள், குறுக்குவழிகள், தோல்கள், அணுகல்தன்மை, சாளரம், புதுப்பிப்புகள் மற்றும் கணினியுடன் தொடங்கவும் |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google நிகழ்ச்சி நிரல் மற்றும் GitHub (தனிப்பட்ட டோக்கன் அல்லது சாதன ஓட்டம்) |
 | 🛡️ [Security and data](docs/seguranca.md) | அச்சுறுத்தல் மாதிரி, `.canto` காப்புப்பிரதி, ஒன்றிணைத்தல், கடவுச்சொல் மாற்றம், வட்டில் உள்ள கோப்புகள் |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify மற்றும் தொகுதி சோதனைகள் |

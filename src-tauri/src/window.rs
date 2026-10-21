@@ -45,6 +45,7 @@ pub fn show(app: &tauri::AppHandle) -> tauri::Result<()> {
     let Some(win) = app.get_webview_window("main") else {
         return Ok(());
     };
+    #[cfg(desktop)]
     crate::window_state::place(&win)?;
     win.show()?;
     win.set_focus()?;
@@ -77,6 +78,7 @@ pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()
 /// Brings the pending alerts to the user: in mini mode the dock lists them (a pop-up would cover the edge strip
 /// the user chose to live with), otherwise the pop-up window shows.
 pub fn present_pending(app: &tauri::AppHandle) -> tauri::Result<()> {
+    #[cfg(desktop)]
     if crate::window_mode::mini_active(app) {
         return app.emit(ALERT_EVENT, ());
     }

@@ -5,12 +5,13 @@ use std::time::Duration;
 use tauri::{AppHandle, Manager};
 
 use crate::vault::AppState;
-use crate::{autolock, backup, sync, window_state};
+use crate::{autolock, backup, sync};
 
 /// Frozen event name: the frontend listens for this literal in `App.tsx`.
 pub const AUTO_LOCK_EVENT: &str = "canto://auto-lock";
 
 const IDLE_POLL: Duration = Duration::from_secs(20);
+#[cfg(desktop)]
 const WINDOW_STATE_POLL: Duration = Duration::from_secs(2);
 const BACKUP_POLL: Duration = Duration::from_secs(30 * 60);
 const SYNC_POLL: Duration = Duration::from_secs(5 * 60);
@@ -18,6 +19,7 @@ const SYNC_POLL: Duration = Duration::from_secs(5 * 60);
 /// Starts all four watchers; called once from `setup()`.
 pub fn start(app: AppHandle, dir: PathBuf) {
     watch_idle(app.clone());
+    #[cfg(desktop)]
     watch_window_state(app.clone(), dir.clone());
     watch_backup(dir);
     watch_sync(app);
@@ -49,10 +51,11 @@ pub fn lock_from_tray(app: &AppHandle) {
 }
 
 /// Position and size hit disk at most every 2s, not on every dragged pixel.
+#[cfg(desktop)]
 fn watch_window_state(app: AppHandle, dir: PathBuf) {
     std::thread::spawn(move || loop {
         std::thread::sleep(WINDOW_STATE_POLL);
-        if let Err(e) = app.state::<window_state::WindowState>().save_if_dirty(&dir) {
+        if let Err(e) = app.state::<crate::window_state::WindowState>().save_if_dirty(&dir) {
             eprintln!("posicao da janela nao gravou: {e}");
         }
     });

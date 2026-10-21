@@ -500,6 +500,7 @@ Tìm thấy một lỗ hổng? [SECURITY.md](SECURITY.md).
 | Tài liệu | Có gì trong đó |
 |---|---|
 | 📖 [User guide](docs/uso.md) | tab, tác vụ định kỳ, phím tắt, giao diện, khả năng truy cập, cửa sổ, cập nhật và bắt đầu với hệ thống |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google chương trình làm việc và GitHub (mã thông báo cá nhân hoặc luồng thiết bị) |
 | 🛡️ [Security and data](docs/seguranca.md) | mô hình mối đe dọa, sao lưu `.canto`, hợp nhất, thay đổi mật khẩu, tập tin trên đĩa |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetBar, Gitify và kiểm tra âm lượng |

@@ -15,7 +15,7 @@ serde_json = "1"
 
 [dependencies]
 # macos-private-api: sem ela o macOS ignora `transparent` e pinta o fundo da janela.
-tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
+tauri = { version = "2", features = ["macos-private-api"] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 # preserve_order: the JSON clipboard transforms must not reorder a user's keys.
@@ -35,11 +35,8 @@ url = "2"
 # Local wall-clock time for task reminders; already in the tree via feed-rs.
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 time = "0.3"
-tauri-plugin-global-shortcut = "2.3.2"
 tauri-plugin-clipboard-manager = "2.3.3"
-tauri-plugin-autostart = "2"
 tauri-plugin-dialog = "2.7.3"
-tauri-plugin-single-instance = "2.4.4"
 tauri-plugin-notification = "2"
 
 [features]
@@ -62,9 +59,19 @@ windows = { version = "0.62", features = [
 ] }
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+# Tray, global shortcut, autostart, single instance and the updater have no mobile counterpart.
+tauri = { version = "2", features = ["tray-icon", "macos-private-api"] }
+tauri-plugin-global-shortcut = "2.3.2"
+tauri-plugin-autostart = "2"
+tauri-plugin-single-instance = "2.4.4"
 # Sem o recurso `zip`, que só serve a pacotes comprimidos (Tauri v1): o manifesto publica o .exe do NSIS e o
 # AppImage puros (scripts/release-manifest.ts), e o zip 4.x vulnerável (RUSTSEC-2026-0367/68/69) sai da árvore.
 tauri-plugin-updater = { version = "2", default-features = false, features = ["rustls-tls", "system-proxy"] }
+
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+# The pickers hand back content URIs and security-scoped URLs, which only this plugin can open (picked.rs); the
+# dialog plugin already pulls the same version into the tree.
+tauri-plugin-fs = "2"
 
 [target.'cfg(target_os = "macos")'.dependencies]
 # Keychain access for Touch ID (hello_mac.rs): MIT/Apache-2.0, maintained by kornelski.

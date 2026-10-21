@@ -5,6 +5,7 @@ use tauri_plugin_clipboard_manager::ClipboardExt;
 use serde::Serialize;
 
 use crate::calendar::{self, AgendaItem};
+#[cfg(desktop)]
 use crate::clip_watch::ClipWatch;
 use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use crate::commands::new_id;
@@ -88,7 +89,24 @@ fn store_clips(state: &AppState, items: Vec<ClipItem>) -> Option<String> {
     state.store_in_trash(Removed::Clips(items))
 }
 
+/// A phone reads the clipboard only when asked: iOS shows a paste banner on each read, and Android flags reads
+/// done from the background. The UI asks when the person opens the clipboard tab.
+#[tauri::command(async)]
+pub fn clip_capture(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
+    if let Some(text) = app.clipboard().read_text().ok().filter(|_| !crate::clip_os::concealed()) {
+        state.clip_update(|hist| Ok(((), hist.push(&text, new_id()))))?;
+    }
+    Ok(())
+}
+
+#[cfg(mobile)]
+pub fn watch_clipboard(_app: tauri::AppHandle) {}
+
 /// Only decrypts the history when the text actually changed, else it would pay a read + AES-GCM of the whole file 50 times a minute.
+#[cfg(desktop)]
 pub fn watch_clipboard(app: tauri::AppHandle) {
     std::thread::spawn(move || {
         let mut seen = ClipWatch::default();

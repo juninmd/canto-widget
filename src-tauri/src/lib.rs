@@ -4,6 +4,7 @@ pub mod activity_os;
 pub mod activity_watch;
 pub mod alert_log;
 pub mod autolock;
+#[cfg(desktop)]
 pub mod autostart;
 pub mod background;
 pub mod backup;
@@ -12,6 +13,7 @@ pub mod biometric;
 pub mod blocking;
 pub mod calendar;
 pub mod calendar_event;
+#[cfg(desktop)]
 pub mod capture;
 pub mod checks_cache;
 pub mod clip_os;
@@ -65,6 +67,7 @@ pub mod gitlab;
 pub mod gitlab_query;
 pub mod gitlab_todos;
 pub mod gitlab_work;
+#[cfg(desktop)]
 pub mod global_shortcuts;
 pub mod gmail;
 pub mod gmail_alert;
@@ -109,6 +112,7 @@ pub mod own_work_github;
 pub mod own_work_gitlab;
 pub mod password;
 pub mod paste_plain;
+pub mod picked;
 pub mod plain_text;
 pub mod pr_state;
 pub mod prefs;
@@ -145,18 +149,24 @@ pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
 pub mod unlock_log;
+#[cfg(desktop)]
 pub mod updater;
 pub mod vault;
 pub mod weather;
 pub mod weather_state;
 pub mod window;
+#[cfg(desktop)]
 pub mod window_mode;
+#[cfg(desktop)]
 pub mod window_state;
 pub mod work_events;
 
+#[cfg(desktop)]
 pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
 
+#[cfg(desktop)]
 use tauri::menu::{Menu, MenuItem};
+#[cfg(desktop)]
 use tauri::tray::TrayIconBuilder;
 use tauri::Manager;
 
@@ -164,17 +174,22 @@ use crate::vault::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
-        // Must be first: with autostart, reopening the app would create another tray and clipboard.json watcher.
+    let builder = tauri::Builder::default();
+    // Must be first: with autostart, reopening the app would create another tray and clipboard.json watcher.
+    #[cfg(desktop)]
+    let builder = builder
         .plugin(tauri_plugin_single_instance::init(|app, _args, _cwd| {
             let _ = window::show(app);
         }))
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_autostart::Builder::new().args([autostart::ARG_AUTOSTART]).build());
+    #[cfg(mobile)]
+    let builder = builder.plugin(tauri_plugin_fs::init());
+    builder
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .plugin(tauri_plugin_updater::Builder::new().build())
-        .plugin(tauri_plugin_autostart::Builder::new().args([autostart::ARG_AUTOSTART]).build())
         .setup(|app| {
             // A tray widget: no Dock icon or Cmd+Tab entry (`skipTaskbar` is a no-op on macOS). The bundle's
             // Info.plist (LSUIElement) covers launch; this covers `tauri dev` and any later policy reset.
@@ -209,13 +224,19 @@ pub fn run() {
             app.manage(fullscreen_guard::FullscreenHold::load(&dir));
             app.manage(task_reminder::ReminderLead::default());
             app.manage(steam_alert::SteamAlerts::default());
-            app.manage(updater::PendingUpdate::default());
-            app.manage(window_state::WindowState::load(&dir));
-            global_shortcuts::register(app.handle())?;
-            build_tray(app.handle())?;
+            #[cfg(desktop)]
+            {
+                app.manage(updater::PendingUpdate::default());
+                app.manage(window_state::WindowState::load(&dir));
+                global_shortcuts::register(app.handle())?;
+                build_tray(app.handle())?;
+            }
             startup::create_windows(app.handle())?;
+            #[cfg(mobile)]
+            notification::ask_permission(app.handle().clone());
             background::start(app.handle().clone(), dir.clone());
             cmd_extras::watch_clipboard(app.handle().clone());
+            #[cfg(desktop)]
             tray_live::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
@@ -233,12 +254,13 @@ pub fn run() {
             morning_digest::watch(app.handle().clone());
             activity_watch::watch(app.handle().clone());
             // Debug build depends on vite being up: registering it on boot would open a broken widget.
-            #[cfg(not(debug_assertions))]
+            #[cfg(all(desktop, not(debug_assertions)))]
             if let Err(e) = autostart::ensure_default(app.handle()) {
                 // The OS registration being unavailable must not stop the widget from opening.
                 eprintln!("autostart indisponivel: {e}");
             }
 
+            #[cfg(desktop)]
             if let Some(win) = app.get_webview_window("main") {
                 win.set_always_on_top(app.state::<window_state::WindowState>().cfg().always_on_top)?;
                 // Otherwise the global shortcut can't bring the widget over another app's fullscreen Space.
@@ -255,6 +277,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             commands::vault_status,
+            #[cfg(desktop)]
             capture::capture_close,
             commands::vault_create,
             commands::vault_unlock,
@@ -297,6 +320,7 @@ pub fn run() {
             cmd_drive::drive_connect,
             cmd_extras::clip_list,
             cmd_extras::clip_copy,
+            cmd_extras::clip_capture,
             cmd_extras::clip_copy_as,
             cmd_extras::clip_pin,
             cmd_extras::clip_delete,
@@ -319,9 +343,13 @@ pub fn run() {
             cmd_alerts::main_show,
             snooze::alert_snooze,
             cmd_extras::open_link,
+            #[cfg(desktop)]
             autostart::autostart_status,
+            #[cfg(desktop)]
             updater::update_check,
+            #[cfg(desktop)]
             updater::update_install,
+            #[cfg(desktop)]
             autostart::autostart_set,
             autolock::autolock_get,
             autolock::autolock_set,
@@ -336,10 +364,15 @@ pub fn run() {
             cmd_biometric::biometric_enable,
             cmd_biometric::biometric_unlock,
             cmd_biometric::biometric_disable,
+            #[cfg(desktop)]
             window_state::window_config,
+            #[cfg(desktop)]
             window_state::window_set_always_on_top,
+            #[cfg(desktop)]
             window_state::window_reset,
+            #[cfg(desktop)]
             window_mode::window_mini_set,
+            #[cfg(desktop)]
             window_mode::window_mini_resize,
             cmd_github::github_status,
             cmd_github::github_save_token,
@@ -423,25 +456,34 @@ pub fn run() {
             guest_photos::guest_photos,
             tray_live::badge_set_tasks,
         ])
-        .on_window_event(|win, event| match event {
-            // Closing hides the widget; quitting for real only from the tray.
-            tauri::WindowEvent::CloseRequested { api, .. } => {
-                api.prevent_close();
-                let _ = win.hide();
-            }
-            // Quick capture is a transient pop-up: left behind on top of other apps it covers what is under it.
-            tauri::WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW => {
-                let _ = win.hide();
-            }
-            tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {
-                window_state::record(win);
-            }
-            _ => {}
+        .on_window_event(|_win, _event| {
+            #[cfg(desktop)]
+            on_window_event(_win, _event);
         })
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o Canto");
 }
 
+#[cfg(desktop)]
+fn on_window_event(win: &tauri::Window, event: &tauri::WindowEvent) {
+    match event {
+        // Closing hides the widget; quitting for real only from the tray.
+        tauri::WindowEvent::CloseRequested { api, .. } => {
+            api.prevent_close();
+            let _ = win.hide();
+        }
+        // Quick capture is a transient pop-up: left behind on top of other apps it covers what is under it.
+        tauri::WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW => {
+            let _ = win.hide();
+        }
+        tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {
+            window_state::record(win);
+        }
+        _ => {}
+    }
+}
+
+#[cfg(desktop)]
 fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
     let toggle = MenuItem::with_id(app, "toggle", lang::toggle_label(), true, None::<&str>)?;
     let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, tray_live::no_meeting_label(), false, None::<&str>)?;

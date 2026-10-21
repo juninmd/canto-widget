@@ -613,6 +613,15 @@ Ready-made manifests for winget and Homebrew (plus a skeleton for Flatpak, curre
 [`packaging/`](packaging/README.md) — prepared and verified locally, but not yet published to those
 repositories: publishing is a manual decision and action by the maintainer.
 
+## 📱 On your phone
+
+The same code also builds for **Android and iOS** (Tauri v2 Mobile): same encrypted vault, same tabs and alerts,
+in a full-screen layout with the tabs in a bottom bar. Desktop-only pieces (floating window, tray, global
+shortcuts, Activity, synced folder, in-app updates) are left out, and there is no biometric unlock yet. Build
+steps, differences and limits: [docs/mobile.md](docs/mobile.md).
+
+<img src="docs/prints/mobile/01-tarefas.png" alt="Tasks on a phone: capture field, next task with a timer, the day's tasks and the bottom tab bar" width="200"> <img src="docs/prints/mobile/02-abas.png" alt="The tab sheet opened from the bottom bar" width="200"> <img src="docs/prints/mobile/03-ajustes.png" alt="Settings on a phone, without the desktop-only sections" width="200">
+
 ## 🔒 Security at a glance
 
 | Layer | Protection |
@@ -633,6 +642,7 @@ Found a flaw? [SECURITY.md](SECURITY.md).
 | Document | What's in it |
 |---|---|
 | 📖 [User guide](docs/uso.md) | tabs, recurring tasks, shortcuts, skins, accessibility, window, updates and start with the system |
+| 📱 [Mobile](docs/mobile.md) | the Android and iOS apps: what is the same, what is left out, how to build |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda and GitHub (personal token or device flow) |
 | 🛡️ [Security and data](docs/seguranca.md) | threat model, `.canto` backup, merge, password change, files on disk |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify and volume tests |

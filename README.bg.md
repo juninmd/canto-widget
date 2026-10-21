@@ -500,6 +500,7 @@ OneDrive, Syncthing...), започнете със системата и раз�
 | Документ | Какво има в него |
 |---|---|
 | 📖 [User guide](docs/uso.md) | раздели, повтарящи се задачи, преки пътища, кожи, достъпност, прозорец, актуализации и стартиране със системата |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google дневен ред и GitHub (личен токен или поток на устройство) |
 | 🛡️ [Security and data](docs/seguranca.md) | модел на заплаха, `.canto` архивиране, сливане, промяна на парола, файлове на диск |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify и обемни тестове |

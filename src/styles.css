@@ -469,3 +469,18 @@ textarea {
     border: 1px solid CanvasText;
   }
 }
+
+/* Celular: o corpo cobre as áreas seguras (notch, barra de gestos) com o fundo do painel. Sem camada de propósito, para valer sobre `bg-transparent`. */
+html[data-mobile] {
+  -webkit-text-size-adjust: 100%;
+}
+html[data-mobile] body {
+  background: var(--color-panel);
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+/* Abaixo de 16 px o iOS aproxima a tela ao focar o campo. */
+html[data-mobile] :is(input, textarea, select) {
+  font-size: 16px;
+}

@@ -500,6 +500,7 @@ Radai trūkumą? [SECURITY.md](SECURITY.md).
 | Dokumentas | Kas jame |
 |---|---|
 | 📖 [User guide](docs/uso.md) | skirtukai, pasikartojančios užduotys, spartieji klavišai, apvalkalai, pasiekiamumas, langas, naujinimai ir pradžia nuo sistemos |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google darbotvarkė ir GitHub (asmeninis prieigos raktas arba įrenginio srautas) |
 | 🛡️ [Security and data](docs/seguranca.md) | grėsmės modelis, `.canto` atsarginė kopija, sujungimas, slaptažodžio keitimas, failai diske |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify ir apimties testai |

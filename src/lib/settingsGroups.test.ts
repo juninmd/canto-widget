@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { GROUPS, parseOpenGroups, sectionMatches } from "./settingsGroups";
+import { DESKTOP_ONLY_SECTIONS, forPlatform, GROUPS, parseOpenGroups, sectionMatches } from "./settingsGroups";
 
 test("every section lives in exactly one group", () => {
   const all = GROUPS.flatMap((g) => [...g.sections, ...g.sensitive]);
@@ -24,4 +24,18 @@ test("saved groups: first one by default, corrupt data and unknown ids are ignor
   expect(parseOpenGroups("{")).toEqual(["appearance"]);
   expect(parseOpenGroups('["data","nope","app"]')).toEqual(["data", "app"]);
   expect(parseOpenGroups("[]")).toEqual([]);
+});
+
+test("a phone keeps no window, tray, shortcut, focused-app or updater setting", () => {
+  const phone = forPlatform(GROUPS, true);
+  const kept = phone.flatMap((g) => [...g.sections, ...g.sensitive]);
+  for (const s of DESKTOP_ONLY_SECTIONS) expect(kept).not.toContain(s);
+  expect(kept).toContain("backup");
+  expect(kept).toContain("security");
+  // "app" had only desktop sections, so the group goes away instead of rendering an empty heading.
+  expect(phone.map((g) => g.id)).not.toContain("app");
+});
+
+test("the desktop keeps every section", () => {
+  expect(forPlatform(GROUPS, false)).toBe(GROUPS);
 });
