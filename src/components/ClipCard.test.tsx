@@ -50,7 +50,7 @@ test("a normal item has no size warning and copies on click", () => {
 test("colors get a swatch and code keeps its line breaks", () => {
   const { container } = show(item({ preview: "#4f46e5", chars: 7, kept: 7 }));
   expect(screen.getByText("cor")).toBeDefined();
-  expect((container.querySelector("[aria-hidden]") as HTMLElement).style.background).toBe("#4f46e5");
+  expect((container.querySelector("[data-kind=color] span") as HTMLElement).style.background).toBe("#4f46e5");
   cleanup();
   const code = show(item({ preview: "fn main() {\n  run();\n}", chars: 22, kept: 22 }));
   expect(code.container.querySelector("pre")?.textContent).toBe("fn main() {\n  run();\n}");
@@ -121,4 +121,34 @@ test("the rewrite options stay out of the card until its button opens them, so t
 test("privacy mode also blurs a color swatch", () => {
   const { container } = show(item({ preview: "#ff0000" }), { privacy: true });
   expect(container.querySelector("[style]")!.className).toContain("blur-sm");
+});
+
+test("each card leads with a tile for its kind and reads 'Tipo · há X' underneath", () => {
+  const cases: [string, string, string][] = [
+    ["https://example.com", "link", "link"],
+    ["#ff0000", "color", "cor"],
+    ['{"a":1}', "json", "json"],
+    ["const x = 1;", "code", "código"],
+    ["só um texto", "text", "texto"],
+  ];
+  for (const [preview, kind, label] of cases) {
+    const { container } = show(item({ preview, chars: preview.length, kept: preview.length, copied_at: Date.now() }));
+    expect(container.querySelector(`[data-kind=${kind}]`)).not.toBeNull();
+    expect(screen.getByText(label, { selector: "span.first-letter\\:uppercase" })).toBeDefined();
+    expect(container.textContent).toContain("·");
+    cleanup();
+  }
+});
+
+test("the pin and delete actions are 24px-or-larger buttons shown on hover and on keyboard focus", () => {
+  show(item({}));
+  for (const name of ["fixar no histórico", "excluir do histórico"]) {
+    const b = screen.getByRole("button", { name });
+    expect(b.className).toContain("canto-hit");
+    expect(b.className).toContain("size-7");
+  }
+  const bar = screen.getByRole("button", { name: "fixar no histórico" }).parentElement!;
+  expect(bar.className).toContain("opacity-0");
+  expect(bar.className).toContain("group-hover:opacity-100");
+  expect(bar.className).toContain("group-focus-within:opacity-100");
 });

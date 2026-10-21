@@ -49,55 +49,34 @@ beforeEach(() => {
 
 afterEach(cleanup);
 
-test("the type filter only keeps items matching the selected kind", async () => {
+test("the type chips filter by kind and show how many loaded items each holds", async () => {
   await show();
   expect(screen.getByText("https://example.com")).toBeDefined();
   expect(screen.getByText("anotação qualquer")).toBeDefined();
+  expect(screen.getByRole("button", { name: "Todos 2" }).getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByRole("button", { name: "link 1" })).toBeDefined();
+  expect(screen.getByRole("button", { name: "texto 1" })).toBeDefined();
+  expect(screen.queryByRole("button", { name: /^cor/ })).toBeNull();
 
   await act(async () => {
-    fireEvent.change(screen.getByLabelText("filtrar por tipo"), { target: { value: "link" } });
+    fireEvent.click(screen.getByRole("button", { name: "link 1" }));
   });
 
+  expect(screen.getByRole("button", { name: "link 1" }).getAttribute("aria-pressed")).toBe("true");
   expect(screen.getByText("https://example.com")).toBeDefined();
   expect(screen.queryByText("anotação qualquer")).toBeNull();
+
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Todos 2" }));
+  });
+  expect(screen.getByText("anotação qualquer")).toBeDefined();
 });
 
-test("changing the pinned limit saves it through clip_set_max_pinned, clamped to 1000", async () => {
+test("the pinned limit no longer sits on the tab: it lives in Settings", async () => {
   await show();
-  const input = screen.getByLabelText("máximo de itens fixados");
-
-  await act(async () => {
-    fireEvent.change(input, { target: { value: "5000" } });
-  });
-  expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 1000 } });
-});
-
-test("clearing or zeroing the pinned limit while typing saves nothing and the poll keeps the draft", async () => {
-  await show();
-  const input = screen.getByLabelText("máximo de itens fixados") as HTMLInputElement;
-
-  await act(async () => {
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: "" } });
-  });
-  await act(async () => {
-    fireEvent.change(input, { target: { value: "0" } });
-  });
-  expect(calls.some((c) => c.cmd === "clip_set_max_pinned")).toBe(false);
-
-  await act(async () => {
-    fireEvent.change(input, { target: { value: "" } });
-  });
-  await act(async () => {
-    await new Promise((r) => setTimeout(r, 2700));
-  });
-  expect(calls.some((c) => c.cmd === "clip_list")).toBe(true);
-  expect(input.value).toBe("");
-
-  await act(async () => {
-    fireEvent.change(input, { target: { value: "25" } });
-  });
-  expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 25 } });
+  expect(screen.queryByLabelText("máximo de itens fixados")).toBeNull();
+  expect(screen.queryByRole("combobox")).toBeNull();
+  expect(screen.queryByRole("spinbutton")).toBeNull();
 });
 
 test("a new global-search jump re-seeds the already-open tab, even with the same query", async () => {
@@ -134,7 +113,7 @@ test("a new global-search jump re-seeds the already-open tab, even with the same
 test("privacy mode blurs the preview text without hiding the card itself", async () => {
   await show(true);
   expect(screen.getByText("anotação qualquer").className).toContain("blur-sm");
-  expect(screen.getByLabelText("máximo de itens fixados")).toBeTruthy();
+  expect(screen.getAllByTitle("clique para copiar de novo").length).toBe(2);
 });
 
 test("a slow reply for an older query does not overwrite a faster, newer search", async () => {

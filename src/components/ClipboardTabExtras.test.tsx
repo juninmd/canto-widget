@@ -57,11 +57,18 @@ test("a skeleton shows instead of the empty state until the first list answers",
   expect(screen.getByText(/copie algo/)).toBeTruthy();
 });
 
+async function openClear() {
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "mais ações do clipboard" }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("menuitem", { name: "Limpar histórico…" }));
+  });
+}
+
 test("clear asks first, with the count and the pinned items that stay", async () => {
   await show();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "limpar" }));
-  });
+  await openClear();
   expect(calls.some((c) => c.cmd === "clip_clear")).toBe(false);
   const ask = screen.getByText(/Limpar 2 itens/).closest("[role=alert]")!;
   expect(ask.textContent).toContain("Limpar 2 itens do histórico?");
@@ -73,9 +80,7 @@ test("clear asks first, with the count and the pinned items that stay", async ()
   expect(screen.queryByText(/Limpar 2 itens/)).toBeNull();
   expect(calls.some((c) => c.cmd === "clip_clear")).toBe(false);
 
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "limpar" }));
-  });
+  await openClear();
   await act(async () => {
     fireEvent.click(within(screen.getByText(/Limpar 2 itens/).closest("[role=alert]") as HTMLElement).getByRole("button", { name: "limpar" }));
   });
@@ -108,12 +113,12 @@ test("the poll stops while the window is hidden and resumes when it is back", as
 
 test("the history notice can be dismissed and stays dismissed", async () => {
   await show();
-  expect(screen.getByText(/nunca entra no backup/)).toBeTruthy();
+  expect(screen.getByText(/fora do backup/)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "ocultar este aviso" }));
-  expect(screen.queryByText(/nunca entra no backup/)).toBeNull();
+  expect(screen.queryByText(/fora do backup/)).toBeNull();
   cleanup();
   await show();
-  expect(screen.queryByText(/nunca entra no backup/)).toBeNull();
+  expect(screen.queryByText(/fora do backup/)).toBeNull();
 });
 
 test("copying a second item restarts the flash instead of the first timer cutting it short", async () => {

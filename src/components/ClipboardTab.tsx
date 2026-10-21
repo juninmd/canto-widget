@@ -1,32 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuerySeed } from "../lib/useQuerySeed";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
-import { clipKind, KIND_LABEL, type ClipKind } from "../lib/clip";
+import { clipKind, kindCounts } from "../lib/clip";
 import { t } from "../i18n";
 import ClipCard from "./ClipCard";
 import EmptyState from "./EmptyState";
 import Skeleton from "./Skeleton";
 import ClipNote from "./ClipNote";
 import ClipClearConfirm from "./ClipClearConfirm";
+import ClipGroups from "./ClipGroups";
+import ClipKindChips, { type KindFilter } from "./ClipKindChips";
+import ClipAgendaMenu from "./ClipAgendaMenu";
 import { useCopied } from "../lib/useCopied";
 import { useWindowVisible } from "../lib/useWindowVisible";
 import { ClipboardIcon, SearchIcon } from "./Icons";
-
-const KIND_OPTIONS: (ClipKind | "all")[] = ["all", "link", "color", "json", "email", "phone", "code", "text"];
 
 type Props = { privacy: boolean; initialQuery?: string; querySeq?: number; onError: (m: string) => void };
 
 export default function ClipboardTab({ privacy, initialQuery, querySeq, onError }: Props) {
   const [query, setQuery] = useState(initialQuery ?? "");
   useQuerySeed(initialQuery, querySeq, setQuery);
-  const [kindFilter, setKindFilter] = useState<ClipKind | "all">("all");
+  const [kindFilter, setKindFilter] = useState<KindFilter>("all");
   const [items, setItems] = useState<ClipItem[]>([]);
-  const [maxPinned, setMaxPinned] = useState("100");
-  // While the field is focused the poll must not overwrite what the user is typing.
-  const editingMax = useRef(false);
   const [copied, flashCopied] = useCopied();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const visibleWindow = useWindowVisible();
@@ -45,7 +43,6 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
       const list = await api.clipList(q);
       if (!isLatest(id)) return;
       setItems(list.items);
-      if (!editingMax.current) setMaxPinned(String(list.max_pinned));
       setLoadedFor(q);
       lastError.current = "";
     } catch (e) {
@@ -60,20 +57,8 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
   const pinnedCount = items.filter((i) => i.pinned).length;
   // Under a search the list is partial, so only an unfiltered list says how much a clear removes.
   const clearable = loadedFor === "" && !query ? items.length - pinnedCount : -1;
+  const counts = useMemo(() => kindCounts(items.map((i) => i.preview)), [items]);
   const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
-
-  async function editMaxPinned(text: string) {
-    setMaxPinned(text);
-    // Empty or partial input is a keystroke in progress, not a limit of 1.
-    if (!/^\d+$/.test(text.trim())) return;
-    const next = Math.min(1000, Number(text));
-    if (next < 1) return;
-    try {
-      await api.clipSetMaxPinned(next);
-    } catch (e) {
-      onError(errText(e));
-    }
-  }
 
   useEffect(() => {
     // A hidden window has nobody watching the list; coming back reloads at once.
@@ -103,10 +88,12 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
     }
   }
 
+  const filtering = query || kindFilter !== "all";
+
   return (
     <div className="flex h-full flex-col gap-2">
       <ClipNote />
-      <div className="flex gap-2">
+      <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
             <SearchIcon />
@@ -120,15 +107,10 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
             className="canto-field w-full py-2 pl-9 pr-3 text-sm"
           />
         </div>
-        <button
-          type="button"
-          onClick={() => setConfirmingClear(true)}
-          disabled={clearable === 0}
-          title={t("clipboard.clearTitle")}
-          className="canto-hit rounded-xl bg-edge px-3 text-xs text-fg hover:bg-active active:bg-active disabled:opacity-50"
-        >
-          {t("clipboard.clear")}
-        </button>
+        <ClipAgendaMenu
+          label={t("clipui.more")}
+          actions={[{ label: t("clipui.clearMenu"), danger: true, disabled: clearable === 0, onSelect: () => setConfirmingClear(true) }]}
+        />
       </div>
       {confirmingClear && (
         <ClipClearConfirm
@@ -141,75 +123,49 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
           }}
         />
       )}
-      <div className="flex items-center gap-2 text-[11px]">
-        <select
-          value={kindFilter}
-          onChange={(e) => setKindFilter(e.target.value as ClipKind | "all")}
-          aria-label={t("clipboard.kindFilterLabel")}
-          className="canto-field px-2 py-1"
-        >
-          {KIND_OPTIONS.map((k) => (
-            <option key={k} value={k}>
-              {k === "all" ? t("clipboard.allKinds") : KIND_LABEL[k]}
-            </option>
-          ))}
-        </select>
-        <label className="ml-auto flex items-center gap-1 text-faint" title={t("clipboard.maxPinnedTitle")}>
-          {t("clipboard.maxPinned")}
-          <input
-            type="number"
-            min={1}
-            max={1000}
-            value={maxPinned}
-            onChange={(e) => void editMaxPinned(e.target.value)}
-            onFocus={() => (editingMax.current = true)}
-            onBlur={() => {
-              editingMax.current = false;
-              void reload();
-            }}
-            aria-label={t("clipboard.maxPinnedLabel")}
-            className="canto-field w-14 !rounded-md px-1.5 py-0.5"
-          />
-        </label>
-      </div>
+      <ClipKindChips counts={counts} total={items.length} value={kindFilter} onChange={setKindFilter} />
 
-      <ul className="flex-1 space-y-1.5 overflow-y-auto pr-1">
-        {visible.map((i) => (
-          <ClipCard
-            key={i.id}
-            item={i}
-            copied={copied === i.id}
-            privacy={privacy}
-            className={`${isNew(i.id) ? ENTER_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
-            onCopy={() =>
-              run(async () => {
-                await api.clipCopy(i.id);
-                flashCopied(i.id);
-              })
-            }
-            onCopyAs={(mode) =>
-              run(async () => {
-                await api.clipCopyAs(i.id, mode);
-                flashCopied(i.id);
-              })
-            }
-            onPin={() => run(() => api.clipPin(i.id))}
-            onDelete={() =>
-              void leave(i.id, () => run(async () => undoable(await api.clipDelete(i.id), t("clipboard.itemDeleted"))))
-            }
-          />
-        ))}
-        {visible.length === 0 && loadedFor === null && (
-          <li>
-            <Skeleton label={t("clipboard.loading")} />
-          </li>
+      <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <ClipGroups
+          items={visible}
+          card={(i) => (
+            <ClipCard
+              key={i.id}
+              item={i}
+              copied={copied === i.id}
+              privacy={privacy}
+              className={`${isNew(i.id) ? ENTER_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
+              onCopy={() =>
+                run(async () => {
+                  await api.clipCopy(i.id);
+                  flashCopied(i.id);
+                })
+              }
+              onCopyAs={(mode) =>
+                run(async () => {
+                  await api.clipCopyAs(i.id, mode);
+                  flashCopied(i.id);
+                })
+              }
+              onPin={() => run(() => api.clipPin(i.id))}
+              onDelete={() =>
+                void leave(i.id, () => run(async () => undoable(await api.clipDelete(i.id), t("clipboard.itemDeleted"))))
+              }
+            />
+          )}
+        />
+        {visible.length === 0 && (
+          <ul>
+            {loadedFor === null ? (
+              <li>
+                <Skeleton label={t("clipboard.loading")} />
+              </li>
+            ) : (
+              <EmptyState icon={filtering ? <SearchIcon /> : <ClipboardIcon />}>{filtering ? t("clipboard.emptySearch") : t("clipboard.empty")}</EmptyState>
+            )}
+          </ul>
         )}
-        {visible.length === 0 && loadedFor !== null && (
-          <EmptyState icon={query || kindFilter !== "all" ? <SearchIcon /> : <ClipboardIcon />}>
-            {query || kindFilter !== "all" ? t("clipboard.emptySearch") : t("clipboard.empty")}
-          </EmptyState>
-        )}
-      </ul>
+      </div>
     </div>
   );
 }

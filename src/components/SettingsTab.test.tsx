@@ -82,6 +82,16 @@ test("search finds a setting by its keywords and opens the group that holds it",
   expect(screen.queryByRole("heading", { level: 2, name: "Aparência" })).toBeNull();
 });
 
+test("the clipboard's pinned limit lives in the data group and is found by 'fixados' or 'pinned'", async () => {
+  await mount();
+  for (const word of ["fixados", "pinned"]) {
+    fireEvent.change(screen.getByRole("searchbox", { name: "buscar ajuste" }), { target: { value: word } });
+    expect(toggle("Dados e contas").getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("group", { name: "Histórico do clipboard" })).toBeTruthy();
+    expect(screen.queryByRole("group", { name: "Tema" })).toBeNull();
+  }
+});
+
 test("a search with no match says so in a live region, and clearing it brings the groups back", async () => {
   await mount();
   const box = screen.getByRole("searchbox", { name: "buscar ajuste" });

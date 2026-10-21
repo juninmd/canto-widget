@@ -67,3 +67,19 @@ export function clipTransforms(kind: ClipKind, preview: string): ClipMode[] {
   }
   return [];
 }
+
+export const CLIP_KINDS: ClipKind[] = ["link", "color", "json", "email", "phone", "code", "text"];
+
+/** How many of the given previews fall in each kind, for the counts on the filter chips. */
+export function kindCounts(previews: string[]): Record<ClipKind, number> {
+  const counts = { link: 0, color: 0, json: 0, email: 0, phone: 0, code: 0, text: 0 };
+  for (const p of previews) counts[clipKind(p)]++;
+  return counts;
+}
+
+/** The text that fits a max-pinned field: only whole numbers count, capped at 1000; anything else is a keystroke in progress. */
+export function parseMaxPinned(text: string): number | null {
+  if (!/^\d+$/.test(text.trim())) return null;
+  const next = Math.min(1000, Number(text));
+  return next < 1 ? null : next;
+}
