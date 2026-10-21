@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, errText, type AgendaItem, type Priority, type Task } from "../lib/api";
 import SummaryPanel from "./SummaryPanel";
 import TaskRow from "./TaskRow";
@@ -17,6 +17,7 @@ import Skeleton from "./Skeleton";
 import TaskAddForm from "./TaskAddForm";
 import { useTaskBulk } from "../lib/useTaskBulk";
 import { ChecklistIcon } from "./Icons";
+import TaskDoneHeader from "./TaskDoneHeader";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -45,6 +46,8 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
+  // Finished tasks fold away by default: they are history, and the count in the header says how many there are.
+  const [doneOpen, setDoneOpen] = useState(false);
 
   async function reload() {
     const id = bump();
@@ -100,12 +103,13 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const done = doneIds.length;
   const bulk = useTaskBulk(today, doneIds, reload, onError);
   const visible = priorityFilter ? tasks.filter((task) => task.priority === priorityFilter) : tasks;
-  const firstDone = visible.find((task) => task.done)?.id;
-  const firstOpen = visible.find((task) => !task.done)?.id;
+  const openRows = visible.filter((task) => !task.done);
+  const doneRows = visible.filter((task) => task.done);
+  const shown = doneOpen ? [...openRows, ...doneRows] : openRows;
 
   // A filtered view reorders its own rows; hidden tasks keep their slots in the day's order.
   const reorder = useReorder(
-    visible.map((task) => task.id),
+    shown.map((task) => task.id),
     (visibleIds) => {
       const ids = mergeOrder(
         tasks.map((task) => task.id),
@@ -122,6 +126,62 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
       <SummaryPanel today={today} tasks={tasks} agenda={agenda} onClose={() => setSummary(false)} onError={onError} />
     );
   }
+
+  const renderRow = (task: Task) => (
+    <TaskRow
+      key={task.id}
+      task={task}
+      isNew={isNew(task.id)}
+      isLeaving={leaving.has(task.id)}
+      checking={checking === task.id}
+      editing={editing}
+      detailsOpen={details === task.id}
+      draggable
+      dragging={reorder.dragging === task.id}
+      dropTarget={reorder.dragging !== null && reorder.over === task.id && reorder.dragging !== task.id}
+      onDragStart={() => reorder.start(task.id)}
+      onDragHover={() => reorder.hover(task.id)}
+      onMove={(delta) => reorder.step(task.id, delta)}
+      onToggleDone={() => {
+        if (!task.done && focusStore.get()?.id === task.id) void focusStore.stop();
+        setChecking(task.id);
+        // The row folds into the collapsed "Concluídas" group, so focus would otherwise fall to <body>.
+        const neighbor = !task.done && !doneOpen ? (shown[shown.indexOf(task) + 1] ?? shown[shown.indexOf(task) - 1]) : undefined;
+        void run(() => api.taskToggle(task.id)).then(() => {
+          if (!task.done && !doneOpen) setTimeout(() => refocusAfterDelete(listRef.current, neighbor?.id), 0);
+        });
+      }}
+      onCheckAnimationEnd={() => setChecking("")}
+      onStartEdit={() => {
+        editEnded.current = false;
+        setEditing({ id: task.id, title: task.title });
+      }}
+      onEditChange={(value) => setEditing({ id: task.id, title: value })}
+      onEditCommit={() => void rename()}
+      onEditCancel={() => {
+        editEnded.current = true;
+        setEditing(null);
+      }}
+      onDelete={() => {
+        if (focusStore.get()?.id === task.id) focusStore.discard();
+        const neighbor = shown[shown.indexOf(task) + 1] ?? shown[shown.indexOf(task) - 1];
+        void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title })))).then(
+          () => setTimeout(() => refocusAfterDelete(listRef.current, neighbor?.id), 0),
+        );
+      }}
+      onToggleDetails={() => setDetails(details === task.id ? "" : task.id)}
+      onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(task.id, time, repeat))}
+      onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(task.id, repeat))}
+      onLinkPr={(url) => void run(() => api.taskLinkPr(task.id, url))}
+      onPriority={(priority) => void run(() => api.taskSetPriority(task.id, priority))}
+      onEstimate={(minutes) => {
+        focusStore.setEstimate(task.id, minutes);
+        void run(() => api.taskSetEstimate(task.id, minutes));
+      }}
+      onSubtasksChange={reload}
+      onError={onError}
+    />
+  );
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -140,63 +200,14 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
       />
 
       <ul ref={listRef} className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
-        {visible.map((task) => (
-          <Fragment key={task.id}>
-            {(task.id === firstOpen || task.id === firstDone) && (
-              <li aria-hidden="true" className="px-1 pb-0.5 pt-1.5 text-[11px] uppercase tracking-wider text-faint">
-                {t(task.done ? "tasks.group.done" : "tasks.group.open", { n: visible.filter((x) => x.done === task.done).length })}
-              </li>
-            )}
-          <TaskRow
-            task={task}
-            isNew={isNew(task.id)}
-            isLeaving={leaving.has(task.id)}
-            checking={checking === task.id}
-            editing={editing}
-            detailsOpen={details === task.id}
-            draggable
-            dragging={reorder.dragging === task.id}
-            dropTarget={reorder.dragging !== null && reorder.over === task.id && reorder.dragging !== task.id}
-            onDragStart={() => reorder.start(task.id)}
-            onDragHover={() => reorder.hover(task.id)}
-            onMove={(delta) => reorder.step(task.id, delta)}
-            onToggleDone={() => {
-              if (!task.done && focusStore.get()?.id === task.id) void focusStore.stop();
-              setChecking(task.id);
-              void run(() => api.taskToggle(task.id));
-            }}
-            onCheckAnimationEnd={() => setChecking("")}
-            onStartEdit={() => {
-              editEnded.current = false;
-              setEditing({ id: task.id, title: task.title });
-            }}
-            onEditChange={(value) => setEditing({ id: task.id, title: value })}
-            onEditCommit={() => void rename()}
-            onEditCancel={() => {
-              editEnded.current = true;
-              setEditing(null);
-            }}
-            onDelete={() => {
-              if (focusStore.get()?.id === task.id) focusStore.discard();
-              const neighbor = visible[visible.indexOf(task) + 1] ?? visible[visible.indexOf(task) - 1];
-              void leave(task.id, () => run(async () => undoable(await api.itemDelete(task.id), t("tasks.deleted", { title: task.title })))).then(
-                () => setTimeout(() => refocusAfterDelete(listRef.current, neighbor?.id), 0),
-              );
-            }}
-            onToggleDetails={() => setDetails(details === task.id ? "" : task.id)}
-            onSchedule={(time, repeat) => void run(() => api.taskSetSchedule(task.id, time, repeat))}
-            onExtendedRepeat={(repeat) => void run(() => api.taskSetExtendedRepeat(task.id, repeat))}
-            onLinkPr={(url) => void run(() => api.taskLinkPr(task.id, url))}
-            onPriority={(priority) => void run(() => api.taskSetPriority(task.id, priority))}
-            onEstimate={(minutes) => {
-              focusStore.setEstimate(task.id, minutes);
-              void run(() => api.taskSetEstimate(task.id, minutes));
-            }}
-            onSubtasksChange={reload}
-            onError={onError}
-          />
-          </Fragment>
-        ))}
+        {openRows.length > 0 && (
+          <li aria-hidden="true" className="px-1 pb-0.5 pt-1.5 text-[11px] uppercase tracking-wider text-faint">
+            {t("tasks.group.open", { n: openRows.length })}
+          </li>
+        )}
+        {openRows.map(renderRow)}
+        {doneRows.length > 0 && <TaskDoneHeader n={doneRows.length} open={doneOpen} onToggle={() => setDoneOpen(!doneOpen)} />}
+        {doneOpen && doneRows.map(renderRow)}
         {tasks.length === 0 && loadedFor !== today && (
           <li>
             <Skeleton label={t("tasks.loading")} />

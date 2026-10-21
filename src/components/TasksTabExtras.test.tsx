@@ -80,7 +80,10 @@ test("carry over reports how many tasks came to today", async () => {
   carried = 2;
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "puxar pendências" }));
+    fireEvent.click(screen.getByRole("button", { name: "ações da lista" }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("menuitem", { name: "puxar pendências" }));
   });
   expect(await screen.findByText("2 pendências trazidas para hoje")).toBeTruthy();
 });
@@ -126,7 +129,10 @@ test("clearing the done tasks deletes them all and one undo brings them back", a
   list = [mk("t1", "aberta"), mk("t2", "feita um", true), mk("t3", "feita dois", true)];
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "limpar concluídas" }));
+    fireEvent.click(screen.getByRole("button", { name: "ações da lista" }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("menuitem", { name: "limpar concluídas" }));
   });
   expect(calls.filter((c) => c.cmd === "item_delete").map((c) => c.args?.id)).toEqual(["t2", "t3"]);
   expect(await screen.findByText("2 tarefas concluídas excluídas")).toBeTruthy();
@@ -141,5 +147,7 @@ test("clearing the done tasks deletes them all and one undo brings them back", a
 
 test("the clear button only exists when something is done", async () => {
   await mount();
-  expect(screen.queryByRole("button", { name: "limpar concluídas" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "ações da lista" }));
+  expect(screen.getByRole("menuitem", { name: "puxar pendências" })).toBeTruthy();
+  expect(screen.queryByRole("menuitem", { name: "limpar concluídas" })).toBeNull();
 });
