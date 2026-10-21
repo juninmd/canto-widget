@@ -3,16 +3,17 @@ import { api, type StatusResult } from "../lib/api";
 import { canAlert, lastIncident, level, type Level } from "../lib/status";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
-import { BellIcon } from "./Icons";
+import { BellIcon, ChevronIcon } from "./Icons";
+import StatePill, { type StateTone } from "./StatePill";
 
-/** Color by state; the word next to the dot carries the same meaning for who can't tell colors apart. */
-const TONE: Record<Level, { dot: string; text: string; card: string }> = {
-  down: { dot: "bg-danger motion-safe:animate-pulse", text: "text-danger", card: "border-danger/60 bg-danger/10" },
-  degraded: { dot: "bg-warn motion-safe:animate-pulse", text: "text-warn", card: "border-warn/60 bg-warn/10" },
-  recent: { dot: "bg-warn", text: "text-warn", card: "border-warn/50 bg-warn/5" },
-  maintenance: { dot: "bg-muted", text: "text-muted", card: "border-edge bg-ink/60" },
-  ok: { dot: "bg-ok", text: "text-ok", card: "border-edge bg-ink/60" },
-  unknown: { dot: "bg-faint", text: "text-faint", card: "border-edge bg-ink/40" },
+/** Color by state; the pill's word says the same for who can't tell colors apart. */
+const TONE: Record<Level, { tone: StateTone; pulse: boolean; text: string; card: string }> = {
+  down: { tone: "bad", pulse: true, text: "text-danger", card: "border-danger/60 bg-danger/10" },
+  degraded: { tone: "warn", pulse: true, text: "text-warn", card: "border-warn/60 bg-warn/10" },
+  recent: { tone: "warn", pulse: false, text: "text-warn", card: "border-warn/50 bg-warn/5" },
+  maintenance: { tone: "violet", pulse: false, text: "text-muted", card: "border-edge bg-ink/60" },
+  ok: { tone: "ok", pulse: false, text: "text-ok", card: "border-edge bg-ink/60" },
+  unknown: { tone: "neutral", pulse: false, text: "text-faint", card: "border-edge bg-ink/40" },
 };
 
 type Props = {
@@ -23,6 +24,7 @@ type Props = {
   onWatch: () => void;
 };
 
+/** One service: the row expands to its recent incidents; the bell is a separate button so the two never share a click. */
 export default function StatusCard({ result, open, watched, onToggle, onWatch }: Props) {
   const bodyId = useId();
   const state = level(result, Date.now());
@@ -37,45 +39,45 @@ export default function StatusCard({ result, open, watched, onToggle, onWatch }:
       : t("status.alertOn", { name: result.label });
 
   return (
-    <section
-      data-troubled={troubled || undefined}
-      data-level={state}
-      className={`relative rounded-xl border transition-colors ${tone.card} ${open ? "col-span-2" : ""}`}
-    >
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        aria-controls={bodyId}
-        className="flex w-full flex-col gap-0.5 rounded-xl p-2.5 pr-8 text-left hover:bg-edge/40"
-      >
-        <span className="flex min-w-0 items-center gap-1.5">
-          <span aria-hidden="true" className={`size-2 shrink-0 rounded-full ${tone.dot}`} />
-          <span className="truncate text-xs font-semibold text-fg">{result.label}</span>
-        </span>
-        <span className={`truncate text-[11px] font-medium ${tone.text}`}>{t(`status.level.${state}`)}</span>
-        <span className="truncate text-[10px] text-faint">
-          {result.error ? t("status.unavailable") : last > 0 ? timeAgo(last) : t("status.noIncidents")}
-        </span>
-        {result.live && state !== "ok" && (
-          <span className={`truncate text-[10px] ${tone.text}`} title={result.live.description}>
-            {result.live.description}
+    <section data-troubled={troubled || undefined} data-level={state} className={`rounded-xl border transition-colors ${tone.card}`}>
+      <div className="flex items-start">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          aria-controls={bodyId}
+          className="canto-hit flex min-w-0 flex-1 flex-col gap-0.5 rounded-xl p-2.5 text-left hover:bg-edge/40"
+        >
+          <span className="flex min-w-0 items-center gap-2">
+            <span className="truncate text-xs font-semibold text-fg">{result.label}</span>
+            <StatePill tone={tone.tone} pulse={tone.pulse}>
+              {t(`status.level.${state}`)}
+            </StatePill>
+            <span aria-hidden="true" className={`ml-auto shrink-0 text-faint transition-transform motion-reduce:transition-none ${open ? "rotate-90" : ""}`}>
+              <ChevronIcon dir="right" />
+            </span>
           </span>
-        )}
-      </button>
-      <button
-        type="button"
-        onClick={onWatch}
-        disabled={!alertable}
-        aria-pressed={alertable ? watched : undefined}
-        aria-label={bellLabel}
-        title={bellLabel}
-        className={`absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-md hover:bg-edge disabled:opacity-30 disabled:hover:bg-transparent ${
-          watched ? "text-accent-text" : "text-faint hover:text-fg"
-        }`}
-      >
-        <BellIcon on={watched} />
-      </button>
+          <span className="truncate text-[11px] text-faint">{result.error ? t("status.unavailable") : last > 0 ? timeAgo(last) : t("status.noIncidents")}</span>
+          {result.live && state !== "ok" && (
+            <span className={`truncate text-[11px] ${tone.text}`} title={result.live.description}>
+              {result.live.description}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={onWatch}
+          disabled={!alertable}
+          aria-pressed={alertable ? watched : undefined}
+          aria-label={bellLabel}
+          title={bellLabel}
+          className={`canto-hit m-1.5 grid size-7 shrink-0 place-items-center rounded-lg hover:bg-edge disabled:opacity-30 disabled:hover:bg-transparent ${
+            watched ? "text-accent-text" : "text-faint hover:text-fg"
+          }`}
+        >
+          <BellIcon on={watched} />
+        </button>
+      </div>
       {open && (
         <div id={bodyId} className="border-t border-edge/60 px-2.5 pt-1.5 pb-2">
           {result.error ? (
@@ -91,7 +93,7 @@ export default function StatusCard({ result, open, watched, onToggle, onWatch }:
                     onClick={() => void api.openLink(it.link)}
                     disabled={!it.link}
                     title={it.link}
-                    className="w-full truncate rounded px-1 py-0.5 text-left text-[11px] text-muted hover:bg-edge hover:text-fg disabled:hover:bg-transparent"
+                    className="canto-hit w-full truncate rounded px-1 py-0.5 text-left text-[11px] text-muted hover:bg-edge hover:text-fg disabled:hover:bg-transparent"
                   >
                     {it.published_at > 0 && <span className="text-faint">{timeAgo(it.published_at)} · </span>}
                     {it.title}

@@ -2,16 +2,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText } from "../lib/api";
 import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 import { summarize } from "../lib/health";
+import { worstFirst } from "../lib/healthSort";
 import { t } from "../i18n";
 import HealthDetail from "./HealthDetail";
 import HealthForm from "./HealthForm";
 import HealthTile from "./HealthTile";
 import Skeleton from "./Skeleton";
+import StatePill from "./StatePill";
+import StatusToolbar from "./StatusToolbar";
 
 const POLL_MS = 10_000;
+const ADD = "canto-hit min-h-[28px] shrink-0 whitespace-nowrap rounded-lg bg-accent px-3 text-xs font-semibold text-on-accent hover:opacity-90 active:opacity-80";
 
-/** "Meus endpoints": a grid of status tiles; the open one stretches over the row like a list item. */
-export default function HealthTab() {
+/** "Meus endpoints": a column of status tiles, worst first; the open one swaps places with its tile. */
+export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null }) {
   const [views, setViews] = useState<HealthView[] | null>(null);
   const [error, setError] = useState("");
   const [open, setOpen] = useState<string | null>(null);
@@ -47,36 +51,47 @@ export default function HealthTab() {
 
   const save = (e: HealthEndpoint) => run(() => api.healthSave(e));
   const sum = views ? summarize(views) : null;
-  const trouble = sum ? sum.down + sum.slow + sum.cert : 0;
+  const startAdding = () => {
+    setAdding(true);
+    setOpen(null);
+  };
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <div className="flex items-center justify-between gap-2 text-[11px] text-faint">
-        <span className={trouble > 0 ? "font-semibold text-danger" : ""}>
-          {sum === null ? t("health.header") : trouble === 0 ? t("health.summary.ok") : t("health.summary.problems", sum)}
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            setAdding(true);
-            setOpen(null);
-          }}
-          className="canto-hit min-h-[24px] shrink-0 whitespace-nowrap rounded-md px-1.5 text-accent-text hover:bg-hover active:bg-active"
-        >
-          {t("health.add")}
+      <StatusToolbar host={toolbar}>
+        <button type="button" aria-expanded={adding} onClick={startAdding} className={ADD}>
+          {t("uiStatus.add")}
         </button>
-      </div>
+      </StatusToolbar>
+      <p className="text-[11.5px] text-faint">{t("health.header")}</p>
       {error && (
         <p role="alert" className="text-xs text-danger">
           {error}
         </p>
       )}
-      <div className="flex-1 overflow-y-auto pr-1">
-        {views === null ? (
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto pr-1">
+        {views === null || sum === null ? (
           <Skeleton label={t("health.loading")} rows={3} />
         ) : (
-          <div className="grid grid-cols-2 gap-2">
-            {views.map((v) =>
+          <>
+            {adding && (
+              <HealthForm
+                onCancel={() => setAdding(false)}
+                onSave={(e) => {
+                  setAdding(false);
+                  void save(e);
+                }}
+              />
+            )}
+            {views.length > 0 && (
+              <div role="group" aria-label={t("uiStatus.pills.label")} className="flex flex-wrap items-center gap-1.5 rounded-xl border border-edge bg-panel px-3 py-2.5">
+                <StatePill tone={sum.down > 0 ? "bad" : "ok"}>{t("uiStatus.pill.down", { n: sum.down })}</StatePill>
+                <StatePill tone={sum.slow > 0 ? "warn" : "ok"}>{t("uiStatus.pill.slow", { n: sum.slow })}</StatePill>
+                <StatePill tone={sum.cert > 0 ? "warn" : "ok"}>{t("uiStatus.pill.cert", { n: sum.cert })}</StatePill>
+                <span className="ml-auto text-[11px] text-faint">{t("uiStatus.count", { n: views.length })}</span>
+              </div>
+            )}
+            {worstFirst(views).map((v) =>
               open === v.endpoint.id ? (
                 <HealthDetail
                   key={v.endpoint.id}
@@ -104,20 +119,17 @@ export default function HealthTab() {
                 />
               ),
             )}
-            {adding ? (
-              <HealthForm
-                onCancel={() => setAdding(false)}
-                onSave={(e) => {
-                  setAdding(false);
-                  void save(e);
-                }}
-              />
-            ) : (
-              views.length === 0 && <p className="col-span-2 px-2 py-6 text-center text-xs text-faint">{t("health.empty")}</p>
+            {views.length === 0 && !adding && (
+              <div className="flex flex-col items-center gap-3 px-2 py-6 text-center">
+                <p className="text-xs text-faint">{t("health.empty")}</p>
+                <button type="button" onClick={startAdding} className={ADD}>
+                  {t("uiStatus.emptyAdd")}
+                </button>
+              </div>
             )}
-          </div>
+          </>
         )}
-        <p className="mt-3 text-[10px] leading-snug text-faint">{t("health.hint")}</p>
+        <p className="mt-1 text-[10px] leading-snug text-faint">{t("health.hint")}</p>
       </div>
     </div>
   );

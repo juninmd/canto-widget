@@ -9,8 +9,9 @@ import { reads } from "./reads";
 import { protos } from "./protos";
 import { steam } from "./steam";
 import { tasks } from "./tasks";
+import { uiForgeStatus } from "./uiForgeStatus";
 import { weather } from "./weather";
 import { uiModelsActivity } from "./uiModelsActivity";
 
-export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity };
+export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...reads, ...uiModelsActivity, ...uiForgeStatus };
 export const messages = es;
