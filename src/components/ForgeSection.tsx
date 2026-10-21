@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { api, type ChecksStatus, type ForgeItem, type ForgeList, type ForgeSection as ForgeSectionKey } from "../lib/api";
+import type { ForgeList, ForgeSection as ForgeSectionKey } from "../lib/api";
 import type { Forge } from "../lib/forge";
 import { checkKey, type CiMap, type ConflictMap } from "../lib/forgeChecks";
-import { daysSince, timeAgo } from "../lib/time";
-import { loadSnoozes, oldestFirst, overdue, snoozeUntil, waitHours, waitLabel } from "../lib/reviewRadar";
-import { t, type MessageKey } from "../i18n";
-import { IssueIcon, PullIcon } from "./Icons";
+import { loadSnoozes, oldestFirst, snoozeUntil } from "../lib/reviewRadar";
+import { t } from "../i18n";
+import ForgeRow from "./ForgeRow";
 
 type Props = {
   title: string;
@@ -32,7 +31,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
   const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
   return (
     <section aria-label={title}>
-      <h3 className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-fg">
+      <h3 className="sticky top-0 z-10 -mx-0.5 mb-1.5 flex items-center gap-1.5 bg-panel px-0.5 py-1 text-xs font-semibold text-fg">
         {title}
         <span className="rounded-full bg-edge px-1.5 text-[10px] font-medium tabular-nums text-muted">{list.total}</span>
       </h3>
@@ -50,7 +49,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
       ) : (
         <ul className="space-y-1.5">
           {shown.map((it) => (
-            <Row
+            <ForgeRow
               key={it.url}
               item={it}
               login={login}
@@ -74,118 +73,5 @@ export default function ForgeSection({ title, section, forge, list, login, filte
         </button>
       )}
     </section>
-  );
-}
-
-const STALE_DAYS = 7;
-type RowProps = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; onSnooze?: () => void };
-function Row({ item, login, forge, waiting, ci, conflict, onSnooze }: RowProps) {
-  const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
-  const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
-  const wait = waiting && item.is_pr ? waitHours(item) : null;
-  // Review requests already show "aguardando"; elsewhere a PR/MR nobody touched for a week is flagged.
-  const idle = !waiting && item.is_pr ? daysSince(item.updated_at) : null;
-
-  async function loadChecks() {
-    setChecks("loading");
-    try {
-      setChecks(forge === "github" ? await api.githubPrChecks(item.repo, item.number) : await api.gitlabMrChecks(item.repo, item.number));
-    } catch {
-      setChecks("none");
-    }
-  }
-
-  return (
-    <li>
-      <button
-        type="button"
-        onClick={() => void api.openLink(item.url)}
-        title={item.url}
-        className={`flex w-full gap-2.5 rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
-      >
-        <span className={`mt-0.5 shrink-0 ${item.draft ? "text-faint" : "text-accent-text"}`} aria-label={kind} role="img">
-          {item.is_pr ? <PullIcon /> : <IssueIcon />}
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="line-clamp-2 text-sm text-fg">{item.title}</span>
-          <span className="mt-0.5 flex gap-2 text-[11px] text-muted">
-            {conflict && (
-              <span className="shrink-0 font-medium text-danger" title={t("forge.item.conflictTitle")}>
-                ⚠ {t("forge.item.conflict")}
-              </span>
-            )}
-            {item.is_pr && ci && <CiPill status={ci} />}
-            <span className="truncate">{item.reference}</span>
-            {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
-            {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
-            {wait !== null && (
-              <span className={`shrink-0 ${overdue(wait) ? "text-danger" : "text-faint"}`} title={overdue(wait) ? t("forge.item.overdueTitle") : undefined}>
-                {t("forge.item.waiting", { wait: waitLabel(wait) })}
-              </span>
-            )}
-            {idle !== null && idle >= STALE_DAYS && (
-              <span className="shrink-0 text-danger" title={t("forge.item.staleTitle", { n: idle })}>
-                {t("forge.item.stale", { n: idle })}
-              </span>
-            )}
-            <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>
-          </span>
-        </span>
-        <span aria-hidden="true" title={t("forge.openExternal")} className="shrink-0 self-start text-[11px] text-faint">
-          ↗
-        </span>
-      </button>
-      {item.is_pr && !ci && (
-        <div className="mt-1 flex items-center gap-2 pl-7 text-[11px]">
-          {onSnooze && (
-            <button
-              type="button"
-              onClick={onSnooze}
-              aria-label={t("forge.snoozeOf", { title: item.title })}
-              className="text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active"
-            >
-              {t("forge.snooze")}
-            </button>
-          )}
-          {checks === null ? (
-            <button type="button" onClick={() => void loadChecks()} className="text-muted canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
-              {t("forge.checks.show")}
-            </button>
-          ) : (
-            <ChecksBadge status={checks} />
-          )}
-        </div>
-      )}
-    </li>
-  );
-}
-
-function ChecksBadge({ status }: { status: ChecksStatus | "loading" }) {
-  const map: Record<ChecksStatus | "loading", { label: string; className: string }> = {
-    loading: { label: t("forge.checks.loading"), className: "text-faint" },
-    success: { label: t("forge.checks.success"), className: "text-accent-text" },
-    failure: { label: t("forge.checks.failure"), className: "text-danger" },
-    running: { label: t("forge.checks.running"), className: "text-muted" },
-    none: { label: t("forge.checks.none"), className: "text-faint" },
-  };
-  const { label, className } = map[status];
-  return <span className={className}>{label}</span>;
-}
-
-const PILL: Record<ChecksStatus, { glyph: string; label: MessageKey; className: string }> = {
-  success: { glyph: "✓", label: "forge.checks.success", className: "text-accent-text" },
-  failure: { glyph: "✗", label: "forge.checks.failure", className: "text-danger" },
-  running: { glyph: "●", label: "forge.checks.running", className: "text-muted" },
-  none: { glyph: "○", label: "forge.checks.none", className: "text-faint" },
-};
-
-/** Compact so the reference still fits on a narrow widget; the full wording is the accessible name. */
-function CiPill({ status }: { status: ChecksStatus }) {
-  const { glyph, label, className } = PILL[status];
-  const text = t(label);
-  return (
-    <span role="img" aria-label={text} title={text} className={`shrink-0 rounded-full border border-edge px-1.5 leading-4 ${className}`}>
-      {glyph} CI
-    </span>
   );
 }

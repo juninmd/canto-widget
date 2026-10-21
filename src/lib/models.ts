@@ -5,10 +5,6 @@ export type ModelSort = "intelligence" | "price" | "speed";
 
 export const SORTS: ModelSort[] = ["intelligence", "price", "speed"];
 
-export function nextSort(current: ModelSort): ModelSort {
-  return SORTS[(SORTS.indexOf(current) + 1) % SORTS.length];
-}
-
 /** Price ascending and speed descending; models without the measure go last, then by rank. */
 export function sortModels(rows: readonly ModelRow[], sort: ModelSort): ModelRow[] {
   const byRank = (a: ModelRow, b: ModelRow) => a.rank - b.rank;

@@ -48,12 +48,34 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-test("the grid shows each endpoint's state and the summary counts what needs attention", async () => {
+test("the list shows each endpoint's state as a word and the summary pills count what needs attention", async () => {
   await mount();
   expect(screen.getByText("API principal")).toBeTruthy();
   expect(screen.getByText("fora do ar")).toBeTruthy();
   expect(screen.getByText("certificado: 9 d")).toBeTruthy();
-  expect(screen.getByText("1 fora · 0 lentos · 1 a vencer")).toBeTruthy();
+  const pills = screen.getByRole("group", { name: "resumo dos endpoints" });
+  expect(within(pills).getByText("1 fora")).toBeTruthy();
+  expect(within(pills).getByText("0 lentos")).toBeTruthy();
+  expect(within(pills).getByText("1 a vencer")).toBeTruthy();
+  expect(within(pills).getByText("3 endpoints")).toBeTruthy();
+});
+
+test("endpoints are listed worst first and the open one keeps its place", async () => {
+  await mount();
+  const order = () => [...document.querySelectorAll("button[aria-expanded]")].map((b) => b.querySelector("b")?.textContent).filter(Boolean);
+  expect(order()).toEqual(["Painel", "exemplo.dev", "API principal"]);
+  fireEvent.click(screen.getByText("Painel"));
+  expect(screen.getAllByRole("region").map((r) => r.getAttribute("aria-label"))).toEqual(["Painel"]);
+});
+
+test("'+ endereço' sits in the header, opens the form, and the empty state offers the same action", async () => {
+  views = [];
+  await mount();
+  expect(screen.queryByRole("group", { name: "resumo dos endpoints" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "adicionar endpoint" }));
+  expect(screen.getByRole("form", { name: "novo endpoint" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "+ endereço" }).getAttribute("aria-expanded")).toBe("true");
+  expect(screen.queryByText(/nenhum endpoint ainda/)).toBeNull();
 });
 
 test("clicking a tile opens it as a wide item with the chart, and clicking the header closes it", async () => {
@@ -81,7 +103,7 @@ test("changing the limit or an alert saves the endpoint with the new value", asy
 
 test("the DNS kind asks for host and port and offers the certificate alert", async () => {
   await mount();
-  fireEvent.click(screen.getByText("+ adicionar endpoint"));
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
   const form = screen.getByRole("form", { name: "novo endpoint" });
   fireEvent.click(within(form).getByRole("button", { name: "DNS + certificado" }));
   expect(within(form).getByLabelText("porta")).toBeTruthy();
@@ -97,7 +119,7 @@ test("the DNS kind asks for host and port and offers the certificate alert", asy
 
 test("a bad address stays in the form with the reason and nothing is sent", async () => {
   await mount();
-  fireEvent.click(screen.getByText("+ adicionar endpoint"));
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
   const form = screen.getByRole("form", { name: "novo endpoint" });
   fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "X" } });
   fireEvent.change(within(form).getByLabelText("endereço (http ou https)"), { target: { value: "ftp://x.dev" } });
@@ -108,7 +130,7 @@ test("a bad address stays in the form with the reason and nothing is sent", asyn
 
 test("TCP takes a port, and removing sends the id", async () => {
   await mount();
-  fireEvent.click(screen.getByText("+ adicionar endpoint"));
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
   const form = screen.getByRole("form", { name: "novo endpoint" });
   fireEvent.click(within(form).getByRole("button", { name: "TCP + porta" }));
   fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Banco" } });

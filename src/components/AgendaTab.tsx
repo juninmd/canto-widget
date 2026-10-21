@@ -8,6 +8,7 @@ import AgendaRibbon from "./AgendaRibbon";
 import AgendaTray from "./AgendaTray";
 import AgendaEmpty from "./AgendaEmpty";
 import AgendaToolbar from "./AgendaToolbar";
+import AgendaViewTabs from "./AgendaViewTabs";
 import ErrorBanner from "./ErrorBanner";
 import { conflicts, freeLabel, nextFree } from "../lib/agendaFree";
 import { minuteOf } from "../lib/agendaRail";
@@ -27,9 +28,6 @@ import { testEvent } from "../lib/agendaTestEvent";
 import { clockLabel } from "../lib/clockLabel";
 
 const systemNow = () => new Date();
-
-const VIEWS: AgendaView[] = ["today", "meetings"];
-const LABEL = { today: "agenda.view.today", meetings: "plan.viewMeetings" } as const;
 
 export default function AgendaTab({
   agenda: live,
@@ -99,31 +97,20 @@ export default function AgendaTab({
 
   return (
     <div className="flex h-full flex-col gap-2">
-      <div role="group" aria-label={t("plan.viewLabel")} className="flex gap-0.5 self-start rounded-xl border border-edge bg-ink/60 p-0.5 text-xs">
-        {VIEWS.map((v) => (
-          <button
-            key={v}
-            type="button"
-            aria-pressed={view === v}
-            onClick={() => pick(v)}
-            className={`canto-hit min-h-7 rounded-lg px-3 transition-colors ${view === v ? "bg-raised font-semibold text-accent-text shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
-          >
-            {t(LABEL[v])}
-          </button>
-        ))}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <AgendaViewTabs view={view} onPick={pick} />
+        {view !== "meetings" && (
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-0.5">
+            <AgendaDayBar day={day} today={today} onPick={pickDay} />
+            <AgendaToolbar
+              loading={loading}
+              fetchedAt={fetchedAt}
+              onTestAlert={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
+              onRefresh={refresh}
+            />
+          </div>
+        )}
       </div>
-
-      {view !== "meetings" && <AgendaDayBar day={day} today={today} onPick={pickDay} />}
-
-      {view !== "meetings" && (
-        <AgendaToolbar
-          isToday={isToday}
-          loading={loading}
-          fetchedAt={fetchedAt}
-          onTestAlert={() => void api.alertOpen(testEvent()).catch((e) => onError(errText(e)))}
-          onRefresh={refresh}
-        />
-      )}
 
       {view !== "meetings" && error && !(disconnected && !hasDay) && <ErrorBanner message={stale} onRetry={() => void reload()} busy={loading} />}
       {view !== "meetings" && tasksError && <ErrorBanner message={t("agenda.tasksFailed", { error: tasksError })} onRetry={() => setReloadTasks((n) => n + 1)} />}

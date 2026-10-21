@@ -34,7 +34,6 @@ export default function AgendaRibbon({ items, tasks, now }: { items: AgendaItem[
   const at = minuteOf(now);
   return (
     <section aria-label={t("agenda.ribbon.title")} className="rounded-2xl border border-edge bg-ink/60 p-3">
-      <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-muted">{t("agenda.ribbon.title")}</h3>
       <div role="img" aria-label={t("agenda.ribbon.label", { from: r.from / 60, to: r.to / 60 })} className="relative h-6 overflow-hidden rounded-lg bg-edge">
         {r.segments.map((s) => (
           <i key={s.id} className={`absolute inset-y-0 min-w-[3px] ${LOOK[s.kind]} ${s.kind === "event" ? TONE[s.tone] : ""}`} style={{ left: pos(Math.max(s.start, r.from)), width: size(s) }} />

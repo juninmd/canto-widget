@@ -6,11 +6,14 @@ import { useLatestRequest } from "../lib/useLatestRequest";
 import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { t } from "../i18n";
 import NoteCard from "./NoteCard";
-import EmptyState from "./EmptyState";
-import Skeleton from "./Skeleton";
 import NoteFilterChip from "./NoteFilterChip";
+import NoteList from "./NoteList";
+import NoteTagChips from "./NoteTagChips";
+import NoteViewToggle from "./NoteViewToggle";
+import { activeTag, censusOf, type TagCensus } from "../lib/noteTags";
+import { useNotesView } from "../lib/useNotesView";
 import { useAnnouncement } from "../lib/useAnnouncement";
-import { NoteIcon, PlusIcon, SearchIcon } from "./Icons";
+import { PlusIcon, SearchIcon } from "./Icons";
 import { useNoteDraft, type NoteDraft } from "../lib/useNoteDraft";
 import type { Draft } from "./NoteEditor";
 
@@ -40,6 +43,9 @@ export default function NotesTab({ today, agenda = [], privacy, initialQuery, qu
   const [notes, setNotes] = useState<Note[]>([]);
   const [total, setTotal] = useState(0);
   const [limit, setLimit] = useState(PAGE);
+  const [view, setView] = useNotesView();
+  // Tag counts come from the last unfiltered list, so the chips do not collapse to one tag once it is picked.
+  const [census, setCensus] = useState<TagCensus | null>(null);
   const own = useNoteDraft();
   const { draft, original, editing, setDraft, open, close } = note ?? own;
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -56,12 +62,15 @@ export default function NotesTab({ today, agenda = [], privacy, initialQuery, qu
       if (!isLatest(id)) return;
       setNotes(page.items);
       setTotal(page.total);
+      if (!q.trim()) setCensus(censusOf(page.items, page.total));
       setLoadedFor(`${q}
 ${lim}`);
     } catch (e) {
       onError(errText(e));
     }
   }
+
+  const tagCensus = census ?? (notes.length > 0 ? { ...censusOf(notes, total), complete: false } : null);
 
   const undoable = useUndo(onError, () => reload());
   const isNew = useNewIds(
@@ -153,6 +162,7 @@ ${lim}`);
             className="canto-field w-full py-2 pl-9 pr-3 text-sm"
           />
         </div>
+        <NoteViewToggle view={view} onChange={setView} />
         <button
           type="button"
           onClick={() => open()}
@@ -164,6 +174,15 @@ ${lim}`);
         </button>
       </div>
 
+      {tagCensus && (
+        <NoteTagChips
+          census={tagCensus}
+          active={activeTag(query)}
+          unfiltered={query.trim() === ""}
+          onTag={(tag) => setQuery(`#${tag}`)}
+          onAll={() => setQuery("")}
+        />
+      )}
       <NoteFilterChip query={query} total={total} onClear={() => setQuery("")} />
       <p
         role="status"
@@ -172,13 +191,24 @@ ${lim}`);
       >
         {announcement}
       </p>
-      <ul className="flex-1 space-y-2 overflow-y-auto pr-1">
-        {notes.map((n) => (
+      <NoteList
+        notes={notes}
+        total={total}
+        loaded={loadedFor !== null}
+        query={query}
+        view={view}
+        onMore={() => {
+          setLimit(limit + PAGE);
+          void reload(query, limit + PAGE);
+        }}
+        onClearQuery={() => setQuery("")}
+        card={(n, compact) => (
           <NoteCard
             key={n.id}
             note={n}
             query={query}
             privacy={privacy}
+            compact={compact}
             className={`${isNew(n.id) ? ENTER_CLASS : ""} ${leaving.has(n.id) ? EXIT_CLASS : ""}`}
             onOpen={() => open({ id: n.id, title: n.title, body: n.body, tags: n.tags.join(", "), link: n.link ?? null })}
             onPin={() => void pin(n)}
@@ -187,30 +217,8 @@ ${lim}`);
             onOpenLink={(kind) => (kind === "task" ? onOpenTasks() : onOpenAgenda())}
             onExport={() => void exportMd(n)}
           />
-        ))}
-        {total > notes.length && (
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                setLimit(limit + PAGE);
-                void reload(query, limit + PAGE);
-              }}
-              className="canto-hit w-full rounded-xl bg-edge px-3 py-1.5 text-xs text-muted hover:bg-active hover:text-fg active:bg-active"
-            >
-              {t("notes.showMore", { n: total - notes.length })}
-            </button>
-          </li>
         )}
-        {notes.length === 0 && loadedFor === null && (
-          <li>
-            <Skeleton label={t("notes.loading")} />
-          </li>
-        )}
-        {notes.length === 0 && loadedFor !== null && (
-          <EmptyState icon={query ? <SearchIcon /> : <NoteIcon />}>{query ? t("notes.emptySearch") : t("notes.empty")}</EmptyState>
-        )}
-      </ul>
+      />
     </div>
   );
 }

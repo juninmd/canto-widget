@@ -26,6 +26,10 @@ async function mount() {
         onError={() => {}}
         hiddenTabs={[]}
         onHiddenTabs={() => {}}
+        layout="horizontal"
+        onLayout={() => {}}
+        pinned={false}
+        onPinned={() => {}}
         reminderLead={5}
         onReminderLead={() => {}}
         onShowShortcuts={() => shortcuts++}
@@ -82,6 +86,16 @@ test("search finds a setting by its keywords and opens the group that holds it",
   expect(screen.queryByRole("heading", { level: 2, name: "Aparência" })).toBeNull();
 });
 
+test("the clipboard's pinned limit lives in the data group and is found by 'fixados' or 'pinned'", async () => {
+  await mount();
+  for (const word of ["fixados", "pinned"]) {
+    fireEvent.change(screen.getByRole("searchbox", { name: "buscar ajuste" }), { target: { value: word } });
+    expect(toggle("Dados e contas").getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("group", { name: "Histórico do clipboard" })).toBeTruthy();
+    expect(screen.queryByRole("group", { name: "Tema" })).toBeNull();
+  }
+});
+
 test("a search with no match says so in a live region, and clearing it brings the groups back", async () => {
   await mount();
   const box = screen.getByRole("searchbox", { name: "buscar ajuste" });
@@ -100,4 +114,13 @@ test("password, backup and sync sit under a 'Zona sensível' heading, one level 
   expect(within(zone).getByRole("heading", { level: 4, name: "Backup" })).toBeTruthy();
   expect(within(zone).getByRole("heading", { level: 4, name: "Pasta sincronizada" })).toBeTruthy();
   expect(screen.getByRole("heading", { level: 3, name: "Zona sensível" })).toBeTruthy();
+});
+
+test("the search field stays stuck to the top of the scroller while the groups scroll", async () => {
+  await mount();
+  const bar = document.querySelector("[data-settings-search]")!;
+  expect(bar.className).toContain("sticky");
+  expect(bar.className).toContain("top-0");
+  expect(bar.contains(screen.getByLabelText("buscar ajuste"))).toBe(true);
+  expect(bar.parentElement!.className).toContain("overflow-y-auto");
 });

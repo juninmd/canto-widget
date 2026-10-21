@@ -89,3 +89,53 @@ test("arrows reach a tab that was in the menu", async ({ page }) => {
   await expect(last).toHaveAttribute("aria-selected", "true");
   await expect(last).toBeFocused();
 });
+
+test.describe("vertical layout", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 420, height: 580 });
+    await mockTauri(page);
+    await page.addInitScript(() => localStorage.getItem("canto.tabLayout") ?? localStorage.setItem("canto.tabLayout", "vertical"));
+    await page.goto("/");
+  });
+
+  test("every tab is on the rail, with no 'mais' menu, and the content keeps its width", async ({ page }) => {
+    await expect(page.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical");
+    await expect(page.getByRole("tab")).toHaveCount(7);
+    await expect(page.getByRole("button", { name: /^mais/ })).toHaveCount(0);
+    const rail = await page.getByRole("tablist").evaluate((el) => el.parentElement!.getBoundingClientRect().width);
+    expect(rail).toBeLessThanOrEqual(53);
+    const scrolled = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+    expect(scrolled).toBeLessThanOrEqual(0);
+  });
+
+  test("hovering opens the labels over the content, and the pin button keeps them open", async ({ page }) => {
+    const tab = page.getByRole("tab", { name: "Notas" });
+    await expect(tab.getByText("Notas")).toBeHidden();
+    await tab.hover();
+    await expect(tab.getByText("Notas")).toBeVisible();
+    await page.mouse.move(300, 300);
+    await expect(tab.getByText("Notas")).toBeHidden();
+    await page.getByRole("button", { name: "manter aberta" }).click();
+    await page.mouse.move(300, 300);
+    await expect(tab.getByText("Notas")).toBeVisible();
+  });
+
+  test("clicking, Alt+N and the arrows switch tabs", async ({ page }) => {
+    await page.getByRole("tab", { name: "Notas" }).click();
+    await expect(page.getByRole("tab", { name: "Notas" })).toHaveAttribute("aria-selected", "true");
+    await page.keyboard.press("Alt+1");
+    await expect(page.getByRole("tab", { name: "Tarefas" })).toHaveAttribute("aria-selected", "true");
+    await page.getByRole("tab", { name: "Tarefas" }).focus();
+    await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("tab", { name: "Notas" })).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("the choice is made in Ajustes and flips the bar back", async ({ page }) => {
+    await goTab(page, "Ajustes");
+    await page.mouse.move(300, 300);
+    await page.getByRole("radio", { name: /Horizontal/ }).click();
+    await expect(page.getByRole("tablist")).toHaveAttribute("aria-orientation", "horizontal");
+    await page.reload();
+    await expect(page.getByRole("tablist")).toHaveAttribute("aria-orientation", "horizontal");
+  });
+});

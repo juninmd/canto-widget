@@ -25,14 +25,15 @@ export const MODELS_VIEW = {
   error: null,
 };
 
-test("the AI models tab ranks models and cycles the sort", async ({ page }) => {
+test("the AI models tab ranks models and sorts by the chips", async ({ page }) => {
   await mockTauri(page, { hiddenTabs: ["gitlab", "status"], knownTabs: ALL_TABS, models: MODELS_VIEW });
   await page.goto("/");
   await goTab(page, "Modelos IA");
   await expect(page.getByText("Intelligence Index · 187 modelos")).toBeVisible();
   await expect(page.locator("[data-model]").first()).toContainText("Aurora 4");
   await expect(page.getByText("$3,44 / 1M tokens")).toBeVisible();
-  await page.getByRole("button", { name: /ordenar por inteligência/ }).click();
+  await page.getByRole("button", { name: "velocidade" }).click();
+  await expect(page.getByRole("button", { name: "velocidade" })).toHaveAttribute("aria-pressed", "true");
   await expect(page.locator("[data-model]").first()).toContainText("Quill Flash");
   await page.getByRole("button", { name: "parar de avisar sobre o top 10" }).click();
   expect((await calls(page)).find((c) => c.cmd === "models_alerts_set")?.args).toEqual({ enabled: false });

@@ -318,9 +318,8 @@ test("filtering by priority hides tasks that don't match", async () => {
   await mount();
   expect(rowText("pagar conta")).toBeTruthy();
 
-  const filter = screen.getByLabelText("filtrar por prioridade");
   await act(async () => {
-    fireEvent.change(filter, { target: { value: "low" } });
+    fireEvent.click(within(screen.getByRole("group", { name: "filtrar por prioridade" })).getByRole("button", { name: "baixa" }));
   });
   expect(screen.queryByText("comprar leite")).toBeNull();
   expect(rowText("pagar conta")).toBeTruthy();
@@ -372,7 +371,7 @@ test("with a priority filter, reordering the visible tasks keeps the hidden ones
   extraTasks = [{ ...baseTask, id: "t2", title: "ligar pro banco", priority: "high", created_at: 2, updated_at: 2 }];
   await mount();
   await act(async () => {
-    fireEvent.change(screen.getByLabelText("filtrar por prioridade"), { target: { value: "low" } });
+    fireEvent.click(within(screen.getByRole("group", { name: "filtrar por prioridade" })).getByRole("button", { name: "baixa" }));
   });
   expect(screen.queryByText("ligar pro banco")).toBeNull();
   await act(async () => {
@@ -428,7 +427,10 @@ test("a subtask is added, toggled and removed from the checklist", async () => {
 test("day summary shows the text and returns with Esc", async () => {
   await mount();
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "resumo do dia" }));
+    fireEvent.click(screen.getByRole("button", { name: "ações da lista" }));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("menuitem", { name: "resumo do dia" }));
   });
   const summary = screen.getByRole("region", { name: "resumo do dia" });
   expect(summary.textContent).toContain("Pendente (1)");

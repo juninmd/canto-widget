@@ -4,7 +4,7 @@ export type SectionId =
   | "skin" | "density" | "language" | "tabs"
   | "reminders" | "digest" | "dnd" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
   | "activity" | "focus" | "security"
-  | "google" | "backup" | "sync"
+  | "google" | "clipboard" | "backup" | "sync"
   | "window" | "autostart" | "shortcuts" | "update";
 
 type Group = { id: GroupId; sections: SectionId[]; sensitive: SectionId[] };
@@ -14,7 +14,7 @@ export const GROUPS: Group[] = [
   { id: "appearance", sections: ["skin", "density", "language", "tabs"], sensitive: [] },
   { id: "notifications", sections: ["reminders", "digest", "dnd", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
   { id: "privacy", sections: ["activity", "focus"], sensitive: ["security"] },
-  { id: "data", sections: ["google"], sensitive: ["backup", "sync"] },
+  { id: "data", sections: ["google", "clipboard"], sensitive: ["backup", "sync"] },
   { id: "app", sections: ["window", "autostart", "shortcuts", "update"], sensitive: [] },
 ];
 
@@ -23,7 +23,7 @@ const KEYWORDS: Record<SectionId, string> = {
   skin: "tema skin cor cores aparência theme color appearance",
   density: "densidade compacto espaçamento tamanho density compact spacing size",
   language: "idioma língua português inglês language english",
-  tabs: "abas esconder ocultar tabs hide",
+  tabs: "abas esconder ocultar tabs hide layout vertical horizontal lateral barra",
   reminders: "lembrete lembretes antecedência reminders lead",
   digest: "resumo do dia manhã bom dia reuniões tarefas revisões menções digest summary morning",
   dnd: "não perturbe silêncio silenciar foco do not disturb silence mute",
@@ -34,6 +34,7 @@ const KEYWORDS: Record<SectionId, string> = {
   focus: "foco estimativa tempo cronômetro focus estimate timer",
   security: "segurança senha mestra bloqueio automático biometria hello touch id security password lock biometric",
   google: "google agenda calendário conta calendar account",
+  clipboard: "clipboard área de transferência histórico copiado fixados fixar limite máximo pinned limit history copied",
   backup: "backup exportar importar cópia export import",
   sync: "sincronizar sincronização pasta nuvem sync folder cloud",
   window: "janela sempre no topo posição window top position",

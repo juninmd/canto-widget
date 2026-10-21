@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { GROUPS, loadOpenGroups, saveOpenGroups, sectionMatches, type GroupId, type SectionId } from "../lib/settingsGroups";
 import BackupSection from "./BackupSection";
 import SyncSection from "./SyncSection";
+import ClipSection from "./ClipSection";
 import GoogleSection from "./GoogleSection";
 import WindowSection from "./WindowSection";
 import SecuritySection from "./SecuritySection";
@@ -23,6 +24,7 @@ import ShortcutsSection from "./ShortcutsSection";
 import SettingsGroup from "./SettingsGroup";
 import { SensitiveZone } from "./SettingsSection";
 import type { Tab } from "./TabBar";
+import type { TabLayout } from "../lib/tabLayout";
 import type { LeadMinutes } from "../lib/reminderLead";
 import { t } from "../i18n";
 
@@ -30,12 +32,16 @@ type Props = {
   onError: (m: string) => void;
   hiddenTabs: Tab[];
   onHiddenTabs: (hidden: Tab[]) => void;
+  layout: TabLayout;
+  onLayout: (layout: TabLayout) => void;
+  pinned: boolean;
+  onPinned: (pinned: boolean) => void;
   reminderLead: LeadMinutes;
   onReminderLead: (lead: LeadMinutes) => void;
   onShowShortcuts: () => void;
 };
 
-export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminderLead, onReminderLead, onShowShortcuts }: Props) {
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout, onLayout, pinned, onPinned, reminderLead, onReminderLead, onShowShortcuts }: Props) {
   const [open, setOpen] = useState<GroupId[]>(loadOpenGroups);
   const [query, setQuery] = useState("");
   const searching = query.trim() !== "";
@@ -44,7 +50,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
     skin: <SkinPicker />,
     density: <DensityPicker />,
     language: <LanguagePicker />,
-    tabs: <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} />,
+    tabs: <TabsSection hidden={hiddenTabs} onChange={onHiddenTabs} layout={layout} onLayout={onLayout} pinned={pinned} onPinned={onPinned} />,
     reminders: <RemindersSection lead={reminderLead} onChange={onReminderLead} />,
     digest: <DigestSection onError={onError} />,
     dnd: <DoNotDisturbSection onError={onError} />,
@@ -57,6 +63,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
     google: <GoogleSection onError={onError} />,
     backup: <BackupSection onError={onError} />,
     sync: <SyncSection onError={onError} />,
+    clipboard: <ClipSection onError={onError} />,
     window: <WindowSection onError={onError} />,
     autostart: <AutostartSection onError={onError} />,
     shortcuts: <ShortcutsSection onOpen={onShowShortcuts} />,
@@ -75,7 +82,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, reminde
 
   return (
     <div className="flex h-full flex-col gap-3 overflow-y-auto pr-1 text-sm">
-      <div>
+      <div data-settings-search className="sticky top-0 z-10 -mb-1 bg-panel/95 px-0.5 pb-1 pt-0.5 backdrop-blur">
         <input
           type="search"
           value={query}

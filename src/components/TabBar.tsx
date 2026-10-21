@@ -8,28 +8,29 @@ export type Tab =
   | "tasks" | "notes" | "clipboard" | "agenda" | "github" | "gitlab" | "steam" | "status" | "models" | "agents"
   | "weather" | "market" | "reads" | "activity" | "gmail" | "gdrive" | "settings";
 
+/** Grouped as the vertical bar shows them; Alt+1 to Alt+4 stay on the four oldest tabs. */
 export const TABS: { id: Tab; label: string }[] = [
   { id: "tasks", label: t("tabs.tasks") },
   { id: "notes", label: t("tabs.notes") },
   { id: "clipboard", label: t("tabs.clipboard") },
   { id: "agenda", label: t("tabs.agenda") },
-  { id: "github", label: "GitHub" },
-  { id: "gitlab", label: "GitLab" },
-  { id: "steam", label: "Steam" },
-  { id: "status", label: t("tabs.status") },
-  { id: "models", label: t("tabs.models") },
-  { id: "agents", label: t("agents.tab") },
-  { id: "weather", label: t("weather.tab") },
-  { id: "market", label: t("protos.tab.market") },
-  { id: "reads", label: t("reads.tab") },
-  { id: "activity", label: t("tabs.activity") },
   { id: "gmail", label: "Gmail" },
   { id: "gdrive", label: "Drive" },
+  { id: "github", label: "GitHub" },
+  { id: "gitlab", label: "GitLab" },
+  { id: "status", label: t("tabs.status") },
+  { id: "agents", label: t("agents.tab") },
+  { id: "models", label: t("tabs.models") },
+  { id: "activity", label: t("tabs.activity") },
+  { id: "weather", label: t("weather.tab") },
+  { id: "market", label: t("protos.tab.market") },
+  { id: "steam", label: "Steam" },
+  { id: "reads", label: t("reads.tab") },
   { id: "settings", label: t("tabs.settings") },
 ];
 
 export const panelId = (tab: Tab) => `panel-${tab}`;
-const tabId = (tab: Tab) => `aba-${tab}`;
+export const tabId = (tab: Tab) => `aba-${tab}`;
 
 /** WAI-ARIA APG tabs pattern: one Tab stop, arrows/Home/End switch tabs. */
 type Props = {
@@ -101,7 +102,7 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
 
   return (
     <div ref={row} className="relative flex shrink-0 items-center gap-0.5 px-3 pb-1 pt-1.5 text-xs">
-      <nav role="tablist" aria-label={t("tabs.label")} onKeyDown={onKeyDown} className="flex min-w-0 gap-0.5">
+      <nav role="tablist" aria-orientation="horizontal" aria-label={t("tabs.label")} onKeyDown={onKeyDown} className="flex min-w-0 gap-0.5">
         {kept.map((i) => {
           const tab = tabs[i];
           return (

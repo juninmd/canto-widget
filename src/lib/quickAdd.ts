@@ -8,11 +8,11 @@ const TIME =
 const PRIORITY_TOKEN: Record<string, Priority> = {
   alta: "high", high: "high", "1": "high",
   media: "medium", "média": "medium", medium: "medium", "2": "medium",
-  baixa: "low", low: "low", "3": "low",
+  baixa: "low", baja: "low", low: "low", "3": "low",
 };
 
 /** "!alta", "!média", "!baixa" (or !high/!medium/!low, !1/!2/!3) anywhere sets the priority and leaves the title. */
-function takePriority(input: string): { rest: string; priority?: Priority } {
+export function takePriority(input: string): { rest: string; priority?: Priority } {
   let priority: Priority | undefined;
   const rest = input.replace(/(^|\s)!(\p{L}+|[123])(?=\s|$)/giu, (whole, lead: string, word: string) => {
     const found = PRIORITY_TOKEN[word.toLowerCase()];

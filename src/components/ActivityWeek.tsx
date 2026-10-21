@@ -40,14 +40,18 @@ export default function ActivityWeek({ series, goalMin }: { series: ReturnType<t
           const x = PAD.left + gap / 2 + i * (BAR + gap);
           let acc = 0;
           return (
-            <g key={d.day}>
+            <g key={d.day} data-today={i === series.length - 1 ? "" : undefined}>
+              {i === series.length - 1 && <rect x={x - gap / 2 + 1} y={PAD.top - 2} width={BAR + gap - 2} height={H - PAD.bottom - PAD.top + 22} rx="6" className="fill-accent/10" />}
+              {d.total > 0 && (
+                <text x={x + BAR / 2} y={y(d.total) - 4} textAnchor="middle" className={`font-mono text-[9px] ${i === series.length - 1 ? "fill-fg font-bold" : "fill-muted"}`}>{secsLabel(d.total)}</text>
+              )}
               {d.stack.map((c) => {
                 const top = y(acc + c.secs);
                 const height = Math.max(1, y(acc) - top - 1);
                 acc += c.secs;
                 return (
                   <rect key={c.category} x={x} y={top} width={BAR} height={height} rx="3" fill={CATEGORY_VAR[c.category]}>
-                    <title>{`${name(d.day)} · ${t(`activity.cat.${c.category}` as const)} ${secsLabel(c.secs)} · ${secsLabel(d.total)}`}</title>
+                    <title>{`${name(d.day)}${i === series.length - 1 ? ` (${t("uima.weekToday")})` : ""} · ${t(`activity.cat.${c.category}` as const)} ${secsLabel(c.secs)} · ${secsLabel(d.total)}`}</title>
                   </rect>
                 );
               })}

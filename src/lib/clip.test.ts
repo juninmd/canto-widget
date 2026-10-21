@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { clipKind, sizeLabel } from "./clip";
+import { clipKind, kindCounts, parseMaxPinned, sizeLabel } from "./clip";
 
 describe("clipKind", () => {
   test("a lone URL is a link, but a sentence containing one is text", () => {
@@ -46,4 +46,16 @@ test("sizeLabel stays readable from a few characters to millions", () => {
   expect(sizeLabel(42)).toBe("42 caracteres");
   expect(sizeLabel(32_000)).toBe("32 mil caracteres");
   expect(sizeLabel(2_150_000)).toBe("2,2 mi caracteres");
+});
+
+test("kindCounts tallies every kind, zero included", () => {
+  expect(kindCounts(["https://a.io", "https://b.io", "#fff", "oi", "x@y.com"])).toEqual({ link: 2, color: 1, json: 0, email: 1, phone: 0, code: 0, text: 1 });
+  expect(Object.values(kindCounts([])).every((n) => n === 0)).toBe(true);
+});
+
+test("parseMaxPinned accepts whole numbers up to 1000 and ignores a keystroke in progress", () => {
+  expect(parseMaxPinned("25")).toBe(25);
+  expect(parseMaxPinned(" 7 ")).toBe(7);
+  expect(parseMaxPinned("5000")).toBe(1000);
+  for (const bad of ["", "0", "-3", "1.5", "abc"]) expect(parseMaxPinned(bad)).toBeNull();
 });

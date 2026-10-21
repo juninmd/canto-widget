@@ -308,4 +308,16 @@ export const app: Record<keyof typeof source, string> = {
   "capture.hint": "Enter: task · Ctrl+Enter: note · Esc: close",
   "capture.close": "close",
   "shortcuts.capture": "quick capture of a task or note, from any app",
+
+  "tabs.group.day": "My day",
+  "tabs.group.code": "Code",
+  "tabs.group.explore": "Explore",
+  "tabs.rail.pin": "keep open",
+  "tabs.rail.unpin": "collapse bar",
+  "settings.tabs.layout": "Tab layout",
+  "settings.tabs.horizontal": "Horizontal",
+  "settings.tabs.horizontalHint": "Tabs on top; what does not fit goes to “more”.",
+  "settings.tabs.vertical": "Vertical",
+  "settings.tabs.verticalHint": "Side bar with every tab, in groups.",
+  "settings.tabs.pin": "keep the side bar open (otherwise it opens on hover)",
 };
