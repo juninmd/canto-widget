@@ -244,12 +244,25 @@ so the quick capture goes to **Google Tasks** instead.
 <tr>
 <td>
 
+### 👥 Your Google contacts, searchable
+
+The **Contacts** tab shows your Google address book (read-only, `contacts.readonly`): the total, a search that
+ignores accents and matches name, company, e-mail or phone, filters with counts (all, starred, with e-mail, with
+phone) and A to Z sections. Open a contact to **copy** an e-mail or number in one click or jump to Google Contacts.
+It starts hidden, one checkbox away in Settings, and needs the People API on your Google Cloud project.
+
+</td>
+<td><img src="docs/prints/app/115-contatos.png" alt="Contacts tab: total, starred count, search box, All/Starred/With e-mail/With phone chips and contacts in A to Z sections with initials avatars, job and company"></td>
+</tr>
+<tr>
+<td>
+
 ### ☑️ Google Tasks under your day
 
 Signed in to Google, the **Tasks** tab gains a **Google Tasks** section under the day's tasks: the open tasks of
 your default list with their due day (late ones in red), a field that **adds straight to Google Tasks** and a
-box to check one off. It folds to its header, and without a Google login it does not show at all. The Gmail and
-Drive tabs start hidden, one checkbox away in Settings.
+box to check one off. It folds to its header, and without a Google login it does not show at all. The Gmail,
+Drive and Contacts tabs start hidden, one checkbox away in Settings.
 
 </td>
 <td><img src="docs/prints/app/104-google-tarefas.png" alt="Tasks tab with the Google Tasks section below the day's tasks: a capture field and three open tasks, one of them late"></td>
@@ -607,7 +620,7 @@ repositories: publishing is a manual decision and action by the maintainer.
 | Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, a fresh nonce on every write, atomic write with `fsync` |
 | Key | RAM only, zeroed on lock; configurable auto-lock (5 to 60 min idle, 15 min by default) |
 | Network | only the Rust process talks to the network; the webview has no remote origin (CSP) and never sees tokens |
-| Google | optional: `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list), `gmail.modify` (unread count, important mail, mark as read), `tasks` and `drive.metadata.readonly` (file names, never contents) plus profile, OAuth with PKCE and loopback |
+| Google | optional: `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list), `gmail.modify` (unread count, important mail, mark as read), `tasks`, `drive.metadata.readonly` (file names, never contents) and `contacts.readonly` (read-only address book) plus profile, OAuth with PKCE and loopback |
 | GitHub | optional, encrypted token; items only open if the link is `https://github.com/` |
 | GitLab | optional, encrypted address and token; `https://` only, no redirects, links only from the configured instance |
 | Updates | only installs a package signed by the project's key; a tampered download is discarded before running |

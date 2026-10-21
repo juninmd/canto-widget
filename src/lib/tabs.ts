@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { TABS, type Tab } from "../components/TabBar";
+import { mirrorPref } from "./prefsMirror";
 
 const KEY = "canto.hiddenTabs";
 const KNOWN_KEY = "canto.knownTabs";
@@ -7,8 +8,8 @@ const KNOWN_KEY = "canto.knownTabs";
 /** Ajustes can't be hidden: it's the only way back to the other tabs. */
 export const HIDEABLE = TABS.filter((t) => t.id !== "settings");
 
-/** Seventeen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes, Clima, Mercado, Leituras, Gmail and Drive start hidden, one checkbox away in Ajustes. */
-const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive"];
+/** Eighteen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes, Clima, Mercado, Leituras, Gmail, Drive and Contatos start hidden, one checkbox away in Ajustes. */
+const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts"];
 
 /** Nothing saved yet means the default; unknown ids (a tab removed in an update) and corrupt data are ignored. */
 export function parseHidden(raw: string | null): Tab[] {
@@ -22,7 +23,7 @@ export function parseHidden(raw: string | null): Tab[] {
 }
 
 /** Shipped after people could save their hidden list; before `canto.knownTabs` existed, these were the unknown ones. */
-const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "market", "reads", "gmail", "gdrive"];
+const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts"];
 
 /** A tab hidden by default stays hidden for someone who saved a choice before it existed, instead of crowding their bar. */
 export function hideNewTabs(hidden: Tab[], rawKnown: string | null): Tab[] {
@@ -40,8 +41,13 @@ function load(): Tab[] {
   try {
     const raw = localStorage.getItem(KEY);
     const hidden = raw === null ? DEFAULT_HIDDEN : hideNewTabs(parseHidden(raw), localStorage.getItem(KNOWN_KEY));
-    localStorage.setItem(KNOWN_KEY, JSON.stringify(HIDEABLE.map((t) => t.id)));
-    if (raw !== null) localStorage.setItem(KEY, JSON.stringify(hidden));
+    const known = JSON.stringify(HIDEABLE.map((t) => t.id));
+    localStorage.setItem(KNOWN_KEY, known);
+    mirrorPref(KNOWN_KEY, known);
+    if (raw !== null) {
+      localStorage.setItem(KEY, JSON.stringify(hidden));
+      mirrorPref(KEY, JSON.stringify(hidden));
+    }
     return hidden;
   } catch {
     return DEFAULT_HIDDEN;
@@ -58,6 +64,7 @@ export function useHiddenTabs() {
     const clean = parseHidden(JSON.stringify(next));
     setHidden(clean);
     localStorage.setItem(KEY, JSON.stringify(clean));
+    mirrorPref(KEY, JSON.stringify(clean));
   }, []);
   return [hidden, change] as const;
 }

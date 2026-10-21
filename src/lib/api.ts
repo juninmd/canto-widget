@@ -307,6 +307,19 @@ export type DriveFile = {
   starred: boolean;
   editor: string;
 };
+/** One Google contact; `link` is empty when the id isn't one Google would hand out. */
+export type Contact = {
+  id: string;
+  name: string;
+  emails: string[];
+  phones: string[];
+  org: string;
+  title: string;
+  starred: boolean;
+  link: string;
+};
+/** `total` is the whole address book; `items` is capped, so the two can differ. */
+export type ContactsView = { total: number; items: Contact[] };
 
 /** One Mercado quote; `points` run from the previous close to the live price. */
 export type MarketQuote = { symbol: string; price: number; change: number; points: number[] };
@@ -572,6 +585,11 @@ export const api = {
   gtasksAdd: (title: string) => invoke<GTask>("gtasks_add", { title }),
   gtasksComplete: (id: string) => invoke<void>("gtasks_complete", { id }),
   gdriveList: (filter: DriveFilter, search: string) => invoke<DriveFile[]>("gdrive_list", { filter, search }),
+  contactsList: () => invoke<ContactsView>("contacts_list"),
+
+  /** Tab choices kept in a file as well: the webview's storage can come back empty after an update. */
+  prefsGet: () => invoke<Record<string, string>>("prefs_get"),
+  prefsSet: (key: string, value: string) => invoke<void>("prefs_set", { key, value }),
 
   /** Mercado: Yahoo Finance quotes; Rust keeps them for 15 min. */
   marketGet: (force = false) => invoke<MarketView>("market_get", { force }),

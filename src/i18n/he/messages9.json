@@ -1,0 +1,20 @@
+{
+  "contacts.tab": "Contacts",
+  "contacts.total": "contacts on Google",
+  "contacts.search": "search contacts",
+  "contacts.filter.all": "All",
+  "contacts.filter.starred": "Starred",
+  "contacts.filter.email": "With e-mail",
+  "contacts.filter.phone": "With phone",
+  "contacts.empty": "No contacts in your Google account.",
+  "contacts.noMatch": "No contact matches this filter.",
+  "contacts.copy": "copy {value}",
+  "contacts.copyShort": "copy",
+  "contacts.copied": "Copied",
+  "contacts.starred": "starred",
+  "contacts.email": "e-mail",
+  "contacts.phone": "phone",
+  "contacts.noDetails": "No e-mail or phone saved.",
+  "contacts.open": "open in Google Contacts",
+  "contacts.capped": "showing {shown} of {total}; use Google Contacts to see the rest"
+}

@@ -8,10 +8,11 @@ use std::time::{Duration, Instant};
 use crate::error::{AppError, Result};
 
 /// Read-only calendar, identity, the Workspace directory (guests' photos), Gmail (count, important, mark read),
-/// Google Tasks and Drive file metadata; file contents stay inaccessible.
+/// Google Tasks, Drive file metadata and the address book (read-only); file contents stay inaccessible.
 pub const SCOPE: &str = "https://www.googleapis.com/auth/calendar.events.readonly \
 https://www.googleapis.com/auth/directory.readonly https://www.googleapis.com/auth/gmail.modify \
-https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/drive.metadata.readonly openid email profile";
+https://www.googleapis.com/auth/tasks https://www.googleapis.com/auth/drive.metadata.readonly \
+https://www.googleapis.com/auth/contacts.readonly openid email profile";
 /// A desktop app's client secret isn't confidential to Google; the flow is protected by PKCE + state.
 pub fn embedded_client() -> Option<(&'static str, &'static str)> {
     Some((option_env!("CANTO_GOOGLE_CLIENT_ID")?, option_env!("CANTO_GOOGLE_CLIENT_SECRET").unwrap_or("")))

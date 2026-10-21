@@ -7,6 +7,7 @@ import WindowBoundary from "./components/WindowBoundary";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
 import { LANGUAGE } from "./i18n";
+import { syncPrefs } from "./lib/prefsMirror";
 import { RTL_LANGUAGES } from "./i18n/languages";
 import "./styles.css";
 
@@ -22,10 +23,13 @@ followSystem(() => {
 // The pop-up and capture windows load the same bundle with `?alert` / `?capture` (see `tauri.conf.json`).
 const windowParams = new URLSearchParams(location.search);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <WindowBoundary>
-      {windowParams.has("alert") ? <AlertWindow /> : windowParams.has("capture") ? <CaptureWindow /> : <App />}
-    </WindowBoundary>
-  </React.StrictMode>,
+// The tab choices are read once while rendering, so a copy restored from the file has to land first.
+void syncPrefs().then(() =>
+  ReactDOM.createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+      <WindowBoundary>
+        {windowParams.has("alert") ? <AlertWindow /> : windowParams.has("capture") ? <CaptureWindow /> : <App />}
+      </WindowBoundary>
+    </React.StrictMode>,
+  ),
 );

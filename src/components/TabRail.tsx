@@ -81,7 +81,7 @@ export default function TabRail({ current, onChange, tabs, pinned, onPinned }: P
 
   let last: string | undefined;
   return (
-    <div data-pinned={pinned} className="group/rail relative z-10 w-[52px] shrink-0 data-[pinned=true]:w-[178px]">
+    <div data-pinned={pinned} className="group/rail relative z-30 w-[52px] shrink-0 data-[pinned=true]:w-[178px]">
       <div
         className={`absolute inset-y-0 left-0 flex w-[52px] flex-col overflow-hidden border-r border-edge bg-panel px-1.5 py-2 transition-[width,box-shadow] motion-reduce:transition-none group-data-[pinned=false]/rail:group-hover/rail:shadow-2xl ${OPEN}`}
       >

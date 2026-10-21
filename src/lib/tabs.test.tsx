@@ -13,7 +13,7 @@ test("saved data that isn't a list of known tabs is ignored, and Ajustes can nev
   expect(parseHidden("{oops")).toEqual([]);
   expect(parseHidden('{"github":true}')).toEqual([]);
   expect(parseHidden(null)).toEqual([
-    "gitlab", "status", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive",
+    "gitlab", "status", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts",
   ]);
   expect(parseHidden("[]")).toEqual([]);
 });
@@ -21,14 +21,14 @@ test("saved data that isn't a list of known tabs is ignored, and Ajustes can nev
 test("hidden tabs leave the bar; the order of the rest is kept", () => {
   const ids = visibleTabs(["notes", "gitlab"]).map((t) => t.id);
   expect(ids).toEqual([
-    "tasks", "clipboard", "agenda", "gmail", "gdrive", "github", "status", "agents", "models", "activity",
+    "tasks", "clipboard", "agenda", "gmail", "gdrive", "contacts", "github", "status", "agents", "models", "activity",
     "weather", "market", "steam", "reads", "settings",
   ]);
 });
 
 test("a tab hidden by default also starts hidden for someone who saved a choice before it existed; AI models is visible", () => {
   const before = JSON.stringify(["tasks", "notes", "gitlab"]);
-  const added: Tab[] = ["steam", "agents", "weather", "market", "reads", "gmail", "gdrive"];
+  const added: Tab[] = ["steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts"];
   expect(hideNewTabs(["gitlab"], before)).toEqual(["gitlab", "status", "activity", ...added]);
   expect(hideNewTabs([], "{oops")).toEqual(added);
   const known = JSON.stringify([
@@ -46,7 +46,7 @@ function Harness({ start }: { start: Tab[] }) {
 }
 
 test("unchecking hides a tab and the last visible one can't be unchecked", () => {
-  render(<Harness start={["notes", "clipboard", "agenda", "github", "status", "models", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive"]} />);
+  render(<Harness start={["notes", "clipboard", "agenda", "github", "status", "models", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts"]} />);
   const gitlab = screen.getByLabelText("GitLab") as HTMLInputElement;
   const tasks = screen.getByLabelText("Tarefas") as HTMLInputElement;
   expect(tasks.disabled).toBe(false);

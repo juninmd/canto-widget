@@ -11,14 +11,14 @@
 1. No Google Cloud Console: **APIs e serviços → Credenciais → Criar credencial → ID do cliente OAuth → App para computador**.
 2. Habilite a **Google Calendar API** e a **People API** no mesmo projeto (a People API só busca as fotos dos
    convidados no diretório do Google Workspace; sem ela, os avatares ficam com as iniciais). Para as abas
-   **Gmail** e **Drive** e a seção **Google Tarefas**, habilite também a **Gmail API**, a **Google Tasks API** e a
-   **Google Drive API**; uma API desativada aparece na aba como "API desativada no projeto do Google Cloud".
+   **Gmail**, **Drive** e **Contatos** e a seção **Google Tarefas**, habilite também a **Gmail API**, a **Google Tasks API** e a
+   **Google Drive API** (a aba Contatos usa a **People API**, a mesma das fotos); uma API desativada aparece na aba como "API desativada no projeto do Google Cloud".
 3. Na aba **ajustes**, cole o *Client ID* (e o *client secret*, que o Google emite para apps desktop) e salve.
 4. **entrar com o Google** abre o navegador; ao autorizar, o widget captura o code na porta loopback
    e mostra um cartão com foto, nome e e-mail da conta. **sair** revoga o token no Google e apaga a
    conta do cofre; as credenciais do cliente continuam salvas.
 
-Gmail, Google Tarefas e Drive usam o mesmo login. Quem conectou antes dessas integrações vê **Reconectar
+Gmail, Google Tarefas, Drive e Contatos usam o mesmo login. Quem conectou antes dessas integrações vê **Reconectar
 Google** na aba: o token antigo não tem os escopos novos. O Google Keep não tem API para contas pessoais (só
 Workspace com administrador), por isso a captura vai para o Google Tarefas.
 

@@ -1,7 +1,8 @@
-//! Gmail, Google Tasks and Drive commands. They reuse the Agenda's Google login; tokens never leave Rust.
+//! Gmail, Google Tasks, Drive and Contacts commands. They reuse the Agenda's Google login; tokens never leave Rust.
 use tauri::{AppHandle, Manager};
 
 use crate::blocking::run;
+use crate::contacts::{self, ContactsView};
 use crate::drive_files::{self, DriveFile};
 use crate::error::Result;
 use crate::gmail::{self, GmailSummary};
@@ -52,4 +53,9 @@ pub async fn gdrive_list(app: AppHandle, filter: String, search: String) -> Resu
         drive_files::list(&token(&app)?, &filter, &search)
     })
     .await
+}
+
+#[tauri::command]
+pub async fn contacts_list(app: AppHandle) -> Result<ContactsView> {
+    run(move || contacts::list(&token(&app)?)).await
 }

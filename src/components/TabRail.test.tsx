@@ -66,3 +66,10 @@ test("hidden tabs leave the rail", () => {
   render(<Harness tabs={TABS.filter((t) => t.id === "tasks" || t.id === "settings")} />);
   expect(screen.getAllByRole("tab")).toHaveLength(2);
 });
+
+test("the expanded rail paints above the sticky search of Ajustes (z-10)", () => {
+  const { container } = render(<Harness />);
+  const rail = container.querySelector<HTMLElement>("[data-pinned]")!;
+  const z = Number(/\bz-(\d+)\b/.exec(rail.className)?.[1]);
+  expect(z).toBeGreaterThan(10);
+});
