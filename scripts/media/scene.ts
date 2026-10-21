@@ -4,12 +4,12 @@ import { CLIPS } from "./data-clip";
 import { seedActivity } from "./data-activity";
 import { seedAgenda } from "./data-agenda";
 import { GITHUB_FIXED, GITLAB_FIXED } from "./data-forge";
-import { AGENTS, HEALTH, MARKET, MODELS, READS, STATUS, WEATHER } from "./data-ops";
+import { AGENTS, GOOGLE, HEALTH, MARKET, MODELS, READS, STATUS, WEATHER } from "./data-ops";
 import { NOTES, TASKS } from "./data-vault";
 import { openScene, settle, type SceneOptions } from "./stage";
 import { seedVault } from "./vault";
 
-const TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents", "weather", "market", "reads", "activity", "settings"];
+const TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents", "weather", "market", "reads", "activity", "gmail", "gdrive", "settings"];
 
 /** Every answer a tab asks Rust for, so any of them can be opened from the same scene. */
 export const FIXED = {
@@ -19,6 +19,7 @@ export const FIXED = {
   ...AGENTS,
   ...WEATHER,
   ...MARKET,
+  ...GOOGLE,
   ...READS,
   health_list: HEALTH,
   activity_status: { supported: true, enabled: true },

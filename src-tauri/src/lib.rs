@@ -28,6 +28,7 @@ pub mod cmd_gemini;
 pub mod cmd_github;
 pub mod cmd_github_lists;
 pub mod cmd_gitlab;
+pub mod cmd_google;
 pub mod cmd_harness;
 pub mod cmd_health;
 pub mod cmd_market;
@@ -44,6 +45,7 @@ pub mod commands;
 pub mod crypto;
 pub mod do_not_disturb;
 pub mod drive;
+pub mod drive_files;
 pub mod error;
 pub mod focus;
 pub mod forge;
@@ -63,7 +65,11 @@ pub mod gitlab_query;
 pub mod gitlab_todos;
 pub mod gitlab_work;
 pub mod global_shortcuts;
+pub mod gmail;
+pub mod gmail_alert;
+pub mod google_api;
 pub mod google_token;
+pub mod gtasks;
 pub mod guest_photos;
 pub mod harness;
 pub mod harness_cache;
@@ -181,6 +187,7 @@ pub fn run() {
             app.manage(cmd_github::GithubState::default());
             app.manage(status_cache::StatusCache::default());
             app.manage(status_alert::StatusAlerts::load(&dir));
+            app.manage(gmail_alert::GmailAlerts::load(&dir));
             app.manage(health_watch::HealthState::default());
             app.manage(harness_cache::HarnessCache::default());
             app.manage(weather_state::WeatherState::load(&dir));
@@ -211,6 +218,7 @@ pub fn run() {
             task_reminder::watch(app.handle().clone());
             steam_alert::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
+            gmail_alert::watch(app.handle().clone());
             health_watch::watch(app.handle().clone());
             models_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
@@ -366,6 +374,14 @@ pub fn run() {
             cmd_status::api_status,
             cmd_harness::harness_list,
             cmd_market::market_get,
+            cmd_google::gmail_summary,
+            cmd_google::gmail_mark_read,
+            cmd_google::gtasks_list,
+            cmd_google::gtasks_add,
+            cmd_google::gtasks_complete,
+            cmd_google::gdrive_list,
+            gmail_alert::gmail_alerts_get,
+            gmail_alert::gmail_alerts_set,
             cmd_weather::weather_get,
             cmd_weather::weather_search,
             cmd_weather::weather_set_place,

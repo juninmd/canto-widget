@@ -291,6 +291,23 @@ export type WeatherView = {
   error: string | null;
 };
 
+/** Gmail: the inbox's unread count and the unread messages Gmail marked as important (`date` in ms). */
+export type GmailMail = { id: string; from: string; subject: string; snippet: string; date: number; link: string };
+export type GmailSummary = { unread: number; important: GmailMail[] };
+/** An open Google Tasks task; `due` is `YYYY-MM-DD` or empty. */
+export type GTask = { id: string; title: string; due: string };
+export type DriveFilter = "recent" | "starred" | "shared";
+/** A Drive file's metadata; `editor` is empty when the user changed it last, `link` empty when not Google's. */
+export type DriveFile = {
+  id: string;
+  name: string;
+  kind: "doc" | "sheet" | "slide" | "pdf" | "other";
+  link: string;
+  modified: string;
+  starred: boolean;
+  editor: string;
+};
+
 /** One Mercado quote; `points` run from the previous close to the live price. */
 export type MarketQuote = { symbol: string; price: number; change: number; points: number[] };
 export type MarketView = {
@@ -545,6 +562,16 @@ export const api = {
 
   /** Coding-agent CLIs: detection is local, the release feed comes from GitHub (30 min floor in Rust). */
   harnessList: (force = false) => invoke<HarnessView[]>("harness_list", { force }),
+
+  /** Gmail, Google Tasks and Drive reuse the Agenda's Google login; Rust holds the token. */
+  gmailSummary: () => invoke<GmailSummary>("gmail_summary"),
+  gmailMarkRead: (id: string) => invoke<void>("gmail_mark_read", { id }),
+  gmailAlertsGet: () => invoke<boolean>("gmail_alerts_get"),
+  gmailAlertsSet: (on: boolean) => invoke<boolean>("gmail_alerts_set", { on }),
+  gtasksList: () => invoke<GTask[]>("gtasks_list"),
+  gtasksAdd: (title: string) => invoke<GTask>("gtasks_add", { title }),
+  gtasksComplete: (id: string) => invoke<void>("gtasks_complete", { id }),
+  gdriveList: (filter: DriveFilter, search: string) => invoke<DriveFile[]>("gdrive_list", { filter, search }),
 
   /** Mercado: Yahoo Finance quotes; Rust keeps them for 15 min. */
   marketGet: (force = false) => invoke<MarketView>("market_get", { force }),
