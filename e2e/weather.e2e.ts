@@ -40,7 +40,7 @@ test("the weather tab shows the sky, the details, the hours, the days and the ra
   await expect(page.locator("[data-weather-day]").first()).toContainText("hoje");
   await expect(page.locator("[data-weather-day]").first()).toContainText("27°");
   await expect(page.locator("[data-weather-details]")).toContainText("71%");
-  await expect(page.locator("[data-weather-details]")).toContainText("18:12");
+  await expect(page.locator("[data-weather-astro]")).toContainText("18:12");
   await expect(page.locator("[data-weather-hour]")).toHaveCount(2);
   await expect(page.getByText(/dados: Open-Meteo/)).toBeVisible();
 });

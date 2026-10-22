@@ -3,13 +3,19 @@ use super::*;
 const FORECAST_BODY: &str = r#"{
   "latitude": -23.5, "longitude": -46.6, "timezone": "America/Sao_Paulo",
   "current": { "time": "2026-10-17T10:30", "temperature_2m": 22.4, "apparent_temperature": 24.1, "weather_code": 3,
-    "relative_humidity_2m": 71.4, "wind_speed_10m": 12.6, "wind_direction_10m": 225.0, "is_day": 0 },
+    "relative_humidity_2m": 71.4, "wind_speed_10m": 12.6, "wind_direction_10m": 225.0, "is_day": 0,
+    "wind_gusts_10m": 31.7, "pressure_msl": 1012.4, "visibility": 8450.0, "dew_point_2m": 16.9 },
   "hourly": {
     "time": ["2026-10-17T10:00", "2026-10-17T11:00", "2026-10-17T12:00", "2026-10-17T13:00"],
     "temperature_2m": [22.4, 23.9, 25.2, 24.8],
     "precipitation_probability": [10, 20, 65, 80],
-    "weather_code": [3, 2, 61, 63]
+    "weather_code": [3, 2, 61, 63],
+    "apparent_temperature": [24.1, 25.0, null, 26.3],
+    "wind_speed_10m": [12.6, 14.0, 18.2, 20.5],
+    "wind_direction_10m": [225.0, 230.0, 400.0, 250.0],
+    "precipitation": [0.0, 0.0, 1.2, 3.4]
   },
+  "minutely_15": { "time": ["2026-10-17T10:30", "2026-10-17T10:45"], "precipitation": [0.0, 0.4] },
   "daily": {
     "time": ["2026-10-17", "2026-10-18"],
     "temperature_2m_max": [25.2, 27.0],
@@ -34,13 +40,26 @@ fn the_forecast_parses_with_the_rain_window() {
             humidity: 71,
             wind: 12.6,
             wind_dir: 225,
-            is_day: false
+            is_day: false,
+            gusts: Some(31.7),
+            pressure: Some(1012.4),
+            visibility: Some(8.5),
+            dew_point: Some(16.9)
         }
     );
     assert_eq!(forecast.hours.len(), 4);
     assert_eq!(
         forecast.hours[2],
-        Hour { at: "2026-10-17T12:00".into(), temp: 25.2, rain: 65, condition: Condition::Rain }
+        Hour {
+            at: "2026-10-17T12:00".into(),
+            temp: 25.2,
+            rain: 65,
+            condition: Condition::Rain,
+            feels: 25.2,
+            wind: 18.2,
+            wind_dir: 40,
+            precip: 1.2
+        }
     );
     assert_eq!(forecast.days.len(), 2);
     assert_eq!(
@@ -58,6 +77,49 @@ fn the_forecast_parses_with_the_rain_window() {
     );
     assert_eq!(forecast.rain_from.as_deref(), Some("2026-10-17T12:00"));
     assert_eq!((forecast.days[0].sunset.as_str(), forecast.days[0].uv), ("2026-10-17T18:12", 8.4));
+    assert_eq!(forecast.next_rain, vec![0.0, 0.4]);
+    assert_eq!(forecast.air, None, "the air quality comes from its own call");
+}
+
+#[test]
+fn a_reading_without_the_extra_details_leaves_them_empty() {
+    let body = FORECAST_BODY
+        .replace(
+            ",\n    \"wind_gusts_10m\": 31.7, \"pressure_msl\": 1012.4, \"visibility\": 8450.0, \"dew_point_2m\": 16.9",
+            "",
+        )
+        .replace(
+            r#""minutely_15": { "time": ["2026-10-17T10:30", "2026-10-17T10:45"], "precipitation": [0.0, 0.4] },"#,
+            "",
+        );
+    let forecast = parse_forecast(body.as_bytes()).unwrap();
+    let now = &forecast.now;
+    assert_eq!((now.gusts, now.pressure, now.visibility, now.dew_point), (None, None, None, None));
+    assert!(forecast.next_rain.is_empty());
+}
+
+#[test]
+fn only_the_next_day_counts_for_the_rain_warning() {
+    let hours: Vec<String> = (0..30).map(|i| format!("\"2026-10-{:02}T{:02}:00\"", 17 + i / 24, i % 24)).collect();
+    let rain: Vec<&str> = (0..30).map(|i| if i == 26 { "90" } else { "0" }).collect();
+    let temps = vec!["20.0"; 30].join(",");
+    let codes = vec!["1"; 30].join(",");
+    let body = format!(
+        r#"{{"current": {{"temperature_2m": 20.0, "apparent_temperature": 20.0, "weather_code": 1}},
+        "hourly": {{"time": [{}], "temperature_2m": [{temps}], "precipitation_probability": [{}], "weather_code": [{codes}]}}}}"#,
+        hours.join(","),
+        rain.join(",")
+    );
+    let forecast = parse_forecast(body.as_bytes()).unwrap();
+    assert_eq!(forecast.hours.len(), 30);
+    assert_eq!(forecast.rain_from, None);
+}
+
+#[test]
+fn the_air_quality_is_read_as_a_whole_us_aqi() {
+    assert_eq!(parse_air(br#"{"current": {"time": "2026-10-17T10:00", "us_aqi": 52.4}}"#), Some(52));
+    assert_eq!(parse_air(br#"{"current": {"us_aqi": null}}"#), None);
+    assert_eq!(parse_air(b"not json"), None);
 }
 
 #[test]

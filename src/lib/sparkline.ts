@@ -17,10 +17,16 @@ export function sparkline(values: number[], width: number, height: number): stri
  * A smooth curve through the values (Catmull-Rom as cubic Béziers) plus the closed area under it, for a filled
  * chart. `xs` are the column centers, so the points line up with the labels laid out below them.
  */
-export function smoothCurve(values: number[], xs: number[], height: number, pad = 6): { line: string; area: string } {
+export function smoothCurve(
+  values: number[],
+  xs: number[],
+  height: number,
+  pad = 6,
+  /** A shared scale, so two curves drawn over each other line up; defaults to the values' own range. */
+  range?: [number, number],
+): { line: string; area: string } {
   if (values.length === 0 || xs.length !== values.length) return { line: "", area: "" };
-  const min = Math.min(...values);
-  const max = Math.max(...values);
+  const [min, max] = range ?? [Math.min(...values), Math.max(...values)];
   const span = max === min ? 1 : max - min;
   const pts = values.map((v, i) => ({
     x: xs[i],

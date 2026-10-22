@@ -268,9 +268,24 @@ export type WeatherNow = {
   wind: number;
   wind_dir: number;
   is_day: boolean;
+  /** Gusts in km/h, pressure in hPa, visibility in km, dew point in °C; null when the API omits them. */
+  gusts?: number | null;
+  pressure?: number | null;
+  visibility?: number | null;
+  dew_point?: number | null;
 };
-/** Times and dates come already local to the city (`timezone=auto` on the API call). */
-export type WeatherHour = { at: string; temp: number; rain: number; condition: WeatherCondition };
+/** Times and dates come already local to the city (`timezone=auto` on the API call). Seven days of hours. */
+export type WeatherHour = {
+  at: string;
+  temp: number;
+  rain: number;
+  condition: WeatherCondition;
+  /** Apparent temperature, wind in km/h with the direction it blows from, precipitation in mm. */
+  feels?: number;
+  wind?: number;
+  wind_dir?: number;
+  precip?: number;
+};
 export type WeatherDay = {
   date: string;
   min: number;
@@ -282,7 +297,16 @@ export type WeatherDay = {
   sunset: string;
   uv: number;
 };
-export type WeatherForecast = { now: WeatherNow; hours: WeatherHour[]; days: WeatherDay[]; rain_from: string | null };
+export type WeatherForecast = {
+  now: WeatherNow;
+  hours: WeatherHour[];
+  days: WeatherDay[];
+  rain_from: string | null;
+  /** mm in each of the next quarters of an hour (two hours); empty when the API sends none. */
+  next_rain?: number[];
+  /** US AQI; null when the air-quality call failed. */
+  air?: number | null;
+};
 export type WeatherView = {
   place: WeatherPlace | null;
   forecast: WeatherForecast | null;

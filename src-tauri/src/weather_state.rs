@@ -89,8 +89,21 @@ mod tests {
                 wind: 10.0,
                 wind_dir: 90,
                 is_day: true,
+                gusts: None,
+                pressure: None,
+                visibility: None,
+                dew_point: None,
             },
-            hours: vec![Hour { at: "2026-10-17T10:00".into(), temp, rain: 0, condition: Condition::Clear }],
+            hours: vec![Hour {
+                at: "2026-10-17T10:00".into(),
+                temp,
+                rain: 0,
+                condition: Condition::Clear,
+                feels: temp,
+                wind: 0.0,
+                wind_dir: 0,
+                precip: 0.0,
+            }],
             days: vec![Day {
                 date: "2026-10-17".into(),
                 min: temp,
@@ -102,6 +115,8 @@ mod tests {
                 uv: 0.0,
             }],
             rain_from: None,
+            next_rain: Vec::new(),
+            air: None,
         }
     }
 

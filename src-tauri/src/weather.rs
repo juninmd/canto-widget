@@ -5,11 +5,16 @@ use serde::{Deserialize, Serialize};
 
 const GEOCODE: &str = "https://geocoding-api.open-meteo.com/v1/search";
 const FORECAST: &str = "https://api.open-meteo.com/v1/forecast";
+const AIR: &str = "https://air-quality-api.open-meteo.com/v1/air-quality";
 const TIMEOUT_S: u64 = 15;
 /// Long enough for "São Paulo" and short enough not to be a payload.
 pub const MAX_CITY: usize = 64;
-/// The card shows a window of the API's answer; asking for less keeps the payload small.
-const HOURS: u8 = 24;
+/// Every hour of the seven days, so picking a day on the card shows its own hours.
+const HOURS: u8 = 168;
+/// The rain warning and the "next hours" strip only look this far ahead.
+const NEAR_HOURS: usize = 24;
+/// Two hours in 15-minute steps: the "next 2 hours" rain strip.
+const QUARTERS: u8 = 8;
 const DAYS: u8 = 7;
 /// Rain from this probability on is worth a line on the card.
 pub const RAIN_CHANCE: u8 = 50;
@@ -64,6 +69,11 @@ pub struct Now {
     pub wind_dir: u16,
     /// Night changes the sky and the icons; an API that omits it reads as day.
     pub is_day: bool,
+    /// Gusts in km/h, sea-level pressure in hPa, visibility in km and dew point in °C; `None` when the API omits them.
+    pub gusts: Option<f64>,
+    pub pressure: Option<f64>,
+    pub visibility: Option<f64>,
+    pub dew_point: Option<f64>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -73,6 +83,11 @@ pub struct Hour {
     pub temp: f64,
     pub rain: u8,
     pub condition: Condition,
+    /// Apparent temperature, wind in km/h with the direction it blows from, and precipitation in mm.
+    pub feels: f64,
+    pub wind: f64,
+    pub wind_dir: u16,
+    pub precip: f64,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -95,6 +110,10 @@ pub struct Forecast {
     pub days: Vec<Day>,
     /// The first hour with a real chance of rain, for the warning line.
     pub rain_from: Option<String>,
+    /// Precipitation in mm for each of the next quarters of an hour; empty when the API sends none.
+    pub next_rain: Vec<f64>,
+    /// US AQI from the air-quality API, which is a separate call that may fail on its own.
+    pub air: Option<u16>,
 }
 
 #[derive(Deserialize)]
@@ -119,6 +138,8 @@ struct RawForecast {
     current: Option<RawCurrent>,
     hourly: Option<RawHourly>,
     daily: Option<RawDaily>,
+    #[serde(default)]
+    minutely_15: Option<RawQuarters>,
 }
 
 #[derive(Deserialize)]
@@ -134,6 +155,14 @@ struct RawCurrent {
     wind_direction_10m: Option<f64>,
     #[serde(default)]
     is_day: Option<u8>,
+    #[serde(default)]
+    wind_gusts_10m: Option<f64>,
+    #[serde(default)]
+    pressure_msl: Option<f64>,
+    #[serde(default)]
+    visibility: Option<f64>,
+    #[serde(default)]
+    dew_point_2m: Option<f64>,
 }
 
 #[derive(Deserialize)]
@@ -146,6 +175,31 @@ struct RawHourly {
     precipitation_probability: Vec<Option<u8>>,
     #[serde(default)]
     weather_code: Vec<u8>,
+    #[serde(default)]
+    apparent_temperature: Vec<Option<f64>>,
+    #[serde(default)]
+    wind_speed_10m: Vec<Option<f64>>,
+    #[serde(default)]
+    wind_direction_10m: Vec<Option<f64>>,
+    #[serde(default)]
+    precipitation: Vec<Option<f64>>,
+}
+
+#[derive(Deserialize)]
+struct RawQuarters {
+    #[serde(default)]
+    precipitation: Vec<Option<f64>>,
+}
+
+#[derive(Deserialize)]
+struct RawAir {
+    current: Option<RawAirNow>,
+}
+
+#[derive(Deserialize)]
+struct RawAirNow {
+    #[serde(default)]
+    us_aqi: Option<f64>,
 }
 
 #[derive(Deserialize)]
@@ -203,11 +257,16 @@ pub fn parse_forecast(body: &[u8]) -> Option<Forecast> {
                 return None;
             }
             let code = *hourly.weather_code.get(i)?;
+            let wind = finite(hourly.wind_speed_10m.get(i).copied().flatten()).unwrap_or(0.0).max(0.0);
             Some(Hour {
                 at: at.clone(),
                 temp,
                 rain: hourly.precipitation_probability.get(i).copied().flatten().unwrap_or(0),
                 condition: condition(code),
+                feels: finite(hourly.apparent_temperature.get(i).copied().flatten()).unwrap_or(temp),
+                wind,
+                wind_dir: direction(hourly.wind_direction_10m.get(i).copied().flatten()),
+                precip: finite(hourly.precipitation.get(i).copied().flatten()).unwrap_or(0.0).max(0.0),
             })
         })
         .collect();
@@ -243,13 +302,37 @@ pub fn parse_forecast(body: &[u8]) -> Option<Forecast> {
             condition: condition(current.weather_code),
             humidity: percent(current.relative_humidity_2m),
             wind: current.wind_speed_10m.filter(|w| w.is_finite()).unwrap_or(0.0).max(0.0),
-            wind_dir: current.wind_direction_10m.filter(|d| d.is_finite()).map_or(0, |d| d.rem_euclid(360.0) as u16),
+            wind_dir: direction(current.wind_direction_10m),
             is_day: current.is_day.unwrap_or(1) != 0,
+            gusts: finite(current.wind_gusts_10m).map(|g| g.max(0.0)),
+            pressure: finite(current.pressure_msl),
+            // The API measures visibility in metres; the card reads kilometres.
+            visibility: finite(current.visibility).map(|m| (m.max(0.0) / 1000.0 * 10.0).round() / 10.0),
+            dew_point: finite(current.dew_point_2m),
         },
-        rain_from: hours.iter().find(|h| h.rain >= RAIN_CHANCE).map(|h| h.at.clone()),
+        rain_from: hours.iter().take(NEAR_HOURS).find(|h| h.rain >= RAIN_CHANCE).map(|h| h.at.clone()),
+        next_rain: raw
+            .minutely_15
+            .map(|q| q.precipitation.into_iter().map(|mm| finite(mm).unwrap_or(0.0).max(0.0)).collect())
+            .unwrap_or_default(),
+        air: None,
         hours,
         days,
     })
+}
+
+/// The current US AQI, or `None` for any answer that does not carry one.
+pub fn parse_air(body: &[u8]) -> Option<u16> {
+    let raw: RawAir = serde_json::from_slice(body).ok()?;
+    finite(raw.current?.us_aqi).map(|aqi| aqi.clamp(0.0, 999.0).round() as u16)
+}
+
+fn finite(value: Option<f64>) -> Option<f64> {
+    value.filter(|v| v.is_finite())
+}
+
+fn direction(value: Option<f64>) -> u16 {
+    finite(value).map_or(0, |d| d.rem_euclid(360.0) as u16)
 }
 
 fn percent(value: Option<f64>) -> u8 {
@@ -334,10 +417,16 @@ pub fn forecast(place: &Place) -> Result<Forecast, String> {
             ("longitude", place.lon.to_string()),
             (
                 "current",
-                "temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,wind_speed_10m,wind_direction_10m,is_day"
+                "temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,wind_speed_10m,wind_direction_10m,is_day,wind_gusts_10m,pressure_msl,visibility,dew_point_2m"
                     .into(),
             ),
-            ("hourly", "temperature_2m,precipitation_probability,weather_code".into()),
+            (
+                "hourly",
+                "temperature_2m,precipitation_probability,weather_code,apparent_temperature,wind_speed_10m,wind_direction_10m,precipitation"
+                    .into(),
+            ),
+            ("minutely_15", "precipitation".into()),
+            ("forecast_minutely_15", QUARTERS.to_string()),
             (
                 "daily",
                 "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,uv_index_max"
@@ -350,7 +439,19 @@ pub fn forecast(place: &Place) -> Result<Forecast, String> {
     )
     .map_err(|e| e.to_string())?;
     let body = body(&client, url)?;
-    parse_forecast(&body).ok_or_else(|| "a previsão veio em formato inesperado".to_string())
+    let mut forecast = parse_forecast(&body).ok_or_else(|| "a previsão veio em formato inesperado".to_string())?;
+    // The air quality is a bonus: its own failure must not cost the forecast.
+    forecast.air = air(&client, place);
+    Ok(forecast)
+}
+
+fn air(client: &reqwest::blocking::Client, place: &Place) -> Option<u16> {
+    let url = reqwest::Url::parse_with_params(
+        AIR,
+        [("latitude", place.lat.to_string()), ("longitude", place.lon.to_string()), ("current", "us_aqi".into())],
+    )
+    .ok()?;
+    parse_air(&body(client, url).ok()?)
 }
 
 #[cfg(test)]

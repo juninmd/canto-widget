@@ -7,6 +7,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Clima com o céu de verdade**: o cartão de cima agora é desenhado num canvas, com chuva que cai com o vento
+  e respinga no chão, raio ramificado com clarão na tempestade, raios de sol girando, nuvens em camadas, neve,
+  neblina e, à noite, estrelas e estrelas cadentes (tudo parado quando o sistema pede menos movimento ou a janela
+  some). Abaixo dele: **próximas 2 horas** em blocos de 15 min dizendo quando a chuva começa ou para; **oito
+  leituras** (sensação, umidade, vento com rajada, pressão, visibilidade, ponto de orvalho, UV e qualidade do ar);
+  o **gráfico por hora** com a faixa de chuva animada, a chance de chuva em cada hora, a linha de sensação térmica
+  e os modos chuva (mm) e vento; **dias clicáveis**, que trocam o gráfico para as horas daquele dia; um aviso em
+  destaque para tempestade, rajadas fortes ou UV muito alto; e o **arco do sol** com a **fase da lua** desenhada
+  como se vê do hemisfério da cidade. Tudo do Open-Meteo, sem chave: a qualidade do ar vem da API de ar do mesmo
+  serviço e, se ela falhar, só esse quadro fica vazio.
+
 - **Canto para Android e iOS**, a partir do mesmo código (Tauri v2 Mobile). O cofre, as abas e os avisos são os
   mesmos; a janela vira tela cheia, as abas ficam numa barra embaixo (com uma folha "mais" para as demais), o
   cabeçalho ganha a busca global e o que só existe no computador (janela, bandeja, atalhos globais, Atividade,

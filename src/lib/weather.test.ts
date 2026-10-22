@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import type { WeatherDay } from "./api";
-import { clock, conditionKey, degrees, isNight, rangeBar, uvKey, weekday } from "./weather";
+import type { WeatherDay, WeatherForecast } from "./api";
+import { airLevel, clock, conditionKey, dayHours, degrees, isNight, nowcast, rangeBar, uvKey, weatherAlert, weekday } from "./weather";
 
 test("every condition maps to its sentence and rain is not the percentage key", () => {
   expect(conditionKey("clear")).toBe("weather.clear");
@@ -63,4 +63,41 @@ test("a day's bar sits inside the window's range and never vanishes", () => {
   expect(rangeBar(day({ min: 20, max: 30 }), 10, 30)).toEqual({ from: 50, span: 50 });
   expect(rangeBar(day({ min: 15, max: 15 }), 10, 30).span).toBe(6);
   expect(rangeBar(day({ min: 5, max: 5 }), 5, 5)).toEqual({ from: 0, span: 6 });
+});
+
+test("the next two hours say when the rain starts, stops or that nothing changes", () => {
+  expect(nowcast([0, 0, 0, 0])).toEqual({ key: "weather.nowcast.dry" });
+  expect(nowcast([0, 0.05, 0.3, 1])).toEqual({ key: "weather.nowcast.starts", min: 30 });
+  expect(nowcast([1, 0.5, 0, 0])).toEqual({ key: "weather.nowcast.stops", min: 30 });
+  expect(nowcast([1, 1, 1, 1])).toEqual({ key: "weather.nowcast.raining" });
+});
+
+test("today opens the next 24 hours and another day its own calendar hours", () => {
+  const hours = Array.from({ length: 30 }, (_, i) => ({ at: `2026-10-${17 + Math.floor((10 + i) / 24)}T${String((10 + i) % 24).padStart(2, "0")}:00`, temp: 20, rain: 0, condition: "clear" as const }));
+  const days = [{ date: "2026-10-17" }, { date: "2026-10-18" }, { date: "2026-10-19" }] as WeatherDay[];
+  expect(dayHours(hours, days, 0)).toHaveLength(24);
+  expect(dayHours(hours, days, 1).map((h) => h.at)).toEqual(hours.slice(14).map((h) => h.at));
+  expect(dayHours(hours, days, 2)).toEqual([]);
+});
+
+test("the air quality falls into the US AQI bands", () => {
+  expect(airLevel(42).key).toBe("weather.air.good");
+  expect(airLevel(51).key).toBe("weather.air.moderate");
+  expect(airLevel(140).key).toBe("weather.air.sensitive");
+  expect(airLevel(301).key).toBe("weather.air.veryBad");
+});
+
+test("the sky warns about the most urgent thing first", () => {
+  const base: WeatherForecast = {
+    now: { temp: 25, feels: 26, condition: "clear", humidity: 50, wind: 10, wind_dir: 0, is_day: true, gusts: 20 },
+    hours: [{ at: "2026-10-17T10:00", temp: 25, rain: 0, condition: "clear" }],
+    days: [{ date: "2026-10-17", min: 18, max: 30, rain: 0, condition: "clear", sunrise: "", sunset: "", uv: 9 }],
+    rain_from: null,
+  };
+  expect(weatherAlert(base)).toEqual({ level: "warn", key: "weather.alert.uv", uv: "weather.uv.veryHigh" });
+  expect(weatherAlert({ ...base, now: { ...base.now, gusts: 64 } })).toEqual({ level: "warn", key: "weather.alert.gusts", n: 64 });
+  const later = { ...base, hours: [...base.hours, { at: "2026-10-17T15:00", temp: 24, rain: 80, condition: "storm" as const }] };
+  expect(weatherAlert(later)).toEqual({ level: "warn", key: "weather.alert.stormAt", time: "15:00" });
+  expect(weatherAlert({ ...later, now: { ...base.now, condition: "storm" } })).toEqual({ level: "danger", key: "weather.alert.storm" });
+  expect(weatherAlert({ ...base, now: { ...base.now, is_day: false } })).toBeNull();
 });

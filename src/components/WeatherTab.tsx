@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type WeatherPlace, type WeatherView } from "../lib/api";
-import { fetchedClock } from "../lib/weather";
+import { dayHours, fetchedClock, weekday } from "../lib/weather";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -10,13 +10,16 @@ import WeatherDays from "./WeatherDays";
 import WeatherDetails from "./WeatherDetails";
 import WeatherHero from "./WeatherHero";
 import WeatherHours from "./WeatherHours";
+import WeatherAstro from "./WeatherAstro";
+import WeatherNowcast from "./WeatherNowcast";
 
-/** The weather of one city: the sky now, the details, the next hours as a curve and the next days. */
+/** The weather of one city: the sky now, the next two hours, the details, the hours of the picked day, the days, sun and moon. */
 export default function WeatherTab() {
   const [view, setView] = useState<WeatherView | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [changing, setChanging] = useState(false);
+  const [day, setDay] = useState(0);
 
   const load = useCallback(async (force: boolean) => {
     setLoading(true);
@@ -62,9 +65,18 @@ export default function WeatherTab() {
       {forecast ? (
         <>
           <WeatherHero place={place} forecast={forecast} loading={loading} onRefresh={() => void load(true)} onChange={() => setChanging(true)} />
-          <WeatherDetails now={forecast.now} today={forecast.days[0]} first={1} />
-          <WeatherHours hours={forecast.hours} days={forecast.days} index={7} />
-          {forecast.days.length > 0 && <WeatherDays days={forecast.days} index={8} />}
+          {(forecast.next_rain?.length ?? 0) > 0 && <WeatherNowcast quarters={forecast.next_rain!} index={1} />}
+          <WeatherDetails now={forecast.now} today={forecast.days[0]} air={forecast.air ?? null} first={2} />
+          <WeatherHours
+            key={day}
+            hours={dayHours(forecast.hours, forecast.days, day)}
+            days={forecast.days}
+            title={day === 0 ? t("weather.hours") : t("weather.hoursOf", { day: weekday(forecast.days[day]?.date ?? "") })}
+            isToday={day === 0}
+            index={10}
+          />
+          {forecast.days.length > 0 && <WeatherDays days={forecast.days} selected={day} onPick={setDay} index={11} />}
+          <WeatherAstro today={forecast.days[0]} nowAt={forecast.hours[0]?.at ?? ""} lat={place.lat} index={12} />
         </>
       ) : (
         <FailedCard place={place} loading={loading} onRefresh={() => void load(true)} onChange={() => setChanging(true)} />

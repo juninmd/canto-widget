@@ -1,39 +1,44 @@
 import type { CSSProperties } from "react";
 import type { WeatherDay } from "../lib/api";
-import { conditionKey, degrees, rangeBar, weekday } from "../lib/weather";
+import { conditionKey, degrees, weekday } from "../lib/weather";
 import { t } from "../i18n";
 import WeatherIcon from "./WeatherIcon";
 
-/** The days ahead, each with its own min..max bar placed inside the week's range so the days compare at a glance. */
-export default function WeatherDays({ days, index }: { days: WeatherDay[]; index: number }) {
-  const lo = Math.min(...days.map((d) => d.min));
-  const hi = Math.max(...days.map((d) => d.max));
+type Props = { days: WeatherDay[]; selected: number; onPick: (index: number) => void; index: number };
+
+/** The days ahead as cards in a row; picking one turns the hourly chart to that day. */
+export default function WeatherDays({ days, selected, onPick, index }: Props) {
   return (
-    <section className="wx-glass wx-rise shrink-0 p-2" style={{ "--i": index } as CSSProperties}>
-      <h3 className="px-1 pb-1 text-[11px] text-faint">{t("weather.days")}</h3>
-      <ul className="flex flex-col">
-        {days.map((day, i) => {
-          const bar = rangeBar(day, lo, hi);
-          return (
-            <li key={day.date} data-weather-day={day.date} className="flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-hover">
-              <span className="w-11 shrink-0 text-xs text-muted">{i === 0 ? t("weather.today") : weekday(day.date)}</span>
-              <WeatherIcon condition={day.condition} className="h-6 w-6 shrink-0" />
+    <section className="wx-glass wx-rise flex shrink-0 flex-col gap-1.5 p-2" style={{ "--i": index } as CSSProperties}>
+      <h3 className="flex items-center justify-between gap-2 px-1 text-[11px] text-faint">
+        <span>{t("weather.days")}</span>
+        <span className="truncate">{t("weather.pickDay")}</span>
+      </h3>
+      <ul className="flex gap-1.5 overflow-x-auto px-0.5 pb-1 [scrollbar-width:none]">
+        {days.map((day, i) => (
+          <li key={day.date} className="shrink-0">
+            <button
+              type="button"
+              data-weather-day={day.date}
+              aria-pressed={i === selected}
+              onClick={() => onPick(i)}
+              title={t("weather.rain", { n: day.rain })}
+              className="wx-pick canto-hit flex w-[68px] flex-col items-center gap-0.5 rounded-xl border border-edge bg-panel px-1 py-2 tabular-nums hover:bg-hover aria-pressed:border-accent aria-pressed:bg-accent/10"
+            >
+              <span className={`text-[11px] ${i === selected ? "font-semibold text-fg" : "text-muted"}`}>
+                {i === 0 ? t("weather.today") : weekday(day.date)}
+              </span>
+              <WeatherIcon condition={day.condition} className="h-7 w-7" />
               <span className="sr-only">{t(conditionKey(day.condition))}</span>
-              <span
-                title={t("weather.rain", { n: day.rain })}
-                className={`w-9 shrink-0 text-[10px] tabular-nums ${day.rain >= 30 ? "text-sky-400" : "invisible"}`}
-              >
-                {day.rain >= 30 && <span aria-hidden="true">💧</span>}
+              <span className="text-[13px] font-semibold text-fg">{degrees(day.max)}°</span>
+              <span className="text-[11px] text-faint">{degrees(day.min)}°</span>
+              <span className={`min-h-[13px] text-[10px] font-semibold text-sky-400 ${day.rain >= 30 ? "" : "invisible"}`}>
+                <span aria-hidden="true">💧</span>
                 {day.rain}%
               </span>
-              <span className="w-7 shrink-0 text-right text-xs tabular-nums text-faint">{degrees(day.min)}°</span>
-              <span className="wx-range min-w-8 flex-1" aria-hidden="true">
-                <span style={{ "--from": `${bar.from}%`, "--span": `${bar.span}%` } as CSSProperties} />
-              </span>
-              <span className="w-7 shrink-0 text-xs font-semibold tabular-nums text-fg">{degrees(day.max)}°</span>
-            </li>
-          );
-        })}
+            </button>
+          </li>
+        ))}
       </ul>
     </section>
   );
