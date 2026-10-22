@@ -26,7 +26,19 @@ jobs:
       - run: bun run lint
       - run: bun test
       - run: bun run build
-      - run: bun audit
+      # The advisory endpoint occasionally answers 503; retry a few times before failing the gate.
+      - run: |
+          for attempt in 1 2 3; do
+            if bun audit; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              delay=$((attempt * 10))
+              echo "bun audit failed (attempt $attempt), retrying in ${delay}s..."
+              sleep "$delay"
+            fi
+          done
+          exit 1
 
   audit:
     runs-on: ubuntu-24.04
