@@ -73,7 +73,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 ### Alterado
 
 - **Releases e CI mais rápidos**: o binário de release usa LTO thin (otimiza em paralelo, em vez de num só
-  passo), o `cargo-audit` vem pronto em vez de compilado a cada execução e os testes e2e usam todos os núcleos do CI.
+  passo), o `cargo-audit` vem pronto em vez de compilado a cada execução e os testes e2e no CI
+  rodam sobre o bundle pronto (`vite preview`) em vez do servidor de desenvolvimento, na metade do tempo.
 - **Abas na vertical ou na horizontal, à sua escolha**: em Ajustes > Aparência, "Layout das abas" troca a barra de
   cima por uma barra lateral com todas as abas, em grupos (Meu dia, Código, Explorar) e Ajustes no fim. Ela mostra só
   os ícones, abre por cima do conteúdo ao passar o mouse ou navegar pelo teclado, e pode ficar aberta. As setas
