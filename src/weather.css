@@ -48,55 +48,11 @@
   pointer-events: none;
   overflow: hidden;
 }
-.wx-drop,
-.wx-flake,
-.wx-star,
-.wx-cloud,
-.wx-fog {
+.wx-canvas {
   position: absolute;
-  left: var(--x);
-}
-.wx-drop {
-  top: -14%;
-  width: 1.5px;
-  height: 16px;
-  border-radius: 2px;
-  background: linear-gradient(to bottom, transparent, rgb(186 230 253 / 0.85));
-  opacity: 0.55;
-}
-.wx-flake {
-  top: -6%;
-  width: var(--s);
-  height: var(--s);
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0.8;
-}
-.wx-star {
-  top: var(--y);
-  width: 2px;
-  height: 2px;
-  border-radius: 50%;
-  background: #fff;
-  opacity: 0.7;
-}
-.wx-cloud {
-  top: var(--y);
-  width: 150px;
-  height: 46px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.13);
-  filter: blur(10px);
-  transform: translateX(-30%);
-}
-.wx-fog {
-  top: var(--y);
-  width: 130%;
-  height: 26px;
-  left: -15%;
-  border-radius: 999px;
-  background: rgb(226 232 240 / 0.16);
-  filter: blur(12px);
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 .wx-flash {
   position: absolute;
@@ -140,24 +96,64 @@
   transform-origin: center;
 }
 
+/* Horas com chuva: a faixa sombreada no gráfico, com gotas caindo dentro dela. */
+.wx-band {
+  position: absolute;
+  top: 34px;
+  bottom: 24px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: rgb(56 189 248 / 0.12);
+  pointer-events: none;
+}
+.wx-band > i {
+  position: absolute;
+  top: 0;
+  left: var(--x);
+  width: 1.5px;
+  height: 8px;
+  border-radius: 2px;
+  background: rgb(56 189 248 / 0.8);
+  opacity: 0;
+}
+.wx-toggle > i {
+  position: relative;
+  width: 24px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--color-edge);
+  transition: background-color 160ms;
+}
+.wx-toggle > i::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-fg);
+  transition: transform 160ms;
+}
+.wx-toggle[aria-pressed="true"] > i {
+  background: var(--color-accent);
+}
+.wx-toggle[aria-pressed="true"] > i::after {
+  transform: translateX(10px);
+  background: var(--color-on-accent);
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .wx-drop {
-    animation: wx-rain 0.9s linear var(--d) infinite;
+  .wx-band > i {
+    animation: wx-hour-rain 1s linear var(--d) infinite;
   }
-  .wx-flake {
-    animation: wx-snow 7s linear var(--d) infinite;
+  .wx-alert-danger {
+    animation: wx-alert 2s ease-in-out infinite;
   }
-  .wx-star {
-    animation: wx-twinkle 3.2s ease-in-out var(--d) infinite;
-  }
-  .wx-cloud {
-    animation: wx-pass 26s linear var(--d) infinite;
-  }
-  .wx-fog {
-    animation: wx-fog 14s ease-in-out var(--d) infinite alternate;
-  }
-  .wx-flash {
-    animation: wx-flash 7s linear infinite;
+  .wx-bar {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: wx-grow 600ms var(--ease-entrar) backwards;
   }
   .wx-icon .wx-ray-ring {
     animation: wx-turn 24s linear infinite;
@@ -201,54 +197,9 @@
   }
 }
 
-@keyframes wx-rain {
-  to {
-    transform: translateY(340px) translateX(-14px);
-  }
-}
-@keyframes wx-snow {
-  0% {
-    transform: translate(0, 0);
-  }
-  50% {
-    transform: translate(14px, 260px);
-  }
-  100% {
-    transform: translate(-6px, 560px);
-  }
-}
 @keyframes wx-twinkle {
   50% {
     opacity: 0.15;
-  }
-}
-@keyframes wx-pass {
-  to {
-    transform: translateX(380%);
-  }
-}
-@keyframes wx-fog {
-  to {
-    transform: translateX(9%);
-  }
-}
-@keyframes wx-flash {
-  0%,
-  92%,
-  100% {
-    opacity: 0;
-  }
-  93% {
-    opacity: 0.9;
-  }
-  95% {
-    opacity: 0.1;
-  }
-  96% {
-    opacity: 0.7;
-  }
-  99% {
-    opacity: 0;
   }
 }
 @keyframes wx-turn {
@@ -314,5 +265,28 @@
 @keyframes wx-fade-in {
   from {
     opacity: 0;
+  }
+}
+@keyframes wx-hour-rain {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translateY(150px);
+    opacity: 0;
+  }
+}
+@keyframes wx-alert {
+  50% {
+    box-shadow: 0 0 0 5px rgb(251 113 133 / 0.3);
+  }
+}
+@keyframes wx-grow {
+  from {
+    transform: scaleY(0);
   }
 }

@@ -147,17 +147,23 @@ export const AGENTS = {
 
 /** Invented city and forecast: a real one would read as a fact. */
 const SKY = ["cloudy", "cloudy", "clear", "clear", "cloudy", "clear", "clear", "cloudy"] as const;
-const WEATHER_HOURS = Array.from({ length: 24 }, (_, i) => {
+const WEATHER_HOURS = Array.from({ length: 158 }, (_, i) => {
   const hour = (10 + i) % 24;
+  const wet = i <= 5 || (i >= 28 && i <= 31);
+  const temp = Math.round((20.4 + 4 * Math.sin(((hour - 10) / 24) * Math.PI * 2)) * 10) / 10;
   return {
     at: `2026-10-${17 + Math.floor((10 + i) / 24)}T${String(hour).padStart(2, "0")}:00`,
-    temp: Math.round((22.4 + 4 * Math.sin(((i - 2) / 24) * Math.PI * 2)) * 10) / 10,
-    rain: i >= 3 && i <= 6 ? 45 + i * 6 : 5 + (i % 4) * 5,
-    condition: i >= 3 && i <= 6 ? "rain" : SKY[Math.floor(i / 3)],
+    temp,
+    rain: wet ? 85 - (i % 24) * 6 : 5 + (i % 4) * 5,
+    condition: wet ? "rain" : SKY[Math.floor((i % 24) / 3)],
+    feels: Math.round((temp + (wet ? -0.8 : 1.2)) * 10) / 10,
+    wind: 9 + (i % 6) * 2 + (wet ? 8 : 0),
+    wind_dir: 160 + (i % 8) * 10,
+    precip: wet ? Math.round((3.2 - (i % 24) * 0.45) * 10) / 10 : 0,
   };
 });
 const WEATHER_DAYS = [
-  [17.1, 26.1, 80, "rain", 8.4], [16.4, 27.0, 20, "clear", 9.1], [15.8, 24.3, 10, "cloudy", 6.2],
+  [17.1, 24.1, 85, "rain", 3.1], [16.4, 27.0, 20, "clear", 9.1], [15.8, 24.3, 10, "cloudy", 6.2],
   [18.2, 28.4, 0, "clear", 10.3], [19.0, 29.5, 5, "clear", 11.2], [17.5, 25.0, 65, "rain", 4.1],
   [16.0, 23.8, 40, "cloudy", 5.0],
 ] as const;
@@ -226,7 +232,19 @@ export const WEATHER = {
   weather_get: {
     place: { city: "Aurora", admin1: "Vale Azul", country: "Brasil", lat: -23.5, lon: -46.6 },
     forecast: {
-      now: { temp: 22.4, feels: 24.1, condition: "cloudy", humidity: 71, wind: 12.6, wind_dir: 135, is_day: true },
+      now: {
+        temp: 20.4,
+        feels: 19.6,
+        condition: "rain",
+        humidity: 91,
+        wind: 18.2,
+        wind_dir: 200,
+        is_day: true,
+        gusts: 34.1,
+        pressure: 1008.3,
+        visibility: 4.2,
+        dew_point: 18.6,
+      },
       hours: WEATHER_HOURS,
       days: WEATHER_DAYS.map(([min, max, rain, condition, uv], i) => ({
         date: `2026-10-${17 + i}`,
@@ -238,7 +256,9 @@ export const WEATHER = {
         sunrise: `2026-10-${17 + i}T05:${40 - i}`,
         sunset: `2026-10-${17 + i}T18:${12 + i}`,
       })),
-      rain_from: "2026-10-17T13:00",
+      rain_from: "2026-10-17T10:00",
+      next_rain: [1.6, 1.9, 1.4, 1.1, 0.7, 0.3, 0, 0],
+      air: 38,
     },
     fetched_at: NOW.getTime(),
     error: null,

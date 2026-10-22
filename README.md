@@ -182,16 +182,19 @@ in Settings.
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: an animated sky card with 22 °C, the condition drawn as an icon, today's range, the rain warning and tiles for humidity, wind, UV, sunrise, sunset and today's rain chance"><img src="docs/prints/app/93-clima-previsao.png" alt="Weather tab scrolled: the next 24 hours as a smooth curve with icons and rain chance, and seven days with a min-to-max bar each"><img src="docs/prints/app/97-clima-busca.png" alt="Picking a city: results listed while typing, each with its state and country, the first one highlighted"><img src="docs/prints/app/99-clima-cidades.png" alt="Picking a city before typing: popular cities as one-click chips"></td></td>
+<td><img src="docs/prints/app/92-clima.png" alt="Weather tab: a rainy sky card with slanted drops and splashes at 20 °C, the next 2 hours as rain bars and tiles for feels like, humidity, wind with gusts and pressure"><img src="docs/prints/app/93-clima-previsao.png" alt="Weather tab scrolled: the hourly chart with the rainy hours shaded and each hour's rain chance, seven day cards with today picked, the sun's arc and the moon phase"><img src="docs/prints/app/97-clima-busca.png" alt="Picking a city: results listed while typing, each with its state and country, the first one highlighted"><img src="docs/prints/app/99-clima-cidades.png" alt="Picking a city before typing: popular cities as one-click chips"></td></td>
 <td>
 
 ### 🌤️ The weather without leaving the widget
 
 **A sky that matches the weather**: the card behind the temperature turns into clear blue, a starry night, rain,
-snow, fog or a storm with lightning — falling drops and flakes, drifting clouds, a drawn and animated icon for
-each condition (all of it still when your system asks for less motion). Under it: **humidity, wind with its
-direction, UV index, sunrise, sunset** and today's rain chance, the **next 24 hours as a smooth curve** and **seven
-days** with a min-to-max bar each, so the days compare at a glance; "rain from 13:00" when it is coming.
+snow, fog or a storm, painted on a canvas: rain that slants with the wind and splashes, branching lightning with
+a flash, turning sun rays, layered clouds, stars and shooting stars at night (all of it still when your system
+asks for less motion). Under it: the **next 2 hours** in 15-minute steps ("rain starts in ~30 min"), **eight
+readings** (feels like, humidity, wind with gusts, pressure, visibility, dew point, UV, air quality), the **hourly
+chart** with the rainy hours shaded and raining, each hour's rain chance, a feels-like line and rain and wind
+modes, **seven days you can tap** to see that day's hours, a warning pill for storms, strong gusts or harsh sun,
+and the **sun's arc with the moon phase** drawn as it looks from the city's hemisphere.
 
 **Choosing the city takes seconds**: results appear **while you type** (arrows and Enter work), the cities you
 picked before and a row of **popular ones are one click away**, and "Londres" still lists England, Argentina and
