@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "последно тримесечие",
   "weather.moon.waningCrescent": "намаляващ полумесец",
   "weather.moon.lit": "{n}% осветен",
-  "weather.moon.toFull": "пълен след {n} дни"
+  "weather.moon.toFull": "пълен след {n} дни",
+  "notes.savedAnnouncement": "\"{title}\" е запазена"
 }

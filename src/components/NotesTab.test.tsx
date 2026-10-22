@@ -61,6 +61,17 @@ test("Ctrl+Enter saves the card without going through the button", async () => {
   expect(saved?.args?.title).toBe("ideia solta");
 });
 
+test("saving tells the person the note was saved instead of closing in silence", async () => {
+  const title = await openEditor();
+  await act(async () => {
+    fireEvent.change(title, { target: { value: "ideia solta" } });
+    fireEvent.keyDown(title, { key: "Enter", ctrlKey: true });
+    await new Promise((ready) => setTimeout(ready, 0));
+  });
+
+  expect(screen.getAllByRole("status").some((s) => s.textContent === '"ideia solta" salva')).toBe(true);
+});
+
 test("Enter alone does not save", async () => {
   const title = await openEditor();
   await act(async () => {

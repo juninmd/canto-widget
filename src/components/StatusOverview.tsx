@@ -29,7 +29,7 @@ export default function StatusOverview({ counts, bad, ok, filter, onFilter }: Pr
           aria-label={t("uiStatus.bar", { down: counts.down, warn: counts.warn, maint: counts.maintenance, ok: counts.ok })}
           className="mt-2.5 flex h-2 gap-0.5 overflow-hidden rounded-full bg-edge"
         >
-          {SEGMENTS.map((s) => (counts[s.key] > 0 ? <i key={s.key} className={`${s.color} min-w-1`} style={{ flexGrow: counts[s.key] }} /> : null))}
+          {SEGMENTS.map((s) => (counts[s.key] > 0 ? <i key={s.key} className={`canto-grow-x ${s.color} min-w-1`} style={{ flexGrow: counts[s.key] }} /> : null))}
         </div>
       </div>
       <div role="group" aria-label={t("uiStatus.filter.label")} className="flex flex-wrap gap-1 text-[11px]">

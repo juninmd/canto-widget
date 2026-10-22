@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "sista kvartalet",
   "weather.moon.waningCrescent": "avtagande halvmåne",
   "weather.moon.lit": "{n}% lyser",
-  "weather.moon.toFull": "fullt om {n} dagar"
+  "weather.moon.toFull": "fullt om {n} dagar",
+  "notes.savedAnnouncement": "”{title}” sparad"
 }

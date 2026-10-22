@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useIndicator } from "../lib/useIndicator";
 import { TAB_GROUP } from "../lib/tabLayout";
 import { t } from "../i18n";
 import { panelId, tabId, type Tab, type TABS } from "./TabBar";
@@ -20,6 +21,8 @@ const SHOWN = "hidden group-hover/rail:inline group-has-[:focus-visible]/rail:in
 export default function TabRail({ current, onChange, tabs, pinned, onPinned }: Props) {
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
   const focusCurrent = useRef(false);
+  const list = useRef<HTMLElement>(null);
+  const box = useIndicator(list, () => refs.current[current], current);
 
   useEffect(() => {
     if (!focusCurrent.current) return;
@@ -86,11 +89,13 @@ export default function TabRail({ current, onChange, tabs, pinned, onPinned }: P
         className={`absolute inset-y-0 left-0 flex w-[52px] flex-col overflow-hidden border-r border-edge bg-panel px-1.5 py-2 transition-[width,box-shadow] motion-reduce:transition-none group-data-[pinned=false]/rail:group-hover/rail:shadow-2xl ${OPEN}`}
       >
         <nav
+          ref={list}
           role="tablist"
           aria-orientation="vertical"
+          data-sliding={box ? "" : undefined}
           aria-label={t("tabs.label")}
           onKeyDown={onKeyDown}
-          className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden [scrollbar-width:none]"
+          className="canto-tabs relative flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden [scrollbar-width:none]"
         >
           {items.map((tab) => {
             const group = TAB_GROUP[tab.id];
@@ -113,6 +118,14 @@ export default function TabRail({ current, onChange, tabs, pinned, onPinned }: P
           })}
           <div className="min-h-2 flex-1" />
           {settings && tabButton(settings)}
+          {box && (
+            <span
+              aria-hidden="true"
+              data-tab-indicator
+              className="canto-indicator pointer-events-none absolute left-0 top-0 w-[3px] rounded-r bg-accent"
+              style={{ height: Math.max(0, box.h - 16), transform: `translateY(${box.y + 8}px)` }}
+            />
+          )}
         </nav>
         <button
           type="button"

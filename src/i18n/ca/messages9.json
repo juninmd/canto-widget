@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "darrer trimestre",
   "weather.moon.waningCrescent": "creixent minvant",
   "weather.moon.lit": "{n}% il·luminat",
-  "weather.moon.toFull": "ple en {n} dies"
+  "weather.moon.toFull": "ple en {n} dies",
+  "notes.savedAnnouncement": "\"{title}\" desada"
 }

@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "dernier trimestre",
   "weather.moon.waningCrescent": "croissant décroissant",
   "weather.moon.lit": "{n}% illuminé",
-  "weather.moon.toFull": "complet dans {n} jours"
+  "weather.moon.toFull": "complet dans {n} jours",
+  "notes.savedAnnouncement": "« {title} » enregistrée"
 }

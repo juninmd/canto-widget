@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { api, type ReadArticle } from "../lib/api";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
@@ -24,10 +24,12 @@ function useDataImage(load: () => Promise<string | null>) {
 /** One reading: the thumbnail when the entry has one, the source and the age, and the two actions. */
 export default function ReadCard({
   article,
+  index = 0,
   onMark,
   onError,
 }: {
   article: ReadArticle;
+  index?: number;
   onMark: (article: ReadArticle) => void;
   onError: (message: string) => void;
 }) {
@@ -36,11 +38,12 @@ export default function ReadCard({
   return (
     <li
       data-read={article.id}
-      className={`flex gap-2 rounded-lg border border-edge/60 px-2 py-1.5 transition-colors ${
+      style={{ "--i": Math.min(index, 10) } as CSSProperties}
+      className={`wx-rise flex gap-2 rounded-lg border border-edge/60 px-2 py-1.5 transition-[opacity,background-color,border-color] duration-300 motion-reduce:transition-none ${
         article.unread ? "" : "opacity-60"
       }`}
     >
-      {thumb && <img src={thumb} alt="" className="h-14 w-20 shrink-0 rounded object-cover" />}
+      {thumb && <img src={thumb} alt="" className="canto-img-in h-14 w-20 shrink-0 rounded object-cover" />}
       <div className="min-w-0 flex-1">
         <button
           type="button"

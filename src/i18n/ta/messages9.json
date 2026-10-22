@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "கடைசி காலாண்டு",
   "weather.moon.waningCrescent": "குறையும் பிறை",
   "weather.moon.lit": "{n}% ஒளிரும்",
-  "weather.moon.toFull": "{n} நாட்களில் முழுமையாக"
+  "weather.moon.toFull": "{n} நாட்களில் முழுமையாக",
+  "notes.savedAnnouncement": "\"{title}\" சேமிக்கப்பட்டது"
 }

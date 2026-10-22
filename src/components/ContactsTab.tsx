@@ -95,7 +95,7 @@ export default function ContactsTab({ onNotice }: Props) {
       {error && <ErrorBanner message={error} busy={loading} onRetry={() => void load()} />}
       <section className="wx-glass wx-rise flex items-center justify-between gap-2 bg-gradient-to-br from-accent/15 via-accent/5 to-transparent p-3">
         <div>
-          <p data-contacts-total className="text-3xl font-semibold tabular-nums tracking-tight text-fg">{view.total}</p>
+          <p key={view.total} data-contacts-total className="canto-roll text-3xl font-semibold tabular-nums tracking-tight text-fg">{view.total}</p>
           <span className="text-[11px] text-muted">{t("contacts.total")}</span>
         </div>
         <span className="flex items-center gap-1.5">
@@ -158,7 +158,7 @@ export default function ContactsTab({ onNotice }: Props) {
                     >
                       <span
                         aria-hidden="true"
-                        className={`grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ${avatarTone(contact.emails[0] ?? contact.name)}`}
+                        className={`canto-pop grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ${avatarTone(contact.emails[0] ?? contact.name)}`}
                       >
                         {initials(contact.name)}
                       </span>
@@ -170,7 +170,7 @@ export default function ContactsTab({ onNotice }: Props) {
                       <span aria-hidden="true" className={`text-[9px] text-faint transition-transform ${expanded ? "rotate-180" : ""}`}>▾</span>
                     </button>
                     {expanded && (
-                      <div className="flex flex-col gap-1.5 bg-ink/40 px-3 pb-2.5 pt-1.5">
+                      <div className="flex flex-col gap-1.5 bg-ink/40 px-3 pb-2.5 pt-1.5 motion-safe:animate-aba">
                         <Detail label={t("contacts.email")} values={contact.emails} onCopy={(v) => void copy(v)} />
                         <Detail label={t("contacts.phone")} values={contact.phones} onCopy={(v) => void copy(v)} />
                         {contact.emails.length + contact.phones.length === 0 && <p className="text-[11px] text-faint">{t("contacts.noDetails")}</p>}

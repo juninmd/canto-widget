@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "quý trước",
   "weather.moon.waningCrescent": "lưỡi liềm suy yếu",
   "weather.moon.lit": "{n}% được chiếu sáng",
-  "weather.moon.toFull": "đầy trong {n} ngày"
+  "weather.moon.toFull": "đầy trong {n} ngày",
+  "notes.savedAnnouncement": "Đã lưu \"{title}\""
 }

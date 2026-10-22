@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "poslední čtvrtletí",
   "weather.moon.waningCrescent": "ubývající půlměsíc",
   "weather.moon.lit": "{n}% svítí",
-  "weather.moon.toFull": "plné za {n} dní"
+  "weather.moon.toFull": "plné za {n} dní",
+  "notes.savedAnnouncement": "„{title}“ uložena"
 }

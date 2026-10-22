@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "zadnja četvrtina",
   "weather.moon.waningCrescent": "opadajući polumjesec",
   "weather.moon.lit": "{n}% osvijetljen",
-  "weather.moon.toFull": "puna za {n} dana"
+  "weather.moon.toFull": "puna za {n} dana",
+  "notes.savedAnnouncement": "\"{title}\" spremljena"
 }

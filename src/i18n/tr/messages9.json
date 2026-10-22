@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "son çeyrek",
   "weather.moon.waningCrescent": "azalan hilal",
   "weather.moon.lit": "{n}% yanıyor",
-  "weather.moon.toFull": "{n} gün sonra dolacak"
+  "weather.moon.toFull": "{n} gün sonra dolacak",
+  "notes.savedAnnouncement": "\"{title}\" kaydedildi"
 }

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./noteEditor.css";
 @import "./weather.css";
+@import "./motion.css";
 
 /* Skin padrão. Cada skin abaixo só redefine estes tokens. */
 :root,
@@ -194,6 +195,8 @@
   --animate-baixar: canto-baixar 150ms var(--ease-sair) forwards;
   --animate-marcar: canto-marcar 150ms var(--ease-entrar);
   --animate-fade: canto-fade 100ms linear backwards;
+  /* Item novo que chega de fora (um clip copiado em outro app): cai do topo com a mola leve. */
+  --animate-cair: canto-cair 320ms cubic-bezier(0.3, 1.2, 0.5, 1) backwards;
   /* Mola leve: so tamanho e posicao passam do alvo, nunca fade ou saida. */
   --animate-borda: canto-borda 420ms cubic-bezier(0.3, 1.2, 0.5, 1) backwards;
 
@@ -236,6 +239,12 @@
     from {
       opacity: 0;
       transform: translateX(28px);
+    }
+  }
+  @keyframes canto-cair {
+    from {
+      opacity: 0;
+      transform: translateY(-14px) scale(0.97);
     }
   }
   @keyframes canto-fade {

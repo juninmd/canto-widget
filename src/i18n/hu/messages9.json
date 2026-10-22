@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "utolsó negyedévben",
   "weather.moon.waningCrescent": "fogyó félhold",
   "weather.moon.lit": "{n}% megvilágított",
-  "weather.moon.toFull": "megtelt {n} napon belül"
+  "weather.moon.toFull": "megtelt {n} napon belül",
+  "notes.savedAnnouncement": "„{title}” mentve"
 }

@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "последний квартал",
   "weather.moon.waningCrescent": "убывающий полумесяц",
   "weather.moon.lit": "{n}% горит",
-  "weather.moon.toFull": "полностью через {n} дней"
+  "weather.moon.toFull": "полностью через {n} дней",
+  "notes.savedAnnouncement": "«{title}» сохранена"
 }

@@ -2,6 +2,7 @@ export const content = {
   "notes.deleted": 'card "{title}" excluído',
   "notes.pinnedAnnouncement": '"{title}" fixada no topo',
   "notes.unpinnedAnnouncement": '"{title}" desafixada',
+  "notes.savedAnnouncement": '"{title}" salva',
   "notes.exportedAnnouncement": '"{title}" exportada em {where}',
   "notes.untitledDefault": "sem titulo",
   "notes.searchLabel": "buscar notas",

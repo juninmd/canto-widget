@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "الربع الأخير",
   "weather.moon.waningCrescent": "الهلال المتضائل",
   "weather.moon.lit": "{n}% مضاءة",
-  "weather.moon.toFull": "كاملاً خلال {n} من الأيام"
+  "weather.moon.toFull": "كاملاً خلال {n} من الأيام",
+  "notes.savedAnnouncement": "تم حفظ \"{title}\""
 }

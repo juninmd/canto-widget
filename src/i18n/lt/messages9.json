@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "paskutinis ketvirtis",
   "weather.moon.waningCrescent": "nykstantis pusmėnulis",
   "weather.moon.lit": "{n}% apšviesta",
-  "weather.moon.toFull": "pilna per {n} dienas"
+  "weather.moon.toFull": "pilna per {n} dienas",
+  "notes.savedAnnouncement": "„{title}“ išsaugota"
 }

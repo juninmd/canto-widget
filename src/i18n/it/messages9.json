@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "ultimo trimestre",
   "weather.moon.waningCrescent": "mezzaluna calante",
   "weather.moon.lit": "{n}% illuminato",
-  "weather.moon.toFull": "completo in {n} giorni"
+  "weather.moon.toFull": "completo in {n} giorni",
+  "notes.savedAnnouncement": "\"{title}\" salvata"
 }

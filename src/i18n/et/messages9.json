@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "viimane veerand",
   "weather.moon.waningCrescent": "kahanev poolkuu",
   "weather.moon.lit": "{n}% valgustatud",
-  "weather.moon.toFull": "täis {n} päevaga"
+  "weather.moon.toFull": "täis {n} päevaga",
+  "notes.savedAnnouncement": "„{title}“ salvestatud"
 }

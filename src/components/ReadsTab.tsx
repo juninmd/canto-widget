@@ -62,8 +62,8 @@ export default function ReadsTab({ onError }: { onError: (message: string) => vo
         <p className="text-xs text-faint">{view.feeds.length === 0 ? t("reads.empty") : t("reads.emptyItems")}</p>
       ) : (
         <ul className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1">
-          {view.items.map((article) => (
-            <ReadCard key={article.id} article={article} onMark={mark} onError={onError} />
+          {view.items.map((article, i) => (
+            <ReadCard key={article.id} article={article} index={i} onMark={mark} onError={onError} />
           ))}
         </ul>
       )}

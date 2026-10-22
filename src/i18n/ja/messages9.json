@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "最後の四半期",
   "weather.moon.waningCrescent": "衰退する三日月",
   "weather.moon.lit": "{n}% が点灯",
-  "weather.moon.toFull": "{n} 日で満杯になります"
+  "weather.moon.toFull": "{n} 日で満杯になります",
+  "notes.savedAnnouncement": "「{title}」を保存しました"
 }

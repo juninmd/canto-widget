@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "ไตรมาสที่แล้ว",
   "weather.moon.waningCrescent": "เสี้ยวข้างแรม",
   "weather.moon.lit": "{n}% สว่างขึ้น",
-  "weather.moon.toFull": "เต็มใน {n} วัน"
+  "weather.moon.toFull": "เต็มใน {n} วัน",
+  "notes.savedAnnouncement": "บันทึก \"{title}\" แล้ว"
 }

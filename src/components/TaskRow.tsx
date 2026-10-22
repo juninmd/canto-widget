@@ -147,7 +147,8 @@ export default function TaskRow({
         ) : (
           <span className="flex min-w-0 flex-1 flex-col pr-20">
             <span
-              className={`whitespace-pre-wrap break-words text-sm leading-snug ${task.done ? "text-faint line-through" : "text-fg"}`}
+              data-fresh={checking && task.done ? "" : undefined}
+              className={`whitespace-pre-wrap break-words text-sm leading-snug ${task.done ? "canto-strike text-faint line-through" : "text-fg"}`}
               title={t("tasks.renameHint", { title: task.title })}
               onDoubleClick={onStartEdit}
             >

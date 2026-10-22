@@ -16,7 +16,7 @@ export default function SteamRowItem({ row, rank, currency }: { row: SteamRow; r
         type="button"
         onClick={() => void api.openLink(steamUrl(row.appid)).catch(() => {})}
         title={t("steam.row.open", { name: title })}
-        className="canto-hit flex w-full items-center gap-2 rounded-lg border border-edge bg-ink/60 p-1.5 text-left hover:bg-hover active:bg-active"
+        className="canto-hit group flex w-full items-center gap-2 rounded-lg border border-edge bg-ink/60 p-1.5 text-left hover:bg-hover active:bg-active"
       >
         <SteamThumb art={row.art} name={title} />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -26,7 +26,7 @@ export default function SteamRowItem({ row, rank, currency }: { row: SteamRow; r
             {row.discount > 0 && (
               <span
                 title={t("steam.row.discount", { n: row.discount })}
-                className="shrink-0 rounded bg-accent/15 px-1.5 text-[11px] font-semibold text-accent-text"
+                className="canto-pop shrink-0 rounded bg-accent/15 px-1.5 text-[11px] font-semibold text-accent-text"
               >
                 -{row.discount}%
               </span>

@@ -1,15 +1,17 @@
 import { api, type ModelRow } from "../lib/api";
 import { barWidth, formatPrice, formatScore, formatSpeed, modelUrl, type ModelSort } from "../lib/models";
+import type { CSSProperties } from "react";
 import { t } from "../i18n";
+import CountUp from "./CountUp";
 
 /** One ranked model: the bar is relative to the best score on screen, not to 100; the metric being sorted by is the one that lights up. */
-export default function ModelItem({ row, max, sort }: { row: ModelRow; max: number; sort: ModelSort }) {
+export default function ModelItem({ row, max, sort, index = 0 }: { row: ModelRow; max: number; sort: ModelSort; index?: number }) {
   const leader = row.rank === 1;
   const top = row.rank <= 3;
   const score = formatScore(row.score);
   const on = (metric: ModelSort) => (sort === metric ? "font-semibold text-accent-text" : "");
   return (
-    <li data-model={row.id}>
+    <li data-model={row.id} data-flip={row.id} style={{ "--i": Math.min(index, 10) } as CSSProperties}>
       <button
         type="button"
         onClick={() => void api.openLink(modelUrl(row.id))}
@@ -33,7 +35,7 @@ export default function ModelItem({ row, max, sort }: { row: ModelRow; max: numb
           </div>
           {row.creator && <div className="truncate text-[10px] text-faint">{row.creator}</div>}
           <div aria-hidden="true" className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-edge">
-            <div className={`h-full rounded-full ${top ? "bg-accent" : "bg-muted/60"}`} style={{ width: `${barWidth(row.score, max)}%` }} />
+            <div className={`canto-grow-x h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none ${top ? "bg-accent" : "bg-muted/60"}`} style={{ width: `${barWidth(row.score, max)}%` }} />
           </div>
           <div className="mt-1 flex flex-wrap gap-x-3 text-[10.5px] text-muted tabular-nums">
             <span className={on("price")}>{row.price === null ? t("models.noPrice") : t("models.price", { price: formatPrice(row.price) })}</span>
@@ -41,7 +43,7 @@ export default function ModelItem({ row, max, sort }: { row: ModelRow; max: numb
           </div>
         </div>
         <span className={`text-right text-sm font-bold tabular-nums ${sort === "intelligence" ? "text-accent-text" : "text-fg"}`} title={t("models.scoreTitle", { score })}>
-          {score}
+          <CountUp value={row.score} format={formatScore} />
         </span>
       </button>
     </li>

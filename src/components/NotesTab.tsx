@@ -132,6 +132,7 @@ ${lim}`);
       });
       close();
       await reload();
+      setAnnouncement(t("notes.savedAnnouncement", { title: draft.title.trim() || t("notes.untitledDefault") }));
     } catch (e) {
       onError(errText(e));
     }
@@ -187,7 +188,8 @@ ${lim}`);
       <p
         role="status"
         title={announcement}
-        className={announcement ? "truncate rounded-md bg-edge px-2 py-1 text-[11px] text-fg" : "sr-only"}
+        key={announcement}
+        className={announcement ? "truncate rounded-md bg-edge px-2 py-1 text-[11px] text-fg motion-safe:animate-surgir" : "sr-only"}
       >
         {announcement}
       </p>

@@ -104,7 +104,7 @@ export default function AgendaRail({ items, tasks, now, live = true, clashes, op
           <span key={`${e.kind}-${e.id}`} className="contents">
             {i === lineAt && (
               <li aria-label={t("plan.nowLine")} className="flex h-5 items-center gap-2 text-[10px] font-bold text-danger">
-                <span className="h-0.5 w-3.5 bg-danger" />
+                <span className="canto-now-dot relative h-0.5 w-3.5 bg-danger" />
                 <span className="font-mono tabular-nums">{hhmm(at)}</span>
                 <span className="h-0.5 flex-1 bg-danger/70" />
               </li>

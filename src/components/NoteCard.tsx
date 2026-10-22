@@ -26,7 +26,7 @@ export default function NoteCard({ note: n, className, query, privacy, onOpen, o
   const mask = privacy ? "blur-sm select-none" : "";
   const actionBtn = `${compact ? "bg-ink/90 " : ""}canto-hit grid size-6 shrink-0 place-items-center rounded-md hover:bg-hover active:bg-active focus-visible:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100`;
   return (
-    <li className={`group relative rounded-xl border bg-ink/60 p-3 transition-colors hover:bg-ink ${n.fixada ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
+    <li data-flip={n.id} className={`group relative rounded-xl border bg-ink/60 p-3 transition-colors hover:bg-ink ${n.fixada ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}>
       <div className="flex items-start justify-between gap-2">
         <button type="button" className="min-w-0 flex-1 text-left" onClick={onOpen}>
           <p className={`truncate text-sm font-medium text-fg ${compact ? `${n.fixada ? "pr-6" : ""} group-hover:pr-[4.5rem] group-focus-within:pr-[4.5rem]` : ""} ${mask}`}>{highlight(n.title, query)}</p>

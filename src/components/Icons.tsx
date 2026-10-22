@@ -8,8 +8,8 @@ export const ClockIcon = () => (
   </svg>
 );
 
-export const PinIcon = ({ filled }: { filled: boolean }) => (
-  <svg {...base} fill={filled ? "currentColor" : "none"}>
+export const PinIcon = ({ filled, className }: { filled: boolean; className?: string }) => (
+  <svg {...base} fill={filled ? "currentColor" : "none"} className={className}>
     <path d="M12 17v5M9 10.76V4h6v6.76l2.5 2.74H6.5z" />
   </svg>
 );

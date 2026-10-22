@@ -15,7 +15,8 @@ export default function StatePill({ tone, pulse, children }: { tone: StateTone; 
   const c = TONE[tone];
   return (
     <span className={`inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 text-[10.5px] font-medium leading-[18px] ${c.pill}`}>
-      <i aria-hidden="true" className={`size-1.5 rounded-full ${c.dot} ${pulse ? "motion-safe:animate-pulse" : ""}`} />
+      {/* A calm radar on what works, a blink on what needs attention. */}
+      <i aria-hidden="true" className={`relative size-1.5 rounded-full ${c.dot} ${pulse ? "canto-blink" : tone === "ok" ? "canto-ping" : ""}`} />
       {children}
     </span>
   );

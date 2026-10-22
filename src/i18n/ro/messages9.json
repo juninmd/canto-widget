@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "ultimul trimestru",
   "weather.moon.waningCrescent": "semiluna în scădere",
   "weather.moon.lit": "{n}% iluminat",
-  "weather.moon.toFull": "plin în {n} zile"
+  "weather.moon.toFull": "plin în {n} zile",
+  "notes.savedAnnouncement": "„{title}” salvată"
 }

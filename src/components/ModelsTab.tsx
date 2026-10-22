@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useFlip } from "../lib/useFlip";
 import { api, errText, type ModelsView } from "../lib/api";
 import { SORTS, sortModels, type ModelSort } from "../lib/models";
 import { timeAgo } from "../lib/time";
@@ -16,6 +17,9 @@ export default function ModelsTab() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [sort, setSort] = useState<ModelSort>("intelligence");
+  const list = useRef<HTMLOListElement>(null);
+  // Re-sorting glides each model to its new rank instead of reshuffling the list in one frame.
+  useFlip(list, `${sort}|${view?.models.length ?? 0}`);
 
   const load = useCallback(async (force: boolean) => {
     setLoading(true);
@@ -109,9 +113,9 @@ export default function ModelsTab() {
         {rows.length === 0 ? (
           <p className="text-xs text-faint">{t("models.empty")}</p>
         ) : (
-          <ol className="flex flex-col gap-2">
-            {rows.map((r) => (
-              <ModelItem key={r.id} row={r} max={max} sort={sort} />
+          <ol ref={list} className="flex flex-col gap-2">
+            {rows.map((r, i) => (
+              <ModelItem key={r.id} row={r} max={max} sort={sort} index={i} />
             ))}
           </ol>
         )}

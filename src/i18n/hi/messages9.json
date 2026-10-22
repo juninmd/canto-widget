@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "अंतिम तिमाही",
   "weather.moon.waningCrescent": "घटता हुआ अर्धचंद्र",
   "weather.moon.lit": "{n}% प्रकाशित",
-  "weather.moon.toFull": "{n} दिनों में पूर्ण"
+  "weather.moon.toFull": "{n} दिनों में पूर्ण",
+  "notes.savedAnnouncement": "\"{title}\" सहेजा गया"
 }

@@ -122,11 +122,11 @@ export default function AgendaTab({
       )}
 
       {view === "meetings" ? (
-        <div className="min-h-0 flex-1">
+        <div key="meetings" className="min-h-0 flex-1 motion-safe:animate-aba">
           <TranscriptsTab privacy={privacy} onError={onError} />
         </div>
       ) : (
-        <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <div key={`today-${day}`} className="flex-1 space-y-3 overflow-y-auto pr-1 motion-safe:animate-aba">
           {hasDay && (
             <>
               <AgendaHero items={items} now={at} relative={isToday} clashes={clashes} onDetails={setOpen} />

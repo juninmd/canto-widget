@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "robo ya mwisho",
   "weather.moon.waningCrescent": "mpevu unaopungua",
   "weather.moon.lit": "{n}% imeangaziwa",
-  "weather.moon.toFull": "imejaa ndani ya siku {n}"
+  "weather.moon.toFull": "imejaa ndani ya siku {n}",
+  "notes.savedAnnouncement": "\"{title}\" imehifadhiwa"
 }
