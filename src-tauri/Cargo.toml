@@ -79,7 +79,7 @@ security-framework = "3.7"
 # App Nap opt-out (meeting_alert.rs): already in the tree via tao/wry.
 objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSProcessInfo", "NSString", "NSObject"] }
 
+# Thin LTO keeps most of fat LTO's size and speed while optimizing in parallel: the installers built in 7-10 min.
 [profile.release]
-codegen-units = 1
-lto = true
+lto = "thin"
 strip = true
