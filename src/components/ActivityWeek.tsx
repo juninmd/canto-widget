@@ -50,7 +50,7 @@ export default function ActivityWeek({ series, goalMin }: { series: ReturnType<t
                 const height = Math.max(1, y(acc) - top - 1);
                 acc += c.secs;
                 return (
-                  <rect key={c.category} x={x} y={top} width={BAR} height={height} rx="3" fill={CATEGORY_VAR[c.category]}>
+                  <rect key={c.category} x={x} y={top} width={BAR} height={height} rx="3" fill={CATEGORY_VAR[c.category]} className="wx-bar" style={{ animationDelay: `${i * 50}ms` }}>
                     <title>{`${name(d.day)}${i === series.length - 1 ? ` (${t("uima.weekToday")})` : ""} · ${t(`activity.cat.${c.category}` as const)} ${secsLabel(c.secs)} · ${secsLabel(d.total)}`}</title>
                   </rect>
                 );

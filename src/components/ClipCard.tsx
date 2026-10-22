@@ -32,6 +32,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
 
   return (
     <li
+      data-flip={i.id}
       className={`group relative rounded-xl border bg-ink/60 p-2.5 transition-colors hover:bg-ink focus-within:border-line ${i.pinned ? "border-accent/60" : "border-edge hover:border-line"} ${className}`}
     >
       <div className="flex gap-2.5">
@@ -61,7 +62,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
             <span className="first-letter:uppercase">{KIND_LABEL[kind]}</span>
             <span aria-hidden="true">·</span>
             {copied ? (
-              <span role="status" className="font-medium text-accent-text">
+              <span role="status" className="canto-copied font-medium text-accent-text">
                 {t("clipboard.copied")}
               </span>
             ) : (
@@ -97,7 +98,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
           title={i.pinned ? t("clipboard.unpinTitle") : t("clipboard.pinTitle")}
           className={`${actionBtn} ${i.pinned ? "text-accent-text" : ""}`}
         >
-          <PinIcon filled={i.pinned} />
+          <PinIcon filled={i.pinned} className="canto-pin" />
         </button>
         <button type="button" onClick={onDelete} aria-label={t("clipboard.deleteLabel")} title={t("clipboard.deleteTitle")} className={`${actionBtn} hover:text-danger`}>
           <CrossIcon />

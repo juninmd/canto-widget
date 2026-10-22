@@ -7,6 +7,22 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Animações nas outras abas**, no espírito do Clima: movimento que diz o que mudou, curto e parado quando o
+  sistema pede menos movimento. O sublinhado da aba (e a barra da lateral) **desliza** até a aba escolhida; o
+  carregamento ganha um **brilho correndo** no lugar do pulso. **Tarefas**: o risco atravessa o texto ao marcar e
+  zerar o dia solta **confete** no anel. **Notas**: "salva" aparece depois de salvar, a nota fixada **desliza** para
+  o topo e trocar lista/grade assenta suave. **Clipboard**: o item copiado em outro app **cai do topo**, "copiado"
+  estoura e o alfinete inclina ao fixar. **Agenda**: a linha do agora anda e pulsa, a próxima reunião ganha um
+  **halo** quando faltam 15 min, Hoje/Reuniões e a troca de dia deslizam. **Gmail**: marcar como lido **varre** o
+  e-mail para o lado e o contador rola. **Drive** e **Contatos**: os ícones e avatares surgem em cascata.
+  **GitHub/GitLab**: a CI rodando gira e, quando o resultado chega na tela, pulsa (passou) ou treme (falhou).
+  **Status**: serviço no ar com um radar discreto, incidente piscando, barra de resumo crescendo e a latência
+  **desenhada**. **Agentes**: ícones surgem, o instalado pulsa e a versão de até 3 dias brilha. **Modelos**: barras
+  crescem, a nota **conta** até o valor e reordenar desliza cada modelo ao novo lugar. **Atividade**: a rosca gira
+  fatia por fatia, as colunas da semana sobem e o mapa de horas acende em onda. **Mercado**: o preço **pisca**
+  verde ou vermelho quando muda e o fim da curva pulsa. **Steam**: a capa inclina ao passar o mouse. **Leituras**:
+  os cartões entram em cascata. **Ajustes**: o ✓ das caixas estala e trocar o tema faz as cores **fundirem**.
+
 - **Aba Clima com o céu de verdade**: o cartão de cima agora é desenhado num canvas, com chuva que cai com o vento
   e respinga no chão, raio ramificado com clarão na tempestade, raios de sol girando, nuvens em camadas, neve,
   neblina e, à noite, estrelas e estrelas cadentes (tudo parado quando o sistema pede menos movimento ou a janela

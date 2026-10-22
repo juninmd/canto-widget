@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type CSSProperties } from "react";
 import { api, errText, type HarnessView } from "../lib/api";
 import { installedCount } from "../lib/agents";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
@@ -49,10 +49,10 @@ export default function AgentsTab({ onError }: { onError: (m: string) => void })
           </button>
         </div>
         <ul aria-hidden="true" className="mt-2 flex items-center gap-1.5">
-          {views.map((view) => (
-            <li key={view.id} title={view.name} className="relative">
+          {views.map((view, i) => (
+            <li key={view.id} title={view.name} className="canto-pop relative" style={{ "--i": i } as CSSProperties}>
               <ProviderIcon id={view.id} name={view.name} size={30} dim={!view.installed} />
-              {view.installed && <span className="absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-2 border-panel bg-accent" />}
+              {view.installed && <span className="canto-ping absolute -right-0.5 -bottom-0.5 size-2 rounded-full border-2 border-panel bg-accent text-accent" />}
             </li>
           ))}
         </ul>
@@ -64,7 +64,7 @@ export default function AgentsTab({ onError }: { onError: (m: string) => void })
           className="mt-2.5 h-1 overflow-hidden rounded-full bg-edge/70"
         >
           <div
-            className="h-full rounded-full bg-accent transition-[width] duration-500 motion-reduce:transition-none"
+            className="canto-grow-x h-full rounded-full bg-accent transition-[width] duration-500 motion-reduce:transition-none"
             style={{ width: `${views.length ? (installedCount(views) / views.length) * 100 : 0}%` }}
           />
         </div>
@@ -78,8 +78,8 @@ export default function AgentsTab({ onError }: { onError: (m: string) => void })
         <p className="text-xs text-faint">{t("agents.empty")}</p>
       ) : (
         <ul className="flex flex-1 flex-col gap-1.5 overflow-y-auto pr-1">
-          {views.map((view) => (
-            <AgentRow key={view.id} view={view} onError={onError} />
+          {views.map((view, i) => (
+            <AgentRow key={view.id} view={view} index={i} onError={onError} />
           ))}
         </ul>
       )}

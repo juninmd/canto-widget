@@ -1,4 +1,5 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
+import { useFlip } from "../lib/useFlip";
 import { t } from "../i18n";
 import type { Note } from "../lib/api";
 import type { NotesView } from "../lib/useNotesView";
@@ -25,8 +26,15 @@ export default function NoteList({ notes, total, loaded, query, view, card, onMo
   const span = grid ? "col-span-2" : "";
   const pinned = notes.filter((n) => n.fixada);
   const recent = notes.filter((n) => !n.fixada);
+  const list = useRef<HTMLUListElement>(null);
+  useFlip(list, notes.map((n) => `${n.id}:${n.fixada}`).join());
   return (
-    <ul className={`flex-1 content-start overflow-y-auto pr-1 ${grid ? "grid grid-cols-2 gap-2" : "space-y-2"}`}>
+    // Keyed by the view: switching list and grid rebuilds the cards with a short settle instead of a hard swap.
+    <ul
+      ref={list}
+      key={view}
+      className={`flex-1 content-start overflow-y-auto pr-1 motion-safe:animate-surgir ${grid ? "grid grid-cols-2 gap-2" : "space-y-2"}`}
+    >
       {pinned.length > 0 && (
         <li aria-hidden="true" className={`${LABEL} ${span}`}>
           {t("uiTasksNotes.section.pinned")}

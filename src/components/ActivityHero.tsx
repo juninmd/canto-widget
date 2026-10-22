@@ -26,7 +26,7 @@ export default function ActivityHero({ all, shown, hidden, onToggle, reference, 
         <div className="relative h-32 w-32 shrink-0 @max-[340px]/hero:h-[104px] @max-[340px]/hero:w-[104px]">
           <svg viewBox="0 0 128 128" role="img" aria-label={t("activity.chartLabel")} className="h-full w-full -rotate-90">
             <circle cx="64" cy="64" r={R} fill="none" strokeWidth="14" className="stroke-edge" />
-            {arcs.map((a) => (
+            {arcs.map((a, i) => (
               <circle
                 key={a.category}
                 cx="64"
@@ -37,7 +37,8 @@ export default function ActivityHero({ all, shown, hidden, onToggle, reference, 
                 stroke={CATEGORY_VAR[a.category]}
                 strokeDasharray={`${a.dash} ${CIRC}`}
                 strokeDashoffset={-a.offset}
-                className="ease-out motion-safe:transition-[stroke-dasharray,stroke-dashoffset] motion-safe:duration-500"
+                style={{ animationDelay: `${i * 90}ms` }}
+                className="canto-sweep ease-out motion-safe:transition-[stroke-dasharray,stroke-dashoffset] motion-safe:duration-500"
               >
                 <title>{`${catLabel(a.category)} ${secsLabel(a.secs)}`}</title>
               </circle>

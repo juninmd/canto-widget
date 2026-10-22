@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { LOCALE, t } from "../i18n";
 import { hourlyHeat, peakWindow, secsLabel } from "../lib/activity";
 import type { Day } from "../lib/activityView";
@@ -28,7 +29,7 @@ export default function ActivityHeat({ days }: { days: Day[] }) {
           <div key={r.day} className="contents">
             <span className="flex items-center truncate">{name(r.day)}</span>
             {cols.map((h) => (
-              <span key={h} title={`${name(r.day)} ${h}h`} className="h-[17px] rounded bg-accent" style={{ opacity: r.hours[h] ? 0.16 + (r.hours[h] / max) * 0.84 : 0.06 }} />
+              <span key={h} title={`${name(r.day)} ${h}h`} className="canto-heat h-[17px] rounded bg-accent" style={{ "--i": h, opacity: r.hours[h] ? 0.16 + (r.hours[h] / max) * 0.84 : 0.06 } as CSSProperties} />
             ))}
           </div>
         ))}

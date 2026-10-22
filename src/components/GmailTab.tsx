@@ -1,7 +1,9 @@
-import { useCallback, useEffect, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { api, errText, type GmailMail, type GmailSummary } from "../lib/api";
 import { googleGate, initials, shortWhen } from "../lib/google";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
+import { useExit } from "../lib/motion";
+import { useFlip } from "../lib/useFlip";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
 import GoogleGate from "./GoogleGate";
@@ -17,6 +19,9 @@ export default function GmailTab({ onNotice }: Props) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [alerts, setAlerts] = useState(false);
+  const { leaving, leave } = useExit();
+  const list = useRef<HTMLUListElement>(null);
+  useFlip(list, summary?.important.map((m) => m.id).join());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -42,15 +47,17 @@ export default function GmailTab({ onNotice }: Props) {
     return error ? <ErrorBanner message={error} busy={loading} onRetry={() => void load()} /> : <Skeleton label={t("google.fetching")} rows={4} />;
   }
 
-  const act = async (mail: GmailMail, run: () => Promise<unknown>, notice?: string) => {
-    try {
-      await run();
-      setSummary((s) => s && { unread: Math.max(0, s.unread - 1), important: s.important.filter((m) => m.id !== mail.id) });
-      if (notice) onNotice(notice);
-    } catch (e) {
-      setError(errText(e));
-    }
-  };
+  // The mail is swept aside first, then the list closes the gap; a failure puts it back.
+  const act = (mail: GmailMail, run: () => Promise<unknown>, notice?: string) =>
+    leave(mail.id, async () => {
+      try {
+        await run();
+        setSummary((s) => s && { unread: Math.max(0, s.unread - 1), important: s.important.filter((m) => m.id !== mail.id) });
+        if (notice) onNotice(notice);
+      } catch (e) {
+        setError(errText(e));
+      }
+    });
   const now = new Date();
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
@@ -58,7 +65,7 @@ export default function GmailTab({ onNotice }: Props) {
       <section className="wx-glass wx-rise flex items-start justify-between gap-2 bg-gradient-to-br from-accent/10 to-transparent p-3">
         <div>
           <span className="text-[11px] text-muted">{t("gmail.inbox")}</span>
-          <p data-gmail-unread className="text-3xl font-semibold tabular-nums tracking-tight text-fg">{summary.unread}</p>
+          <p key={summary.unread} data-gmail-unread className="canto-roll text-3xl font-semibold tabular-nums tracking-tight text-fg">{summary.unread}</p>
           <span className="text-[11px] text-muted">{t("gmail.unread")}</span>
         </div>
         <span className="flex items-center gap-1.5">
@@ -80,9 +87,15 @@ export default function GmailTab({ onNotice }: Props) {
       {summary.important.length === 0 ? (
         <p className="wx-glass p-3 text-xs text-muted">{t("gmail.none")}</p>
       ) : (
-        <ul className="wx-glass shrink-0 divide-y divide-edge">
+        <ul ref={list} className="wx-glass shrink-0 divide-y divide-edge overflow-hidden">
           {summary.important.map((mail, index) => (
-            <li key={mail.id} data-gmail-mail={mail.id} className="wx-rise grid grid-cols-[2rem_1fr_auto] gap-x-2 p-2.5" style={{ "--i": index + 1 } as CSSProperties}>
+            <li
+              key={mail.id}
+              data-gmail-mail={mail.id}
+              data-flip={mail.id}
+              className={`wx-rise grid ${leaving.has(mail.id) ? "canto-swipe pointer-events-none" : ""} grid-cols-[2rem_1fr_auto] gap-x-2 p-2.5`}
+              style={{ "--i": index + 1 } as CSSProperties}
+            >
               <span aria-hidden="true" className="row-span-3 grid size-8 place-items-center rounded-full bg-accent/20 text-[11px] font-bold text-accent-text">
                 {initials(mail.from)}
               </span>

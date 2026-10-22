@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "سه ماهه آخر",
   "weather.moon.waningCrescent": "هلال در حال کاهش",
   "weather.moon.lit": "{n}% روشن شده است",
-  "weather.moon.toFull": "در {n} روز کامل است"
+  "weather.moon.toFull": "در {n} روز کامل است",
+  "notes.savedAnnouncement": "«{title}» ذخیره شد"
 }

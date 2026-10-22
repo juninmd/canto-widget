@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { fitTabs } from "../lib/fitTabs";
 import { useAltHeld } from "../lib/useAltHeld";
+import { useIndicator } from "../lib/useIndicator";
 import { t } from "../i18n";
 import TabMore, { TabBadge } from "./TabMore";
 
@@ -49,6 +50,7 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
   const row = useRef<HTMLDivElement>(null);
   const ruler = useRef<HTMLDivElement>(null);
+  const list = useRef<HTMLElement>(null);
   const focusCurrent = useRef(false);
   const [shown, setShown] = useState<number[]>(() => tabs.map((_, i) => i));
   const alt = useAltHeld();
@@ -100,10 +102,19 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
   // `shown` holds indices of the previous list until the layout effect re-measures: one past the end crashes the window.
   const kept = shown.filter((i) => i < tabs.length);
   const hidden = tabs.map((tab, i) => ({ tab, i })).filter(({ i }) => !kept.includes(i));
+  const box = useIndicator(list, () => refs.current[current], `${current}|${kept.join()}`);
 
   return (
     <div ref={row} className="relative flex shrink-0 items-center gap-0.5 px-3 pb-1 pt-1.5 text-xs">
-      <nav role="tablist" aria-orientation="horizontal" aria-label={t("tabs.label")} onKeyDown={onKeyDown} className="flex min-w-0 gap-0.5">
+      <nav
+        ref={list}
+        role="tablist"
+        aria-orientation="horizontal"
+        aria-label={t("tabs.label")}
+        onKeyDown={onKeyDown}
+        data-sliding={box ? "" : undefined}
+        className="canto-tabs relative flex min-w-0 gap-0.5"
+      >
         {kept.map((i) => {
           const tab = tabs[i];
           return (
@@ -138,6 +149,14 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
             </button>
           );
         })}
+        {box && (
+          <span
+            aria-hidden="true"
+            data-tab-indicator
+            className="canto-indicator pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-full bg-accent"
+            style={{ width: Math.max(0, box.w - 16), transform: `translateX(${box.x + 8}px)` }}
+          />
+        )}
       </nav>
       {hidden.length > 0 && <TabMore hidden={hidden} attention={attention} onPick={onChange} />}
       {/* Invisible copy of the bar, the only way to know each tab's width before deciding which fit; clipped so its width cannot scroll the window. */}

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { api, type HarnessView } from "../lib/api";
 import { releaseDate, releaseSummary } from "../lib/agents";
 import { useCopied } from "../lib/useCopied";
@@ -5,14 +6,18 @@ import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import ProviderIcon, { providerColor } from "./ProviderIcon";
 
+// A release this recent still deserves a glance: its tag glows until it ages out.
+const FRESH_MS = 3 * 24 * 3600_000;
+
 const LINK = "canto-hit min-h-[24px] shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
 
 /** One agent CLI: where it comes from, whether it is installed here, what it shipped last and how to install it. */
-export default function AgentRow({ view, onError }: { view: HarnessView; onError: (m: string) => void }) {
+export default function AgentRow({ view, index = 0, onError }: { view: HarnessView; index?: number; onError: (m: string) => void }) {
   const [copied, flash] = useCopied();
   const release = view.release;
   const date = release ? releaseDate(release.published_at) : "";
   const notes = release ? releaseSummary(release.notes) : "";
+  const fresh = release ? Date.now() - new Date(release.published_at).getTime() < FRESH_MS : false;
 
   async function copy() {
     try {
@@ -26,7 +31,8 @@ export default function AgentRow({ view, onError }: { view: HarnessView; onError
   return (
     <li
       data-agent={view.id}
-      className="relative shrink-0 overflow-hidden rounded-xl border border-edge/60 bg-panel/40 p-2 pl-3 transition-colors hover:bg-panel/70"
+      style={{ "--i": Math.min(index, 8) } as CSSProperties}
+      className="wx-rise relative shrink-0 overflow-hidden rounded-xl border border-edge/60 bg-panel/40 p-2 pl-3 transition-colors hover:bg-panel/70"
     >
       <span
         aria-hidden="true"
@@ -45,7 +51,7 @@ export default function AgentRow({ view, onError }: { view: HarnessView; onError
             >
               <span
                 aria-hidden="true"
-                className={`size-1.5 rounded-full ${view.installed ? "bg-accent shadow-[0_0_6px_var(--color-accent)]" : "bg-faint/60"}`}
+                className={`relative size-1.5 rounded-full ${view.installed ? "canto-ping bg-accent shadow-[0_0_6px_var(--color-accent)]" : "bg-faint/60"}`}
               />
               {t(view.installed ? "agents.installed" : "agents.notInstalled")}
             </span>
@@ -56,7 +62,8 @@ export default function AgentRow({ view, onError }: { view: HarnessView; onError
               <>
                 <span
                   title={t("agents.release", { tag: release.tag })}
-                  className="shrink-0 rounded-md bg-edge/70 px-1.5 py-px font-mono text-[10px] tabular-nums text-fg"
+                  data-fresh={fresh ? "" : undefined}
+                  className={`${fresh ? "canto-glow" : ""} shrink-0 rounded-md bg-edge/70 px-1.5 py-px font-mono text-[10px] tabular-nums text-fg`}
                 >
                   {release.tag}
                 </span>
@@ -100,7 +107,7 @@ export default function AgentRow({ view, onError }: { view: HarnessView; onError
                   {view.install_command}
                 </code>
                 <button type="button" onClick={() => void copy()} className={`${LINK} text-[10px] text-muted`}>
-                  {copied === view.id ? t("agents.copied") : t("agents.copy")}
+                  {copied === view.id ? <span className="canto-copied inline-block">{t("agents.copied")}</span> : t("agents.copy")}
                 </button>
               </div>
             </div>

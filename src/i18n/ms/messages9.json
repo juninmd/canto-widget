@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "suku lepas",
   "weather.moon.waningCrescent": "bulan sabit semakin pudar",
   "weather.moon.lit": "{n}% bercahaya",
-  "weather.moon.toFull": "penuh dalam {n} hari"
+  "weather.moon.toFull": "penuh dalam {n} hari",
+  "notes.savedAnnouncement": "\"{title}\" disimpan"
 }

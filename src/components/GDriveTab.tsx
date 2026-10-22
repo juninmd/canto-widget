@@ -82,14 +82,14 @@ export default function GDriveTab() {
       ) : files.length === 0 ? (
         <p className="wx-glass p-3 text-xs text-muted">{t("gdrive.empty")}</p>
       ) : (
-        <ul className="wx-glass shrink-0 divide-y divide-edge">
+        <ul key={`${filter}|${search}`} className="wx-glass shrink-0 divide-y divide-edge">
           {files.map((file, index) => {
             const when = shortWhen(new Date(file.modified), now);
             return (
               <li key={file.id} data-drive-file={file.id} className="wx-rise flex items-center gap-2.5 p-2.5" style={{ "--i": index + 1 } as CSSProperties}>
                 <span
                   aria-hidden="true"
-                  className="grid size-8 shrink-0 place-items-center rounded-md text-[8px] font-bold tracking-wide"
+                  className="canto-pop grid size-8 shrink-0 place-items-center rounded-md text-[8px] font-bold tracking-wide"
                   style={{ color: KIND_COLOR[file.kind], background: `color-mix(in srgb, ${KIND_COLOR[file.kind]} 18%, transparent)` }}
                 >
                   {t(`gdrive.kind.${file.kind}`)}

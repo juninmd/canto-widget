@@ -29,8 +29,17 @@ export function isSystemLight(): boolean {
   return typeof window !== "undefined" && !!window.matchMedia?.(LIGHT_QUERY).matches;
 }
 
+const SKIN_FADE_MS = 400;
+
 export function applySkin(skin: SkinId): void {
-  document.documentElement.dataset.skin = resolveSkin(skin, isSystemLight());
+  const root = document.documentElement;
+  const next = resolveSkin(skin, isSystemLight());
+  // A switch while the widget is open crossfades the colors; the first paint at startup stays instant.
+  if (root.dataset.skin && root.dataset.skin !== next) {
+    root.dataset.skinFade = "";
+    setTimeout(() => delete root.dataset.skinFade, SKIN_FADE_MS);
+  }
+  root.dataset.skin = next;
   localStorage.setItem(KEY, skin);
 }
 

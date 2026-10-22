@@ -5,6 +5,9 @@ import { heroOf } from "../lib/agendaRail";
 import { t } from "../i18n";
 import AgendaRing from "./AgendaRing";
 
+// The halo starts when there is still time to wrap up and join, not one minute before.
+const SOON_MS = 15 * 60_000;
+
 type Props = { items: AgendaItem[]; now: Date; /** False on other days: "in 1h30" would be measured from a made-up clock. */ relative?: boolean; clashes: Map<string, string[]>; onDetails: (id: string) => void };
 
 /** The one thing to look at: the meeting in progress, else the next one, else how the day went. */
@@ -25,8 +28,13 @@ export default function AgendaHero({ items, now, relative = true, clashes, onDet
   const other = clashes.get(e.id)?.[0];
   const endsIn = live ? t("agenda.hero.endsIn", { duration: duration(hero.left) }) : "";
   const guests = e.guests ?? 0;
+  const soon = !live && relative && new Date(e.start).getTime() - now.getTime() <= SOON_MS;
   return (
-    <section aria-label={live ? t("agenda.hero.now") : t("agenda.hero.next")} className={`rounded-2xl border p-3 ${live ? "border-accent bg-accent/10" : "border-edge bg-ink/60"}`}>
+    <section
+      aria-label={live ? t("agenda.hero.now") : t("agenda.hero.next")}
+      data-soon={soon ? "" : undefined}
+      className={`rounded-2xl border p-3 ${live ? "border-accent bg-accent/10" : soon ? "canto-halo border-accent/60 bg-ink/60" : "border-edge bg-ink/60"}`}
+    >
       <div className="flex items-start gap-3">
         {live && <AgendaRing left={hero.left} pct={hero.pct} label={endsIn} />}
         <div className="min-w-0 flex-1">

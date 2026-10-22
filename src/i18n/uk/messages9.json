@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "остання чверть",
   "weather.moon.waningCrescent": "спадаючий півмісяць",
   "weather.moon.lit": "{n}% освітлений",
-  "weather.moon.toFull": "повний за {n} днів"
+  "weather.moon.toFull": "повний за {n} днів",
+  "notes.savedAnnouncement": "«{title}» збережено"
 }

@@ -7,6 +7,7 @@ import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
 import MarketChart from "./MarketChart";
 import MarketDelta from "./MarketDelta";
+import PriceTick from "./PriceTick";
 import Skeleton from "./Skeleton";
 
 /** Live quotes with the day's variation; picking a card puts its curve in the spotlight. */
@@ -67,7 +68,9 @@ export default function MarketTab() {
             </button>
           </span>
         </div>
-        <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-fg">{formatPrice(hero.symbol, hero.price)}</p>
+        <p className="mt-1 text-2xl font-semibold tabular-nums tracking-tight text-fg">
+          <PriceTick key={hero.symbol} value={hero.price} text={formatPrice(hero.symbol, hero.price)} className="rounded px-0.5 -mx-0.5" />
+        </p>
         <div className="-mx-3 -mb-3 mt-2">
           <MarketChart key={hero.symbol} points={hero.points} up={up} width={240} height={56} draw />
         </div>
@@ -89,7 +92,7 @@ export default function MarketTab() {
                 <span className="truncate text-[11px] text-muted">{quoteLabel(quote.symbol)}</span>
                 <MarketDelta change={quote.change} />
               </span>
-              <span className="text-sm font-semibold tabular-nums text-fg">{formatPrice(quote.symbol, quote.price)}</span>
+              <PriceTick value={quote.price} text={formatPrice(quote.symbol, quote.price)} className="self-start rounded px-0.5 -mx-0.5 text-sm font-semibold tabular-nums text-fg" />
               <span className="-mx-2">
                 <MarketChart points={quote.points} up={quote.change >= 0} width={120} height={24} />
               </span>

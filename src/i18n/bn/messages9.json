@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "শেষ প্রান্তিক",
   "weather.moon.waningCrescent": "ক্ষয়প্রাপ্ত ক্রিসেন্ট",
   "weather.moon.lit": "{n}% আলোকিত",
-  "weather.moon.toFull": "{n} দিনে পূর্ণ"
+  "weather.moon.toFull": "{n} দিনে পূর্ণ",
+  "notes.savedAnnouncement": "\"{title}\" সংরক্ষিত"
 }

@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "pēdējā ceturksnī",
   "weather.moon.waningCrescent": "dilstošs pusmēness",
   "weather.moon.lit": "{n}% apgaismots",
-  "weather.moon.toFull": "pilna {n} dienu laikā"
+  "weather.moon.toFull": "pilna {n} dienu laikā",
+  "notes.savedAnnouncement": "“{title}” saglabāta"
 }

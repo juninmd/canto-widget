@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "ostatni kwartał",
   "weather.moon.waningCrescent": "słabnący półksiężyc",
   "weather.moon.lit": "{n}% podświetlone",
-  "weather.moon.toFull": "pełna w {n} dni"
+  "weather.moon.toFull": "pełna w {n} dni",
+  "notes.savedAnnouncement": "„{title}” zapisana"
 }

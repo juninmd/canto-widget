@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "τελευταίο τρίμηνο",
   "weather.moon.waningCrescent": "φθίνουσα ημισέληνος",
   "weather.moon.lit": "{n}% φωτισμένο",
-  "weather.moon.toFull": "πλήρης σε {n} ημέρες"
+  "weather.moon.toFull": "πλήρης σε {n} ημέρες",
+  "notes.savedAnnouncement": "Το «{title}» αποθηκεύτηκε"
 }

@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "laatste kwartaal",
   "weather.moon.waningCrescent": "afnemende halve maan",
   "weather.moon.lit": "{n}% verlicht",
-  "weather.moon.toFull": "vol over {n} dagen"
+  "weather.moon.toFull": "vol over {n} dagen",
+  "notes.savedAnnouncement": "\"{title}\" opgeslagen"
 }

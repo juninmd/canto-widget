@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "letztes Quartal",
   "weather.moon.waningCrescent": "abnehmender Halbmond",
   "weather.moon.lit": "{n}% beleuchtet",
-  "weather.moon.toFull": "voll in {n} Tagen"
+  "weather.moon.toFull": "voll in {n} Tagen",
+  "notes.savedAnnouncement": "„{title}“ gespeichert"
 }

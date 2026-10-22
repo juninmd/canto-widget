@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "지난 분기",
   "weather.moon.waningCrescent": "쇠퇴하는 초승달",
   "weather.moon.lit": "{n}% 조명",
-  "weather.moon.toFull": "{n}일 안에 가득 찼습니다"
+  "weather.moon.toFull": "{n}일 안에 가득 찼습니다",
+  "notes.savedAnnouncement": "\"{title}\" 저장됨"
 }

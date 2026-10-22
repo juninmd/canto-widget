@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "viimeisellä neljänneksellä",
   "weather.moon.waningCrescent": "laskeva puolikuu",
   "weather.moon.lit": "{n}% valaistu",
-  "weather.moon.toFull": "täynnä {n} päivässä"
+  "weather.moon.toFull": "täynnä {n} päivässä",
+  "notes.savedAnnouncement": "”{title}” tallennettu"
 }

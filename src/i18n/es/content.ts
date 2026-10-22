@@ -4,6 +4,7 @@ export const content: Record<keyof typeof source, string> = {
   "notes.deleted": 'tarjeta "{title}" eliminada',
   "notes.pinnedAnnouncement": '"{title}" fijada arriba',
   "notes.unpinnedAnnouncement": '"{title}" desfijada',
+  "notes.savedAnnouncement": '"{title}" guardada',
   "notes.exportedAnnouncement": '"{title}" exportada a {where}',
   "notes.untitledDefault": "sin título",
   "notes.searchLabel": "buscar notas",

@@ -38,7 +38,7 @@ export default function AgendaRibbon({ items, tasks, now }: { items: AgendaItem[
         {r.segments.map((s) => (
           <i key={s.id} className={`absolute inset-y-0 min-w-[3px] ${LOOK[s.kind]} ${s.kind === "event" ? TONE[s.tone] : ""}`} style={{ left: pos(Math.max(s.start, r.from)), width: size(s) }} />
         ))}
-        {at >= r.from && at <= r.to && <span className="absolute -inset-y-0.5 w-0.5 bg-fg" style={{ left: pos(at) }} />}
+        {at >= r.from && at <= r.to && <span data-now className="canto-now absolute -inset-y-0.5 w-0.5 bg-fg" style={{ left: pos(at) }} />}
       </div>
       <div aria-hidden="true" className="relative mt-1 h-3 text-[10px] text-faint">
         {r.ticks.map((h) => (

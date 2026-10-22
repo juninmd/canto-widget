@@ -64,5 +64,6 @@
   "weather.moon.lastQuarter": "上个季度",
   "weather.moon.waningCrescent": "渐亏新月",
   "weather.moon.lit": "{n}% 发光",
-  "weather.moon.toFull": "{n} 天后满"
+  "weather.moon.toFull": "{n} 天后满",
+  "notes.savedAnnouncement": "已保存“{title}”"
 }

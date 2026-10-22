@@ -3,7 +3,8 @@ import { useQuerySeed } from "../lib/useQuerySeed";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
-import { ENTER_CLASS, EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import { EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
+import { useFlip } from "../lib/useFlip";
 import { clipKind, kindCounts } from "../lib/clip";
 import { t } from "../i18n";
 import ClipCard from "./ClipCard";
@@ -18,6 +19,9 @@ import { useCopied } from "../lib/useCopied";
 import { useWindowVisible } from "../lib/useWindowVisible";
 import { IS_MOBILE } from "../lib/platform";
 import { ClipboardIcon, SearchIcon } from "./Icons";
+
+// A clip copied elsewhere drops in from above, where it came from, and pushes the list down.
+const DROP_CLASS = "motion-safe:animate-cair motion-reduce:animate-fade";
 
 type Props = { privacy: boolean; initialQuery?: string; querySeq?: number; onError: (m: string) => void };
 
@@ -60,6 +64,8 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
   const clearable = loadedFor === "" && !query ? items.length - pinnedCount : -1;
   const counts = useMemo(() => kindCounts(items.map((i) => i.preview)), [items]);
   const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
+  const list = useRef<HTMLDivElement>(null);
+  useFlip(list, visible.map((i) => `${i.id}:${i.pinned}`).join());
 
   useEffect(() => {
     // A hidden window has nobody watching the list; coming back reloads at once.
@@ -136,7 +142,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
       )}
       <ClipKindChips counts={counts} total={items.length} value={kindFilter} onChange={setKindFilter} />
 
-      <div className="flex-1 space-y-3 overflow-y-auto pr-1">
+      <div ref={list} className="flex-1 space-y-3 overflow-y-auto pr-1">
         <ClipGroups
           items={visible}
           card={(i) => (
@@ -145,7 +151,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
               item={i}
               copied={copied === i.id}
               privacy={privacy}
-              className={`${isNew(i.id) ? ENTER_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
+              className={`${isNew(i.id) ? DROP_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
               onCopy={() =>
                 run(async () => {
                   await api.clipCopy(i.id);

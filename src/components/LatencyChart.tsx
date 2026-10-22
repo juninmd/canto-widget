@@ -26,9 +26,9 @@ export default function LatencyChart({ name, samples, limit, state }: { name: st
       <text x={W - 8} y={c.limitY - 4} textAnchor="end" className="fill-warn text-[10px]">
         {t("health.chart.limit", { ms: limit })}
       </text>
-      <path d={c.area} fill="currentColor" opacity={0.12} />
-      <path d={c.line} fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
-      {c.last && <circle cx={c.last.x} cy={c.last.y} r={3.5} fill="currentColor" />}
+      <path className="wx-area" d={c.area} fill="currentColor" opacity={0.12} />
+      <path className="wx-draw" d={c.line} pathLength={1} fill="none" stroke="currentColor" strokeWidth={2} strokeLinejoin="round" />
+      {c.last && <circle className="canto-endpoint" cx={c.last.x} cy={c.last.y} r={3.5} fill="currentColor" />}
       <text x={34} y={H - 4} className="fill-faint text-[10px]">
         {t("health.chart.before")}
       </text>
