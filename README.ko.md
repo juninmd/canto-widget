@@ -500,6 +500,7 @@ Winget 및 Homebrew에 대한 기성 매니페스트(현재 차단된 Flatpak용
 | 문서 | 그 안에 무엇이 들어있나요 |
 |---|---|
 | 📖 [User guide](docs/uso.md) | 탭, 반복 작업, 바로가기, 스킨, 접근성, 창, 업데이트 및 시스템 시작 |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google 의제 및 GitHub(개인 토큰 또는 장치 흐름) |
 | 🛡️ [Security and data](docs/seguranca.md) | 위협 모델, `.canto` 백업, 병합, 비밀번호 변경, 디스크의 파일 |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify 및 볼륨 테스트 |

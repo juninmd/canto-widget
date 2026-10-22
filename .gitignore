@@ -12,3 +12,6 @@ client_secret_*.json
 test-results/
 playwright-report/
 __pycache__/
+# Binarios de instalacao saem do release, nunca do git.
+*.apk
+*.idsig

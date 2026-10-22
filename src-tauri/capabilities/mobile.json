@@ -1,0 +1,8 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "mobile",
+  "description": "Celular: so a janela principal, sem as permissoes de janela do desktop (arrastar, esconder, tela cheia); URLs e clipboard passam pelos comandos em Rust",
+  "platforms": ["android", "iOS"],
+  "windows": ["main"],
+  "permissions": ["core:default"]
+}

@@ -500,6 +500,7 @@ OneDrive, Syncthing...), התחל עם המערכת ומקטע **עדכונים*
 | מסמך | מה יש בו |
 |---|---|
 | 📖 [User guide](docs/uso.md) | כרטיסיות, משימות חוזרות, קיצורי דרך, סקינים, נגישות, חלון, עדכונים והתחל עם המערכת |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google סדר יום וGitHub (אסימון אישי או זרימת מכשיר) |
 | 🛡️ [Security and data](docs/seguranca.md) | מודל איום, `.canto` גיבוי, מיזוג, שינוי סיסמה, קבצים בדיסק |
 | 📊 [Benchmark](docs/benchmark.md) | מבחני Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify ונפח |

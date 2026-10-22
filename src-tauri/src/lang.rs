@@ -2,8 +2,11 @@
 //! the choice made in Settings.
 use std::sync::atomic::{AtomicUsize, Ordering};
 
+#[cfg(desktop)]
 use tauri::menu::MenuItem;
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
+#[cfg(desktop)]
+use tauri::Manager;
 
 use crate::error::{AppError, Result};
 
@@ -41,6 +44,7 @@ pub(crate) fn translate(code: &str, pt: &'static str, en: &'static str) -> &'sta
 }
 
 /// Static tray items whose labels must follow the language (the join item is refreshed by `tray_live`).
+#[cfg(desktop)]
 pub struct TrayLabels {
     pub toggle: MenuItem<tauri::Wry>,
     pub mini: MenuItem<tauri::Wry>,
@@ -48,6 +52,7 @@ pub struct TrayLabels {
     pub quit: MenuItem<tauri::Wry>,
 }
 
+#[cfg(desktop)]
 pub fn toggle_label() -> String {
     format!("{}  ({})", tr("Mostrar / esconder", "Show / hide"), crate::TOGGLE_SHORTCUT_LABEL)
 }
@@ -59,6 +64,7 @@ pub fn parse(lang: &str) -> Result<usize> {
 #[tauri::command]
 pub fn language_set(app: AppHandle, lang: String) -> Result<()> {
     LANGUAGE.store(parse(&lang)?, Ordering::Relaxed);
+    #[cfg(desktop)]
     if let Some(items) = app.try_state::<TrayLabels>() {
         let _ = items.toggle.set_text(toggle_label());
         let _ = items.mini.set_text(tr("Modo mini", "Mini mode"));

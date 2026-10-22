@@ -500,6 +500,7 @@ OneDrive، Syncthing...)، با سیستم و بخش **به روز رسانی** 
 | سند | چه چیزی در آن است |
 |---|---|
 | 📖 [User guide](docs/uso.md) | زبانه ها، وظایف تکرار شونده، میانبرها، پوسته ها، دسترسی، پنجره، به روز رسانی و شروع با سیستم |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | دستور کار Google و GitHub (توکن شخصی یا جریان دستگاه) |
 | 🛡️ [Security and data](docs/seguranca.md) | مدل تهدید، `.canto` پشتیبان گیری، ادغام، تغییر رمز عبور، فایل های روی دیسک |
 | 📊 [Benchmark](docs/benchmark.md) | تست های Todoist، TickTick، Obsidian، Joplin، Raycast، PowerToys، CopyQ، Ditto، MeetingBar، Gitify و حجم |

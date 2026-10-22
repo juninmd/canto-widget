@@ -1,3 +1,5 @@
+import { IS_MOBILE } from "./platform";
+
 export type GroupId = "appearance" | "notifications" | "privacy" | "data" | "app";
 
 export type SectionId =
@@ -9,14 +11,26 @@ export type SectionId =
 
 type Group = { id: GroupId; sections: SectionId[]; sensitive: SectionId[] };
 
+/** Window, tray, global shortcut, focused-app and updater settings; the phone has no such thing (the store updates the app). */
+export const DESKTOP_ONLY_SECTIONS: readonly SectionId[] = ["fullscreen", "activity", "window", "autostart", "shortcuts", "update", "sync"];
+
+/** What a phone keeps of each group; a group left with nothing goes away. */
+export function forPlatform(groups: Group[], mobile: boolean): Group[] {
+  if (!mobile) return groups;
+  const keep = (list: SectionId[]) => list.filter((s) => !DESKTOP_ONLY_SECTIONS.includes(s));
+  return groups.map((g) => ({ ...g, sections: keep(g.sections), sensitive: keep(g.sensitive) })).filter((g) => g.sections.length + g.sensitive.length > 0);
+}
+
 /** Password, backup and sync sit apart in each group, under "Zona sensível". */
-export const GROUPS: Group[] = [
+const DESKTOP_GROUPS: Group[] = [
   { id: "appearance", sections: ["skin", "density", "language", "tabs"], sensitive: [] },
   { id: "notifications", sections: ["reminders", "digest", "dnd", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
   { id: "privacy", sections: ["activity", "focus"], sensitive: ["security"] },
   { id: "data", sections: ["google", "clipboard"], sensitive: ["backup", "sync"] },
   { id: "app", sections: ["window", "autostart", "shortcuts", "update"], sensitive: [] },
 ];
+
+export const GROUPS = forPlatform(DESKTOP_GROUPS, IS_MOBILE);
 
 /** Search terms in both languages, so "tema" and "theme" find the same setting whatever the UI language. */
 const KEYWORDS: Record<SectionId, string> = {

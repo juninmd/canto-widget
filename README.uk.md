@@ -500,6 +500,7 @@ OneDrive, Syncthing...), почніть із системи та розділу 
 | Документ | Що в ньому |
 |---|---|
 | 📖 [User guide](docs/uso.md) | вкладки, повторювані завдання, ярлики, скіни, доступність, вікно, оновлення та запуск із системою |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google порядок денний і GitHub (персональний маркер або потік пристрою) |
 | 🛡️ [Security and data](docs/seguranca.md) | модель загроз, резервне копіювання `.canto`, злиття, зміна пароля, файли на диску |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify та об’ємні тести |

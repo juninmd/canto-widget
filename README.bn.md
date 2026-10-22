@@ -500,6 +500,7 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 | দলিল | কি আছে এতে |
 |---|---|
 | 📖 [User guide](docs/uso.md) | ট্যাব, পুনরাবৃত্ত কাজ, শর্টকাট, স্কিন, অ্যাক্সেসিবিলিটি, উইন্ডো, আপডেট এবং সিস্টেম দিয়ে শুরু করুন |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google এজেন্ডা এবং GitHub (ব্যক্তিগত টোকেন বা ডিভাইস প্রবাহ) |
 | 🛡️ [Security and data](docs/seguranca.md) | হুমকি মডেল, `.canto` ব্যাকআপ, মার্জ, পাসওয়ার্ড পরিবর্তন, ডিস্কে ফাইল |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify এবং ভলিউম পরীক্ষা |

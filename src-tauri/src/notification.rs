@@ -74,6 +74,16 @@ pub fn send(app: &tauri::AppHandle, event: &AgendaItem) {
     notify_os(app, title, &body);
 }
 
+/// Android 13+ and iOS keep notifications off until the person agrees; the system dialog only shows while undecided.
+#[cfg(mobile)]
+pub fn ask_permission(app: tauri::AppHandle) {
+    std::thread::spawn(move || {
+        if let Err(e) = app.notification().request_permission() {
+            eprintln!("permissao de notificacao falhou: {e}");
+        }
+    });
+}
+
 /// The only way to an OS notification, so do not disturb covers every kind. Best effort: a denied or
 /// unavailable notification must not block the window alert.
 pub fn notify_os(app: &tauri::AppHandle, title: &str, body: &str) {

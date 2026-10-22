@@ -500,6 +500,7 @@ Hibát talált? [SECURITY.md](SECURITY.md).
 | dokumentum | Mi van benne |
 |---|---|
 | 📖 [User guide](docs/uso.md) | lapok, ismétlődő feladatok, parancsikonok, felszínek, kisegítő lehetőségek, ablak, frissítések és kezdés a rendszerrel |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google napirend és GitHub (személyes token vagy eszközfolyam) |
 | 🛡️ [Security and data](docs/seguranca.md) | fenyegetési modell, `.canto` biztonsági mentés, összevonás, jelszómódosítás, fájlok a lemezen |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify és hangerőtesztek |

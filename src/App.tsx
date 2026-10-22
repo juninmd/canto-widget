@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useClearOnLock } from "./lib/useClearOnLock";
-import { MOD_KEY } from "./lib/platform";
+import { IS_MOBILE, MOD_KEY } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText } from "./lib/api";
@@ -47,6 +47,7 @@ import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./components/TabBar";
 import TabRail from "./components/TabRail";
+import MobileNav from "./components/MobileNav";
 import FocusBar from "./components/FocusBar";
 import { focusStore } from "./lib/focus";
 import AppHeader from "./components/AppHeader";
@@ -279,8 +280,10 @@ function Canto() {
 
   return (
     <div
-      className={`relative flex h-screen flex-col overflow-hidden bg-panel/95 text-fg backdrop-blur ${
-        mode === "max" ? "" : "rounded-2xl border border-edge shadow-2xl"
+      className={`relative flex flex-col overflow-hidden text-fg ${
+        IS_MOBILE
+          ? "h-dvh bg-panel pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)]"
+          : `h-screen bg-panel/95 backdrop-blur ${mode === "max" ? "" : "rounded-2xl border border-edge shadow-2xl"}`
       }`}
     >
       {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
@@ -339,6 +342,7 @@ function Canto() {
         pending={alerts.length}
         onBell={openAlerts}
         onHelp={() => setHelpOpen(true)}
+        onSearch={() => setSearchOpen(true)}
         onLock={() => void lock()}
         onTogglePrivacy={togglePrivacy}
         onPickMode={pickMode}
@@ -357,8 +361,8 @@ function Canto() {
       ) : !status.unlocked ? (
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
-        <div className={`flex min-h-0 min-w-0 flex-1 ${layout === "vertical" ? "flex-row" : "flex-col"}`}>
-          {layout === "vertical" ? (
+        <div className={`flex min-h-0 min-w-0 flex-1 ${layout === "vertical" && !IS_MOBILE ? "flex-row" : "flex-col"}`}>
+          {IS_MOBILE ? null : layout === "vertical" ? (
             <TabRail current={tab} onChange={changeTab} tabs={tabs} pinned={pinned} onPinned={setPinned} />
           ) : (
             <TabBar current={tab} onChange={changeTab} tabs={tabs} />
@@ -428,6 +432,7 @@ function Canto() {
             </main>
             <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
           </div>
+          {IS_MOBILE && <MobileNav current={tab} onChange={changeTab} tabs={tabs} />}
         </div>
       )}
     </div>

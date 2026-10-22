@@ -500,6 +500,7 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 | เอกสาร | มีอะไรอยู่ในนั้น |
 |---|---|
 | 📖 [User guide](docs/uso.md) | แท็บ, งานที่เกิดซ้ำ, ทางลัด, สกิน, การเข้าถึง, หน้าต่าง, อัปเดตและเริ่มต้นด้วยระบบ |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google วาระการประชุมและ GitHub (โทเค็นส่วนบุคคลหรือการไหลของอุปกรณ์) |
 | 🛡️ [Security and data](docs/seguranca.md) | โมเดลภัยคุกคาม, การสำรองข้อมูล `.canto`, รวม, การเปลี่ยนรหัสผ่าน, ไฟล์บนดิสก์ |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify และการทดสอบระดับเสียง |

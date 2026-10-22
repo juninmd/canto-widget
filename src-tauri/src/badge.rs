@@ -4,7 +4,9 @@
 //! unsupported there) — only `set_overlay_icon`, which takes an image. Drawing digits needs a
 //! font we don't ship, so Windows/Linux get a plain red dot ("something needs you"); macOS's
 //! Dock renders the real count natively.
-use tauri::{AppHandle, Manager};
+use tauri::AppHandle;
+#[cfg(desktop)]
+use tauri::Manager;
 
 #[cfg(any(target_os = "windows", test))]
 const DOT_SIZE: u32 = 20;
@@ -30,10 +32,16 @@ fn red_dot() -> tauri::image::Image<'static> {
 
 /// `total` 0 clears the badge. Errors are swallowed: an unsupported platform must not be noisy.
 pub fn apply(app: &AppHandle, total: u32) {
-    let Some(win) = app.get_webview_window("main") else { return };
+    // The mobile launcher badge is out of Tauri's reach, so the window has nothing to show there.
+    #[cfg(mobile)]
+    let _ = (app, total);
+    #[cfg(desktop)]
+    let Some(win) = app.get_webview_window("main") else {
+        return;
+    };
     #[cfg(target_os = "windows")]
     let _ = win.set_overlay_icon(if total > 0 { Some(red_dot()) } else { None });
-    #[cfg(not(target_os = "windows"))]
+    #[cfg(all(desktop, not(target_os = "windows")))]
     let _ = win.set_badge_count(if total > 0 { Some(total as i64) } else { None });
 }
 

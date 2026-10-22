@@ -153,7 +153,18 @@ pub fn note_export_md(app: tauri::AppHandle, state: State<'_, AppState>, id: Str
     else {
         return Ok(None);
     };
-    let destination = chosen.into_path().map_err(|e| AppError::Io(e.to_string()))?;
-    std::fs::write(&destination, to_markdown(&note)).map_err(|e| AppError::Io(e.to_string()))?;
-    Ok(Some(destination.display().to_string()))
+    write_chosen(&app, chosen, to_markdown(&note).as_bytes()).map(Some)
+}
+
+#[cfg(desktop)]
+fn write_chosen(_app: &tauri::AppHandle, chosen: tauri_plugin_dialog::FilePath, bytes: &[u8]) -> Result<String> {
+    let destination = crate::picked::path(chosen)?;
+    std::fs::write(&destination, bytes).map_err(|e| AppError::Io(e.to_string()))?;
+    Ok(destination.display().to_string())
+}
+
+#[cfg(mobile)]
+fn write_chosen(app: &tauri::AppHandle, chosen: tauri_plugin_dialog::FilePath, bytes: &[u8]) -> Result<String> {
+    crate::picked::write(app, chosen.clone(), bytes)?;
+    Ok(crate::picked::label(&chosen))
 }

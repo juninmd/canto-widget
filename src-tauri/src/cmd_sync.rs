@@ -1,4 +1,5 @@
 use tauri::State;
+#[cfg(desktop)]
 use tauri_plugin_dialog::DialogExt;
 
 use crate::backup::ImportSummary;
@@ -17,12 +18,25 @@ pub fn sync_set_folder(app: tauri::AppHandle, state: State<'_, AppState>) -> Res
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
+    let Some(folder) = pick_folder(&app)? else {
+        return Ok(None);
+    };
+    sync::set_folder(&state, folder.clone())?;
+    Ok(Some(folder.display().to_string()))
+}
+
+#[cfg(desktop)]
+fn pick_folder(app: &tauri::AppHandle) -> Result<Option<std::path::PathBuf>> {
     let Some(chosen) = app.dialog().file().blocking_pick_folder() else {
         return Ok(None);
     };
-    let folder = chosen.into_path().map_err(|e| AppError::Io(e.to_string()))?;
-    sync::set_folder(&state, folder.clone())?;
-    Ok(Some(folder.display().to_string()))
+    chosen.into_path().map(Some).map_err(|e| AppError::Io(e.to_string()))
+}
+
+/// A phone's folder picker hands back a content URI, not a path the poller could read.
+#[cfg(mobile)]
+fn pick_folder(_app: &tauri::AppHandle) -> Result<Option<std::path::PathBuf>> {
+    Err(AppError::Config("a pasta sincronizada não existe no celular; use o backup".into()))
 }
 
 #[tauri::command(async)]

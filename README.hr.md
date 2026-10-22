@@ -500,6 +500,7 @@ Pronašli ste grešku? [SECURITY.md](SECURITY.md).
 | Dokument | Što je u njemu |
 |---|---|
 | 📖 [User guide](docs/uso.md) | kartice, ponavljajući zadaci, prečaci, maske, pristupačnost, prozor, ažuriranja i početak rada sa sustavom |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google dnevni red i GitHub (osobni token ili tijek uređaja) |
 | 🛡️ [Security and data](docs/seguranca.md) | model prijetnje, `.canto` sigurnosna kopija, spajanje, promjena lozinke, datoteke na disku |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify i testovi volumena |

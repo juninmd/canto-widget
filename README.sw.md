@@ -500,6 +500,7 @@ Umepata dosari? [SECURITY.md](SECURITY.md).
 | Hati | Kuna nini ndani yake |
 |---|---|
 | 📖 [User guide](docs/uso.md) | vichupo, kazi zinazojirudia, njia za mkato, ngozi, ufikiaji, dirisha, masasisho na anza na mfumo |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google ajenda na GitHub (tokeni ya kibinafsi au mtiririko wa kifaa) |
 | 🛡️ [Security and data](docs/seguranca.md) | mfano tishio, `.canto` chelezo, unganisha, mabadiliko ya nenosiri, faili kwenye diski |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify na majaribio ya kiasi |

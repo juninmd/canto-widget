@@ -3,6 +3,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
 import { api } from "./api";
 import { useFullscreen } from "./useFullscreen";
+import { IS_MOBILE } from "./platform";
 import { MODE_EVENT, modeOf, type Mode } from "./windowMode";
 
 const KEY = "canto.mini";
@@ -24,8 +25,15 @@ function remember(mini: boolean) {
   }
 }
 
+const FULL_SCREEN_APP = { mode: "normal" as Mode, setMode: async (_next: Mode) => {} };
+
+/** A phone's app always fills the screen: there is no window to shrink, move or hide. */
+function useMobileMode() {
+  return FULL_SCREEN_APP;
+}
+
 /** Rust owns mini (it moves and resizes the window); fullscreen is read from the window like before. */
-export function useWindowMode() {
+function useDesktopMode() {
   const fullscreen = useFullscreen();
   const [mini, setMini] = useState(remembered);
   useEffect(() => remember(mini), [mini]);
@@ -63,3 +71,6 @@ export function useWindowMode() {
 
   return { mode, setMode };
 }
+
+// Constant for the whole process, so the hook order never changes between renders.
+export const useWindowMode = IS_MOBILE ? useMobileMode : useDesktopMode;

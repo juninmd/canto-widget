@@ -500,6 +500,7 @@ Terjumpa kecacatan? [SECURITY.md](SECURITY.md).
 | Dokumen | Apa yang ada di dalamnya |
 |---|---|
 | 📖 [User guide](docs/uso.md) | tab, tugasan berulang, pintasan, kulit, kebolehcapaian, tetingkap, kemas kini dan mulakan dengan sistem |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda dan GitHub (token peribadi atau aliran peranti) |
 | 🛡️ [Security and data](docs/seguranca.md) | model ancaman, `.canto` sandaran, cantum, tukar kata laluan, fail pada cakera |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify dan ujian volum |

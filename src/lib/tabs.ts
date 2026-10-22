@@ -1,12 +1,18 @@
 import { useCallback, useState } from "react";
 import { TABS, type Tab } from "../components/TabBar";
+import { IS_MOBILE } from "./platform";
 import { mirrorPref } from "./prefsMirror";
 
 const KEY = "canto.hiddenTabs";
 const KNOWN_KEY = "canto.knownTabs";
 
+/** Needs the desktop's focused-app probe, which a phone has no counterpart for. */
+export const DESKTOP_ONLY_TABS: readonly Tab[] = ["activity"];
+
+const offered = TABS.filter((t) => !IS_MOBILE || !DESKTOP_ONLY_TABS.includes(t.id));
+
 /** Ajustes can't be hidden: it's the only way back to the other tabs. */
-export const HIDEABLE = TABS.filter((t) => t.id !== "settings");
+export const HIDEABLE = offered.filter((t) => t.id !== "settings");
 
 /** Eighteen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes, Clima, Mercado, Leituras, Gmail, Drive and Contatos start hidden, one checkbox away in Ajustes. */
 const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts"];
@@ -55,7 +61,7 @@ function load(): Tab[] {
 }
 
 export function visibleTabs(hidden: readonly Tab[]) {
-  return TABS.filter((t) => !hidden.includes(t.id));
+  return offered.filter((t) => !hidden.includes(t.id));
 }
 
 export function useHiddenTabs() {

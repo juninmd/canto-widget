@@ -1,6 +1,6 @@
 import type { AgendaItem } from "./api";
 import type { Tab } from "../components/TabBar";
-import { MOD_KEY } from "./platform";
+import { IS_MOBILE, MOD_KEY } from "./platform";
 import { SETTINGS_KEYS } from "./shortcuts";
 import { SKINS, type SkinId } from "./theme";
 import { PALETTE_PROVIDERS, type PaletteCommand } from "./palette";
@@ -79,10 +79,10 @@ export function buildCommands(ctx: PaletteContext): PaletteCommand[] {
       keys: ["Alt", "P"],
       run: ctx.togglePrivacy,
     },
-    { id: "fullscreen.toggle", title: t("palette.fullscreen"), keys: ["F11"], run: ctx.toggleFullscreen },
-    { id: "help.open", title: t("palette.help"), keys: ["?"], run: ctx.help },
-    { id: "window.mini", title: t("palette.mini"), keywords: [t("palette.keywords.mini")], run: ctx.mini },
-    { id: "window.hide", title: t("palette.hide"), run: ctx.hide },
+    !IS_MOBILE && { id: "fullscreen.toggle", title: t("palette.fullscreen"), keys: ["F11"], run: ctx.toggleFullscreen },
+    !IS_MOBILE && { id: "help.open", title: t("palette.help"), keys: ["?"], run: ctx.help },
+    !IS_MOBILE && { id: "window.mini", title: t("palette.mini"), keywords: [t("palette.keywords.mini")], run: ctx.mini },
+    !IS_MOBILE && { id: "window.hide", title: t("palette.hide"), run: ctx.hide },
     { id: "vault.lock", title: t("palette.lock"), keys: ["Alt", "L"], run: ctx.lock },
   ];
   return [...tabs, ...core.filter((c): c is PaletteCommand => !!c), ...PALETTE_PROVIDERS.flatMap((p) => p())];

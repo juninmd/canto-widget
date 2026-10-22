@@ -7,6 +7,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Canto para Android e iOS**, a partir do mesmo código (Tauri v2 Mobile). O cofre, as abas e os avisos são os
+  mesmos; a janela vira tela cheia, as abas ficam numa barra embaixo (com uma folha "mais" para as demais), o
+  cabeçalho ganha a busca global e o que só existe no computador (janela, bandeja, atalhos globais, Atividade,
+  pasta sincronizada, início com o sistema, atualização pelo app) some de Ajustes. No celular o Clipboard captura
+  o que foi copiado quando a aba aparece, o backup e a exportação de nota usam o seletor de arquivos do sistema e
+  o Canto pede a permissão de notificações na primeira abertura. O CI passa a compilar o crate para Android e iOS.
+  Ainda não há desbloqueio biométrico no celular. Veja [docs/mobile.md](docs/mobile.md).
+
 - **Aba Contatos, com a sua agenda do Google**: a People API, somente leitura (`contacts.readonly`), com o mesmo
   login da Agenda. Mostra o total de contatos, busca ao digitar (nome, empresa, cargo, e-mail ou telefone, sem
   ligar para acentos), filtros com contagem (Todos, Favoritos, Com e-mail, Com telefone), seções de A a Z com

@@ -453,6 +453,8 @@ export const api = {
   driveDisconnect: () => invoke<void>("drive_disconnect"),
 
   clipList: (query: string) => invoke<ClipList>("clip_list", { query }),
+  /** Phones only: reads the clipboard once; the desktop watches it in the background. */
+  clipCapture: () => invoke<void>("clip_capture"),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
   /** Copies the item rewritten by `mode` (see `clipTransforms`); the history entry stays as it was. */
   clipCopyAs: (id: string, mode: ClipMode) => invoke<void>("clip_copy_as", { id, mode }),

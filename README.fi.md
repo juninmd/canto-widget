@@ -500,6 +500,7 @@ Löysitkö vian? [SECURITY.md](SECURITY.md).
 | Asiakirja | Mitä siinä on |
 |---|---|
 | 📖 [User guide](docs/uso.md) | välilehdet, toistuvat tehtävät, pikakuvakkeet, ulkoasut, saavutettavuus, ikkuna, päivitykset ja aloita järjestelmästä |
+| 📱 [Mobile](docs/mobile.md) | Android / iOS |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda ja GitHub (henkilökohtainen tunnus tai laitevirta) |
 | 🛡️ [Security and data](docs/seguranca.md) | uhkamalli, `.canto` varmuuskopiointi, yhdistäminen, salasanan vaihto, tiedostot levyllä |
 | 📊 [Benchmark](docs/benchmark.md) | Todoist, TickTick, Obsidian, Joplin, Raycast, PowerToys, CopyQ, Ditto, MeetingBar, Gitify ja äänenvoimakkuustestit |
