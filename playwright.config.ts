@@ -9,8 +9,6 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
-  // Playwright defaults to half the cores on CI; the tests are isolated pages, so the runner can use them all.
-  workers: process.env.CI ? "100%" : undefined,
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: url,
@@ -18,7 +16,10 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 420, height: 580 } } }],
   webServer: {
-    command: `bun run dev -- --port ${port}`,
+    // On CI the built bundle loads in a few requests instead of hundreds of dev modules: the suite runs in half the time.
+    command: process.env.CI
+      ? `bunx vite build && bunx vite preview --port ${port} --strictPort`
+      : `bun run dev -- --port ${port}`,
     url,
     reuseExistingServer: false,
     timeout: 60_000,
