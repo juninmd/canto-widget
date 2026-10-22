@@ -52,8 +52,10 @@ jobs:
           components: rustfmt
       - run: cargo fmt --check
         working-directory: src-tauri
+      # Prebuilt binary: `cargo install` compiled it from source on every run (~2.5 min).
+      - uses: taiki-e/install-action@8b0909b8902031c9ed62abc2387ebd6120876869 # cargo-audit
       # Fails only on vulnerabilities; "unmaintained"/"unsound" notices come from Tauri's GTK stack.
-      - run: cargo install cargo-audit --locked && cargo audit
+      - run: cargo audit
         working-directory: src-tauri
 
   e2e:

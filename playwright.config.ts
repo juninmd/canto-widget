@@ -9,6 +9,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
+  // Playwright defaults to half the cores on CI; the tests are isolated pages, so the runner can use them all.
+  workers: process.env.CI ? "100%" : undefined,
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: url,
