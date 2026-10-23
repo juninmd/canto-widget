@@ -3,13 +3,15 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 const calls: string[] = [];
+const resized: number[] = [];
 const emitted: { event: string; payload?: unknown }[] = [];
 let payload: unknown[] = [];
 let pending: unknown[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
-  invoke: (cmd: string) => {
+  invoke: (cmd: string, args?: { height?: number }) => {
     calls.push(cmd);
+    if (cmd === "alert_resize" && args?.height) resized.push(args.height);
     return Promise.resolve(cmd === "alert_payload" ? payload : cmd === "alert_settle" ? pending : null);
   },
 }));
@@ -43,6 +45,7 @@ const settle = () => act(async () => void (await Promise.resolve()));
 
 beforeEach(() => {
   calls.length = 0;
+  resized.length = 0;
   emitted.length = 0;
   payload = [];
   pending = [];
@@ -146,9 +149,11 @@ test("a janela do aviso pede a altura do cartão ao Rust", async () => {
     payload = [alert("task:t1")];
     render(<AlertWindow />);
     await settle();
-    observers.forEach((cb) => cb([], {} as ResizeObserver));
+    // The card's layout height, even while the entry animation still has it scaled down.
+    const entry = { borderBoxSize: [{ blockSize: 147.4, inlineSize: 420 }] } as unknown as ResizeObserverEntry;
+    observers.forEach((cb) => cb([entry], {} as ResizeObserver));
     await settle();
-    expect(calls).toContain("alert_resize");
+    expect(resized).toEqual([148]);
   } finally {
     globalThis.ResizeObserver = original;
   }

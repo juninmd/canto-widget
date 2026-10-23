@@ -121,8 +121,6 @@
   "agents.hint": "该命令仅被复制： Canto 不安装任何内容",
   "agents.source": "GitHub 发布",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

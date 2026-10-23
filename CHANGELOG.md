@@ -7,6 +7,15 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Mercado redesenhado e mais completo**, a partir de um benchmark de Google Finance, Yahoo Finance,
+  TradingView, Investing e Status Invest. Agora são **24 ativos**: dez moedas (dólar, euro, libra, iene, franco suíço, dólares
+  canadense e australiano, yuan e peso argentino em reais, mais euro/dólar), sete índices (Ibovespa, S&P 500, Nasdaq, Dow Jones, DAX, FTSE 100,
+  Nikkei 225) e sete criptos (Bitcoin, Ethereum, Solana, XRP, BNB, Dogecoin, Cardano). No topo, se o pregão está
+  **aberto ou fechado** e quando muda, e uma **barra de altas e baixas**. O destaque mostra o preço com a unidade,
+  a **variação em valor e em %**, o **fechamento anterior como linha tracejada**, um **cursor** que diz preço e
+  hora em qualquer ponto da curva, os períodos **1D, 5D, 1M, 6M e 1A** (buscados sob demanda, com cache de 15
+  min), a abertura e réguas da **faixa do dia** e de **52 semanas**. Os cartões viram uma **lista de
+  acompanhamento** com mini-curva, filtro **Moedas / Índices / Cripto** e ordem por **maiores altas ou baixas**.
 - **Aba Mapa, com o trânsito da sua região.** Um mapa com as ruas **coloridas pela velocidade ao vivo** (de
   livre a parado), a rota do trajeto escolhido desenhada por cima e pinos para **acidentes, lentidão, obras e vias
   interditadas**; dá para arrastar, aproximar e ligar ou desligar as camadas. Abaixo, um **termômetro** de quanto a
@@ -104,6 +113,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
   modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da atualização
   com uma cópia **antiga** (não vazia), vale a mais recente, em vez de a antiga apagar a do arquivo.
+- **Pop-up de notificação sem a borda de cima**: a janela media o cartão no meio da animação de entrada (ainda
+  em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **A atualização não apaga mais as abas que você deixou visíveis.** A escolha das abas (e o layout) só ficava no
   armazenamento da webview, que pode voltar vazio depois de uma atualização, e então voltava o padrão. Agora ela
   também é gravada em `preferencias.json`, ao lado do cofre, e restaurada na abertura quando a webview perdeu a

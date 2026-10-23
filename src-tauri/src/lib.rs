@@ -91,6 +91,7 @@ pub mod hello;
 pub mod hello_mac;
 pub mod lang;
 pub mod market;
+pub mod market_net;
 pub mod meet;
 pub mod meeting_alert;
 pub mod mention_alerts;
@@ -420,6 +421,7 @@ pub fn run() {
             cmd_status::api_status,
             cmd_harness::harness_list,
             cmd_market::market_get,
+            cmd_market::market_history,
             cmd_google::gmail_summary,
             cmd_google::gmail_modify,
             cmd_google::gtasks_list,

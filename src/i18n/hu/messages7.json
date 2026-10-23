@@ -121,8 +121,6 @@
   "agents.hint": "a parancs csak másolásra kerül: Canto nem telepít semmit",
   "agents.source": "GitHub kiadások",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",
