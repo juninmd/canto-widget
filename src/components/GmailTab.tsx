@@ -41,15 +41,21 @@ export default function GmailTab({ onNotice }: Props) {
   const list = useRef<HTMLUListElement>(null);
   useFlip(list, summary?.important.map((m) => m.id).join());
 
+  const latest = useRef(0);
+
+  // Only the newest request lands: a slow answer for an earlier view or search must not replace the current one.
   const load = useCallback(async (which: GmailView, query: string) => {
+    const ticket = ++latest.current;
     setLoading(true);
     try {
-      setSummary(await api.gmailSummary(which, query));
+      const next = await api.gmailSummary(which, query);
+      if (ticket !== latest.current) return;
+      setSummary(next);
       setError("");
     } catch (e) {
-      setError(errText(e));
+      if (ticket === latest.current) setError(errText(e));
     } finally {
-      setLoading(false);
+      if (ticket === latest.current) setLoading(false);
     }
   }, []);
 
