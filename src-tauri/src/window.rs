@@ -1,4 +1,4 @@
-use tauri::{Emitter, LogicalPosition, Manager, WebviewWindow};
+use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 
 use crate::calendar::AgendaItem;
 
@@ -141,6 +141,25 @@ pub fn settle_alert(app: &tauri::AppHandle) -> Vec<AgendaItem> {
     list
 }
 
+/// The pop-up's width in `tauri.conf.json`; only its height follows the card.
+const ALERT_WIDTH: f64 = 420.0;
+/// A one-line alert still fits; a meeting with its agenda and guests can grow until here, then its boxes scroll.
+pub const ALERT_HEIGHT: (f64, f64) = (96.0, 640.0);
+
+/// The webview measures its card; a bad value must not leave a giant or invisible window over the corner.
+pub fn clamp_alert_height(height: f64) -> f64 {
+    if height.is_finite() { height.clamp(ALERT_HEIGHT.0, ALERT_HEIGHT.1) } else { ALERT_HEIGHT.1 }
+}
+
+/// The window hugs the card so the rest of the corner stays clickable; it grows upward from the same corner.
+pub fn resize_alert(app: &tauri::AppHandle, height: f64) -> tauri::Result<()> {
+    if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
+        win.set_size(LogicalSize::new(ALERT_WIDTH, clamp_alert_height(height)))?;
+        anchor_bottom_right(&win)?;
+    }
+    Ok(())
+}
+
 fn hide_alert_window(app: &tauri::AppHandle) {
     if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
         let _ = win.hide();
@@ -199,6 +218,18 @@ mod tests {
         }
         let caps = include_str!("lib.rs");
         assert!(caps.contains("cmd_alerts::alert_settle"), "the empty overlay needs a way to hide its window");
+    }
+
+    #[test]
+    fn the_alert_window_height_stays_within_bounds() {
+        use super::{clamp_alert_height, ALERT_HEIGHT};
+        assert_eq!(clamp_alert_height(148.0), 148.0);
+        assert_eq!(clamp_alert_height(0.0), ALERT_HEIGHT.0);
+        assert_eq!(clamp_alert_height(5000.0), ALERT_HEIGHT.1);
+        assert_eq!(clamp_alert_height(f64::NAN), ALERT_HEIGHT.1);
+        let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
+        let alert = conf["app"]["windows"].as_array().unwrap().iter().find(|w| w["label"] == super::ALERT_WINDOW);
+        assert_eq!(alert.unwrap()["width"], super::ALERT_WIDTH);
     }
 
     #[test]

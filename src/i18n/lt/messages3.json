@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "uždaryti",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "dienos santrauka",
   "alert.modelNew": "naujas modelis",
   "alert.silence": "nutildyti",

@@ -520,6 +520,8 @@ export const api = {
   alertClose: (id: string, outcome?: AlertOutcome) => invoke<void>("alert_close", { id, outcome }),
   /** The overlay has no card left: Rust hides its window, or returns what is still pending. */
   alertSettle: () => invoke<AgendaItem[]>("alert_settle"),
+  /** The pop-up's card height: its window shrinks or grows to it, anchored to the screen corner. */
+  alertResize: (height: number) => invoke<void>("alert_resize", { height }),
   /** "Fechar todos" on the overlay: the whole queue goes in one call, and each one is still logged. */
   alertCloseAll: (outcome?: AlertOutcome) => invoke<void>("alert_close_all", { outcome }),
   alertLog: () => invoke<ResolvedAlert[]>("alert_log"),

@@ -9,7 +9,7 @@ export default function AlertGuests({ guests, total }: { guests: Guest[]; total:
   const hidden = total - guests.length;
   return (
     <>
-      <ul className="mt-1 space-y-0.5">
+      <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5">
         {guests.map((g) => (
           <li key={g.email || g.name} title={g.email} className="flex min-w-0 items-center gap-1.5 text-xs">
             <span aria-hidden="true" className={`w-3 shrink-0 text-center ${TEXT[g.response] ?? "text-muted"}`}>

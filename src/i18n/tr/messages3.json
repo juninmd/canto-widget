@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "kapat",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "günün özeti",
   "alert.modelNew": "yeni model",
   "alert.silence": "sessiz",

@@ -338,6 +338,7 @@ pub fn run() {
             cmd_alerts::alert_close,
             cmd_alerts::alert_close_all,
             cmd_alerts::alert_settle,
+            cmd_alerts::alert_resize,
             alert_log::alert_log,
             fullscreen_guard::fullscreen_hold_get,
             fullscreen_guard::fullscreen_hold_set,

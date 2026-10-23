@@ -90,6 +90,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
+  420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
+  de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
+  motivo e autor numa linha só, e as ações logo abaixo. **Fechar** vira um ✕ no canto (Esc continua valendo) e
+  **fechar todos** fica sempre visível com a contagem da fila. Reuniões e descrições longas deixam a janela maior
+  para mostrar tudo, com a lista de **convidados** em duas colunas.
 - **Releases e CI mais rápidos**: o binário de release usa LTO thin (otimiza em paralelo, em vez de num só
   passo), o `cargo-audit` vem pronto em vez de compilado a cada execução e os testes e2e no CI
   rodam sobre o bundle pronto (`vite preview`) em vez do servidor de desenvolvimento, na metade do tempo.
