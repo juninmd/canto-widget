@@ -24,6 +24,12 @@ pub fn alert_settle(app: AppHandle) -> Vec<AgendaItem> {
     window::settle_alert(&app)
 }
 
+/// The card's measured height: the pop-up window takes it, so no empty, click-eating space stays on screen.
+#[tauri::command]
+pub fn alert_resize(app: AppHandle, height: f64) -> Result<()> {
+    window::resize_alert(&app, height).map_err(|e| AppError::Io(e.to_string()))
+}
+
 /// The alert window's way to bring the widget up (e.g. "abrir aba Modelos"); an alert alone never does.
 #[tauri::command]
 pub fn main_show(app: AppHandle) -> Result<()> {

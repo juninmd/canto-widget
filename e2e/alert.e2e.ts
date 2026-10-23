@@ -79,9 +79,8 @@ test("fechar todos fecha a fila inteira de uma vez", async ({ page }) => {
 
   const dialog = page.getByRole("alertdialog");
   await expect(dialog.getByRole("group", { name: "avisos pendentes" }).getByRole("button")).toHaveCount(3);
-  // O chevron colado ao "fechar" abre a única outra saída: fechar a fila inteira.
-  await dialog.getByRole("button", { name: "mais opções de fechar" }).click();
-  await dialog.getByRole("menuitem", { name: "fechar todos" }).click();
+  // "fechar todos" fica sempre à vista ao lado das ações.
+  await dialog.getByRole("button", { name: "fechar todos" }).click();
   await expect(page.getByRole("alertdialog")).toHaveCount(0);
   expect((await calls(page)).some((c) => c.cmd === "alert_close_all")).toBe(true);
 
