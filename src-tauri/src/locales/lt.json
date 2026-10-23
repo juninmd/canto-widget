@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI nepavyko",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Pigiau jūsų norų sąraše",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Netrukdyti 1 val",
   "Free": "Nemokamai",
@@ -26,10 +25,14 @@
   "Task reminder": "Užduočių priminimas",
   "Turn off do not disturb": "Išjunkite netrukdyti",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Nuolaida norų sąraše",
   "You were mentioned": "Jus paminėjo",
   "certificate expired": "pasibaigęs sertifikato galiojimas",
   "certificate expires in": "sertifikato galiojimo laikas baigiasi",
   "days": "dienų",
   "down:": "žemyn:",
-  "high latency:": "didelis delsimas:"
+  "high latency:": "didelis delsimas:",
+  "more alerts in the Steam tab": "pranešimų daugiau Steam skirtuke",
+  "new update": "naujas atnaujinimas",
+  "was": "buvo"
 }

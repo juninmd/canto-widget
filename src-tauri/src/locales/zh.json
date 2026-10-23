@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "持续集成失败",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "愿望单中的游戏降价了",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1小时内请勿打扰",
   "Free": "免费",
@@ -26,10 +25,14 @@
   "Task reminder": "任务提醒",
   "Turn off do not disturb": "关闭请勿打扰",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "愿望单特惠",
   "You were mentioned": "你被提到了",
   "certificate expired": "证书已过期",
   "certificate expires in": "证书到期时间为",
   "days": "天",
   "down:": "向下：",
-  "high latency:": "高延迟："
+  "high latency:": "高延迟：",
+  "more alerts in the Steam tab": "条提醒在 Steam 标签页",
+  "new update": "新更新",
+  "was": "原价"
 }

@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "ЦИ није успео",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Јефтиније на вашој листи жеља",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Не узнемиравај 1 х",
   "Free": "Бесплатно",
@@ -26,10 +25,14 @@
   "Task reminder": "Подсетник за задатак",
   "Turn off do not disturb": "Искључите не узнемиравај",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Попуст на листи жеља",
   "You were mentioned": "Поменули сте",
   "certificate expired": "сертификат је истекао",
   "certificate expires in": "сертификат истиче у",
   "days": "дана",
   "down:": "доле:",
-  "high latency:": "висока латенција:"
+  "high latency:": "висока латенција:",
+  "more alerts in the Steam tab": "обавештења више на картици Steam",
+  "new update": "ново ажурирање",
+  "was": "пре"
 }

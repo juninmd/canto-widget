@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "A CI nem sikerült",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Olcsóbb a kívánságlistádon",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Ne zavarjon 1 óráig",
   "Free": "Ingyenes",
@@ -26,10 +25,14 @@
   "Task reminder": "Feladat emlékeztető",
   "Turn off do not disturb": "Kapcsolja ki a Ne zavarjanak lehetőséget",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Akció a kívánságlistádon",
   "You were mentioned": "Téged emlegettek",
   "certificate expired": "tanúsítvány lejárt",
   "certificate expires in": "ban lejár a tanúsítvány",
   "days": "napokon",
   "down:": "lefelé:",
-  "high latency:": "magas késleltetés:"
+  "high latency:": "magas késleltetés:",
+  "more alerts in the Steam tab": "további értesítés a Steam lapon",
+  "new update": "új frissítés",
+  "was": "korábban"
 }

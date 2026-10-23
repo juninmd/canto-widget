@@ -66,6 +66,8 @@ struct OwnedRaw {
     name: String,
     #[serde(default)]
     playtime_forever: u32,
+    #[serde(default)]
+    rtime_last_played: i64,
 }
 
 /// `{"response":{}}` is a private profile, not an error: the library is then simply empty.
@@ -82,6 +84,7 @@ pub fn parse_owned(json: &str) -> Vec<OwnedGame> {
             total_min: g.playtime_forever,
             // The command fills the capsule: it is built from the appid, not reported by the API.
             art: String::new(),
+            last_played: g.rtime_last_played,
         })
         .collect()
 }

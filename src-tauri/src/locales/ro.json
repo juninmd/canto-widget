@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI a eșuat",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Mai ieftin în lista de dorințe",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Nu deranjați timp de 1 oră",
   "Free": "Gratuit",
@@ -26,10 +25,14 @@
   "Task reminder": "Memento de sarcină",
   "Turn off do not disturb": "Opriți nu deranjați",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Reducere pe lista de dorințe",
   "You were mentioned": "Ai fost menționat",
   "certificate expired": "certificatul a expirat",
   "certificate expires in": "certificatul expiră în",
   "days": "zile",
   "down:": "jos:",
-  "high latency:": "latență mare:"
+  "high latency:": "latență mare:",
+  "more alerts in the Steam tab": "alerte în plus în fila Steam",
+  "new update": "actualizare nouă",
+  "was": "înainte"
 }

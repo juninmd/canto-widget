@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI gagal",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Lebih murah di daftar keinginan Anda",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Jangan ganggu selama 1 jam",
   "Free": "Gratis",
@@ -26,10 +25,14 @@
   "Task reminder": "Pengingat tugas",
   "Turn off do not disturb": "Matikan jangan ganggu",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Diskon di daftar keinginan",
   "You were mentioned": "Anda disebutkan",
   "certificate expired": "sertifikat sudah habis masa berlakunya",
   "certificate expires in": "sertifikat habis masa berlakunya",
   "days": "hari",
   "down:": "turun:",
-  "high latency:": "latensi tinggi:"
+  "high latency:": "latensi tinggi:",
+  "more alerts in the Steam tab": "peringatan lagi di tab Steam",
+  "new update": "pembaruan baru",
+  "was": "sebelumnya"
 }

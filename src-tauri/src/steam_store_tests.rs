@@ -120,4 +120,9 @@ fn the_saved_amount_comes_from_the_two_printed_prices() {
     assert_eq!(savings("", ""), 0);
     assert_eq!(cents("R$ 1.234,56"), Some(123456));
     assert_eq!(cents("Grátis"), None);
+    assert_eq!(cents("¥ 1,980"), Some(198000), "the yen prints no decimals, so it is scaled to hundredths");
+    assert_eq!(cents("₩ 22,000"), Some(2200000));
+    assert_eq!(cents("CHF 12.50"), Some(1250));
+    assert_eq!(cents("$9.99 USD"), Some(999));
+    assert_eq!(savings("¥ 4,980", "¥ 1,245"), 373500);
 }

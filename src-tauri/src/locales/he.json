@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI נכשל",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "זול יותר ברשימת המשאלות שלך",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "אל תפריע למשך שעה אחת",
   "Free": "חינם",
@@ -26,10 +25,14 @@
   "Task reminder": "תזכורת למשימה",
   "Turn off do not disturb": "כבה 'נא לא להפריע'",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "מבצע ברשימת המשאלות",
   "You were mentioned": "הזכירו אותך",
   "certificate expired": "פג תוקף האישור",
   "certificate expires in": "תוקף האישור יפוג ב",
   "days": "ימים",
   "down:": "למטה:",
-  "high latency:": "זמן אחזור גבוה:"
+  "high latency:": "זמן אחזור גבוה:",
+  "more alerts in the Steam tab": "התראות נוספות בלשונית Steam",
+  "new update": "עדכון חדש",
+  "was": "היה"
 }

@@ -21,7 +21,7 @@ fn web(path: &str, query: &[(&str, &str)]) -> Url {
     url
 }
 
-fn joined(ids: &[u32]) -> String {
+pub fn joined(ids: &[u32]) -> String {
     ids.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(",")
 }
 
@@ -85,6 +85,33 @@ pub fn owned_url(key: &str, steamid: &str) -> Url {
 /// extra request; the one Steam has no capsule for keeps the initial where the art would be.
 pub fn capsule_url(appid: u32) -> String {
     format!("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/capsule_231x87.jpg")
+}
+
+/// The wide header (460x215) the list and the cards show.
+pub fn header_url(appid: u32) -> String {
+    format!("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/header.jpg")
+}
+
+/// The vertical library cover (300x450) the grid shows.
+pub fn portrait_url(appid: u32) -> String {
+    format!("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/{appid}/library_600x900.jpg")
+}
+
+/// Every update and announcement a game posts on Steam, newest first; public, no key.
+pub fn news_url(appid: u32, count: usize) -> Url {
+    let mut url = web("ISteamNews/GetNewsForApp/v2", &[("feeds", "steam_community_announcements"), ("maxlength", "0")]);
+    url.query_pairs_mut().append_pair("appid", &appid.to_string()).append_pair("count", &count.to_string());
+    url
+}
+
+/// The 100 games with the most people in them right now; public, no key.
+pub fn charts_url() -> Url {
+    web("ISteamChartsService/GetGamesByConcurrentPlayers/v1", &[])
+}
+
+/// Where an update opens when Steam gives no link of its own.
+pub fn news_page(appid: u32) -> String {
+    format!("https://store.steampowered.com/news/app/{appid}")
 }
 
 pub fn trending_url(region: &Region) -> Url {

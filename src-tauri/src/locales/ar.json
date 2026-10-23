@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "فشل سي آي",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "أرخص في قائمة رغباتك",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "لا تزعج لمدة 1 ساعة",
   "Free": "مجانًا",
@@ -26,10 +25,14 @@
   "Task reminder": "تذكير بالمهمة",
   "Turn off do not disturb": "إيقاف عدم الإزعاج",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "تخفيض في قائمة رغباتك",
   "You were mentioned": "لقد تم ذكرك",
   "certificate expired": "انتهت صلاحية الشهادة",
   "certificate expires in": "تنتهي الشهادة في",
   "days": "أيام",
   "down:": "أسفل:",
-  "high latency:": "الكمون العالي:"
+  "high latency:": "الكمون العالي:",
+  "more alerts in the Steam tab": "تنبيهات أخرى في تبويب Steam",
+  "new update": "تحديث جديد",
+  "was": "كان"
 }
