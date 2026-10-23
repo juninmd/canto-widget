@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI ebaõnnestus",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Odavam sinu soovinimekirjas",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Mitte segada 1 h",
   "Free": "Tasuta",
@@ -26,10 +25,14 @@
   "Task reminder": "Ülesande meeldetuletus",
   "Turn off do not disturb": "Lülitage mitte segada",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Allahindlus soovinimekirjas",
   "You were mentioned": "Sind mainiti",
   "certificate expired": "sertifikaat aegunud",
   "certificate expires in": "sertifikaat aegub aastal",
   "days": "päevadel",
   "down:": "alla:",
-  "high latency:": "kõrge latentsusaeg:"
+  "high latency:": "kõrge latentsusaeg:",
+  "more alerts in the Steam tab": "teavitust veel Steami vahekaardil",
+  "new update": "uus uuendus",
+  "was": "enne"
 }

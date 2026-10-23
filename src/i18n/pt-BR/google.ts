@@ -135,4 +135,7 @@ export const google = {
   "contacts.upcoming.in": "em {n} dias",
   "contacts.letters": "ir para a letra",
   "contacts.jump": "ir para {letter}",
+  "notes.keep.import": "importar notas do Google Keep",
+  "notes.keep.help": "Importar do Google Keep: exporte o Keep em takeout.google.com, descompacte e escolha os .json da pasta Keep. A API do Keep só atende contas Google Workspace, por isso a importação usa o Takeout.",
+  "notes.keep.done": "Keep: {n} importadas, {dup} já estavam aqui, {skip} ignoradas (lixeira ou vazias)",
 } as const;

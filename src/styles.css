@@ -3,6 +3,7 @@
 @import "./weather.css";
 @import "./map.css";
 @import "./motion.css";
+@import "./steam.css";
 
 /* Skin padrão. Cada skin abaixo só redefine estes tokens. */
 :root,

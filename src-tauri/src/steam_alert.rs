@@ -1,6 +1,7 @@
-//! Opt-in OS notifications when a game on the wishlist gets cheaper. Rung from Rust so a hidden
-//! webview still gets them, and only while the vault is open: the last prices are sealed. Off by
-//! default, like the activity log. What to ring about is decided in `steam_watch.rs`.
+//! Opt-in OS notifications for the Steam tab: a wishlist game on sale at 75% or more, and a new update
+//! for a game installed here or played lately. Rung from Rust so a hidden webview still gets them, and
+//! only while the vault is open: what was announced is sealed. Off by default, like the activity log.
+//! What to ring about is decided in `steam_watch.rs`.
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
@@ -11,9 +12,7 @@ use crate::error::{AppError, Result};
 use crate::model::now_ms;
 use crate::steam::{region_of, SteamConfig};
 use crate::steam_feed as feed;
-use crate::steam_parse::Price;
-use crate::steam_region::Region;
-use crate::steam_watch::{drops, message, Drop, SteamWatch};
+use crate::steam_watch::{deal_message, hot_deals, new_updates, summary_message, update_message, SteamWatch, BURST};
 use crate::store;
 use crate::vault::AppState;
 
@@ -91,41 +90,77 @@ impl SteamAlerts {
         self.0.lock().unwrap().watch.as_ref().is_some_and(|watch| watch.watching)
     }
 
-    /// One scan: rings for what got cheaper and remembers the prices it saw. Answers whether the
+    /// When the updates were last marked as read (ms), for the "new" dots in the pane.
+    pub fn news_read_at(&self, state: &AppState) -> i64 {
+        self.with(state, |watch| watch.news_read_at).unwrap_or(0)
+    }
+
+    pub fn mark_news_read(&self, state: &AppState, now: i64) -> Result<()> {
+        self.with(state, |watch| watch.news_read_at = now)?;
+        self.flush(state)
+    }
+
+    /// One scan: hot sales on the wishlist, then updates of the games at hand. Answers whether the
     /// store answered at all, so a failure only pushes the next try back.
     fn scan(&self, app: &AppHandle, state: &AppState, cfg: &SteamConfig) -> bool {
         let region = region_of(cfg);
         let Ok(ids) = feed::wishlist(&cfg.steamid) else { return false };
         let Ok(prices) = feed::prices(&ids, &region) else { return false };
         let current = self.0.lock().unwrap().watch.clone().unwrap_or_default();
-        let (fell, next) = drops(&current, &prices, region.code, &cfg.steamid);
-        // Always keep what this scan saw: otherwise the next one would ring for a price already there.
-        let stale = next.prices != current.prices || next.region != current.region || next.steamid != current.steamid;
-        if stale {
+        let (ring, next) = hot_deals(&current, &prices, region.code, &cfg.steamid);
+        if next.hot != current.hot || next.region != current.region || next.steamid != current.steamid {
             let written = self.with(state, |watch| {
                 watch.region = next.region;
                 watch.steamid = next.steamid;
-                watch.prices = next.prices;
+                watch.hot = next.hot;
             });
             let _ = written.and_then(|()| self.flush(state));
         }
-        if !fell.is_empty() && self.on() {
-            self.ring(app, &region, &fell, &prices);
+        let mut toasts: Vec<(String, String)> = Vec::new();
+        if !ring.is_empty() {
+            let names = feed::basics(&ring, &region).unwrap_or_default();
+            for id in &ring {
+                let name = names.get(id).map(|(name, _)| name.clone()).unwrap_or_else(|| format!("#{id}"));
+                toasts.push(deal_message(&name, &prices[id]));
+            }
+        }
+        toasts.extend(self.scan_news(state, cfg));
+        if self.on() {
+            ring_all(app, &toasts);
         }
         true
     }
 
-    /// A drop is rare, so one extra request per game to name it is still cheap.
-    fn ring(&self, app: &AppHandle, region: &Region, fell: &[Drop], prices: &HashMap<u32, Price>) {
-        let ids: Vec<u32> = fell.iter().map(|drop| drop.appid).collect();
-        let names = feed::basics(&ids, region).unwrap_or_default();
-        for drop in fell {
-            let Some(price) = prices.get(&drop.appid) else { continue };
-            let name =
-                names.get(&drop.appid).map(|(name, _)| name.clone()).unwrap_or_else(|| format!("#{}", drop.appid));
-            let (title, body) = message(&name, price);
-            crate::notification::notify_os(app, &title, &body);
+    /// The newest update of every game installed here or played in the last two weeks.
+    fn scan_news(&self, state: &AppState, cfg: &SteamConfig) -> Vec<(String, String)> {
+        let games = crate::cmd_steam_more::news_games(cfg);
+        let Ok(items) = feed::news(&games) else { return Vec::new() };
+        let mut latest: HashMap<u32, String> = HashMap::new();
+        let mut titles: HashMap<u32, (String, String)> = HashMap::new();
+        // Items come newest first per game, so the first one seen is that game's newest.
+        for item in items {
+            if let std::collections::hash_map::Entry::Vacant(slot) = latest.entry(item.appid) {
+                slot.insert(item.gid.clone());
+                titles.insert(item.appid, (item.game.clone(), item.title.clone()));
+            }
         }
+        let seen = self.0.lock().unwrap().watch.as_ref().map(|w| w.news.clone()).unwrap_or_default();
+        let (ring, next) = new_updates(&seen, &latest);
+        if next != seen {
+            let _ = self.with(state, |watch| watch.news = next).and_then(|()| self.flush(state));
+        }
+        ring.iter().filter_map(|id| titles.get(id)).map(|(game, title)| update_message(game, title)).collect()
+    }
+}
+
+/// A few toasts one by one, the rest folded into a summary, so a big sale day is not a burst.
+fn ring_all(app: &AppHandle, toasts: &[(String, String)]) {
+    for (title, body) in toasts.iter().take(BURST) {
+        crate::notification::notify_os(app, title, body);
+    }
+    if toasts.len() > BURST {
+        let (title, body) = summary_message(toasts.len() - BURST);
+        crate::notification::notify_os(app, &title, &body);
     }
 }
 

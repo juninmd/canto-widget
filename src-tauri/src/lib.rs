@@ -33,6 +33,7 @@ pub mod cmd_gitlab;
 pub mod cmd_google;
 pub mod cmd_harness;
 pub mod cmd_health;
+pub mod cmd_keep;
 pub mod cmd_market;
 pub mod cmd_mentions;
 pub mod cmd_models;
@@ -41,6 +42,7 @@ pub mod cmd_reads;
 pub mod cmd_report;
 pub mod cmd_status;
 pub mod cmd_steam;
+pub mod cmd_steam_more;
 pub mod cmd_sync;
 pub mod cmd_traffic;
 pub mod cmd_traffic_setup;
@@ -89,8 +91,10 @@ pub mod health_watch;
 pub mod hello;
 #[cfg(target_os = "macos")]
 pub mod hello_mac;
+pub mod keep_import;
 pub mod lang;
 pub mod market;
+pub mod market_net;
 pub mod meet;
 pub mod meeting_alert;
 pub mod mention_alerts;
@@ -137,13 +141,18 @@ pub mod steam_alert;
 pub mod steam_feed;
 pub mod steam_id;
 pub mod steam_lists;
+pub mod steam_local;
+pub mod steam_news;
 pub mod steam_parse;
+pub mod steam_play;
 pub mod steam_player;
 pub mod steam_region;
 pub mod steam_review;
 pub mod steam_store;
+pub mod steam_top;
 pub mod steam_url;
 pub mod steam_watch;
+pub mod steam_wish;
 pub mod store;
 pub mod subtask;
 pub mod sync;
@@ -222,6 +231,7 @@ pub fn run() {
             app.manage(cmd_reads::ReadsState::load(&dir));
             app.manage(cmd_models::ModelsLock::default());
             app.manage(cmd_steam::SteamLock::default());
+            app.manage(cmd_steam_more::TopHistory::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
@@ -316,6 +326,7 @@ pub fn run() {
             cmd_notes::note_save,
             cmd_notes::note_pin,
             cmd_notes::note_export_md,
+            cmd_keep::notes_import_keep,
             note_images::note_image_save,
             note_images::note_image_get,
             routine::task_set_schedule,
@@ -420,6 +431,7 @@ pub fn run() {
             cmd_status::api_status,
             cmd_harness::harness_list,
             cmd_market::market_get,
+            cmd_market::market_history,
             cmd_google::gmail_summary,
             cmd_google::gmail_modify,
             cmd_google::gtasks_list,
@@ -457,8 +469,12 @@ pub fn run() {
             cmd_steam::steam_deals,
             cmd_steam::steam_trending,
             cmd_steam::steam_catalog,
-            cmd_steam::steam_recent,
-            cmd_steam::steam_library,
+            cmd_steam_more::steam_play,
+            cmd_steam_more::steam_launch,
+            cmd_steam_more::steam_news,
+            cmd_steam_more::steam_news_read,
+            cmd_steam_more::steam_top,
+            cmd_steam_more::steam_wishlist,
             cmd_steam::steam_image,
             cmd_traffic::traffic_get,
             cmd_traffic::traffic_departures,

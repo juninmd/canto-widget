@@ -1,9 +1,10 @@
 //! Which storefront the widget reads: Steam takes the country for the price, the language for the
 //! wording, and the currency is what the savings are written in.
 //!
-//! Two things keep this list short. The review buckets are read back from Steam's own wording, which
-//! is only mapped for Portuguese and English (`steam_review::bucket`); and the savings are read back
-//! from the printed price as cents, which only works for currencies with two decimals.
+//! The review buckets are read back from Steam's own wording, which is only mapped for Portuguese and
+//! English (`steam_review::bucket`), so every store outside Brazil reads in English. The savings are
+//! read back from the printed price; `steam_store::cents` scales a price printed without decimals (yen,
+//! won) so every amount reaches the interface in hundredths.
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Region {
@@ -15,11 +16,19 @@ pub struct Region {
     pub currency: &'static str,
 }
 
-pub const REGIONS: [Region; 4] = [
+pub const REGIONS: [Region; 12] = [
     Region { code: "br", country: "BR", language: "portuguese", currency: "BRL" },
     Region { code: "us", country: "US", language: "english", currency: "USD" },
     Region { code: "eu", country: "DE", language: "english", currency: "EUR" },
     Region { code: "gb", country: "GB", language: "english", currency: "GBP" },
+    Region { code: "jp", country: "JP", language: "english", currency: "JPY" },
+    Region { code: "cn", country: "CN", language: "english", currency: "CNY" },
+    Region { code: "au", country: "AU", language: "english", currency: "AUD" },
+    Region { code: "ca", country: "CA", language: "english", currency: "CAD" },
+    Region { code: "ch", country: "CH", language: "english", currency: "CHF" },
+    Region { code: "kr", country: "KR", language: "english", currency: "KRW" },
+    Region { code: "in", country: "IN", language: "english", currency: "INR" },
+    Region { code: "mx", country: "MX", language: "english", currency: "MXN" },
 ];
 
 pub fn parse(code: &str) -> Option<Region> {

@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI が失敗しました",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "ウィッシュリストのゲームが安くなりました",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1時間は邪魔しないでください",
   "Free": "無料",
@@ -26,10 +25,14 @@
   "Task reminder": "タスクリマインダー",
   "Turn off do not disturb": "邪魔しないでオフにしてください",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "ウィッシュリストのセール",
   "You were mentioned": "あなたが言及されました",
   "certificate expired": "証明書の有効期限が切れました",
   "certificate expires in": "証明書の有効期限は次のとおりです",
   "days": "日",
   "down:": "下:",
-  "high latency:": "高いレイテンシ:"
+  "high latency:": "高いレイテンシ:",
+  "more alerts in the Steam tab": "件の通知が Steam タブにあります",
+  "new update": "新しいアップデート",
+  "was": "通常"
 }

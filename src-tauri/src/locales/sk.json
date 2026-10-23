@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI zlyhalo",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Lacnejšie vo vašom zozname prianí",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Nerušiť 1 hodinu",
   "Free": "Zadarmo",
@@ -26,10 +25,14 @@
   "Task reminder": "Pripomenutie úlohy",
   "Turn off do not disturb": "Vypnite režim Nerušiť",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Zľava zo zoznamu želaní",
   "You were mentioned": "Boli ste spomenutí",
   "certificate expired": "platnosť certifikátu vypršala",
   "certificate expires in": "platnosť certifikátu vyprší v",
   "days": "dní",
   "down:": "dole:",
-  "high latency:": "vysoká latencia:"
+  "high latency:": "vysoká latencia:",
+  "more alerts in the Steam tab": "ďalších upozornení na karte Steam",
+  "new update": "nová aktualizácia",
+  "was": "predtým"
 }

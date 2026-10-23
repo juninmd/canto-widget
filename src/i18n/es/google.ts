@@ -136,4 +136,7 @@ export const google: Record<keyof typeof source, string> = {
   "contacts.upcoming.in": "en {n} días",
   "contacts.letters": "ir a la letra",
   "contacts.jump": "ir a {letter}",
+  "notes.keep.import": "importar notas de Google Keep",
+  "notes.keep.help": "Importar de Google Keep: exporta Keep en takeout.google.com, descomprímelo y elige los .json de la carpeta Keep. La API de Keep solo atiende cuentas de Google Workspace, por eso la importación usa Takeout.",
+  "notes.keep.done": "Keep: {n} importadas, {dup} ya estaban aquí, {skip} omitidas (papelera o vacías)",
 };

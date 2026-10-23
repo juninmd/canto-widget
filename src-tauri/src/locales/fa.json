@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI ناموفق بود",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "ارزانتر در فهرست علاقهمندیهای شما",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "برای 1 ساعت مزاحم نشوید",
   "Free": "رایگان",
@@ -26,10 +25,14 @@
   "Task reminder": "یادآوری کار",
   "Turn off do not disturb": "مزاحم نشوید خاموش کنید",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "حراج در فهرست علاقه‌مندی‌ها",
   "You were mentioned": "به شما اشاره شد",
   "certificate expired": "گواهی منقضی شده است",
   "certificate expires in": "گواهی منقضی می شود",
   "days": "روز",
   "down:": "پایین:",
-  "high latency:": "تأخیر بالا:"
+  "high latency:": "تأخیر بالا:",
+  "more alerts in the Steam tab": "هشدار دیگر در زبانه Steam",
+  "new update": "به‌روزرسانی جدید",
+  "was": "قبلاً"
 }

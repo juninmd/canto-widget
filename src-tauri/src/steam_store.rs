@@ -105,13 +105,26 @@ fn savings(original: &str, price: &str) -> u32 {
     }
 }
 
-/// Cents out of a printed price: "R$ 1.234,56" -> 123456; "Grátis" -> `None`.
+/// Cents out of a printed price: "R$ 1.234,56" -> 123456; "Grátis" -> `None`. A price printed
+/// without decimals ("¥ 1,980", "₩ 22,000") is scaled, so every store's savings arrive in hundredths.
 fn cents(text: &str) -> Option<u32> {
     let digits: String = text.chars().filter(char::is_ascii_digit).collect();
     if digits.is_empty() || digits.len() > 9 {
         return None;
     }
-    digits.parse().ok()
+    let whole: u32 = digits.parse().ok()?;
+    if has_decimals(text) {
+        Some(whole)
+    } else {
+        whole.checked_mul(100)
+    }
+}
+
+/// Whether the last number group is two digits after a separator ("1.234,56"), not a thousands group.
+fn has_decimals(text: &str) -> bool {
+    let number = text.trim_end_matches(|c: char| !c.is_ascii_digit());
+    let tail: String = number.chars().rev().take_while(char::is_ascii_digit).collect();
+    tail.len() == 2 && number[..number.len() - 2].ends_with(['.', ','])
 }
 
 /// A single pass over `&...;`, so `&amp;lt;` decodes to `&lt;` instead of `<`.

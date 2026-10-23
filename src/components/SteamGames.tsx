@@ -100,7 +100,7 @@ export default function SteamGames({
       ) : (
         <ul className="min-h-0 flex-1 space-y-1 overflow-y-auto pr-1">
           {list.items.map((row, i) => (
-            <SteamRowItem key={row.appid} row={row} rank={numbered ? i + 1 : undefined} currency={list.currency} />
+            <SteamRowItem key={row.appid} row={row} rank={numbered ? i + 1 : undefined} currency={list.currency} index={i} />
           ))}
         </ul>
       )}

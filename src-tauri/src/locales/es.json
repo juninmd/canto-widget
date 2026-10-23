@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI falló",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Más barato en tu lista de deseos",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "No molestar durante 1 h.",
   "Free": "Gratis",
@@ -26,10 +25,14 @@
   "Task reminder": "Recordatorio de tarea",
   "Turn off do not disturb": "Desactivar no molestar",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Oferta en tu lista de deseos",
   "You were mentioned": "fuiste mencionado",
   "certificate expired": "certificado caducado",
   "certificate expires in": "el certificado vence en",
   "days": "dias",
   "down:": "abajo:",
-  "high latency:": "alta latencia:"
+  "high latency:": "alta latencia:",
+  "more alerts in the Steam tab": "avisos más en la pestaña Steam",
+  "new update": "nueva actualización",
+  "was": "antes"
 }
