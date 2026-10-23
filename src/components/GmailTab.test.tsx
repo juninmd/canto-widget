@@ -4,7 +4,7 @@ import type { GmailSummary } from "../lib/api";
 
 type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
-let summary: GmailSummary | Error;
+let summary: GmailSummary | Error | Promise<GmailSummary>;
 
 const INBOX: GmailSummary = {
   unread: 27,
@@ -115,4 +115,19 @@ test("without a Google login there is one button to sign in, and an old login as
   summary = new Error("reconecte o Google em Ajustes para liberar Gmail, Tarefas e Drive");
   render(<GmailTab onNotice={() => {}} />);
   expect(await screen.findByText("Reconectar Google")).toBeTruthy();
+});
+
+test("a slow answer for an earlier view does not replace the view picked after it", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await screen.findByText("Contrato revisado");
+  let late: (s: GmailSummary) => void = () => {};
+  summary = new Promise((resolve) => (late = resolve));
+  fireEvent.click(screen.getByText("Com estrela"));
+  await waitFor(() => expect(calls).toContainEqual({ cmd: "gmail_summary", args: { view: "starred", search: "" } }));
+  summary = { unread: 3, important: [{ ...INBOX.important[0], id: "u1", subject: "Só os não lidos" }] };
+  fireEvent.click(screen.getByText("Não lidos"));
+  expect(await screen.findByText("Só os não lidos")).toBeTruthy();
+  late({ unread: 3, important: [{ ...INBOX.important[1], id: "s1", subject: "Resposta atrasada" }] });
+  await new Promise((r) => setTimeout(r, 30));
+  expect(screen.queryByText("Resposta atrasada") === null).toBe(true);
 });

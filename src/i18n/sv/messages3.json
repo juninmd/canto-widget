@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "nära",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "dag sammanfattning",
   "alert.modelNew": "ny modell",
   "alert.silence": "tyst",

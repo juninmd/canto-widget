@@ -148,7 +148,6 @@ export const tasks = {
   "notif.closeFailed": "Não foi possível fechar o aviso. {error}",
   "alert.close": "fechar",
   "alert.closeAll": "fechar todos",
-  "alert.closeMore": "mais opções de fechar",
   "alert.digestSummary": "resumo do dia",
   "alert.modelNew": "modelo novo",
   "alert.silence": "silenciar",

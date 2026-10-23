@@ -33,6 +33,7 @@ import GitlabTab from "./components/GitlabTab";
 import SteamTab from "./components/SteamTab";
 import AgentsTab from "./components/AgentsTab";
 import WeatherTab from "./components/WeatherTab";
+import MapTab from "./components/MapTab";
 import ReadsTab from "./components/ReadsTab";
 import MarketTab from "./components/MarketTab";
 import GmailTab from "./components/GmailTab";
@@ -409,6 +410,7 @@ function Canto() {
               {tab === "models" && <ModelsTab />}
               {tab === "agents" && <AgentsTab onError={setError} />}
               {tab === "weather" && <WeatherTab />}
+              {tab === "map" && <MapTab />}
               {tab === "market" && <MarketTab />}
               {tab === "gmail" && <GmailTab onNotice={(message) => notify({ message })} />}
               {tab === "gdrive" && <GDriveTab onNotice={(message) => notify({ message })} />}

@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "zavřít",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "shrnutí dne",
   "alert.modelNew": "nový model",
   "alert.silence": "ztlumit",

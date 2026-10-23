@@ -16,6 +16,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   hora em qualquer ponto da curva, os períodos **1D, 5D, 1M, 6M e 1A** (buscados sob demanda, com cache de 15
   min), a abertura e réguas da **faixa do dia** e de **52 semanas**. Os cartões viram uma **lista de
   acompanhamento** com mini-curva, filtro **Moedas / Índices / Cripto** e ordem por **maiores altas ou baixas**.
+- **Aba Mapa, com o trânsito da sua região.** Um mapa com as ruas **coloridas pela velocidade ao vivo** (de
+  livre a parado), a rota do trajeto escolhido desenhada por cima e pinos para **acidentes, lentidão, obras e vias
+  interditadas**; dá para arrastar, aproximar e ligar ou desligar as camadas. Abaixo, um **termômetro** de quanto a
+  região está mais lenta que no trânsito livre, com a linha das leituras do dia; **seus trajetos** (trabalho,
+  academia...) com o tempo agora, os **minutos a mais** e a distância; a **melhor hora para sair** nas próximas 2
+  horas, de 15 em 15 min; e as **ocorrências num raio de 5 km**, das mais próximas, com filtro por tipo. Os dados
+  vêm da **TomTom com a sua chave grátis** (2.500 pedidos por dia, sem cartão), selada no cofre junto com o ponto de
+  partida e os trajetos; sem chave, a aba mostra só o mapa do OpenStreetMap. O ponto de partida pode ser a cidade da
+  aba Clima. Tudo passa pelo Rust e os blocos do mapa chegam como imagem embutida, então a CSP continua sem origem
+  remota. Atualiza a cada 5 min com a janela visível. A aba começa escondida, a um clique em Ajustes.
 - **Modelos de IA com ficha completa e comparação lado a lado.** Tocar num modelo abre a **ficha** ali mesmo:
   lançamento, contexto, pesos abertos ou fechados, raciocínio, preço de **entrada**, **saída** e combinado,
   velocidade, **tempo até o 1º token**, índices de **inteligência**, **programação** e **matemática** com a
@@ -109,6 +119,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
+  420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
+  de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
+  motivo e autor numa linha só, e as ações logo abaixo. **Fechar** vira um ✕ no canto (Esc continua valendo) e
+  **fechar todos** fica sempre visível com a contagem da fila. Reuniões e descrições longas deixam a janela maior
+  para mostrar tudo, com a lista de **convidados** em duas colunas.
 - **Releases e CI mais rápidos**: o binário de release usa LTO thin (otimiza em paralelo, em vez de num só
   passo), o `cargo-audit` vem pronto em vez de compilado a cada execução e os testes e2e no CI
   rodam sobre o bundle pronto (`vite preview`) em vez do servidor de desenvolvimento, na metade do tempo.
