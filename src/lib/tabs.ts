@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { TABS, type Tab } from "../components/TabBar";
 import { IS_MOBILE } from "./platform";
-import { PREFS_RESTORED, mirrorPref } from "./prefsMirror";
 
 const KEY = "canto.hiddenTabs";
 const KNOWN_KEY = "canto.knownTabs";
@@ -46,10 +45,8 @@ export function hideNewTabs(hidden: Tab[], rawKnown: string | null): Tab[] {
 /** The known list is written only next to a saved hidden list: on its own it would mark tabs as seen by a choice that isn't there. */
 function save(hidden: Tab[]) {
   const known = JSON.stringify(HIDEABLE.map((t) => t.id));
-  for (const [key, value] of [[KNOWN_KEY, known], [KEY, JSON.stringify(hidden)]]) {
-    localStorage.setItem(key, value);
-    mirrorPref(key, value);
-  }
+  localStorage.setItem(KNOWN_KEY, known);
+  localStorage.setItem(KEY, JSON.stringify(hidden));
 }
 
 function load(): Tab[] {
@@ -70,11 +67,6 @@ export function visibleTabs(hidden: readonly Tab[]) {
 
 export function useHiddenTabs() {
   const [hidden, setHidden] = useState<Tab[]>(load);
-  useEffect(() => {
-    const reload = () => setHidden(load());
-    window.addEventListener(PREFS_RESTORED, reload);
-    return () => window.removeEventListener(PREFS_RESTORED, reload);
-  }, []);
   const change = useCallback((next: Tab[]) => {
     const clean = parseHidden(JSON.stringify(next));
     setHidden(clean);

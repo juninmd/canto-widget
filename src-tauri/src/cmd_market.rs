@@ -1,4 +1,6 @@
-//! Mercado tab command: every quote at once, cached for 15 min in RAM. Public data, nothing saved.
+//! Mercado tab commands: every quote at once, and one asset over a longer period, cached for 15 min in RAM.
+//! Public data, nothing saved.
+use std::collections::HashMap;
 use std::sync::Mutex;
 
 use serde::Serialize;
@@ -6,7 +8,8 @@ use tauri::{AppHandle, Manager};
 
 use crate::blocking::run;
 use crate::error::AppError;
-use crate::market::{self, Quote};
+use crate::market::{History, Quote};
+use crate::market_net;
 use crate::model::now_ms;
 
 pub const TTL_MS: i64 = 15 * 60_000;
@@ -14,6 +17,7 @@ pub const TTL_MS: i64 = 15 * 60_000;
 #[derive(Default)]
 pub struct MarketState {
     cached: Mutex<Option<(i64, Vec<Quote>)>>,
+    history: Mutex<HashMap<(String, String), (i64, History)>>,
 }
 
 #[derive(Serialize)]
@@ -44,11 +48,43 @@ impl MarketState {
             }
         }
     }
+
+    /// A period's curve from RAM while fresh; a failure is only an error when nothing was read before.
+    pub fn history(
+        &self,
+        key: (String, String),
+        now: i64,
+        fetch: impl FnOnce() -> Result<History, String>,
+    ) -> Result<History, String> {
+        let cached = self.history.lock().unwrap().get(&key).cloned();
+        if let Some((at, history)) = &cached {
+            if now - at < TTL_MS {
+                return Ok(history.clone());
+            }
+        }
+        match fetch() {
+            Ok(history) => {
+                self.history.lock().unwrap().insert(key, (now, history.clone()));
+                Ok(history)
+            }
+            Err(error) => cached.map(|(_, history)| history).ok_or(error),
+        }
+    }
+}
+
+#[tauri::command]
+pub async fn market_history(app: AppHandle, symbol: String, range: String) -> Result<History, String> {
+    run(move || {
+        let key = (symbol.clone(), range.clone());
+        Ok::<_, AppError>(app.state::<MarketState>().history(key, now_ms(), || market_net::history(&symbol, &range)))
+    })
+    .await
+    .map_err(|error| error.to_string())?
 }
 
 #[tauri::command]
 pub async fn market_get(app: AppHandle, force: bool) -> MarketView {
-    run(move || Ok::<_, AppError>(app.state::<MarketState>().view(force, now_ms(), market::quotes)))
+    run(move || Ok::<_, AppError>(app.state::<MarketState>().view(force, now_ms(), market_net::quotes)))
         .await
         .unwrap_or_else(|error| MarketView { quotes: Vec::new(), fetched_at: 0, error: Some(error.to_string()) })
 }
@@ -58,7 +94,7 @@ mod tests {
     use super::*;
 
     fn quote(price: f64) -> Quote {
-        Quote { symbol: "IBOV".into(), price, change: 0.0, points: vec![price] }
+        Quote { symbol: "IBOV".into(), price, points: vec![price], ..Quote::default() }
     }
 
     #[test]
@@ -81,5 +117,17 @@ mod tests {
         assert_eq!(view.fetched_at, 1_000);
         let empty = MarketState::default().view(false, 1_000, || Err("sem resposta".into()));
         assert!(empty.quotes.is_empty());
+    }
+
+    #[test]
+    fn a_period_is_read_once_per_floor_and_survives_a_failure() {
+        let state = MarketState::default();
+        let key = || ("IBOV".to_string(), "1mo".to_string());
+        let curve = |p: f64| History { points: vec![p], times: vec![1] };
+        assert_eq!(state.history(key(), 1_000, || Ok(curve(1.0))).unwrap().points, vec![1.0]);
+        assert_eq!(state.history(key(), 2_000, || panic!("não devia buscar")).unwrap().points, vec![1.0]);
+        assert_eq!(state.history(key(), 1_000 + TTL_MS, || Err("sem resposta".into())).unwrap().points, vec![1.0]);
+        let other = state.history(("IBOV".into(), "1y".into()), 1_000, || Err("sem resposta".into()));
+        assert_eq!(other, Err("sem resposta".to_string()));
     }
 }

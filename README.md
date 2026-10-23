@@ -143,25 +143,22 @@ respects the rate limit. Sign in with a read-only personal token or from the bro
 </td>
 </tr>
 <tr>
-<td><img src="docs/prints/app/87-steam.png" alt="Steam tab, wishlist deals sub-tab: fictitious games with capsule art, the review score and its wording, discount badges, crossed-out original prices, the new price in the chosen store's currency, what each deal saves, the region picker and the price-alert bell in the header"></td>
+<td><img src="docs/prints/app/119-steam-jogue-agora.png" alt="Steam tab, play now sub-tab: a hero banner for the last game played with its playtimes and a Play button, filters for all, recent and installed games with counts, the list, cards and grid view switch, a search box and a pager"></td>
 <td>
 
 ### 🎮 Steam without leaving the widget
 
-Five sub-tabs for Steam: **wishlist deals** (biggest discount first, each with what it saves), the **top sellers**
-ranked, **play now** (every game Steam reports for the last two weeks), the **library** (every game you own, most
-played first, with the total hours and a search box) and the **catalog**, ordered by rating, by lowest price or by
-release date and filterable to **only what is on sale**, paged with **load more** so it reaches the rest of the
-store. Every row carries the **capsule art**, the **review score**
-with Steam's own wording and how many reviews it counts, the crossed-out price, the price of the storefront you pick
-and what the discount saves — and the list adds up the total saving. The **region picker** in the header chooses the
-store (Brasil, United States, Euro, United Kingdom): prices, wording and currency follow it, and it starts on the
-one your language implies, keeping whatever you pick afterwards. The **bell** turns on price alerts for your
-wishlist: a game that got cheaper rings an OS
-notification, and nothing rings for a price it already had before you turned them on — a game that becomes **free**
-is the biggest drop of all. The public lists only need your
-**SteamID64**; an optional **Steam Web API key**, pasteable from the header at any time, adds **play now** and the
-**library**. The tab starts off by default, one checkbox away in Settings.
+Seven sub-tabs for Steam, animated (and still when the system asks for reduced motion). **Play now** pages through
+**every game you own**, last played first, with a hero banner and a **Play** button that launches the game, filters
+for **recent** and **installed** games (read from the local Steam libraries) and three views: **list**, **cards** and
+**grid** with the game's art. **Updates** shows the **changelog** of each patch your recent or installed games post,
+expandable, with an unread badge. **Wishlist** pages through the whole list with its prices, sorted by discount,
+price or list order, and highlights sales of **75% or more**. **Most played** ranks the games with the most players
+right now, with today's peak, how each moved and which ones you own. **Deals**, **trending** and the **catalog**
+complete the tab. The **region picker**, with flags and search, chooses among 12 stores and currencies (BRL, USD,
+EUR, GBP, JPY, CNY, AUD, CAD, CHF, KRW, INR and MXN). With the **bell** on, a wishlist sale of 75% or more and a new
+update of your games ring an OS notification once each. The public lists only need your **SteamID64**; an optional
+**Steam Web API key** adds your library and playtimes. The tab starts off by default, one checkbox away in Settings.
 
 </td>
 </tr>
@@ -264,7 +261,10 @@ The **Drive** tab shows the **storage in use** as a bar, one-click blank **Doc, 
 **today, yesterday, this week and earlier**. Each file shows its kind, who edited it last and its size, with
 **open**, **copy link** and **open folder**. Canto only reads file
 **metadata** (`drive.metadata.readonly`): contents never reach it. Google Keep has no API for personal accounts,
-so the quick capture goes to **Google Tasks** instead.
+so the quick capture goes to **Google Tasks** instead, and **Notes** imports Keep from a
+[Google Takeout](https://takeout.google.com) export: pick the `.json` files of its Keep folder and each note
+arrives with its checklist, labels (as tags), pin and dates, tagged `#keep`; importing again skips what is
+already there and the trash is left out.
 
 </td>
 <td><img src="docs/prints/app/103-drive.png" alt="Drive tab: 4.2 GB of 15 GB storage bar, new Doc/Sheet/Slides buttons, search, recent/starred/shared/mine filters, kind chips and files grouped under Today and Yesterday with folder, copy-link and open buttons"></td>
@@ -531,13 +531,17 @@ And **Follow system**, which switches between light and dark along with the OS. 
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: the top sellers, numbered | Steam: the last five games played, with both playtimes |
+| Steam: the changelog of your games' updates | Steam: the wishlist with sales of 75% or more highlighted |
 |---|---|
-| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+| ![Steam tab, updates sub-tab: fictitious patch notes with game art, unread dots, how long ago, one expanded with its list of changes and a link to the full notes](docs/prints/app/120-steam-atualizacoes.png) | ![Steam tab, wishlist sub-tab: counters for games on the list, on sale and at 75% or more, sort chips and fictitious games with discount badges, old and new prices and what each saves](docs/prints/app/121-steam-desejos.png) |
 
-| Steam: the catalog by rating, with "load more" | Steam: the library, most played first, with a search box |
+| Steam: the most played games right now | Steam: play now as a list and as a grid |
 |---|---|
-| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) | ![Steam tab, library sub-tab: fictitious owned games most played first, with capsule art, the total hours of each and a summary line above, plus a search box and a load more button](docs/prints/app/98-steam-biblioteca.png) |
+| ![Steam tab, most played sub-tab: total players in the top 100, an only mine toggle and fictitious games ranked with player counts, today's peak, rank movement and a badge on the ones you own](docs/prints/app/122-steam-mais-jogados.png) | ![Steam tab, play now sub-tab in the grid view: fictitious game covers in columns with recent and installed badges](docs/prints/app/98-steam-biblioteca.png) |
+
+| Steam: wishlist deals | Steam: the top sellers, numbered |
+|---|---|
+| ![Steam tab, deals sub-tab: fictitious games with capsule art, review score, discount badges, crossed-out prices and the new price in the chosen currency](docs/prints/app/87-steam.png) | ![Steam tab, trending sub-tab: fictitious games ranked with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) |
 
 | One alert overlay for everything pending: outages, meetings, tasks and new AI models |
 |---|
@@ -600,11 +604,15 @@ is kept and what never is.
 
 ## 📈 Market
 
-**Mercado** started as a prototype and now shows **live quotes**: dollar and euro against the real, bitcoin,
-Ibovespa, S&P 500 and Nasdaq, each with the day's variation against the previous close. One quote sits in the
-spotlight with a smooth area chart of the session; the rest are cards with a mini chart (click one to spotlight
-it). The data comes from Yahoo Finance's public chart endpoint, keyless and fetched by Rust, kept in memory for
-15 min (↻ forces a new reading); nothing is stored. It starts hidden, one checkbox away in Settings.
+**Mercado** follows **24 live quotes**: ten currencies (dollar, euro, pound, yen, Swiss franc, Canadian and Australian dollar, yuan and Argentine peso
+against the real, plus euro/dollar), seven indexes (Ibovespa, S&P 500, Nasdaq, Dow Jones, DAX, FTSE 100, Nikkei
+225) and seven coins (Bitcoin, Ethereum, Solana, XRP, BNB, Dogecoin, Cardano). The top line tells whether the
+spotlighted market is open and when it closes, and how many assets are up or down today. The spotlight shows the
+price with its unit, the move in value and percent, a curve with the previous close as a dashed line and a
+crosshair that tells the price and time under the pointer, periods **1D / 5D / 1M / 6M / 1Y**, the open, the
+previous close and rulers for the day's and the 52-week range. Below it a watchlist, filterable by **Currencies /
+Indexes / Crypto** and sortable by top gainers or losers. The data comes from Yahoo Finance's public chart
+endpoint, keyless and fetched by Rust, kept in memory for 15 min (↻ forces a new reading); nothing is stored. It starts hidden, one checkbox away in Settings.
 
 | Market |
 |---|

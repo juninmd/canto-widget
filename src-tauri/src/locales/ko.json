@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI 실패",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "위시리스트 게임이 더 저렴해졌습니다",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1시간 동안 방해하지 마세요",
   "Free": "무료",
@@ -26,10 +25,14 @@
   "Task reminder": "작업 알림",
   "Turn off do not disturb": "방해 금지 모드 끄기",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "찜 목록 할인",
   "You were mentioned": "당신이 언급되었습니다",
   "certificate expired": "인증서가 만료되었습니다.",
   "certificate expires in": "인증서가 다음에 만료됩니다.",
   "days": "일",
   "down:": "아래로:",
-  "high latency:": "높은 대기 시간:"
+  "high latency:": "높은 대기 시간:",
+  "more alerts in the Steam tab": "개의 알림이 Steam 탭에 있음",
+  "new update": "새 업데이트",
+  "was": "정가"
 }

@@ -85,3 +85,40 @@ test("a new page is appended without repeating what is already listed", () => {
   expect(mergeGames([], [row(9)]).map((r) => r.appid)).toEqual([9]);
   expect(mergeGames([row(1)], [])).toHaveLength(1);
 });
+
+test("the twelve stores have distinct codes and a name in the reader's language", async () => {
+  const { REGIONS, regionNames } = await import("./steam");
+  expect(REGIONS.length).toBe(12);
+  expect(new Set(REGIONS.map((r) => r.code)).size).toBe(12);
+  const jp = REGIONS.find((r) => r.code === "jp")!;
+  expect(regionNames(jp).country).toBe("Japão");
+  expect(regionNames(jp).currency.toLowerCase()).toContain("iene");
+});
+
+test("a yen price from Rust arrives in hundredths and prints without decimals", () => {
+  expect(money(198000, "JPY")).toBe("JP¥ 1.980");
+});
+
+test("how long ago a session was reads the way the language says it", async () => {
+  const { ago } = await import("./steam");
+  const now = Date.UTC(2026, 9, 23, 12);
+  expect(ago(now / 1000 - 86400, now)).toBe("ontem");
+  expect(ago(now / 1000 - 5 * 86400, now)).toBe("há 5 dias");
+  expect(ago(now / 1000 - 3 * 3600, now)).toBe("há 3 horas");
+  expect(ago(now / 1000 - 800 * 86400, now)).toBe("há 2 anos");
+});
+
+test("disk sizes switch from MB to GB and the header art is deterministic", async () => {
+  const { diskSize, headerArt } = await import("./steam");
+  expect(diskSize(150e9)).toBe("150 GB");
+  expect(diskSize(1.25e9)).toBe("1,3 GB");
+  expect(diskSize(512e6)).toBe("512 MB");
+  expect(headerArt(620)).toBe("https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/620/header.jpg");
+});
+
+test("the pager shows the ends and the neighbours, with a gap between", async () => {
+  const { pageList } = await import("../components/SteamPager");
+  expect(pageList(0, 1)).toEqual([0]);
+  expect(pageList(0, 5)).toEqual([0, 1, "gap", 4]);
+  expect(pageList(5, 10)).toEqual([0, "gap", 4, 5, 6, "gap", 9]);
+});

@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "सीआई विफल",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "आपकी विशलिस्ट में सस्ता",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1 घंटे तक परेशान न करें",
   "Free": "मुफ़्त",
@@ -26,10 +25,14 @@
   "Task reminder": "कार्य अनुस्मारक",
   "Turn off do not disturb": "परेशान न करें को बंद करें",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "विशलिस्ट में सेल",
   "You were mentioned": "आपका उल्लेख किया गया था",
   "certificate expired": "प्रमाणपत्र समाप्त हो गया",
   "certificate expires in": "प्रमाणपत्र समाप्त हो रहा है",
   "days": "दिन",
   "down:": "नीचे:",
-  "high latency:": "उच्च विलंबता:"
+  "high latency:": "उच्च विलंबता:",
+  "more alerts in the Steam tab": "और अलर्ट Steam टैब में",
+  "new update": "नया अपडेट",
+  "was": "पहले"
 }

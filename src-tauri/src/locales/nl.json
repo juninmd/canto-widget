@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI is mislukt",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Goedkoper op je verlanglijst",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1 uur niet storen",
   "Free": "Gratis",
@@ -26,10 +25,14 @@
   "Task reminder": "Taakherinnering",
   "Turn off do not disturb": "Schakel 'Niet storen' uit",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Aanbieding op je verlanglijst",
   "You were mentioned": "Je werd genoemd",
   "certificate expired": "certificaat verlopen",
   "certificate expires in": "certificaat verloopt over",
   "days": "dagen",
   "down:": "naar beneden:",
-  "high latency:": "hoge latentie:"
+  "high latency:": "hoge latentie:",
+  "more alerts in the Steam tab": "meldingen meer in het Steam-tabblad",
+  "new update": "nieuwe update",
+  "was": "was"
 }

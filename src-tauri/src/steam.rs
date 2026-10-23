@@ -26,7 +26,7 @@ pub const WISHLIST_SCAN: usize = 1000;
 pub const TTL_MS: i64 = 5 * 60_000;
 /// The catalog keys on free text and every capsule is an entry, so the cache is capped; the oldest
 /// entry goes. Big enough for a list plus the covers it is showing.
-const MAX_ENTRIES: usize = 64;
+const MAX_ENTRIES: usize = 240;
 
 /// Deliberately not `Debug`: it holds the Web API key.
 #[derive(Default, Clone, Serialize, Deserialize)]
@@ -140,6 +140,9 @@ pub struct OwnedGame {
     pub total_min: u32,
     /// Capsule on Steam's CDN; built from the appid, so a whole library needs no extra request.
     pub art: String,
+    /// Unix seconds of the last session; 0 for a game never played.
+    #[serde(default)]
+    pub last_played: i64,
 }
 
 /// `items` is a page of the library, most played first; `total` is how many games matched the search
