@@ -1,7 +1,15 @@
 use super::*;
 
 fn m(id: &str, name: &str, score: f64) -> Model {
-    Model { id: id.into(), name: name.into(), creator: "Lumen Labs".into(), score, price: None, speed: None }
+    Model {
+        id: id.into(),
+        name: name.into(),
+        creator: "Lumen Labs".into(),
+        score,
+        price: None,
+        speed: None,
+        ..Default::default()
+    }
 }
 
 /// Twelve models, `a0` best: `a0`..`a9` are the top 10.
