@@ -48,6 +48,7 @@ pub mod cmd_traffic;
 pub mod cmd_traffic_setup;
 pub mod cmd_weather;
 pub mod commands;
+pub mod contact_photos;
 pub mod contacts;
 pub mod crypto;
 pub mod do_not_disturb;
@@ -489,6 +490,7 @@ pub fn run() {
             do_not_disturb::dnd_set,
             do_not_disturb::dnd_clear,
             guest_photos::guest_photos,
+            contact_photos::contact_photos,
             tray_live::badge_set_tasks,
         ])
         .on_window_event(|_win, _event| {

@@ -37,6 +37,8 @@ pub struct AppState {
     pub forges: crate::forge_cache::ForgeCache,
     /// Guests' directory photos; dropped on lock like the rest of the plaintext.
     pub guest_photos: crate::guest_photos::GuestPhotos,
+    /// Contact photos as `data:` URLs; dropped on lock like the rest of the plaintext.
+    pub contact_photos: crate::contact_photos::ContactPhotos,
     /// Steam lists (wishlist deals, top sellers, catalog); dropped on lock with the rest.
     pub steam: crate::steam::SteamCache,
     pub traffic: crate::traffic_cache::TrafficCache,
@@ -61,6 +63,7 @@ impl AppState {
             trash: Default::default(),
             forges: Default::default(),
             guest_photos: Default::default(),
+            contact_photos: Default::default(),
             steam: Default::default(),
             traffic: Default::default(),
             next_meeting: Mutex::new(None),
@@ -145,6 +148,7 @@ impl AppState {
         self.trash.clear();
         self.forges.clear();
         self.guest_photos.clear();
+        self.contact_photos.clear();
         self.steam.clear();
         self.traffic.clear();
         *self.next_meeting.lock().unwrap() = None;

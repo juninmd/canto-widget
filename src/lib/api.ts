@@ -432,6 +432,8 @@ export type Contact = {
   /** "Name (relation)". */
   relations: string[];
   note: string;
+  /** The contact's own photo on Google's CDN (never Google's placeholder); `contactPhotos` turns it into a `data:` URL. */
+  photo?: string;
 };
 /** `total` is the whole address book; `items` is capped, so the two can differ. */
 export type ContactsView = { total: number; items: Contact[] };
@@ -739,6 +741,8 @@ export const api = {
   gdriveList: (filter: DriveFilter, kind: DriveKind, search: string) => invoke<DriveFile[]>("gdrive_list", { filter, kind, search }),
   gdriveQuota: () => invoke<DriveQuota>("gdrive_quota"),
   contactsList: () => invoke<ContactsView>("contacts_list"),
+  /** `data:` URLs by photo URL, at most 60 per call; one that failed to download is left out. */
+  contactPhotos: (urls: string[]) => invoke<Record<string, string>>("contact_photos", { urls }),
 
   /** Tab choices kept in a file as well: the webview's storage can come back empty after an update. */
   prefsGet: () => invoke<Record<string, string>>("prefs_get"),

@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Fotos dos contatos na aba Contatos.** A lista, os aniversariantes do dia e os próximos aniversários mostram a
+  foto que o contato tem no Google, no lugar das iniciais; quem não tem foto (ou só tem o avatar genérico do Google)
+  continua com as iniciais. As fotos ficam guardadas em memória enquanto o Canto está desbloqueado e chegam já
+  embutidas, sem abrir a política de segurança para imagens externas. Usa o mesmo escopo de Contatos de antes.
 - **Google Keep na aba Notas.** O botão de importar ao lado do **+** traz as notas do Keep a partir de um
   export do [Google Takeout](https://takeout.google.com): escolha os `.json` da pasta Keep e cada nota chega com
   a lista de verificação, os marcadores (como tags), o fixado e as datas, marcada com `#keep`; importar de novo
