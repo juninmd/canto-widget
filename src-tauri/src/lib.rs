@@ -43,6 +43,8 @@ pub mod cmd_report;
 pub mod cmd_status;
 pub mod cmd_steam;
 pub mod cmd_sync;
+pub mod cmd_traffic;
+pub mod cmd_traffic_setup;
 pub mod cmd_weather;
 pub mod commands;
 pub mod contacts;
@@ -149,6 +151,11 @@ pub mod subtask;
 pub mod sync;
 pub mod task_order;
 pub mod task_reminder;
+pub mod traffic;
+pub mod traffic_cache;
+pub mod traffic_feed;
+pub mod traffic_search;
+pub mod traffic_tiles;
 pub mod transcripts;
 pub mod trash;
 pub mod tray_live;
@@ -342,6 +349,7 @@ pub fn run() {
             cmd_alerts::alert_close,
             cmd_alerts::alert_close_all,
             cmd_alerts::alert_settle,
+            cmd_alerts::alert_resize,
             alert_log::alert_log,
             fullscreen_guard::fullscreen_hold_get,
             fullscreen_guard::fullscreen_hold_set,
@@ -455,6 +463,14 @@ pub fn run() {
             cmd_steam::steam_recent,
             cmd_steam::steam_library,
             cmd_steam::steam_image,
+            cmd_traffic::traffic_get,
+            cmd_traffic::traffic_departures,
+            cmd_traffic::traffic_map,
+            cmd_traffic_setup::traffic_set_key,
+            cmd_traffic_setup::traffic_search,
+            cmd_traffic_setup::traffic_set_origin,
+            cmd_traffic_setup::traffic_add_trip,
+            cmd_traffic_setup::traffic_remove_trip,
             steam_alert::steam_watch_set,
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,

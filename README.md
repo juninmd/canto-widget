@@ -205,6 +205,27 @@ of yours leaving the machine — and a 30-minute cache. The tab starts off by de
 </td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/100-mapa.png" alt="Map tab: a dark street map with roads colored green to red by traffic, a trip line to work, incident pins, a gauge saying the area is 34% slower than free flow and three saved trips with their minutes and delay"><img src="docs/prints/app/101-mapa-ocorrencias.png" alt="Map tab scrolled: bars for the travel time leaving now and every 15 minutes with the best time pointed out, and the accidents, slow traffic, road works and closures within 5 km"></td>
+<td>
+
+### 🗺️ Local traffic at a glance
+
+A **map of the streets around you colored by live speed**, from free flow to standstill, with the trip you picked
+drawn on top and pins for **accidents, jams, works and closures**; drag it, zoom it and switch the traffic,
+incidents and route layers. Under it, a **gauge** of how much slower the area is than in free flow, with today's
+readings as a line; **your trips** (work, gym...) with the time they take now, the **extra minutes** and the
+distance; the **best time to leave** in the next two hours, in 15-minute steps; and the **incidents within 5 km**,
+nearest first, filterable by kind.
+
+The data comes from **TomTom with your own free key** (2,500 requests a day, no card), sealed in the vault with
+the starting point and the trips; without a key the tab still shows the OpenStreetMap streets. Every call goes
+through Rust and the map tiles reach the window as embedded images, so the CSP still allows no remote origin.
+Readings refresh every 5 minutes while the window is visible. The tab starts off by default, one checkbox away in
+Settings.
+
+</td>
+</tr>
+<tr>
 <td>
 
 ### 📰 An RSS/Atom reader with thumbnails

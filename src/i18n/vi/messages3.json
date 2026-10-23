@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "đóng",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "tóm tắt ngày",
   "alert.modelNew": "mẫu mới",
   "alert.silence": "tắt tiếng",

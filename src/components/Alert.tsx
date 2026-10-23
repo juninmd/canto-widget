@@ -6,6 +6,7 @@ import { t } from "../i18n";
 import AlertActions from "./AlertActions";
 import AlertDetail from "./AlertDetail";
 import AlertStrip, { TONE } from "./AlertStrip";
+import { CrossIcon } from "./Icons";
 
 type Props = {
   events: AgendaItem[];
@@ -74,17 +75,47 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [event, dismiss]);
 
+  // The window hugs the card: it measures itself and Rust sizes the pop-up to it, so no empty space covers the corner.
+  const card = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = card.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const fit = () => void api.alertResize(Math.ceil(el.getBoundingClientRect().height)).catch(() => {});
+    const observer = new ResizeObserver(fit);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [event?.id]);
+
   if (!event) return null;
-  const label = t("alert.dialogLabel", { kind: t(`alert.kind.${kindOf(event)}`), title: event.title });
+  const label = t("alert.dialogLabel", {
+    kind: t(`alert.kind.${kindOf(event)}`),
+    title: event.title,
+  });
+
+  const tone = TONE[toneOf(event)];
 
   return (
-    <div className="absolute inset-0 z-50 flex">
+    <div className="absolute inset-x-0 bottom-0 z-50 flex">
       <div
+        ref={card}
         role="alertdialog"
         aria-modal="true"
         aria-label={label}
-        className={`flex h-full w-full flex-col gap-3 overflow-hidden rounded-2xl border-2 bg-panel p-4 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${TONE[toneOf(event)].border}`}
+        className={`relative flex w-full flex-col gap-2 overflow-hidden rounded-2xl border bg-panel p-3 text-fg shadow-2xl motion-safe:animate-surgir motion-reduce:animate-fade ${tone.border}`}
       >
+        <span
+          aria-hidden="true"
+          className={`pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-current to-transparent opacity-10 ${tone.text}`}
+        />
+        <button
+          type="button"
+          onClick={() => dismiss(event.id)}
+          aria-label={t("alert.close")}
+          title="Esc"
+          className="absolute right-2 top-2 z-10 grid size-6 place-items-center rounded-md text-faint transition hover:bg-edge hover:text-fg"
+        >
+          <CrossIcon />
+        </button>
         {items.length > 1 && <AlertStrip items={items} selected={event.id} onSelect={setPicked} />}
         <AlertDetail event={event} onOpenNotes={onOpenNotes} />
         <AlertActions
@@ -93,6 +124,8 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
           onDismiss={(outcome) => dismiss(event.id, outcome)}
           onHide={() => hide(event.id)}
           onCloseAll={items.length > 1 ? closeAll : undefined}
+          count={items.length}
+          hideClose
           onCompleted={onCompleted}
           onOpenModels={onOpenModels}
         />

@@ -150,7 +150,6 @@ export const tasks: Record<keyof typeof source, string> = {
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "close",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "day summary",
   "alert.modelNew": "new model",
   "alert.silence": "mute",
