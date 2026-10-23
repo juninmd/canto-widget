@@ -4,7 +4,15 @@ use crate::model::now_ms;
 const T0: i64 = 1_790_000_000_000;
 
 fn m(id: &str, score: f64) -> Model {
-    Model { id: id.into(), name: id.into(), creator: "Stratos".into(), score, price: Some(1.0), speed: None }
+    Model {
+        id: id.into(),
+        name: id.into(),
+        creator: "Stratos".into(),
+        score,
+        price: Some(1.0),
+        speed: None,
+        ..Default::default()
+    }
 }
 
 fn list(n: usize) -> Vec<Model> {

@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "நெருக்கமான",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "நாள் சுருக்கம்",
   "alert.modelNew": "புதிய மாடல்",
   "alert.silence": "ஊமை",

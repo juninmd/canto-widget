@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "閉じる",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "一日の概要",
   "alert.modelNew": "新しいモデル",
   "alert.silence": "ミュート",

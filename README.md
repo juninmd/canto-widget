@@ -299,7 +299,12 @@ the last two weeks, plus `.vtt`, `.srt`, `.txt` and `.md` transcripts from a loc
 
 🤖 **AI models** (on the tab bar by default, **no API key or account**): LLMs ranked by the
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, read from its public leaderboard page,
-with a score bar, creator, price per 1M tokens and speed, sortable by intelligence, price or speed. It fetches at
+with a score bar, creator, price per 1M tokens, speed and context window, sortable by intelligence, price, speed,
+context or release date and filterable by open weights or reasoning. Tap a model for its **full sheet** (release
+date, context, open or closed weights, reasoning, input/output/blended price, speed, time to first token,
+intelligence, coding and math indexes with their place, input modalities); mark up to four with ⊕ and the
+**Compare** sub-tab puts them side by side: a one-line verdict ("3.8× cheaper"), a radar, one bar per metric with
+the best starred, and the full table with an "only differences" switch. It fetches at
 most once every 3 hours, and the opt-in 🔔 notifies you when a
 model **enters the top 10** or **climbs within it** (checked every 6 hours while the vault is unlocked), with
 "new" and "up" badges for a week.
@@ -402,6 +407,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](docs/prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](docs/prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](docs/prints/app/107-atividade-meta.png) |
+
+| AI models: the full sheet | AI models: Compare | AI models: metric by metric |
+|---|---|---|
+| ![AI models with one model opened: release, context, weights, input, output and blended price, speed, first token, reasoning, the three indexes with their place and the modalities](docs/prints/app/116-modelos-ficha.png) | ![The Compare sub-tab with three picked models, presets, a summary in sentences and a radar](docs/prints/app/117-modelos-comparar.png) | ![Compare: one bar per metric with the best starred and the full side-by-side table](docs/prints/app/118-modelos-comparar-metricas.png) |
 
 | Games and full screen: alerts wait until you leave |
 |---|
