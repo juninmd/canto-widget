@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "قريب",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "ملخص اليوم",
   "alert.modelNew": "نموذج جديد",
   "alert.silence": "كتم الصوت",

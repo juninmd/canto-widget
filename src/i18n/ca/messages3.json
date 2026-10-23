@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "tancar",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "resum del dia",
   "alert.modelNew": "nou model",
   "alert.silence": "mut",

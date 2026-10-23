@@ -205,6 +205,27 @@ of yours leaving the machine — and a 30-minute cache. The tab starts off by de
 </td>
 </tr>
 <tr>
+<td><img src="docs/prints/app/100-mapa.png" alt="Map tab: a dark street map with roads colored green to red by traffic, a trip line to work, incident pins, a gauge saying the area is 34% slower than free flow and three saved trips with their minutes and delay"><img src="docs/prints/app/101-mapa-ocorrencias.png" alt="Map tab scrolled: bars for the travel time leaving now and every 15 minutes with the best time pointed out, and the accidents, slow traffic, road works and closures within 5 km"></td>
+<td>
+
+### 🗺️ Local traffic at a glance
+
+A **map of the streets around you colored by live speed**, from free flow to standstill, with the trip you picked
+drawn on top and pins for **accidents, jams, works and closures**; drag it, zoom it and switch the traffic,
+incidents and route layers. Under it, a **gauge** of how much slower the area is than in free flow, with today's
+readings as a line; **your trips** (work, gym...) with the time they take now, the **extra minutes** and the
+distance; the **best time to leave** in the next two hours, in 15-minute steps; and the **incidents within 5 km**,
+nearest first, filterable by kind.
+
+The data comes from **TomTom with your own free key** (2,500 requests a day, no card), sealed in the vault with
+the starting point and the trips; without a key the tab still shows the OpenStreetMap streets. Every call goes
+through Rust and the map tiles reach the window as embedded images, so the CSP still allows no remote origin.
+Readings refresh every 5 minutes while the window is visible. The tab starts off by default, one checkbox away in
+Settings.
+
+</td>
+</tr>
+<tr>
 <td>
 
 ### 📰 An RSS/Atom reader with thumbnails
@@ -297,7 +318,12 @@ the last two weeks, plus `.vtt`, `.srt`, `.txt` and `.md` transcripts from a loc
 
 🤖 **AI models** (on the tab bar by default, **no API key or account**): LLMs ranked by the
 [Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, read from its public leaderboard page,
-with a score bar, creator, price per 1M tokens and speed, sortable by intelligence, price or speed. It fetches at
+with a score bar, creator, price per 1M tokens, speed and context window, sortable by intelligence, price, speed,
+context or release date and filterable by open weights or reasoning. Tap a model for its **full sheet** (release
+date, context, open or closed weights, reasoning, input/output/blended price, speed, time to first token,
+intelligence, coding and math indexes with their place, input modalities); mark up to four with ⊕ and the
+**Compare** sub-tab puts them side by side: a one-line verdict ("3.8× cheaper"), a radar, one bar per metric with
+the best starred, and the full table with an "only differences" switch. It fetches at
 most once every 3 hours, and the opt-in 🔔 notifies you when a
 model **enters the top 10** or **climbs within it** (checked every 6 hours while the vault is unlocked), with
 "new" and "up" badges for a week.
@@ -400,6 +426,10 @@ And **Follow system**, which switches between light and dark along with the OS. 
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](docs/prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](docs/prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](docs/prints/app/107-atividade-meta.png) |
+
+| AI models: the full sheet | AI models: Compare | AI models: metric by metric |
+|---|---|---|
+| ![AI models with one model opened: release, context, weights, input, output and blended price, speed, first token, reasoning, the three indexes with their place and the modalities](docs/prints/app/116-modelos-ficha.png) | ![The Compare sub-tab with three picked models, presets, a summary in sentences and a radar](docs/prints/app/117-modelos-comparar.png) | ![Compare: one bar per metric with the best starred and the full side-by-side table](docs/prints/app/118-modelos-comparar-metricas.png) |
 
 | Games and full screen: alerts wait until you leave |
 |---|

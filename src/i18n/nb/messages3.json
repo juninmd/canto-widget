@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "lukke",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "dagsoppsummering",
   "alert.modelNew": "ny modell",
   "alert.silence": "mute",

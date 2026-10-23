@@ -41,6 +41,7 @@ pub struct AppState {
     pub contact_photos: crate::contact_photos::ContactPhotos,
     /// Steam lists (wishlist deals, top sellers, catalog); dropped on lock with the rest.
     pub steam: crate::steam::SteamCache,
+    pub traffic: crate::traffic_cache::TrafficCache,
     /// Soonest upcoming event with a Meet link, refreshed by `tray_live::watch`; read by the tray and the join shortcut.
     pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
     /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.
@@ -64,6 +65,7 @@ impl AppState {
             guest_photos: Default::default(),
             contact_photos: Default::default(),
             steam: Default::default(),
+            traffic: Default::default(),
             next_meeting: Mutex::new(None),
             badge_tasks: Mutex::new(0),
             clip_lock: Mutex::new(()),
@@ -148,6 +150,7 @@ impl AppState {
         self.guest_photos.clear();
         self.contact_photos.clear();
         self.steam.clear();
+        self.traffic.clear();
         *self.next_meeting.lock().unwrap() = None;
         *self.badge_tasks.lock().unwrap() = 0;
     }

@@ -36,7 +36,7 @@ type Props = { items: AgendaItem[]; selected: string; onSelect: (id: string) => 
 
 export default function AlertStrip({ items, selected, onSelect }: Props) {
   return (
-    <div role="group" aria-label={t("alert.strip")} data-alert-strip className="flex gap-1.5 overflow-x-auto p-1">
+    <div role="group" aria-label={t("alert.strip")} data-alert-strip className="-mx-1 -mt-1 mr-7 flex gap-1.5 overflow-x-auto p-1 [scrollbar-width:none]">
       {items.map((e) => {
         const tone = TONE[toneOf(e)];
         const on = e.id === selected;
@@ -46,7 +46,7 @@ export default function AlertStrip({ items, selected, onSelect }: Props) {
             type="button"
             aria-pressed={on}
             onClick={() => onSelect(e.id)}
-            className={`min-w-28 flex-1 rounded-lg border px-2 py-1 text-left ${tone.card} ${on ? `ring-2 ring-offset-1 ring-offset-panel ${tone.ring}` : "opacity-80 hover:opacity-100"}`}
+            className={`min-w-24 max-w-40 flex-1 rounded-lg border px-2 py-1 text-left transition ${tone.card} ${on ? `ring-1 ${tone.ring} ${tone.border}` : "opacity-70 hover:opacity-100"}`}
           >
             <span className="flex items-center gap-1.5">
               {e.sender ? (
@@ -54,7 +54,7 @@ export default function AlertStrip({ items, selected, onSelect }: Props) {
               ) : (
                 <span aria-hidden="true" className={`size-1.5 shrink-0 rounded-full ${tone.dot}`} />
               )}
-              <span className="truncate text-xs font-semibold text-fg">{e.title}</span>
+              <span className="truncate text-[11.5px] font-semibold text-fg">{e.title}</span>
             </span>
             <span className="block truncate text-[10.5px] text-muted">{summary(e)}</span>
           </button>

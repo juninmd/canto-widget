@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "zatvoriti",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "dnevni sažetak",
   "alert.modelNew": "novi model",
   "alert.silence": "utišati",

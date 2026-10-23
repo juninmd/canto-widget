@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "schließen",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "Tageszusammenfassung",
   "alert.modelNew": "neues Modell",
   "alert.silence": "stumm",

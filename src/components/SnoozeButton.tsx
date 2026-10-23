@@ -22,12 +22,12 @@ export default function SnoozeButton({ onSnooze }: { onSnooze: (minutes: number)
   };
 
   return (
-    <div className="relative flex flex-[1.2]" onKeyDown={onKeyDown} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
+    <div className="relative flex" onKeyDown={onKeyDown} onBlur={(e) => !e.currentTarget.contains(e.relatedTarget) && setOpen(false)}>
       <button
         type="button"
         onClick={() => onSnooze(minutes)}
         aria-label={t("alert.snooze", { minutes })}
-        className="flex-1 whitespace-nowrap rounded-l-lg bg-edge px-2 py-2 text-sm text-fg"
+        className="h-8 whitespace-nowrap rounded-l-lg bg-edge px-2.5 text-[13px] text-fg hover:brightness-125"
       >
         {t("alert.snoozeShort", { minutes })}
       </button>
@@ -37,7 +37,7 @@ export default function SnoozeButton({ onSnooze }: { onSnooze: (minutes: number)
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label={t("alert.snoozeMore")}
-        className="rounded-r-lg border-l border-panel bg-edge px-2 text-xs text-muted"
+        className="h-8 rounded-r-lg border-l border-panel bg-edge px-2 text-xs text-muted hover:brightness-125"
       >
         <span aria-hidden="true">▾</span>
       </button>

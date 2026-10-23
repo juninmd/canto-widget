@@ -1,30 +1,35 @@
-import { forwardRef, useState } from "react";
+import { forwardRef } from "react";
 import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
 import { kindOf, STATUS_PREFIX } from "../lib/alerts";
 import { TASK_PREFIX } from "../lib/reminders";
 import { t } from "../i18n";
 import SnoozeButton from "./SnoozeButton";
+import { CrossIcon } from "./Icons";
 
 type Props = {
   event: AgendaItem;
   onDismiss: (outcome?: AlertOutcome) => void;
   /** Leaves the overlay without telling Rust, for when Rust already dropped the alert (a snooze). */
   onHide: () => void;
-  /** Every alert leaves at once; with it the close button grows a chevron for the queue. */
+  /** Every alert leaves at once; with it a visible "fechar todos" joins the row. */
   onCloseAll?: () => void;
+  /** How many alerts "fechar todos" takes with it. */
+  count?: number;
+  /** The pop-up has its own ✕ in the corner, so the row drops the "fechar" button. */
+  hideClose?: boolean;
   onCompleted?: () => void;
   onOpenModels?: () => void;
 };
 
-const PRIMARY = "min-w-24 flex-[1.6] rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-on-accent";
-const SECONDARY = "flex-1 rounded-lg bg-edge px-3 py-2 text-sm text-fg";
+const PRIMARY =
+  "h-8 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-semibold text-on-accent shadow-md shadow-accent/30 transition hover:brightness-110";
+const SECONDARY = "h-8 whitespace-nowrap rounded-lg bg-edge px-3 text-[13px] text-fg transition hover:brightness-125";
 
 /** Buttons change with the kind of alert: only calendar events and tasks can be snoozed, only services muted. */
 const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
-  { event, onDismiss, onHide, onCloseAll, onCompleted, onOpenModels },
+  { event, onDismiss, onHide, onCloseAll, count, hideClose, onCompleted, onOpenModels },
   primary,
 ) {
-  const [menu, setMenu] = useState(false);
   const kind = kindOf(event);
   const open = (url: string) => () => void api.openLink(url);
   const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, () => onDismiss());
@@ -38,12 +43,17 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap items-center gap-1.5">
       {kind === "task" && (
         <button
           ref={primary}
           type="button"
-          onClick={() => void api.taskComplete(event.id.slice(TASK_PREFIX.length)).then(onCompleted).finally(() => onDismiss("done"))}
+          onClick={() =>
+            void api
+              .taskComplete(event.id.slice(TASK_PREFIX.length))
+              .then(onCompleted)
+              .finally(() => onDismiss("done"))
+          }
           className={PRIMARY}
         >
           {t("alert.completeTask")}
@@ -109,70 +119,30 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
         </button>
       )}
       {(kind === "meeting" || kind === "task") && <SnoozeButton onSnooze={snooze} />}
-      {onCloseAll ? <CloseWithAll onClose={() => onDismiss()} onCloseAll={onCloseAll} open={menu} setOpen={setMenu} /> : (
-        <button type="button" onClick={() => onDismiss()} title="Esc" className="rounded-lg px-3 py-2 text-sm text-muted hover:bg-edge hover:text-fg">
+      {onCloseAll && (
+        <button
+          type="button"
+          onClick={onCloseAll}
+          aria-label={t("alert.closeAll")}
+          className="ml-auto flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[13px] text-muted transition hover:bg-edge hover:text-fg"
+        >
+          <CrossIcon />
+          {t("alert.closeAll")}
+          {count ? <span className="font-mono text-[11px] text-faint">{count}</span> : null}
+        </button>
+      )}
+      {!hideClose && (
+        <button
+          type="button"
+          onClick={() => onDismiss()}
+          title="Esc"
+          className={`${onCloseAll ? "" : "ml-auto "}h-8 rounded-lg px-3 text-[13px] text-muted hover:bg-edge hover:text-fg`}
+        >
           {t("alert.close")}
         </button>
       )}
     </div>
   );
 });
-
-/** "fechar" with a chevron that opens the one other way out: closing the whole queue at once. */
-function CloseWithAll({
-  onClose,
-  onCloseAll,
-  open,
-  setOpen,
-}: {
-  onClose: () => void;
-  onCloseAll: () => void;
-  open: boolean;
-  setOpen: (open: boolean) => void;
-}) {
-  // Esc closes the menu first; the overlay's own Esc (close one alert) only gets it with the menu shut.
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape" && open) {
-      e.stopPropagation();
-      setOpen(false);
-    }
-  };
-  return (
-    <div
-      className="relative flex"
-      onKeyDown={onKeyDown}
-      onBlur={(e) => !e.currentTarget.contains(e.relatedTarget as Node | null) && setOpen(false)}
-    >
-      <button type="button" onClick={onClose} title="Esc" className="rounded-l-lg bg-edge px-3 py-2 text-sm text-muted">
-        {t("alert.close")}
-      </button>
-      <button
-        type="button"
-        onClick={() => setOpen(!open)}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label={t("alert.closeMore")}
-        className="rounded-r-lg border-l border-panel bg-edge px-2 text-xs text-muted"
-      >
-        <span aria-hidden="true">▾</span>
-      </button>
-      {open && (
-        <div role="menu" className="absolute bottom-full right-0 z-10 mb-1 flex flex-col overflow-hidden rounded-lg border border-line bg-panel shadow-lg">
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => {
-              setOpen(false);
-              onCloseAll();
-            }}
-            className="whitespace-nowrap px-4 py-2 text-left text-sm text-fg hover:bg-edge"
-          >
-            {t("alert.closeAll")}
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default AlertActions;

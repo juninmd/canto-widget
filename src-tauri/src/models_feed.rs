@@ -6,13 +6,15 @@ use std::time::Duration;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::models_fields::{self, Details};
+
 pub const URL: &str = "https://artificialanalysis.ai/leaderboards/models";
 const TIMEOUT_S: u64 = 20;
 const MAX_TEXT: usize = 120;
 /// Opens each Next.js flight chunk: a JSON string literal holding a slice of the payload.
 const CHUNK: &str = "self.__next_f.push([1,\"";
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Model {
     pub id: String,
     pub name: String,
@@ -22,6 +24,9 @@ pub struct Model {
     pub price: Option<f64>,
     /// Median output tokens per second.
     pub speed: Option<f64>,
+    /// Absent from rankings sealed before the sheet existed: they read back empty until the next fetch.
+    #[serde(flatten)]
+    pub details: Details,
 }
 
 #[derive(Debug, PartialEq)]
@@ -68,6 +73,7 @@ fn model(v: &Value) -> Option<Model> {
         score,
         price: blended(v),
         speed: positive(&v["medianOutputTokensPerSecond"]),
+        details: models_fields::details(v),
         id,
         name,
     })
