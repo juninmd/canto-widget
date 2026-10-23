@@ -17,22 +17,44 @@ function read(key: string): string | null {
   }
 }
 
+/** Fired when the file answers after the first render already happened, so the tab choices can be read again. */
+export const PREFS_RESTORED = "canto:prefs-restored";
+
+/** What the webview lost comes back from the file; what only the webview has goes into it. Says whether anything came back. */
+function merge(saved: Record<string, string>): boolean {
+  let restored = false;
+  for (const key of KEYS) {
+    const local = read(key);
+    if (local !== null) {
+      if (saved[key] !== local) mirrorPref(key, local);
+    } else if (typeof saved[key] === "string") {
+      localStorage.setItem(key, saved[key]);
+      restored = true;
+    }
+  }
+  return restored;
+}
+
 /**
- * Runs before the first render: what the webview lost comes back from the file, and what only the webview has
- * (a choice made before the file existed) goes into it. The webview's copy wins when both exist.
+ * Runs before the first render, waiting at most `WAIT_MS` for the file. The webview's copy wins when both exist.
+ * A file slower than that (the first start after an update is the slow one) still lands: the defaults shown meanwhile
+ * give way to the saved choices instead of staying until the next start.
  */
 export async function syncPrefs(): Promise<void> {
+  const pending = api.prefsGet().catch(() => null);
+  const first = await Promise.race([pending.then((saved) => ({ saved })), new Promise<null>((done) => setTimeout(() => done(null), WAIT_MS))]);
   try {
-    const saved = await Promise.race([api.prefsGet(), new Promise<null>((done) => setTimeout(() => done(null), WAIT_MS))]);
-    if (!saved) return;
-    for (const key of KEYS) {
-      const local = read(key);
-      if (local !== null) {
-        if (saved[key] !== local) mirrorPref(key, local);
-      } else if (typeof saved[key] === "string") {
-        localStorage.setItem(key, saved[key]);
-      }
+    if (first) {
+      if (first.saved) merge(first.saved);
+      return;
     }
+    void pending.then((saved) => {
+      try {
+        if (saved && merge(saved)) window.dispatchEvent(new Event(PREFS_RESTORED));
+      } catch {
+        // No storage: the defaults stay, as on a fresh install.
+      }
+    });
   } catch {
     // No file and no storage: the defaults apply, as on a fresh install.
   }

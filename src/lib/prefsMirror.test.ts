@@ -2,7 +2,7 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 
 type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
-let file: Record<string, string> | "fail" = {};
+let file: Record<string, string> | "fail" | Promise<Record<string, string>> = {};
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
@@ -12,8 +12,9 @@ mock.module("@tauri-apps/api/core", () => ({
   },
 }));
 
-const { syncPrefs, mirrorPref } = await import("./prefsMirror");
-const { parseHidden } = await import("./tabs");
+const { syncPrefs, mirrorPref, PREFS_RESTORED } = await import("./prefsMirror");
+const { parseHidden, useHiddenTabs } = await import("./tabs");
+const { act, renderHook } = await import("@testing-library/react");
 
 beforeEach(() => {
   calls.length = 0;
@@ -50,4 +51,19 @@ test("a missing file leaves the webview's storage alone and never blocks the sta
   mirrorPref("canto.hiddenTabs", "[]");
   await Promise.resolve();
   expect(calls.at(-1)).toEqual({ cmd: "prefs_set", args: { key: "canto.hiddenTabs", value: "[]" } });
+});
+
+test("a file slower than the start still brings the saved tabs back, replacing the defaults on screen", async () => {
+  let answer: (saved: Record<string, string>) => void = () => {};
+  file = new Promise((done) => (answer = done));
+  await syncPrefs();
+  const { result } = renderHook(() => useHiddenTabs());
+  expect(result.current[0]).toContain("steam");
+  expect(localStorage.getItem("canto.knownTabs")).toBeNull();
+  const restored = new Promise((done) => window.addEventListener(PREFS_RESTORED, done, { once: true }));
+  await act(async () => {
+    answer({ "canto.hiddenTabs": '["gitlab"]', "canto.knownTabs": JSON.stringify(parseHidden(null).concat("github", "notes")) });
+    await restored;
+  });
+  expect(result.current[0]).toEqual(["gitlab"]);
 });
