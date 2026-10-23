@@ -114,10 +114,10 @@ test("fechar todos fecha a fila inteira numa chamada só", async () => {
   await settle();
   expect(screen.getByRole("alertdialog")).toBeTruthy();
 
-  // O "fechar todos" mora atrás do chevron colado ao "fechar".
-  fireEvent.click(screen.getByRole("button", { name: "mais opções de fechar" }));
-  await settle();
-  fireEvent.click(screen.getByRole("menuitem", { name: "fechar todos" }));
+  // O "fechar todos" fica sempre visível, com quantos avisos leva junto.
+  const all = screen.getByRole("button", { name: "fechar todos" });
+  expect(all.textContent).toContain("3");
+  fireEvent.click(all);
   await settle();
   expect(calls).toContain("alert_close_all");
   expect(screen.queryByRole("alertdialog")).toBeNull();
@@ -128,24 +128,30 @@ test("um aviso sozinho não oferece fechar todos", async () => {
   render(<AlertWindow />);
   await settle();
   expect(screen.getByRole("button", { name: "fechar" })).toBeTruthy();
-  expect(screen.queryByRole("button", { name: "mais opções de fechar" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "fechar todos" }) === null).toBe(true);
 });
 
-test("o chevron abre e fecha o menu sem fechar o aviso", async () => {
-  payload = [alert("task:t1"), alert("status:s1")];
-  render(<AlertWindow />);
-  await settle();
-  const chevron = screen.getByRole("button", { name: "mais opções de fechar" });
-  expect(chevron.getAttribute("aria-expanded")).toBe("false");
-
-  fireEvent.click(chevron);
-  await settle();
-  expect(chevron.getAttribute("aria-expanded")).toBe("true");
-  fireEvent.keyDown(chevron.parentElement as Element, { key: "Escape" });
-  await settle();
-  expect(screen.queryByRole("menuitem", { name: "fechar todos" })).toBeNull();
-  expect(calls).not.toContain("alert_close");
-  expect(screen.getByRole("alertdialog")).toBeTruthy();
+test("a janela do aviso pede a altura do cartão ao Rust", async () => {
+  const observers: ResizeObserverCallback[] = [];
+  const original = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    constructor(cb: ResizeObserverCallback) {
+      observers.push(cb);
+    }
+    observe() {}
+    disconnect() {}
+    unobserve() {}
+  } as unknown as typeof ResizeObserver;
+  try {
+    payload = [alert("task:t1")];
+    render(<AlertWindow />);
+    await settle();
+    observers.forEach((cb) => cb([], {} as ResizeObserver));
+    await settle();
+    expect(calls).toContain("alert_resize");
+  } finally {
+    globalThis.ResizeObserver = original;
+  }
 });
 
 test("a descrição do aviso é renderizada como markdown", async () => {
