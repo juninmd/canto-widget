@@ -119,6 +119,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
+  arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
+  modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da atualização
+  com uma cópia **antiga** (não vazia), vale a mais recente, em vez de a antiga apagar a do arquivo.
 - **Pop-up de notificação sem a borda de cima**: a janela media o cartão no meio da animação de entrada (ainda
   em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **A atualização não apaga mais as abas que você deixou visíveis.** A escolha das abas (e o layout) só ficava no
