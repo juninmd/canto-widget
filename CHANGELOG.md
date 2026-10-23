@@ -7,6 +7,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Google Keep na aba Notas.** O botão de importar ao lado do **+** traz as notas do Keep a partir de um
+  export do [Google Takeout](https://takeout.google.com): escolha os `.json` da pasta Keep e cada nota chega com
+  a lista de verificação, os marcadores (como tags), o fixado e as datas, marcada com `#keep`; importar de novo
+  não duplica e a lixeira fica de fora. A API do Keep só atende contas Google Workspace por conta de serviço,
+  então contas pessoais não têm sincronização direta.
 - **Aba Steam refeita, animada e com sete sub-abas.** **Jogue agora** pagina **todos os seus jogos**, do último
   jogado ao mais antigo, com um destaque do último jogo e o botão **Jogar**, filtros **recentes** e **instalados**
   (lidos das bibliotecas locais da Steam) e três visualizações: **lista**, **cards** e **grade** com a arte do jogo.

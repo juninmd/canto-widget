@@ -13,7 +13,7 @@ import NoteViewToggle from "./NoteViewToggle";
 import { activeTag, censusOf, type TagCensus } from "../lib/noteTags";
 import { useNotesView } from "../lib/useNotesView";
 import { useAnnouncement } from "../lib/useAnnouncement";
-import { PlusIcon, SearchIcon } from "./Icons";
+import { DownloadIcon, PlusIcon, SearchIcon } from "./Icons";
 import { useNoteDraft, type NoteDraft } from "../lib/useNoteDraft";
 import type { Draft } from "./NoteEditor";
 
@@ -107,6 +107,18 @@ ${lim}`);
     }
   }
 
+  async function importKeep() {
+    try {
+      const r = await api.notesImportKeep();
+      if (!r) return;
+      setAnnouncement(t("notes.keep.done", { n: r.imported, dup: r.duplicates, skip: r.skipped }));
+      if (r.imported > 0 && query !== "#keep") setQuery("#keep");
+      else void reload();
+    } catch (e) {
+      onError(errText(e));
+    }
+  }
+
   useEffect(() => {
     setLimit(PAGE);
     const timer = setTimeout(() => void reload(query, PAGE), 150);
@@ -164,6 +176,15 @@ ${lim}`);
           />
         </div>
         <NoteViewToggle view={view} onChange={setView} />
+        <button
+          type="button"
+          onClick={() => void importKeep()}
+          aria-label={t("notes.keep.import")}
+          title={t("notes.keep.help")}
+          className="canto-hit grid w-9 shrink-0 place-items-center rounded-xl border border-edge text-muted hover:bg-hover hover:text-fg"
+        >
+          <DownloadIcon />
+        </button>
         <button
           type="button"
           onClick={() => open()}

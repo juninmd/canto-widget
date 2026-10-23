@@ -13,6 +13,7 @@ mock.module("@tauri-apps/api/core", () => ({
     if (cmd === "notes_search" && search) return search;
     if (cmd === "notes_search") return Promise.resolve({ total: notes.length, items: notes });
     if (cmd === "note_pin") return Promise.resolve(true);
+    if (cmd === "notes_import_keep") return Promise.resolve({ imported: 3, duplicates: 1, skipped: 2 });
     return Promise.resolve(null);
   },
 }));
@@ -141,4 +142,19 @@ test("the formatting bar moves focus with the arrow keys and carries no emoji", 
     fireEvent.keyDown(first!, { key: "ArrowRight" });
   });
   expect(document.activeElement).toBe(second!);
+});
+
+test("importing from Google Keep reports the counts and filters the imported notes", async () => {
+  await mount();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "importar notas do Google Keep" }));
+    await new Promise((ready) => setTimeout(ready, 250));
+  });
+  await act(async () => {
+    await new Promise((ready) => setTimeout(ready, 250));
+  });
+  expect(calls.some((c) => c.cmd === "notes_import_keep")).toBe(true);
+  expect(screen.getByText("Keep: 3 importadas, 1 já estavam aqui, 2 ignoradas (lixeira ou vazias)")).toBeTruthy();
+  expect((screen.getByLabelText("buscar notas") as HTMLInputElement).value).toBe("#keep");
+  expect(calls.some((c) => c.cmd === "notes_search" && c.args?.query === "#keep")).toBe(true);
 });
