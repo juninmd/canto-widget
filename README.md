@@ -251,7 +251,9 @@ so the quick capture goes to **Google Tasks** instead.
 
 The **Contacts** tab shows your Google address book (read-only, `contacts.readonly`): the total, a search that
 ignores accents and matches name, company, e-mail or phone, filters with counts (all, starred, with e-mail, with
-phone) and A to Z sections. Open a contact to **copy** an e-mail or number in one click or jump to Google Contacts.
+phone) and A to Z sections. **Today's birthdays** sit on top, with the age and a one-click WhatsApp greeting. Open a
+contact to see everything Google keeps (nickname, department, birthday, addresses, websites, relations, notes),
+**copy** an e-mail or number, open a phone straight in **WhatsApp** (`wa.me`) or jump to Google Contacts.
 It starts hidden, one checkbox away in Settings, and needs the People API on your Google Cloud project.
 
 </td>

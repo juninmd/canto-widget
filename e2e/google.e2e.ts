@@ -17,8 +17,16 @@ const GOOGLE = {
   contacts_list: {
     total: 2,
     items: [
-      { id: "c1", name: "Marina Lopes", emails: ["marina@exemplo.com"], phones: ["+55 11 90000-0000"], org: "Vértice", title: "Diretora", starred: true, link: "https://contacts.google.com/person/c1" },
-      { id: "c2", name: "Rafael Prado", emails: ["rafael@exemplo.com"], phones: [], org: "Vértice", title: "", starred: false, link: "" },
+      {
+        id: "c1", name: "Marina Lopes", emails: ["marina@exemplo.com"], phones: ["+55 11 90000-0000"], org: "Vértice", title: "Diretora", starred: true,
+        link: "https://contacts.google.com/person/c1", nickname: "Mari", department: "Vendas",
+        birthday: { day: new Date().getDate(), month: new Date().getMonth() + 1, year: null },
+        addresses: ["Rua A, 10, São Paulo"], urls: [], relations: [], note: "",
+      },
+      {
+        id: "c2", name: "Rafael Prado", emails: ["rafael@exemplo.com"], phones: [], org: "Vértice", title: "", starred: false, link: "",
+        nickname: "", department: "", birthday: null, addresses: [], urls: [], relations: [], note: "",
+      },
     ],
   },
   gdrive_list: [
@@ -50,13 +58,18 @@ test("Contatos lists the address book, filters it and opens a contact in Google"
   await mockTauri(page, { hiddenTabs: [], knownTabs: ALL_TABS, fixed: GOOGLE });
   await page.goto("/");
   await goTab(page, "Contatos");
-  await expect(page.getByText("Marina Lopes")).toBeVisible();
+  const birthdays = page.getByRole("region", { name: "Aniversariantes de hoje" });
+  await expect(birthdays.getByText("Marina Lopes")).toBeVisible();
+  const row = page.locator("[data-contact=c1]");
   await page.getByLabel("buscar contato").fill("rafael");
-  await expect(page.getByText("Marina Lopes")).toHaveCount(0);
+  await expect(row).toHaveCount(0);
   await page.getByLabel("buscar contato").fill("");
-  await page.getByText("Marina Lopes").click();
+  await row.getByText("Marina Lopes").click();
+  await expect(row.getByText("Rua A, 10, São Paulo")).toBeVisible();
   await page.getByRole("button", { name: "abrir no Google Contatos" }).click();
   await expect.poll(async () => (await calls(page)).find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://contacts.google.com/person/c1" });
+  await page.getByRole("button", { name: "abrir +55 11 90000-0000 no WhatsApp" }).click();
+  await expect.poll(async () => (await calls(page)).filter((c) => c.cmd === "open_link").at(-1)?.args).toEqual({ url: "https://wa.me/5511900000000" });
 });
 
 test("a hidden-tab choice lost with the webview's storage comes back from the file", async ({ page }) => {

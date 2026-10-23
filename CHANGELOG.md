@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Contatos renovada**: os **aniversariantes do dia** aparecem no topo, com a idade quando o Google sabe o ano e
+  um botão de **parabéns pelo WhatsApp** com a mensagem já escrita (o bolo 🎂 também marca a pessoa na lista).
+  Abrir um contato agora mostra **tudo** o que o Google guarda: apelido, setor, aniversário, endereços, sites,
+  relações e notas. Cada telefone ganha um botão **WhatsApp** que abre a conversa direto (`wa.me`), com o número
+  normalizado: `+` ou `00` contam como internacional e um número com DDD sem código de país é lido como do Brasil.
+  A busca também acha pelo apelido e pelo setor.
 - **Animações nas outras abas**, no espírito do Clima: movimento que diz o que mudou, curto e parado quando o
   sistema pede menos movimento. O sublinhado da aba (e a barra da lateral) **desliza** até a aba escolhida; o
   carregamento ganha um **brilho correndo** no lugar do pulso. **Tarefas**: o risco atravessa o texto ao marcar e

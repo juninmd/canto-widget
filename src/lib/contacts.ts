@@ -10,7 +10,7 @@ const digits = (text: string) => text.replace(/\D/g, "");
 export function matchesContact(contact: Contact, query: string): boolean {
   const q = plain(query.trim());
   if (!q) return true;
-  const text = plain([contact.name, contact.org, contact.title, ...contact.emails].join(" "));
+  const text = plain([contact.name, contact.nickname, contact.org, contact.title, contact.department, ...contact.emails].join(" "));
   if (text.includes(q)) return true;
   const wanted = digits(q);
   return wanted.length >= 3 && contact.phones.some((phone) => digits(phone).includes(wanted));

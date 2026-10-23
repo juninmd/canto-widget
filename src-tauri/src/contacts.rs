@@ -2,15 +2,30 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
-use crate::google_api::{client, send, valid_id};
+use crate::google_api::{client, send};
+
+#[path = "contacts_person.rs"]
+mod person;
+pub(crate) use person::Person;
 
 const API: &str = "https://people.googleapis.com/v1/people/me/connections";
-const FIELDS: &str = "names,emailAddresses,phoneNumbers,organizations,memberships";
+const FIELDS: &str =
+    "names,nicknames,emailAddresses,phoneNumbers,organizations,memberships,birthdays,addresses,urls,biographies,relations";
 const PAGE_SIZE: &str = "200";
 /// Five pages: the webview filters this list as you type, so it stays bounded.
 const MAX_PAGES: usize = 5;
 const MAX_VALUES: usize = 3;
 const MAX_TEXT: usize = 120;
+/// A note is free text; the rest of it stays in Google Contacts.
+const MAX_NOTE: usize = 500;
+
+/// Google lets a birthday leave the year out.
+#[derive(Debug, Clone, Copy, Serialize, PartialEq)]
+pub struct Birthday {
+    pub day: u8,
+    pub month: u8,
+    pub year: Option<u16>,
+}
 
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct Contact {
@@ -22,6 +37,14 @@ pub struct Contact {
     pub title: String,
     pub starred: bool,
     pub link: String,
+    pub nickname: String,
+    pub department: String,
+    pub birthday: Option<Birthday>,
+    pub addresses: Vec<String>,
+    pub urls: Vec<String>,
+    /// "Name (relation)", as the address book words it.
+    pub relations: Vec<String>,
+    pub note: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
@@ -39,85 +62,6 @@ struct Page {
     next_page_token: String,
     #[serde(rename = "totalItems", default)]
     total_items: u32,
-}
-
-#[derive(Deserialize, Default)]
-pub(crate) struct Person {
-    #[serde(rename = "resourceName", default)]
-    resource_name: String,
-    #[serde(default)]
-    names: Vec<Name>,
-    #[serde(rename = "emailAddresses", default)]
-    emails: Vec<Value>,
-    #[serde(rename = "phoneNumbers", default)]
-    phones: Vec<Value>,
-    #[serde(default)]
-    organizations: Vec<Organization>,
-    #[serde(default)]
-    memberships: Vec<Membership>,
-}
-
-#[derive(Deserialize)]
-struct Name {
-    #[serde(rename = "displayName", default)]
-    display_name: String,
-}
-
-#[derive(Deserialize)]
-struct Value {
-    #[serde(default)]
-    value: String,
-}
-
-#[derive(Deserialize)]
-struct Organization {
-    #[serde(default)]
-    name: String,
-    #[serde(default)]
-    title: String,
-}
-
-#[derive(Deserialize)]
-struct Membership {
-    #[serde(rename = "contactGroupMembership", default)]
-    group: Option<GroupMembership>,
-}
-
-#[derive(Deserialize)]
-struct GroupMembership {
-    #[serde(rename = "contactGroupId", default)]
-    id: String,
-}
-
-fn clean(text: &str) -> String {
-    text.trim().chars().take(MAX_TEXT).collect()
-}
-
-fn values(list: &[Value]) -> Vec<String> {
-    list.iter().map(|v| clean(&v.value)).filter(|v| !v.is_empty()).take(MAX_VALUES).collect()
-}
-
-impl Person {
-    /// A contact with no name falls back to its first e-mail or phone; one with none of them is not worth a row.
-    pub(crate) fn into_contact(self) -> Option<Contact> {
-        let emails = values(&self.emails);
-        let phones = values(&self.phones);
-        let name = self.names.first().map(|n| clean(&n.display_name)).filter(|n| !n.is_empty());
-        let name = name.or_else(|| emails.first().or(phones.first()).cloned())?;
-        let id = self.resource_name.strip_prefix("people/").unwrap_or(&self.resource_name).to_string();
-        let org = self.organizations.first();
-        let starred = self.memberships.iter().any(|m| m.group.as_ref().is_some_and(|g| g.id == "starred"));
-        Some(Contact {
-            link: if valid_id(&id) { format!("https://contacts.google.com/person/{id}") } else { String::new() },
-            org: org.map(|o| clean(&o.name)).unwrap_or_default(),
-            title: org.map(|o| clean(&o.title)).unwrap_or_default(),
-            id,
-            name,
-            emails,
-            phones,
-            starred,
-        })
-    }
 }
 
 pub fn list(token: &str) -> Result<ContactsView> {
