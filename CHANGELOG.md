@@ -100,6 +100,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Pop-up de notificação sem a borda de cima**: a janela media o cartão no meio da animação de entrada (ainda
+  em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **A atualização não apaga mais as abas que você deixou visíveis.** A escolha das abas (e o layout) só ficava no
   armazenamento da webview, que pode voltar vazio depois de uma atualização, e então voltava o padrão. Agora ela
   também é gravada em `preferencias.json`, ao lado do cofre, e restaurada na abertura quando a webview perdeu a
