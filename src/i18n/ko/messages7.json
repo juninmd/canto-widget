@@ -110,8 +110,6 @@
   "agents.hint": "명령은 복사만 됩니다. Canto은 아무것도 설치하지 않습니다.",
   "agents.source": "GitHub 출시",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

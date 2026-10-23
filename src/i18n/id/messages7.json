@@ -110,8 +110,6 @@
   "agents.hint": "perintahnya hanya disalin: Canto tidak menginstal apa pun",
   "agents.source": "GitHub rilis",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

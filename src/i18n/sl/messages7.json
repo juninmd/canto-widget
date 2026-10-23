@@ -110,8 +110,6 @@
   "agents.hint": "ukaz je samo kopiran: Canto ne namesti ničesar",
   "agents.source": "GitHub izdaje",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

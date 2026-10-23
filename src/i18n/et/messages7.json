@@ -110,8 +110,6 @@
   "agents.hint": "käsk ainult kopeeritakse: Canto ei installi midagi",
   "agents.source": "GitHub väljalaset",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",
