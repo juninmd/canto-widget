@@ -58,3 +58,21 @@ fn errors_read_as_pt_br_for_the_ui() {
     assert!(FetchError::RateLimited.message().contains("limite"));
     assert!(FetchError::Network("dns".into()).message().contains("sem resposta"));
 }
+
+#[test]
+fn each_model_carries_its_sheet() {
+    let body = r#"{"models":[{"slug":"m","name":"M","intelligenceIndex":50,"contextWindowTokens":1000000,
+      "releaseDate":"2026-09-30","isOpenWeights":false,"price1mInputTokens":5,"price1mOutputTokens":25}]}"#;
+    let m = &parse_page(&page(body)).unwrap()[0];
+    assert_eq!((m.details.context, m.details.released.as_deref()), (Some(1_000_000), Some("2026-09-30")));
+    assert_eq!((m.details.input_price, m.details.output_price, m.price), (Some(5.0), Some(25.0), Some(10.0)));
+}
+
+#[test]
+fn a_ranking_sealed_before_the_sheet_still_reads() {
+    let old: Model =
+        serde_json::from_str(r#"{"id":"a","name":"A","creator":"","score":1,"price":null,"speed":null}"#).unwrap();
+    assert_eq!(old.details, Details::default());
+    let json = serde_json::to_value(&old).unwrap();
+    assert!(json.get("context").is_some(), "the sheet is flattened for the webview");
+}

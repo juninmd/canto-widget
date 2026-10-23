@@ -205,6 +205,20 @@ export type ModelRow = {
   speed: number | null;
   rank: number;
   badge: "new" | "up" | null;
+  /** The sheet below is null (or empty) for whatever the leaderboard page didn't carry. */
+  input_price: number | null;
+  output_price: number | null;
+  /** Seconds to the first token. */
+  ttft: number | null;
+  /** Tokens. */
+  context: number | null;
+  /** `YYYY-MM-DD`. */
+  released: string | null;
+  open_weights: boolean | null;
+  reasoning: boolean | null;
+  coding: number | null;
+  math: number | null;
+  inputs: string[];
 };
 /** `throttled`: a manual refresh inside the 3 h floor, answered from the cache until `next_fetch_at`. */
 export type ModelsView = {
