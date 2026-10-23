@@ -80,7 +80,12 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
   useEffect(() => {
     const el = card.current;
     if (!el || typeof ResizeObserver === "undefined") return;
-    const fit = () => void api.alertResize(Math.ceil(el.getBoundingClientRect().height)).catch(() => {});
+    // Layout size, not getBoundingClientRect: the entry animation scales the card to 98%, and measuring that
+    // left the window a few pixels short, cutting off the card's top border.
+    const fit = (entries: ResizeObserverEntry[]) => {
+      const height = entries[0]?.borderBoxSize?.[0]?.blockSize ?? el.offsetHeight;
+      void api.alertResize(Math.ceil(height)).catch(() => {});
+    };
     const observer = new ResizeObserver(fit);
     observer.observe(el);
     return () => observer.disconnect();
