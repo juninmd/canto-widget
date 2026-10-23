@@ -12,6 +12,7 @@ const PATHS: Record<Tab, string> = {
   status: "M22 12h-4l-3 9L9 3l-3 9H2",
   models: "M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2ZM9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3",
   agents: "M7 8h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-6a3 3 0 0 1 3-3ZM12 8V5M9 13v2M15 13v2M12 3h.01",
+  map: "M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2ZM9 4v14M15 6v14",
   weather: "M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6ZM8 2v1M2 8h1M3.8 3.8l.7.7M12.2 3.8l-.7.7M8 21h9a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.5 14 3.5 3.5 0 0 0 8 21Z",
   market: "M22 7l-8.5 8.5-5-5L2 17M16 7h6v6",
   reads: "M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z",

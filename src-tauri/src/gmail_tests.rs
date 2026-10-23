@@ -43,3 +43,12 @@ fn the_labels_say_whether_a_mail_is_unread_and_starred() {
     let mail = raw(r#"{"id": "a2", "labelIds": ["UNREAD", "IMPORTANT"]}"#).into_mail();
     assert_eq!((mail.unread, mail.starred), (true, false));
 }
+
+#[test]
+fn a_message_that_fails_is_left_out_and_the_order_is_kept() {
+    let fetch =
+        |id: &str| if id == "b" { Err(crate::error::AppError::Drive("404".into())) } else { Ok(id.to_string()) };
+    assert_eq!(fetch_all(&["a", "b", "c"], fetch).unwrap(), vec!["a", "c"]);
+    assert!(fetch_all(&["b"], fetch).is_err());
+    assert!(fetch_all(&[], fetch).unwrap().is_empty());
+}

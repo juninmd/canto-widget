@@ -112,6 +112,10 @@ pub fn models_path(dir: &Path) -> PathBuf {
 }
 
 /// The SteamID64 and the optional Web API key; never a list, which is fetched fresh.
+pub fn traffic_path(dir: &Path) -> PathBuf {
+    dir.join("transito.json")
+}
+
 pub fn steam_path(dir: &Path) -> PathBuf {
     dir.join("steam.json")
 }

@@ -3,7 +3,7 @@ import { calls, goTab, mockTauri } from "./mock";
 
 const ALL_TABS = [
   "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
-  "weather", "market", "reads", "activity", "gmail", "gdrive", "contacts",
+  "weather", "map", "market", "reads", "activity", "gmail", "gdrive", "contacts",
 ];
 
 const GOOGLE = {
