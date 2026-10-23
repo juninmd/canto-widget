@@ -2,19 +2,45 @@ use super::*;
 
 #[test]
 fn filters_become_drive_queries_and_a_search_cannot_break_out_of_its_quotes() {
-    let (q, order) = query("shared", "", "").unwrap();
+    let (q, order) = query("shared", "", "", "").unwrap();
     assert!(q.ends_with("and sharedWithMe = true"), "{q}");
     assert_eq!(order, "sharedWithMeTime desc");
-    let (q, _) = query("recent", "", " d'água \\ ").unwrap();
+    let (q, _) = query("recent", "", " d'água \\ ", "").unwrap();
     assert!(q.ends_with(r"and name contains 'd\'água \\'"), "{q}");
-    assert!(query("trashed", "", "").is_err());
+    assert!(query("trashed", "", "", "").is_err());
 }
 
 #[test]
 fn owned_files_and_a_kind_narrow_the_query_and_an_unknown_kind_is_refused() {
-    let (q, _) = query("mine", "sheet", "").unwrap();
+    let (q, _) = query("mine", "sheet", "", "").unwrap();
     assert!(q.ends_with("and 'me' in owners and mimeType = 'application/vnd.google-apps.spreadsheet'"), "{q}");
-    assert!(query("recent", "folder", "").is_err());
+    assert!(query("recent", "folder", "", "").is_err());
+}
+
+#[test]
+fn all_browses_my_drive_folders_first_and_a_folder_lists_its_children_whatever_the_filter() {
+    let (q, order) = query("all", "", "", "").unwrap();
+    assert_eq!((q.as_str(), order), ("trashed = false and 'root' in parents", "folder,name_natural"));
+    let (q, _) = query("all", "", "plano", "").unwrap();
+    assert_eq!(q, "trashed = false and name contains 'plano'");
+    let (q, order) = query("starred", "pdf", "", "0AbcFolder").unwrap();
+    assert_eq!(q, "trashed = false and '0AbcFolder' in parents and mimeType = 'application/pdf'");
+    assert_eq!(order, "folder,name_natural");
+    assert!(query("all", "", "", "x' or '1").is_err());
+}
+
+#[test]
+fn a_page_carries_the_next_token_and_folders_get_their_own_kind() {
+    let list: FileList = serde_json::from_str(
+        r#"{"nextPageToken": "~!abc", "files": [{"id": "f", "name": "Notas",
+            "mimeType": "application/vnd.google-apps.folder", "webViewLink": "https://drive.google.com/drive/folders/f"}]}"#,
+    )
+    .unwrap();
+    assert_eq!(list.next_page_token, "~!abc");
+    let file = list.files.into_iter().next().unwrap().into_file();
+    assert_eq!((file.kind.as_str(), file.link.as_str()), ("folder", "https://drive.google.com/drive/folders/f"));
+    assert!(valid_page("~!abc") && valid_page(""));
+    assert!(!valid_page("a b") && !valid_page(&"x".repeat(2001)));
 }
 
 #[test]

@@ -29,9 +29,12 @@ const GOOGLE = {
       },
     ],
   },
-  gdrive_list: [
-    { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: new Date().toISOString(), starred: true, editor: "", folder: "", size: 0 },
-  ],
+  gdrive_list: {
+    files: [
+      { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: new Date().toISOString(), starred: true, editor: "", folder: "", size: 0 },
+    ],
+    next: "",
+  },
   gdrive_quota: { used: 1_073_741_824, limit: 16_106_127_360 },
 };
 

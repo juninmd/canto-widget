@@ -238,9 +238,11 @@ It uses the same Google sign-in as the Agenda, and the token stays in the vault.
 
 ### 📂 Drive files one click away
 
-The **Drive** tab shows the **storage in use** as a bar, one-click blank **Doc, Sheet or Slides**, and your
-**recent**, **starred**, **shared with me** or **own** files, narrowed by **kind** and searchable by name, grouped by
-**today, yesterday, this week and earlier**. Each file shows its kind, who edited it last and its size, with
+The **Drive** tab shows the **storage in use** as a bar, one-click blank **Doc, Sheet or Slides**, and **all** of
+My Drive with its **folders**, which open in place with a path back, or your **recent**, **starred**, **shared with
+me** or **own** files grouped by **today, yesterday, this week and earlier**, narrowed by **kind** and searchable by
+name. Every list loads **page by page** as you scroll, and folders already seen come back instantly from a short
+cache. Each file shows its kind, who edited it last and its size, with
 **open**, **copy link** and **open folder**. Canto only reads file
 **metadata** (`drive.metadata.readonly`): contents never reach it. Google Keep has no API for personal accounts,
 so the quick capture goes to **Google Tasks** instead.

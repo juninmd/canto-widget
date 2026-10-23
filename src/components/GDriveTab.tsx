@@ -1,67 +1,63 @@
-import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { api, errText, type DriveFile, type DriveFilter, type DriveKind, type DriveQuota } from "../lib/api";
 import { NEW_FILE, formatBytes, groupByDay, quotaShare } from "../lib/driveExtras";
 import { googleGate } from "../lib/google";
+import { useDrivePages } from "../lib/useDrivePages";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
 import GDriveRow, { KIND_COLOR } from "./GDriveRow";
+import GDriveMore from "./GDriveMore";
 import GoogleGate from "./GoogleGate";
 import { SearchIcon } from "./Icons";
 import Skeleton from "./Skeleton";
 
 type Props = { onNotice: (message: string) => void };
 
-const FILTERS: DriveFilter[] = ["recent", "starred", "shared", "mine"];
+const FILTERS: DriveFilter[] = ["all", "recent", "starred", "shared", "mine"];
 const KINDS: DriveKind[] = ["", "doc", "sheet", "slide", "pdf"];
 const CREATE = ["doc", "sheet", "slide"] as const;
 const DRIVE = "https://drive.google.com/drive/my-drive";
-const SEARCH_PAUSE_MS = 350;
 const CHIP =
   "canto-hit rounded-full border border-edge px-2.5 py-0.5 text-[11px] text-muted aria-pressed:border-accent/50 aria-pressed:bg-accent/15 aria-pressed:text-accent-text";
 
-/** Drive by day: recent, starred, shared or owned files of a kind, the storage in use and blank documents one click away. */
+type Crumb = { id: string; name: string };
+
+/** All of Drive, a page at a time: My Drive's folders to walk into, or recent, starred, shared or owned files by day,
+ * of a kind, plus the storage in use and blank documents one click away. */
 export default function GDriveTab({ onNotice }: Props) {
-  const [filter, setFilter] = useState<DriveFilter>("recent");
+  const [filter, setFilter] = useState<DriveFilter>("all");
   const [kind, setKind] = useState<DriveKind>("");
   const [search, setSearch] = useState("");
-  const [files, setFiles] = useState<DriveFile[] | null>(null);
+  const [path, setPath] = useState<Crumb[]>([]);
   const [quota, setQuota] = useState<DriveQuota | null>(null);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [failure, setFailure] = useState("");
+  const folder = path.at(-1)?.id ?? "";
+  const { files, next, error: listError, loading, reload, more } = useDrivePages(filter, kind, search, folder);
+  const error = failure || listError;
+  const browsing = folder !== "" || filter === "all";
 
-  const load = useCallback(async (which: DriveFilter, type: DriveKind, query: string) => {
-    setLoading(true);
-    try {
-      setFiles(await api.gdriveList(which, type, query));
-      setError("");
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => void load(filter, kind, search), search ? SEARCH_PAUSE_MS : 0);
-    return () => clearTimeout(timer);
-  }, [load, filter, kind, search]);
   useEffect(() => {
     api.gdriveQuota().then(setQuota, () => {});
   }, []);
-  useRefreshEvent("gdrive", () => void load(filter, kind, search));
-  const groups = useMemo(() => groupByDay(files ?? [], new Date()), [files]);
+  useRefreshEvent("gdrive", reload);
+  const groups = useMemo(() => (browsing ? [] : groupByDay(files ?? [], new Date())), [files, browsing]);
 
   const gate = googleGate(error);
-  if (gate) return <GoogleGate kind={gate} onConnected={() => void load(filter, kind, search)} />;
+  if (gate) return <GoogleGate kind={gate} onConnected={reload} />;
 
-  const open = (url: string) => void api.openLink(url).catch((e) => setError(errText(e)));
+  const open = (url: string) => void api.openLink(url).catch((e) => setFailure(errText(e)));
+  const choose = (id: DriveFilter) => {
+    setPath([]);
+    setFilter(id);
+  };
+  const enter = (file: DriveFile) => setPath((at) => [...at, { id: file.id, name: file.name }]);
   const copy = async (file: DriveFile) => {
     try {
       await navigator.clipboard.writeText(file.link);
       onNotice(t("gdrive.linkCopied"));
     } catch (e) {
-      setError(errText(e));
+      setFailure(errText(e));
     }
   };
   const share = quota ? quotaShare(quota.used, quota.limit) : 0;
@@ -87,7 +83,10 @@ export default function GDriveTab({ onNotice }: Props) {
           </button>
           <button
             type="button"
-            onClick={() => void load(filter, kind, search)}
+            onClick={() => {
+              setFailure("");
+              reload();
+            }}
             disabled={loading}
             aria-label={t("google.refresh")}
             className="canto-hit flex size-6 items-center justify-center rounded-full text-muted hover:bg-hover hover:text-fg disabled:opacity-60"
@@ -129,7 +128,7 @@ export default function GDriveTab({ onNotice }: Props) {
       </label>
       <div className="flex flex-wrap gap-1.5">
         {FILTERS.map((id) => (
-          <button key={id} type="button" aria-pressed={filter === id} onClick={() => setFilter(id)} className={CHIP}>
+          <button key={id} type="button" aria-pressed={filter === id && !folder} onClick={() => choose(id)} className={CHIP}>
             {t(`gdrive.filter.${id}`)}
           </button>
         ))}
@@ -148,7 +147,33 @@ export default function GDriveTab({ onNotice }: Props) {
           </button>
         ))}
       </div>
-      {error && <ErrorBanner message={error} busy={loading} onRetry={() => void load(filter, kind, search)} />}
+      {browsing && (
+        <nav aria-label={t("gdrive.path")} className="flex min-w-0 flex-wrap items-center gap-0.5 text-[11px] text-muted">
+          {[{ id: "", name: t("gdrive.myDrive") }, ...path].map((crumb, i, all) => (
+            <span key={crumb.id || "root"} className="flex min-w-0 items-center gap-0.5">
+              {i > 0 && <span aria-hidden="true" className="text-faint">›</span>}
+              <button
+                type="button"
+                aria-current={i === all.length - 1 ? "location" : undefined}
+                onClick={() => (i === 0 && filter !== "all" ? choose("all") : setPath(path.slice(0, i)))}
+                className="canto-hit max-w-40 truncate rounded px-1 hover:bg-hover hover:text-fg aria-[current]:font-semibold aria-[current]:text-fg"
+              >
+                {crumb.name}
+              </button>
+            </span>
+          ))}
+        </nav>
+      )}
+      {error && (
+        <ErrorBanner
+          message={error}
+          busy={loading}
+          onRetry={() => {
+            setFailure("");
+            reload();
+          }}
+        />
+      )}
       {files === null ? (
         !error && <Skeleton label={t("google.fetching")} rows={5} />
       ) : files.length === 0 ? (
@@ -156,18 +181,27 @@ export default function GDriveTab({ onNotice }: Props) {
           <span aria-hidden="true" className="canto-float inline-block text-base">🗂️</span>
           {t("gdrive.empty")}
         </p>
+      ) : browsing ? (
+        <section key={`${folder}|${kind}|${search}`} aria-label={path.at(-1)?.name ?? t("gdrive.myDrive")} className="wx-glass shrink-0">
+          <ul className="divide-y divide-edge">
+            {files.map((file) => (
+              <GDriveRow key={file.id} file={file} index={index++} now={now} onOpen={open} onCopy={(f) => void copy(f)} onEnter={enter} />
+            ))}
+          </ul>
+        </section>
       ) : (
         groups.map((group) => (
           <section key={`${filter}|${kind}|${search}|${group.day}`} aria-label={t(`gdrive.day.${group.day}`)} className="wx-glass shrink-0">
             <h3 className="px-3 pb-0.5 pt-2 text-[10px] font-semibold uppercase tracking-widest text-accent-text">{t(`gdrive.day.${group.day}`)}</h3>
             <ul className="divide-y divide-edge">
               {group.files.map((file) => (
-                <GDriveRow key={file.id} file={file} index={index++} now={now} onOpen={open} onCopy={(f) => void copy(f)} />
+                <GDriveRow key={file.id} file={file} index={index++} now={now} onOpen={open} onCopy={(f) => void copy(f)} onEnter={enter} />
               ))}
             </ul>
           </section>
         ))
       )}
+      {next && files && <GDriveMore key={files.length} loading={loading} onMore={more} />}
     </div>
   );
 }

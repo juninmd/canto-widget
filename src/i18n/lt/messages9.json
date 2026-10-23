@@ -138,5 +138,12 @@
   "contacts.upcoming.tomorrow": "tomorrow",
   "contacts.upcoming.in": "in {n} days",
   "contacts.letters": "jump to letter",
-  "contacts.jump": "jump to {letter}"
+  "contacts.jump": "jump to {letter}",
+  "gdrive.filter.all": "All",
+  "gdrive.kind.folder": "FOLDER",
+  "gdrive.myDrive": "My Drive",
+  "gdrive.path": "folder path",
+  "gdrive.enter": "open folder {name}",
+  "gdrive.more": "load more",
+  "gdrive.loadingMore": "loading more…"
 }
