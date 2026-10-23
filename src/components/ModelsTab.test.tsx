@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ModelRow, ModelsView } from "../lib/api";
+import { modelRow } from "../lib/modelsTestRow";
 
 let view: ModelsView;
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
@@ -17,16 +18,8 @@ mock.module("@tauri-apps/api/core", () => ({
 
 const { default: ModelsTab } = await import("./ModelsTab");
 
-const row = (id: string, name: string, creator: string, rank: number, score: number, price: number | null, speed: number | null, badge: ModelRow["badge"] = null): ModelRow => ({
-  id,
-  name,
-  creator,
-  score,
-  price,
-  speed,
-  rank,
-  badge,
-});
+const row = (id: string, name: string, creator: string, rank: number, score: number, price: number | null, speed: number | null, badge: ModelRow["badge"] = null, sheet: Partial<ModelRow> = {}): ModelRow =>
+  modelRow({ id, name, creator, score, price, speed, rank, badge, ...sheet });
 
 const models = [
   row("a", "Aurora 4", "Lumen Labs", 1, 73.2, 3.44, 142.7, "new"),
@@ -138,11 +131,66 @@ test("the tab never asks for a key", async () => {
   expect(screen.queryByRole("button", { name: /chave/ })).toBeNull();
 });
 
-test("clicking a model opens its page on the leaderboard's site", async () => {
+test("clicking a model opens its sheet in place, and the site is one tap away from it", async () => {
+  view = connected({ models: [row("a", "Aurora 4", "Lumen Labs", 1, 73.2, 3.44, 142.7, null, { input_price: 2, output_price: 8, context: 131_072, released: "2026-09-30", open_weights: true, reasoning: true, coding: 61, ttft: 0.83, inputs: ["text", "image"] }), ...models.slice(1)] });
   await show();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: /Nimbus Ultra/ }));
-  });
-  const call = calls.find((c) => c.cmd === "open_link");
-  expect(call?.args).toEqual({ url: "https://artificialanalysis.ai/models/n" });
+  const toggle = screen.getByTitle("ver a ficha de Aurora 4");
+  expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  await act(async () => fireEvent.click(toggle));
+  expect(toggle.getAttribute("aria-expanded")).toBe("true");
+  const sheet = document.querySelector('[data-model="a"]')!.textContent!;
+  for (const text of ["Lançamento", "set. de 2026", "131k", "abertos", "$2,00", "$8,00", "0,83 s", "Programação", "61", "#1", "imagem"]) expect(sheet).toContain(text);
+  expect(calls.some((c) => c.cmd === "open_link")).toBe(false);
+  await act(async () => fireEvent.click(screen.getByText(/Ver no site/)));
+  expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://artificialanalysis.ai/models/a" });
+});
+
+test("fields the page didn't carry read as a dash, and filters stay hidden without data", async () => {
+  await show();
+  await act(async () => fireEvent.click(screen.getByTitle("ver a ficha de Brisa Mini")));
+  expect(document.querySelector('[data-model="b"]')!.textContent).toContain("Lançamento—");
+  expect(screen.queryByText("pesos abertos") === null).toBe(true);
+});
+
+test("the open-weights filter narrows the ranking", async () => {
+  view = connected({ models: models.map((m, i) => ({ ...m, open_weights: i % 2 === 0 })) });
+  await show();
+  await act(async () => fireEvent.click(screen.getByText("pesos abertos")));
+  expect(names()).toEqual(["a", "o"]);
+});
+
+test("marking two models and opening Comparar shows the summary, radar, bars and table", async () => {
+  localStorage.clear();
+  await show();
+  await act(async () => fireEvent.click(screen.getByLabelText("comparar Aurora 4")));
+  expect(screen.getByText("1 marcado · escolha mais um")).toBeTruthy();
+  await act(async () => fireEvent.click(screen.getByLabelText("comparar Nimbus Ultra")));
+  expect(JSON.parse(localStorage.getItem("canto.models.compare")!)).toEqual(["a", "n"]);
+  await act(async () => fireEvent.click(screen.getByText(/^Comparar →/)));
+  expect(screen.getByText("Aurora 4 é o mais inteligente, 3,2 pontos à frente de Nimbus Ultra.")).toBeTruthy();
+  expect(screen.getByText("Nimbus Ultra é o mais barato: 3,8× menos que Aurora 4.")).toBeTruthy();
+  expect(document.querySelectorAll("[data-radar]").length).toBe(2);
+  expect(document.querySelector('[data-metric="price"]')!.textContent).toContain("★$0,90");
+  expect(screen.getByText("Tabela completa")).toBeTruthy();
+  await act(async () => fireEvent.click(screen.getByLabelText("remover Nimbus Ultra")));
+  expect(screen.getByText("Escolha pelo menos 2 modelos")).toBeTruthy();
+});
+
+test("the picker adds a model by search and the presets fill the comparison", async () => {
+  localStorage.setItem("canto.models.compare", JSON.stringify(["a", "sumiu"]));
+  await show();
+  await act(async () => fireEvent.click(screen.getByText("Comparar · 1")));
+  await act(async () => fireEvent.click(screen.getByText("+ modelo")));
+  await act(async () => fireEvent.change(screen.getByLabelText("buscar nome ou empresa"), { target: { value: "pelag" } }));
+  await act(async () => fireEvent.click(screen.getByText("Orca Think")));
+  expect(document.querySelectorAll("[data-radar]").length).toBe(2);
+  await act(async () => fireEvent.click(screen.getByText("Mais rápidos")));
+  expect(JSON.parse(localStorage.getItem("canto.models.compare")!)).toEqual(["n", "a", "o"]);
+});
+
+test("rows from a backend without the sheet still open and compare", async () => {
+  view = connected({ models: models.map(({ id, name, creator, score, price, speed, rank, badge }) => ({ id, name, creator, score, price, speed, rank, badge }) as ModelRow) });
+  await show();
+  await act(async () => fireEvent.click(screen.getByTitle("ver a ficha de Aurora 4")));
+  expect(document.querySelector('[data-model="a"]')!.textContent).not.toContain("undefined");
 });

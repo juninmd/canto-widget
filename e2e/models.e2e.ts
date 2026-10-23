@@ -39,6 +39,18 @@ test("the AI models tab ranks models and sorts by the chips", async ({ page }) =
   expect((await calls(page)).find((c) => c.cmd === "models_alerts_set")?.args).toEqual({ enabled: false });
 });
 
+test("two marked models open side by side in Comparar", async ({ page }) => {
+  await mockTauri(page, { hiddenTabs: ["gitlab", "status"], knownTabs: ALL_TABS, models: MODELS_VIEW });
+  await page.goto("/");
+  await goTab(page, "Modelos IA");
+  await page.getByRole("button", { name: "comparar Aurora 4" }).click();
+  await page.getByRole("button", { name: "comparar Quill Flash" }).click();
+  await page.getByRole("button", { name: /^Comparar →/ }).click();
+  await expect(page.getByText("Aurora 4 é o mais inteligente, 12,5 pontos à frente de Quill Flash.")).toBeVisible();
+  await expect(page.locator("[data-radar]")).toHaveCount(2);
+  await expect(page.getByText("Tabela completa")).toBeVisible();
+});
+
 test("the AI models tab is on the bar by default, even for a saved choice from before it existed", async ({ page }) => {
   // Wide enough for every tab: the narrow window sends the last ones to the "mais" menu (tabs.e2e.ts).
   await page.setViewportSize({ width: 1100, height: 700 });

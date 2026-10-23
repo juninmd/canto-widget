@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "ปิด",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "สรุปวัน",
   "alert.modelNew": "รุ่นใหม่",
   "alert.silence": "ปิดเสียง",

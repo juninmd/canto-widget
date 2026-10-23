@@ -100,6 +100,7 @@ pub mod mentions_state;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
+pub mod models_fields;
 pub mod models_rank;
 pub mod models_state;
 pub mod morning_digest;
@@ -345,6 +346,7 @@ pub fn run() {
             cmd_alerts::alert_close,
             cmd_alerts::alert_close_all,
             cmd_alerts::alert_settle,
+            cmd_alerts::alert_resize,
             alert_log::alert_log,
             fullscreen_guard::fullscreen_hold_get,
             fullscreen_guard::fullscreen_hold_set,

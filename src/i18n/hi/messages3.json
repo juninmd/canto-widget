@@ -77,7 +77,6 @@
   "notif.closeFailed": "Could not close the alert. {error}",
   "alert.close": "बंद करें",
   "alert.closeAll": "close all",
-  "alert.closeMore": "more ways to close",
   "alert.digestSummary": "दिन का सारांश",
   "alert.modelNew": "नया मॉडल",
   "alert.silence": "मूक",
