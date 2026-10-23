@@ -99,6 +99,7 @@ pub mod mentions_state;
 pub mod model;
 pub mod models_alert;
 pub mod models_feed;
+pub mod models_fields;
 pub mod models_rank;
 pub mod models_state;
 pub mod morning_digest;
