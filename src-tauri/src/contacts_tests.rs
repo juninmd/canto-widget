@@ -61,3 +61,18 @@ fn a_contact_brings_its_birthday_addresses_links_relations_and_note() {
     let c = person(r#"{"resourceName": "people/c8", "names": [{"displayName": "Rui"}], "birthdays": [{"date": {"year": 1990, "month": 2, "day": 30}}, {"date": {"year": 1990, "month": 13, "day": 1}}]}"#).unwrap();
     assert_eq!(c.birthday, Some(Birthday { day: 30, month: 2, year: Some(1990) }));
 }
+
+#[test]
+fn a_contact_photo_is_its_own_sized_cdn_url_never_the_placeholder() {
+    let c = person(
+        r#"{"resourceName": "people/c4", "names": [{"displayName": "Ana"}],
+            "photos": [{"url": "https://lh3.googleusercontent.com/cm/def=s100", "default": true},
+                       {"url": "https://lh3.googleusercontent.com/contacts/abc=s100"}]}"#,
+    )
+    .unwrap();
+    assert_eq!(c.photo, "https://lh3.googleusercontent.com/contacts/abc=s96-c");
+    let only_default = r#"{"resourceName": "people/c5", "names": [{"displayName": "Ana"}], "photos": [{"url": "https://lh3.googleusercontent.com/a=s100", "default": true}]}"#;
+    assert_eq!(person(only_default).unwrap().photo, "");
+    let elsewhere = r#"{"resourceName": "people/c6", "names": [{"displayName": "Ana"}], "photos": [{"url": "https://evil.example/a.png"}]}"#;
+    assert_eq!(person(elsewhere).unwrap().photo, "");
+}

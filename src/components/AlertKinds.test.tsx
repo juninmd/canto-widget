@@ -353,3 +353,30 @@ test("the day summary lists what is waiting, has no action but closing and says 
   expect(screen.getByRole("button", { name: "fechar" })).toBeTruthy();
   expect(screen.queryByText(/adiar/)).toBeNull();
 });
+
+test("the strip is a carousel: arrows and ← → step through every alert and wrap around", async () => {
+  await show([outage, meeting, model]);
+  const picked = () => cards().findIndex((c) => c.getAttribute("aria-pressed") === "true");
+  expect(picked()).toBe(0);
+  expect(screen.getByText("1 de 3")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("próximo aviso"));
+  });
+  expect(picked()).toBe(1);
+  expect(screen.getByText("2 de 3")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("aviso anterior"));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("aviso anterior"));
+  });
+  expect(picked(), "going back from the first lands on the last").toBe(2);
+
+  await act(async () => {
+    fireEvent.keyDown(cards()[2], { key: "ArrowRight" });
+  });
+  expect(picked()).toBe(0);
+  expect(document.activeElement === cards()[0], "the keyboard moves focus along with the pick").toBe(true);
+});

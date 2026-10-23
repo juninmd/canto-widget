@@ -11,6 +11,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam
   na hora do cache.
+- **Fotos dos contatos na aba Contatos.** A lista, os aniversariantes do dia e os próximos aniversários mostram a
+  foto que o contato tem no Google, no lugar das iniciais; quem não tem foto (ou só tem o avatar genérico do Google)
+  continua com as iniciais. As fotos ficam guardadas em memória enquanto o Canto está desbloqueado e chegam já
+  embutidas, sem abrir a política de segurança para imagens externas. Usa o mesmo escopo de Contatos de antes.
 - **Google Keep na aba Notas.** O botão de importar ao lado do **+** traz as notas do Keep a partir de um
   export do [Google Takeout](https://takeout.google.com): escolha os `.json` da pasta Keep e cada nota chega com
   a lista de verificação, os marcadores (como tags), o fixado e as datas, marcada com `#keep`; importar de novo
@@ -121,13 +125,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   opcional **só dos importantes** toca uma notificação do sistema para cada e-mail importante novo (checado a cada
   2 min). A aba **Drive** lista arquivos recentes, com estrela ou compartilhados comigo, com busca por nome e
   abertura no navegador, lendo só os metadados. A aba **Tarefas** ganha a seção **Google Tarefas**, com as tarefas
-  abertas da lista padrão, a data (vencidas em vermelho), captura direto no Google e concluir com um clique; sem
+  abertas da lista padrão, a data (vencidas em vermelho), captura direta no Google e concluir com um clique; sem
   login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
   ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
   novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
 
 ### Corrigido
 
+- **Carrossel de notificações navegável**: com muitos avisos, a tira do topo do pop-up cortava os últimos sem
+  jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse
+  e arrastando, e o aviso escolhido sempre rola para a vista.
 - **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
   arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
   modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da atualização
@@ -407,31 +414,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   em issues e PRs abertos (menção a time não entra); no GitLab, os to-dos de menção ainda pendentes. A lista só é
   buscada na primeira vez que a subaba abre, e "atualizar" no topo recarrega a subaba que está aberta. Se o Canto não
   achar o comentário no GitHub, a linha mostra a conversa sem autor nem prévia.
-- **Estados de carregamento, erro e conexão em todas as abas**: Tarefas, Notas, Clipboard e Ajustes mostram o esqueleto
-  antes da primeira carga, em vez de piscar o vazio. Agenda, GitHub/GitLab e Atividade mantêm os dados antigos sob um
-  aviso com **tentar de novo** quando a atualização falha, mostram **atualizado às HH:MM** e param de consultar com a
-  janela escondida. A tela sem status ganha esqueleto e aviso com nova tentativa, e um selo **sem conexão** aparece no
-  cabeçalho.
-- **Menu "mais" e avisos pelo teclado**: o menu abre com o foco no primeiro item, anda com as setas e devolve o foco
-  com Esc; Alt mostra o número de cada aba; a doca do modo mini expande com o foco. **Dispensar todas** faz uma só
-  atualização, mostra **ver mais** além de 8 avisos e não esconde um aviso cujo fechamento falhou. Um sino no cabeçalho
-  conta os avisos pendentes e abre o pior primeiro. A paleta ganha **Atualizar aba atual** e `Ctrl+,` abre os Ajustes.
-- **Ajustes em grupos com busca**: cinco grupos recolhíveis (Aparência, Notificações, Privacidade e segurança, Dados e
-  contas, Aplicativo), um campo **buscar ajuste**, a zona sensível separada, erros de gravação na própria seção e um
-  aviso quando o GitHub não está conectado nos alertas que dependem dele.
-- **Tarefas**: **limpar concluídas** com desfazer, aviso com a contagem ao puxar pendências, Delete/Backspace apaga a
-  linha em foco e o foco segue para a vizinha, e um título que falha ao agendar não se duplica ao tentar de novo.
-- **Notas, Clipboard e Transcrições**: Esc com rascunho pergunta antes de descartar, o filtro por tag vira um chip com
-  ×, o modo privacidade borra também tags, a amostra de cor e as transcrições, **limpar** o clipboard pede confirmação
-  com a contagem, "copiar como" deixa de depender do mouse, e a transcrição aberta destaca a busca, tem **copiar** e
-  volta ao item com Esc.
-- **Agenda**: o dia escolhido sobrevive à troca de aba, `[` e `]` andam entre os dias e `H` volta a hoje, o vazio
-  distingue "sem conta" de "sem eventos" e leva aos Ajustes, e agendar uma tarefa pela lateral confirma com um aviso.
-- **Atividade**: aviso com nova tentativa quando a primeira carga falha, botão de atualizar visível, menu `···` pelo
-  teclado, a grade de horas lida por leitores de tela e um chip **meta** para editar o objetivo.
-- **Prévia do texto da menção no GitHub**: o aviso de menção agora mostra o trecho do comentário (ou da descrição) que
-  cita você, em uma linha e com até 280 caracteres, como o GitLab já fazia. Quando o texto é longo, o recorte fica em
-  volta do @usuário, com "…" no que foi cortado. Se o Canto não achar o comentário, o aviso segue com a frase de antes.
 - **Quem mencionou você, com nome e foto**: o aviso de menção no GitHub e no GitLab mostra a foto, o nome e o @usuário
   de quem escreveu (iniciais quando não há foto), e a faixa de avisos traz o nome em cada cartão. No GitHub o Canto
   procura o comentário que cita você; se não achar, o aviso aparece como antes, sem rosto. Nos resumos (mais de 3

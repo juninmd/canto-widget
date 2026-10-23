@@ -6,6 +6,7 @@ type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
 let reply: ContactsView | string;
 
+const PHOTO = "https://lh3.googleusercontent.com/contacts/marina=s96-c";
 const NONE = { nickname: "", department: "", birthday: null, addresses: [], urls: [], relations: [], note: "" };
 const now = new Date();
 const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -24,6 +25,7 @@ const VIEW: ContactsView = {
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
     calls.push({ cmd, args });
+    if (cmd === "contact_photos") return Promise.resolve({ [PHOTO]: "data:image/png;base64,AA", "https://lh3.googleusercontent.com/x": "javascript:1" });
     if (cmd !== "contacts_list") return Promise.resolve(null);
     return typeof reply === "string" ? Promise.reject(reply) : Promise.resolve(reply);
   },
@@ -139,4 +141,20 @@ test("the A to Z index lists only the letters in use and jumps to one", async ()
   expect(index.textContent).toBe("ABMRZ");
   fireEvent.click(screen.getByLabelText("ir para Z"));
   await waitFor(() => expect(document.querySelector("[data-letter=Z]")?.className).toContain("canto-flash"));
+});
+
+test("a contact's Google photo replaces the initials, the others keep theirs", async () => {
+  reply = { ...VIEW, items: VIEW.items.map((c) => (c.id === "c1" ? { ...c, photo: PHOTO } : c)) };
+  render(<ContactsTab onNotice={() => {}} />);
+  await waitFor(() => expect(document.querySelectorAll("[data-contact-photo]").length).toBeGreaterThan(0));
+  expect(calls.find((c) => c.cmd === "contact_photos")?.args).toEqual({ urls: [PHOTO] });
+  const row = document.querySelector('[data-contact="c1"]');
+  expect(row?.querySelector("img")?.getAttribute("src")).toBe("data:image/png;base64,AA");
+  expect(document.querySelector('[data-contact="c3"]')?.textContent).toContain("AS");
+});
+
+test("without photos no photo call is made", async () => {
+  render(<ContactsTab onNotice={() => {}} />);
+  await screen.findByText("Ana Souza");
+  expect(calls.some((c) => c.cmd === "contact_photos")).toBe(false);
 });

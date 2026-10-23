@@ -1,15 +1,14 @@
 import type { CSSProperties } from "react";
 import type { Contact } from "../lib/api";
-import { avatarTone } from "../lib/agenda";
 import { ageToday, whatsappLink } from "../lib/contactExtras";
-import { initials } from "../lib/google";
 import { t } from "../i18n";
+import ContactAvatar from "./ContactAvatar";
 import { MINI } from "./ContactDetails";
 
-type Props = { people: Contact[]; today: Date; onOpen: (url: string) => void; onShow: (id: string) => void };
+type Props = { people: Contact[]; photos: Record<string, string>; today: Date; onOpen: (url: string) => void; onShow: (id: string) => void };
 
 /** Today's birthdays on top of the address book, each with a WhatsApp greeting already typed when there is a number. */
-export default function ContactBirthdays({ people, today, onOpen, onShow }: Props) {
+export default function ContactBirthdays({ people, photos, today, onOpen, onShow }: Props) {
   if (people.length === 0) return null;
   return (
     <section
@@ -30,12 +29,7 @@ export default function ContactBirthdays({ people, today, onOpen, onShow }: Prop
           return (
             <li key={contact.id} className="canto-pop flex items-center gap-2.5" style={{ "--i": i } as CSSProperties}>
               <button type="button" onClick={() => onShow(contact.id)} className="canto-hit flex min-w-0 flex-1 items-center gap-2.5 text-left">
-                <span
-                  aria-hidden="true"
-                  className={`canto-glow grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ring-2 ring-warn/60 ${avatarTone(contact.emails[0] ?? contact.name)}`}
-                >
-                  {initials(contact.name)}
-                </span>
+                <ContactAvatar contact={contact} photos={photos} className="canto-glow size-8 ring-2 ring-warn/60" />
                 <span className="flex min-w-0 flex-col">
                   <span className="truncate text-xs font-semibold text-fg">{contact.name}</span>
                   {age !== null && <span className="text-[11px] text-muted">{t("contacts.birthdays.age", { age })}</span>}
