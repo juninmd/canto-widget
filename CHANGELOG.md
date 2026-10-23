@@ -7,6 +7,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Modelos de IA com ficha completa e comparação lado a lado.** Tocar num modelo abre a **ficha** ali mesmo:
+  lançamento, contexto, pesos abertos ou fechados, raciocínio, preço de **entrada**, **saída** e combinado,
+  velocidade, **tempo até o 1º token**, índices de **inteligência**, **programação** e **matemática** com a
+  posição de cada um, e o que o modelo entende (texto, imagem, áudio, vídeo); o site continua a um toque, em "Ver
+  no site". O ranking ganha as ordens **Contexto** e **Lançamento** e os filtros **pesos abertos** e **com
+  raciocínio**. O **⊕** marca até 4 modelos e a nova sub-aba **Comparar** mostra um **resumo em frases** (quem
+  lidera, quantas vezes mais barato, quantas vezes mais rápido), um **radar**, uma **barra por métrica** com o
+  melhor marcado ★ e a **tabela completa**, com a opção "só diferenças"; atalhos Top 3, Mais baratos, Mais
+  rápidos e Abertos, e a seleção fica salva. Tudo vem da mesma página pública da Artificial Analysis, sem conta
+  nem chave; o que a página não trouxer aparece como "—".
 - **Gmail, Drive e Contatos renovados, com mais ações e animações novas.** **Gmail**: quatro visões
   (**Importantes**, **Não lidos**, **Com estrela**, **Entrada**) com busca no próprio Gmail; cada e-mail ganha
   **estrela** (que gira ao marcar), **arquivar** (desliza para a esquerda), **lixeira** (afunda e some), marcar
