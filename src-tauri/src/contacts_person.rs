@@ -30,6 +30,17 @@ pub(crate) struct Person {
     biographies: Vec<Value>,
     #[serde(default)]
     relations: Vec<Relation>,
+    #[serde(default)]
+    photos: Vec<Photo>,
+}
+
+#[derive(Deserialize)]
+struct Photo {
+    #[serde(default)]
+    url: String,
+    /// Google's generated placeholder: the initials avatar looks better and costs no download.
+    #[serde(default)]
+    default: bool,
 }
 
 #[derive(Deserialize)]
@@ -120,6 +131,20 @@ fn birthday(list: &[BirthdayField]) -> Option<Birthday> {
         .map(|d| Birthday { day: d.day, month: d.month, year: (d.year > 0).then_some(d.year) })
 }
 
+/// Contact photos are served at any size by suffix; 96 px covers the 36 px avatar on a 3x display.
+const PHOTO_SIZE: &str = "=s96-c";
+
+/// The first real photo, if it lives on Google's CDN: anything else would never be downloaded anyway.
+fn photo(list: &[Photo]) -> String {
+    let Some(photo) = list.iter().find(|p| !p.default && !p.url.is_empty()) else { return String::new() };
+    let url = format!("{}{PHOTO_SIZE}", photo.url.split('=').next().unwrap_or(&photo.url));
+    if crate::account::is_trusted_photo(&url) {
+        url
+    } else {
+        String::new()
+    }
+}
+
 impl Person {
     /// A contact with no name falls back to its first e-mail or phone; one with none of them is not worth a row.
     pub(crate) fn into_contact(self) -> Option<Contact> {
@@ -151,6 +176,7 @@ impl Person {
                 .filter(|u| u.starts_with("https://") || u.starts_with("http://"))
                 .collect(),
             note: self.biographies.first().map(|b| clip(&b.value, MAX_NOTE)).unwrap_or_default(),
+            photo: photo(&self.photos),
             relations,
             id,
             name,

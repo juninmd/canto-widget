@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { api, errText, type Contact, type ContactsView } from "../lib/api";
-import { avatarTone } from "../lib/agenda";
 import { birthdaysToday, contactCard, isBirthday, upcomingBirthdays } from "../lib/contactExtras";
 import { filterContacts, groupByLetter, subtitle, type ContactFilter } from "../lib/contacts";
-import { googleGate, initials } from "../lib/google";
+import { googleGate } from "../lib/google";
+import { useContactPhotos } from "../lib/useContactPhotos";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
+import ContactAvatar from "./ContactAvatar";
 import ContactBirthdays from "./ContactBirthdays";
 import ContactDetails, { MINI } from "./ContactDetails";
 import ContactLetters from "./ContactLetters";
@@ -50,7 +51,8 @@ export default function ContactsTab({ onNotice }: Props) {
   }, [load]);
   useRefreshEvent("contacts", () => void load());
 
-  const items = view?.items ?? [];
+  const items = useMemo(() => view?.items ?? [], [view]);
+  const photos = useContactPhotos(items);
   const counts = useMemo<Record<ContactFilter, number>>(
     () => ({
       all: items.length,
@@ -123,8 +125,8 @@ export default function ContactsTab({ onNotice }: Props) {
           </button>
         </span>
       </section>
-      <ContactBirthdays people={birthdays} today={today} onOpen={openLink} onShow={show} />
-      <ContactUpcoming people={upcoming} onShow={show} />
+      <ContactBirthdays people={birthdays} photos={photos} today={today} onOpen={openLink} onShow={show} />
+      <ContactUpcoming people={upcoming} photos={photos} onShow={show} />
       <label className="canto-field flex items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
         <span aria-hidden="true" className="text-faint [&>svg]:size-3.5"><SearchIcon /></span>
         <input
@@ -174,12 +176,7 @@ export default function ContactsTab({ onNotice }: Props) {
                       onClick={() => setOpen(expanded ? "" : contact.id)}
                       className="canto-hit flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-hover"
                     >
-                      <span
-                        aria-hidden="true"
-                        className={`canto-stack grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ${avatarTone(contact.emails[0] ?? contact.name)}`}
-                      >
-                        {initials(contact.name)}
-                      </span>
+                      <ContactAvatar contact={contact} photos={photos} className="canto-stack size-8" />
                       <span className="flex min-w-0 flex-1 flex-col">
                         <span className="truncate text-xs font-semibold text-fg">{contact.name}</span>
                         <span className="truncate text-[11px] text-muted">{subtitle(contact)}</span>

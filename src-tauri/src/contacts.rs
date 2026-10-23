@@ -1,4 +1,5 @@
-//! Google Contacts: the user's own address book (People API), read-only. Photos stay out: the CSP allows no remote image.
+//! Google Contacts: the user's own address book (People API), read-only. Photos go out as Google URLs only; the UI asks
+//! `contact_photos` for them, which embeds them as `data:` URLs (the only kind the CSP allows).
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
@@ -10,7 +11,7 @@ pub(crate) use person::Person;
 
 const API: &str = "https://people.googleapis.com/v1/people/me/connections";
 const FIELDS: &str =
-    "names,nicknames,emailAddresses,phoneNumbers,organizations,memberships,birthdays,addresses,urls,biographies,relations";
+    "names,nicknames,emailAddresses,phoneNumbers,organizations,memberships,birthdays,addresses,urls,biographies,relations,photos";
 const PAGE_SIZE: &str = "200";
 /// Five pages: the webview filters this list as you type, so it stays bounded.
 const MAX_PAGES: usize = 5;
@@ -45,6 +46,8 @@ pub struct Contact {
     /// "Name (relation)", as the address book words it.
     pub relations: Vec<String>,
     pub note: String,
+    /// The contact's own photo on Google's CDN, sized for the avatar; empty for none or Google's generated placeholder.
+    pub photo: String,
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
