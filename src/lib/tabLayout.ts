@@ -1,6 +1,6 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Tab } from "../components/TabBar";
-import { mirrorPref } from "./prefsMirror";
+import { PREFS_RESTORED, mirrorPref } from "./prefsMirror";
 
 export type TabLayout = "horizontal" | "vertical";
 
@@ -41,6 +41,14 @@ function write(key: string, value: string) {
 export function useTabLayout() {
   const [layout, setLayoutState] = useState<TabLayout>(() => parseLayout(read(LAYOUT_KEY)));
   const [pinned, setPinnedState] = useState(() => read(PINNED_KEY) === "1");
+  useEffect(() => {
+    const reload = () => {
+      setLayoutState(parseLayout(read(LAYOUT_KEY)));
+      setPinnedState(read(PINNED_KEY) === "1");
+    };
+    window.addEventListener(PREFS_RESTORED, reload);
+    return () => window.removeEventListener(PREFS_RESTORED, reload);
+  }, []);
   const setLayout = useCallback((next: TabLayout) => {
     setLayoutState(next);
     write(LAYOUT_KEY, next);

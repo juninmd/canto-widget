@@ -1,7 +1,7 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TABS, type Tab } from "../components/TabBar";
 import { IS_MOBILE } from "./platform";
-import { mirrorPref } from "./prefsMirror";
+import { PREFS_RESTORED, mirrorPref } from "./prefsMirror";
 
 const KEY = "canto.hiddenTabs";
 const KNOWN_KEY = "canto.knownTabs";
@@ -43,17 +43,21 @@ export function hideNewTabs(hidden: Tab[], rawKnown: string | null): Tab[] {
   return [...hidden, ...DEFAULT_HIDDEN.filter((id) => !seen.includes(id) && !hidden.includes(id))];
 }
 
+/** The known list is written only next to a saved hidden list: on its own it would mark tabs as seen by a choice that isn't there. */
+function save(hidden: Tab[]) {
+  const known = JSON.stringify(HIDEABLE.map((t) => t.id));
+  for (const [key, value] of [[KNOWN_KEY, known], [KEY, JSON.stringify(hidden)]]) {
+    localStorage.setItem(key, value);
+    mirrorPref(key, value);
+  }
+}
+
 function load(): Tab[] {
   try {
     const raw = localStorage.getItem(KEY);
-    const hidden = raw === null ? DEFAULT_HIDDEN : hideNewTabs(parseHidden(raw), localStorage.getItem(KNOWN_KEY));
-    const known = JSON.stringify(HIDEABLE.map((t) => t.id));
-    localStorage.setItem(KNOWN_KEY, known);
-    mirrorPref(KNOWN_KEY, known);
-    if (raw !== null) {
-      localStorage.setItem(KEY, JSON.stringify(hidden));
-      mirrorPref(KEY, JSON.stringify(hidden));
-    }
+    if (raw === null) return DEFAULT_HIDDEN;
+    const hidden = hideNewTabs(parseHidden(raw), localStorage.getItem(KNOWN_KEY));
+    save(hidden);
     return hidden;
   } catch {
     return DEFAULT_HIDDEN;
@@ -66,11 +70,19 @@ export function visibleTabs(hidden: readonly Tab[]) {
 
 export function useHiddenTabs() {
   const [hidden, setHidden] = useState<Tab[]>(load);
+  useEffect(() => {
+    const reload = () => setHidden(load());
+    window.addEventListener(PREFS_RESTORED, reload);
+    return () => window.removeEventListener(PREFS_RESTORED, reload);
+  }, []);
   const change = useCallback((next: Tab[]) => {
     const clean = parseHidden(JSON.stringify(next));
     setHidden(clean);
-    localStorage.setItem(KEY, JSON.stringify(clean));
-    mirrorPref(KEY, JSON.stringify(clean));
+    try {
+      save(clean);
+    } catch {
+      // Private mode or a full disk: the choice lasts until the window closes.
+    }
   }, []);
   return [hidden, change] as const;
 }
