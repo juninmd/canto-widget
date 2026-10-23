@@ -118,19 +118,44 @@ pub fn list(token: &str, view: &str, search: &str) -> Result<GmailSummary> {
         "gmail",
         http.get(format!("{API}/messages")).bearer_auth(token).query(&[("q", q.as_str()), ("maxResults", LIST_MAX)]),
     )?;
-    let mut important = Vec::with_capacity(ids.messages.len());
-    for message in ids.messages.iter().filter(|m| crate::google_api::valid_id(&m.id)) {
-        let raw: RawMessage = send(
+    let wanted: Vec<&str> =
+        ids.messages.iter().map(|m| m.id.as_str()).filter(|id| crate::google_api::valid_id(id)).collect();
+    let important = fetch_all(&wanted, |id| {
+        send::<RawMessage>(
             "gmail",
-            http.get(format!("{API}/messages/{}", message.id)).bearer_auth(token).query(&[
+            http.get(format!("{API}/messages/{id}")).bearer_auth(token).query(&[
                 ("format", "metadata"),
                 ("metadataHeaders", "From"),
                 ("metadataHeaders", "Subject"),
             ]),
-        )?;
-        important.push(raw.into_mail());
-    }
+        )
+        .map(RawMessage::into_mail)
+    })?;
     Ok(GmailSummary { unread: inbox.messages_unread, important })
+}
+
+/// Fetches every message at once, in list order. One that vanished or failed between the list and its fetch is
+/// left out instead of failing the whole view; only when every fetch fails is the first error returned.
+pub(crate) fn fetch_all<T: Send>(ids: &[&str], fetch: impl Fn(&str) -> Result<T> + Sync) -> Result<Vec<T>> {
+    let results: Vec<Result<T>> = std::thread::scope(|scope| {
+        let fetch = &fetch;
+        let jobs: Vec<_> = ids.iter().map(|id| scope.spawn(move || fetch(id))).collect();
+        jobs.into_iter()
+            .map(|job| job.join().unwrap_or_else(|_| Err(crate::error::AppError::Drive("gmail: falha ao ler".into()))))
+            .collect()
+    });
+    let mut first_error = None;
+    let mut found = Vec::with_capacity(results.len());
+    for result in results {
+        match result {
+            Ok(item) => found.push(item),
+            Err(e) => first_error = first_error.or(Some(e)),
+        }
+    }
+    match first_error {
+        Some(e) if found.is_empty() => Err(e),
+        _ => Ok(found),
+    }
 }
 
 #[cfg(test)]
