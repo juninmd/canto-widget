@@ -128,6 +128,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Carrossel de notificações navegável**: com muitos avisos, a tira do topo do pop-up cortava os últimos sem
+  jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse
+  e arrastando, e o aviso escolhido sempre rola para a vista.
 - **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
   arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
   modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da atualização
