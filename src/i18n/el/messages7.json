@@ -121,8 +121,6 @@
   "agents.hint": "η εντολή αντιγράφεται μόνο: Canto δεν εγκαθιστά τίποτα",
   "agents.source": "GitHub κυκλοφορίες",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

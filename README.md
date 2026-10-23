@@ -600,11 +600,15 @@ is kept and what never is.
 
 ## 📈 Market
 
-**Mercado** started as a prototype and now shows **live quotes**: dollar and euro against the real, bitcoin,
-Ibovespa, S&P 500 and Nasdaq, each with the day's variation against the previous close. One quote sits in the
-spotlight with a smooth area chart of the session; the rest are cards with a mini chart (click one to spotlight
-it). The data comes from Yahoo Finance's public chart endpoint, keyless and fetched by Rust, kept in memory for
-15 min (↻ forces a new reading); nothing is stored. It starts hidden, one checkbox away in Settings.
+**Mercado** follows **24 live quotes**: ten currencies (dollar, euro, pound, yen, Swiss franc, Canadian and Australian dollar, yuan and Argentine peso
+against the real, plus euro/dollar), seven indexes (Ibovespa, S&P 500, Nasdaq, Dow Jones, DAX, FTSE 100, Nikkei
+225) and seven coins (Bitcoin, Ethereum, Solana, XRP, BNB, Dogecoin, Cardano). The top line tells whether the
+spotlighted market is open and when it closes, and how many assets are up or down today. The spotlight shows the
+price with its unit, the move in value and percent, a curve with the previous close as a dashed line and a
+crosshair that tells the price and time under the pointer, periods **1D / 5D / 1M / 6M / 1Y**, the open, the
+previous close and rulers for the day's and the 52-week range. Below it a watchlist, filterable by **Currencies /
+Indexes / Crypto** and sortable by top gainers or losers. The data comes from Yahoo Finance's public chart
+endpoint, keyless and fetched by Rust, kept in memory for 15 min (↻ forces a new reading); nothing is stored. It starts hidden, one checkbox away in Settings.
 
 | Market |
 |---|

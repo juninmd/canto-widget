@@ -121,8 +121,6 @@
   "agents.hint": "কমান্ডটি শুধুমাত্র অনুলিপি করা হয়েছে: Canto কিছুই ইনস্টল করে না",
   "agents.source": "GitHub রিলিজ",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

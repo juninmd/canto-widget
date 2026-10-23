@@ -121,8 +121,6 @@
   "agents.hint": "คำสั่งจะถูกคัดลอกเท่านั้น: Canto ไม่ได้ติดตั้งอะไรเลย",
   "agents.source": "GitHub เผยแพร่",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",
