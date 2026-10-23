@@ -115,6 +115,25 @@ fn the_endpoint_list_stays_readable_after_a_password_change() {
 }
 
 #[test]
+fn the_traffic_key_and_trips_stay_readable_after_a_password_change() {
+    use crate::traffic::{Spot, Trip};
+    let st = state("transito");
+    let spot = Spot { name: "Rua Fictícia, 100".into(), detail: "Aurora".into(), lat: -20.5, lon: -47.4 };
+    let mut cfg = st.traffic_config().unwrap();
+    cfg.api_key = "chaveficticia0123456789abcdefABCD".into();
+    cfg.origin = Some(spot.clone());
+    cfg.trips.push(Trip { id: "t1".into(), name: "Trabalho".into(), icon: "work".into(), to: spot });
+    st.save_traffic(&cfg).unwrap();
+    st.change_password("senha-velha", "senha-nova").unwrap();
+    st.lock();
+    st.unlock("senha-nova").unwrap();
+    let back = st.traffic_config().unwrap();
+    assert_eq!(back.api_key, cfg.api_key, "the TomTom key was lost to the password change");
+    assert_eq!(back.trips, cfg.trips);
+    cleanup(&st);
+}
+
+#[test]
 fn what_the_user_read_and_muted_stays_readable_after_a_password_change() {
     use crate::mentions_state::{self, Saved};
     let st = state("mencoes");

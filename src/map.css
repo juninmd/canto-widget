@@ -1,0 +1,94 @@
+/* Mapa tab: traffic colors (the same four in every dark skin, deeper on the light one), the glass over the map and its motion. */
+:root {
+  --color-traffic-free: #22c55e;
+  --color-traffic-slow: #facc15;
+  --color-traffic-jam: #f97316;
+  --color-traffic-stop: #dc2626;
+}
+:root[data-skin="claro"] {
+  --color-traffic-free: #16a34a;
+  --color-traffic-slow: #ca8a04;
+  --color-traffic-jam: #ea580c;
+  --color-traffic-stop: #b91c1c;
+}
+.map-frame {
+  background: var(--color-ink);
+}
+.map-glass {
+  border: 1px solid var(--color-edge);
+  background: color-mix(in srgb, var(--color-panel) 84%, transparent);
+  backdrop-filter: blur(8px);
+}
+/* OpenStreetMap only has a light style: the dark skins get it inverted, keeping the hues. */
+:root:not([data-skin="claro"]) .map-osm {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9);
+}
+.map-route-glow {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.25;
+}
+.map-route {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.map-me-ring {
+  fill: var(--color-accent);
+  opacity: 0.3;
+}
+.map-live {
+  background: var(--color-traffic-free);
+}
+.map-pin {
+  cursor: pointer;
+}
+.map-pin > path {
+  transition: transform 160ms var(--ease-entrar);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.map-pin:hover > path,
+.map-pin.is-on > path {
+  transform: scale(1.25);
+}
+.map-pin:focus-visible {
+  outline: none;
+}
+.map-pin:focus-visible > path {
+  stroke: var(--color-accent);
+}
+.map-gauge {
+  transition: stroke-dasharray 900ms var(--ease-entrar), stroke 600ms;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .map-me-ring {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: map-ping 2.2s ease-out infinite;
+  }
+  .map-live {
+    animation: map-blink 1.6s ease-in-out infinite;
+  }
+  .map-route {
+    stroke-dasharray: 2000;
+    animation: map-draw 1.2s var(--ease-entrar) both;
+  }
+}
+@keyframes map-ping {
+  from { transform: scale(0.6); opacity: 0.5; }
+  to { transform: scale(2.6); opacity: 0; }
+}
+@keyframes map-blink {
+  50% { opacity: 0.3; }
+}
+@keyframes map-draw {
+  from { stroke-dashoffset: 2000; }
+  to { stroke-dashoffset: 0; }
+}
