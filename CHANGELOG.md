@@ -12,6 +12,25 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   a lista de verificação, os marcadores (como tags), o fixado e as datas, marcada com `#keep`; importar de novo
   não duplica e a lixeira fica de fora. A API do Keep só atende contas Google Workspace por conta de serviço,
   então contas pessoais não têm sincronização direta.
+- **Aba Steam refeita, animada e com sete sub-abas.** **Jogue agora** pagina **todos os seus jogos**, do último
+  jogado ao mais antigo, com um destaque do último jogo e o botão **Jogar**, filtros **recentes** e **instalados**
+  (lidos das bibliotecas locais da Steam) e três visualizações: **lista**, **cards** e **grade** com a arte do jogo.
+  **Atualizações** traz o **changelog** de cada patch dos jogos recentes ou instalados, com contador de não lidas.
+  **Desejos** pagina a lista inteira com preços, ordenada por desconto, preço ou ordem da lista, e destaca
+  promoções de **75% ou mais**. **Mais jogados** mostra os jogos com mais jogadores agora, o pico do dia, quem subiu
+  ou caiu e quais são seus. O seletor de região ganha bandeiras, busca e **12 moedas** (BRL, USD, EUR, GBP, JPY,
+  CNY, AUD, CAD, CHF, KRW, INR e MXN). Com o sino ligado, uma promoção de 75% ou mais na lista de desejos e uma
+  atualização nova dos seus jogos avisam uma vez cada. As animações param com "reduzir movimento".
+
+- **Mercado redesenhado e mais completo**, a partir de um benchmark de Google Finance, Yahoo Finance,
+  TradingView, Investing e Status Invest. Agora são **24 ativos**: dez moedas (dólar, euro, libra, iene, franco suíço, dólares
+  canadense e australiano, yuan e peso argentino em reais, mais euro/dólar), sete índices (Ibovespa, S&P 500, Nasdaq, Dow Jones, DAX, FTSE 100,
+  Nikkei 225) e sete criptos (Bitcoin, Ethereum, Solana, XRP, BNB, Dogecoin, Cardano). No topo, se o pregão está
+  **aberto ou fechado** e quando muda, e uma **barra de altas e baixas**. O destaque mostra o preço com a unidade,
+  a **variação em valor e em %**, o **fechamento anterior como linha tracejada**, um **cursor** que diz preço e
+  hora em qualquer ponto da curva, os períodos **1D, 5D, 1M, 6M e 1A** (buscados sob demanda, com cache de 15
+  min), a abertura e réguas da **faixa do dia** e de **52 semanas**. Os cartões viram uma **lista de
+  acompanhamento** com mini-curva, filtro **Moedas / Índices / Cripto** e ordem por **maiores altas ou baixas**.
 - **Aba Mapa, com o trânsito da sua região.** Um mapa com as ruas **coloridas pela velocidade ao vivo** (de
   livre a parado), a rota do trajeto escolhido desenhada por cima e pinos para **acidentes, lentidão, obras e vias
   interditadas**; dá para arrastar, aproximar e ligar ou desligar as camadas. Abaixo, um **termômetro** de quanto a
@@ -105,6 +124,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
+  arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
+  modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da atualização
+  com uma cópia **antiga** (não vazia), vale a mais recente, em vez de a antiga apagar a do arquivo.
+- **Pop-up de notificação sem a borda de cima**: a janela media o cartão no meio da animação de entrada (ainda
+  em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **A atualização não apaga mais as abas que você deixou visíveis.** A escolha das abas (e o layout) só ficava no
   armazenamento da webview, que pode voltar vazio depois de uma atualização, e então voltava o padrão. Agora ela
   também é gravada em `preferencias.json`, ao lado do cofre, e restaurada na abertura quando a webview perdeu a

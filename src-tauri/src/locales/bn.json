@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "সিআই ব্যর্থ হয়েছে",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "আপনার উইশলিস্টে সস্তা",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1 ঘন্টার জন্য বিরক্ত করবেন না",
   "Free": "বিনামূল্যে",
@@ -26,10 +25,14 @@
   "Task reminder": "টাস্ক রিমাইন্ডার",
   "Turn off do not disturb": "বিরক্ত করবেন না বন্ধ করুন",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "উইশলিস্টে সেল",
   "You were mentioned": "আপনাকে উল্লেখ করা হয়েছিল",
   "certificate expired": "শংসাপত্রের মেয়াদ শেষ",
   "certificate expires in": "শংসাপত্রের মেয়াদ শেষ হয়",
   "days": "দিন",
   "down:": "নিচে:",
-  "high latency:": "উচ্চ বিলম্বিতা:"
+  "high latency:": "উচ্চ বিলম্বিতা:",
+  "more alerts in the Steam tab": "আরও সতর্কতা Steam ট্যাবে",
+  "new update": "নতুন আপডেট",
+  "was": "আগে"
 }

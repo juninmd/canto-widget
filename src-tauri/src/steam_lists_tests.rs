@@ -39,7 +39,7 @@ fn a_recent_list_without_a_key_says_so_instead_of_calling_out() {
 
 /// One owned game, the way the Web API reports it (before the capsule is built).
 fn owned(appid: u32, name: &str, total_min: u32) -> OwnedGame {
-    OwnedGame { appid, name: name.into(), total_min, art: String::new() }
+    OwnedGame { appid, name: name.into(), total_min, art: String::new(), last_played: 0 }
 }
 
 #[test]

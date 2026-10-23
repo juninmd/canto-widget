@@ -11,7 +11,8 @@ use crate::steam_player as player;
 use crate::steam_region::Region;
 use crate::steam_store;
 use crate::steam_url::{
-    basic_url, is_steam_image, owned_url, price_url, recent_url, reviews_url, summary_url, vanity_url, wishlist_url,
+    basic_url, charts_url, is_steam_image, news_url, owned_url, price_url, recent_url, reviews_url, summary_url,
+    vanity_url, wishlist_url,
 };
 
 pub const TIMEOUT_S: u64 = 20;
@@ -19,8 +20,8 @@ pub const TIMEOUT_S: u64 = 20;
 const BATCH: usize = 40;
 /// `basic`, the review summaries and the capsules have no batch form, so they go in small parallel waves.
 const WAVE: usize = 6;
-/// A 231x87 capsule is a few KB; the cap bounds what one cache entry can hold.
-const ART_MAX_BYTES: usize = 96 * 1024;
+/// A header or a library cover is tens of KB; the cap bounds what one cache entry can hold.
+const ART_MAX_BYTES: usize = 200 * 1024;
 const UA: &str = "Mozilla/5.0 (compatible; canto-widget)";
 
 #[derive(Debug, PartialEq)]
@@ -203,6 +204,25 @@ pub fn recent(key: &str, steamid: &str) -> Result<Vec<RecentGame>, FetchError> {
 
 pub fn owned(key: &str, steamid: &str) -> Result<Vec<OwnedGame>, FetchError> {
     Ok(player::parse_owned(&get(&owned_url(key, steamid))?))
+}
+
+/// The updates each game posted lately; a game whose feed failed simply has none.
+pub fn news(games: &[(u32, String)]) -> Result<Vec<crate::steam_news::NewsItem>, FetchError> {
+    let ids: Vec<u32> = games.iter().map(|(id, _)| *id).collect();
+    let found =
+        in_waves(&ids, |client, id| Some(crate::steam_news::parse(&text(client, &news_url(id, 5)).ok()?, id, "")))?;
+    let mut items = Vec::new();
+    for (id, name) in games {
+        for mut item in found.get(id).cloned().unwrap_or_default() {
+            item.game = name.clone();
+            items.push(item);
+        }
+    }
+    Ok(items)
+}
+
+pub fn charts() -> Result<(Vec<crate::steam_top::Rank>, i64), FetchError> {
+    Ok(crate::steam_top::parse(&get(&charts_url())?))
 }
 
 pub fn resolve(key: &str, name: &str) -> Result<String, FetchError> {

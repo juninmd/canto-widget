@@ -253,10 +253,6 @@ export type SteamRow = {
 };
 /** `currency` is the ISO 4217 code of the storefront the prices came from. */
 export type SteamList = { items: SteamRow[]; has_more: boolean; currency: string };
-/** Both playtimes are minutes, as the Steam Web API reports them. */
-export type RecentGame = { appid: number; name: string; recent_min: number; total_min: number; art: string };
-/** `has_key` false means only the recent list is unavailable: the UI explains instead of erroring. */
-export type SteamRecent = { items: RecentGame[]; has_key: boolean };
 /** `region` is the storefront in use ("br", "us"...), already resolved from the language. */
 export type SteamStatus = {
   configured: boolean;
@@ -266,10 +262,49 @@ export type SteamStatus = {
   region: string;
   watching: boolean;
 };
-/** A game the player owns; only the total playtime is kept here. */
-export type OwnedGame = { appid: number; name: string; total_min: number; art: string };
-/** `total`/`minutes` cover every match, not just the paged `items`; `has_key` false means no Web API key. */
-export type SteamLibrary = { items: OwnedGame[]; total: number; minutes: number; has_key: boolean };
+/** A game the player can reach: on the account (with the key) or installed here. Playtimes in minutes. */
+export type PlayGame = {
+  appid: number;
+  name: string;
+  /** Wide header, for the list and the cards. */
+  art: string;
+  /** Vertical library cover, for the grid. */
+  cover: string;
+  total_min: number;
+  recent_min: number;
+  /** Unix seconds; 0 when Steam never saw it run. */
+  last_played: number;
+  installed: boolean;
+  size_bytes: number;
+};
+export type PlayFilter = "all" | "recent" | "installed";
+/** `total`/`minutes` cover every match of the filter and search; `hero` is the last game played. */
+export type SteamPlay = {
+  items: PlayGame[];
+  total: number;
+  minutes: number;
+  pages: number;
+  counts: { all: number; recent: number; installed: number };
+  hero: PlayGame | null;
+  has_key: boolean;
+};
+/** One update a game posted; `lines` is the trimmed changelog, `date` unix seconds. */
+export type NewsItem = {
+  gid: string;
+  appid: number;
+  game: string;
+  title: string;
+  url: string;
+  date: number;
+  lines: string[];
+  fresh: boolean;
+};
+export type SteamNews = { items: NewsItem[]; unread: number };
+/** A place on the most played chart; `moved` is places gained since the previous chart. */
+export type TopGame = { rank: number; appid: number; name: string; art: string; players: number; peak: number; moved: number; mine: boolean };
+export type SteamTop = { items: TopGame[]; players: number; pages: number; updated: number };
+export type WishSort = "discount" | "price" | "order";
+export type SteamWishlist = { items: SteamRow[]; total: number; on_sale: number; hot: number; pages: number; currency: string };
 /** Mapa: a place the user picked (starting point or a trip's destination). */
 export type TrafficSpot = { name: string; detail: string; lat: number; lon: number };
 export type TrafficTrip = { id: string; name: string; icon: "work" | "home" | "gym" | "heart" | "pin"; to: TrafficSpot };
@@ -401,8 +436,29 @@ export type Contact = {
 /** `total` is the whole address book; `items` is capped, so the two can differ. */
 export type ContactsView = { total: number; items: Contact[] };
 
-/** One Mercado quote; `points` run from the previous close to the live price. */
-export type MarketQuote = { symbol: string; price: number; change: number; points: number[] };
+export type MarketGroup = "fx" | "index" | "crypto";
+/** One Mercado quote; `points` run through the session up to the live price, `times` in unix seconds. */
+export type MarketQuote = {
+  symbol: string;
+  group: MarketGroup;
+  price: number;
+  change: number;
+  points: number[];
+  times: number[];
+  currency: string | null;
+  prev_close: number | null;
+  open: number | null;
+  day_low: number | null;
+  day_high: number | null;
+  year_low: number | null;
+  year_high: number | null;
+  market_time: number | null;
+  /** Today's regular session, unix seconds. */
+  session: [number, number] | null;
+};
+/** The spotlight's longer periods, as Yahoo names them. */
+export type MarketRange = "1d" | "5d" | "1mo" | "6mo" | "1y";
+export type MarketHistory = { points: number[]; times: number[] };
 export type MarketView = {
   quotes: MarketQuote[];
   fetched_at: number;
@@ -644,7 +700,7 @@ export const api = {
   steamDisconnect: () => invoke<SteamStatus>("steam_disconnect"),
   /** The storefront the prices, the wording and the currency come from; drops the cached lists. */
   steamRegion: (region: string) => invoke<SteamStatus>("steam_region_set", { region }),
-  /** Opt-in OS notifications when a wishlist game gets cheaper; answers the value now in effect. */
+  /** Opt-in OS notifications for hot wishlist sales (75%+) and game updates; answers the value now in effect. */
   steamWatch: (enabled: boolean) => invoke<boolean>("steam_watch_set", { enabled }),
   /** Wishlist deals, biggest discount first; `page` starts at 0. */
   steamDeals: (page = 0, force = false) => invoke<SteamList>("steam_deals", { page, force }),
@@ -653,9 +709,19 @@ export const api = {
    *  `onlySale` asks the store for what is discounted now. `page` starts at 0. */
   steamCatalog: (term = "", page = 0, sort = "reviews", onlySale = false, force = false) =>
     invoke<SteamList>("steam_catalog", { term, page, sort, onlySale, force }),
-  steamRecent: (force = false) => invoke<SteamRecent>("steam_recent", { force }),
-  /** Every owned game, most played first, filtered by `term` and paged by 100; `page` starts at 0. */
-  steamLibrary: (term = "", page = 0, force = false) => invoke<SteamLibrary>("steam_library", { term, page, force }),
+  /** Every reachable game, last played first; `filter` narrows, `term` searches, `page` starts at 0. */
+  steamPlay: (filter: PlayFilter = "all", term = "", page = 0, force = false) =>
+    invoke<SteamPlay>("steam_play", { filter, term, page, force }),
+  /** Opens the game through the Steam client. */
+  steamLaunch: (appid: number) => invoke<void>("steam_launch", { appid }),
+  /** Updates of the games installed or played lately; `filter` "installed" keeps only what is here. */
+  steamNews: (filter: "all" | "installed" = "all", force = false) => invoke<SteamNews>("steam_news", { filter, force }),
+  steamNewsRead: () => invoke<void>("steam_news_read"),
+  /** Steam's chart of the games with the most people in them now, 20 per page. */
+  steamTop: (page = 0, onlyMine = false, force = false) => invoke<SteamTop>("steam_top", { page, onlyMine, force }),
+  /** The whole wishlist, 20 per page, sorted by discount, price or Steam's own order. */
+  steamWishlist: (page = 0, sort: WishSort = "discount", force = false) =>
+    invoke<SteamWishlist>("steam_wishlist", { page, sort, force }),
   /** One capsule as a `data:` URL, cached in Rust; empty when Steam has no art for the app. */
   steamImage: (url: string) => invoke<string>("steam_image", { url }),
 
@@ -680,6 +746,8 @@ export const api = {
 
   /** Mercado: Yahoo Finance quotes; Rust keeps them for 15 min. */
   marketGet: (force = false) => invoke<MarketView>("market_get", { force }),
+  /** One asset over a longer period, for the spotlight; also cached for 15 min. */
+  marketHistory: (symbol: string, range: MarketRange) => invoke<MarketHistory>("market_history", { symbol, range }),
 
   /** Mapa: the reading needs the TomTom key and a starting point; Rust keeps it for 5 min. */
   trafficGet: (force = false) => invoke<TrafficView>("traffic_get", { force }),

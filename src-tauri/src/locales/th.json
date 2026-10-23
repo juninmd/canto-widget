@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "ซีไอไอล้มเหลว",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "ถูกลงในรายการที่ต้องการของคุณ",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "ห้ามรบกวนเป็นเวลา 1 ชม",
   "Free": "ฟรี",
@@ -26,10 +25,14 @@
   "Task reminder": "การแจ้งเตือนงาน",
   "Turn off do not disturb": "ปิดอย่ารบกวน",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "ลดราคาในรายการที่อยากได้",
   "You were mentioned": "คุณถูกกล่าวถึง",
   "certificate expired": "ใบรับรองหมดอายุ",
   "certificate expires in": "ใบรับรองจะหมดอายุภายใน",
   "days": "วัน",
   "down:": "ลง:",
-  "high latency:": "เวลาแฝงสูง:"
+  "high latency:": "เวลาแฝงสูง:",
+  "more alerts in the Steam tab": "การแจ้งเตือนเพิ่มเติมในแท็บ Steam",
+  "new update": "อัปเดตใหม่",
+  "was": "เดิม"
 }
