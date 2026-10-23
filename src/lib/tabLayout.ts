@@ -13,7 +13,7 @@ export type TabGroup = "day" | "code" | "explore";
 export const TAB_GROUP: Partial<Record<Tab, TabGroup>> = {
   tasks: "day", notes: "day", clipboard: "day", agenda: "day",
   github: "code", gitlab: "code", status: "code", agents: "code",
-  models: "explore", activity: "explore", gmail: "day", gdrive: "day", contacts: "day", weather: "explore", market: "explore", steam: "explore", reads: "explore",
+  models: "explore", activity: "explore", gmail: "day", gdrive: "day", contacts: "day", weather: "explore", map: "explore", market: "explore", steam: "explore", reads: "explore",
 };
 
 /** Anything but a saved "vertical" is horizontal: the bar people already know. */
