@@ -121,8 +121,6 @@
   "agents.hint": "kommandoen kopieres bare: Canto installerer ingenting",
   "agents.source": "GitHub utgivelser",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

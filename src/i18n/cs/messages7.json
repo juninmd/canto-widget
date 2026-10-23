@@ -121,8 +121,6 @@
   "agents.hint": "příkaz se pouze zkopíruje: Canto nic neinstaluje",
   "agents.source": "GitHub vydání",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",

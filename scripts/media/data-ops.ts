@@ -171,16 +171,33 @@ const WEATHER_DAYS = [
 /** Invented quotes: the curves only have to look like a trading day. */
 const curve = (from: number, steps: number[]) => steps.reduce<number[]>((acc, d) => [...acc, acc[acc.length - 1] * (1 + d / 100)], [from]);
 const WAVE = [0.2, -0.1, 0.3, 0.15, -0.2, 0.1, 0.25, -0.05, 0.1, -0.15, 0.2, 0.05];
-const quote = (symbol: string, previous: number, sign: number) => {
+const OPEN_AT = Date.UTC(2026, 9, 17, 13, 0) / 1000;
+const quote = (symbol: string, group: string, previous: number, sign: number, currency = "BRL") => {
   const points = curve(previous, WAVE.map((d) => d * sign));
   const price = points[points.length - 1];
-  return { symbol, price, change: ((price - previous) / previous) * 100, points };
+  const times = points.map((_, i) => OPEN_AT + i * 900);
+  const low = Math.min(...points);
+  const high = Math.max(...points);
+  return {
+    symbol, group, price, change: ((price - previous) / previous) * 100, points, times, currency,
+    prev_close: previous, open: points[0], day_low: low * 0.999, day_high: high * 1.001,
+    year_low: previous * 0.82, year_high: previous * 1.12, market_time: times[times.length - 1],
+    session: group === "crypto" ? null : [OPEN_AT, OPEN_AT + 7 * 3600],
+  };
 };
 export const MARKET = {
   market_get: {
     quotes: [
-      quote("USD/BRL", 5.4, 1), quote("EUR/BRL", 5.89, -0.4), quote("BTC/USD", 116900, 2.2),
-      quote("IBOV", 133100, -0.9), quote("S&P 500", 6410, 0.6), quote("NASDAQ", 21300, 1.1),
+      quote("USD/BRL", "fx", 5.4, 1), quote("EUR/BRL", "fx", 5.89, -0.4), quote("GBP/BRL", "fx", 7.02, 0.5),
+      quote("JPY/BRL", "fx", 0.0361, -0.6), quote("CHF/BRL", "fx", 6.78, 0.3), quote("CAD/BRL", "fx", 3.89, -0.2),
+      quote("AUD/BRL", "fx", 3.55, 0.4), quote("CNY/BRL", "fx", 0.758, 0.2), quote("ARS/BRL", "fx", 0.0046, -1.4),
+      quote("EUR/USD", "fx", 1.083, -0.3, "USD"),
+      quote("IBOV", "index", 133100, -0.9), quote("S&P 500", "index", 6410, 0.6, "USD"), quote("NASDAQ", "index", 21300, 1.1, "USD"),
+      quote("DOW JONES", "index", 44200, 0.3, "USD"), quote("DAX", "index", 23900, -0.5, "EUR"), quote("FTSE 100", "index", 9180, 0.4, "GBP"),
+      quote("NIKKEI 225", "index", 47800, 0.8, "JPY"),
+      quote("BTC/USD", "crypto", 116900, 2.2, "USD"), quote("ETH/USD", "crypto", 4210, 2.8, "USD"), quote("SOL/USD", "crypto", 198, -1.6, "USD"),
+      quote("XRP/USD", "crypto", 2.71, 1.3, "USD"), quote("BNB/USD", "crypto", 1105, 0.7, "USD"), quote("DOGE/USD", "crypto", 0.231, -2.1, "USD"),
+      quote("ADA/USD", "crypto", 0.78, -0.8, "USD"),
     ],
     fetched_at: Date.UTC(2026, 9, 17, 13, 30),
     error: null,

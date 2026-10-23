@@ -121,8 +121,6 @@
   "agents.hint": "comanda este doar copiată: Canto nu instalează nimic",
   "agents.source": "GitHub lansează",
   "protos.tab.market": "Market",
-  "protos.market.quotes": "quotes",
-  "protos.market.change": "{n}% today",
   "weather.tab": "Weather",
   "weather.loading": "checking the weather",
   "weather.ask.title": "Pick a city",
