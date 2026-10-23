@@ -65,5 +65,21 @@
   "weather.moon.waningCrescent": "bulan sabit semakin pudar",
   "weather.moon.lit": "{n}% bercahaya",
   "weather.moon.toFull": "penuh dalam {n} hari",
-  "notes.savedAnnouncement": "\"{title}\" disimpan"
+  "notes.savedAnnouncement": "\"{title}\" disimpan",
+  "contacts.birthdays.title": "Birthdays today",
+  "contacts.birthdays.age": "turns {age}",
+  "contacts.birthdays.today": "birthday today",
+  "contacts.birthdays.greet": "Happy birthday, {name}! 🎉",
+  "contacts.greet": "wish {name} a happy birthday on WhatsApp",
+  "contacts.greetShort": "wish",
+  "contacts.whatsapp": "open {value} in WhatsApp",
+  "contacts.whatsappShort": "WhatsApp",
+  "contacts.nickname": "nickname",
+  "contacts.department": "department",
+  "contacts.birthday": "birthday",
+  "contacts.address": "address",
+  "contacts.url": "website",
+  "contacts.relation": "relation",
+  "contacts.note": "notes",
+  "contacts.openLink": "open {value}"
 }

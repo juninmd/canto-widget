@@ -39,3 +39,25 @@ fn only_url_safe_ids_become_links_and_values_are_capped() {
         .unwrap();
     assert_eq!((c.emails.len(), c.name.chars().count()), (MAX_VALUES, MAX_TEXT));
 }
+
+#[test]
+fn a_contact_brings_its_birthday_addresses_links_relations_and_note() {
+    let c = person(
+        r#"{"resourceName": "people/c9", "names": [{"displayName": "Bia"}], "nicknames": [{"value": "Bibi"}],
+            "organizations": [{"name": "Vértice", "department": "Vendas"}],
+            "birthdays": [{"text": "sem data"}, {"date": {"month": 10, "day": 23}}],
+            "addresses": [{"formattedValue": "Rua A, 10\nSão Paulo"}],
+            "urls": [{"value": "https://bia.dev"}, {"value": "javascript:alert(1)"}],
+            "relations": [{"person": "Rui", "formattedType": "Cônjuge"}, {"person": "Lia"}],
+            "biographies": [{"value": "Prefere WhatsApp."}]}"#,
+    )
+    .unwrap();
+    assert_eq!(c.birthday, Some(Birthday { day: 23, month: 10, year: None }));
+    assert_eq!((c.nickname.as_str(), c.department.as_str()), ("Bibi", "Vendas"));
+    assert_eq!(c.addresses, ["Rua A, 10 São Paulo"]);
+    assert_eq!(c.urls, ["https://bia.dev"]);
+    assert_eq!(c.relations, ["Rui (Cônjuge)", "Lia"]);
+    assert_eq!(c.note, "Prefere WhatsApp.");
+    let c = person(r#"{"resourceName": "people/c8", "names": [{"displayName": "Rui"}], "birthdays": [{"date": {"year": 1990, "month": 2, "day": 30}}, {"date": {"year": 1990, "month": 13, "day": 1}}]}"#).unwrap();
+    assert_eq!(c.birthday, Some(Birthday { day: 30, month: 2, year: Some(1990) }));
+}

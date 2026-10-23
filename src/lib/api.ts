@@ -341,6 +341,15 @@ export type Contact = {
   title: string;
   starred: boolean;
   link: string;
+  nickname: string;
+  department: string;
+  /** Google lets the year out. */
+  birthday: { day: number; month: number; year: number | null } | null;
+  addresses: string[];
+  urls: string[];
+  /** "Name (relation)". */
+  relations: string[];
+  note: string;
 };
 /** `total` is the whole address book; `items` is capped, so the two can differ. */
 export type ContactsView = { total: number; items: Contact[] };

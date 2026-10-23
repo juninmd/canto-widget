@@ -6,12 +6,16 @@ type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
 let reply: ContactsView | string;
 
+const NONE = { nickname: "", department: "", birthday: null, addresses: [], urls: [], relations: [], note: "" };
+const now = new Date();
 const VIEW: ContactsView = {
   total: 3,
   items: [
-    { id: "c2", name: "Rafael Prado", emails: ["rafael@exemplo.com"], phones: [], org: "Vértice", title: "", starred: false, link: "https://contacts.google.com/person/c2" },
-    { id: "c1", name: "Marina Lopes", emails: ["marina@exemplo.com"], phones: ["+55 11 90000-0000"], org: "Vértice", title: "Diretora", starred: true, link: "https://contacts.google.com/person/c1" },
-    { id: "c3", name: "Ana Souza", emails: [], phones: ["555-0100"], org: "", title: "", starred: false, link: "" },
+    { id: "c2", name: "Rafael Prado", emails: ["rafael@exemplo.com"], phones: [], org: "Vértice", title: "", starred: false, link: "https://contacts.google.com/person/c2", ...NONE },
+    { id: "c1", name: "Marina Lopes", emails: ["marina@exemplo.com"], phones: ["+55 11 90000-0000"], org: "Vértice", title: "Diretora", starred: true, link: "https://contacts.google.com/person/c1", ...NONE,
+      nickname: "Mari", department: "Vendas", birthday: { day: now.getDate(), month: now.getMonth() + 1, year: now.getFullYear() - 30 },
+      addresses: ["Rua A, 10, São Paulo"], urls: ["https://marina.dev"], relations: ["Rui (Cônjuge)"], note: "Prefere WhatsApp." },
+    { id: "c3", name: "Ana Souza", emails: [], phones: ["555-0100"], org: "", title: "", starred: false, link: "", ...NONE },
   ],
 };
 
@@ -33,10 +37,10 @@ afterEach(cleanup);
 
 test("contacts come in A to Z sections with the star and the job line", async () => {
   render(<ContactsTab onNotice={() => {}} />);
-  expect(await screen.findByText("Marina Lopes")).toBeTruthy();
+  expect(await screen.findByText("Marina Lopes", { selector: "li[data-contact] span" })).toBeTruthy();
   expect(screen.getByText("Diretora · Vértice")).toBeTruthy();
   expect(screen.getByRole("img", { name: "favorito" })).toBeTruthy();
-  expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["A", "M", "R"]);
+  expect(screen.getAllByRole("heading", { level: 3 }).map((h) => h.textContent).filter((h) => h?.length === 1)).toEqual(["A", "M", "R"]);
   expect(document.querySelector("[data-contacts-total]")?.textContent).toBe("3");
 });
 
@@ -58,7 +62,7 @@ test("opening a contact shows its numbers; copy and the Google link work", async
   Object.defineProperty(navigator, "clipboard", { value: { writeText: (v: string) => (copied.push(v), Promise.resolve()) }, configurable: true });
   const notices: string[] = [];
   render(<ContactsTab onNotice={(m) => notices.push(m)} />);
-  fireEvent.click(await screen.findByText("Marina Lopes"));
+  fireEvent.click(await screen.findByText("Marina Lopes", { selector: "li[data-contact] span" }));
   fireEvent.click(screen.getByRole("button", { name: "copiar marina@exemplo.com" }));
   await waitFor(() => expect(notices).toEqual(["Copiado"]));
   expect(copied).toEqual(["marina@exemplo.com"]);
@@ -74,4 +78,30 @@ test("without a Google login or with an old grant the tab asks for it", async ()
   reply = "reconecte o Google em Ajustes para liberar Gmail, Tarefas, Drive e Contatos";
   render(<ContactsTab onNotice={() => {}} />);
   expect(await screen.findByRole("button", { name: "Reconectar Google" })).toBeTruthy();
+});
+
+test("today's birthdays sit on top with the age and a WhatsApp greeting already typed", async () => {
+  render(<ContactsTab onNotice={() => {}} />);
+  const section = await screen.findByRole("region", { name: "Aniversariantes de hoje" });
+  expect(section.textContent).toContain("Marina Lopes");
+  expect(section.textContent).toContain("faz 30 anos");
+  expect(section.textContent).not.toContain("Ana Souza");
+  expect(screen.getByRole("img", { name: "aniversário hoje" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "dar parabéns a Marina Lopes no WhatsApp" }));
+  expect(calls.at(-1)).toEqual({
+    cmd: "open_link",
+    args: { url: `https://wa.me/5511900000000?text=${encodeURIComponent("Feliz aniversário, Mari! 🎉")}` },
+  });
+});
+
+test("an open contact shows everything Google keeps and a WhatsApp link only for a dialable number", async () => {
+  render(<ContactsTab onNotice={() => {}} />);
+  fireEvent.click(await screen.findByText("Marina Lopes", { selector: "li[data-contact] span" }));
+  for (const text of ["Mari", "Vendas", "Rua A, 10, São Paulo", "Rui (Cônjuge)", "Prefere WhatsApp."]) expect(screen.getByText(text)).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "abrir +55 11 90000-0000 no WhatsApp" }));
+  expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://wa.me/5511900000000" } });
+  fireEvent.click(screen.getByRole("button", { name: "abrir https://marina.dev" }));
+  expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://marina.dev" } });
+  fireEvent.click(screen.getByText("Ana Souza"));
+  expect(screen.queryByRole("button", { name: "abrir 555-0100 no WhatsApp" })).toBeNull();
 });

@@ -3,7 +3,8 @@ import type { Contact } from "./api";
 import { filterContacts, groupByLetter, letterOf, matchesContact, subtitle } from "./contacts";
 
 const c = (over: Partial<Contact>): Contact => ({
-  id: "1", name: "Ana", emails: [], phones: [], org: "", title: "", starred: false, link: "", ...over,
+  id: "1", name: "Ana", emails: [], phones: [], org: "", title: "", starred: false, link: "",
+  nickname: "", department: "", birthday: null, addresses: [], urls: [], relations: [], note: "", ...over,
 });
 
 test("search ignores accents and case and finds company, e-mail and a phone however it is spaced", () => {

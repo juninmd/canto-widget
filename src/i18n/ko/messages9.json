@@ -65,5 +65,21 @@
   "weather.moon.waningCrescent": "쇠퇴하는 초승달",
   "weather.moon.lit": "{n}% 조명",
   "weather.moon.toFull": "{n}일 안에 가득 찼습니다",
-  "notes.savedAnnouncement": "\"{title}\" 저장됨"
+  "notes.savedAnnouncement": "\"{title}\" 저장됨",
+  "contacts.birthdays.title": "Birthdays today",
+  "contacts.birthdays.age": "turns {age}",
+  "contacts.birthdays.today": "birthday today",
+  "contacts.birthdays.greet": "Happy birthday, {name}! 🎉",
+  "contacts.greet": "wish {name} a happy birthday on WhatsApp",
+  "contacts.greetShort": "wish",
+  "contacts.whatsapp": "open {value} in WhatsApp",
+  "contacts.whatsappShort": "WhatsApp",
+  "contacts.nickname": "nickname",
+  "contacts.department": "department",
+  "contacts.birthday": "birthday",
+  "contacts.address": "address",
+  "contacts.url": "website",
+  "contacts.relation": "relation",
+  "contacts.note": "notes",
+  "contacts.openLink": "open {value}"
 }
