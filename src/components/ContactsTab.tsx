@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import { api, errText, type Contact, type ContactsView } from "../lib/api";
 import { avatarTone } from "../lib/agenda";
-import { birthdaysToday, isBirthday } from "../lib/contactExtras";
+import { birthdaysToday, contactCard, isBirthday, upcomingBirthdays } from "../lib/contactExtras";
 import { filterContacts, groupByLetter, subtitle, type ContactFilter } from "../lib/contacts";
 import { googleGate, initials } from "../lib/google";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ContactBirthdays from "./ContactBirthdays";
-import ContactDetails from "./ContactDetails";
+import ContactDetails, { MINI } from "./ContactDetails";
+import ContactLetters from "./ContactLetters";
+import ContactUpcoming from "./ContactUpcoming";
 import ErrorBanner from "./ErrorBanner";
 import GoogleGate from "./GoogleGate";
 import { SearchIcon } from "./Icons";
@@ -15,9 +17,13 @@ import Skeleton from "./Skeleton";
 
 type Props = { onNotice: (message: string) => void };
 
-const FILTERS: ContactFilter[] = ["all", "starred", "email", "phone"];
+const FILTERS: ContactFilter[] = ["all", "starred", "email", "phone", "birthday"];
+const UPCOMING_DAYS = 30;
+const UPCOMING_MAX = 8;
+const APP = "https://contacts.google.com/";
+const NEW = "https://contacts.google.com/new";
 
-/** The Google address book: today's birthdays, search as you type, filters with counts, A to Z sections and every detail Google keeps, with WhatsApp one click away. */
+/** The Google address book: today's and the next birthdays, search as you type, filters with counts, an A to Z index and every detail Google keeps, with WhatsApp and Gmail one click away. */
 export default function ContactsTab({ onNotice }: Props) {
   const [view, setView] = useState<ContactsView | null>(null);
   const [error, setError] = useState("");
@@ -25,6 +31,7 @@ export default function ContactsTab({ onNotice }: Props) {
   const [filter, setFilter] = useState<ContactFilter>("all");
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState("");
+  const [flash, setFlash] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -50,12 +57,14 @@ export default function ContactsTab({ onNotice }: Props) {
       starred: items.filter((c) => c.starred).length,
       email: items.filter((c) => c.emails.length > 0).length,
       phone: items.filter((c) => c.phones.length > 0).length,
+      birthday: items.filter((c) => c.birthday).length,
     }),
     [items],
   );
   const groups = useMemo(() => groupByLetter(filterContacts(items, filter, search)), [items, filter, search]);
   const today = useMemo(() => new Date(), [view]);
   const birthdays = useMemo(() => birthdaysToday(items, today), [items, today]);
+  const upcoming = useMemo(() => upcomingBirthdays(items, today, UPCOMING_DAYS).slice(0, UPCOMING_MAX), [items, today]);
 
   const gate = googleGate(error);
   if (gate) return <GoogleGate kind={gate} onConnected={() => void load()} />;
@@ -78,6 +87,11 @@ export default function ContactsTab({ onNotice }: Props) {
     setOpen(id);
     requestAnimationFrame(() => document.querySelector(`[data-contact="${CSS.escape(id)}"]`)?.scrollIntoView?.({ block: "nearest" }));
   };
+  const copyCard = (contact: Contact) => void copy(contactCard(contact));
+  const jump = (letter: string) => {
+    setFlash(letter);
+    document.querySelector(`[data-letter="${CSS.escape(letter)}"]`)?.scrollIntoView?.({ block: "start", behavior: "smooth" });
+  };
   const shown = groups.reduce((sum, g) => sum + g.items.length, 0);
   let index = 0;
   return (
@@ -88,7 +102,13 @@ export default function ContactsTab({ onNotice }: Props) {
           <p key={view.total} data-contacts-total className="canto-roll text-3xl font-semibold tabular-nums tracking-tight text-fg">{view.total}</p>
           <span className="text-[11px] text-muted">{t("contacts.total")}</span>
         </div>
-        <span className="flex items-center gap-1.5">
+        <span className="flex items-center gap-1">
+          <button type="button" onClick={() => openLink(NEW)} className={`${MINI} bg-accent text-ink hover:opacity-90`}>
+            + {t("contacts.new")}
+          </button>
+          <button type="button" onClick={() => openLink(APP)} aria-label={t("contacts.openApp")} className={`${MINI} bg-edge/60 hover:bg-hover`}>
+            ↗
+          </button>
           {counts.starred > 0 && (
             <span className="rounded-full bg-warn/15 px-2 py-0.5 text-[11px] font-semibold text-warn">★ {counts.starred}</span>
           )}
@@ -104,6 +124,7 @@ export default function ContactsTab({ onNotice }: Props) {
         </span>
       </section>
       <ContactBirthdays people={birthdays} today={today} onOpen={openLink} onShow={show} />
+      <ContactUpcoming people={upcoming} onShow={show} />
       <label className="canto-field flex items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
         <span aria-hidden="true" className="text-faint [&>svg]:size-3.5"><SearchIcon /></span>
         <input
@@ -129,11 +150,17 @@ export default function ContactsTab({ onNotice }: Props) {
           </button>
         ))}
       </div>
+      {shown > 0 && <ContactLetters letters={groups.map((g) => g.letter)} onJump={jump} />}
       {shown === 0 ? (
         <p className="wx-glass p-3 text-xs text-muted">{items.length === 0 ? t("contacts.empty") : t("contacts.noMatch")}</p>
       ) : (
         groups.map((group) => (
-          <section key={group.letter} aria-label={group.letter} className="wx-glass shrink-0">
+          <section
+            key={flash === group.letter ? `${group.letter}*` : group.letter}
+            aria-label={group.letter}
+            data-letter={group.letter}
+            className={`wx-glass shrink-0 scroll-mt-1 ${flash === group.letter ? "canto-flash" : ""}`}
+          >
             <h3 className="px-3 pb-0.5 pt-2 text-[10px] font-semibold uppercase tracking-widest text-accent-text">{group.letter}</h3>
             <ul className="divide-y divide-edge">
               {group.items.map((contact: Contact) => {
@@ -149,7 +176,7 @@ export default function ContactsTab({ onNotice }: Props) {
                     >
                       <span
                         aria-hidden="true"
-                        className={`canto-pop grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ${avatarTone(contact.emails[0] ?? contact.name)}`}
+                        className={`canto-stack grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ${avatarTone(contact.emails[0] ?? contact.name)}`}
                       >
                         {initials(contact.name)}
                       </span>
@@ -157,11 +184,11 @@ export default function ContactsTab({ onNotice }: Props) {
                         <span className="truncate text-xs font-semibold text-fg">{contact.name}</span>
                         <span className="truncate text-[11px] text-muted">{subtitle(contact)}</span>
                       </span>
-                      {isBirthday(contact, today) && <span role="img" aria-label={t("contacts.birthdays.today")}>🎂</span>}
+                      {isBirthday(contact, today) && <span role="img" aria-label={t("contacts.birthdays.today")} className="canto-wiggle inline-block">🎂</span>}
                       {contact.starred && <span role="img" aria-label={t("contacts.starred")} className="text-warn">★</span>}
                       <span aria-hidden="true" className={`text-[9px] text-faint transition-transform ${expanded ? "rotate-180" : ""}`}>▾</span>
                     </button>
-                    {expanded && <ContactDetails contact={contact} onCopy={(v) => void copy(v)} onOpen={openLink} />}
+                    {expanded && <ContactDetails contact={contact} onCopy={(v) => void copy(v)} onCopyCard={() => copyCard(contact)} onOpen={openLink} />}
                   </li>
                 );
               })}

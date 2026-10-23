@@ -18,7 +18,7 @@ export default function ContactBirthdays({ people, today, onOpen, onShow }: Prop
       className="wx-glass wx-rise shrink-0 bg-gradient-to-br from-warn/15 via-warn/5 to-transparent p-3"
     >
       <h3 className="flex items-center gap-1.5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-warn">
-        <span aria-hidden="true" className="canto-pop text-sm">🎂</span>
+        <span aria-hidden="true" className="canto-wiggle inline-block text-sm">🎂</span>
         {t("contacts.birthdays.title")}
         <span className="tabular-nums opacity-70">{people.length}</span>
       </h3>
@@ -32,7 +32,7 @@ export default function ContactBirthdays({ people, today, onOpen, onShow }: Prop
               <button type="button" onClick={() => onShow(contact.id)} className="canto-hit flex min-w-0 flex-1 items-center gap-2.5 text-left">
                 <span
                   aria-hidden="true"
-                  className={`grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ring-2 ring-warn/60 ${avatarTone(contact.emails[0] ?? contact.name)}`}
+                  className={`canto-glow grid size-8 shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ring-2 ring-warn/60 ${avatarTone(contact.emails[0] ?? contact.name)}`}
                 >
                   {initials(contact.name)}
                 </span>

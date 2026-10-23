@@ -7,6 +7,18 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Gmail, Drive e Contatos renovados, com mais ações e animações novas.** **Gmail**: quatro visões
+  (**Importantes**, **Não lidos**, **Com estrela**, **Entrada**) com busca no próprio Gmail; cada e-mail ganha
+  **estrela** (que gira ao marcar), **arquivar** (desliza para a esquerda), **lixeira** (afunda e some), marcar
+  como lido ou **não lido**, e "virar tarefa"; tocar no avatar **seleciona** e uma barra sobe com as **ações em
+  lote** (ler, arquivar, lixeira, todos). No topo, **escrever** abre a janela de novo e-mail do Gmail. **Drive**:
+  o **armazenamento usado** com uma barra que cresce, atalhos para criar **Doc, Planilha ou Apresentação** em
+  branco, o filtro **Meus arquivos**, filtro por **tipo** (Docs, Planilhas, Apresentações, PDFs), arquivos
+  agrupados por **Hoje / Ontem / Nesta semana / Antes**, tamanho dos arquivos que ocupam espaço, **copiar link** e
+  **abrir a pasta**. **Contatos**: **próximos aniversários** (30 dias, "amanhã", "em 5 dias"), filtro **Com
+  aniversário**, **índice A–Z** que pula para a letra e a destaca, botão **escrever** no Gmail para cada e-mail,
+  **copiar ficha** inteira, **novo contato** e o bolo 🎂 que balança. Tudo com os mesmos escopos de antes
+  (`gmail.modify`, `drive.metadata.readonly`, `contacts.readonly`) e parado quando o sistema pede menos movimento.
 - **Contatos renovada**: os **aniversariantes do dia** aparecem no topo, com a idade quando o Google sabe o ano e
   um botão de **parabéns pelo WhatsApp** com a mensagem já escrita (o bolo 🎂 também marca a pessoa na lista).
   Abrir um contato agora mostra **tudo** o que o Google guarda: apelido, setor, aniversário, endereços, sites,

@@ -411,7 +411,7 @@ function Canto() {
               {tab === "weather" && <WeatherTab />}
               {tab === "market" && <MarketTab />}
               {tab === "gmail" && <GmailTab onNotice={(message) => notify({ message })} />}
-              {tab === "gdrive" && <GDriveTab />}
+              {tab === "gdrive" && <GDriveTab onNotice={(message) => notify({ message })} />}
               {tab === "contacts" && <ContactsTab onNotice={(message) => notify({ message })} />}
               {tab === "reads" && <ReadsTab onError={setError} />}
               {tab === "activity" && <ActivityTab today={today} onError={setError} />}

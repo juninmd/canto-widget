@@ -1,13 +1,11 @@
-//! Gmail: the inbox's unread count and the unread messages Gmail itself marked as important.
+//! Gmail: the inbox's unread count and one view of it (important, unread, starred), optionally searched.
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
-use crate::google_api::{check_id, client, send};
+use crate::google_api::{client, send};
 
-const API: &str = "https://gmail.googleapis.com/gmail/v1/users/me";
-/// Gmail's own importance marker decides what alerts: the rest only counts.
-pub const IMPORTANT_QUERY: &str = "in:inbox is:unread is:important";
-const IMPORTANT_MAX: &str = "10";
+pub(crate) const API: &str = "https://gmail.googleapis.com/gmail/v1/users/me";
+const LIST_MAX: &str = "15";
 
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
 pub struct Mail {
@@ -18,6 +16,8 @@ pub struct Mail {
     /// Milliseconds since the epoch, from Gmail's `internalDate`.
     pub date: i64,
     pub link: String,
+    pub unread: bool,
+    pub starred: bool,
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
@@ -50,6 +50,8 @@ pub(crate) struct RawMessage {
     thread_id: String,
     #[serde(default)]
     snippet: String,
+    #[serde(rename = "labelIds", default)]
+    label_ids: Vec<String>,
     #[serde(rename = "internalDate", default)]
     internal_date: String,
     #[serde(default)]
@@ -73,6 +75,8 @@ impl RawMessage {
         let header = |name: &str| {
             self.payload.headers.iter().find(|h| h.name.eq_ignore_ascii_case(name)).map(|h| h.value.clone())
         };
+        let has = |label: &str| self.label_ids.iter().any(|l| l == label);
+        let (unread, starred) = (has("UNREAD"), has("STARRED"));
         let thread = if crate::google_api::valid_id(&self.thread_id) { &self.thread_id } else { &self.id };
         Mail {
             from: sender_name(&header("From").unwrap_or_default()),
@@ -80,6 +84,8 @@ impl RawMessage {
             snippet: decode_entities(&self.snippet),
             date: self.internal_date.parse().unwrap_or(0),
             link: format!("https://mail.google.com/mail/u/0/#inbox/{thread}"),
+            unread,
+            starred,
             id: self.id,
         }
     }
@@ -100,13 +106,17 @@ fn decode_entities(text: &str) -> String {
 }
 
 pub fn summary(token: &str) -> Result<GmailSummary> {
+    list(token, "important", "")
+}
+
+/// The inbox's unread count and the newest mail of a view (`important`, `unread`, `starred`), narrowed by a search.
+pub fn list(token: &str, view: &str, search: &str) -> Result<GmailSummary> {
+    let q = crate::gmail_actions::view_query(view, search)?;
     let http = client()?;
     let inbox: Label = send("gmail", http.get(format!("{API}/labels/INBOX")).bearer_auth(token))?;
     let ids: IdList = send(
         "gmail",
-        http.get(format!("{API}/messages"))
-            .bearer_auth(token)
-            .query(&[("q", IMPORTANT_QUERY), ("maxResults", IMPORTANT_MAX)]),
+        http.get(format!("{API}/messages")).bearer_auth(token).query(&[("q", q.as_str()), ("maxResults", LIST_MAX)]),
     )?;
     let mut important = Vec::with_capacity(ids.messages.len());
     for message in ids.messages.iter().filter(|m| crate::google_api::valid_id(&m.id)) {
@@ -121,14 +131,6 @@ pub fn summary(token: &str) -> Result<GmailSummary> {
         important.push(raw.into_mail());
     }
     Ok(GmailSummary { unread: inbox.messages_unread, important })
-}
-
-pub fn mark_read(token: &str, id: &str) -> Result<()> {
-    check_id(id)?;
-    let body = serde_json::json!({ "removeLabelIds": ["UNREAD"] });
-    let _: serde::de::IgnoredAny =
-        send("gmail", client()?.post(format!("{API}/messages/{id}/modify")).bearer_auth(token).json(&body))?;
-    Ok(())
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { Contact } from "./api";
-import { ageToday, birthdaysToday, isBirthday, whatsappLink, whatsappNumber } from "./contactExtras";
+import { ageToday, birthdaysToday, composeLink, contactCard, isBirthday, upcomingBirthdays, whatsappLink, whatsappNumber } from "./contactExtras";
 
 const c = (over: Partial<Contact>): Contact => ({
   id: "1", name: "Ana", emails: [], phones: [], org: "", title: "", starred: false, link: "",
@@ -38,4 +38,26 @@ test("WhatsApp numbers get the country code; a short local number gets no link",
   expect(whatsappNumber("+12")).toBeNull();
   expect(whatsappLink("(11) 90000-1234", "Oi & tchau")).toBe("https://wa.me/5511900001234?text=Oi%20%26%20tchau");
   expect(whatsappLink("555-0100")).toBeNull();
+});
+
+test("upcoming birthdays start tomorrow, soonest first, and cross the year", () => {
+  const today = new Date(2026, 11, 30);
+  const soon = upcomingBirthdays(
+    [
+      c({ id: "a", birthday: { day: 2, month: 1, year: null } }),
+      c({ id: "b", birthday: { day: 31, month: 12, year: null } }),
+      c({ id: "t", birthday: { day: 30, month: 12, year: null } }),
+      c({ id: "far", birthday: { day: 20, month: 1, year: null } }),
+    ],
+    today,
+    7,
+  );
+  expect(soon.map((s) => [s.contact.id, s.in])).toEqual([["b", 1], ["a", 3]]);
+});
+
+test("the card copies as plain lines and the compose link is addressed", () => {
+  const card = contactCard(c({ name: "Marina Lopes", title: "Diretora", org: "Vértice", emails: ["m@exemplo.com"], phones: ["+55 11 90000-0000"] }));
+  expect(card).toBe("Marina Lopes\nDiretora · Vértice\nm@exemplo.com\n+55 11 90000-0000");
+  expect(composeLink("a+b@exemplo.com")).toBe("https://mail.google.com/mail/?view=cm&fs=1&to=a%2Bb%40exemplo.com");
+  expect(composeLink()).toBe("https://mail.google.com/mail/?view=cm&fs=1");
 });

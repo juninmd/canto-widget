@@ -223,26 +223,30 @@ the vault (it is only public addresses). The tab starts off by default.
 
 ### 📬 Gmail without opening the inbox
 
-The **Gmail** tab shows the inbox's **unread count** and the unread mail **Gmail itself marked as important**,
-each with **open in Gmail**, **mark as read** and **make it a task** (it lands in Google Tasks). Turn on **alert
-only important mail** and a system notification rings for each new important message; the rest only counts.
+The **Gmail** tab shows the inbox's **unread count** and one of four views, **Important**, **Unread**, **Starred** or
+the whole **Inbox**, searchable with Gmail's own search. Each mail can be **starred**, **archived**, sent to the
+**trash**, marked **read or unread**, opened in Gmail or turned into a task (it lands in Google Tasks); tap the
+avatars to select several and a bar rises with the same actions **in bulk**. **Compose** opens Gmail's new-mail
+window. Turn on **alert only important mail** and a system notification rings for each new important message.
 It uses the same Google sign-in as the Agenda, and the token stays in the vault.
 
 </td>
-<td><img src="docs/prints/app/102-gmail.png" alt="Gmail tab: 27 unread, three important messages with sender, subject, snippet and the open, mark-as-read and make-it-a-task actions"></td>
+<td><img src="docs/prints/app/102-gmail.png" alt="Gmail tab: 27 unread with compose and open buttons, Important/Unread/Starred/Inbox views, a search box and important mail with star, open, mark-as-read, archive, trash and make-it-a-task actions"></td>
 </tr>
 <tr>
 <td>
 
 ### 📂 Drive files one click away
 
-The **Drive** tab lists your **recent**, **starred** or **shared with me** files, searchable by name, each with
-its kind, who edited it last and an **open** button that goes to the browser. Canto only reads file
+The **Drive** tab shows the **storage in use** as a bar, one-click blank **Doc, Sheet or Slides**, and your
+**recent**, **starred**, **shared with me** or **own** files, narrowed by **kind** and searchable by name, grouped by
+**today, yesterday, this week and earlier**. Each file shows its kind, who edited it last and its size, with
+**open**, **copy link** and **open folder**. Canto only reads file
 **metadata** (`drive.metadata.readonly`): contents never reach it. Google Keep has no API for personal accounts,
 so the quick capture goes to **Google Tasks** instead.
 
 </td>
-<td><img src="docs/prints/app/103-drive.png" alt="Drive tab: search box, recent/starred/shared filters and a list of documents, sheets, slides and a PDF with who edited them and an open button"></td>
+<td><img src="docs/prints/app/103-drive.png" alt="Drive tab: 4.2 GB of 15 GB storage bar, new Doc/Sheet/Slides buttons, search, recent/starred/shared/mine filters, kind chips and files grouped under Today and Yesterday with folder, copy-link and open buttons"></td>
 </tr>
 <tr>
 <td>
@@ -251,13 +255,15 @@ so the quick capture goes to **Google Tasks** instead.
 
 The **Contacts** tab shows your Google address book (read-only, `contacts.readonly`): the total, a search that
 ignores accents and matches name, company, e-mail or phone, filters with counts (all, starred, with e-mail, with
-phone) and A to Z sections. **Today's birthdays** sit on top, with the age and a one-click WhatsApp greeting. Open a
-contact to see everything Google keeps (nickname, department, birthday, addresses, websites, relations, notes),
-**copy** an e-mail or number, open a phone straight in **WhatsApp** (`wa.me`) or jump to Google Contacts.
+phone, with birthday), an A to Z index and A to Z sections. **Today's birthdays** sit on top, with the age and a
+one-click WhatsApp greeting, followed by the **next birthdays** of the month. Open a contact to see everything Google
+keeps (nickname, department, birthday, addresses, websites, relations, notes), **copy** an e-mail, a number or the
+whole card, **write** to an e-mail in Gmail, open a phone straight in **WhatsApp** (`wa.me`) or jump to Google
+Contacts, where **new contact** also leads.
 It starts hidden, one checkbox away in Settings, and needs the People API on your Google Cloud project.
 
 </td>
-<td><img src="docs/prints/app/115-contatos.png" alt="Contacts tab: total, starred count, search box, All/Starred/With e-mail/With phone chips and contacts in A to Z sections with initials avatars, job and company"></td>
+<td><img src="docs/prints/app/115-contatos.png" alt="Contacts tab: total with new-contact button, today's birthday with a WhatsApp greeting, the next birthdays with days left, search, filter chips with counts and an A to Z index"></td>
 </tr>
 <tr>
 <td>
@@ -634,7 +640,7 @@ steps, differences and limits: [docs/mobile.md](docs/mobile.md).
 | Vault | Argon2id (19 MiB, t=2) → AES-256-GCM, a fresh nonce on every write, atomic write with `fsync` |
 | Key | RAM only, zeroed on lock; configurable auto-lock (5 to 60 min idle, 15 min by default) |
 | Network | only the Rust process talks to the network; the webview has no remote origin (CSP) and never sees tokens |
-| Google | optional: `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list), `gmail.modify` (unread count, important mail, mark as read), `tasks`, `drive.metadata.readonly` (file names, never contents) and `contacts.readonly` (read-only address book) plus profile, OAuth with PKCE and loopback |
+| Google | optional: `calendar.events.readonly`, `directory.readonly` (Workspace colleagues' photos in the guest list), `gmail.modify` (unread count, mail views, read/unread, star, archive, trash), `tasks`, `drive.metadata.readonly` (file names and storage quota, never contents) and `contacts.readonly` (read-only address book) plus profile, OAuth with PKCE and loopback |
 | GitHub | optional, encrypted token; items only open if the link is `https://github.com/` |
 | GitLab | optional, encrypted address and token; `https://` only, no redirects, links only from the configured instance |
 | Updates | only installs a package signed by the project's key; a tampered download is discarded before running |

@@ -50,3 +50,26 @@ export function birthdayLabel(contact: Contact): string {
   const date = new Date(b.year ?? 2000, b.month - 1, b.day);
   return date.toLocaleDateString(LOCALE, b.year ? { day: "2-digit", month: "2-digit", year: "numeric" } : { day: "2-digit", month: "long" });
 }
+
+const DAY_MS = 86_400_000;
+
+/** Birthdays in the next `days` days (tomorrow on), soonest first, with how many days are left. */
+export function upcomingBirthdays(items: Contact[], today: Date, days: number): { contact: Contact; in: number }[] {
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const out: { contact: Contact; in: number }[] = [];
+  for (let n = 1; n <= days; n++) {
+    const day = new Date(start.getTime() + n * DAY_MS + DAY_MS / 2);
+    for (const contact of items) if (isBirthday(contact, day)) out.push({ contact, in: n });
+  }
+  return out;
+}
+
+/** The whole card as plain text, one field per line, ready to paste in a chat or a note. */
+export function contactCard(contact: Contact): string {
+  const job = [contact.title, contact.org].filter(Boolean).join(" · ");
+  return [contact.name, job, ...contact.emails, ...contact.phones, ...contact.addresses, ...contact.urls].filter(Boolean).join("\n");
+}
+
+/** Gmail's compose window, addressed and opened in the browser. */
+export const composeLink = (to = "") =>
+  `https://mail.google.com/mail/?view=cm&fs=1${to ? `&to=${encodeURIComponent(to)}` : ""}`;

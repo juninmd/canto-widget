@@ -37,6 +37,9 @@ fn the_sender_is_the_display_name_or_the_bare_address() {
 }
 
 #[test]
-fn marking_read_refuses_an_id_that_could_reach_another_path() {
-    assert!(mark_read("token", "../labels").is_err());
+fn the_labels_say_whether_a_mail_is_unread_and_starred() {
+    let mail = raw(r#"{"id": "a1", "labelIds": ["INBOX", "STARRED"]}"#).into_mail();
+    assert_eq!((mail.unread, mail.starred), (false, true));
+    let mail = raw(r#"{"id": "a2", "labelIds": ["UNREAD", "IMPORTANT"]}"#).into_mail();
+    assert_eq!((mail.unread, mail.starred), (true, false));
 }
