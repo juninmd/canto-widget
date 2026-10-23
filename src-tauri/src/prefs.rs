@@ -9,9 +9,15 @@ use crate::error::{AppError, Result};
 use crate::store;
 use crate::vault::AppState;
 
-/// Only the tab choices; anything else from the webview is refused instead of piling up in a plain file.
-const KEYS: [&str; 4] = ["canto.hiddenTabs", "canto.knownTabs", "canto.tabLayout", "canto.railPinned"];
-const MAX_VALUE: usize = 2048;
+/// Only the webview's own `canto.*` choices (theme, language, tabs...), bounded so the plain file can't pile up.
+const PREFIX: &str = "canto.";
+const MAX_KEY: usize = 128;
+const MAX_VALUE: usize = 16 * 1024;
+const MAX_KEYS: usize = 200;
+
+fn known(key: &str) -> bool {
+    key.starts_with(PREFIX) && key.len() <= MAX_KEY
+}
 
 type Prefs = BTreeMap<String, String>;
 
@@ -28,7 +34,7 @@ fn load(dir: &Path) -> Prefs {
 }
 
 pub fn accept(key: &str, value: &str) -> Result<()> {
-    if KEYS.contains(&key) && value.len() <= MAX_VALUE {
+    if known(key) && value.len() <= MAX_VALUE {
         return Ok(());
     }
     Err(AppError::Config(crate::lang::tr("preferência inválida", "invalid preference").into()))
@@ -40,6 +46,9 @@ fn set(dir: &Path, key: &str, value: &str) -> Result<()> {
     if prefs.get(key).map(String::as_str) == Some(value) {
         return Ok(());
     }
+    if !prefs.contains_key(key) && prefs.len() >= MAX_KEYS {
+        return Err(AppError::Config(crate::lang::tr("preferências demais", "too many preferences").into()));
+    }
     prefs.insert(key.into(), value.into());
     store::write_json_atomic(&path(dir), &prefs)
 }
@@ -47,7 +56,7 @@ fn set(dir: &Path, key: &str, value: &str) -> Result<()> {
 #[tauri::command]
 pub fn prefs_get(state: State<AppState>, lock: State<PrefsLock>) -> Result<Prefs> {
     let _guard = lock.0.lock().unwrap();
-    Ok(load(&state.dir).into_iter().filter(|(k, _)| KEYS.contains(&k.as_str())).collect())
+    Ok(load(&state.dir).into_iter().filter(|(k, _)| known(k)).collect())
 }
 
 #[tauri::command]
@@ -75,7 +84,9 @@ mod tests {
         let prefs = load(&dir);
         assert_eq!(prefs["canto.hiddenTabs"], "[]");
         assert_eq!(prefs["canto.tabLayout"], "vertical");
-        assert!(set(&dir, "canto.token", "x").is_err());
+        set(&dir, "canto.skin", "noite").unwrap();
+        assert_eq!(load(&dir)["canto.skin"], "noite");
+        assert!(set(&dir, "token", "x").is_err());
         assert!(set(&dir, "canto.hiddenTabs", &"x".repeat(MAX_VALUE + 1)).is_err());
         let _ = std::fs::remove_dir_all(&dir);
     }

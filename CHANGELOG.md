@@ -100,6 +100,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
+  arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
+  modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da atualização
+  com uma cópia **antiga** (não vazia), vale a mais recente, em vez de a antiga apagar a do arquivo.
 - **A atualização não apaga mais as abas que você deixou visíveis.** A escolha das abas (e o layout) só ficava no
   armazenamento da webview, que pode voltar vazio depois de uma atualização, e então voltava o padrão. Agora ela
   também é gravada em `preferencias.json`, ao lado do cofre, e restaurada na abertura quando a webview perdeu a

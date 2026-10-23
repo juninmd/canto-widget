@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { Tab } from "../components/TabBar";
-import { PREFS_RESTORED, mirrorPref } from "./prefsMirror";
 
 export type TabLayout = "horizontal" | "vertical";
 
@@ -32,7 +31,6 @@ function read(key: string): string | null {
 function write(key: string, value: string) {
   try {
     localStorage.setItem(key, value);
-    mirrorPref(key, value);
   } catch {
     // Private mode or a full disk: the choice lasts until the window closes.
   }
@@ -41,14 +39,6 @@ function write(key: string, value: string) {
 export function useTabLayout() {
   const [layout, setLayoutState] = useState<TabLayout>(() => parseLayout(read(LAYOUT_KEY)));
   const [pinned, setPinnedState] = useState(() => read(PINNED_KEY) === "1");
-  useEffect(() => {
-    const reload = () => {
-      setLayoutState(parseLayout(read(LAYOUT_KEY)));
-      setPinnedState(read(PINNED_KEY) === "1");
-    };
-    window.addEventListener(PREFS_RESTORED, reload);
-    return () => window.removeEventListener(PREFS_RESTORED, reload);
-  }, []);
   const setLayout = useCallback((next: TabLayout) => {
     setLayoutState(next);
     write(LAYOUT_KEY, next);

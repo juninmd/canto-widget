@@ -73,12 +73,15 @@ test("Contatos lists the address book, filters it and opens a contact in Google"
   await expect.poll(async () => (await calls(page)).filter((c) => c.cmd === "open_link").at(-1)?.args).toEqual({ url: "https://wa.me/5511900000000" });
 });
 
-test("a hidden-tab choice lost with the webview's storage comes back from the file", async ({ page }) => {
+test("choices lost with the webview's storage come back from the file, and new ones go to it", async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 700 });
-  await mockTauri(page, { fixed: { prefs_get: { "canto.hiddenTabs": '["gitlab"]', "canto.knownTabs": JSON.stringify(ALL_TABS) } } });
+  await mockTauri(page, { fixed: { prefs_get: { "canto.hiddenTabs": '["gitlab"]', "canto.knownTabs": JSON.stringify(ALL_TABS), "canto.densidade": "compacta" } } });
   await page.goto("/");
   await expect(page.getByRole("tablist").first()).toBeVisible();
   await expect.poll(() => page.evaluate(() => localStorage.getItem("canto.hiddenTabs"))).toBe('["gitlab"]');
+  expect(await page.evaluate(() => localStorage.getItem("canto.densidade"))).toBe("compacta");
+  await page.evaluate(() => localStorage.setItem("canto.agendaView", "semana"));
+  await expect.poll(async () => (await calls(page)).some((c) => c.cmd === "prefs_set" && c.args.key === "canto.agendaView")).toBe(true);
   await expect(page.getByRole("tab", { name: "Gmail", exact: true }).or(page.getByRole("button", { name: /mais/ })).first()).toBeVisible();
 });
 
