@@ -148,7 +148,11 @@ pub const ALERT_HEIGHT: (f64, f64) = (96.0, 640.0);
 
 /// The webview measures its card; a bad value must not leave a giant or invisible window over the corner.
 pub fn clamp_alert_height(height: f64) -> f64 {
-    if height.is_finite() { height.clamp(ALERT_HEIGHT.0, ALERT_HEIGHT.1) } else { ALERT_HEIGHT.1 }
+    if height.is_finite() {
+        height.clamp(ALERT_HEIGHT.0, ALERT_HEIGHT.1)
+    } else {
+        ALERT_HEIGHT.1
+    }
 }
 
 /// The window hugs the card so the rest of the corner stays clickable; it grows upward from the same corner.
