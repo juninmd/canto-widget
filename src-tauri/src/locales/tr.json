@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI başarısız oldu",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "İstek listenizde daha ucuz",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "1 saat boyunca rahatsız etmeyin",
   "Free": "Ücretsiz",
@@ -26,10 +25,14 @@
   "Task reminder": "Görev hatırlatıcısı",
   "Turn off do not disturb": "Kapatın rahatsız etmeyin",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "İstek listende indirim",
   "You were mentioned": "Senden bahsedilmişti",
   "certificate expired": "sertifikanın süresi doldu",
   "certificate expires in": "sertifikanın süresi doluyor",
   "days": "günler",
   "down:": "aşağı:",
-  "high latency:": "yüksek gecikme:"
+  "high latency:": "yüksek gecikme:",
+  "more alerts in the Steam tab": "uyarı daha Steam sekmesinde",
+  "new update": "yeni güncelleme",
+  "was": "önceki"
 }

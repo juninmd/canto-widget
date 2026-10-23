@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI ha fallat",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Més barat a la teva llista de desitjos",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "No molesteu durant 1 h",
   "Free": "Gratis",
@@ -26,10 +25,14 @@
   "Task reminder": "Recordatori de tasques",
   "Turn off do not disturb": "Apagueu no molesteu",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Oferta a la llista de desitjos",
   "You were mentioned": "Et van esmentar",
   "certificate expired": "certificat caducat",
   "certificate expires in": "el certificat caduca en",
   "days": "dies",
   "down:": "avall:",
-  "high latency:": "alta latència:"
+  "high latency:": "alta latència:",
+  "more alerts in the Steam tab": "avisos més a la pestanya Steam",
+  "new update": "nova actualització",
+  "was": "abans"
 }

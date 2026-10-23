@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI imeshindwa",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Nafuu kwenye orodha yako ya matamanio",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Usisumbue kwa saa 1",
   "Free": "Bila malipo",
@@ -26,10 +25,14 @@
   "Task reminder": "Kikumbusho cha kazi",
   "Turn off do not disturb": "Zima usisumbue",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Ofa kwenye orodha ya matakwa",
   "You were mentioned": "Ulitajwa",
   "certificate expired": "cheti kimeisha muda wake",
   "certificate expires in": "cheti kinaisha muda wake",
   "days": "siku",
   "down:": "chini:",
-  "high latency:": "utulivu wa juu:"
+  "high latency:": "utulivu wa juu:",
+  "more alerts in the Steam tab": "arifa zaidi kwenye kichupo cha Steam",
+  "new update": "sasisho jipya",
+  "was": "awali"
 }

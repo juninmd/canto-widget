@@ -101,6 +101,37 @@ export function steamArtUrl(appid: number): string {
   return `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appid}/capsule_231x87.jpg`;
 }
 
+/** The wide header of a fictitious game; the media scene answers it with a placeholder. */
+export function steamHeaderUrl(appid: number): string {
+  return `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appid}/header.jpg`;
+}
+
+/** The scene's clock is fixed, so "days ago" is counted from it. */
+const SCENE_NOW = Math.floor(NOW.getTime() / 1000);
+
+const steamPlayGame = (appid: number, name: string, total_min: number, recent_min: number, daysAgo: number, installed: boolean) => ({
+  appid,
+  name,
+  art: steamHeaderUrl(appid),
+  cover: `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${appid}/library_600x900.jpg`,
+  total_min,
+  recent_min,
+  last_played: SCENE_NOW - daysAgo * 86_400,
+  installed,
+  size_bytes: installed ? 12e9 + appid % 50 * 1e9 : 0,
+});
+
+const steamNews = (gid: string, appid: number, game: string, title: string, daysAgo: number, lines: string[], fresh: boolean) => ({
+  gid,
+  appid,
+  game,
+  title,
+  url: `https://store.steampowered.com/news/app/${appid}`,
+  date: Math.round(SCENE_NOW - daysAgo * 86_400),
+  lines,
+  fresh,
+});
+
 const steamGame = (
   appid: number,
   name: string,
@@ -374,29 +405,62 @@ export const STEAM = {
       steamGame(900025, "Vale Noturno", "R$ 27,49", "", 0, 71, "mostly_positive", 1310),
     ],
   },
-  steam_recent: {
-    has_key: true,
-    items: [
-      { appid: 900030, name: "Aurora Drift", recent_min: 135, total_min: 4210, art: steamArtUrl(900030) },
-      { appid: 900031, name: "Maré Profunda", recent_min: 78, total_min: 615, art: steamArtUrl(900031) },
-      { appid: 900032, name: "Papiro Quest", recent_min: 42, total_min: 1305, art: steamArtUrl(900032) },
-      { appid: 900033, name: "Forja Tática", recent_min: 21, total_min: 2870, art: steamArtUrl(900033) },
-      { appid: 900034, name: "Lumen Cove", recent_min: 12, total_min: 96, art: steamArtUrl(900034) },
-    ],
-  },
-  steam_library: {
+  steam_play: {
     has_key: true,
     total: 412,
     minutes: 128_400,
+    pages: 18,
+    counts: { all: 412, recent: 5, installed: 23 },
+    hero: steamPlayGame(900030, "Aurora Drift", 42_100, 135, 1, true),
     items: [
-      { appid: 900030, name: "Aurora Drift", total_min: 42_100, art: steamArtUrl(900030) },
-      { appid: 900012, name: "Basalto", total_min: 28_640, art: steamArtUrl(900012) },
-      { appid: 900033, name: "Forja Tática", total_min: 19_320, art: steamArtUrl(900033) },
-      { appid: 900020, name: "Quill Chronicles", total_min: 15_860, art: steamArtUrl(900020) },
-      { appid: 900011, name: "Lumen Cove", total_min: 12_405, art: steamArtUrl(900011) },
-      { appid: 900003, name: "Nimbus Racer", total_min: 9_780, art: steamArtUrl(900003) },
-      { appid: 900005, name: "Papiro Quest", total_min: 7_250, art: steamArtUrl(900005) },
-      { appid: 900002, name: "Maré Profunda", total_min: 5_120, art: steamArtUrl(900002) },
+      steamPlayGame(900030, "Aurora Drift", 42_100, 135, 1, true),
+      steamPlayGame(900031, "Maré Profunda", 5_120, 78, 2, true),
+      steamPlayGame(900033, "Forja Tática", 19_320, 21, 4, true),
+      steamPlayGame(900032, "Papiro Quest", 7_250, 42, 6, false),
+      steamPlayGame(900012, "Basalto", 28_640, 0, 40, true),
+      steamPlayGame(900020, "Quill Chronicles", 15_860, 0, 95, false),
+      steamPlayGame(900011, "Lumen Cove", 12_405, 12, 9, true),
+      steamPlayGame(900003, "Nimbus Racer", 9_780, 0, 300, false),
+      steamPlayGame(900005, "Vento Valley", 3_210, 0, 420, false),
+    ],
+  },
+  steam_news: {
+    unread: 2,
+    items: [
+      steamNews("n1", 900030, "Aurora Drift", "Atualização 2.4: Costa Partida", 0.1, ["Nova região: a Costa Partida, com três chefes", "Modo foto com filtros e poses", "Desempenho até 20% melhor em placas antigas", "Corrige o salvamento automático no capítulo 5"], true),
+      steamNews("n2", 900033, "Forja Tática", "Hotfix 1.8.2", 1, ["Corrige travamento ao abrir o mapa", "Ajusta o recuo do rifle pesado"], true),
+      steamNews("n3", 900031, "Maré Profunda", "Notas da versão 0.9", 4, ["Cooperativo para até 4 pessoas", "Novos peixes no bioma abissal"], false),
+      steamNews("n4", 900012, "Basalto", "Patch de equilíbrio", 9, ["Rebalanceia as classes de suporte"], false),
+    ],
+  },
+  steam_top: {
+    players: 9_412_300,
+    pages: 5,
+    updated: SCENE_NOW,
+    items: [
+      { rank: 1, appid: 900040, name: "Kestrel Arena", art: steamHeaderUrl(900040), players: 1_482_311, peak: 1_702_455, moved: 0, mine: true },
+      { rank: 2, appid: 900041, name: "Basalto", art: steamHeaderUrl(900041), players: 612_904, peak: 781_220, moved: 1, mine: true },
+      { rank: 3, appid: 900042, name: "Tide Runner", art: steamHeaderUrl(900042), players: 398_112, peak: 701_330, moved: -1, mine: false },
+      { rank: 4, appid: 900043, name: "Pedra Alta", art: steamHeaderUrl(900043), players: 201_877, peak: 288_004, moved: 2, mine: false },
+      { rank: 5, appid: 900044, name: "Coral", art: steamHeaderUrl(900044), players: 188_420, peak: 260_119, moved: 0, mine: false },
+      { rank: 6, appid: 900045, name: "Orca Bay", art: steamHeaderUrl(900045), players: 140_392, peak: 203_551, moved: -2, mine: true },
+      { rank: 7, appid: 900046, name: "Vale Noturno", art: steamHeaderUrl(900046), players: 98_233, peak: 121_004, moved: 3, mine: false },
+    ],
+  },
+  steam_wishlist: {
+    total: 48,
+    on_sale: 9,
+    hot: 3,
+    pages: 3,
+    currency: "BRL",
+    items: [
+      steamGame(900050, "Lâmina Silenciosa", "R$ 45,99", "R$ 229,90", 80, 95, "overwhelmingly_positive", 210_400, 18391),
+      steamGame(900051, "Estrada Fria", "R$ 37,49", "R$ 149,99", 75, 88, "very_positive", 64_200, 11250),
+      steamGame(900052, "Papiro Quest", "R$ 7,49", "R$ 29,99", 75, 96, "overwhelmingly_positive", 640, 2250),
+      steamGame(900053, "Controle Remoto", "R$ 26,99", "R$ 89,99", 70, 90, "very_positive", 41_000, 6300),
+      steamGame(900054, "Inscrição", "R$ 19,59", "R$ 48,99", 60, 97, "overwhelmingly_positive", 88_100, 2940),
+      steamGame(900055, "Céu Estrelado", "R$ 179,40", "R$ 299,00", 40, 61, "mixed", 12_300, 11960),
+      steamGame(900056, "Pena Dourada", "R$ 69,99", "", 0, 94, "very_positive", 9_800),
     ],
   },
 };

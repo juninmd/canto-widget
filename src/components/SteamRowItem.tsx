@@ -1,22 +1,23 @@
 import { api, type SteamRow } from "../lib/api";
-import { count, gameTitle, money, reviewLabelKey, reviewTone, steamUrl } from "../lib/steam";
+import { count, gameTitle, HOT, money, reviewLabelKey, reviewTone, steamUrl } from "../lib/steam";
 import { t } from "../i18n";
 import SteamThumb from "./SteamThumb";
 
 const TONE = { good: "text-accent-text", mixed: "text-warn", bad: "text-danger", "": "text-faint" };
 
 /** One game: capsule, title, how the reviews read, and what it costs — with what the discount saves. */
-export default function SteamRowItem({ row, rank, currency }: { row: SteamRow; rank?: number; currency: string }) {
+export default function SteamRowItem({ row, rank, currency, index = 0 }: { row: SteamRow; rank?: number; currency: string; index?: number }) {
+  const hot = row.discount >= HOT;
   const reviews = count(row.review_count);
   const label = reviewLabelKey(row.review_key);
   const title = gameTitle(row);
   return (
-    <li data-steam={row.appid}>
+    <li data-steam={row.appid} style={{ "--i": index } as React.CSSProperties} className="steam-rise">
       <button
         type="button"
         onClick={() => void api.openLink(steamUrl(row.appid)).catch(() => {})}
         title={t("steam.row.open", { name: title })}
-        className="canto-hit group flex w-full items-center gap-2 rounded-lg border border-edge bg-ink/60 p-1.5 text-left hover:bg-hover active:bg-active"
+        className={`canto-hit group flex w-full items-center gap-2 rounded-lg border border-edge bg-ink/60 p-1.5 text-left transition hover:translate-x-0.5 hover:bg-hover active:bg-active ${hot ? "steam-hot-row" : ""}`}
       >
         <SteamThumb art={row.art} name={title} />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -26,7 +27,7 @@ export default function SteamRowItem({ row, rank, currency }: { row: SteamRow; r
             {row.discount > 0 && (
               <span
                 title={t("steam.row.discount", { n: row.discount })}
-                className="canto-pop shrink-0 rounded bg-accent/15 px-1.5 text-[11px] font-semibold text-accent-text"
+                className={`canto-pop shrink-0 rounded px-1.5 text-[11px] font-semibold ${hot ? "steam-hot-badge" : "bg-accent/15 text-accent-text"}`}
               >
                 -{row.discount}%
               </span>

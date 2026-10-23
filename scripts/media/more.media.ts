@@ -17,8 +17,9 @@ async function steamArt(page: Page) {
       const url = String((args as { url?: string })?.url ?? "");
       const appid = Number(url.match(/apps\/(\d+)/)?.[1] ?? 0);
       const hue = (appid * 47) % 360;
+      const [w2, h2] = url.includes("library_600x900") ? [300, 450] : url.includes("header") ? [460, 215] : [231, 87];
       const svg =
-        `<svg xmlns="http://www.w3.org/2000/svg" width="231" height="87">` +
+        `<svg xmlns="http://www.w3.org/2000/svg" width="${w2}" height="${h2}" viewBox="0 0 231 87" preserveAspectRatio="none">` +
         `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">` +
         `<stop offset="0" stop-color="hsl(${hue},68%,46%)"/>` +
         `<stop offset="1" stop-color="hsl(${(hue + 70) % 360},68%,22%)"/>` +
@@ -84,21 +85,49 @@ test("activity: week, off and a wide window", async ({ browser }) => {
   await shoot(wide, "activity-wide");
 });
 
-test("steam: wishlist deals, the ranking, the recent games, the library and the catalog", async ({ browser }) => {
+test("steam: play now in three views, updates, wishlist, most played, deals, top sellers and the catalog", async ({ browser }) => {
   const page = await fullScene(browser, { fixed: STEAM, before: steamArt });
   await openTab(page, "Steam", 1200);
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "docs/prints/app/119-steam-jogue-agora.png", omitBackground: true });
+  await page.getByRole("button", { name: "lista" }).click();
+  await settle(page, 900);
+  // The rows rise in with CSS animations, which run on the real clock, not the frozen one.
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "docs/prints/app/89-steam-recentes.png", omitBackground: true });
+  await page.getByRole("button", { name: "grade" }).click();
+  await settle(page, 900);
+  // The rows rise in with CSS animations, which run on the real clock, not the frozen one.
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "docs/prints/app/98-steam-biblioteca.png", omitBackground: true });
+  await page.getByRole("button", { name: "cards" }).click();
+  await page.getByRole("tab", { name: "atualizações" }).click();
+  await settle(page, 900);
+  // The rows rise in with CSS animations, which run on the real clock, not the frozen one.
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "docs/prints/app/120-steam-atualizacoes.png", omitBackground: true });
+  await page.getByRole("tab", { name: "desejos" }).click();
+  await settle(page, 1200);
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "docs/prints/app/121-steam-desejos.png", omitBackground: true });
+  await page.getByRole("tab", { name: "mais jogados" }).click();
+  await settle(page, 1200);
+  await page.waitForTimeout(1500);
+  await page.screenshot({ path: "docs/prints/app/122-steam-mais-jogados.png", omitBackground: true });
+  await page.getByRole("tab", { name: "ofertas" }).click();
+  await settle(page, 900);
+  // The rows rise in with CSS animations, which run on the real clock, not the frozen one.
+  await page.waitForTimeout(1500);
   await page.screenshot({ path: "docs/prints/app/87-steam.png", omitBackground: true });
   await page.getByRole("tab", { name: "em alta" }).click();
   await settle(page, 900);
+  // The rows rise in with CSS animations, which run on the real clock, not the frozen one.
+  await page.waitForTimeout(1500);
   await page.screenshot({ path: "docs/prints/app/88-steam-em-alta.png", omitBackground: true });
-  await page.getByRole("tab", { name: "jogue agora" }).click();
-  await settle(page, 900);
-  await page.screenshot({ path: "docs/prints/app/89-steam-recentes.png", omitBackground: true });
-  await page.getByRole("tab", { name: "biblioteca" }).click();
-  await settle(page, 900);
-  await page.screenshot({ path: "docs/prints/app/98-steam-biblioteca.png", omitBackground: true });
   await page.getByRole("tab", { name: "catálogo" }).click();
   await settle(page, 900);
+  // The rows rise in with CSS animations, which run on the real clock, not the frozen one.
+  await page.waitForTimeout(1500);
   await page.screenshot({ path: "docs/prints/app/90-steam-catalogo.png", omitBackground: true });
 });
 

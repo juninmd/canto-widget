@@ -76,7 +76,7 @@ const MIN = 24;
 
 /** Sub-tabs a tab opens on top of the first one, so the sweep visits every reachable pane. */
 const SUB_TABS: Record<string, string[]> = {
-  Steam: ["em alta", "jogue agora", "biblioteca", "catálogo"],
+  Steam: ["atualizações", "desejos", "ofertas", "mais jogados", "em alta", "catálogo"],
 };
 
 /** Buttons, tabs and selects under 24 CSS px (WCAG 2.5.8), skipping what is not on screen. */
@@ -127,18 +127,40 @@ for (const density of ["compacta", "padrao"]) {
               },
             ],
           },
-          steam_recent: { has_key: true, items: [] },
           steam_trending: { has_more: false, currency: "BRL", items: [] },
           steam_catalog: { has_more: false, currency: "BRL", items: [] },
-          steam_library: {
+          steam_play: {
             has_key: true,
-            total: 2,
-            minutes: 4000,
+            total: 1,
+            minutes: 3000,
+            pages: 2,
+            counts: { all: 1, recent: 1, installed: 1 },
+            hero: null,
             items: [
-              { appid: 900002, name: "Maré Profunda", total_min: 3000, art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900002/capsule_231x87.jpg" },
-              { appid: 900003, name: "Nimbus Racer", total_min: 1000, art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900003/capsule_231x87.jpg" },
+              {
+                appid: 900002,
+                name: "Maré Profunda",
+                art: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900002/header.jpg",
+                cover: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/900002/library_600x900.jpg",
+                total_min: 3000,
+                recent_min: 60,
+                last_played: 1_790_000_000,
+                installed: true,
+                size_bytes: 12e9,
+              },
             ],
           },
+          steam_news: {
+            unread: 1,
+            items: [{ gid: "n1", appid: 900002, game: "Maré Profunda", title: "Atualização 1.2", url: "https://store.steampowered.com/news/app/900002", date: 1_790_000_000, lines: ["Novo mapa"], fresh: true }],
+          },
+          steam_top: {
+            players: 1000,
+            pages: 2,
+            updated: 0,
+            items: [{ rank: 1, appid: 900003, name: "Nimbus Racer", art: "", players: 1000, peak: 2000, moved: 1, mine: true }],
+          },
+          steam_wishlist: { total: 1, on_sale: 0, hot: 0, pages: 2, currency: "BRL", items: [] },
           harness_list: agents,
           weather_get: {
             place: { city: "Aurora", country: "Brasil", lat: -23.5, lon: -46.6 },

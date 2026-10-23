@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI απέτυχε",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Φθηνότερα στη λίστα επιθυμιών σας",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Μην ενοχλείτε για 1 ώρα",
   "Free": "Δωρεάν",
@@ -26,10 +25,14 @@
   "Task reminder": "Υπενθύμιση εργασιών",
   "Turn off do not disturb": "Απενεργοποιήστε το μην ενοχλείτε",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Προσφορά στη λίστα επιθυμιών",
   "You were mentioned": "Αναφέρθηκες",
   "certificate expired": "πιστοποιητικό έληξε",
   "certificate expires in": "το πιστοποιητικό λήγει σε",
   "days": "ημέρες",
   "down:": "κάτω:",
-  "high latency:": "υψηλή καθυστέρηση:"
+  "high latency:": "υψηλή καθυστέρηση:",
+  "more alerts in the Steam tab": "ειδοποιήσεις ακόμη στην καρτέλα Steam",
+  "new update": "νέα ενημέρωση",
+  "was": "πριν"
 }

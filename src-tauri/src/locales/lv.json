@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI neizdevās",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Lētāk jūsu vēlmju sarakstā",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Netraucēt 1h",
   "Free": "Bezmaksas",
@@ -26,10 +25,14 @@
   "Task reminder": "Uzdevuma atgādinājums",
   "Turn off do not disturb": "Izslēdziet režīmu Netraucēt",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Atlaide vēlmju sarakstā",
   "You were mentioned": "Tevi pieminēja",
   "certificate expired": "sertifikāta derīguma termiņš beidzies",
   "certificate expires in": "sertifikāta derīguma termiņš beidzas",
   "days": "dienas",
   "down:": "uz leju:",
-  "high latency:": "augsts latentums:"
+  "high latency:": "augsts latentums:",
+  "more alerts in the Steam tab": "paziņojumi vairāk Steam cilnē",
+  "new update": "jauns atjauninājums",
+  "was": "bija"
 }

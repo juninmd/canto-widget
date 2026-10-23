@@ -3,7 +3,6 @@
   "Assigned to you": "Assigned to you",
   "CI failed": "CI mislyktes",
   "Changes requested": "Changes requested",
-  "Cheaper on your wishlist": "Billigere på ønskelisten din",
   "Day summary": "Day summary",
   "Do not disturb for 1 h": "Ikke forstyrr i 1 time",
   "Free": "Gratis",
@@ -26,10 +25,14 @@
   "Task reminder": "Oppgavepåminnelse",
   "Turn off do not disturb": "Slå av ikke forstyrr",
   "Updates on your PRs": "Updates on your PRs",
+  "Wishlist sale": "Salg på ønskelisten din",
   "You were mentioned": "Du ble nevnt",
   "certificate expired": "sertifikatet utløpt",
   "certificate expires in": "sertifikatet utløper om",
   "days": "dager",
   "down:": "ned:",
-  "high latency:": "høy latens:"
+  "high latency:": "høy latens:",
+  "more alerts in the Steam tab": "flere varsler i Steam-fanen",
+  "new update": "ny oppdatering",
+  "was": "før"
 }

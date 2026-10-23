@@ -375,13 +375,17 @@ acțiune după nume: accesați o filă, o nouă sarcină sau o notă, alăturaț
 |---|
 | ![AI models tab with fictitious models ranked by Intelligence Index: rank, creator, "new" and "up" badges, score bar, price per 1M tokens and tokens per second, sort toggle and alert bell](docs/prints/app/47-modelos-ia.png) |
 
-| Steam: cele mai vândute, numerotate | Steam: ultimele cinci jocuri jucate, cu ambele timpi de joc |
+| Steam: the changelog of your games' updates | Steam: the wishlist with sales of 75% or more highlighted |
 |---|---|
-| ![Steam tab, trending sub-tab: fictitious games ranked #1 to #5 with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) | ![Steam tab, play now sub-tab: five fictitious games with capsule art, the time in the last two weeks and the total time](docs/prints/app/89-steam-recentes.png) |
+| ![Steam tab, updates sub-tab: fictitious patch notes with game art, unread dots, how long ago, one expanded with its list of changes and a link to the full notes](docs/prints/app/120-steam-atualizacoes.png) | ![Steam tab, wishlist sub-tab: counters for games on the list, on sale and at 75% or more, sort chips and fictitious games with discount badges, old and new prices and what each saves](docs/prints/app/121-steam-desejos.png) |
 
-| Steam: catalogul după rating, cu „încărcați mai mult” | | Steam: the library, most played first, with a search box |
+| Steam: the most played games right now | Steam: play now as a list and as a grid |
 |---|---|
-| ![Steam tab, catalog sub-tab: fictitious games ordered by review score, each with capsule, score, review count and price, and a load more button under the list](docs/prints/app/90-steam-catalogo.png) | ![Steam tab, library sub-tab: fictitious owned games most played first, with capsule art, the total hours of each and a summary line above, plus a search box and a load more button](docs/prints/app/98-steam-biblioteca.png) |
+| ![Steam tab, most played sub-tab: total players in the top 100, an only mine toggle and fictitious games ranked with player counts, today's peak, rank movement and a badge on the ones you own](docs/prints/app/122-steam-mais-jogados.png) | ![Steam tab, play now sub-tab in the grid view: fictitious game covers in columns with recent and installed badges](docs/prints/app/98-steam-biblioteca.png) |
+
+| Steam: wishlist deals | Steam: the top sellers, numbered |
+|---|---|
+| ![Steam tab, deals sub-tab: fictitious games with capsule art, review score, discount badges, crossed-out prices and the new price in the chosen currency](docs/prints/app/87-steam.png) | ![Steam tab, trending sub-tab: fictitious games ranked with capsule art, review score, review count and price](docs/prints/app/88-steam-em-alta.png) |
 
 | O singură suprapunere de alerte pentru tot ce este în așteptare: întreruperi, întâlniri, sarcini și noi modele AI |
 |---|

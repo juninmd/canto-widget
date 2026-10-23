@@ -41,6 +41,7 @@ pub mod cmd_reads;
 pub mod cmd_report;
 pub mod cmd_status;
 pub mod cmd_steam;
+pub mod cmd_steam_more;
 pub mod cmd_sync;
 pub mod cmd_traffic;
 pub mod cmd_traffic_setup;
@@ -138,13 +139,18 @@ pub mod steam_alert;
 pub mod steam_feed;
 pub mod steam_id;
 pub mod steam_lists;
+pub mod steam_local;
+pub mod steam_news;
 pub mod steam_parse;
+pub mod steam_play;
 pub mod steam_player;
 pub mod steam_region;
 pub mod steam_review;
 pub mod steam_store;
+pub mod steam_top;
 pub mod steam_url;
 pub mod steam_watch;
+pub mod steam_wish;
 pub mod store;
 pub mod subtask;
 pub mod sync;
@@ -223,6 +229,7 @@ pub fn run() {
             app.manage(cmd_reads::ReadsState::load(&dir));
             app.manage(cmd_models::ModelsLock::default());
             app.manage(cmd_steam::SteamLock::default());
+            app.manage(cmd_steam_more::TopHistory::default());
             app.manage(do_not_disturb::DoNotDisturb::load(&dir));
             app.manage(review_alert::ReviewAlerts::load(&dir));
             app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
@@ -459,8 +466,12 @@ pub fn run() {
             cmd_steam::steam_deals,
             cmd_steam::steam_trending,
             cmd_steam::steam_catalog,
-            cmd_steam::steam_recent,
-            cmd_steam::steam_library,
+            cmd_steam_more::steam_play,
+            cmd_steam_more::steam_launch,
+            cmd_steam_more::steam_news,
+            cmd_steam_more::steam_news_read,
+            cmd_steam_more::steam_top,
+            cmd_steam_more::steam_wishlist,
             cmd_steam::steam_image,
             cmd_traffic::traffic_get,
             cmd_traffic::traffic_departures,
