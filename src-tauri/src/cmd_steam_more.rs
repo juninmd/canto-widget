@@ -204,10 +204,25 @@ pub async fn steam_wishlist(app: AppHandle, page: usize, sort: String, force: bo
         let sorted = wish::sorted(&entries, &sort);
         let slice = wish::page_ids(&sorted, page);
         let ids: Vec<u32> = slice.iter().map(|(id, _)| *id).collect();
-        let info = feed::deals_info(&ids, &region).map_err(failed)?;
+        // The titles and scores of a page are the slow part of paging back and forth, so they are cached too.
+        let info_key = format!("wishinfo:{}:{}", region.code, crate::steam_url::joined(&ids));
+        let info: HashMap<u32, (String, Option<u8>, String, u32)> =
+            state.steam.get_or(&info_key, force, now_ms(), || {
+                let found = feed::deals_info(&ids, &region).map_err(failed)?;
+                Ok(found.into_iter().map(|(id, d)| (id, (d.name, d.review, d.review_key, d.review_count))).collect())
+            })?;
+        let deal = |id: &u32| {
+            info.get(id).map(|(name, review, review_key, review_count)| feed::Deal {
+                name: name.clone(),
+                art: String::new(),
+                review: *review,
+                review_key: review_key.clone(),
+                review_count: *review_count,
+            })
+        };
         let (total, on_sale, hot) = wish::summary(&entries);
         Ok(SteamWishlist {
-            items: slice.iter().map(|(id, price)| wish::row(*id, price.as_ref(), info.get(id))).collect(),
+            items: slice.iter().map(|(id, price)| wish::row(*id, price.as_ref(), deal(id).as_ref())).collect(),
             total,
             on_sale,
             hot,
