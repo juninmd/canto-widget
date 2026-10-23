@@ -33,6 +33,7 @@ pub mod cmd_gitlab;
 pub mod cmd_google;
 pub mod cmd_harness;
 pub mod cmd_health;
+pub mod cmd_keep;
 pub mod cmd_market;
 pub mod cmd_mentions;
 pub mod cmd_models;
@@ -87,6 +88,7 @@ pub mod health_watch;
 pub mod hello;
 #[cfg(target_os = "macos")]
 pub mod hello_mac;
+pub mod keep_import;
 pub mod lang;
 pub mod market;
 pub mod meet;
@@ -308,6 +310,7 @@ pub fn run() {
             cmd_notes::note_save,
             cmd_notes::note_pin,
             cmd_notes::note_export_md,
+            cmd_keep::notes_import_keep,
             note_images::note_image_save,
             note_images::note_image_get,
             routine::task_set_schedule,

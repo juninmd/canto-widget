@@ -243,7 +243,10 @@ The **Drive** tab shows the **storage in use** as a bar, one-click blank **Doc, 
 **today, yesterday, this week and earlier**. Each file shows its kind, who edited it last and its size, with
 **open**, **copy link** and **open folder**. Canto only reads file
 **metadata** (`drive.metadata.readonly`): contents never reach it. Google Keep has no API for personal accounts,
-so the quick capture goes to **Google Tasks** instead.
+so the quick capture goes to **Google Tasks** instead, and **Notes** imports Keep from a
+[Google Takeout](https://takeout.google.com) export: pick the `.json` files of its Keep folder and each note
+arrives with its checklist, labels (as tags), pin and dates, tagged `#keep`; importing again skips what is
+already there and the trash is left out.
 
 </td>
 <td><img src="docs/prints/app/103-drive.png" alt="Drive tab: 4.2 GB of 15 GB storage bar, new Doc/Sheet/Slides buttons, search, recent/starred/shared/mine filters, kind chips and files grouped under Today and Yesterday with folder, copy-link and open buttons"></td>
