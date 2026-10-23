@@ -3,9 +3,10 @@ use tauri::{AppHandle, Manager};
 
 use crate::blocking::run;
 use crate::contacts::{self, ContactsView};
-use crate::drive_files::{self, DriveFile};
+use crate::drive_files::{self, DriveFile, DriveQuota};
 use crate::error::Result;
 use crate::gmail::{self, GmailSummary};
+use crate::gmail_actions;
 use crate::gtasks::{self, GTask};
 use crate::vault::AppState;
 
@@ -14,13 +15,21 @@ fn token(app: &AppHandle) -> Result<String> {
 }
 
 #[tauri::command]
-pub async fn gmail_summary(app: AppHandle) -> Result<GmailSummary> {
-    run(move || gmail::summary(&token(&app)?)).await
+pub async fn gmail_summary(app: AppHandle, view: String, search: String) -> Result<GmailSummary> {
+    run(move || {
+        gmail_actions::view_query(&view, &search)?;
+        gmail::list(&token(&app)?, &view, &search)
+    })
+    .await
 }
 
 #[tauri::command]
-pub async fn gmail_mark_read(app: AppHandle, id: String) -> Result<()> {
-    run(move || gmail::mark_read(&token(&app)?, &id)).await
+pub async fn gmail_modify(app: AppHandle, ids: Vec<String>, action: String) -> Result<()> {
+    run(move || {
+        gmail_actions::check_batch(&ids, &action)?;
+        gmail_actions::modify(&token(&app)?, &ids, &action)
+    })
+    .await
 }
 
 #[tauri::command]
@@ -47,12 +56,17 @@ pub async fn gtasks_complete(app: AppHandle, id: String) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn gdrive_list(app: AppHandle, filter: String, search: String) -> Result<Vec<DriveFile>> {
+pub async fn gdrive_list(app: AppHandle, filter: String, kind: String, search: String) -> Result<Vec<DriveFile>> {
     run(move || {
-        drive_files::query(&filter, &search)?;
-        drive_files::list(&token(&app)?, &filter, &search)
+        drive_files::query(&filter, &kind, &search)?;
+        drive_files::list(&token(&app)?, &filter, &kind, &search)
     })
     .await
+}
+
+#[tauri::command]
+pub async fn gdrive_quota(app: AppHandle) -> Result<DriveQuota> {
+    run(move || drive_files::quota(&token(&app)?)).await
 }
 
 #[tauri::command]

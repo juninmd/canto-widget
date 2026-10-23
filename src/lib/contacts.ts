@@ -1,7 +1,7 @@
 import { LOCALE } from "../i18n";
 import type { Contact } from "./api";
 
-export type ContactFilter = "all" | "starred" | "email" | "phone";
+export type ContactFilter = "all" | "starred" | "email" | "phone" | "birthday";
 
 const plain = (text: string) => text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 const digits = (text: string) => text.replace(/\D/g, "");
@@ -21,6 +21,7 @@ export function filterContacts(items: Contact[], filter: ContactFilter, query: s
     if (filter === "starred" && !c.starred) return false;
     if (filter === "email" && c.emails.length === 0) return false;
     if (filter === "phone" && c.phones.length === 0) return false;
+    if (filter === "birthday" && !c.birthday) return false;
     return matchesContact(c, query);
   });
 }

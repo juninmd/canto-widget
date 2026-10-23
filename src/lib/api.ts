@@ -315,12 +315,18 @@ export type WeatherView = {
   error: string | null;
 };
 
-/** Gmail: the inbox's unread count and the unread messages Gmail marked as important (`date` in ms). */
-export type GmailMail = { id: string; from: string; subject: string; snippet: string; date: number; link: string };
+/** Gmail: the inbox's unread count and the newest mail of one view (`date` in ms). */
+export type GmailMail = { id: string; from: string; subject: string; snippet: string; date: number; link: string; unread: boolean; starred: boolean };
 export type GmailSummary = { unread: number; important: GmailMail[] };
+export type GmailView = "important" | "unread" | "starred" | "inbox";
+export type GmailAction = "read" | "unread" | "star" | "unstar" | "archive" | "trash";
 /** An open Google Tasks task; `due` is `YYYY-MM-DD` or empty. */
 export type GTask = { id: string; title: string; due: string };
-export type DriveFilter = "recent" | "starred" | "shared";
+export type DriveFilter = "recent" | "starred" | "shared" | "mine";
+/** Empty for any kind. */
+export type DriveKind = "" | "doc" | "sheet" | "slide" | "pdf";
+/** Bytes; `limit` is 0 when the plan is unlimited. */
+export type DriveQuota = { used: number; limit: number };
 /** A Drive file's metadata; `editor` is empty when the user changed it last, `link` empty when not Google's. */
 export type DriveFile = {
   id: string;
@@ -330,6 +336,10 @@ export type DriveFile = {
   modified: string;
   starred: boolean;
   editor: string;
+  /** The parent folder on drive.google.com, or empty. */
+  folder: string;
+  /** Bytes; 0 for Google's own documents. */
+  size: number;
 };
 /** One Google contact; `link` is empty when the id isn't one Google would hand out. */
 export type Contact = {
@@ -612,14 +622,15 @@ export const api = {
   harnessList: (force = false) => invoke<HarnessView[]>("harness_list", { force }),
 
   /** Gmail, Google Tasks and Drive reuse the Agenda's Google login; Rust holds the token. */
-  gmailSummary: () => invoke<GmailSummary>("gmail_summary"),
-  gmailMarkRead: (id: string) => invoke<void>("gmail_mark_read", { id }),
+  gmailSummary: (view: GmailView, search: string) => invoke<GmailSummary>("gmail_summary", { view, search }),
+  gmailModify: (ids: string[], action: GmailAction) => invoke<void>("gmail_modify", { ids, action }),
   gmailAlertsGet: () => invoke<boolean>("gmail_alerts_get"),
   gmailAlertsSet: (on: boolean) => invoke<boolean>("gmail_alerts_set", { on }),
   gtasksList: () => invoke<GTask[]>("gtasks_list"),
   gtasksAdd: (title: string) => invoke<GTask>("gtasks_add", { title }),
   gtasksComplete: (id: string) => invoke<void>("gtasks_complete", { id }),
-  gdriveList: (filter: DriveFilter, search: string) => invoke<DriveFile[]>("gdrive_list", { filter, search }),
+  gdriveList: (filter: DriveFilter, kind: DriveKind, search: string) => invoke<DriveFile[]>("gdrive_list", { filter, kind, search }),
+  gdriveQuota: () => invoke<DriveQuota>("gdrive_quota"),
   contactsList: () => invoke<ContactsView>("contacts_list"),
 
   /** Tab choices kept in a file as well: the webview's storage can come back empty after an update. */

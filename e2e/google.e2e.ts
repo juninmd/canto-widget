@@ -9,7 +9,7 @@ const ALL_TABS = [
 const GOOGLE = {
   gmail_summary: {
     unread: 27,
-    important: [{ id: "m1", from: "Marina Lopes", subject: "Contrato revisado", snippet: "Consegue assinar?", date: Date.now(), link: "https://mail.google.com/mail/u/0/#inbox/t1" }],
+    important: [{ id: "m1", from: "Marina Lopes", subject: "Contrato revisado", snippet: "Consegue assinar?", date: Date.now(), link: "https://mail.google.com/mail/u/0/#inbox/t1", unread: true, starred: false }],
   },
   gmail_alerts_get: false,
   gtasks_list: [{ id: "g1", title: "Renovar seguro do carro", due: "" }],
@@ -30,8 +30,9 @@ const GOOGLE = {
     ],
   },
   gdrive_list: [
-    { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: new Date().toISOString(), starred: true, editor: "" },
+    { id: "d1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/d1/edit", modified: new Date().toISOString(), starred: true, editor: "", folder: "", size: 0 },
   ],
+  gdrive_quota: { used: 1_073_741_824, limit: 16_106_127_360 },
 };
 
 test("Gmail, Drive and Google Tasks work from their tabs", async ({ page }) => {
@@ -49,7 +50,7 @@ test("Gmail, Drive and Google Tasks work from their tabs", async ({ page }) => {
   await expect(page.getByText("Contrato revisado")).toHaveCount(0);
 
   await goTab(page, "Drive");
-  await page.getByRole("button", { name: "abrir" }).click();
+  await page.getByRole("button", { name: "abrir", exact: true }).click();
   await expect.poll(async () => (await calls(page)).find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://docs.google.com/document/d/d1/edit" });
 });
 

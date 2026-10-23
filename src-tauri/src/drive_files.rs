@@ -1,12 +1,13 @@
-//! Google Drive files: recent, starred or shared with the user, optionally by name. Metadata only.
+//! Google Drive files: recent, starred, shared or owned, by kind and name, plus the storage quota. Metadata only.
 use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, Result};
 use crate::google_api::{client, send};
 
 const API: &str = "https://www.googleapis.com/drive/v3/files";
-const FIELDS: &str =
-    "files(id,name,mimeType,webViewLink,modifiedTime,starred,lastModifyingUser/displayName,lastModifyingUser/me)";
+const ABOUT: &str = "https://www.googleapis.com/drive/v3/about";
+const FIELDS: &str = "files(id,name,mimeType,webViewLink,modifiedTime,starred,parents,size,\
+lastModifyingUser/displayName,lastModifyingUser/me)";
 const SEARCH_MAX: usize = 100;
 
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
@@ -20,6 +21,31 @@ pub struct DriveFile {
     pub starred: bool,
     /// Who changed it last; empty when it was the user.
     pub editor: String,
+    /// The folder it lives in, on drive.google.com; empty when Drive doesn't say.
+    pub folder: String,
+    /// Bytes; 0 for Google's own documents, which don't count against the quota.
+    pub size: u64,
+}
+
+/// Bytes used and the plan's limit; `limit` is 0 when the storage is unlimited.
+#[derive(Debug, Clone, Default, Serialize, PartialEq)]
+pub struct DriveQuota {
+    pub used: u64,
+    pub limit: u64,
+}
+
+#[derive(Deserialize)]
+struct About {
+    #[serde(rename = "storageQuota", default)]
+    storage_quota: RawQuota,
+}
+
+#[derive(Deserialize, Default)]
+struct RawQuota {
+    #[serde(default)]
+    limit: String,
+    #[serde(default)]
+    usage: String,
 }
 
 #[derive(Deserialize)]
@@ -43,6 +69,11 @@ pub(crate) struct RawFile {
     starred: bool,
     #[serde(rename = "lastModifyingUser", default)]
     last_modifying_user: Option<User>,
+    #[serde(default)]
+    parents: Vec<String>,
+    /// Drive sends int64 as a string.
+    #[serde(default)]
+    size: String,
 }
 
 #[derive(Deserialize)]
@@ -76,8 +107,16 @@ fn safe_link(link: &str) -> String {
 impl RawFile {
     pub(crate) fn into_file(self) -> DriveFile {
         let editor = self.last_modifying_user.filter(|u| !u.me).map(|u| u.display_name).unwrap_or_default();
+        let folder = self
+            .parents
+            .first()
+            .filter(|p| crate::google_api::valid_id(p))
+            .map(|p| format!("https://drive.google.com/drive/folders/{p}"))
+            .unwrap_or_default();
         DriveFile {
             kind: kind_of(&self.mime_type).into(),
+            folder,
+            size: self.size.parse().unwrap_or(0),
             link: safe_link(&self.web_view_link),
             id: self.id,
             name: self.name,
@@ -88,15 +127,29 @@ impl RawFile {
     }
 }
 
-/// The Drive `q` expression and its order for a filter (`recent`, `starred`, `shared`) and a name search.
-pub fn query(filter: &str, search: &str) -> Result<(String, &'static str)> {
+fn invalid() -> AppError {
+    AppError::Config(crate::lang::tr("filtro inválido", "invalid filter").into())
+}
+
+/// The Drive `q` expression and its order for a filter (`recent`, `starred`, `shared`, `mine`), a kind (empty for
+/// any) and a name search.
+pub fn query(filter: &str, kind: &str, search: &str) -> Result<(String, &'static str)> {
     let (extra, order) = match filter {
         "recent" => ("", "recency desc"),
         "starred" => (" and starred = true", "recency desc"),
         "shared" => (" and sharedWithMe = true", "sharedWithMeTime desc"),
-        _ => return Err(AppError::Config(crate::lang::tr("filtro inválido", "invalid filter").into())),
+        "mine" => (" and 'me' in owners", "recency desc"),
+        _ => return Err(invalid()),
     };
-    let mut q = format!("trashed = false and mimeType != 'application/vnd.google-apps.folder'{extra}");
+    let mime = match kind {
+        "" => "",
+        "doc" => " and mimeType = 'application/vnd.google-apps.document'",
+        "sheet" => " and mimeType = 'application/vnd.google-apps.spreadsheet'",
+        "slide" => " and mimeType = 'application/vnd.google-apps.presentation'",
+        "pdf" => " and mimeType = 'application/pdf'",
+        _ => return Err(invalid()),
+    };
+    let mut q = format!("trashed = false and mimeType != 'application/vnd.google-apps.folder'{extra}{mime}");
     let search: String = search.trim().chars().take(SEARCH_MAX).collect();
     if !search.is_empty() {
         q.push_str(&format!(" and name contains '{}'", search.replace('\\', "\\\\").replace('\'', "\\'")));
@@ -104,44 +157,22 @@ pub fn query(filter: &str, search: &str) -> Result<(String, &'static str)> {
     Ok((q, order))
 }
 
-pub fn list(token: &str, filter: &str, search: &str) -> Result<Vec<DriveFile>> {
-    let (q, order) = query(filter, search)?;
+pub fn list(token: &str, filter: &str, kind: &str, search: &str) -> Result<Vec<DriveFile>> {
+    let (q, order) = query(filter, kind, search)?;
     let params = [("q", q.as_str()), ("orderBy", order), ("pageSize", "30"), ("fields", FIELDS)];
     let list: FileList = send("drive", client()?.get(API).bearer_auth(token).query(&params))?;
     Ok(list.files.into_iter().map(RawFile::into_file).collect())
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn filters_become_drive_queries_and_a_search_cannot_break_out_of_its_quotes() {
-        let (q, order) = query("shared", "").unwrap();
-        assert!(q.ends_with("and sharedWithMe = true"), "{q}");
-        assert_eq!(order, "sharedWithMeTime desc");
-        let (q, _) = query("recent", " d'água \\ ").unwrap();
-        assert!(q.ends_with(r"and name contains 'd\'água \\'"), "{q}");
-        assert!(query("trashed", "").is_err());
-    }
-
-    #[test]
-    fn a_file_keeps_its_kind_editor_and_only_a_google_link() {
-        let raw: RawFile = serde_json::from_str(
-            r#"{"id": "1", "name": "Roadmap Q4", "mimeType": "application/vnd.google-apps.document",
-                "webViewLink": "https://docs.google.com/document/d/1/edit", "starred": true,
-                "modifiedTime": "2026-10-20T14:20:00Z", "lastModifyingUser": {"displayName": "Rafael", "me": false}}"#,
-        )
-        .unwrap();
-        let file = raw.into_file();
-        assert_eq!((file.kind.as_str(), file.editor.as_str(), file.starred), ("doc", "Rafael", true));
-        assert_eq!(file.link, "https://docs.google.com/document/d/1/edit");
-        let mine: RawFile = serde_json::from_str(
-            r#"{"id": "2", "mimeType": "image/png", "webViewLink": "javascript:alert(1)",
-                "lastModifyingUser": {"displayName": "Eu", "me": true}}"#,
-        )
-        .unwrap();
-        let file = mine.into_file();
-        assert_eq!((file.kind.as_str(), file.editor.as_str(), file.link.as_str()), ("other", "", ""));
-    }
+fn into_quota(raw: RawQuota) -> DriveQuota {
+    DriveQuota { used: raw.usage.parse().unwrap_or(0), limit: raw.limit.parse().unwrap_or(0) }
 }
+
+pub fn quota(token: &str) -> Result<DriveQuota> {
+    let about: About = send("drive", client()?.get(ABOUT).bearer_auth(token).query(&[("fields", "storageQuota")]))?;
+    Ok(into_quota(about.storage_quota))
+}
+
+#[cfg(test)]
+#[path = "drive_files_tests.rs"]
+mod tests;

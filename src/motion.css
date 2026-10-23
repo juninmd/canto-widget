@@ -172,6 +172,42 @@
     animation: canto-fade 400ms ease-out backwards;
   }
 
+  .canto-archive {
+    animation: canto-archive 150ms var(--ease-sair) forwards;
+  }
+  .canto-trash {
+    animation: canto-trash 150ms var(--ease-sair) forwards;
+  }
+  .canto-star {
+    animation: canto-star 480ms cubic-bezier(0.3, 1.2, 0.5, 1);
+  }
+  .canto-flash {
+    animation: canto-flash 900ms ease-out;
+  }
+  .canto-bar-up {
+    animation: canto-bar-up 260ms cubic-bezier(0.3, 1.2, 0.5, 1) backwards;
+  }
+  .canto-float {
+    animation: canto-float 3.2s ease-in-out infinite;
+  }
+  .canto-wiggle {
+    transform-origin: 50% 80%;
+    animation: canto-wiggle 1.8s ease-in-out infinite;
+  }
+  .canto-stack {
+    animation: canto-pop 420ms cubic-bezier(0.3, 1.4, 0.5, 1) calc(var(--i, 0) * 70ms) backwards;
+  }
+  .canto-unfold {
+    transform-origin: top;
+    animation: canto-unfold 240ms var(--ease-entrar) backwards;
+  }
+  .canto-lift {
+    transition: transform 200ms var(--ease-entrar), background-color 200ms var(--ease-entrar);
+  }
+  .canto-lift:hover {
+    transform: translateX(2px);
+  }
+
   .canto-box:checked::after {
     animation: canto-check 260ms cubic-bezier(0.3, 1.2, 0.5, 1) backwards;
   }
@@ -329,5 +365,63 @@
 @keyframes canto-check {
   from {
     transform: rotate(45deg) scale(0);
+  }
+}
+@keyframes canto-archive {
+  to {
+    opacity: 0;
+    transform: translateX(-70%);
+  }
+}
+@keyframes canto-trash {
+  to {
+    opacity: 0;
+    transform: translateY(30%) scale(0.85) rotate(-3deg);
+  }
+}
+@keyframes canto-star {
+  0% {
+    transform: rotate(-90deg) scale(0.3);
+  }
+  60% {
+    transform: rotate(12deg) scale(1.35);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes canto-flash {
+  from {
+    background-color: color-mix(in oklab, var(--color-accent) 22%, transparent);
+  }
+}
+@keyframes canto-bar-up {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+@keyframes canto-float {
+  50% {
+    transform: translateY(-4px) rotate(-4deg);
+  }
+}
+@keyframes canto-wiggle {
+  0%,
+  60%,
+  100% {
+    transform: none;
+  }
+  70% {
+    transform: rotate(-12deg);
+  }
+  80% {
+    transform: rotate(10deg);
+  }
+}
+@keyframes canto-unfold {
+  from {
+    opacity: 0;
+    transform: scaleY(0.85) translateY(-4px);
   }
 }

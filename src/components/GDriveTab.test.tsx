@@ -6,13 +6,14 @@ type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
 
 const FILES: DriveFile[] = [
-  { id: "1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/1/edit", modified: "2026-10-01T14:20:00Z", starred: true, editor: "" },
-  { id: "2", name: "Kickoff Vértice", kind: "slide", link: "", modified: "2026-10-02T09:00:00Z", starred: false, editor: "Rafael Prado" },
+  { id: "1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/1/edit", modified: "2026-10-01T14:20:00Z", starred: true, editor: "", folder: "https://drive.google.com/drive/folders/f1", size: 0 },
+  { id: "2", name: "Kickoff Vértice", kind: "slide", link: "", modified: "2026-10-02T09:00:00Z", starred: false, editor: "Rafael Prado", folder: "", size: 2_202_009 },
 ];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
     calls.push({ cmd, args });
+    if (cmd === "gdrive_quota") return Promise.resolve({ used: 4_509_715_660, limit: 16_106_127_360 });
     return Promise.resolve(cmd === "gdrive_list" ? FILES : null);
   },
 }));
@@ -25,24 +26,52 @@ beforeEach(() => {
 afterEach(cleanup);
 
 test("recent files show their kind, who edited them and open in the browser", async () => {
-  render(<GDriveTab />);
+  render(<GDriveTab onNotice={() => {}} />);
   expect(await screen.findByText("Roadmap Q4 2026")).toBeTruthy();
   expect(screen.getByText("DOC")).toBeTruthy();
   expect(screen.getByText("APRES")).toBeTruthy();
   expect(screen.getByText(/^editado por você · 01\/10/)).toBeTruthy();
-  expect(screen.getByText(/^Rafael Prado editou · 02\/10/)).toBeTruthy();
+  expect(screen.getByText(/^Rafael Prado editou · 02\/10\/? .*· 2 MB$/)).toBeTruthy();
   expect(screen.getByRole("img", { name: "com estrela" })).toBeTruthy();
   const open = screen.getAllByRole("button", { name: "abrir" });
   expect(open).toHaveLength(1);
   fireEvent.click(open[0]);
   expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://docs.google.com/document/d/1/edit" } });
-  expect(calls[0]).toEqual({ cmd: "gdrive_list", args: { filter: "recent", search: "" } });
+  expect(calls.find((c) => c.cmd === "gdrive_list")).toEqual({ cmd: "gdrive_list", args: { filter: "recent", kind: "", search: "" } });
 });
 
 test("a filter and a name search go to Rust", async () => {
-  render(<GDriveTab />);
+  render(<GDriveTab onNotice={() => {}} />);
   fireEvent.click(await screen.findByRole("button", { name: "Compartilhados comigo" }));
-  await waitFor(() => expect(calls.at(-1)).toEqual({ cmd: "gdrive_list", args: { filter: "shared", search: "" } }));
+  await waitFor(() => expect(calls.at(-1)).toEqual({ cmd: "gdrive_list", args: { filter: "shared", kind: "", search: "" } }));
   fireEvent.change(screen.getByLabelText("buscar no Drive"), { target: { value: "roadmap" } });
-  await waitFor(() => expect(calls.at(-1)).toEqual({ cmd: "gdrive_list", args: { filter: "shared", search: "roadmap" } }));
+  await waitFor(() => expect(calls.at(-1)).toEqual({ cmd: "gdrive_list", args: { filter: "shared", kind: "", search: "roadmap" } }));
+});
+
+test("the storage in use shows as text and a meter, and blank documents open in the browser", async () => {
+  render(<GDriveTab onNotice={() => {}} />);
+  expect((await screen.findByText("4,2 GB de 15 GB")).hasAttribute("data-drive-quota")).toBe(true);
+  expect(document.querySelector("[role=meter]")?.getAttribute("aria-valuenow")).toBe("28");
+  fireEvent.click(screen.getByLabelText("criar novo Planilha no navegador"));
+  expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://sheets.new" } });
+});
+
+test("a kind and my own files narrow the list in Rust, and files sit under their day", async () => {
+  render(<GDriveTab onNotice={() => {}} />);
+  expect(await screen.findByLabelText("Antes")).toBeTruthy();
+  fireEvent.click(screen.getByText("Meus arquivos"));
+  fireEvent.click(screen.getByText("Planilhas"));
+  await waitFor(() => expect(calls.at(-1)).toEqual({ cmd: "gdrive_list", args: { filter: "mine", kind: "sheet", search: "" } }));
+});
+
+test("a file's folder opens and its link copies", async () => {
+  const notices: string[] = [];
+  const writes: string[] = [];
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText: async (v: string) => void writes.push(v) } });
+  render(<GDriveTab onNotice={(m) => notices.push(m)} />);
+  fireEvent.click(await screen.findByLabelText("abrir a pasta de Roadmap Q4 2026"));
+  expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://drive.google.com/drive/folders/f1" } });
+  fireEvent.click(screen.getByLabelText("copiar link de Roadmap Q4 2026"));
+  await waitFor(() => expect(notices).toEqual(["Link copiado"]));
+  expect(writes).toEqual(["https://docs.google.com/document/d/1/edit"]);
 });

@@ -8,10 +8,12 @@ let reply: ContactsView | string;
 
 const NONE = { nickname: "", department: "", birthday: null, addresses: [], urls: [], relations: [], note: "" };
 const now = new Date();
+const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 const VIEW: ContactsView = {
   total: 3,
   items: [
-    { id: "c2", name: "Rafael Prado", emails: ["rafael@exemplo.com"], phones: [], org: "Vértice", title: "", starred: false, link: "https://contacts.google.com/person/c2", ...NONE },
+    { id: "c2", name: "Rafael Prado", emails: ["rafael@exemplo.com"], phones: [], org: "Vértice", title: "", starred: false, link: "https://contacts.google.com/person/c2", ...NONE,
+      birthday: { day: tomorrow.getDate(), month: tomorrow.getMonth() + 1, year: null } },
     { id: "c1", name: "Marina Lopes", emails: ["marina@exemplo.com"], phones: ["+55 11 90000-0000"], org: "Vértice", title: "Diretora", starred: true, link: "https://contacts.google.com/person/c1", ...NONE,
       nickname: "Mari", department: "Vendas", birthday: { day: now.getDate(), month: now.getMonth() + 1, year: now.getFullYear() - 30 },
       addresses: ["Rua A, 10, São Paulo"], urls: ["https://marina.dev"], relations: ["Rui (Cônjuge)"], note: "Prefere WhatsApp." },
@@ -104,4 +106,37 @@ test("an open contact shows everything Google keeps and a WhatsApp link only for
   expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://marina.dev" } });
   fireEvent.click(screen.getByText("Ana Souza"));
   expect(screen.queryByRole("button", { name: "abrir 555-0100 no WhatsApp" })).toBeNull();
+});
+
+test("the next birthdays show how many days are left and lead to the contact", async () => {
+  render(<ContactsTab onNotice={() => {}} />);
+  const next = await screen.findByLabelText("Próximos aniversários");
+  expect(next.textContent).toContain("Rafael");
+  expect(next.textContent).toContain("amanhã");
+  expect(next.textContent).not.toContain("Marina");
+  fireEvent.click(screen.getByText("Com aniversário"));
+  expect(screen.queryByText("Ana Souza") === null).toBe(true);
+});
+
+test("an e-mail opens Gmail's compose and the whole card copies as text", async () => {
+  const copied: string[] = [];
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: (v: string) => (copied.push(v), Promise.resolve()) }, configurable: true });
+  render(<ContactsTab onNotice={() => {}} />);
+  fireEvent.click(await screen.findByText("Marina Lopes", { selector: "li[data-contact] span" }));
+  fireEvent.click(screen.getByLabelText("escrever para marina@exemplo.com no Gmail"));
+  expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://mail.google.com/mail/?view=cm&fs=1&to=marina%40exemplo.com" } });
+  fireEvent.click(screen.getByText("copiar ficha"));
+  await waitFor(() => expect(copied[0]?.split("\n").slice(0, 3)).toEqual(["Marina Lopes", "Diretora · Vértice", "marina@exemplo.com"]));
+  fireEvent.click(screen.getByText("+ novo contato"));
+  expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://contacts.google.com/new" } });
+});
+
+test("the A to Z index lists only the letters in use and jumps to one", async () => {
+  const extra = (id: string, name: string) => ({ ...VIEW.items[2], id, name });
+  reply = { total: 5, items: [...VIEW.items, extra("c4", "Bruno Lima"), extra("c5", "Zélia Andrade")] };
+  render(<ContactsTab onNotice={() => {}} />);
+  const index = await screen.findByLabelText("ir para a letra");
+  expect(index.textContent).toBe("ABMRZ");
+  fireEvent.click(screen.getByLabelText("ir para Z"));
+  await waitFor(() => expect(document.querySelector("[data-letter=Z]")?.className).toContain("canto-flash"));
 });

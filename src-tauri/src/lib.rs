@@ -70,6 +70,7 @@ pub mod gitlab_work;
 #[cfg(desktop)]
 pub mod global_shortcuts;
 pub mod gmail;
+pub mod gmail_actions;
 pub mod gmail_alert;
 pub mod google_api;
 pub mod google_token;
@@ -411,11 +412,12 @@ pub fn run() {
             cmd_harness::harness_list,
             cmd_market::market_get,
             cmd_google::gmail_summary,
-            cmd_google::gmail_mark_read,
+            cmd_google::gmail_modify,
             cmd_google::gtasks_list,
             cmd_google::gtasks_add,
             cmd_google::gtasks_complete,
             cmd_google::gdrive_list,
+            cmd_google::gdrive_quota,
             cmd_google::contacts_list,
             prefs::prefs_get,
             prefs::prefs_set,
