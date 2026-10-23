@@ -394,7 +394,7 @@ export type GmailView = "important" | "unread" | "starred" | "inbox";
 export type GmailAction = "read" | "unread" | "star" | "unstar" | "archive" | "trash";
 /** An open Google Tasks task; `due` is `YYYY-MM-DD` or empty. */
 export type GTask = { id: string; title: string; due: string };
-export type DriveFilter = "recent" | "starred" | "shared" | "mine";
+export type DriveFilter = "all" | "recent" | "starred" | "shared" | "mine";
 /** Empty for any kind. */
 export type DriveKind = "" | "doc" | "sheet" | "slide" | "pdf";
 /** Bytes; `limit` is 0 when the plan is unlimited. */
@@ -403,7 +403,7 @@ export type DriveQuota = { used: number; limit: number };
 export type DriveFile = {
   id: string;
   name: string;
-  kind: "doc" | "sheet" | "slide" | "pdf" | "other";
+  kind: "folder" | "doc" | "sheet" | "slide" | "pdf" | "other";
   link: string;
   modified: string;
   starred: boolean;
@@ -413,6 +413,8 @@ export type DriveFile = {
   /** Bytes; 0 for Google's own documents. */
   size: number;
 };
+/** One page of files; `next` is the token for the following page, empty on the last one. */
+export type DrivePage = { files: DriveFile[]; next: string };
 /** One Google contact; `link` is empty when the id isn't one Google would hand out. */
 export type Contact = {
   id: string;
@@ -738,7 +740,9 @@ export const api = {
   gtasksList: () => invoke<GTask[]>("gtasks_list"),
   gtasksAdd: (title: string) => invoke<GTask>("gtasks_add", { title }),
   gtasksComplete: (id: string) => invoke<void>("gtasks_complete", { id }),
-  gdriveList: (filter: DriveFilter, kind: DriveKind, search: string) => invoke<DriveFile[]>("gdrive_list", { filter, kind, search }),
+  /** `folder` empty lists by filter (`all` is My Drive's root); `page` empty asks for the first page. */
+  gdriveList: (filter: DriveFilter, kind: DriveKind, search: string, folder = "", page = "") =>
+    invoke<DrivePage>("gdrive_list", { filter, kind, search, folder, page }),
   gdriveQuota: () => invoke<DriveQuota>("gdrive_quota"),
   contactsList: () => invoke<ContactsView>("contacts_list"),
   /** `data:` URLs by photo URL, at most 60 per call; one that failed to download is left out. */

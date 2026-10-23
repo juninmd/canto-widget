@@ -7,6 +7,7 @@ import { LinkIcon } from "./Icons";
 
 /** Badge color per kind, from the skin's category colors so every skin keeps them apart. */
 export const KIND_COLOR: Record<DriveFile["kind"], string> = {
+  folder: "var(--color-accent)",
   doc: "var(--color-cat-meet)",
   sheet: "var(--color-cat-web)",
   slide: "var(--color-cat-docs)",
@@ -15,10 +16,18 @@ export const KIND_COLOR: Record<DriveFile["kind"], string> = {
 };
 const ICON = "canto-hit grid size-6 place-items-center rounded-md text-muted hover:bg-hover hover:text-fg [&>svg]:size-3.5";
 
-type Props = { file: DriveFile; index: number; now: Date; onOpen: (url: string) => void; onCopy: (file: DriveFile) => void };
+type Props = {
+  file: DriveFile;
+  index: number;
+  now: Date;
+  onOpen: (url: string) => void;
+  onCopy: (file: DriveFile) => void;
+  onEnter: (file: DriveFile) => void;
+};
 
-/** One file: the kind badge tilts on hover, the name opens it, and the folder and link are a click away. */
-export default function GDriveRow({ file, index, now, onOpen, onCopy }: Props) {
+/** One file or folder: the kind badge tilts on hover, a folder opens in place, and the parent and link are a click away. */
+export default function GDriveRow({ file, index, now, onOpen, onCopy, onEnter }: Props) {
+  const isFolder = file.kind === "folder";
   const when = shortWhen(new Date(file.modified), now);
   const who = file.editor ? t("gdrive.byOther", { name: file.editor, when }) : t("gdrive.byYou", { when });
   return (
@@ -31,7 +40,13 @@ export default function GDriveRow({ file, index, now, onOpen, onCopy }: Props) {
         {t(`gdrive.kind.${file.kind}`)}
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-xs text-fg">{file.name}</span>
+        {isFolder ? (
+          <button type="button" onClick={() => onEnter(file)} aria-label={t("gdrive.enter", { name: file.name })} className="truncate text-left text-xs font-medium text-fg hover:underline">
+            {file.name}
+          </button>
+        ) : (
+          <span className="truncate text-xs text-fg">{file.name}</span>
+        )}
         <span className="truncate text-[11px] text-faint">{file.size > 0 ? `${who} · ${formatBytes(file.size)}` : who}</span>
       </span>
       {file.starred && <span role="img" aria-label={t("gdrive.starred")} className="canto-pop text-warn">★</span>}
@@ -47,7 +62,11 @@ export default function GDriveRow({ file, index, now, onOpen, onCopy }: Props) {
           </button>
         )}
       </span>
-      {file.link && (
+      {isFolder ? (
+        <button type="button" onClick={() => onEnter(file)} aria-hidden="true" tabIndex={-1} className="canto-hit rounded-md px-1.5 text-sm text-muted hover:bg-hover hover:text-fg">
+          ›
+        </button>
+      ) : file.link && (
         <button
           type="button"
           onClick={() => onOpen(file.link)}

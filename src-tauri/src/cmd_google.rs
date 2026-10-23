@@ -3,8 +3,8 @@ use tauri::{AppHandle, Manager};
 
 use crate::blocking::run;
 use crate::contacts::{self, ContactsView};
-use crate::drive_files::{self, DriveFile, DriveQuota};
-use crate::error::Result;
+use crate::drive_files::{self, DrivePage, DriveQuota};
+use crate::error::{AppError, Result};
 use crate::gmail::{self, GmailSummary};
 use crate::gmail_actions;
 use crate::gtasks::{self, GTask};
@@ -56,10 +56,20 @@ pub async fn gtasks_complete(app: AppHandle, id: String) -> Result<()> {
 }
 
 #[tauri::command]
-pub async fn gdrive_list(app: AppHandle, filter: String, kind: String, search: String) -> Result<Vec<DriveFile>> {
+pub async fn gdrive_list(
+    app: AppHandle,
+    filter: String,
+    kind: String,
+    search: String,
+    folder: String,
+    page: String,
+) -> Result<DrivePage> {
     run(move || {
-        drive_files::query(&filter, &kind, &search)?;
-        drive_files::list(&token(&app)?, &filter, &kind, &search)
+        if !drive_files::valid_page(&page) {
+            return Err(AppError::Config(crate::lang::tr("página inválida", "invalid page").into()));
+        }
+        drive_files::query(&filter, &kind, &search, &folder)?;
+        drive_files::list(&token(&app)?, &filter, &kind, &search, &folder, &page)
     })
     .await
 }
