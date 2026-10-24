@@ -9,6 +9,7 @@ export const google: Record<keyof typeof source, string> = {
   "google.reconnect.hint": "Tu cuenta se conectó antes de estas integraciones. Vuelve a entrar para permitir Gmail, Google Tasks, Drive y Contactos.",
   "google.reconnect.button": "Reconectar Google",
   "google.refresh": "actualizar",
+  "google.enableApi": "activar la API",
   "google.fetching": "consultando Google",
   "gmail.inbox": "bandeja de entrada",
   "gmail.unread": "sin leer",

@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
+  não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
+  API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
+  abre a página certa do console.
 - **Carrossel de notificações navegável**: com muitos avisos, a tira do topo do pop-up cortava os últimos sem
   jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse
   e arrastando, e o aviso escolhido sempre rola para a vista.

@@ -32,17 +32,32 @@ pub fn refusal(service: &str, status: u16, body: &str) -> AppError {
             .into(),
         );
     }
-    if status == 403 && body.contains("SERVICE_DISABLED") {
-        return AppError::Drive(format!(
-            "{service}: {}",
-            crate::lang::tr(
-                "API desativada no projeto do Google Cloud deste Client ID",
-                "API disabled in this Client ID's Google Cloud project",
-            )
-        ));
+    if status == 403 && (body.contains("SERVICE_DISABLED") || body.contains("accessNotConfigured")) {
+        let what = crate::lang::tr(
+            "API desativada no projeto do Google Cloud deste Client ID",
+            "API disabled in this Client ID's Google Cloud project",
+        );
+        // Google names the console page that turns the API on; the tab offers it as a button.
+        return AppError::Drive(match activation_url(body) {
+            Some(url) => format!("{service}: {what}. {} {url}", crate::lang::tr("Ative em", "Enable it at")),
+            None => format!("{service}: {what}"),
+        });
     }
     let detail: String = body.chars().take(200).collect();
     AppError::Drive(format!("{service} respondeu {status}: {detail}"))
+}
+
+/// The Google Cloud console link a SERVICE_DISABLED refusal carries; only Google's own console hosts are kept.
+fn activation_url(body: &str) -> Option<String> {
+    ["https://console.developers.google.com/", "https://console.cloud.google.com/"].iter().find_map(|host| {
+        let start = body.find(host)?;
+        let url: String = body[start..]
+            .chars()
+            .take_while(|c| c.is_ascii_alphanumeric() || "/:.?=&_-%".contains(*c))
+            .take(300)
+            .collect();
+        Some(url)
+    })
 }
 
 /// Ids Google hands out (messages, tasks, files) are URL-safe tokens; anything else from the webview is refused.
@@ -74,6 +89,18 @@ mod tests {
         let text = refusal("drive", 500, "boom").text("pt-BR");
         assert!(text.contains("drive respondeu 500: boom"), "{text}");
         assert!(refusal("tasks", 403, "SERVICE_DISABLED").text("pt-BR").contains("Google Cloud"));
+    }
+
+    #[test]
+    fn a_disabled_api_names_the_console_page_that_enables_it() {
+        let body = r#"{"error":{"code":403,"status":"PERMISSION_DENIED","errors":[{"reason":"accessNotConfigured"}],
+            "details":[{"reason":"SERVICE_DISABLED","metadata":{"activationUrl":"https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=123"}}]}}"#;
+        let text = refusal("gmail", 403, body).text("pt-BR");
+        assert!(
+            text.ends_with("https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=123"),
+            "{text}"
+        );
+        assert_eq!(activation_url(r#""x":"https://evil.example/console.cloud.google.com""#), None);
     }
 
     #[test]

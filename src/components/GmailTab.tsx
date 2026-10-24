@@ -16,7 +16,7 @@ import Skeleton from "./Skeleton";
 
 type Props = { onNotice: (message: string) => void };
 
-const VIEWS: GmailView[] = ["important", "unread", "starred", "inbox"];
+const VIEWS: GmailView[] = ["inbox", "important", "unread", "starred"];
 const INBOX = "https://mail.google.com/mail/u/0/#inbox";
 const SEARCH_PAUSE_MS = 350;
 const BATCH = "\u0000batch";
@@ -29,7 +29,7 @@ const DONE: Partial<Record<GmailAction, "gmail.done.read" | "gmail.done.archive"
 
 /** The inbox's unread count and one view of it (important, unread, starred, all), searchable, with single and batch actions. */
 export default function GmailTab({ onNotice }: Props) {
-  const [view, setView] = useState<GmailView>("important");
+  const [view, setView] = useState<GmailView>("inbox");
   const [search, setSearch] = useState("");
   const [summary, setSummary] = useState<GmailSummary | null>(null);
   const [error, setError] = useState("");

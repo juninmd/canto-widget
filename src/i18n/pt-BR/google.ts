@@ -8,6 +8,7 @@ export const google = {
   "google.reconnect.hint": "Sua conta foi conectada antes destas integrações. Entre de novo para liberar Gmail, Google Tarefas, Drive e Contatos.",
   "google.reconnect.button": "Reconectar Google",
   "google.refresh": "atualizar",
+  "google.enableApi": "ativar a API",
   "google.fetching": "consultando o Google",
   "gmail.inbox": "caixa de entrada",
   "gmail.unread": "não lidos",

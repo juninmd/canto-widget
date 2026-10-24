@@ -33,15 +33,22 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+/** The tab opens on the inbox; the important view is one tap away. */
+async function showImportant() {
+  fireEvent.click(await screen.findByText("Importantes"));
+  await waitFor(() => expect(calls).toContainEqual({ cmd: "gmail_summary", args: { view: "important", search: "" } }));
+}
+
 test("the unread count and the important mail show, each with its actions", async () => {
   render(<GmailTab onNotice={() => {}} />);
   expect(await screen.findByText("27")).toBeTruthy();
-  expect(screen.getByText("2 importantes")).toBeTruthy();
+  expect(calls).toContainEqual({ cmd: "gmail_summary", args: { view: "inbox", search: "" } });
+  await showImportant();
+  expect(await screen.findByText("2 importantes")).toBeTruthy();
   expect(screen.getByText("Contrato revisado")).toBeTruthy();
   expect(screen.getByText("ML")).toBeTruthy();
   fireEvent.click(screen.getAllByText("abrir no Gmail")[0]);
   expect(calls.at(-1)).toEqual({ cmd: "open_link", args: { url: "https://mail.google.com/mail/u/0/#inbox/t1" } });
-  expect(calls).toContainEqual({ cmd: "gmail_summary", args: { view: "important", search: "" } });
 });
 
 test("another view and a search go to Rust", async () => {
@@ -68,6 +75,7 @@ test("archiving and trashing take the mail away; the star toggles in place", asy
 test("selected mail is read in one batch from the bar", async () => {
   const notices: string[] = [];
   render(<GmailTab onNotice={(m) => notices.push(m)} />);
+  await showImportant();
   fireEvent.click(await screen.findByLabelText("selecionar Contrato revisado"));
   const bar = await screen.findByLabelText("1 selecionados");
   fireEvent.click(screen.getByText("todos"));
@@ -79,8 +87,17 @@ test("selected mail is read in one batch from the bar", async () => {
   expect(screen.getByText("Nada importante pendente. Pode focar.")).toBeTruthy();
 });
 
-test("marking as read takes the mail off the list and out of the count", async () => {
+test("in the inbox a mail marked as read stays listed, only no longer bold", async () => {
   render(<GmailTab onNotice={() => {}} />);
+  fireEvent.click((await screen.findAllByText("marcar como lido"))[0]);
+  expect(await screen.findByText("marcar como não lido")).toBeTruthy();
+  expect(screen.getByText("Contrato revisado")).toBeTruthy();
+  expect(document.querySelector("[data-gmail-unread]")?.textContent).toBe("26");
+});
+
+test("in the important view marking as read takes the mail off the list and out of the count", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await showImportant();
   fireEvent.click((await screen.findAllByText("marcar como lido"))[0]);
   await waitFor(() => {
     expect(screen.queryByText("Contrato revisado") === null).toBe(true);
@@ -115,6 +132,15 @@ test("without a Google login there is one button to sign in, and an old login as
   summary = new Error("reconecte o Google em Ajustes para liberar Gmail, Tarefas e Drive");
   render(<GmailTab onNotice={() => {}} />);
   expect(await screen.findByText("Reconectar Google")).toBeTruthy();
+});
+
+test("a disabled Gmail API says so and offers the console page that turns it on", async () => {
+  const url = "https://console.developers.google.com/apis/api/gmail.googleapis.com/overview?project=123";
+  summary = new Error(`google: gmail: API desativada no projeto do Google Cloud deste Client ID. Ative em ${url}`);
+  render(<GmailTab onNotice={() => {}} />);
+  fireEvent.click(await screen.findByText("ativar a API"));
+  expect(screen.getByRole("alert").textContent).not.toContain(url);
+  expect(calls).toContainEqual({ cmd: "open_link", args: { url } });
 });
 
 test("a slow answer for an earlier view does not replace the view picked after it", async () => {
