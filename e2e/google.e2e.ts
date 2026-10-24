@@ -49,6 +49,10 @@ test("Gmail, Drive and Google Tasks work from their tabs", async ({ page }) => {
 
   await goTab(page, "Gmail");
   await expect(page.getByText("27", { exact: true })).toBeVisible();
+  // The tab opens on the inbox, where a read mail stays listed; in Importantes it leaves.
+  await page.getByRole("button", { name: "marcar como lido" }).click();
+  await expect(page.getByRole("button", { name: "marcar como não lido" })).toBeVisible();
+  await page.getByRole("button", { name: "Importantes", exact: true }).click();
   await page.getByRole("button", { name: "marcar como lido" }).click();
   await expect(page.getByText("Contrato revisado")).toHaveCount(0);
 
