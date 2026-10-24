@@ -408,5 +408,6 @@
   "gdrive.path": "folder path",
   "gdrive.enter": "open folder {name}",
   "gdrive.more": "load more",
-  "gdrive.loadingMore": "loading more…"
+  "gdrive.loadingMore": "loading more…",
+  "google.enableApi": "enable the API"
 }
