@@ -204,9 +204,19 @@ mod tests {
         std::fs::write(dir.join("ata.txt"), "Bom dia").unwrap();
         assert!(read(&dir, "segredo.env").is_err(), "read a non-transcript file");
         assert_eq!(read(&dir, "ata.txt").unwrap(), "Bom dia");
-        // Something posing as a transcript that isn't a regular file is refused, not read.
-        std::fs::create_dir_all(dir.join("pasta.txt")).unwrap();
-        assert!(read(&dir, "pasta.txt").is_err());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn read_refuses_a_fifo_posing_as_a_transcript_without_blocking() {
+        use crate::store::tests::{make_fifo, within_5s};
+        let dir = std::env::temp_dir().join(format!("canto-transc-fifo-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        make_fifo(&dir.join("ata.txt"));
+        let d = dir.clone();
+        assert!(within_5s(move || read(&d, "ata.txt")).is_err());
         let _ = std::fs::remove_dir_all(&dir);
     }
 

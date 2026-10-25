@@ -175,11 +175,18 @@ fn write_private(tmp: &Path, bytes: &[u8]) -> std::io::Result<()> {
 /// even if the file grows meanwhile, and a FIFO or device posing as one is refused instead of blocking forever.
 pub fn read_capped(path: &Path, max: u64, too_big: &str) -> Result<Vec<u8>> {
     use std::io::Read;
-    if !std::fs::metadata(path)?.is_file() {
+    let mut options = std::fs::OpenOptions::new();
+    options.read(true);
+    // Opening a FIFO blocks until a writer shows up; non-blocking open returns at once, and the type is then
+    // checked on the handle itself, so nothing can be swapped in between the check and the read.
+    #[cfg(unix)]
+    std::os::unix::fs::OpenOptionsExt::custom_flags(&mut options, libc::O_NONBLOCK);
+    let file = options.open(path)?;
+    if !file.metadata()?.is_file() {
         return Err(AppError::Config("não é um arquivo comum".into()));
     }
     let mut bytes = Vec::new();
-    std::fs::File::open(path)?.take(max + 1).read_to_end(&mut bytes)?;
+    file.take(max + 1).read_to_end(&mut bytes)?;
     if bytes.len() as u64 > max {
         return Err(AppError::Config(too_big.into()));
     }
@@ -194,7 +201,7 @@ fn tmp_path(path: &Path) -> PathBuf {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
 
     fn tmpdir(name: &str) -> PathBuf {
@@ -272,6 +279,37 @@ mod tests {
         assert!(matches!(read_capped(&file, 4, "grande"), Err(AppError::Config(m)) if m == "grande"));
         assert!(read_capped(&dir, 1024, "grande").is_err(), "read a directory");
         assert!(read_capped(&dir.join("nada"), 1024, "grande").is_err());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Creates a real FIFO; with no writer, a blocking open on it would never return.
+    #[cfg(unix)]
+    pub(crate) fn make_fifo(path: &Path) {
+        use std::os::unix::ffi::OsStrExt;
+        let c = std::ffi::CString::new(path.as_os_str().as_bytes()).unwrap();
+        assert_eq!(unsafe { libc::mkfifo(c.as_ptr(), 0o600) }, 0, "mkfifo failed");
+    }
+
+    /// Runs `f` on a thread and fails the test if it hasn't returned in 5 s, instead of hanging the suite.
+    #[cfg(unix)]
+    pub(crate) fn within_5s<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> T {
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = tx.send(f());
+        });
+        rx.recv_timeout(std::time::Duration::from_secs(5)).expect("blocked on the FIFO")
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn capped_read_refuses_a_fifo_without_blocking() {
+        let dir = tmpdir("fifo");
+        std::fs::create_dir_all(&dir).unwrap();
+        let fifo = dir.join("backup.canto");
+        make_fifo(&fifo);
+        let path = fifo.clone();
+        let res = within_5s(move || read_capped(&path, 1024, "grande"));
+        assert!(matches!(res, Err(AppError::Config(m)) if m == "não é um arquivo comum"));
         let _ = std::fs::remove_dir_all(&dir);
     }
 
