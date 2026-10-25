@@ -40,6 +40,8 @@ export const tasks = {
   "tasks.carriedNone": "nenhuma pendência para trazer",
   "tasks.carriedOne": "1 pendência trazida para hoje",
   "tasks.carriedMany": "{n} pendências trazidas para hoje",
+  "tasks.pasteCapped": "só as primeiras {n} linhas viraram tarefas ({dropped} ficaram de fora)",
+  "tasks.pasteLeft": "{n} linhas não entraram; tecle Enter para tentar de novo",
   "tasks.clearDone": "limpar concluídas",
   "tasks.clearDoneHint": "exclui as tarefas concluídas deste dia (dá para desfazer)",
   "tasks.clearedOne": "1 tarefa concluída excluída",
