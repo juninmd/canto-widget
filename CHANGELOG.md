@@ -192,6 +192,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Abertura mais leve.** Ajustes e as abas fora do dia a dia (GitHub, GitLab, Gmail, Drive, Contatos, Status API,
+  Modelos, Agentes, Atividade, Clima, Mapa, Mercado, Steam e Leituras) passam a ser carregadas só na primeira vez
+  que são abertas: o JavaScript lido na abertura caiu de 1.081 KiB para 745 KiB (307 → 228 KiB com gzip).
 - **Menos CPU, bateria e rede com o widget escondido**: no Windows, esconder o widget pela bandeja, pelo atalho
   ou pelo botão agora pausa de verdade as atualizações que só desenham a tela (Endpoints, Atividade, Mapa,
   Área de transferência e o relógio do foco), que voltam na hora ao reabrir. A bandeja deixa de pedir a agenda
