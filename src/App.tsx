@@ -26,6 +26,7 @@ import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
 import NotesTab from "./components/NotesTab";
 import SettingsTab from "./components/SettingsTab";
+import type { SectionId } from "./lib/settingsGroups";
 import ClipboardTab from "./components/ClipboardTab";
 import AgendaTab from "./components/AgendaTab";
 import GithubTab from "./components/GithubTab";
@@ -78,11 +79,22 @@ function Canto() {
   const [jumpQuery, setJumpQuery] = useState("");
   // Bumped per global-search jump so an already-open tab re-seeds, even with the same query.
   const [jumpSeq, setJumpSeq] = useState(0);
+  // An empty state's "configure" button lands on its section, not on the top of Ajustes; any other switch forgets it.
+  const [settingsFocus, setSettingsFocus] = useState<SectionId | null>(null);
   const changeTab = useCallback((id: Tab) => {
     setJumpQuery("");
+    setSettingsFocus(null);
     setTab(id);
   }, []);
   const openSettings = useCallback(() => changeTab("settings"), [changeTab]);
+  const openSettingsAt = useCallback(
+    (section: SectionId) => {
+      changeTab("settings");
+      setSettingsFocus(section);
+    },
+    [changeTab],
+  );
+  const openUpdateSettings = useCallback(() => openSettingsAt("update"), [openSettingsAt]);
   const notify = useToast();
   const setError = useCallback((message: string) => notify({ message, type: "erro" }), [notify]);
   const { status, error: statusError, checking, refresh } = useVaultStatus(setError);
@@ -100,7 +112,7 @@ function Canto() {
   useEffect(() => {
     void api.languageSet(LANGUAGE).catch(() => {});
   }, []);
-  useUpdateNotice(notify, openSettings);
+  useUpdateNotice(notify, openUpdateSettings);
   const [helpOpen, setHelpOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -305,6 +317,7 @@ function Canto() {
           onNavigate={(target, q) => {
             setJumpQuery(q);
             setJumpSeq((n) => n + 1);
+            setSettingsFocus(null);
             setTab(target);
             setSearchOpen(false);
           }}
@@ -402,7 +415,7 @@ function Canto() {
               {tab === "clipboard" && (
                 <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
               )}
-              {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={openSettings} onBooked={(message) => notify({ message })} />}
+              {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={() => openSettingsAt("google")} onBooked={(message) => notify({ message })} />}
               {tab === "github" && <GithubTab onError={setError} />}
               {tab === "gitlab" && <GitlabTab onError={setError} />}
               {tab === "steam" && <SteamTab onError={setError} />}
@@ -429,6 +442,7 @@ function Canto() {
                   reminderLead={reminderLead}
                   onReminderLead={setReminderLead}
                   onShowShortcuts={() => setHelpOpen(true)}
+                  focus={settingsFocus}
                 />
               )}
             </main>
