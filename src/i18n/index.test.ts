@@ -50,3 +50,12 @@ for (const [name, catalog] of [["English", en], ["Spanish", es]] as const) {
     }
   });
 }
+
+test("only the chosen catalog loads at startup: index.ts imports none of them eagerly", async () => {
+  const source = await Bun.file(new URL("./index.ts", import.meta.url)).text();
+  expect(source).not.toMatch(/^import \{[^}]*\} from "\.\/(pt-BR|en|es)";$/m);
+  const { catalogLoaders } = await import("./loaders");
+  expect(await catalogLoaders["pt-BR"]()).toBe(ptBR);
+  expect(await catalogLoaders.en()).toBe(en);
+  expect(await catalogLoaders.es()).toBe(es);
+});
