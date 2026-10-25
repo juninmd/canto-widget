@@ -132,6 +132,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Cofre decifrado e senha mestra são apagados da memória.** O conteúdo aberto do cofre (tarefas, notas, tokens),
+  do histórico do clipboard e dos backups, e a senha mestra digitada ao criar ou desbloquear o cofre, agora são
+  zerados ao sair de uso em vez de ficarem soltos na memória liberada do processo.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
