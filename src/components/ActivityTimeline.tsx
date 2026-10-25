@@ -3,6 +3,7 @@ import { t } from "../i18n";
 import { appName, barBox, categoryOf, CATEGORY_COLOR, hourRange, secsLabel, timelineRows } from "../lib/activity";
 import type { ActivityAway, ActivitySpan } from "../lib/api";
 import { axisTicks, clockOf, type Apps } from "../lib/activityView";
+import { hourLabel, hourTick } from "../lib/clockLabel";
 
 const HATCH = "repeating-linear-gradient(45deg, color-mix(in oklab, var(--color-faint) 60%, transparent) 0 2px, transparent 2px 5px)";
 const LABEL = "truncate text-[11.5px] text-muted";
@@ -33,7 +34,7 @@ export default function ActivityTimeline({ spans, allSpans, idle, apps, dayStart
     <section className="rounded-2xl border border-edge bg-panel p-3.5" aria-label={t("activity.timeline")}>
       <h3 className="mb-2.5 flex items-baseline justify-between gap-2 text-[11px] font-semibold uppercase tracking-wide text-muted">
         {t("activity.timeline")}
-        <span className="text-[10.5px] font-normal normal-case tracking-normal text-faint">{`${range[0]}h – ${range[1]}h`}</span>
+        <span className="text-[10.5px] font-normal normal-case tracking-normal text-faint">{`${hourLabel(range[0])} – ${hourLabel(range[1])}`}</span>
       </h3>
       {spans.length === 0 ? (
         <p className="text-xs text-faint">{t("activity.noneSelected")}</p>
@@ -94,7 +95,7 @@ export default function ActivityTimeline({ spans, allSpans, idle, apps, dayStart
           </div>
           <div aria-hidden="true" className="relative col-start-2 h-3.5 text-[10px] text-faint" style={{ gridRow: rowCount + 1 }}>
             {ticks.map((h) => (
-              <span key={h} className="absolute -translate-x-1/2 font-mono tabular-nums" style={{ left: at(h) }}>{h}h</span>
+              <span key={h} className="absolute -translate-x-1/2 font-mono tabular-nums" style={{ left: at(h) }}>{hourTick(h)}</span>
             ))}
           </div>
         </div>

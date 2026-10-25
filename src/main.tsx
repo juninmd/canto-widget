@@ -1,8 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
-import AlertWindow from "./AlertWindow";
-import CaptureWindow from "./CaptureWindow";
 import WindowBoundary from "./components/WindowBoundary";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
@@ -10,6 +7,7 @@ import { LANGUAGE } from "./i18n";
 import { IS_MOBILE } from "./lib/platform";
 import { syncPrefs } from "./lib/prefsMirror";
 import { RTL_LANGUAGES } from "./i18n/languages";
+import { loadWindowRoot, windowKind } from "./lib/windowRoot";
 import "./styles.css";
 
 document.documentElement.lang = LANGUAGE;
@@ -23,15 +21,13 @@ followSystem(() => {
   if (loadSkin() === "sistema") applySkin("sistema");
 });
 
-// The pop-up and capture windows load the same bundle with `?alert` / `?capture` (see `tauri.conf.json`).
-const windowParams = new URLSearchParams(location.search);
-
-// The tab choices are read once while rendering, so a copy restored from the file has to land first.
-void syncPrefs().then(() =>
+// The tab choices are read once while rendering, so a copy restored from the file has to land first; the window's
+// own code downloads meanwhile instead of after.
+void Promise.all([loadWindowRoot(windowKind(location.search)), syncPrefs()]).then(([Root]) =>
   ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
       <WindowBoundary>
-        {windowParams.has("alert") ? <AlertWindow /> : windowParams.has("capture") ? <CaptureWindow /> : <App />}
+        <Root />
       </WindowBoundary>
     </React.StrictMode>,
   ),
