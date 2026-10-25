@@ -1,5 +1,6 @@
 import type { AgendaItem, Note } from "./api";
 import { hour } from "./agenda";
+import { fold, foldIncludes } from "./fold";
 import { LOCALE, t } from "../i18n";
 
 /** A note a person would keep for this meeting: when, who, the agenda from the invite and room to write. */
@@ -15,7 +16,7 @@ export function meetingNoteDraft(event: AgendaItem): { title: string; body: stri
 
 /** Earlier notes about the same meeting: a title that contains the event's, newest first as the search returns them. */
 export function relatedNotes(notes: Note[], event: AgendaItem, max = 3): Note[] {
-  const needle = event.title.trim().toLowerCase();
+  const needle = fold(event.title.trim());
   if (!needle) return [];
-  return notes.filter((n) => n.title.toLowerCase().includes(needle)).slice(0, max);
+  return notes.filter((n) => foldIncludes(n.title, needle)).slice(0, max);
 }

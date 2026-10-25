@@ -8,6 +8,8 @@ import ErrorBanner from "./ErrorBanner";
 import MarketHero from "./MarketHero";
 import MarketRow from "./MarketRow";
 import Skeleton from "./Skeleton";
+import EmptyRetry from "./EmptyRetry";
+import { PulseIcon } from "./Icons";
 
 const GROUPS: (MarketGroup | "all")[] = ["all", "fx", "index", "crypto"];
 const SORTS: MarketSort[] = ["default", "gainers", "losers"];
@@ -40,7 +42,10 @@ export default function MarketTab() {
 
   const failure = error || view?.error || "";
   if (view === null || view.quotes.length === 0) {
-    return failure ? <ErrorBanner message={failure} busy={loading} onRetry={() => void load(true)} /> : <Skeleton label={t("protos.market.loading")} rows={4} />;
+    if (failure) return <ErrorBanner message={failure} busy={loading} onRetry={() => void load(true)} />;
+    // An answer with no quotes and no error would otherwise leave the skeleton up forever.
+    if (view !== null && !loading) return <EmptyRetry icon={<PulseIcon />} message={t("protos.market.empty")} busy={loading} onRetry={() => void load(true)} />;
+    return <Skeleton label={t("protos.market.loading")} rows={4} />;
   }
 
   const shown = visibleQuotes(view.quotes, group, sort);
