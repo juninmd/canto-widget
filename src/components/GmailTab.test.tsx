@@ -194,3 +194,29 @@ test("/ reaches the Gmail search like the other tabs", async () => {
   render(<GmailTab onNotice={() => {}} />);
   expect((await screen.findByLabelText("buscar no Gmail")).getAttribute("data-shortcut")).toBe("search");
 });
+
+test("in the important view u reads the focused mail away and focus moves on to the next one", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await showImportant();
+  const first = await screen.findByLabelText("selecionar Contrato revisado");
+  first.focus();
+  fireEvent.keyDown(first, { key: "u" });
+  const second = screen.getByLabelText("selecionar Fatura de outubro");
+  expect(document.activeElement === second).toBe(true);
+  await waitFor(() => expect(screen.queryByText("Contrato revisado") === null).toBe(true));
+  expect(calls).toContainEqual({ cmd: "gmail_modify", args: { ids: ["m1"], action: "read" } });
+});
+
+test("a busy mail keeps focus on its buttons and a second e neither moves focus nor sends again", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  const star = await screen.findByLabelText("dar estrela em Contrato revisado");
+  star.focus();
+  fireEvent.click(star);
+  expect(star.getAttribute("aria-disabled")).toBe("true");
+  expect(star.hasAttribute("disabled")).toBe(false);
+  expect(document.activeElement === star).toBe(true);
+  fireEvent.keyDown(star, { key: "e" });
+  expect(document.activeElement === star).toBe(true);
+  await screen.findByLabelText("tirar a estrela de Contrato revisado");
+  expect(calls.filter((c) => c.cmd === "gmail_modify")).toEqual([{ cmd: "gmail_modify", args: { ids: ["m1"], action: "star" } }]);
+});

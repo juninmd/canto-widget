@@ -4,7 +4,7 @@ import { initials, shortWhen } from "../lib/google";
 import { avatarTone } from "../lib/agenda";
 import { t } from "../i18n";
 
-export const MINI = "canto-hit rounded-md px-2 py-0.5 text-[11px] disabled:opacity-60";
+export const MINI = "canto-hit rounded-md px-2 py-0.5 text-[11px] aria-disabled:opacity-60";
 /** How a row leaves, so the motion says where the mail went. */
 const EXIT: Partial<Record<GmailAction, string>> = { archive: "canto-archive", trash: "canto-trash" };
 
@@ -26,6 +26,10 @@ type Props = {
 export default function GmailRow({ mail, index, now, selected, busy, leaving, onSelect, onAct, onTask, onOpen }: Props) {
   const exit = leaving ? (EXIT[leaving] ?? "canto-swipe") : "";
   const label = mail.subject || mail.from;
+  // aria-disabled rather than disabled: a disabled button drops the keyboard focus, and with it the list's shortcuts.
+  const fire = (action: GmailAction) => {
+    if (!busy) onAct(action);
+  };
   return (
     <li
       data-gmail-mail={mail.id}
@@ -56,8 +60,8 @@ export default function GmailRow({ mail, index, now, selected, busy, leaving, on
           type="button"
           aria-pressed={mail.starred}
           aria-label={t(mail.starred ? "gmail.unstar" : "gmail.star", { subject: label })}
-          onClick={() => onAct(mail.starred ? "unstar" : "star")}
-          disabled={busy}
+          onClick={() => fire(mail.starred ? "unstar" : "star")}
+          aria-disabled={busy || undefined}
           className={`canto-hit grid size-5 place-items-center rounded text-sm leading-none ${mail.starred ? "text-warn" : "text-faint hover:text-warn"}`}
         >
           <span key={String(mail.starred)} aria-hidden="true" className={mail.starred ? "canto-star inline-block" : "inline-block"}>
@@ -73,13 +77,13 @@ export default function GmailRow({ mail, index, now, selected, busy, leaving, on
             {t("gmail.open")}
           </button>
         )}
-        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => onAct(mail.unread ? "read" : "unread")} disabled={busy}>
+        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => fire(mail.unread ? "read" : "unread")} aria-disabled={busy || undefined}>
           {t(mail.unread ? "gmail.markRead" : "gmail.markUnread")}
         </button>
-        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => onAct("archive")} disabled={busy}>
+        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => fire("archive")} aria-disabled={busy || undefined}>
           {t("gmail.archive")}
         </button>
-        <button type="button" className={`${MINI} bg-edge/60 hover:bg-danger/20 hover:text-danger`} onClick={() => onAct("trash")} disabled={busy}>
+        <button type="button" className={`${MINI} bg-edge/60 hover:bg-danger/20 hover:text-danger`} onClick={() => fire("trash")} aria-disabled={busy || undefined}>
           {t("gmail.trash")}
         </button>
         <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={onTask}>

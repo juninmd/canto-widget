@@ -146,20 +146,25 @@ export default function GmailTab({ onNotice }: Props) {
       focusRow(at + step);
       return;
     }
-    const run: Record<string, () => void> = {
-      x: () => toggle(mail.id),
-      s: () => act([mail.id], mail.starred ? "unstar" : "star"),
-      u: () => act([mail.id], mail.unread ? "read" : "unread"),
-      e: () => act([mail.id], "archive"),
-      "#": () => act([mail.id], "trash"),
-      o: () => mail.link && openLink(mail.link),
+    if (e.key === "x" || e.key === "o") {
+      e.preventDefault();
+      if (e.key === "x") toggle(mail.id);
+      else if (mail.link) openLink(mail.link);
+      return;
+    }
+    const actions: Record<string, GmailAction> = {
+      s: mail.starred ? "unstar" : "star",
+      u: mail.unread ? "read" : "unread",
+      e: "archive",
+      "#": "trash",
     };
-    const fn = run[e.key];
-    if (!fn) return;
+    const action = actions[e.key];
+    if (!action) return;
     e.preventDefault();
-    // The row is about to leave: hand focus to its neighbour so the keyboard keeps its place.
-    if (e.key === "e" || e.key === "#") focusRow(at + 1 < rows.length ? at + 1 : at - 1);
-    fn();
+    // A row about to leave the view hands focus to its neighbour so the keyboard keeps its place; a mail already
+    // waiting on a request stays put, since this key will be ignored.
+    if (!inFlight.current.has(mail.id) && leavesView(view, action)) focusRow(at + 1 < rows.length ? at + 1 : at - 1);
+    act([mail.id], action);
   };
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
