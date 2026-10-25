@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useClearOnLock } from "./lib/useClearOnLock";
 import { IS_MOBILE, MOD_KEY } from "./lib/platform";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { hideWindow } from "./lib/windowShown";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText } from "./lib/api";
 import { useVaultStatus } from "./lib/useVaultStatus";
@@ -261,7 +261,7 @@ function Canto() {
           .catch(() => setError(t("summary.copyFailed", { mod: MOD_KEY }))),
       refreshTab: refreshCurrent,
       help: () => setHelpOpen(true),
-      hide: () => void getCurrentWindow().hide(),
+      hide: () => void hideWindow(),
       mini: () => pickMode("mini"),
     });
 

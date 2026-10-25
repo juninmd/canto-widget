@@ -171,6 +171,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Menos CPU, bateria e rede com o widget escondido**: no Windows, esconder o widget pela bandeja, pelo atalho
+  ou pelo botão agora pausa de verdade as atualizações que só desenham a tela (Endpoints, Atividade, Mapa,
+  Área de transferência e o relógio do foco), que voltam na hora ao reabrir. A bandeja deixa de pedir a agenda
+  ao Google a cada 90 s e reaproveita a leitura do aviso de reuniões. Avisos e notificações seguem iguais.
 - **Chamadas de rede mais rápidas e leves**: GitHub, GitLab, Google, Steam, Mercado, Clima e Mapa passam a usar
   um cliente HTTP por serviço durante toda a sessão, em vez de criar um novo (com thread e certificados) a cada
   pedido; as conexões ficam abertas entre as páginas e atualizações, sem refazer o handshake TLS toda vez.
