@@ -1,5 +1,12 @@
 ## Corrigido
 
+- **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
+  longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
+  fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
+- **Primeiro uso sem telas enganosas.** Status API sem nenhuma página lida e Mercado sem nenhuma cotação agora dizem
+  isso com um **tentar de novo**, em vez de "0 com problema · 0 operacionais" ou um esqueleto que nunca some; o dia
+  sem tarefas some com o "0 de 0"; e o botão **abrir Ajustes** da Agenda sem Google (e o aviso de atualização) abre
+  o grupo certo e rola até a seção.
 - **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
   nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
   que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
