@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Primeiro uso sem telas enganosas.** Status API sem nenhuma página lida e Mercado sem nenhuma cotação agora dizem
+  isso com um **tentar de novo**, em vez de "0 com problema · 0 operacionais" ou um esqueleto que nunca some; o dia
+  sem tarefas some com o "0 de 0"; e o botão **abrir Ajustes** da Agenda sem Google (e o aviso de atualização) abre
+  o grupo certo e rola até a seção.
 - **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
   foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
@@ -141,6 +145,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
+  longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
+  fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
 - **Lockfile do Flatpak sem o happy-dom vulnerável.** O `packaging/flatpak/yarn.lock` foi regerado a partir do
   `bun.lock` e deixa o happy-dom 20.14.5 (GHSA-834v-8h66-3h79, execução de código pelo alias de import) pelo
   21.0.4, voltando a bater versão a versão com o que o CI testa.
