@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useClearOnLock } from "./lib/useClearOnLock";
 import { IS_MOBILE, MOD_KEY } from "./lib/platform";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -25,28 +25,30 @@ import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
 import TasksTab from "./components/TasksTab";
 import NotesTab from "./components/NotesTab";
-import SettingsTab from "./components/SettingsTab";
 import ClipboardTab from "./components/ClipboardTab";
+import {
+  ActivityTab,
+  AgentsTab,
+  ContactsTab,
+  GDriveTab,
+  GithubTab,
+  GitlabTab,
+  GmailTab,
+  MapTab,
+  MarketTab,
+  ModelsTab,
+  ReadsTab,
+  SettingsTab,
+  StatusTab,
+  SteamTab,
+  WeatherTab,
+} from "./components/lazyTabs";
 import AgendaTab from "./components/AgendaTab";
-import GithubTab from "./components/GithubTab";
-import GitlabTab from "./components/GitlabTab";
-import SteamTab from "./components/SteamTab";
-import AgentsTab from "./components/AgentsTab";
-import WeatherTab from "./components/WeatherTab";
-import MapTab from "./components/MapTab";
-import ReadsTab from "./components/ReadsTab";
-import MarketTab from "./components/MarketTab";
-import GmailTab from "./components/GmailTab";
-import GDriveTab from "./components/GDriveTab";
-import ContactsTab from "./components/ContactsTab";
-import StatusTab from "./components/StatusTab";
-import ModelsTab from "./components/ModelsTab";
-import ActivityTab from "./components/ActivityTab";
 import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import { useTabLayout } from "./lib/tabLayout";
 import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
-import TabBar, { panelId, type Tab } from "./components/TabBar";
+import TabBar, { panelId, TABS, type Tab } from "./components/TabBar";
 import TabRail from "./components/TabRail";
 import MobileNav from "./components/MobileNav";
 import FocusBar from "./components/FocusBar";
@@ -385,6 +387,7 @@ function Canto() {
               aria-labelledby={`aba-${tab}`}
               className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
             >
+              <Suspense fallback={<Skeleton label={TABS.find((item) => item.id === tab)?.label ?? tab} />}>
               {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
               {tab === "notes" && (
                 <NotesTab
@@ -431,6 +434,7 @@ function Canto() {
                   onShowShortcuts={() => setHelpOpen(true)}
                 />
               )}
+              </Suspense>
             </main>
             <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
           </div>

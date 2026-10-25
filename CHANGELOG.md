@@ -155,6 +155,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Abertura mais leve.** Ajustes e as abas fora do dia a dia (GitHub, GitLab, Gmail, Drive, Contatos, Status API,
+  Modelos, Agentes, Atividade, Clima, Mapa, Mercado, Steam e Leituras) passam a ser carregadas só na primeira vez
+  que são abertas: o JavaScript lido na abertura caiu de 1.081 KiB para 745 KiB (307 → 228 KiB com gzip).
 - **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
   420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
   de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
