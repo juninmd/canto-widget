@@ -423,5 +423,7 @@
   "time.hMin": "{h}h {mm}m",
   "shortcuts.moveTask": "move the focused task up or down",
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
-  "protos.market.empty": "no quotes came in right now; check the connection and try again"
+  "protos.market.empty": "no quotes came in right now; check the connection and try again",
+  "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
 }
