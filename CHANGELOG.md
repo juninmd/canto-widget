@@ -124,6 +124,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Colar uma lista cria uma tarefa por linha.** Cole várias linhas no campo de nova tarefa vazio e cada uma vira
+  uma tarefa, na ordem; marcadores de lista (`-`, `*`, `[ ]`, `[x]`, `1.`, `•`) somem e hora e `!alta` de cada
+  linha continuam valendo. Até 50 linhas por vez (um aviso diz quantas ficaram de fora); se uma linha falhar, ela
+  volta ao campo com as seguintes na fila e **Enter** tenta de novo. Uma linha só continua colando como antes.
 - **Aba Leituras (RSS e Atom)**: cole os endereços dos feeds e leia tudo num só lugar, com **contagem de não
   lidos**, o mais novo primeiro, o **favicon** da origem, a idade e um resumo em cada cartão — e a **miniatura**
   quando a entrada tem uma. Tudo é baixado pelo Rust e entregue à interface como `data:`, então a janela nunca
