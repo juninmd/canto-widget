@@ -56,11 +56,20 @@ export function formatPrice(quote: Named, price: number, digits = priceDigits(qu
   return price.toLocaleString(LOCALE, { minimumFractionDigits: digits, maximumFractionDigits: digits });
 }
 
+/** The sign the reader's language uses for a currency ("US$" in pt-BR, "$" in en); the code itself when unknown. */
+export function currencySign(code: string): string {
+  try {
+    const parts = new Intl.NumberFormat(LOCALE, { style: "currency", currency: code }).formatToParts(0);
+    return parts.find((p) => p.type === "currency")?.value ?? code;
+  } catch {
+    return code;
+  }
+}
+
 /** The currency sign before the price, or "pts" after an index. */
 export function priceUnit(quote: Pick<MarketQuote, "group" | "currency">): { before: string; after: string } {
   if (quote.group === "index") return { before: "", after: "pts" };
-  const sign = quote.currency === "BRL" ? "R$" : quote.currency === "USD" ? "US$" : (quote.currency ?? "");
-  return { before: sign, after: "" };
+  return { before: currencySign(quote.currency ?? ""), after: "" };
 }
 
 /** Signed percentage without the symbol, in the user's locale ("+0,31"); the catalog carries the "%". */

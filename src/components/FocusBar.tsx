@@ -52,7 +52,7 @@ export default function FocusBar({ onDone, onError }: { onDone: () => void; onEr
         <span className="min-w-0 flex-1 truncate text-fg">{run.title}</span>
         <span className={`shrink-0 font-mono tabular-nums ${over ? "text-danger" : "text-accent-text"}`} role="timer">
           {clock(secs)}
-          {run.estimateMin ? ` / ${run.estimateMin} min` : ""}
+          {run.estimateMin ? ` / ${t("focus.minutes", { min: run.estimateMin })}` : ""}
         </span>
         <button type="button" onClick={() => void focusStore.stop()} className="min-h-[24px] shrink-0 rounded border border-line px-2 hover:text-fg">
           {t("focus.pauseButton")}
