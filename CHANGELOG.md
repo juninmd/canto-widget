@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **"Mostrar mais" do GitHub/GitLab por seção, e comentaristas pelo teclado.** Cada seção pagina por conta própria:
+  a resposta de uma não apaga mais o **carregando…** de outra, e um segundo clique numa seção que já busca a próxima
+  página é ignorado. No catálogo de comentaristas, o texto de cada comentário virou um botão (abre com Enter/Tab), a
+  busca ganhou rótulo para leitores de tela e o cartão da pessoa filtrada anuncia que está selecionado.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
