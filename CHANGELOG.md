@@ -7,6 +7,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
+  um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
+  endereços de links ficam de fora da conta.
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Tokens copiados ficam fora do histórico do Clipboard.** Uma cópia que é só um token de formato conhecido
   (GitHub, GitLab, Google, Anthropic, Slack, AWS, JWT) ou um bloco de chave privada não entra no histórico, como já
   acontecia com o que gerenciadores de senha marcam como oculto; um texto que só menciona o token continua sendo
