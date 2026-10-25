@@ -132,6 +132,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Lockfile do Flatpak sem o happy-dom vulnerável.** O `packaging/flatpak/yarn.lock` foi regerado a partir do
+  `bun.lock` e deixa o happy-dom 20.14.5 (GHSA-834v-8h66-3h79, execução de código pelo alias de import) pelo
+  21.0.4, voltando a bater versão a versão com o que o CI testa.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
