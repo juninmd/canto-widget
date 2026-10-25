@@ -1,0 +1,8 @@
+# Falsos positivos confirmados manualmente - Placeholders de teste (glpat-segredo-*, glpat-abcdefghij...) em arquivos *_tests.rs.
+# Formato: commit:arquivo:regra:linha (fingerprint exato; segredo novo no mesmo
+# arquivo continua sendo detectado). Nao usar path allowlist para isso.
+
+66335d7a1d5afbd7381768aeed8519a8ba116920:src-tauri/src/cmd_gitlab_tests.rs:generic-api-key:15
+1481adf4a7961bbb772ca8a682314c2687671449:src-tauri/src/cmd_gitlab_tests.rs:generic-api-key:12
+1481adf4a7961bbb772ca8a682314c2687671449:src-tauri/src/gitlab_query_tests.rs:gitlab-pat:73
+1481adf4a7961bbb772ca8a682314c2687671449:src-tauri/src/gitlab_query_tests.rs:gitlab-pat:73
