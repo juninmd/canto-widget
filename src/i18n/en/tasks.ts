@@ -42,6 +42,8 @@ export const tasks: Record<keyof typeof source, string> = {
   "tasks.carriedNone": "no pending tasks to bring",
   "tasks.carriedOne": "1 pending task brought to today",
   "tasks.carriedMany": "{n} pending tasks brought to today",
+  "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
   "tasks.clearDone": "clear done",
   "tasks.clearDoneHint": "deletes this day's completed tasks (can be undone)",
   "tasks.clearedOne": "1 completed task deleted",
