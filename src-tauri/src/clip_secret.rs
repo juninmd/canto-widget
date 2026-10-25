@@ -48,7 +48,7 @@ pub fn looks_like_secret(text: &str) -> bool {
     if t.len() > MAX_SECRET_LEN {
         return false;
     }
-    if t.starts_with("-----BEGIN") && t.contains("PRIVATE KEY-----") {
+    if t.starts_with("-----BEGIN") && t.contains("PRIVATE KEY") {
         return true;
     }
     if t.is_empty() || !t.chars().all(token_char) {
@@ -97,6 +97,8 @@ mod tests {
     fn a_private_key_block_is_recognised() {
         let kind = "OPENSSH PRIVATE";
         assert!(looks_like_secret(&format!("-----BEGIN {kind} KEY-----\nb3BlbnNzaC1rZXk\n-----END {kind} KEY-----")));
+        let pgp = "PGP PRIVATE KEY BLOCK";
+        assert!(looks_like_secret(&format!("-----BEGIN {pgp}-----\n\nlQOYBF0\n-----END {pgp}-----")));
         assert!(!looks_like_secret("-----BEGIN PUBLIC KEY-----\nMIIBIjAN\n-----END PUBLIC KEY-----"));
     }
 

@@ -150,7 +150,7 @@ pub(crate) fn client() -> Result<reqwest::blocking::Client> {
 }
 
 pub(crate) fn network(e: reqwest::Error) -> AppError {
-    AppError::Gitlab(format!("sem resposta do GitLab: {e}"))
+    AppError::Gitlab(format!("sem resposta do GitLab: {}", crate::error::net_text(e)))
 }
 
 pub(crate) fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
