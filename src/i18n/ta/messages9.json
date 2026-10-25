@@ -412,5 +412,7 @@
   "google.enableApi": "enable the API",
   "notes.wordsOne": "1 word",
   "notes.wordsMany": "{n} words",
-  "notes.readMinutes": "{words} · ~{n} min read"
+  "notes.readMinutes": "{words} · ~{n} min read",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on"
 }
