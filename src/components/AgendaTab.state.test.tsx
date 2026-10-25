@@ -146,6 +146,33 @@ test("[ and ] step through the days and h goes back to today, but not while typi
   expect(screen.getByText("Hoje", { selector: "[aria-live]" })).toBeTruthy();
 });
 
+test("j opens today's Meet in progress, but not while typing and not on another day", async () => {
+  const call: AgendaItem = {
+    ...meeting,
+    id: "call",
+    start: new Date(2026, 8, 18, 10, 0).toISOString(),
+    end: new Date(2026, 8, 18, 11, 0).toISOString(),
+    meet: "https://meet.google.com/abc-defg-hij",
+  };
+  render(<AgendaTab agenda={agenda({ items: [call] })} today={TODAY} now={() => new Date(2026, 8, 18, 10, 20)} onError={() => {}} />);
+  await settle();
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("Escolher o dia da agenda"), { key: "j" });
+  });
+  expect(count("open_link")).toBe(0);
+  await act(async () => {
+    fireEvent.keyDown(window, { key: "j" });
+  });
+  expect(calls.filter((c) => c.cmd === "open_link").map((c) => c.args?.url)).toEqual([call.meet]);
+  await act(async () => {
+    fireEvent.keyDown(window, { key: "]" });
+  });
+  await act(async () => {
+    fireEvent.keyDown(window, { key: "J" });
+  });
+  expect(count("open_link")).toBe(1);
+});
+
 test("coming back to the window refetches another day's events, not more than once a burst", async () => {
   const real = Date.now;
   let offset = 0;

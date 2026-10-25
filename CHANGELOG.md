@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Atalho J para entrar na reunião.** Na Agenda de hoje, **J** abre o Meet da reunião em andamento ou da que começa
+  em até 15 minutos; nada acontece enquanto você digita, em outro dia ou com reunião ainda distante. Está na ajuda (**?**).
+
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam

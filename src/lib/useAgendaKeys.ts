@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 
-export type AgendaKey = "prev" | "next" | "today";
+export type AgendaKey = "prev" | "next" | "today" | "join";
 
-const KEYS: Record<string, AgendaKey> = { "[": "prev", "]": "next", h: "today", H: "today" };
+const KEYS: Record<string, AgendaKey> = { "[": "prev", "]": "next", h: "today", H: "today", j: "join", J: "join" };
 
 /** Bare keys, so they only count outside text fields (same rule as the global shortcuts). */
 export function useAgendaKeys(active: boolean, run: (k: AgendaKey) => void) {

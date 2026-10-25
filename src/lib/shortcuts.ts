@@ -29,6 +29,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
       { keys: ["/"], description: t("shortcuts.search") },
       { keys: ["[", "]"], description: t("shortcuts.agendaDays") },
       { keys: ["H"], description: t("shortcuts.agendaToday") },
+      { keys: ["J"], description: t("shortcuts.agendaJoin") },
       { keys: [MOD_KEY, "K"], description: t("shortcuts.globalSearch") },
       { keys: PALETTE_KEYS, description: t("shortcuts.palette") },
       { keys: SETTINGS_KEYS, description: t("shortcuts.settings") },

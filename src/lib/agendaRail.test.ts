@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { AgendaItem, Task } from "./api";
-import { dayStats, fitInGap, freeGaps, heroOf, railEntries, ribbon } from "./agendaRail";
+import { dayStats, fitInGap, freeGaps, heroOf, meetToJoin, railEntries, ribbon } from "./agendaRail";
 import { dayBlocks } from "./dayPlan";
 
 const at = (h: number, m = 0) => new Date(2026, 8, 30, h, m).toISOString();
@@ -56,4 +56,22 @@ test("a task fits a gap only when its estimate does", () => {
   const blocks = dayBlocks([ev("a", [9, 0], [9, 40])], []);
   expect(fitInGap(blocks, task("t", { estimate_min: 30 }), { start: 9 * 60 + 40, end: 10 * 60 + 15 })).toBe(9 * 60 + 45);
   expect(fitInGap(blocks, task("t", { estimate_min: 30 }), { start: 9 * 60 + 40, end: 10 * 60 })).toBeNull();
+});
+
+test("J joins the meeting in progress, else one starting within 15 minutes, never one hours away or declined", () => {
+  const meet = (id: string) => ({ meet: `https://meet.google.com/${id}` });
+  const items = [
+    ev("live", [9, 0], [10, 0], meet("live")),
+    ev("soon", [10, 10], [11, 0], meet("soon")),
+    ev("nolink", [11, 0], [11, 30]),
+    ev("declined", [13, 0], [14, 0], { ...meet("declined"), response: "declined" }),
+    ev("later", [15, 0], [16, 0], meet("later")),
+  ];
+  expect(meetToJoin(items, now(9, 30))?.id).toBe("live");
+  expect(meetToJoin(items, now(10, 0))?.id).toBe("soon");
+  expect(meetToJoin(items, now(10, 30))?.id).toBe("soon");
+  expect(meetToJoin(items, now(11, 10))).toBeNull();
+  expect(meetToJoin(items, now(13, 10))).toBeNull();
+  expect(meetToJoin(items, now(12, 0))).toBeNull();
+  expect(meetToJoin(items, now(14, 45))?.id).toBe("later");
 });

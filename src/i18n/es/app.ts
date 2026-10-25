@@ -222,6 +222,7 @@ export const app: Record<keyof typeof source, string> = {
   "shortcuts.settings": "abrir ajustes",
   "shortcuts.agendaDays": "calendario: día anterior o siguiente",
   "shortcuts.agendaToday": "calendario: volver a hoy",
+  "shortcuts.agendaJoin": "calendario: entrar en la reunión actual o que empieza en hasta 15 min",
 
   "palette.label": "paleta de comandos",
   "palette.placeholder": "escribe una acción…",

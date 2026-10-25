@@ -409,5 +409,6 @@
   "gdrive.enter": "open folder {name}",
   "gdrive.more": "load more",
   "gdrive.loadingMore": "loading more…",
-  "google.enableApi": "enable the API"
+  "google.enableApi": "enable the API",
+  "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

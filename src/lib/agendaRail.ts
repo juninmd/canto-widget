@@ -61,6 +61,19 @@ export function railEntries(items: AgendaItem[], tasks: Task[], now: Date): { pa
   };
 }
 
+/** How early the join shortcut reaches for the next meeting: the same window as the hero's halo. */
+export const JOIN_SOON_MIN = 15;
+
+/** The Meet to join right now: the one in progress, else one starting within `soonMin`. Never a meeting hours away. */
+export function meetToJoin(items: AgendaItem[], now: Date, soonMin = JOIN_SOON_MIN): AgendaItem | null {
+  const at = minuteOf(now);
+  const events = eventEntries(items.filter((i) => i.response !== "declined" && i.meet)).sort((a, b) => a.start - b.start);
+  const live = events.find((e) => e.start <= at && at < e.end);
+  const soon = events.find((e) => e.start > at && e.start - at <= soonMin);
+  const pick = live ?? soon;
+  return pick && pick.kind === "event" ? pick.item : null;
+}
+
 export type Hero =
   | { kind: "now"; item: AgendaItem; left: number; pct: number }
   | { kind: "next"; item: AgendaItem; minutes: number }
