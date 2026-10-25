@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { t } from "../i18n";
 import { api, errText } from "../lib/api";
 import { clock, focusStore, isOver } from "../lib/focus";
@@ -10,6 +10,8 @@ import { useToast } from "../lib/toast";
 export default function FocusBar({ onDone, onError }: { onDone: () => void; onError: (m: string) => void }) {
   const run = useRunning();
   const notify = useToast();
+  // A double-click on "Concluir" would complete the task and reload the list twice.
+  const finishing = useRef(false);
   useTick(run !== null);
   const secs = run ? focusStore.totalSecs() : 0;
   const over = run !== null && isOver(secs, run.estimateMin);
@@ -24,12 +26,16 @@ export default function FocusBar({ onDone, onError }: { onDone: () => void; onEr
   const pct = run.estimateMin ? Math.min(100, (secs / (run.estimateMin * 60)) * 100) : 0;
 
   async function finish() {
+    if (finishing.current) return;
+    finishing.current = true;
     const id = run!.id;
-    await focusStore.stop();
     try {
+      await focusStore.stop();
       await api.taskComplete(id);
     } catch (e) {
       onError(errText(e));
+    } finally {
+      finishing.current = false;
     }
     onDone();
   }
