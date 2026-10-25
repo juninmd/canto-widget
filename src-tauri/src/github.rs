@@ -149,16 +149,19 @@ fn search(token: &str, query: &str, page: u32, f: &ForgeFilter) -> Result<(Forge
 }
 
 pub(crate) fn client() -> Result<reqwest::blocking::Client> {
-    use reqwest::header::{HeaderMap, HeaderValue, ACCEPT};
-    let mut h = HeaderMap::new();
-    h.insert(ACCEPT, HeaderValue::from_static("application/vnd.github+json"));
-    h.insert("X-GitHub-Api-Version", HeaderValue::from_static("2022-11-28"));
-    crate::net::client_builder()
-        .user_agent("canto-widget")
-        .default_headers(h)
-        .timeout(Duration::from_secs(20))
-        .build()
-        .map_err(network)
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        use reqwest::header::{HeaderMap, HeaderValue, ACCEPT};
+        let mut h = HeaderMap::new();
+        h.insert(ACCEPT, HeaderValue::from_static("application/vnd.github+json"));
+        h.insert("X-GitHub-Api-Version", HeaderValue::from_static("2022-11-28"));
+        crate::net::client_builder()
+            .user_agent("canto-widget")
+            .default_headers(h)
+            .timeout(Duration::from_secs(20))
+            .build()
+    })
+    .map_err(network)
 }
 
 pub(crate) fn network(e: reqwest::Error) -> AppError {
