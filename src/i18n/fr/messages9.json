@@ -414,5 +414,7 @@
   "notes.wordsMany": "{n} words",
   "notes.readMinutes": "{words} · ~{n} min read",
   "settings.password.same": "the new password is the same as the current one",
-  "settings.password.capsLock": "Caps Lock is on"
+  "settings.password.capsLock": "Caps Lock is on",
+  "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
+  "protos.market.empty": "no quotes came in right now; check the connection and try again"
 }

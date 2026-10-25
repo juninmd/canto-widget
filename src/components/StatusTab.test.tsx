@@ -267,3 +267,23 @@ test("the sub-tabs switch between the public services and the user's own endpoin
   expect(screen.getByRole("tab", { name: "meus endpoints" }).getAttribute("aria-selected")).toBe("true");
   expect(screen.queryByText("Claude")).toBeNull();
 });
+
+test("an empty answer reads as 'could not read', not as '0 operacionais', and offers a retry", async () => {
+  status = () => Promise.resolve([]);
+  await show();
+  expect(screen.getByText(/não deu para ler nenhuma página de status/)).toBeTruthy();
+  expect(screen.queryByText(/0 operacionais/)).toBeNull();
+  status = () => Promise.resolve([claude, aws, magalu]);
+  await act(async () => {
+    fireEvent.click(screen.getByText("tentar de novo"));
+  });
+  expect(screen.getByText("Claude")).toBeTruthy();
+});
+
+test("a failed first load stops the skeleton and keeps the retry in reach", async () => {
+  status = () => Promise.reject("sem rede");
+  await show();
+  expect(screen.getByText("sem rede")).toBeTruthy();
+  expect(screen.queryByText("buscando o status dos serviços")).toBeNull();
+  expect(screen.getByText("tentar de novo")).toBeTruthy();
+});
