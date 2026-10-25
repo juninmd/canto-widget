@@ -1,6 +1,6 @@
 # Changelog
 
-Mudanças visíveis para quem usa o Canto. Formato [Keep a Changelog](https://keepachangelord.pt-BR/1.1.0/),
+Mudanças visíveis para quem usa o Canto. Formato [Keep a Changelog](https://keepachangelog.pt-BR/1.1.0/),
 versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
