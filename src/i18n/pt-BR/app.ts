@@ -214,6 +214,7 @@ export const app = {
   "shortcuts.new": "nova tarefa ou novo card",
   "shortcuts.lock": "trancar o cofre",
   "shortcuts.rename": "renomear a tarefa em foco",
+  "shortcuts.moveTask": "subir ou descer a tarefa em foco",
   "shortcuts.privacy": "ativar ou desativar o modo privacidade (borra clipboard e notas)",
   "shortcuts.toggle": "mostrar ou esconder o widget, de qualquer app",
   "shortcuts.fullscreen": "entrar ou sair da tela cheia",

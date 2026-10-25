@@ -421,6 +421,7 @@
   "time.sec": "{n} s",
   "time.h": "{h}h",
   "time.hMin": "{h}h {mm}m",
+  "shortcuts.moveTask": "move the focused task up or down",
   "common.cancel": "cancel",
   "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
   "google.signOutYes": "yes, sign out",

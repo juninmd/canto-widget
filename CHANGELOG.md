@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
   revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**
   devolve o foco ao botão. Os botões do **Não perturbe** e as opções de **tela cheia** e **pedidos de revisão** ficam
