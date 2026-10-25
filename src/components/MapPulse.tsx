@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { hourTick } from "../lib/clockLabel";
 import { LEVEL_COLOR, slowLevel, todayHistory } from "../lib/traffic";
 import { t } from "../i18n";
 
@@ -47,7 +48,7 @@ export default function MapPulse({ slowdown, history, now }: { slowdown: number 
             {last && <circle cx={sx(last[0])} cy={sy(last[1])} r="3" fill={color} />}
             {[0, 6, 12, 18].map((h) => (
               <text key={h} x={(h / 24) * W + 2} y={H + 10} className="fill-faint text-[9px]">
-                {h}h
+                {hourTick(h)}
               </text>
             ))}
           </svg>
