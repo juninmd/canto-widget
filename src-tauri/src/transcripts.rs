@@ -137,11 +137,10 @@ pub fn read(dir: &Path, name: &str) -> Result<String> {
     if !is_transcript(Path::new(name)) || !is_transcript(&path) {
         return Err(AppError::Config("arquivo não é uma transcrição".into()));
     }
-    let meta = std::fs::metadata(&path)?;
-    if meta.len() > MAX_BYTES {
-        return Err(AppError::Config("transcrição maior que 5 MB".into()));
-    }
-    Ok(clean_subtitles(&std::fs::read_to_string(path)?))
+    // A FIFO named `x.txt` would otherwise hang the read forever, and the size check can't race a growing file.
+    let bytes = crate::store::read_capped(&path, MAX_BYTES, "transcrição maior que 5 MB")?;
+    let text = String::from_utf8(bytes).map_err(|_| AppError::Format("transcrição não está em UTF-8".into()))?;
+    Ok(clean_subtitles(&text))
 }
 
 #[cfg(test)]
@@ -205,6 +204,9 @@ mod tests {
         std::fs::write(dir.join("ata.txt"), "Bom dia").unwrap();
         assert!(read(&dir, "segredo.env").is_err(), "read a non-transcript file");
         assert_eq!(read(&dir, "ata.txt").unwrap(), "Bom dia");
+        // Something posing as a transcript that isn't a regular file is refused, not read.
+        std::fs::create_dir_all(dir.join("pasta.txt")).unwrap();
+        assert!(read(&dir, "pasta.txt").is_err());
         let _ = std::fs::remove_dir_all(&dir);
     }
 

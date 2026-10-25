@@ -132,6 +132,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Arquivos do cofre só legíveis por você.** No Linux e no macOS, o cofre, as imagens das notas, os backups e as
+  configurações agora são gravados com permissão `0600` (antes herdavam a padrão, legível por outros usuários da
+  máquina), e uma gravação que falha não deixa mais um `.tmp` esquecido ao lado. Importar backup, ler transcrição,
+  importar do Keep e sincronizar pela pasta leem no máximo o limite de tamanho, mesmo que o arquivo cresça no meio,
+  e recusam algo que não seja um arquivo comum em vez de travar.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
