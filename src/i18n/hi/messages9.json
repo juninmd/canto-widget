@@ -411,5 +411,7 @@
   "gdrive.loadingMore": "loading more…",
   "google.enableApi": "enable the API",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on"
 }

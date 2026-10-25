@@ -11,6 +11,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   uma tarefa, na ordem; marcadores de lista (`-`, `*`, `[ ]`, `[x]`, `1.`, `•`) somem e hora e `!alta` de cada
   linha continuam valendo. Até 50 linhas por vez (um aviso diz quantas ficaram de fora); se uma linha falhar, ela
   volta ao campo com as seguintes na fila e **Enter** tenta de novo. Uma linha só continua colando como antes.
+- **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
+  está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
+  senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
+  gerenciador de senhas qual campo é a senha atual e qual é a nova.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam
@@ -136,6 +140,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
+  sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
+  lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
+  uma marcação que falhou marca de novo. No Mercado, o período que não carregou ganha **tentar de novo** ali mesmo.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
