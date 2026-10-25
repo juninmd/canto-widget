@@ -21,6 +21,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
   senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
   gerenciador de senhas qual campo é a senha atual e qual é a nova.
+- **Busca sem acento e sem caixa.** "acao" acha "Ação" e "reuniao" acha "Reunião" (e o contrário) nas notas, no histórico do clipboard, nas transcrições, na busca global de tarefas, nos docs do Gemini e nas notas ligadas a uma reunião; o destaque `<mark>` marca a palavra acentuada inteira.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam
@@ -125,24 +126,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o que foi copiado quando a aba aparece, o backup e a exportação de nota usam o seletor de arquivos do sistema e
   o Canto pede a permissão de notificações na primeira abertura. O CI passa a compilar o crate para Android e iOS.
   Ainda não há desbloqueio biométrico no celular. Veja [docs/mobile.md](docs/mobile.md).
-
-- **Aba Contatos, com a sua agenda do Google**: a People API, somente leitura (`contacts.readonly`), com o mesmo
-  login da Agenda. Mostra o total de contatos, busca ao digitar (nome, empresa, cargo, e-mail ou telefone, sem
-  ligar para acentos), filtros com contagem (Todos, Favoritos, Com e-mail, Com telefone), seções de A a Z com
-  avatar em iniciais e, ao abrir um contato, copiar e-mail ou telefone com um clique e abrir no Google Contatos.
-  Começa oculta, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar o
-  escopo novo, e a **People API** precisa estar ativa no projeto do Google Cloud.
-
-- **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
-  nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
-  que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
-  opcional **só dos importantes** toca uma notificação do sistema para cada e-mail importante novo (checado a cada
-  2 min). A aba **Drive** lista arquivos recentes, com estrela ou compartilhados comigo, com busca por nome e
-  abertura no navegador, lendo só os metadados. A aba **Tarefas** ganha a seção **Google Tarefas**, com as tarefas
-  abertas da lista padrão, a data (vencidas em vermelho), captura direta no Google e concluir com um clique; sem
-  login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
-  ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
-  novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
 
 ### Corrigido
 
