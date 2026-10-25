@@ -21,9 +21,12 @@ export default function SteamCatalog() {
   const [sort, setSort] = useState<Sort>("reviews");
   const [onlySale, setOnlySale] = useState(false);
   const page = useRef(0);
+  // A "ver mais" still in flight when the search restarts must not move the new search's page.
+  const generation = useRef(0);
 
   const load = useCallback(
     (force: boolean) => {
+      generation.current += 1;
       page.current = 0;
       return api.steamCatalog(term, 0, sort, onlySale, force);
     },
@@ -31,9 +34,10 @@ export default function SteamCatalog() {
   );
 
   const loadMore = useCallback(() => {
+    const mine = generation.current;
     const next = page.current + 1;
     return api.steamCatalog(term, next, sort, onlySale, false).then((list) => {
-      page.current = next;
+      if (mine === generation.current) page.current = next;
       return list;
     });
   }, [term, sort, onlySale]);
