@@ -1,6 +1,7 @@
 import type { AgendaItem, Task } from "../lib/api";
 import { duration } from "../lib/agendaFree";
 import { dayStats, horizonMin, minuteOf, ribbon, type RibbonSegment } from "../lib/agendaRail";
+import { hourTick } from "../lib/clockLabel";
 import { hhmm } from "../lib/dayPlan";
 import { t } from "../i18n";
 
@@ -43,7 +44,7 @@ export default function AgendaRibbon({ items, tasks, now }: { items: AgendaItem[
       <div aria-hidden="true" className="relative mt-1 h-3 text-[10px] text-faint">
         {r.ticks.map((h) => (
           <span key={h} className="absolute -translate-x-1/2 font-mono tabular-nums" style={{ left: pos(h * 60) }}>
-            {h}h
+            {hourTick(h)}
           </span>
         ))}
       </div>
