@@ -141,12 +141,15 @@ fn keep_only(raw: Vec<RawItem>, total: Option<u64>, keep: impl Fn(&RawItem) -> b
 
 /// Redirects are refused: the token must only ever reach the address the user typed.
 pub(crate) fn client() -> Result<reqwest::blocking::Client> {
-    crate::net::client_builder()
-        .user_agent("canto-widget")
-        .redirect(reqwest::redirect::Policy::none())
-        .timeout(Duration::from_secs(20))
-        .build()
-        .map_err(network)
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            .user_agent("canto-widget")
+            .redirect(reqwest::redirect::Policy::none())
+            .timeout(Duration::from_secs(20))
+            .build()
+    })
+    .map_err(network)
 }
 
 pub(crate) fn network(e: reqwest::Error) -> AppError {
