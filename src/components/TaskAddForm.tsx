@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { t } from "../i18n";
 import { api, errText } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
+import { splitPastedTasks } from "../lib/pasteTasks";
 import type { TokenEdit } from "../lib/quickAddTokens";
 import { PlusIcon } from "./Icons";
 import TaskQuickChips from "./TaskQuickChips";
@@ -28,25 +29,49 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
     setSelect({ start: edit.start, end: edit.end });
   }
 
+  /** Creates one quick-add line; null when it all landed, else the error to show. */
+  async function create(raw: string): Promise<string | null> {
+    const quick = parseQuickTask(raw);
+    const created = await api.taskAdd(quick.title, today);
+    try {
+      if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
+      if (quick.priority) await api.taskSetPriority(created.id, quick.priority);
+    } catch (err) {
+      return errText(err);
+    }
+    return null;
+  }
+
   async function add(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim()) return;
-    const quick = parseQuickTask(title);
-    let created;
+    let failure: string | null;
     try {
-      created = await api.taskAdd(quick.title, today);
+      failure = await create(title);
     } catch (err) {
       onError(errText(err));
       return;
     }
     // The task exists from here on: clearing the field keeps a retry from adding a duplicate.
     setTitle("");
+    await reload();
+    if (failure) onError(failure);
+  }
+
+  // A list pasted into the empty field becomes one task per line instead of one long title.
+  async function paste(e: React.ClipboardEvent<HTMLInputElement>) {
+    if (title.trim()) return;
+    const lines = splitPastedTasks(e.clipboardData.getData("text/plain"));
+    if (!lines) return;
+    e.preventDefault();
     let failure: string | null = null;
-    try {
-      if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
-      if (quick.priority) await api.taskSetPriority(created.id, quick.priority);
-    } catch (err) {
-      failure = errText(err);
+    for (const line of lines) {
+      try {
+        failure = (await create(line)) ?? failure;
+      } catch (err) {
+        failure = errText(err);
+        break;
+      }
     }
     await reload();
     if (failure) onError(failure);
@@ -64,6 +89,7 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
             value={title}
             data-shortcut="new"
             onChange={(e) => setTitle(e.target.value)}
+            onPaste={paste}
             placeholder={t("tasks.addPlaceholder")}
             className="canto-field w-full py-2 pl-9 pr-3 text-sm"
           />
