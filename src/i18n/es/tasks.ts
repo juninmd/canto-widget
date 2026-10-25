@@ -42,6 +42,8 @@ export const tasks: Record<keyof typeof source, string> = {
   "tasks.carriedNone": "no hay tareas pendientes para traer",
   "tasks.carriedOne": "1 tarea pendiente traída a hoy",
   "tasks.carriedMany": "{n} tareas pendientes traídas a hoy",
+  "tasks.pasteCapped": "solo las primeras {n} líneas se volvieron tareas ({dropped} quedaron fuera)",
+  "tasks.pasteLeft": "{n} líneas no se agregaron; pulsa Enter para intentar de nuevo",
   "tasks.clearDone": "limpiar hechas",
   "tasks.clearDoneHint": "elimina las tareas completadas de este día (se puede deshacer)",
   "tasks.clearedOne": "1 tarea completada eliminada",
