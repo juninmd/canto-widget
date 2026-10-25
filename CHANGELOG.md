@@ -136,6 +136,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Captura rápida e janela de avisos mais firmes.** Na captura rápida, apertar **Enter** duas vezes (ou clicar no
+  botão enquanto salva) não cria mais a tarefa em dobro: os botões ficam travados com um indicador de progresso até
+  terminar, e uma falha ao fechar com **Esc** aparece em vez de sumir. Na janela de avisos, uma leitura antiga que
+  chega atrasada não substitui mais os avisos novos, e uma leitura que falha mantém os cartões na tela. O **tentar de
+  novo** dos erros mostra que está tentando, com o mesmo indicador, em vez de só ficar apagado.
 - **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
   sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
   lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
