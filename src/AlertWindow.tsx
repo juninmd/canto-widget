@@ -9,7 +9,17 @@ export default function AlertWindow() {
   const [alerts, setAlerts] = useState<AgendaItem[]>([]);
 
   useEffect(() => {
-    const load = () => void api.alertPayload().then(setAlerts);
+    // Two rings close together: only the newest read may land, and a failed one keeps what is on screen.
+    let seq = 0;
+    const load = () => {
+      const mine = ++seq;
+      void api.alertPayload().then(
+        (list) => {
+          if (mine === seq) setAlerts(list);
+        },
+        () => {},
+      );
+    };
     load();
     const stop = listen("canto://alert", load);
     return () => {

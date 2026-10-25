@@ -6,6 +6,8 @@ import { todayLocal } from "./lib/api";
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 const emitted: string[] = [];
 let failNext: string | null = null;
+/** When set, `task_add` waits for this promise, so a test can press again while the first save is running. */
+let hold: Promise<void> | null = null;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
@@ -14,6 +16,7 @@ mock.module("@tauri-apps/api/core", () => ({
       failNext = null;
       return Promise.reject("cofre trancado");
     }
+    if (cmd === "task_add" && hold) return hold.then(() => ({ id: "t1" }));
     return Promise.resolve(cmd === "task_add" ? { id: "t1" } : null);
   },
 }));
@@ -41,6 +44,7 @@ beforeEach(() => {
   calls.length = 0;
   emitted.length = 0;
   failNext = null;
+  hold = null;
   render(<CaptureWindow />);
 });
 
@@ -88,4 +92,21 @@ test("a failed save keeps the text and shows the reason", async () => {
   expect(input().value).toBe("importante");
   expect(screen.getByRole("alert").textContent).toContain("cofre trancado");
   expect(cmds()).not.toContain("capture_close");
+});
+
+test("a second Enter while the first save runs does not add the task twice", async () => {
+  let release!: () => void;
+  hold = new Promise((r) => (release = r));
+  fireEvent.change(input(), { target: { value: "comprar pão" } });
+  fireEvent.keyDown(input().parentElement!, { key: "Enter" });
+  fireEvent.keyDown(input().parentElement!, { key: "Enter" });
+  await settle();
+  const task = screen.getByText("tarefa de hoje").closest("button")!;
+  expect(task.disabled).toBe(true);
+  expect(task.getAttribute("aria-busy")).toBe("true");
+  fireEvent.click(task);
+  await act(async () => release());
+  await settle();
+  expect(cmds().filter((c) => c === "task_add")).toHaveLength(1);
+  expect(task.disabled).toBe(false);
 });
