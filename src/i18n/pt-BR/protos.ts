@@ -5,6 +5,7 @@ export const protos = {
   "protos.market.usd": "Dólar",
   "protos.market.eur": "Euro",
   "protos.market.loading": "consultando as cotações",
+  "protos.market.empty": "nenhuma cotação chegou agora; confira a conexão e tente de novo",
   "protos.market.source": "dados: Yahoo Finance",
   "protos.market.gbp": "Libra",
   "protos.market.jpy": "Iene",
