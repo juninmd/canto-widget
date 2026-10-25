@@ -22,11 +22,18 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
   const [notes, setNotes] = useState<Note[]>([]);
   const [notesTotal, setNotesTotal] = useState(0);
   const [clips, setClips] = useState<ClipItem[]>([]);
+  // The query whose three lookups all settled: "nada encontrado" waits for it instead of flashing while they run.
+  const [settled, setSettled] = useState("");
   const input = useRef<HTMLInputElement>(null);
+  const previous = useRef<Element | null>(null);
   const { bump, isLatest } = useLatestRequest();
   const mask = privacy ? "blur-sm select-none" : "";
 
-  useEffect(() => input.current?.focus(), []);
+  useEffect(() => {
+    previous.current = document.activeElement;
+    input.current?.focus();
+    return () => (previous.current as HTMLElement | null)?.focus?.();
+  }, []);
 
   useEffect(() => {
     const q = query.trim();
@@ -36,27 +43,28 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       setNotes([]);
       setNotesTotal(0);
       setClips([]);
+      setSettled("");
       return;
     }
     const timer = setTimeout(() => {
       const id = bump();
       const low = q.toLowerCase();
-      void api
-        .tasksForDay(today)
-        .then((all) => isLatest(id) && setTasks(all.filter((x) => x.title.toLowerCase().includes(low))))
-        .catch((e) => isLatest(id) && onError(errText(e)));
-      void api
-        .notesSearch(q, CAP)
-        .then((page) => {
+      const lookups = [
+        api.tasksForDay(today).then((all) => isLatest(id) && setTasks(all.filter((x) => x.title.toLowerCase().includes(low)))),
+        api.notesSearch(q, CAP).then((page) => {
           if (!isLatest(id)) return;
           setNotes(page.items);
           setNotesTotal(page.total);
-        })
-        .catch((e) => isLatest(id) && onError(errText(e)));
-      void api
-        .clipList(q)
-        .then((list) => isLatest(id) && setClips(list.items))
-        .catch((e) => isLatest(id) && onError(errText(e)));
+        }),
+        api.clipList(q).then((list) => isLatest(id) && setClips(list.items)),
+      ];
+      void Promise.allSettled(lookups).then((done) => {
+        if (!isLatest(id)) return;
+        setSettled(q);
+        // One toast per search: a locked vault fails all three lookups with the same message.
+        const failed = done.find((r) => r.status === "rejected");
+        if (failed) onError(errText((failed as PromiseRejectedResult).reason));
+      });
     }, 150);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -93,7 +101,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
         {!query.trim() ? (
           <p className="px-1 text-xs text-muted">{t("search.hint")}</p>
         ) : tasks.length === 0 && notes.length === 0 && clips.length === 0 ? (
-          <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
+          settled === query.trim() && <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
         ) : (
           <>
             <Group title={t("search.groupTasks")} empty={tasks.length === 0} onOpen={() => go("tasks")}>

@@ -11,6 +11,7 @@ mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown>) => {
     calls.push({ cmd, args });
     if (cmd === "models_get") return Promise.resolve(view);
+    if (cmd === "open_link") return Promise.reject("sem navegador padrão");
     if (cmd === "models_alerts_set") return Promise.resolve(args.enabled);
     return Promise.resolve(null);
   },
@@ -193,4 +194,20 @@ test("rows from a backend without the sheet still open and compare", async () =>
   await show();
   await act(async () => fireEvent.click(screen.getByTitle("ver a ficha de Aurora 4")));
   expect(document.querySelector('[data-model="a"]')!.textContent).not.toContain("undefined");
+});
+
+test("a source link that fails to open says so instead of doing nothing", async () => {
+  await show();
+  await act(async () => fireEvent.click(screen.getByText("artificialanalysis.ai")));
+  expect(screen.getByRole("alert").textContent).toContain("sem navegador padrão");
+});
+
+test("the comparison table labels each value by its model column and metric row", async () => {
+  localStorage.setItem("canto.models.compare", JSON.stringify(["a", "n"]));
+  await show();
+  await act(async () => fireEvent.click(screen.getByText("Comparar · 2")));
+  const heads = [...document.querySelectorAll("thead th")].map((th) => [th.getAttribute("scope"), th.textContent]);
+  expect(heads).toEqual([["col", "Aurora 4"], ["col", "Nimbus Ultra"]]);
+  const row = [...document.querySelectorAll("tbody th[scope=row]")].map((th) => th.textContent);
+  expect(row).toContain("Inteligência");
 });

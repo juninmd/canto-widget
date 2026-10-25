@@ -132,6 +132,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Busca global sem "nada encontrado" piscando e Modelos IA mais acessível.** A busca global só diz **nada
+  encontrado** depois que tarefas, notas e clipboard respondem, mostra um único aviso quando as três falham juntas
+  (cofre bloqueado, por exemplo) e devolve o foco para onde você estava ao fechar. Na aba **Modelos IA**, a tabela de
+  **Comparar** anuncia cada valor pelo modelo e pela métrica no leitor de tela, o ranking não é recalculado a cada
+  ficha aberta e o link **artificialanalysis.ai** avisa quando não consegue abrir o navegador.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
