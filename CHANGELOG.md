@@ -1,4 +1,188 @@
-- **Horas e d- **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
+- **Horas e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
+- **Agenda redesenhada**: as visões Lista e Dia viram uma só, **Hoje** (a escolha anterior cai nela). No topo, um
+  cartão com a reunião em andamento (tempo que falta, andamento, aviso de conflito e **entrar no Meet**) ou a
+  próxima; abaixo, **o dia em uma linha** (reuniões, tarefas e tempo livre ao longo do expediente, com o tempo em
+  reuniões, o tempo livre e os conflitos contados) e uma linha do tempo única em que reuniões, tarefas com horário e
+  janelas livres são linhas próprias. Uma janela livre oferece encaixar uma tarefa sem horário, o que já passou fica
+  recolhido e a linha vermelha marca o agora. Reuniões e os detalhes de cada evento seguem como antes.
+- **GitHub e GitLab com resumo no topo**: quatro números antes das listas (revisões pedidas, meus PRs/MRs, CI que falhou
+  e minhas issues). No GitLab não há o número de CI, porque os MRs só consultam o CI sob demanda.
+- **Tarefas com a tarefa da vez**: no topo, um cartão mostra a tarefa em foco (ou a próxima em aberto) com horário,
+  prioridade, cronômetro, barra da estimativa e um botão para iniciar ou pausar o foco. A lista ganha os grupos
+  **pendentes** e **concluídas**.
+-- **Janela deslizando de lado**: escolher uma aba pelo menu **mais** empurrava o cabeçalho 112 px para a esquerda; a
+  cópia invisível da barra, usada só para medir as abas, agora fica recortada.
+- **Trancar com falha**: se o Rust não conseguir trancar o cofre, a tela avisa e relê o estado real em vez de fingir
+  que trancou. Com o cofre trancado, o cache do GitHub/GitLab e o dia escolhido na Agenda deixam de ficar na memória.
+- **Fechamento ao abrir no Windows**: as janelas só carregam depois de inicializar os estados do Rust e a
+  bandeja, evitando o encerramento provocado por comandos da interface durante a inicialização.
+- **Jogo sem título na Steam**: quando a loja não devolvia o nome de um jogo em promoção, a linha mostrava um texto
+  fixo em português ("jogo 900999"). Agora ela mostra o appid do jogo, que não depende do idioma e não finge ser um
+  título.
+- **Escolher a cidade no Clima**: o campo de busca herdava o estilo da caixa de seleção (`canto-box`), que tem
+  18 px por 18 px — dava para digitar, mas não para ver o que se digitava. O campo volta a ser um campo de texto
+  de verdade, e a busca passa a **mostrar os candidatos com estado e país** para você escolher: antes ela aceitava
+  o primeiro resultado e "Londres" ia parar na Argentina, sem como corrigir. O mesmo campo errado saiu da aba
+  **Leituras**, que o escondia atrás do "+".
+ **Aba Steam**: o nome da conta no cabeçalho virou um atalho para o perfil, e quem não tem a chave da Web API pode
+  colá-la ali mesmo, sem desconectar e reconectar a conta.
+- **Aba Agentes**: os CLIs de agente mais usados (Claude Code, Codex CLI, Gemini CLI, OpenCode, GitHub Copilot CLI e
+  Aider) num só lugar. Cada linha diz se o CLI está instalado nesta máquina — e onde —, mostra a **última release** do
+  GitHub com a data e um resumo do que mudou, e, quando o CLI não está instalado, traz o comando de instalação
+  **pronto para copiar**. O Canto só copia: nada é instalado nem executado por ele. A lista de releases é pública,
+  não precisa de conta nem de chave, e fica 30 min em memória antes de consultar o GitHub de novo. A aba começa
+  desligada, a um clique nos Ajustes.
+- **Aba Agentes mais legível**: cada CLI virou um cartão com a inicial, o repositório de onde vem, a última release
+  e as notas de versão num bloco próprio; o comando de instalação ganhou destaque e o botão de copiar.
+- **Aba Agentes com os logos dos providers**: cada CLI ganhou o ícone da sua marca (Claude, Codex, Gemini, OpenCode,
+  Copilot e Aider) num cartão com a cor do provider, o indicador de instalado com brilho e a versão como etiqueta,
+  seguida de há quanto tempo foi publicada. O topo ganhou uma faixa com os logos (apagados quando o CLI não está
+  instalado) e uma barra de progresso; um agente novo, que a interface ainda não conhece, cai para a inicial.
+- **Ofertas da Steam paginadas**: a lista terminava num aviso ("há mais ofertas na sua lista de desejos") que não
+  levava a lugar nenhum. Agora ela pagina como o catálogo, com **ver mais jogos** e sem reler a lista de desejos a
+  cada página.
+- **Sub-abas da Steam roláveis**: com cinco seções, a régua estourava a largura da janela e cortava a última; agora
+  ela rola na horizontal. O tempo de jogo também passa a usar o separador de milhar do idioma ("2.140 h"), que só
+  aparecia em contas grandes.
+- **Desconectar a Steam pergunta antes**: o botão no cabeçalho abre uma confirmação (a chave da Web API sai do cofre
+  no processo), com cancelar do lado.
+- **Varredura da lista de desejos com limites**: a varredura de preços passou a ter um teto de jogos por vez e a
+  esperar antes de repetir um pedido que a Steam recusou por excesso de requisições, em vez de desistir na primeira
+  resposta 429. O alerta de preço também passou a guardar **de qual conta** são os preços: trocar de conta não
+  compara a lista nova com os preços da anterior, como já acontecia ao trocar de loja.
+- **O texto dos avisos em markdown**: a caixa de detalhes da janela de avisos passa a renderizar markdown — negrito,
+  listas, código e **links que abrem no navegador** — em vez de mostrar tudo como texto corrido. O que vem de uma
+  menção do GitHub/GitLab é markdown de verdade, então é ali que a mudança aparece. Uma quebra de linha sozinha
+  continua sendo uma quebra, para o resumo do dia seguir linha a linha.
+- - **Aba Leituras (RSS e Atom)**: cole os endereços dos feeds e leia tudo num só lugar, com **contagem de não
+  lidos**, o mais novo primeiro, o **favicon** da origem, a idade e um resumo em cada cartão — e a **miniatura**
+  quando a entrada tem uma. Tudo é baixado pelo Rust e entregue à interface como `data:`, então a janela nunca
+  fala com uma origem remota; só **https** e hosts públicos são aceitos numa imagem. Os cartões abrem no navegador
+  e podem ser marcados como lidos/não lidos; um feed que falha fica visível em vermelho, sem esconder os outros.
+  Sem chave, cache de 15 min, e a lista fica ao lado do cofre (são só endereços públicos).
+- **Aba Clima**: escreva o nome da cidade uma vez e o Canto guarda só as coordenadas. A aba mostra **agora**, as
+  **próximas horas numa curva** com a chance de chuva, os **próximos dias** e o aviso de **chuva a partir das
+  HH:MM**. Os dados vêm da Open-Meteo, que é aberta e **não pede chave** — nenhuma conta e nenhum endereço seu sai
+  da máquina —, com cache de 30 min. A aba começa desligada, a um clique nos Ajustes.
+- **Loja Steam da sua região**: um seletor no cabeçalho da aba escolhe a loja — Brasil, Estados Unidos, Euro ou
+  Reino Unido. Preços, moeda e o texto das análises passam a vir dela, e a economia de cada oferta é escrita na
+  moeda escolhida. O padrão segue o idioma da interface (português abre no Brasil), a escolha fica guardada com a
+  conta e sobrevive a desconectar e reconectar.
+- **Alertas de queda de preço na Steam**: um sino no cabeçalho da aba liga os avisos da lista de desejos. Quando um
+  jogo fica mais barato do que a última vez que o Canto olhou, chega uma notificação do sistema com o nome, o novo
+  preço e o desconto — mesmo com a janela escondida, porque quem varre é o Rust. A primeira varredura só anota:
+  nada toca para um preço que o jogo já tinha antes de você ligar os avisos. Desligado por padrão; o estado (a
+  escolha e o último preço de cada jogo) viaja selado, é lido a cada 30 min com o cofre aberto e some da memória ao
+  trancar. Um jogo que fica gratuito toca como a maior queda de todas: a loja não informa preço nenhum para ele,
+  então o aviso diz "Grátis".
+- **Biblioteca da Steam**: uma quinta sub-aba lista **todos os jogos que a conta tem**, do mais jogado para o menos,
+  com capa, o **tempo total** de cada um e uma linha de resumo que diz quantos jogos e quantas horas a lista soma.
+  Tem **busca por nome** e pagina de 100 em 100, como o catálogo, então uma conta de mil jogos continua navegável.
+  Precisa da chave da Steam Web API, como o "jogue agora".
+- **Catálogo da Steam com filtros**: além da busca, a seção ganhou **só em promoção** e a escolha da ordem —
+  melhor avaliados, menor preço ou mais recentes. São os três critérios que a própria loja aceita; "maior
+  desconto" não é um deles, então essa ordem continua sendo a da lista de desejos.
+- **"Fechar todos" na janela de avisos**: quando a fila de avisos passa de um, a janela do alerta ganha **fechar
+  todos** no canto, ao lado da régua. Antes era um clique em "fechar" por aviso, com a janela ficando aberta até o
+  último; agora a fila inteira sai numa chamada só (o Rust derruba a fila de uma vez, e cada aviso continua deixando
+  o seu registro na lista de resolvidos do dia).
+- **Escolher a cidade ficou mais fácil**: os resultados aparecem **enquanto você digita** (setas e Enter funcionam,
+  com `combobox` e lista acessíveis), as **últimas cidades** e uma fileira de **cidades populares** entram com um
+  clique — sem buscar —, e **trocar de cidade** abre o seletor sem esquecer a atual, com **voltar** (o "esquecer a
+  cidade" mudou para dentro dele). Uma busca de uma letra não sai, e uma resposta lenta nunca sobrescreve a mais nova.
+- **Clima com céu animado e mais detalhes**: o cartão de cima agora é um céu que acompanha o tempo — azul limpo,
+  noite estrelada, chuva, neve, neblina, trovoada com relâmpago —, com gotas e flocos caindo, nuvens passando e um
+  ícone desenhado e animado para cada condição (tudo parado quando o sistema pede menos movimento). Abaixo: **umidade,
+  vento com a direção, índice UV, nascer e pôr do sol** e a chance de chuva de hoje; as **próximas 24 horas** numa
+  curva suave que rola de lado, com ícone e chance de chuva (as horas depois do pôr do sol ganham a lua); e **sete
+  dias**, cada um com uma barra de mínima a máxima dentro da faixa da semana. O horário da última leitura aparece
+  no rodapé.
+- **PR/MR com conflito de merge em destaque** nas abas GitHub e GitLab: o cartão ganha borda vermelha e o selo
+  **⚠ conflito** enquanto houver conflito com a branch base a resolver. No GitLab vem da própria lista; no GitHub,
+  da mesma consulta que já traz o selo de CI, sem chamada extra.
+- **Aviso de PR mais direto**: o pop-up de pull request e de menção diz o tipo, o repositório e há quanto tempo numa
+  linha só, traz o motivo (atribuído, CI falhou, aprovado...) num selo colorido e mostra quem abriu o PR com avatar.
+  O bloco "detalhes" só aparece quando tem algo a dizer, e "fechar" ficou mais discreto para não competir com
+  "abrir PR".
+**Abas de protótipo Hábitos e Snippets**: saíram as duas telas de maquete, os rótulos nos 42 idiomas, os prints e
+  os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
+-- **Desativar abas em Ajustes** não faz mais a janela inteira sumir: a barra de abas lia a lista antiga por um
+  instante e derrubava a tela.
+- **Cliques bloqueados por uma janela invisível no canto da tela**: o pop-up de avisos ficava aberto e transparente
+  quando o último aviso saía só da tela (ou era fechado pelo widget), o dock do modo mini continuava largo quando o
+  menu de modos ou o mouse saíam para outro app, a captura rápida ficava por cima depois de perder o foco, e um erro
+  de desenho deixava qualquer janela vazia e transparente. Agora a janela vazia se esconde, o dock encolhe, a captura
+  fecha ao perder o foco e um erro mostra um painel com "tentar de novo" e "fechar".
+ **Mercado deixou de ser protótipo e mostra cotações reais**: dólar e euro contra o real, bitcoin, Ibovespa,
+  S&P 500 e Nasdaq, com a variação do dia sobre o fechamento anterior, vindos do Yahoo Finance (sem chave, buscados
+  pelo Rust e guardados na memória por 15 min; ↻ força uma nova leitura). A cotação em destaque ganhou um cartão
+  grande com o valor, a variação numa pílula com seta e a curva do pregão com área em degradê que se desenha ao
+  abrir; as demais viram cartões em grade com mini gráfico, e **clicar num cartão leva a curva dele para o
+  destaque**. Uma falha mostra o motivo com "tentar de novo" e mantém as últimas cotações na tela. Alta e baixa
+  usam as cores de sucesso e perigo do tema. Saíram o selo de protótipo, a lista de acompanhamento fictícia e o
+  mecanismo de abas de protótipo.
+- **Busca fixa em Ajustes**: o campo de busca acompanha a rolagem.
+- **Atividade com a meta de foco em pílula**: o tempo de código aparece grande com "faltam N min" (ou "Meta
+  cumprida"), as pausas aparecem hachuradas na faixa do dia e a semana marca a coluna de hoje.
+- **Modelos IA com chips de ordenação e posição em destaque**: Inteligência, Preço e Velocidade ficam sempre à vista,
+  a métrica escolhida acende em cada linha e o líder ganha o bloco em destaque.
+- **Status API: serviços por gravidade e endpoints com o que importa primeiro**: quem caiu vem primeiro, com resumo
+  ("N com problema · M operacionais"), barra proporcional, filtros com contagem e o estado escrito num selo. Em "meus
+  endpoints", "+ endereço" fica ao lado das abas, selos resumem fora/lentos/a vencer e os piores sobem. Tocar num
+  serviço continua abrindo os incidentes, e adicionar endereço, gráfico de latência, verificar agora e remover seguem
+  como antes.
+- **GitHub e GitLab: os quatro números do topo filtram a lista**: toque em revisões, meus PRs, CI falhou ou minhas
+  issues para ver só aquele grupo, e de novo para voltar. A ordenação virou um menu compacto, "atualizar" um ícone e
+  "desconectar" foi para o menu "⋯", ainda com a confirmação. O CI aparece como selo colorido, "aguardando há N d"
+  fica vermelho a partir de 2 dias, os títulos das seções ficam fixos e "adiar 4 h" e "ver CI" aparecem ao passar o
+  mouse ou focar.
+- **Agenda com os controles numa linha só**: Hoje/Reuniões, dia anterior/data/próximo, atualizar e o menu "···"
+  (testar aviso, antecedência, última atualização) dividem uma linha, e a reunião em andamento ganhou um anel de
+  contagem regressiva com os minutos que faltam.
+- **Clipboard filtra por tipo com chips e contagem**: Todos, Link, Cor, JSON... no lugar do seletor. O limite de
+  fixados foi para Ajustes > Dados e contas, "limpar" ficou no menu "···" (ainda com a confirmação) e o aviso de
+  privacidade virou um selo de cadeado. Cada cartão ganhou o ícone colorido do tipo, os fixados vêm primeiro e clicar
+  no cartão copia.
+- **Notas filtráveis por tag e em lista ou grade**: uma fileira de chips com a contagem faz a mesma busca de digitar
+  `#tag`, os cards ficam em "Fixadas" e "Recentes", e um alternador mostra os cards em duas colunas, lembrado entre
+  as sessões. A busca sem resultado diz o que fazer.
+- **Tarefas mais limpas e rápidas de filtrar**: o progresso virou um anel com "2 de 6", a prioridade é um seletor em
+  chips (Todas, Alta, Média, Baixa), "resumo do dia", "puxar pendências" e "limpar concluídas" foram para um menu
+  "⋯", e as concluídas ficam recolhidas atrás de um cabeçalho com a contagem. A prioridade aparece como etiqueta
+  colorida na linha, e os chips "hora", "!alta", "!média" e "!baixa" sob o campo inserem o trecho que o parser já
+  entende, então ninguém precisa decorar a sintaxe.
+- **Abas na vertical ou na horizontal, à sua escolha**: em Ajustes > Aparência, "Layout das abas" troca a barra de
+  cima por uma barra lateral com todas as abas, em grupos (Meu dia, Código, Explorar) e Ajustes no fim. Ela mostra só
+  os ícones, abre por cima do conteúdo ao passar o mouse ou navegar pelo teclado, e pode ficar aberta. As setas
+  seguem a direção da barra (cima e baixo na vertical) e o padrão continua horizontal. As abas passaram a seguir a
+  ordem dos grupos; Alt+1 a Alt+4 não mudam.
+- **Releases e CI mais rápidos**: o binário de release usa LTO thin (otimiza em paralelo, em vez de num só
+  passo), o `cargo-audit` vem pronto em vez de compilado a cada execução e os testes e2e no CI
+  rodam sobre o bundle pronto (`vite preview`) em vez do servidor de desenvolvimento, na metade do tempo.
+- **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
+  420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
+  de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
+  motivo e autor numa linha só, e as ações logo abaixo. **Fechar** vira um ✕ no canto (Esc continua valendo) e
+  **fechar todos** fica sempre visível com a contagem da fila. Reuniões e descrições longas deixam a janela maior
+  para mostrar tudo, com a lista de **convidados** em duas colunas.
+- **Chamadas de rede mais rápidas e leves**: GitHub, GitLab, Google, Steam, Mercado, Clima e Mapa passam a usar
+  um cliente HTTP por serviço durante toda a sessão, em vez de criar um novo (com thread e certificados) a cada
+  pedido; as conexões ficam abertas entre as páginas e atualizações, sem refazer o handshake TLS toda vez.
+- **Abertura mais leve.** Ajustes e as abas fora do dia a dia (GitHub, GitLab, Gmail, Drive, Contatos, Status API,
+  Modelos, Agentes, Atividade, Clima, Mapa, Mercado, Steam e Leituras) passam a ser carregadas só na primeira vez
+  que são abertas: o JavaScript lido na abertura caiu de 1.081 KiB para 745 KiB (307 → 228 KiB com gzip).
+d- **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
+  longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
+  fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
+-- **Colar uma lista cria uma tarefa por linha.** Cole várias linhas no campo de nova tarefa vazio e cada uma vira
+  uma tarefa, na ordem; marcadores de lista (`-`, `*`, `[ ]`, `[x]`, `1.`, `•`) somem e hora e `!alta` de cada
+  linha continuam valendo. Até 50 linhas por vez (um aviso diz quantas ficaram de fora); se uma linha falhar, ela
+  volta ao campo com as seguintes na fila e **Enter** tenta de novo. Uma linha só continua colando como antes.
+ **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
   longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
   fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
 u- **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
