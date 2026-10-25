@@ -147,6 +147,7 @@ test("removing a feed asks a second time and Escape gives up", async () => {
   const confirm = screen.getByText("remover o feed");
   await act(async () => fireEvent.keyDown(confirm, { key: "Escape" }));
   expect(screen.queryByText("remover o feed") === null).toBe(true);
+  expect(document.activeElement === screen.getByLabelText("remover Outro")).toBe(true);
   expect(calls.some((c) => c.cmd === "reads_remove")).toBe(false);
 
   await act(async () => fireEvent.click(screen.getByLabelText("remover Outro")));
@@ -165,6 +166,7 @@ test("a feed that cannot be removed reports the error instead of failing silentl
   await act(async () => fireEvent.click(screen.getByText("remover o feed")));
   expect(errors).toEqual(["o cofre está trancado"]);
   expect(document.querySelector("[data-feed='https://outro.test/feed']") === null).toBe(false);
+  expect(document.activeElement === screen.getByLabelText("remover Outro")).toBe(true);
 });
 
 test("a double click on marcar como lido sends a single request", async () => {

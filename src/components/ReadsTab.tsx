@@ -99,17 +99,31 @@ function FeedList({
   // Removing asks twice: the first click arms the chip, the second one (on "remover o feed") removes it.
   const [armed, setArmed] = useState("");
   const [removing, setRemoving] = useState("");
+  // The confirm button unmounts when the chip disarms: focus goes back to that feed's ✕ instead of <body>.
+  const crosses = useRef(new Map<string, HTMLButtonElement>());
+  const refocus = useRef("");
+  useEffect(() => {
+    if (armed || !refocus.current) return;
+    crosses.current.get(refocus.current)?.focus();
+    refocus.current = "";
+  }, [armed]);
+
+  function disarm(url: string) {
+    refocus.current = url;
+    setArmed("");
+  }
 
   async function remove(url: string) {
     if (removing) return;
     setRemoving(url);
     try {
       onChanged(await api.readsRemove(url));
+      setArmed("");
     } catch (e) {
       onError(errText(e));
+      disarm(url);
     } finally {
       setRemoving("");
-      setArmed("");
     }
   }
 
@@ -130,7 +144,7 @@ function FeedList({
               <button
                 type="button"
                 autoFocus
-                disabled={removing === feed.url}
+                aria-disabled={removing === feed.url}
                 aria-busy={removing === feed.url}
                 aria-label={t("reads.removeTitle", { label })}
                 onClick={() => void remove(feed.url)}
@@ -138,16 +152,20 @@ function FeedList({
                 onKeyDown={(e) => {
                   if (e.key === "Escape") {
                     e.stopPropagation();
-                    setArmed("");
+                    disarm(feed.url);
                   }
                 }}
-                className="rounded-full bg-danger/15 px-1.5 font-semibold text-danger hover:bg-danger/25 disabled:opacity-60"
+                className="rounded-full bg-danger/15 px-1.5 font-semibold text-danger hover:bg-danger/25 aria-disabled:opacity-60"
               >
                 {t("reads.remove")}
               </button>
             ) : (
               <button
                 type="button"
+                ref={(node) => {
+                  if (node) crosses.current.set(feed.url, node);
+                  else crosses.current.delete(feed.url);
+                }}
                 aria-label={t("reads.removeTitle", { label })}
                 onClick={() => setArmed(feed.url)}
                 className="text-faint hover:text-danger"
