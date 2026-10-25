@@ -65,7 +65,7 @@ export default function ReadCard({
           {article.published_at > 0 && <span className="shrink-0">· {timeAgo(article.published_at)}</span>}
         </div>
         {article.summary && <p className="mt-1 line-clamp-2 text-[10px] leading-snug text-muted">{article.summary}</p>}
-        <div className="mt-1 flex items-center gap-1.5">
+        <div className="mt-1 flex items-center gap-1.5 text-[11px]">
           <button
             type="button"
             onClick={() => void api.openLink(article.url).catch((e) => onError(String(e)))}
