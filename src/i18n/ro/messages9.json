@@ -420,5 +420,8 @@
   "time.min": "{n} min",
   "time.sec": "{n} s",
   "time.h": "{h}h",
-  "time.hMin": "{h}h {mm}m"
+  "time.hMin": "{h}h {mm}m",
+  "shortcuts.moveTask": "move the focused task up or down",
+  "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
+  "protos.market.empty": "no quotes came in right now; check the connection and try again"
 }
