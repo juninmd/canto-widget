@@ -132,6 +132,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Foco sem tempo contado em dobro e sub-abas no teclado.** Um clique duplo em **Pausar** ou **Concluir** (ou o
+  salvamento de cada minuto coincidindo com a pausa) gravava os mesmos segundos duas vezes; agora os salvamentos
+  entram em fila e **Concluir** só age uma vez. O relógio do foco acompanha o segundo da própria contagem, sem pular
+  nem repetir dígitos, e o chip de minutos da tarefa atualiza uma vez por minuto em vez de a cada segundo. As
+  sub-abas (Status API, Modelos, Steam, Forja) passam a ter uma só parada de Tab e trocam com as setas, Home e End.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
