@@ -7,6 +7,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
+  um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
+  endereços de links ficam de fora da conta.
 - **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
   está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
   senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
