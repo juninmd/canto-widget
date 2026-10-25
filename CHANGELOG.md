@@ -9,6 +9,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 - **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
   foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
+- **Primeiro uso sem telas enganosas.** Status API sem nenhuma página lida e Mercado sem nenhuma cotação agora dizem
+  isso com um **tentar de novo**, em vez de "0 com problema · 0 operacionais" ou um esqueleto que nunca some; o dia
+  sem tarefas some com o "0 de 0"; e o botão **abrir Ajustes** da Agenda sem Google (e o aviso de atualização) abre
+  o grupo certo e rola até a seção.
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
   um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
   endereços de links ficam de fora da conta.
@@ -141,13 +145,16 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
+  longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
+  fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
 - **Teclado no menu de adiar e na folha "mais" do celular.** O menu ▾ de adiar um aviso abre já no tempo atual,
   as setas percorrem as opções e Esc devolve o foco ao botão; a folha de abas do celular abre na aba atual, mantém
   o Tab dentro dela e, ao fechar, devolve o foco ao botão **mais** em vez de perdê-lo.
 - **Horas e durações no idioma escolhido.** Eixos e dicas de Atividade, Agenda e Mapa, o pico do dia, o anel da
   próxima reunião, o tempo de sol, o foco, os intervalos de Saúde e as horas jogadas na Steam deixam de escrever
-  “14h” e “1h30” fixos: em inglês aparecem “14:00” e “1h 30m”, em espanhol “14 h”. O uptime usa a vírgula ou o
-  ponto do idioma e o símbolo da moeda em Mercado vem do idioma (“US$” em português, “$” em inglês).
+  "14h" e "1h30" fixos: em inglês aparecem "14:00" e "1h 30m", em espanhol "14 h". O uptime usa a vírgula ou o
+  ponto do idioma e o símbolo da moeda em Mercado vem do idioma ("US$" em português, "$" em inglês).
 - **Leituras: remover um feed pede confirmação.** O ✕ de um feed agora vira **remover o feed** e só remove no segundo
   clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
   para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os
@@ -161,7 +168,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
   abre a página certa do console.
 - **Carrossel de notificações navegável**: com muitos avisos, a tira do topo do pop-up cortava os últimos sem
-  jeito de chegar a eles. Agora tem setas ‹ ›, contador (“2 de 5”), ← → no teclado, rolagem com a roda do mouse
+  jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse
   e arrastando, e o aviso escolhido sempre rola para a vista.
 - **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
   arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
