@@ -132,6 +132,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Contatos, Atividade e Meus endpoints não voltam a mostrar dados velhos.** Uma resposta mais lenta e mais antiga
+  (a verificação a cada 10 s, o recarregar automático ou o pedido da paleta) não sobrescreve mais a lista que uma
+  ação mais nova já trouxe. Em **meus endpoints**, o formulário de novo endereço só fecha quando a gravação dá certo:
+  se falhar, o erro aparece e o que foi digitado continua lá, e um segundo Enter enquanto grava é ignorado.
+
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que

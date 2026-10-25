@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { t } from "../i18n";
 import { blankEndpoint, draftError, everyLabel, INTERVALS, LIMITS } from "../lib/health";
 import type { HealthEndpoint, HealthKind } from "../lib/healthTypes";
@@ -7,20 +7,39 @@ const KINDS: HealthKind[] = ["http", "dns", "tcp"];
 const FIELD = "canto-field w-full px-2.5 py-1.5 text-xs";
 
 /** New endpoint, in the same wide shape as an open one: the kind picks which target fields exist. */
-export default function HealthForm({ onSave, onCancel }: { onSave: (e: HealthEndpoint) => void; onCancel: () => void }) {
+export default function HealthForm({ onSave, onCancel }: { onSave: (e: HealthEndpoint) => Promise<boolean>; onCancel: () => void }) {
   const [e, setE] = useState<HealthEndpoint>(() => blankEndpoint("http"));
   const [error, setError] = useState<ReturnType<typeof draftError>>(null);
+  const [saving, setSaving] = useState(false);
+  const pending = useRef(false);
+  const mountedRef = useRef(true);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
   const set = (patch: Partial<HealthEndpoint>) => setE((cur) => ({ ...cur, ...patch }));
 
-  function submit(ev: React.FormEvent) {
+  // The draft stays until the save lands, so a failure keeps what was typed; a second Enter meanwhile is ignored.
+  async function submit(ev: React.FormEvent) {
     ev.preventDefault();
+    if (pending.current) return;
     const bad = draftError(e);
     setError(bad);
-    if (!bad) onSave({ ...e, name: e.name.trim(), url: e.url?.trim(), host: e.host?.trim() });
+    if (bad) return;
+    pending.current = true;
+    setSaving(true);
+    try {
+      await onSave({ ...e, name: e.name.trim(), url: e.url?.trim(), host: e.host?.trim() });
+    } finally {
+      pending.current = false;
+      if (mountedRef.current) setSaving(false);
+    }
   }
 
   return (
-    <form onSubmit={submit} aria-label={t("health.newTitle")} className="flex flex-col gap-2 rounded-xl border border-accent bg-panel p-3 text-xs text-muted">
+    <form onSubmit={(ev) => void submit(ev)} aria-busy={saving} aria-label={t("health.newTitle")} className="flex flex-col gap-2 rounded-xl border border-accent bg-panel p-3 text-xs text-muted">
       <div role="group" aria-label={t("health.field.kind")} className="flex">
         {KINDS.map((k, i) => (
           <button
@@ -110,7 +129,7 @@ export default function HealthForm({ onSave, onCancel }: { onSave: (e: HealthEnd
         </p>
       )}
       <div className="flex gap-2">
-        <button type="submit" className="canto-hit min-h-[28px] rounded-lg bg-accent px-3 font-semibold text-on-accent hover:brightness-110">
+        <button type="submit" disabled={saving} className="canto-hit min-h-[28px] rounded-lg bg-accent px-3 font-semibold text-on-accent hover:brightness-110 disabled:opacity-60">
           {t("health.save")}
         </button>
         <button type="button" onClick={onCancel} className="canto-hit min-h-[28px] rounded-lg border border-edge px-3 hover:bg-hover">

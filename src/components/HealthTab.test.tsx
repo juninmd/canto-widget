@@ -6,6 +6,7 @@ import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 type Call = { cmd: string; args?: Record<string, unknown> };
 let calls: Call[] = [];
 let views: HealthView[] = [];
+let override: ((cmd: string) => Promise<unknown> | undefined) | null = null;
 
 const api: HealthEndpoint = {
   id: "a", name: "API principal", kind: "http", url: "https://api.exemplo.dev/health",
@@ -17,6 +18,8 @@ const view = (endpoint: HealthEndpoint, health: HealthView["health"], samples: R
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
+    const held = override?.(cmd);
+    if (held) return held;
     if (cmd === "health_save") {
       const e = args?.endpoint as HealthEndpoint;
       views = e.id ? views.map((v) => (v.endpoint.id === e.id ? { ...v, endpoint: e } : v)) : [...views, view({ ...e, id: "new" }, "unknown", [])];
@@ -40,6 +43,7 @@ async function mount() {
 
 beforeEach(() => {
   calls = [];
+  override = null;
   views = [
     view(api, "up", [sample(110), sample(130)]),
     view({ ...api, id: "b", name: "Painel", url: "https://admin.exemplo.dev" }, "down", [sample(90), sample(null), sample(null)]),
@@ -152,4 +156,39 @@ test("an empty list explains what to add", async () => {
   views = [];
   await mount();
   expect(screen.getByText(/nenhum endpoint ainda/)).toBeTruthy();
+});
+
+test("a failed add keeps the form and what was typed, and a double submit sends one save", async () => {
+  await mount();
+  let fail: (reason: string) => void = () => {};
+  override = (cmd) => (cmd === "health_save" ? new Promise((_, reject) => (fail = reject)) : undefined);
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+  const form = screen.getByRole("form", { name: "novo endpoint" });
+  fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Fila" } });
+  fireEvent.change(within(form).getByLabelText("endereço (http ou https)"), { target: { value: "https://fila.exemplo.dev" } });
+  await act(async () => {
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+  });
+  expect(calls.filter((c) => c.cmd === "health_save").length).toBe(1);
+  expect((within(form).getByRole("button", { name: "adicionar" }) as HTMLButtonElement).disabled).toBe(true);
+  await act(async () => fail("cofre ocupado"));
+  expect(screen.getByText("cofre ocupado")).toBeTruthy();
+  expect((screen.getByLabelText("nome") as HTMLInputElement).value).toBe("Fila");
+  expect((within(form).getByRole("button", { name: "adicionar" }) as HTMLButtonElement).disabled).toBe(false);
+});
+
+test("a slower, older answer does not undo a newer edit on screen", async () => {
+  await mount();
+  const before = views;
+  let finish: (list: HealthView[]) => void = () => {};
+  override = (cmd) => (cmd === "health_check_now" ? new Promise((resolve) => (finish = resolve)) : undefined);
+  fireEvent.click(screen.getByText("API principal"));
+  fireEvent.click(screen.getByRole("button", { name: "verificar agora" }));
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("latência alta acima de"), { target: { value: "800" } });
+  });
+  expect((screen.getByLabelText("latência alta acima de") as HTMLSelectElement).value).toBe("800");
+  await act(async () => finish(before));
+  expect((screen.getByLabelText("latência alta acima de") as HTMLSelectElement).value).toBe("800");
 });

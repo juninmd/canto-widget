@@ -3,6 +3,7 @@ import { api, errText } from "../lib/api";
 import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 import { summarize } from "../lib/health";
 import { worstFirst } from "../lib/healthSort";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { t } from "../i18n";
 import HealthDetail from "./HealthDetail";
 import HealthForm from "./HealthForm";
@@ -22,21 +23,26 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const mounted = useRef(true);
+  const { bump, isLatest } = useLatestRequest();
 
-  const apply = useCallback((list: HealthView[] | null | undefined) => {
-    if (mounted.current && Array.isArray(list)) setViews(list);
-  }, []);
-
+  // The 10 s poll can be in flight during a save: its older list must not undo the edit on screen.
   const run = useCallback(
-    async (call: () => Promise<HealthView[]>) => {
+    async (call: () => Promise<HealthView[]>): Promise<boolean> => {
+      const id = bump();
       try {
-        apply(await call());
-        if (mounted.current) setError("");
+        const list = await call();
+        if (mounted.current && isLatest(id)) {
+          if (Array.isArray(list)) setViews(list);
+          setError("");
+        }
+        return true;
       } catch (e) {
+        // A failed save is shown even if a poll started meanwhile, or the form would stay open in silence.
         if (mounted.current) setError(errText(e));
+        return false;
       }
     },
-    [apply],
+    [bump, isLatest],
   );
 
   useEffect(() => {
@@ -77,9 +83,10 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
             {adding && (
               <HealthForm
                 onCancel={() => setAdding(false)}
-                onSave={(e) => {
-                  setAdding(false);
-                  void save(e);
+                onSave={async (e) => {
+                  const ok = await save(e);
+                  if (ok && mounted.current) setAdding(false);
+                  return ok;
                 }}
               />
             )}
