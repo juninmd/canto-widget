@@ -82,3 +82,21 @@ test("discard drops the run without saving, for a vault that just locked", async
   expect(added).toEqual([]);
   expect(store.totalSecs()).toBe(0);
 });
+
+test("overlapping pauses save the elapsed seconds once, not once per click", async () => {
+  const { store, added, advance } = setup();
+  await store.start({ id: "a", title: "A", trackedSecs: 0 });
+  advance(30_000);
+  await Promise.all([store.stop(), store.stop()]);
+  expect(added).toEqual([["a", 30]]);
+});
+
+test("msToNext aims at the run's own second and minute boundaries", async () => {
+  const { store, advance } = setup();
+  await store.start({ id: "a", title: "A", trackedSecs: 50 });
+  advance(1_300);
+  expect(store.msToNext(1000)).toBe(700);
+  expect(store.msToNext(60_000)).toBe(8_700);
+  expect(store.msToNext(60_000, 1000)).toBe(9_700);
+  await store.stop();
+});
