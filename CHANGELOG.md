@@ -132,6 +132,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Cartões de "meus endpoints" sem sobreposição.** Na aba Status API, com vários endpoints, os cartões
+  encolhiam para caber na lista e o seguinte cobria a latência, as barras e a linha "100% · p95"; agora cada
+  cartão mantém a altura e a lista rola.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
