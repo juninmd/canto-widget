@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Clipboard navegável pelo teclado e sem ação dupla.** Seta para baixo na busca entra na lista; setas, Home e End andam entre os itens e Enter copia o selecionado. Um duplo clique em fixar não fixa e desafixa mais; e o limite de fixados em Ajustes avisa leitores de tela quando o valor é inválido.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam
