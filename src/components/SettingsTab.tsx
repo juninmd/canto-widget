@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { GROUPS, loadOpenGroups, saveOpenGroups, sectionMatches, type GroupId, type SectionId } from "../lib/settingsGroups";
 import BackupSection from "./BackupSection";
 import SyncSection from "./SyncSection";
@@ -39,10 +39,12 @@ type Props = {
   reminderLead: LeadMinutes;
   onReminderLead: (lead: LeadMinutes) => void;
   onShowShortcuts: () => void;
+  /** Section an empty state sent the user to: its group opens and it scrolls into view. */
+  focus?: SectionId | null;
 };
 
-export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout, onLayout, pinned, onPinned, reminderLead, onReminderLead, onShowShortcuts }: Props) {
-  const [open, setOpen] = useState<GroupId[]>(loadOpenGroups);
+export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout, onLayout, pinned, onPinned, reminderLead, onReminderLead, onShowShortcuts, focus = null }: Props) {
+  const [open, setOpen] = useState<GroupId[]>(() => withFocus(loadOpenGroups(), focus));
   const [query, setQuery] = useState("");
   const searching = query.trim() !== "";
 
@@ -69,6 +71,12 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     shortcuts: <ShortcutsSection onOpen={onShowShortcuts} />,
     update: <UpdateSection />,
   };
+
+  useEffect(() => {
+    if (!focus) return;
+    setOpen((current) => withFocus(current, focus));
+    requestAnimationFrame(() => document.querySelector(`[data-settings-section="${focus}"]`)?.scrollIntoView?.({ block: "start" }));
+  }, [focus]);
 
   function toggle(id: GroupId) {
     const next = open.includes(id) ? open.filter((g) => g !== id) : [...open, id];
@@ -105,7 +113,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
             onToggle={() => toggle(g.id)}
           >
             {g.sections.map((s) => (
-              <div key={s} hidden={!visible(s, g.id)}>
+              <div key={s} data-settings-section={s} hidden={!visible(s, g.id)}>
                 {sections[s]}
               </div>
             ))}
@@ -113,7 +121,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
               <div hidden={!g.sensitive.some((s) => visible(s, g.id))}>
                 <SensitiveZone>
                   {g.sensitive.map((s) => (
-                    <div key={s} hidden={!visible(s, g.id)}>
+                    <div key={s} data-settings-section={s} hidden={!visible(s, g.id)}>
                       {sections[s]}
                     </div>
                   ))}
@@ -125,4 +133,10 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
       ))}
     </div>
   );
+}
+
+/** Opens the group holding the focused section for this visit only: the saved choice stays as the user left it. */
+export function withFocus(open: GroupId[], focus: SectionId | null): GroupId[] {
+  const group = focus && GROUPS.find((g) => [...g.sections, ...g.sensitive].includes(focus));
+  return group && !open.includes(group.id) ? [...open, group.id] : open;
 }
