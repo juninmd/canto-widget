@@ -33,9 +33,15 @@ export default function SnoozeButton({ onSnooze }: { onSnooze: (minutes: number)
       trigger.current?.focus();
       return;
     }
+    // Tab moves on naturally; the menu must not stay open behind the focus.
+    if (e.key === "Tab") {
+      setOpen(false);
+      return;
+    }
     const list = items();
     const at = list.indexOf(document.activeElement as HTMLElement);
-    const to = { ArrowDown: (at + 1) % list.length, ArrowUp: (at - 1 + list.length) % list.length, Home: 0, End: list.length - 1 }[e.key];
+    const up = at < 0 ? list.length - 1 : (at - 1 + list.length) % list.length;
+    const to = { ArrowDown: (at + 1) % list.length, ArrowUp: up, Home: 0, End: list.length - 1 }[e.key];
     if (to === undefined) return;
     e.preventDefault();
     list[to]?.focus();

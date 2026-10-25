@@ -19,6 +19,26 @@ test("the menu opens on the current choice and arrows rove through the options",
   expect(document.activeElement === items[2]).toBe(true);
 });
 
+test("from the chevron, ArrowUp lands on the last option and ArrowDown on the first", () => {
+  render(<SnoozeButton onSnooze={() => {}} />);
+  const chevron = screen.getByLabelText("escolher quanto tempo adiar");
+  fireEvent.click(chevron);
+  const items = screen.getAllByRole("menuitem");
+  chevron.focus();
+  fireEvent.keyDown(chevron, { key: "ArrowUp" });
+  expect(document.activeElement === items[2]).toBe(true);
+  chevron.focus();
+  fireEvent.keyDown(chevron, { key: "ArrowDown" });
+  expect(document.activeElement === items[0]).toBe(true);
+});
+
+test("Tab out of the menu closes it", () => {
+  render(<SnoozeButton onSnooze={() => {}} />);
+  fireEvent.click(screen.getByLabelText("escolher quanto tempo adiar"));
+  fireEvent.keyDown(screen.getAllByRole("menuitem")[1], { key: "Tab" });
+  expect(screen.queryByRole("menu")).toBeNull();
+});
+
 test("Esc closes only the menu and hands focus back to the chevron", () => {
   const outer = mock(() => {});
   render(
