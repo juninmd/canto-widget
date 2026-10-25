@@ -356,6 +356,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Tarefas e avisos sem redesenho à toa**: voltar à aba Tarefas (ou outra janela salvar algo) relia o dia e
+  redesenhava todas as linhas mesmo sem mudança (~50–85 ms a mais com 1000 tarefas), e cada foco da janela trocava
+  a lista de avisos e redesenhava o app inteiro. Agora uma resposta idêntica mantém a lista atual e o React pula
+  o redesenho.
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
