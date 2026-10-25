@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
+  está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
+  senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
+  gerenciador de senhas qual campo é a senha atual e qual é a nova.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam
@@ -136,6 +140,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   Google pelo teclado leva o foco para o item vizinho (ou para o campo de captura), em vez de jogá-lo para o topo da
   janela; o campo do Google Tarefas continua focado enquanto salva, pronto para a próxima; e uma subtarefa que falha
   ao salvar devolve o texto digitado ao campo.
+- **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
+  sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
+  lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
+  uma marcação que falhou marca de novo. No Mercado, o período que não carregou ganha **tentar de novo** ali mesmo.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
@@ -159,6 +167,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Chamadas de rede mais rápidas e leves**: GitHub, GitLab, Google, Steam, Mercado, Clima e Mapa passam a usar
+  um cliente HTTP por serviço durante toda a sessão, em vez de criar um novo (com thread e certificados) a cada
+  pedido; as conexões ficam abertas entre as páginas e atualizações, sem refazer o handshake TLS toda vez.
 - **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
   420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
   de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
@@ -360,6 +371,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Tarefas e avisos sem redesenho à toa**: voltar à aba Tarefas (ou outra janela salvar algo) relia o dia e
+  redesenhava todas as linhas mesmo sem mudança (~50–85 ms a mais com 1000 tarefas), e cada foco da janela trocava
+  a lista de avisos e redesenhava o app inteiro. Agora uma resposta idêntica mantém a lista atual e o React pula
+  o redesenho.
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { errText, type SteamList } from "../lib/api";
 import { mergeGames, money } from "../lib/steam";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
@@ -36,17 +36,26 @@ export default function SteamGames({
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  // Bumped by every fresh load: a slower answer for an older search, or a "ver mais" page of the
+  // list that was just replaced, is dropped instead of overwriting (or being appended to) the new one.
+  const seq = useRef(0);
 
   const run = useCallback(
     async (force: boolean) => {
+      const mine = ++seq.current;
       setBusy(true);
       try {
-        setList(await load(force));
+        const next = await load(force);
+        if (mine !== seq.current) return;
+        setList(next);
         setError("");
       } catch (e) {
-        setError(errText(e));
+        if (mine === seq.current) setError(errText(e));
       } finally {
-        setBusy(false);
+        if (mine === seq.current) {
+          setBusy(false);
+          setLoadingMore(false);
+        }
       }
     },
     [load],
@@ -54,17 +63,19 @@ export default function SteamGames({
 
   async function loadAnother() {
     if (!loadMore || loadingMore) return;
+    const mine = seq.current;
     setLoadingMore(true);
     try {
       const next = await loadMore();
+      if (mine !== seq.current) return;
       setList((prev) =>
         prev ? { items: mergeGames(prev.items, next.items), has_more: next.has_more, currency: next.currency } : next,
       );
       setError("");
     } catch (e) {
-      setError(errText(e));
+      if (mine === seq.current) setError(errText(e));
     } finally {
-      setLoadingMore(false);
+      if (mine === seq.current) setLoadingMore(false);
     }
   }
 
