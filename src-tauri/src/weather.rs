@@ -340,13 +340,16 @@ fn percent(value: Option<f64>) -> u8 {
 }
 
 pub fn client() -> Result<reqwest::blocking::Client, String> {
-    crate::net::client_builder()
-        .user_agent("canto-widget")
-        .timeout(Duration::from_secs(TIMEOUT_S))
-        // Nothing here needs a redirect, and one would be a way out of the API's host.
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .map_err(|e| e.to_string())
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            .user_agent("canto-widget")
+            .timeout(Duration::from_secs(TIMEOUT_S))
+            // Nothing here needs a redirect, and one would be a way out of the API's host.
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+    })
+    .map_err(|e| e.to_string())
 }
 
 fn body(client: &reqwest::blocking::Client, url: reqwest::Url) -> Result<Vec<u8>, String> {

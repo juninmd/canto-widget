@@ -110,6 +110,8 @@ export const app: Record<keyof typeof source, string> = {
   "settings.password.submit": "cambiar contraseña",
   "settings.password.submitting": "cambiando...",
   "settings.password.cancel": "cancelar",
+  "settings.password.same": "la nueva contraseña es igual a la actual",
+  "settings.password.capsLock": "Bloq Mayús está activado",
 
   "settings.language.title": "Idioma",
   "settings.language.auto": "Automático (sistema)",

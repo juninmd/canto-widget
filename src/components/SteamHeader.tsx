@@ -22,7 +22,12 @@ export default function SteamHeader({
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const [leaving, setLeaving] = useState(false);
+
   async function disconnect() {
+    // A double click on the confirm would otherwise send a second disconnect.
+    if (leaving) return;
+    setLeaving(true);
     try {
       onStatus(await api.steamDisconnect());
       // The form belonged to the account that just left; the next one starts with a clean header.
@@ -31,6 +36,8 @@ export default function SteamHeader({
       setConfirming(false);
     } catch (e) {
       onError(errText(e));
+    } finally {
+      setLeaving(false);
     }
   }
 
@@ -128,7 +135,8 @@ export default function SteamHeader({
           <button
             type="button"
             onClick={() => void disconnect()}
-            className="canto-hit shrink-0 rounded-md border border-danger/60 px-2 font-semibold text-danger hover:bg-danger/10"
+            disabled={leaving}
+            className="canto-hit shrink-0 rounded-md border border-danger/60 px-2 font-semibold text-danger hover:bg-danger/10 disabled:opacity-50"
           >
             {t("steam.disconnect")}
           </button>
