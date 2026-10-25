@@ -63,7 +63,7 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
         } catch (err) {
           failure = errText(err);
           setTitle(line);
-          queued.current = lines.slice(i + 1);
+          queued.current = lines.slice(i);
           break;
         }
       }
@@ -71,14 +71,14 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
     } finally {
       busy.current = false;
     }
-    if (queued.current.length) toast({ message: t("tasks.pasteLeft", { n: queued.current.length + 1 }) });
+    if (queued.current.length > 1) toast({ message: t("tasks.pasteLeft", { n: queued.current.length }) });
     if (failure) onError(failure);
   }
 
   function add(e: React.FormEvent) {
     e.preventDefault();
     if (busy.current || !title.trim()) return;
-    void batch([title, ...queued.current]);
+    void batch(queued.current[0] === title ? queued.current : [title]);
   }
 
   // A list pasted into the empty field becomes one task per line instead of one long title.
@@ -93,7 +93,8 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
   }
 
   function edit(value: string) {
-    if (!value) queued.current = [];
+    // Typing another task over the failed line means the user gave up on the rest of that list.
+    if (value !== queued.current[0]) queued.current = [];
     setTitle(value);
   }
 

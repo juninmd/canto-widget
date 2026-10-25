@@ -142,3 +142,18 @@ test("Enter or a second paste while a list is still being created adds nothing o
   expect(added()).toEqual(["um", "dois"]);
   expect(reloads).toBe(1);
 });
+
+test("typing a different task over the failed line drops the queued lines", async () => {
+  const field = mount();
+  failOn = "um";
+  await paste(field, "um\ndois");
+  failOn = "";
+  await act(async () => {
+    fireEvent.change(field, { target: { value: "outra coisa" } });
+  });
+  await act(async () => {
+    fireEvent.change(field, { target: { value: "um" } });
+    fireEvent.submit(field.closest("form")!);
+  });
+  expect(added()).toEqual(["um", "um"]);
+});
