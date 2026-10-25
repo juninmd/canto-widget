@@ -410,5 +410,7 @@
   "gdrive.more": "load more",
   "gdrive.loadingMore": "loading more…",
   "google.enableApi": "enable the API",
-  "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
+  "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on"
 }
