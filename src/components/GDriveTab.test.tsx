@@ -132,6 +132,23 @@ test("while a folder loads, the previous listing is dimmed and out of reach so a
   expect(screen.getByRole("navigation", { name: "caminho da pasta" }).textContent).toBe("Meu Drive›Projetos");
 });
 
+test("when a folder fails to load, the previous listing goes and only the error stays, with nothing left busy", async () => {
+  render(<GDriveTab onNotice={() => {}} />);
+  await screen.findByText("Roadmap Q4 2026");
+  let fail: (reason: string) => void = () => {};
+  hold = new Promise((_, reject) => (fail = reject));
+  fireEvent.click(screen.getByLabelText("entrar na pasta Projetos"));
+  await waitFor(() => expect(calls.at(-1)).toEqual(list("all", "", "", "f1")));
+  fail("falha de rede");
+  expect(await screen.findByText(/falha de rede/)).toBeTruthy();
+  expect(screen.queryByText("Roadmap Q4 2026") === null).toBe(true);
+  expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
+  expect(document.querySelector("[inert]") === null).toBe(true);
+  hold = null;
+  fireEvent.click(screen.getByText("tentar de novo"));
+  expect(await screen.findByText("Orçamento 2027")).toBeTruthy();
+});
+
 test("a long file name keeps its full text on hover, and the open button says which file it opens", async () => {
   render(<GDriveTab onNotice={() => {}} />);
   const name = await screen.findByText("Roadmap Q4 2026");

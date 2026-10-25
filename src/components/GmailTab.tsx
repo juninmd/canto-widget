@@ -122,8 +122,11 @@ export default function GmailTab({ onNotice }: Props) {
     });
 
   const mails = summary.important;
-  // Until the picked view or search answers, the list on screen is the previous one's: dim it and keep it out of reach.
-  const stale = shownFor !== `${view}\u0000${search}`;
+  // Until the picked view or search answers, the list on screen is the previous one's: dim it and keep it out of reach,
+  // and if that answer fails, leave only the error banner rather than mail from a view the user left.
+  const outdated = shownFor !== `${view}\u0000${search}`;
+  const failed = outdated && error !== "" && !loading;
+  const stale = outdated && !failed;
   const now = new Date();
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
@@ -188,7 +191,7 @@ export default function GmailTab({ onNotice }: Props) {
         />
       </label>
       <div aria-busy={stale} inert={stale} className={`flex flex-col gap-2 transition-opacity ${stale ? "opacity-60" : ""}`}>
-      {mails.length === 0 ? (
+      {failed ? null : mails.length === 0 ? (
         <p key={view} className="wx-glass wx-rise flex items-center gap-2 p-3 text-xs text-muted">
           <span aria-hidden="true" className="canto-float inline-block text-base">📭</span>
           {search ? t("gmail.noMatch") : t(EMPTY[view])}

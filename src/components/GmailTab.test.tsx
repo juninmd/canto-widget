@@ -173,6 +173,20 @@ test("while another view loads, the old list is dimmed and its actions are out o
   expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
 });
 
+test("when the new view fails, the old list goes and only the error stays, with nothing left busy", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await screen.findByText("Contrato revisado");
+  summary = new Error("falha de rede");
+  fireEvent.click(screen.getByText("Com estrela"));
+  expect(await screen.findByText(/falha de rede/)).toBeTruthy();
+  await waitFor(() => expect(screen.queryByText("Contrato revisado") === null).toBe(true));
+  expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
+  expect(document.querySelector("[inert]") === null).toBe(true);
+  summary = INBOX;
+  fireEvent.click(screen.getByText("tentar de novo"));
+  expect(await screen.findByText("Contrato revisado")).toBeTruthy();
+});
+
 test("a double click on an action sends it once and creates one task", async () => {
   summary = { unread: 1, important: [INBOX.important[0], { ...INBOX.important[1], unread: false }] };
   render(<GmailTab onNotice={() => {}} />);
