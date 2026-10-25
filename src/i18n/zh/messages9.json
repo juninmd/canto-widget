@@ -412,5 +412,8 @@
   "google.enableApi": "enable the API",
   "shortcuts.moveTask": "move the focused task up or down",
   "settings.password.same": "the new password is the same as the current one",
-  "settings.password.capsLock": "Caps Lock is on"
+  "settings.password.capsLock": "Caps Lock is on",
+  "notes.wordsOne": "1 word",
+  "notes.wordsMany": "{n} words",
+  "notes.readMinutes": "{words} · ~{n} min read"
 }
