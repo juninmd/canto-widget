@@ -6,6 +6,8 @@ import { bySeverity, countLevels, matchesFilter, type StatusFilter } from "../li
 import { t } from "../i18n";
 import { RefreshIcon } from "./ForgeIcons";
 import Skeleton from "./Skeleton";
+import EmptyRetry from "./EmptyRetry";
+import { PulseIcon } from "./Icons";
 import Spinner from "./Spinner";
 import StatusCard from "./StatusCard";
 import StatusOverview from "./StatusOverview";
@@ -89,8 +91,11 @@ export default function StatusServices({ toolbar }: { toolbar?: HTMLElement | nu
         </p>
       )}
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto pr-1">
-        {results === null || counts === null ? (
+        {results === null && !error ? (
           <Skeleton label={t("status.loading")} rows={4} />
+        ) : results === null || counts === null || results.length === 0 ? (
+          // Rust answers an empty list when no status page could be read: "0 operacionais" would read as data.
+          <EmptyRetry icon={<PulseIcon />} message={t("uiStatus.none")} busy={loading} onRetry={() => void load(true)} />
         ) : (
           <>
             <StatusOverview counts={counts} bad={bad} ok={results.length - bad} filter={filter} onFilter={setFilter} />
