@@ -5,6 +5,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Desempenho
+
+- **Início mais leve das três janelas.** Cada janela carrega só o próprio código: o pop-up de alerta e a captura
+  rápida não analisam mais o widget inteiro (de 1085 kB para 405 kB e 331 kB de JS), e só o catálogo do idioma
+  escolhido é carregado, não os três (a janela principal cai de 1085 kB para 921 kB). Somando as três webviews
+  criadas ao abrir o app, o JS lido na partida cai de 3255 kB para 1656 kB.
+
 ### Adicionado
 
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
