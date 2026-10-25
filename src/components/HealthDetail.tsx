@@ -1,4 +1,4 @@
-import { t } from "../i18n";
+import { LOCALE, t } from "../i18n";
 import { certDays, everyLabel, INTERVALS, LIMITS, stats, targetLabel, lastOf } from "../lib/health";
 import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 import LatencyChart from "./LatencyChart";
@@ -47,7 +47,7 @@ export default function HealthDetail({ view, busy, onClose, onChange, onCheck, o
             [s.median, t("health.stat.median")],
             [s.p95, t("health.stat.p95")],
             [s.peak, t("health.stat.peak")],
-            [`${s.uptime}%`, t("health.stat.uptime")],
+            [`${s.uptime.toLocaleString(LOCALE)}%`, t("health.stat.uptime")],
           ].map(([v, label]) => (
             <div key={label}>
               <dd className="text-[15px] font-semibold tabular-nums">{v}</dd>
