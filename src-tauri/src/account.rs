@@ -22,12 +22,15 @@ pub struct Profile {
 }
 
 pub(crate) fn client() -> Result<reqwest::blocking::Client> {
-    crate::net::client_builder()
-        .timeout(Duration::from_secs(15))
-        // A redirect would send the "trusted" photo to any host, including the local network.
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .map_err(|e| AppError::Drive(e.to_string()))
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            .timeout(Duration::from_secs(15))
+            // A redirect would send the "trusted" photo to any host, including the local network.
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+    })
+    .map_err(|e| AppError::Drive(e.to_string()))
 }
 
 fn drive(e: reqwest::Error) -> AppError {
