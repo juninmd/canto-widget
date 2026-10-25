@@ -8,6 +8,8 @@ export default function Lock({ exists, onOpen }: Props) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
+  // Which field the error is about; a biometric failure is about neither, so no field is marked invalid.
+  const [invalid, setInvalid] = useState<"password" | "confirm" | null>(null);
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [bio, setBio] = useState<BiometricStatus | null>(null);
@@ -15,8 +17,9 @@ export default function Lock({ exists, onOpen }: Props) {
   const confirmField = useRef<HTMLInputElement>(null);
 
   // After a failure the focus would stay on a disabled button: send it back to the field to retype, already selected.
-  function retry(field: HTMLInputElement | null, message: string) {
+  function retry(field: HTMLInputElement | null, message: string, which: "password" | "confirm" | null) {
     setError(message);
+    setInvalid(which);
     field?.focus();
     field?.select();
   }
@@ -31,12 +34,13 @@ export default function Lock({ exists, onOpen }: Props) {
 
   async function withBiometrics() {
     setError("");
+    setInvalid(null);
     setBusy(true);
     try {
       await api.biometricUnlock();
       onOpen();
     } catch (e) {
-      retry(passwordField.current, errText(e));
+      retry(passwordField.current, errText(e), null);
     } finally {
       setBusy(false);
     }
@@ -45,8 +49,9 @@ export default function Lock({ exists, onOpen }: Props) {
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setInvalid(null);
     if (!exists && password !== confirm) {
-      retry(confirmField.current, t("lock.mismatch"));
+      retry(confirmField.current, t("lock.mismatch"), "confirm");
       return;
     }
     setBusy(true);
@@ -56,7 +61,7 @@ export default function Lock({ exists, onOpen }: Props) {
       setConfirm("");
       onOpen(!exists);
     } catch (e) {
-      retry(passwordField.current, errText(e));
+      retry(passwordField.current, errText(e), "password");
     } finally {
       setBusy(false);
     }
@@ -82,8 +87,8 @@ export default function Lock({ exists, onOpen }: Props) {
         autoFocus
         type={showPassword ? "text" : "password"}
         aria-label={t("lock.password")}
-        aria-invalid={error !== "" || undefined}
-        aria-describedby={error ? "lock-error" : undefined}
+        aria-invalid={invalid === "password" || undefined}
+        aria-describedby={invalid === "password" ? "lock-error" : undefined}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder={t("lock.password")}
@@ -94,8 +99,8 @@ export default function Lock({ exists, onOpen }: Props) {
           ref={confirmField}
           type={showPassword ? "text" : "password"}
           aria-label={t("lock.confirm")}
-          aria-invalid={error !== "" || undefined}
-          aria-describedby={error ? "lock-error" : undefined}
+          aria-invalid={invalid === "confirm" || undefined}
+          aria-describedby={invalid === "confirm" ? "lock-error" : undefined}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           placeholder={t("lock.confirm")}

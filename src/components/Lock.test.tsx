@@ -4,11 +4,13 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 let biometrics: unknown = null;
 let wrongPassword = false;
+let biometricFails = false;
 const calls: string[] = [];
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
     calls.push(cmd);
     if (cmd === "vault_unlock" && wrongPassword) return Promise.reject("senha incorreta");
+    if (cmd === "biometric_unlock" && biometricFails) return Promise.reject("cancelado pelo usuário");
     return Promise.resolve(cmd === "biometric_status" ? biometrics : null);
   },
 }));
@@ -19,6 +21,7 @@ afterEach(() => {
   cleanup();
   biometrics = null;
   wrongPassword = false;
+  biometricFails = false;
   calls.length = 0;
 });
 
@@ -44,6 +47,23 @@ test("mismatched passwords explain how to fix it", () => {
   const again = screen.getByLabelText("repita a senha");
   expect(document.activeElement === again).toBe(true);
   expect(again.getAttribute("aria-describedby")).toBe(screen.getByRole("alert").id);
+  expect(again.getAttribute("aria-invalid")).toBe("true");
+  expect(screen.getByLabelText("senha mestra").getAttribute("aria-invalid")).toBeNull();
+});
+
+test("a cancelled biometric unlock shows the error without marking the empty password field invalid", async () => {
+  biometrics = { available: true, enabled: true, name: "Windows Hello" };
+  biometricFails = true;
+  await act(async () => {
+    render(<Lock exists onOpen={() => {}} />);
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "Destrancar com Windows Hello" }));
+  });
+  expect(screen.getByRole("alert").textContent).toContain("cancelado");
+  const field = screen.getByLabelText("senha mestra");
+  expect(field.getAttribute("aria-invalid")).toBeNull();
+  expect(field.getAttribute("aria-describedby")).toBeNull();
 });
 
 test("a wrong password puts the focus back on the field, selected, and marks it invalid", async () => {
