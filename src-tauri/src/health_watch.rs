@@ -122,6 +122,13 @@ impl HealthState {
         due
     }
 
+    /// Takes one reading and records it; the slot `due` reserved is freed even if `probe` panics, or the
+    /// endpoint would stay "running" and never be probed again.
+    pub fn probe_once(&self, ep: &Endpoint, probe: impl FnOnce() -> Sample) -> Vec<Alert> {
+        let _slot = Slot { state: self, id: &ep.id };
+        self.record(ep, probe())
+    }
+
     /// Stores a reading and returns the alerts it triggers; a reading for a removed endpoint is dropped.
     pub fn record(&self, ep: &Endpoint, sample: Sample) -> Vec<Alert> {
         let mut inner = self.0.lock_safe();
@@ -165,6 +172,17 @@ pub fn alert_event(ep: &Endpoint, alert: &Alert) -> AgendaItem {
     }
 }
 
+struct Slot<'a> {
+    state: &'a HealthState,
+    id: &'a str,
+}
+
+impl Drop for Slot<'_> {
+    fn drop(&mut self) {
+        self.state.0.lock_safe().running.remove(self.id);
+    }
+}
+
 pub fn watch(app: AppHandle) {
     crate::resilient::supervise("health-watch", move || loop {
         std::thread::sleep(TICK);
@@ -181,9 +199,9 @@ pub fn watch(app: AppHandle) {
         for ep in health.due(crate::model::now_ms()) {
             let app = app.clone();
             std::thread::spawn(move || {
-                let sample = crate::health_probe::probe(&ep, crate::model::now_ms());
                 let Some(health) = app.try_state::<HealthState>() else { return };
-                for alert in health.record(&ep, sample) {
+                let alerts = health.probe_once(&ep, || crate::health_probe::probe(&ep, crate::model::now_ms()));
+                for alert in alerts {
                     let _ = crate::window::open_alert(&app, alert_event(&ep, &alert));
                 }
             });

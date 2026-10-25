@@ -35,6 +35,17 @@ fn a_new_endpoint_is_due_at_once_then_only_after_its_interval() {
 }
 
 #[test]
+fn a_probe_that_panics_frees_its_slot_for_the_next_tick() {
+    let s = state_with(vec![ep("a", 60)]);
+    let due = s.due(1_000).remove(0);
+    let crashed = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        s.probe_once(&due, || panic!("sonda quebrou"));
+    }));
+    assert!(crashed.is_err());
+    assert_eq!(s.due(1_001).len(), 1, "the endpoint must be probed again");
+}
+
+#[test]
 fn two_failures_surface_one_alert_and_the_view_shows_the_state() {
     let e = ep("a", 30);
     let s = state_with(vec![e.clone()]);
