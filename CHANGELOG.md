@@ -112,7 +112,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
   para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os
   botões dos cartões voltaram ao tamanho do resto do texto.
-
 - **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
   sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
   lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
@@ -122,6 +121,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
   abre a página certa do console.
+
+- **Carrossel de notificações navegável**: com muitos avisos, a tira do topo do pop-up cortava os últimos sem
+  jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse
+  e arrastando, e o aviso escolhido sempre rola para a vista.
+- **Atualizar o Canto não apaga mais as suas escolhas.** Antes só as abas visíveis e o layout tinham cópia no
+  arquivo `preferencias.json`; agora **todas** as preferências da interface vão para lá (tema, densidade, idioma,
+  modo mini, vista da agenda e das notas, lembretes, grupos de Ajustes...). E quando o webview volta da
+  atualização com uma cópia **antiga** (não vazia), vale a mais recente, em vez de a antiga apagar a do arquivo.
 
 - **Pop-up de notificação sem a borda de cima**: a janela media o cartão no meio da animação de entrada (ainda
   em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
@@ -134,3 +141,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 - **O filtro "buscar ajuste" não cobre mais o menu das abas**: a barra lateral expandida passou a ficar acima do
   campo fixo de busca de Ajustes.
+
+- **Falhas TCP no Windows**: conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR
+  esperada independentemente do idioma do sistema operacional.
