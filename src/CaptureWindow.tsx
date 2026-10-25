@@ -4,11 +4,15 @@ import { t } from "./i18n";
 import { api, errText, todayLocal } from "./lib/api";
 import { CAPTURE_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
 import { parseQuickTask } from "./lib/quickAdd";
+import Spinner from "./components/Spinner";
 
 /** The shortcut's own window: Enter saves a task for today, Ctrl+Enter a note, Esc leaves without saving. */
 export default function CaptureWindow() {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
+  const [saving, setSaving] = useState<"task" | "note" | null>(null);
+  // A ref, not the state: two Enters in the same frame both see the old state and would save twice.
+  const busy = useRef(false);
   const input = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -26,7 +30,10 @@ export default function CaptureWindow() {
 
   async function save(asNote: boolean) {
     const raw = text.trim();
-    if (!raw) return;
+    if (!raw || busy.current) return;
+    busy.current = true;
+    setSaving(asNote ? "note" : "task");
+    setError("");
     try {
       if (asNote) {
         await api.noteSave({ title: raw, body: "", tags: [] });
@@ -44,11 +51,14 @@ export default function CaptureWindow() {
       await api.captureClose();
     } catch (e) {
       setError(errText(e));
+    } finally {
+      busy.current = false;
+      setSaving(null);
     }
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
-    if (e.key === "Escape") void api.captureClose();
+    if (e.key === "Escape") void api.captureClose().catch((err: unknown) => setError(errText(err)));
     if (e.key === "Enter" && !e.nativeEvent.isComposing) {
       e.preventDefault();
       void save(e.ctrlKey || e.metaKey);
@@ -75,15 +85,21 @@ export default function CaptureWindow() {
           <button
             type="button"
             onClick={() => void save(false)}
-            className="min-h-7 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg"
+            disabled={saving !== null}
+            aria-busy={saving === "task"}
+            className="inline-flex min-h-7 items-center gap-1 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg disabled:opacity-60"
           >
+            {saving === "task" && <Spinner />}
             {t("capture.task")}
           </button>
           <button
             type="button"
             onClick={() => void save(true)}
-            className="min-h-7 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg"
+            disabled={saving !== null}
+            aria-busy={saving === "note"}
+            className="inline-flex min-h-7 items-center gap-1 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg disabled:opacity-60"
           >
+            {saving === "note" && <Spinner />}
             {t("capture.note")}
           </button>
         </div>
