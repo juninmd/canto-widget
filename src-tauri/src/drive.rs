@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use std::time::Duration;
 
 use crate::error::{net_text, redact, AppError, Result};
 use crate::oauth::{Pkce, SCOPE, TOKEN_URL};
@@ -32,8 +31,9 @@ struct TokenResponse {
     expires_in: i64,
 }
 
+/// Same settings as every other Google call, so the token refresh rides the shared pooled client.
 fn client() -> Result<reqwest::blocking::Client> {
-    crate::net::client_builder().timeout(Duration::from_secs(30)).build().map_err(|e| AppError::Drive(net_text(e)))
+    crate::google_api::client()
 }
 
 fn post_token(form: &[(&str, &str)]) -> Result<TokenResponse> {

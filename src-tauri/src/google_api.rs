@@ -7,9 +7,8 @@ use serde::de::DeserializeOwned;
 use crate::error::{AppError, Result};
 
 pub fn client() -> Result<Client> {
-    crate::net::client_builder()
-        .timeout(Duration::from_secs(30))
-        .build()
+    static CLIENT: std::sync::OnceLock<Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || crate::net::client_builder().timeout(Duration::from_secs(30)).build())
         .map_err(|e| AppError::Drive(crate::error::net_text(e)))
 }
 
