@@ -27,11 +27,11 @@ pub(crate) fn client() -> Result<reqwest::blocking::Client> {
         // A redirect would send the "trusted" photo to any host, including the local network.
         .redirect(reqwest::redirect::Policy::none())
         .build()
-        .map_err(|e| AppError::Drive(e.to_string()))
+        .map_err(|e| AppError::Drive(crate::error::net_text(e)))
 }
 
 fn drive(e: reqwest::Error) -> AppError {
-    AppError::Drive(e.to_string())
+    AppError::Drive(crate::error::net_text(e))
 }
 
 pub fn fetch_profile(token: &str) -> Result<Profile> {

@@ -1,16 +1,26 @@
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
 
-use crate::error::{AppError, Result};
+use crate::error::{net_text, redact, AppError, Result};
 use crate::oauth::{Pkce, SCOPE, TOKEN_URL};
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct DriveTokens {
     pub refresh_token: String,
     #[serde(default)]
     pub access_token: String,
     #[serde(default)]
     pub expires_at: i64,
+}
+
+impl std::fmt::Debug for DriveTokens {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DriveTokens")
+            .field("refresh_token", &redact(&self.refresh_token))
+            .field("access_token", &redact(&self.access_token))
+            .field("expires_at", &self.expires_at)
+            .finish()
+    }
 }
 
 #[derive(Deserialize)]
@@ -23,16 +33,16 @@ struct TokenResponse {
 }
 
 fn client() -> Result<reqwest::blocking::Client> {
-    crate::net::client_builder().timeout(Duration::from_secs(30)).build().map_err(|e| AppError::Drive(e.to_string()))
+    crate::net::client_builder().timeout(Duration::from_secs(30)).build().map_err(|e| AppError::Drive(net_text(e)))
 }
 
 fn post_token(form: &[(&str, &str)]) -> Result<TokenResponse> {
-    let res = client()?.post(TOKEN_URL).form(form).send().map_err(|e| AppError::Drive(e.to_string()))?;
+    let res = client()?.post(TOKEN_URL).form(form).send().map_err(|e| AppError::Drive(net_text(e)))?;
     if !res.status().is_success() {
         let status = res.status();
         return Err(AppError::Drive(format!("token endpoint respondeu {status}: {}", res.text().unwrap_or_default())));
     }
-    res.json().map_err(|e| AppError::Drive(e.to_string()))
+    res.json().map_err(|e| AppError::Drive(net_text(e)))
 }
 
 pub fn authorize_url(client_id: &str, redirect_uri: &str, pkce: &Pkce) -> String {
@@ -100,4 +110,19 @@ pub fn fresh_access_token(tokens: &mut DriveTokens, client_id: &str, client_secr
     tokens.access_token = res.access_token.clone();
     tokens.expires_at = crate::model::now_ms() + res.expires_in * 1000;
     Ok(res.access_token)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn debug_output_hides_both_google_tokens() {
+        let t = super::DriveTokens {
+            refresh_token: "1//refresh".into(),
+            access_token: "ya29.access".into(),
+            expires_at: 9,
+        };
+        let shown = format!("{t:?}");
+        assert!(!shown.contains("1//refresh") && !shown.contains("ya29"), "{shown}");
+        assert!(shown.contains("expires_at: 9"), "{shown}");
+    }
 }

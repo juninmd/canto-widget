@@ -7,6 +7,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Tokens copiados ficam fora do histórico do Clipboard.** Uma cópia que é só um token de formato conhecido
+  (GitHub, GitLab, Google, Anthropic, Slack, AWS, JWT) ou um bloco de chave privada não entra no histórico, como já
+  acontecia com o que gerenciadores de senha marcam como oculto; um texto que só menciona o token continua sendo
+  guardado. Erros de rede do Google, da TomTom e dos feeds não repetem mais a URL (onde vão chave e dados da busca),
+  e os tokens do GitHub e do Google não aparecem mais em nenhuma saída de depuração.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam

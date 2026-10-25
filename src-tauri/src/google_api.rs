@@ -7,14 +7,17 @@ use serde::de::DeserializeOwned;
 use crate::error::{AppError, Result};
 
 pub fn client() -> Result<Client> {
-    crate::net::client_builder().timeout(Duration::from_secs(30)).build().map_err(|e| AppError::Drive(e.to_string()))
+    crate::net::client_builder()
+        .timeout(Duration::from_secs(30))
+        .build()
+        .map_err(|e| AppError::Drive(crate::error::net_text(e)))
 }
 
 pub fn send<T: DeserializeOwned>(service: &str, request: RequestBuilder) -> Result<T> {
-    let res = request.send().map_err(|e| AppError::Drive(e.to_string()))?;
+    let res = request.send().map_err(|e| AppError::Drive(crate::error::net_text(e)))?;
     let status = res.status().as_u16();
     if (200..300).contains(&status) {
-        return res.json().map_err(|e| AppError::Drive(e.to_string()));
+        return res.json().map_err(|e| AppError::Drive(crate::error::net_text(e)));
     }
     Err(refusal(service, status, &res.text().unwrap_or_default()))
 }

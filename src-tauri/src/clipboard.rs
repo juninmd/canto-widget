@@ -92,7 +92,7 @@ impl ClipHistory {
 
     pub fn push(&mut self, text: &str, id: String) -> bool {
         let text = text.trim();
-        if text.is_empty() {
+        if text.is_empty() || crate::clip_secret::looks_like_secret(text) {
             return false;
         }
         let chars = text.chars().count();
