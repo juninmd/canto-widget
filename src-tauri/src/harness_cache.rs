@@ -1,4 +1,5 @@
 //! Keeps the last release lookup in RAM: public data, so a disk cache would just add a re-seal path.
+use crate::resilient::LockExt;
 use std::sync::Mutex;
 
 use crate::harness_feed::FeedEntry;
@@ -17,7 +18,7 @@ pub struct HarnessCache(Mutex<Option<Entry>>);
 impl HarnessCache {
     pub fn get(&self, force: bool, now: i64, fetch: impl FnOnce() -> Vec<FeedEntry>) -> Vec<FeedEntry> {
         if !force {
-            if let Some(e) = self.0.lock().unwrap().as_ref() {
+            if let Some(e) = self.0.lock_safe().as_ref() {
                 if now - e.at < TTL_MS {
                     return e.feeds.clone();
                 }
@@ -25,7 +26,7 @@ impl HarnessCache {
         }
         // Lock released while fetching: the six requests must not block another tab's lookups.
         let feeds = fetch();
-        *self.0.lock().unwrap() = Some(Entry { feeds: feeds.clone(), at: now });
+        *self.0.lock_safe() = Some(Entry { feeds: feeds.clone(), at: now });
         feeds
     }
 }

@@ -14,7 +14,7 @@ const POLL: Duration = Duration::from_secs(30);
 const INTERVAL: Duration = Duration::from_secs(5 * 60);
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("own-work-alerts", move || {
         let (mut gh, mut gl) = (github::Seen::default(), gitlab::Seen::default());
         let mut last: Option<Instant> = None;
         loop {

@@ -1,6 +1,7 @@
 use crate::cmd_drive::DriveConfig;
 use crate::drive::{self, DriveTokens};
 use crate::error::{AppError, Result};
+use crate::resilient::LockExt;
 use crate::vault::AppState;
 
 /// A fresh Google access token; a refresh is persisted so the next call doesn't repeat it.
@@ -17,7 +18,7 @@ pub fn fresh(state: &AppState) -> Result<String> {
 
 /// Re-reads under the lock: the refresh ran on the network while a disconnect or reconnect may have landed.
 pub(crate) fn store_refreshed(state: &AppState, fresh: DriveTokens) -> Result<()> {
-    let _serial = state.drive_lock.lock().unwrap();
+    let _serial = state.drive_lock.lock_safe();
     let mut current = state.drive_config()?;
     if adopt_refresh(&mut current, fresh) {
         state.save_drive_config(&current)?;

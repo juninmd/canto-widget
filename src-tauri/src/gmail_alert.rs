@@ -61,7 +61,7 @@ pub fn gmail_alerts_set(alerts: State<'_, GmailAlerts>, on: bool) -> Result<bool
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("gmail-alert", move || {
         let mut seen: Option<HashSet<String>> = None;
         loop {
             if !app.state::<GmailAlerts>().on() {

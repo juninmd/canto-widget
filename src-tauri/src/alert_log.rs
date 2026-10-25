@@ -1,5 +1,6 @@
 //! What became of each alert today, for the notifications column of the maximized mode.
 //! Memory only: meeting and PR titles are as sensitive as the agenda, so nothing is written to disk.
+use crate::resilient::LockExt;
 use std::collections::VecDeque;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -35,13 +36,13 @@ pub struct AlertLog(Mutex<VecDeque<Resolved>>);
 
 impl AlertLog {
     pub fn push(&self, item: AgendaItem, outcome: Outcome, at: i64) {
-        let mut list = self.0.lock().unwrap();
+        let mut list = self.0.lock_safe();
         list.push_front(Resolved { item, outcome, at });
         list.truncate(MAX_ENTRIES);
     }
 
     pub fn list(&self) -> Vec<Resolved> {
-        self.0.lock().unwrap().iter().cloned().collect()
+        self.0.lock_safe().iter().cloned().collect()
     }
 }
 

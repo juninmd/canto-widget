@@ -1,5 +1,6 @@
 //! Tray extras that need live data: the "entrar" item for the soonest meeting with a Meet link,
 //! the matching global shortcut, and the taskbar badge (review-requested PRs/MRs + open tasks + unread mentions).
+use crate::resilient::LockExt;
 use std::time::Duration;
 
 #[cfg(desktop)]
@@ -24,12 +25,12 @@ pub struct JoinMenuItem(pub MenuItem<tauri::Wry>);
 
 #[tauri::command]
 pub fn badge_set_tasks(state: State<'_, AppState>, count: u32) {
-    *state.badge_tasks.lock().unwrap() = count;
+    *state.badge_tasks.lock_safe() = count;
 }
 
 /// Opens the cached next meeting's Meet link; used by both the tray item and the join shortcut.
 pub fn join_next_meeting(app: &AppHandle) {
-    let Some(meet) = app.state::<AppState>().next_meeting.lock().unwrap().as_ref().map(|m| m.meet.clone()) else {
+    let Some(meet) = app.state::<AppState>().next_meeting.lock_safe().as_ref().map(|m| m.meet.clone()) else {
         return;
     };
     if meet.starts_with("https://") || meet.starts_with("http://") {
@@ -38,7 +39,7 @@ pub fn join_next_meeting(app: &AppHandle) {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("tray-live", move || loop {
         tick(&app);
         std::thread::sleep(TICK);
     });
@@ -47,7 +48,7 @@ pub fn watch(app: AppHandle) {
 fn tick(app: &AppHandle) {
     let state = app.state::<AppState>();
     if !state.is_unlocked() {
-        *state.next_meeting.lock().unwrap() = None;
+        *state.next_meeting.lock_safe() = None;
         update_menu(app, None);
         badge::apply(app, 0);
         return;
@@ -55,10 +56,10 @@ fn tick(app: &AppHandle) {
 
     let meeting = fetch_next_meeting(app);
     update_menu(app, meeting.as_ref());
-    *state.next_meeting.lock().unwrap() = meeting;
+    *state.next_meeting.lock_safe() = meeting;
 
     let reviews = cmd_forges::review_requested_total(app);
-    let tasks = *state.badge_tasks.lock().unwrap() as u64;
+    let tasks = *state.badge_tasks.lock_safe() as u64;
     let mentions = u64::from(app.state::<crate::mentions_state::MentionsUnread>().count());
     badge::apply(app, (reviews + tasks + mentions).min(u32::MAX as u64) as u32);
 }
@@ -80,7 +81,7 @@ pub fn no_meeting_label() -> &'static str {
 
 /// Re-labels the join item in the current language, keeping the cached meeting.
 pub fn refresh_join_label(app: &AppHandle) {
-    let meeting = app.state::<AppState>().next_meeting.lock().unwrap().clone();
+    let meeting = app.state::<AppState>().next_meeting.lock_safe().clone();
     update_menu(app, meeting.as_ref());
 }
 

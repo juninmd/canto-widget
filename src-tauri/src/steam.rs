@@ -1,6 +1,7 @@
 //! Steam: wishlist deals, top sellers, the last games played and the store catalog by rating.
 //! Only the SteamID64 and an optional Web API key are kept, sealed; the lists live in RAM while the
 //! vault is open, because prices and rankings change all the time.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -173,13 +174,13 @@ impl SteamCache {
         fetch: impl FnOnce() -> Result<T>,
     ) -> Result<T> {
         if !force {
-            let hit = self.0.lock().unwrap().get(key).filter(|e| now - e.at < TTL_MS).map(|e| e.json.clone());
+            let hit = self.0.lock_safe().get(key).filter(|e| now - e.at < TTL_MS).map(|e| e.json.clone());
             if let Some(json) = hit {
                 return Ok(serde_json::from_str(&json)?);
             }
         }
         let value = fetch()?;
-        let mut map = self.0.lock().unwrap();
+        let mut map = self.0.lock_safe();
         map.insert(key.to_string(), Cached { at: now, json: serde_json::to_string(&value)? });
         while map.len() > MAX_ENTRIES {
             let Some(oldest) = map.iter().min_by_key(|(_, e)| e.at).map(|(k, _)| k.clone()) else {
@@ -191,7 +192,7 @@ impl SteamCache {
     }
 
     pub fn clear(&self) {
-        self.0.lock().unwrap().clear();
+        self.0.lock_safe().clear();
     }
 }
 

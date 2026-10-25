@@ -1,5 +1,6 @@
 //! The city the Clima tab shows and the forecast cache. The choice lives next to the vault (public data, like
 //! the Status API list) and the forecast is RAM only, served for 30 min.
+use crate::resilient::LockExt;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 
@@ -31,19 +32,19 @@ impl WeatherState {
     }
 
     pub fn place(&self) -> Option<Place> {
-        self.place.lock().unwrap().clone()
+        self.place.lock_safe().clone()
     }
 
     /// Changing the city throws the forecast away: it belongs to the old one.
     pub fn set_place(&self, place: Option<Place>) -> Result<()> {
-        *self.cached.lock().unwrap() = None;
+        *self.cached.lock_safe() = None;
         crate::store::write_json_atomic(&self.path, &Saved { place: place.clone() })?;
-        *self.place.lock().unwrap() = place;
+        *self.place.lock_safe() = place;
         Ok(())
     }
 
     pub fn fetched_at(&self) -> i64 {
-        self.cached.lock().unwrap().as_ref().map_or(0, |(at, _)| *at)
+        self.cached.lock_safe().as_ref().map_or(0, |(at, _)| *at)
     }
 
     /// A fresh reading comes from RAM; `force` (or the floor) goes to the network. The lock is released while
@@ -55,7 +56,7 @@ impl WeatherState {
         fetch: impl FnOnce(&Place) -> std::result::Result<Forecast, String>,
     ) -> std::result::Result<Forecast, String> {
         if !force {
-            if let Some((at, forecast)) = self.cached.lock().unwrap().clone() {
+            if let Some((at, forecast)) = self.cached.lock_safe().clone() {
                 if now - at < TTL_MS {
                     return Ok(forecast);
                 }
@@ -63,7 +64,7 @@ impl WeatherState {
         }
         let place = self.place().ok_or_else(|| "escolha uma cidade".to_string())?;
         let forecast = fetch(&place)?;
-        *self.cached.lock().unwrap() = Some((now, forecast.clone()));
+        *self.cached.lock_safe() = Some((now, forecast.clone()));
         Ok(forecast)
     }
 }

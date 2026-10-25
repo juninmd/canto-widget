@@ -1,4 +1,5 @@
 //! Images attached to notes: each one sealed in its own file, so a paste never re-seals the whole vault.
+use crate::resilient::LockExt;
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use std::collections::HashSet;
 use std::path::{Path, PathBuf};
@@ -117,7 +118,7 @@ pub fn collect_orphans(dir: &Path, keep: &HashSet<String>, grace: Duration) -> R
 
 impl AppState {
     pub fn note_image_save(&self, bytes: &[u8]) -> Result<String> {
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let id = new_id();
         let blob = SealedBlob::seal(session.key(), session.salt(), bytes, NOTE_IMAGE_AAD, now_ms())?;
@@ -128,7 +129,7 @@ impl AppState {
     /// A `data:` URL, the only image source the CSP accepts; missing or unreadable means "unavailable" in the UI.
     pub fn note_image_data_url(&self, id: &str) -> Result<String> {
         let path = image_path(&self.dir, id)?;
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let blob: SealedBlob = store::read_json(&path)?.ok_or_else(unavailable)?;
         let plain = Zeroizing::new(blob.open(session.key(), NOTE_IMAGE_AAD).map_err(|_| unavailable())?);
@@ -138,7 +139,7 @@ impl AppState {
 
     /// Notes waiting in the trash still count as references, so undoing a delete brings its images back.
     pub fn note_images_gc(&self, grace: Duration) -> Result<usize> {
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let trashed = self.trash.note_bodies();
         let bodies = session.data.notes.iter().map(|n| n.body.as_str()).chain(trashed.iter().map(String::as_str));

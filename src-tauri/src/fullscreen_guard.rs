@@ -98,7 +98,7 @@ pub fn should_ring(waiting: bool, holding: bool, pending: usize) -> bool {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("fullscreen-guard", move || loop {
         std::thread::sleep(TICK);
         let Some(h) = app.try_state::<FullscreenHold>() else { continue };
         if !h.waiting.load(Ordering::Relaxed) || holding(&app) {

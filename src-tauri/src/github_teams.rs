@@ -1,5 +1,6 @@
 //! The teams the user belongs to (`org/slug`), for team-mention searches. Needs the `read:org` scope; without it
 //! the answer is simply no teams, and the user keeps the direct mentions.
+use crate::resilient::LockExt;
 use std::sync::{LazyLock, Mutex};
 use std::time::{Duration, Instant};
 
@@ -33,7 +34,7 @@ fn handles(teams: Vec<Team>) -> Vec<String> {
 }
 
 pub fn lookup(token: &str) -> Vec<String> {
-    let mut cache = CACHE.lock().unwrap_or_else(|e| e.into_inner());
+    let mut cache = CACHE.lock_safe();
     if let Some((_, teams)) = cache.as_ref().filter(|(at, _)| at.elapsed() < TTL) {
         return teams.clone();
     }

@@ -1,5 +1,6 @@
 //! Guests' photos for the agenda: Calendar sends none, so they come from the Workspace directory (People API,
 //! `directory.readonly`). Only domain colleagues have one there; everyone else keeps the initials avatar.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -24,7 +25,7 @@ pub struct GuestPhotos(Mutex<HashMap<String, Option<String>>>);
 
 impl GuestPhotos {
     pub fn clear(&self) {
-        self.0.lock().unwrap().clear();
+        self.0.lock_safe().clear();
     }
 }
 
@@ -161,7 +162,7 @@ pub fn guest_photos(app: tauri::AppHandle, emails: Vec<String>) -> Result<Photos
     }
     let cache = &state.guest_photos;
     let missing: Vec<String> = {
-        let known = cache.0.lock().unwrap();
+        let known = cache.0.lock_safe();
         emails.iter().filter(|e| !known.contains_key(e.as_str())).cloned().collect()
     };
     let mut needs_consent = false;
@@ -172,7 +173,7 @@ pub fn guest_photos(app: tauri::AppHandle, emails: Vec<String>) -> Result<Photos
                 let handles: Vec<_> = chunk.iter().map(|e| s.spawn(|| (e.clone(), lookup(&token, e)))).collect();
                 handles.into_iter().filter_map(|h| h.join().ok()).collect()
             });
-            let mut known = cache.0.lock().unwrap();
+            let mut known = cache.0.lock_safe();
             for (email, outcome) in found {
                 needs_consent |= outcome == Lookup::NeedsConsent;
                 if let Some(entry) = cache_entry(outcome) {
@@ -184,7 +185,7 @@ pub fn guest_photos(app: tauri::AppHandle, emails: Vec<String>) -> Result<Photos
             }
         }
     }
-    let known = cache.0.lock().unwrap();
+    let known = cache.0.lock_safe();
     let photos = emails.iter().filter_map(|e| Some((e.clone(), known.get(e)?.clone()?))).collect();
     Ok(Photos { photos, needs_consent })
 }

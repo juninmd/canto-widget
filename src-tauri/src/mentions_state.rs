@@ -1,5 +1,6 @@
 //! What the user did with the mentions list: the ones they read and the threads and people they muted. Sealed with
 //! the vault key (it names private repositories and people); nothing here works with the vault locked.
+use crate::resilient::LockExt;
 use std::collections::{BTreeMap, BTreeSet};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Mutex;
@@ -99,7 +100,7 @@ impl MentionsUnread {
     }
 
     pub fn set(&self, slot: usize, rows: Vec<Light>, saved: &Saved) -> u32 {
-        let mut lists = self.lists.lock().unwrap_or_else(|e| e.into_inner());
+        let mut lists = self.lists.lock_safe();
         lists[slot] = rows;
         let n = recount(&lists, saved);
         self.count.store(n, Ordering::Relaxed);
@@ -107,7 +108,7 @@ impl MentionsUnread {
     }
 
     pub fn recount(&self, saved: &Saved) -> u32 {
-        let lists = self.lists.lock().unwrap_or_else(|e| e.into_inner());
+        let lists = self.lists.lock_safe();
         let n = recount(&lists, saved);
         self.count.store(n, Ordering::Relaxed);
         n
@@ -131,7 +132,7 @@ pub fn load(state: &AppState) -> Result<Saved> {
 }
 
 pub fn update<T>(state: &AppState, f: impl FnOnce(&mut Saved) -> T) -> Result<(T, Saved)> {
-    let _guard = LOCK.lock().unwrap_or_else(|e| e.into_inner());
+    let _guard = LOCK.lock_safe();
     let mut saved = load(state)?;
     let out = f(&mut saved);
     state.save_sealed(&store::mentions_path(&state.dir), AAD, &saved)?;

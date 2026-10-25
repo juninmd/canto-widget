@@ -1,6 +1,7 @@
 //! A summary of the day, once each morning: how many meetings and open tasks, review requests waiting and unread
 //! mentions. Off by default; rings from Rust (a hidden webview sleeps) inside a window after the chosen hour, so a
 //! widget opened at 4 pm does not announce the morning.
+use crate::resilient::LockExt;
 use std::sync::Mutex;
 use std::time::Duration;
 
@@ -67,23 +68,23 @@ impl MorningDigest {
     }
 
     pub fn get(&self) -> Config {
-        self.saved.lock().unwrap().config.clone()
+        self.saved.lock_safe().config.clone()
     }
 
     fn set(&self, mut config: Config) -> Result<Config> {
         config.hour = config.hour.min(23);
-        let mut saved = self.saved.lock().unwrap();
+        let mut saved = self.saved.lock_safe();
         saved.config = config.clone();
         crate::store::write_json_atomic(&self.path, &*saved)?;
         Ok(config)
     }
 
     fn last_day(&self) -> String {
-        self.saved.lock().unwrap().last_day.clone()
+        self.saved.lock_safe().last_day.clone()
     }
 
     fn rang(&self, day: &str) -> Result<()> {
-        let mut saved = self.saved.lock().unwrap();
+        let mut saved = self.saved.lock_safe();
         saved.last_day = day.to_string();
         crate::store::write_json_atomic(&self.path, &*saved)
     }
@@ -225,7 +226,7 @@ fn gather(app: &AppHandle, state: &AppState, day: NaiveDate, now_ms: i64) -> Cou
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("morning-digest", move || loop {
         std::thread::sleep(TICK);
         let state = app.state::<AppState>();
         let digest = app.state::<MorningDigest>();

@@ -1,5 +1,6 @@
 //! CI status of PR heads kept in RAM, so a list refresh doesn't spend three API calls per PR every time.
 //! Two layers: `repo#n` → head sha and merge conflict (a new push shows up within `HEAD_TTL_MS`) and `repo@sha` → status.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -40,21 +41,21 @@ pub struct ChecksCache {
 
 impl ChecksCache {
     pub fn generation(&self) -> u64 {
-        self.inner.lock().unwrap().generation
+        self.inner.lock_safe().generation
     }
 
     pub fn head(&self, key: &str, now: i64) -> Option<Head> {
-        let g = self.inner.lock().unwrap();
+        let g = self.inner.lock_safe();
         g.heads.get(key).filter(|(_, at)| now - at < HEAD_TTL_MS).map(|(head, _)| head.clone())
     }
 
     pub fn status(&self, key: &str, now: i64) -> Option<ChecksStatus> {
-        let g = self.inner.lock().unwrap();
+        let g = self.inner.lock_safe();
         g.checks.get(key).filter(|(s, at)| now - at < ttl(*s)).map(|(s, _)| *s)
     }
 
     pub fn put_head(&self, generation: u64, key: String, head: Head, now: i64) {
-        let mut g = self.inner.lock().unwrap();
+        let mut g = self.inner.lock_safe();
         if g.generation == generation {
             g.heads.insert(key, (head, now));
             bound(&mut g.heads, now, |_| HEAD_TTL_MS);
@@ -62,7 +63,7 @@ impl ChecksCache {
     }
 
     pub fn put_status(&self, generation: u64, key: String, status: ChecksStatus, now: i64) {
-        let mut g = self.inner.lock().unwrap();
+        let mut g = self.inner.lock_safe();
         if g.generation == generation {
             g.checks.insert(key, (status, now));
             bound(&mut g.checks, now, |(s, _)| ttl(*s));
@@ -71,14 +72,14 @@ impl ChecksCache {
 
     pub fn forget(&self, forge: &str) {
         let prefix = format!("{forge}|");
-        let mut g = self.inner.lock().unwrap();
+        let mut g = self.inner.lock_safe();
         g.heads.retain(|k, _| !k.starts_with(&prefix));
         g.checks.retain(|k, _| !k.starts_with(&prefix));
         g.generation += 1;
     }
 
     pub fn clear(&self) {
-        let mut g = self.inner.lock().unwrap();
+        let mut g = self.inner.lock_safe();
         g.heads.clear();
         g.checks.clear();
         g.generation += 1;

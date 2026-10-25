@@ -128,6 +128,7 @@ pub mod prefs;
 pub mod priority;
 pub mod reads;
 pub mod report;
+pub mod resilient;
 pub mod review_alert;
 pub mod routine;
 pub mod snooze;

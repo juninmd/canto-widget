@@ -145,7 +145,7 @@ impl Memory {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("task-reminder", move || {
         let mut memory = Memory::default();
         loop {
             let state = app.state::<AppState>();

@@ -1,6 +1,7 @@
 //! Do not disturb: silences OS notifications and alert pop-ups until a given time or until turned off.
 //! Rust owns the state because every alert rings from a Rust thread; persisted next to the vault (not
 //! secret) so a restart in the middle of a focus block doesn't start ringing again.
+use crate::resilient::LockExt;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::Duration;
@@ -58,7 +59,7 @@ impl DoNotDisturb {
 
     /// An expired period is dropped (file included) the first time anyone looks.
     pub fn state_at(&self, now_ms: i64) -> DndState {
-        let mut quiet = self.quiet.lock().unwrap();
+        let mut quiet = self.quiet.lock_safe();
         match *quiet {
             Some(q) if q.active_at(now_ms) => DndState { active: true, until_ms: q.until_ms },
             Some(_) => {
@@ -75,7 +76,7 @@ impl DoNotDisturb {
             Some(q) => crate::store::write_json_atomic(&self.path, &q)?,
             None => remove(&self.path)?,
         }
-        *self.quiet.lock().unwrap() = quiet;
+        *self.quiet.lock_safe() = quiet;
         Ok(())
     }
 }
@@ -163,7 +164,7 @@ pub fn dnd_clear(app: AppHandle) -> Result<DndState> {
 
 /// Expires on its own: the tray label and the top-bar indicator follow without anyone polling.
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("do-not-disturb", move || {
         let mut last = current(&app);
         loop {
             std::thread::sleep(TICK);

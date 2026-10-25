@@ -1,3 +1,4 @@
+use crate::resilient::LockExt;
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -70,11 +71,11 @@ impl WindowState {
     }
 
     pub fn cfg(&self) -> WindowConfig {
-        self.cfg.lock().unwrap().clone()
+        self.cfg.lock_safe().clone()
     }
 
     pub fn change(&self, f: impl FnOnce(&mut WindowConfig)) {
-        let mut cfg = self.cfg.lock().unwrap();
+        let mut cfg = self.cfg.lock_safe();
         let before = cfg.clone();
         f(&mut cfg);
         if *cfg != before {

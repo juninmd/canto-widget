@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Uma falha pontual não desliga mais um recurso até reiniciar o Canto.** Os vigias de fundo (bloqueio automático,
+  backup diário, alertas de reunião, tarefas, PRs, menções, Steam, status e afins) voltam sozinhos depois de um erro
+  inesperado, em vez de ficarem mudos até fechar o app; e um erro desses não trava mais o cofre, a fila de alertas
+  ou os caches para todas as chamadas seguintes.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que

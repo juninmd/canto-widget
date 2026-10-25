@@ -1,5 +1,6 @@
 //! Mercado tab commands: every quote at once, and one asset over a longer period, cached for 15 min in RAM.
 //! Public data, nothing saved.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -31,7 +32,7 @@ pub struct MarketView {
 impl MarketState {
     /// Fresh quotes come from RAM; `force` (or the floor) goes to the network. A failure keeps the old quotes.
     pub fn view(&self, force: bool, now: i64, fetch: impl FnOnce() -> Result<Vec<Quote>, String>) -> MarketView {
-        let cached = self.cached.lock().unwrap().clone();
+        let cached = self.cached.lock_safe().clone();
         if let Some((at, quotes)) = &cached {
             if !force && now - at < TTL_MS {
                 return MarketView { quotes: quotes.clone(), fetched_at: *at, error: None };
@@ -39,7 +40,7 @@ impl MarketState {
         }
         match fetch() {
             Ok(quotes) => {
-                *self.cached.lock().unwrap() = Some((now, quotes.clone()));
+                *self.cached.lock_safe() = Some((now, quotes.clone()));
                 MarketView { quotes, fetched_at: now, error: None }
             }
             Err(error) => {
@@ -56,7 +57,7 @@ impl MarketState {
         now: i64,
         fetch: impl FnOnce() -> Result<History, String>,
     ) -> Result<History, String> {
-        let cached = self.history.lock().unwrap().get(&key).cloned();
+        let cached = self.history.lock_safe().get(&key).cloned();
         if let Some((at, history)) = &cached {
             if now - at < TTL_MS {
                 return Ok(history.clone());
@@ -64,7 +65,7 @@ impl MarketState {
         }
         match fetch() {
             Ok(history) => {
-                self.history.lock().unwrap().insert(key, (now, history.clone()));
+                self.history.lock_safe().insert(key, (now, history.clone()));
                 Ok(history)
             }
             Err(error) => cached.map(|(_, history)| history).ok_or(error),

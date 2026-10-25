@@ -1,3 +1,4 @@
+use crate::resilient::LockExt;
 use std::collections::VecDeque;
 use std::sync::Mutex;
 use tauri::State;
@@ -29,7 +30,7 @@ impl Trash {
         key
     }
     fn put(&self, key: String, item: Removed) {
-        let mut queue = self.0.lock().unwrap();
+        let mut queue = self.0.lock_safe();
         if queue.len() == CAPACITY {
             queue.pop_front();
         }
@@ -37,14 +38,14 @@ impl Trash {
     }
 
     pub fn take(&self, key: &str) -> Option<Removed> {
-        let mut queue = self.0.lock().unwrap();
+        let mut queue = self.0.lock_safe();
         let pos = queue.iter().position(|(c, _)| c == key)?;
         queue.remove(pos).map(|(_, item)| item)
     }
 
     /// Bodies of notes still undoable, so their images aren't collected as orphans.
     pub fn note_bodies(&self) -> Vec<String> {
-        let queue = self.0.lock().unwrap();
+        let queue = self.0.lock_safe();
         queue
             .iter()
             .filter_map(|(_, item)| if let Removed::Note(n) = item { Some(n.body.clone()) } else { None })
@@ -53,20 +54,20 @@ impl Trash {
 
     /// Called on lock: plaintext content doesn't survive a closed vault.
     pub fn clear(&self) {
-        self.0.lock().unwrap().clear();
+        self.0.lock_safe().clear();
     }
 }
 
 impl AppState {
     /// Stores while holding the session lock, else the auto-lock watchdog could lock mid-store and leave plaintext in RAM.
     pub fn store_in_trash(&self, item: Removed) -> Option<String> {
-        let session = self.session.lock().unwrap();
+        let session = self.session.lock_safe();
         session.as_ref()?;
         Some(self.trash.store(item))
     }
     /// Same guard as `store_in_trash`; keeps the key the webview already holds.
     fn return_to_trash(&self, key: &str, item: Removed) {
-        let session = self.session.lock().unwrap();
+        let session = self.session.lock_safe();
         if session.is_some() {
             self.trash.put(key.to_string(), item);
         }

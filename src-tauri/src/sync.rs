@@ -1,6 +1,7 @@
 //! Points the encrypted vault file at a folder synced by another tool (Dropbox, OneDrive, Syncthing,
 //! ...): every save copies it there under a fixed name, and whatever shows up from another machine
 //! merges in on its own. A local file, like `autolock.json` — nothing here is secret.
+use crate::resilient::LockExt;
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -71,7 +72,7 @@ pub fn clear_folder(dir: &Path) -> Result<()> {
 /// what was written so the next poll can tell it apart from someone else's change.
 pub fn export_now(dir: &Path) -> Result<()> {
     let Some(folder) = folder(dir) else { return Ok(()) };
-    let _guard = EXPORT_LOCK.lock().unwrap();
+    let _guard = EXPORT_LOCK.lock_safe();
     let dest = target(&folder);
     backup::export(dir, &dest)?;
     let bytes = std::fs::read(&dest)?;

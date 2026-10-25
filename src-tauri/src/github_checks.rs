@@ -1,5 +1,6 @@
 //! CI status and merge conflicts of the PRs in the GitHub lists. The search API has neither, so each PR costs a
 //! `pulls/{n}` call (head sha and `mergeable_state`), then the check runs (Actions, apps) and the legacy commit statuses of that sha.
+use crate::resilient::LockExt;
 use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::Mutex;
@@ -138,7 +139,7 @@ pub fn statuses(cache: &ChecksCache, api: &impl ChecksApi, prs: &[PrRef], now: i
                     break;
                 }
                 match status_for(cache, api, &prs[i], now) {
-                    Ok(status) => found.lock().unwrap().push((i, status)),
+                    Ok(status) => found.lock_safe().push((i, status)),
                     Err(AppError::RateLimited { .. }) => stop.store(true, Ordering::Relaxed),
                     Err(_) => {}
                 }

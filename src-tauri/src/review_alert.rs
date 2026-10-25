@@ -101,7 +101,7 @@ struct Seen {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("review-alert", move || {
         let mut seen: Option<Seen> = None;
         let mut last: Option<Instant> = None;
         loop {
