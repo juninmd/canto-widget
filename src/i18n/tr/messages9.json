@@ -410,11 +410,17 @@
   "gdrive.more": "load more",
   "gdrive.loadingMore": "loading more…",
   "google.enableApi": "enable the API",
-  "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
-  "settings.password.same": "the new password is the same as the current one",
-  "settings.password.capsLock": "Caps Lock is on",
   "notes.wordsOne": "1 word",
   "notes.wordsMany": "{n} words",
-  "notes.readMinutes": "{words} · ~{n} min read"
+  "notes.readMinutes": "{words} · ~{n} min read",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on",
+  "time.hourOfDay": "{h}:00",
+  "time.hourTick": "{h}",
+  "time.min": "{n} min",
+  "time.sec": "{n} s",
+  "time.h": "{h}h",
+  "time.hMin": "{h}h {mm}m",
+  "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
 }

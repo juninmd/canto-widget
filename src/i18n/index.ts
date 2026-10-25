@@ -1,9 +1,7 @@
 import { catalogLoaders } from "./loaders";
-import { en } from "./en";
-import { es } from "./es";
 import { localeFor } from "./languages";
 import { loadChoice, resolveLanguage, type Language } from "./language";
-import { ptBR } from "./pt-BR";
+import type { ptBR } from "./pt-BR";
 
 export type MessageKey = keyof typeof ptBR;
 type Params = Record<string, string | number>;
@@ -17,15 +15,8 @@ export const LANGUAGE: Language = resolveLanguage(
 /** BCP 47 tag for `Intl` / `toLocale*` calls, kept next to the messages it matches. */
 export const LOCALE = localeFor(LANGUAGE);
 
-// Keep the original catalogs synchronous for test runners; additional languages load before labels are computed.
-const messages =
-  LANGUAGE === "pt-BR"
-    ? ptBR
-    : LANGUAGE === "en"
-      ? en
-      : LANGUAGE === "es"
-        ? es
-        : await catalogLoaders[LANGUAGE]();
+// Only the chosen catalog is fetched and parsed at startup (each is ~80 kB); it lands before any label is computed.
+const messages = await catalogLoaders[LANGUAGE]();
 
 /** Looks up a user-facing string; `{name}` placeholders are filled from `params`. */
 export function t(key: MessageKey, params?: Params): string {

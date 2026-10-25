@@ -77,7 +77,7 @@ export default function ModelPicker({ rows, picked, onChange }: Props) {
                     <span className="px-2 py-1.5 text-[11px] text-faint">{t("models.cmp.none")}</span>
                   ) : (
                     options.map((r) => (
-                      <button key={r.id} type="button" onClick={() => add(r.id)} className="canto-hit flex justify-between gap-2 rounded-md px-2 py-1.5 text-left text-[11.5px] text-fg hover:bg-hover">
+                      <button key={r.id} type="button" onClick={() => add(r.id)} className="canto-hit flex shrink-0 justify-between gap-2 rounded-md px-2 py-1.5 text-left text-[11.5px] text-fg hover:bg-hover">
                         <span className="truncate">{r.name}</span>
                         <span className="shrink-0 text-faint tabular-nums">
                           {r.creator} · {formatScore(r.score)}
