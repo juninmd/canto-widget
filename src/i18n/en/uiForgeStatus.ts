@@ -12,6 +12,7 @@ export const uiForgeStatus: Record<keyof typeof source, string> = {
   "uiStatus.filter.ok": "Operational",
   "uiStatus.filter.maintenance": "Maintenance",
   "uiStatus.filter.empty": "no service in this filter",
+  "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "uiStatus.bar": "{down} down, {warn} unstable, {maint} in maintenance, {ok} operational",
   "uiStatus.add": "+ address",
   "uiStatus.emptyAdd": "add endpoint",

@@ -63,6 +63,13 @@ test("finishing the last task throws confetti once; opening on a finished day st
   expect(container.querySelector("[data-confetti]")).toBeNull();
 });
 
+test("an empty day shows no '0 de 0' counter; the first task brings it back", () => {
+  const { container, rerender } = render(<TaskProgress done={0} total={0} />);
+  expect(container.textContent).toBe("");
+  rerender(<TaskProgress done={0} total={1} />);
+  expect(container.textContent).toBe("0 de 1");
+});
+
 test("a price flashes the direction it moved, but not when it first shows", () => {
   const { container, rerender } = render(<PriceTick value={5.4} text="5,40" />);
   const tick = () => container.querySelector("span")!;

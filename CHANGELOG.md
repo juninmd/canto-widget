@@ -122,6 +122,32 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Teclado no menu de adiar e na folha "mais" do celular.** O menu ▾ de adiar um aviso abre já no tempo atual,
+  as setas percorrem as opções e Esc devolve o foco ao botão; a folha de abas do celular abre na aba atual, mantém
+  o Tab dentro dela e, ao fechar, devolve o foco ao botão **mais** em vez de perdê-lo.
+- **Horas e durações no idioma escolhido.** Eixos e dicas de Atividade, Agenda e Mapa, o pico do dia, o anel da próxima reunião, o tempo de sol, o foco, os intervalos de Saúde e as horas jogadas na Steam deixam de escrever "14h" e "1h30" fixos: em inglês aparecem "14:00" e "1h 30m", em espanhol "14 h". O uptime usa a vírgula ou o ponto do idioma e o símbolo da moeda em Mercado vem do idioma ("US$" em português, "$" em inglês).
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
+- **Aba Contatos, com a sua agenda do Google**: a People API, somente leitura (`contacts.readonly`), com o mesmo
+  login da Agenda. Mostra o total de contatos, busca ao digitar (nome, empresa, cargo, e-mail ou telefone, sem
+  ligar para acentos), filtros com contagem (Todos, Favoritos, Com e-mail, Com telefone), seções de A a Z com
+  avatar em iniciais e, ao abrir um contato, copiar e-mail ou telefone com um clique e abrir no Google Contatos.
+  Começa oculta, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar o
+  escopo novo, e a **People API** precisa estar ativa no projeto do Google Cloud.
+- **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
+  nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
+  que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
+  opcional **só dos importantes** toca uma notificação do sistema para cada e-mail importante novo (checado a cada
+  2 min). A aba **Drive** lista arquivos recentes, com estrela ou compartilhados comigo, com busca por nome e
+  abertura no navegador, lendo só os metadados. A aba **Tarefas** ganha a seção **Google Tarefas**, com as tarefas
+  abertas da lista padrão, a data (vencidas em vermelho), captura direta no Google e concluir com um clique; sem
+  login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
+  ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
+  novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
+- **Primeiro uso sem telas enganosas.** Status API sem nenhuma página lida e Mercado sem nenhuma cotação agora dizem
+  isso com um **tentar de novo**, em vez de "0 com problema · 0 operacionais" ou um esqueleto que nunca some; o dia
+  sem tarefas some com o "0 de 0"; e o botão **abrir Ajustes** da Agenda sem Google (e o aviso de atualização) abre
+  o grupo certo e rola até a seção.
 - **Leituras: remover um feed pede confirmação.** O ✕ de um feed agora vira **remover o feed** e só remove no segundo
   clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
   para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os
