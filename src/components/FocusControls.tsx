@@ -31,7 +31,9 @@ export function FocusButton({ task }: { task: Task }) {
 /** "12/45 min" under the title: red past the estimate, live while this task runs. */
 export function FocusBadge({ task }: { task: Task }) {
   const mine = useRunning()?.id === task.id;
-  useTick(mine);
+  // The chip counts whole minutes: ticking every second would re-render the row 59 times for nothing. One second past
+  // the minute is where `isOver` (strictly past the estimate) flips, and a minute count a second late goes unseen.
+  useTick(mine, 60_000, 1000);
   const secs = mine ? focusStore.totalSecs() : (task.tracked_secs ?? 0);
   const est = task.estimate_min ?? null;
   if (!est && secs < 60 && !mine) return null;
