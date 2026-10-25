@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Colar uma lista cria uma tarefa por linha.** Cole várias linhas no campo de nova tarefa vazio e cada uma vira
+  uma tarefa, na ordem; marcadores de lista (`-`, `*`, `[ ]`, `[x]`, `1.`, `•`) somem e hora e `!alta` de cada
+  linha continuam valendo. Até 50 linhas por vez (um aviso diz quantas ficaram de fora); se uma linha falhar, ela
+  volta ao campo com as seguintes na fila e **Enter** tenta de novo. Uma linha só continua colando como antes.
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
   um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
   endereços de links ficam de fora da conta.
@@ -139,6 +143,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
+  longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
+  fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
 - **Teclado no menu de adiar e na folha "mais" do celular.** O menu ▾ de adiar um aviso abre já no tempo atual,
   as setas percorrem as opções e Esc devolve o foco ao botão; a folha de abas do celular abre na aba atual, mantém
   o Tab dentro dela e, ao fechar, devolve o foco ao botão **mais** em vez de perdê-lo.
