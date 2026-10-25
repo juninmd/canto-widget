@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Atalho J para entrar na reunião.** Na Agenda de hoje, **J** abre o Meet da reunião em andamento ou da que começa
   em até 15 minutos; nada acontece enquanto você digita, em outro dia ou com reunião ainda distante. Está na ajuda (**?**).
 

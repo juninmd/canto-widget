@@ -421,5 +421,6 @@
   "time.sec": "{n} s",
   "time.h": "{h}h",
   "time.hMin": "{h}h {mm}m",
+  "shortcuts.moveTask": "move the focused task up or down",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

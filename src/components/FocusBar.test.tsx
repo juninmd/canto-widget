@@ -64,3 +64,16 @@ test("finishing from the bar marks the task done", async () => {
   expect(calls.some((c) => c.cmd === "task_complete" && c.args?.id === "t1")).toBe(true);
   expect(screen.queryByRole("region", { name: "tarefa em foco" })).toBeNull();
 });
+
+test("a double-click on Concluir completes the task once", async () => {
+  mount();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("iniciar foco em revisar PR"));
+  });
+  await act(async () => {
+    const done = screen.getByText("Concluir");
+    fireEvent.click(done);
+    fireEvent.click(done);
+  });
+  expect(calls.filter((c) => c.cmd === "task_complete").length).toBe(1);
+});
