@@ -19,7 +19,7 @@ const { ToastProvider } = await import("../lib/toast");
 
 let shortcuts = 0;
 
-async function mount() {
+async function mount(focus: "google" | null = null) {
   render(
     <ToastProvider>
       <SettingsTab
@@ -33,6 +33,7 @@ async function mount() {
         reminderLead={5}
         onReminderLead={() => {}}
         onShowShortcuts={() => shortcuts++}
+        focus={focus}
       />
     </ToastProvider>,
   );
@@ -123,4 +124,24 @@ test("the search field stays stuck to the top of the scroller while the groups s
   expect(bar.className).toContain("top-0");
   expect(bar.contains(screen.getByLabelText("buscar ajuste"))).toBe(true);
   expect(bar.parentElement!.className).toContain("overflow-y-auto");
+});
+
+test("a 'configure' jump opens the section's group and scrolls to it, without saving the open groups", async () => {
+  const scrolled: string[] = [];
+  const original = HTMLElement.prototype.scrollIntoView;
+  HTMLElement.prototype.scrollIntoView = function (this: HTMLElement) {
+    scrolled.push(this.getAttribute("data-settings-section") ?? "");
+  };
+  try {
+    await mount("google");
+    await act(async () => {
+      await new Promise((r) => requestAnimationFrame(() => r(null)));
+    });
+    expect(toggle("Dados e contas").getAttribute("aria-expanded")).toBe("true");
+    expect(toggle("Aparência").getAttribute("aria-expanded")).toBe("true");
+    expect(scrolled).toEqual(["google"]);
+    expect(localStorage.getItem("canto.settingsGroups") === null).toBe(true);
+  } finally {
+    HTMLElement.prototype.scrollIntoView = original;
+  }
 });
