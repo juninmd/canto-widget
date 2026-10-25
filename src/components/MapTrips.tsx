@@ -80,10 +80,10 @@ export default function MapTrips({ status, routes, selected, onSelect, onChanged
             <button
               type="button"
               aria-label={t("map.trips.remove", { name: trip.name })}
-              disabled={removing !== null}
+              aria-disabled={removing !== null}
               aria-busy={removing === trip.id}
               onClick={() => void remove(trip)}
-              className="canto-hit absolute -right-1 -top-1 hidden h-5 w-5 items-center justify-center rounded-full border border-edge bg-panel text-[10px] text-faint hover:text-danger group-hover:flex group-focus-within:flex"
+              className="canto-hit absolute -right-1 -top-1 hidden h-5 w-5 items-center justify-center rounded-full border border-edge bg-panel text-[10px] text-faint hover:text-danger aria-disabled:opacity-60 group-hover:flex group-focus-within:flex"
             >
               ✕
             </button>

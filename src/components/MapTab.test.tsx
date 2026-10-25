@@ -126,9 +126,13 @@ test("a double click on a trip's remove button asks Rust once", async () => {
   view = LIVE;
   await show();
   const x = screen.getByLabelText("remover Trabalho") as HTMLButtonElement;
+  x.focus();
   fireEvent.click(x);
   fireEvent.click(x);
   expect(calls.filter((c) => c.cmd === "traffic_remove_trip").length).toBe(1);
-  expect(x.disabled).toBe(true);
+  // aria-disabled, not disabled: the focused button keeps focus, so a failure doesn't drop keyboard users to <body>.
+  expect(x.getAttribute("aria-disabled")).toBe("true");
+  expect(x.disabled).toBe(false);
+  expect(document.activeElement === x).toBe(true);
   await act(async () => removeGate!());
 });
