@@ -6,6 +6,8 @@ import type { TrafficStatus, TrafficView } from "../lib/api";
 type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
 let view: TrafficView;
+let failGet = "";
+let settle: () => void = () => {};
 
 const ORIGIN = { name: "Rua Fictícia, 100", detail: "Aurora", lat: -23.5, lon: -46.6 };
 const TRIP = { id: "t1", name: "Trabalho", icon: "work" as const, to: { name: "Av. Aurora, 900", detail: "", lat: -23.45, lon: -46.55 } };
@@ -38,10 +40,11 @@ const DEPARTURES = [0, 1, 2, 3].map((i) => ({ at: now + i * 900_000, minutes: [2
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
     calls.push({ cmd, args });
-    if (cmd === "traffic_get") return Promise.resolve(view);
+    if (cmd === "traffic_get") return failGet ? Promise.reject(failGet) : Promise.resolve(view);
     if (cmd === "traffic_map") return Promise.resolve({ zoom: 14, tiles: [], source: "tomtom" });
     if (cmd === "traffic_departures") return Promise.resolve(DEPARTURES);
-    if (cmd === "traffic_set_origin" || cmd === "traffic_set_key") return Promise.resolve(view.status satisfies TrafficStatus);
+    if (cmd === "traffic_set_origin") return new Promise((r) => (settle = () => r(view.status)));
+    if (cmd === "traffic_set_key") return Promise.resolve(view.status satisfies TrafficStatus);
     return Promise.resolve(null);
   },
 }));
@@ -56,6 +59,7 @@ async function show() {
 
 beforeEach(() => {
   calls.length = 0;
+  failGet = "";
 });
 afterEach(cleanup);
 
@@ -64,7 +68,9 @@ test("without a starting point the tab asks for one and offers the Clima city", 
   await show();
   expect(screen.getByText("De onde você sai?")).toBeTruthy();
   fireEvent.click(screen.getByText("usar Aurora, da aba Clima"));
-  await act(async () => {});
+  fireEvent.click(screen.getByText("usar Aurora, da aba Clima"));
+  await act(async () => settle());
+  expect(calls.filter((c) => c.cmd === "traffic_set_origin")).toHaveLength(1);
   const saved = calls.find((c) => c.cmd === "traffic_set_origin");
   expect(saved?.args.spot).toEqual(NO_PLACE.suggested);
 });
@@ -118,4 +124,13 @@ test("the layers switch the traffic, incidents and route on and off", async () =
   expect(container.querySelector(".map-route")).toBeTruthy();
   fireEvent.click(screen.getByText("Rota"));
   expect(container.querySelector(".map-route") === null).toBe(true);
+});
+
+test("a refresh that fails keeps the map and says why, instead of failing silently", async () => {
+  view = LIVE;
+  await show();
+  failGet = "TomTom recusou a chave";
+  await act(async () => fireEvent.click(screen.getByText("atualizar")));
+  expect(screen.getByRole("alert").textContent).toContain("TomTom recusou a chave");
+  expect(screen.getByText("38%")).toBeTruthy();
 });

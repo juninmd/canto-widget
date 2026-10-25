@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Clima e Mapa não falham mais em silêncio.** Quando **atualizar** (ou esquecer a chave da TomTom) dá erro com a
+  cidade ou o mapa já na tela, o aviso aparece em cima do card, com **tentar de novo**, em vez de não acontecer
+  nada. Uma leitura lenta que chega depois de uma mais nova é descartada, sem trazer de volta dados velhos, e um
+  clique duplo no ponto de partida do Mapa salva uma vez só.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
