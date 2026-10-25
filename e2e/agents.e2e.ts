@@ -62,6 +62,8 @@ test("copying the command touches nothing but the clipboard", async ({ page }) =
   await mockTauri(page, { hiddenTabs: ["gitlab", "status", "activity", "steam"], knownTabs: ALL_TABS, fixed: { harness_list: AGENTS } });
   await page.goto("/");
   await goTab(page, "Agentes");
+  // The tab loads on demand: count only after its own first fetch has landed.
+  await expect(page.locator("[data-agent=aider]")).toBeVisible();
   const before = (await calls(page)).length;
   await page.locator("[data-agent=aider]").getByRole("button", { name: "copiar" }).click();
   await expect(page.locator("[data-agent=aider]").getByText("comando copiado")).toBeVisible();
