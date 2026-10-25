@@ -7,6 +7,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
+  um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
+  endereços de links ficam de fora da conta.
+- **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
+  está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
+  senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
+  gerenciador de senhas qual campo é a senha atual e qual é a nova.
 - **Busca sem acento e sem caixa.** "acao" acha "Ação" e "reuniao" acha "Reunião" (e o contrário) nas notas, no histórico do clipboard, nas transcrições, na busca global de tarefas, nos docs do Gemini e nas notas ligadas a uma reunião; o destaque `<mark>` marca a palavra acentuada inteira.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
@@ -113,26 +120,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o Canto pede a permissão de notificações na primeira abertura. O CI passa a compilar o crate para Android e iOS.
   Ainda não há desbloqueio biométrico no celular. Veja [docs/mobile.md](docs/mobile.md).
 
-- **Aba Contatos, com a sua agenda do Google**: a People API, somente leitura (`contacts.readonly`), com o mesmo
-  login da Agenda. Mostra o total de contatos, busca ao digitar (nome, empresa, cargo, e-mail ou telefone, sem
-  ligar para acentos), filtros com contagem (Todos, Favoritos, Com e-mail, Com telefone), seções de A a Z com
-  avatar em iniciais e, ao abrir um contato, copiar e-mail ou telefone com um clique e abrir no Google Contatos.
-  Começa oculta, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar o
-  escopo novo, e a **People API** precisa estar ativa no projeto do Google Cloud.
-
-- **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
-  nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
-  que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
-  opcional **só dos importantes** toca uma notificação do sistema para cada e-mail importante novo (checado a cada
-  2 min). A aba **Drive** lista arquivos recentes, com estrela ou compartilhados comigo, com busca por nome e
-  abertura no navegador, lendo só os metadados. A aba **Tarefas** ganha a seção **Google Tarefas**, com as tarefas
-  abertas da lista padrão, a data (vencidas em vermelho), captura direta no Google e concluir com um clique; sem
-  login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
-  ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
-  novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
-
 ### Corrigido
 
+- **Leituras: remover um feed pede confirmação.** O ✕ de um feed agora vira **remover o feed** e só remove no segundo
+  clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
+  para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os
+  botões dos cartões voltaram ao tamanho do resto do texto.
+
+- **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
+  sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
+  lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
+  uma marcação que falhou marca de novo. No Mercado, o período que não carregou ganha **tentar de novo** ali mesmo.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
@@ -156,6 +154,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Chamadas de rede mais rápidas e leves**: GitHub, GitLab, Google, Steam, Mercado, Clima e Mapa passam a usar
+  um cliente HTTP por serviço durante toda a sessão, em vez de criar um novo (com thread e certificados) a cada
+  pedido; as conexões ficam abertas entre as páginas e atualizações, sem refazer o handshake TLS toda vez.
 - **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
   420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
   de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
@@ -357,6 +358,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Tarefas e avisos sem redesenho à toa**: voltar à aba Tarefas (ou outra janela salvar algo) relia o dia e
+  redesenhava todas as linhas mesmo sem mudança (~50–85 ms a mais com 1000 tarefas), e cada foco da janela trocava
+  a lista de avisos e redesenhava o app inteiro. Agora uma resposta idêntica mantém a lista atual e o React pula
+  o redesenho.
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
