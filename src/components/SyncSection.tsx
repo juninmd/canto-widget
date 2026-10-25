@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../lib/api";
 import { useSectionError } from "../lib/useSectionError";
 import { t } from "../i18n";
+import ConfirmButton from "./ConfirmButton";
 import { SettingsSection } from "./SettingsSection";
 
 export default function SyncSection({ onError }: { onError: (m: string) => void }) {
@@ -79,7 +80,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
       ) : (
         <p className="text-[11px] text-faint">{t("settings.sync.none")}</p>
       )}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           disabled={busy}
@@ -98,14 +99,15 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
             >
               {t("settings.sync.now")}
             </button>
-            <button
-              type="button"
+            <ConfirmButton
+              ask={t("settings.sync.stopAsk")}
+              yes={t("settings.sync.stopYes")}
               disabled={busy}
-              onClick={() => void stop()}
+              onConfirm={() => void stop()}
               className="rounded-lg bg-edge px-3 py-1.5 text-xs text-fg disabled:opacity-40"
             >
               {t("settings.sync.stop")}
-            </button>
+            </ConfirmButton>
           </>
         )}
       </div>

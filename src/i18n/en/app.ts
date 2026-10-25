@@ -191,6 +191,8 @@ export const app: Record<keyof typeof source, string> = {
   "settings.sync.change": "change folder",
   "settings.sync.now": "sync now",
   "settings.sync.stop": "stop",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop",
   "settings.sync.merged": "merged: the vault has {tasks} tasks and {notes} notes",
   "settings.sync.nothingNew": "nothing new to merge",
 
@@ -295,6 +297,7 @@ export const app: Record<keyof typeof source, string> = {
   "update.available": "Canto {version} available",
   "update.view": "view",
   "common.retry": "try again",
+  "common.cancel": "cancel",
   "common.refresh": "refresh",
   "common.refreshing": "refreshing",
   "common.updatedAt": "updated at {time}",

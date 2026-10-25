@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
+  revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**
+  devolve o foco ao botão. Os botões do **Não perturbe** e as opções de **tela cheia** e **pedidos de revisão** ficam
+  travados enquanto salvam, então um clique duplo não manda dois pedidos nem deixa o estado invertido.
 - **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
   está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
   senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao

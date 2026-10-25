@@ -411,5 +411,10 @@
   "gdrive.loadingMore": "loading more…",
   "google.enableApi": "enable the API",
   "settings.password.same": "the new password is the same as the current one",
-  "settings.password.capsLock": "Caps Lock is on"
+  "settings.password.capsLock": "Caps Lock is on",
+  "common.cancel": "cancel",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop"
 }

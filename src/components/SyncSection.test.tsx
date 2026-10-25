@@ -58,9 +58,27 @@ test("'parar' clears the folder and hides the sync actions again", async () => {
   responses.sync_get = () => Promise.resolve("D:\\Dropbox\\canto");
   responses.sync_clear = () => Promise.resolve(null);
   await open();
+  fireEvent.click(screen.getByText("parar"));
   await act(async () => {
-    fireEvent.click(screen.getByText("parar"));
+    fireEvent.click(screen.getByText("sim, parar"));
   });
   expect(screen.getByText("nenhuma pasta escolhida")).toBeTruthy();
   expect(screen.queryByText("sincronizar agora")).toBeNull();
+});
+
+test("'parar' asks first; Esc keeps the folder and puts focus back on 'parar'", async () => {
+  responses.sync_get = () => Promise.resolve("D:\\Dropbox\\canto");
+  let cleared = false;
+  responses.sync_clear = () => {
+    cleared = true;
+    return Promise.resolve(null);
+  };
+  await open();
+  fireEvent.click(screen.getByText("parar"));
+  expect(screen.getByText("parar de sincronizar? a pasta e os arquivos nela ficam como estão")).toBeTruthy();
+  expect(document.activeElement?.textContent).toBe("cancelar");
+  fireEvent.keyDown(document.activeElement!, { key: "Escape" });
+  expect(cleared).toBe(false);
+  expect(screen.getByText("D:\\Dropbox\\canto")).toBeTruthy();
+  expect(document.activeElement?.textContent).toBe("parar");
 });
