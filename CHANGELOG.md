@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Gmail pelo teclado, sem ação em dobro.** Com o foco num e-mail, **J/K** (ou as setas) andam pela lista, **X** seleciona, **S** dá estrela, **U** alterna lido, **E** arquiva, **#** manda para a lixeira e **O** abre no Gmail; o foco passa para o vizinho quando o e-mail sai. Um clique duplo em "marcar como lido", estrela, arquivar ou lixeira agora envia um pedido só: as ações do e-mail esperam a resposta. **/** também foca a busca no Gmail, no Drive e nos Contatos.
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
   um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
