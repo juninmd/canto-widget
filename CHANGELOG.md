@@ -180,6 +180,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Abertura mais leve.** Ajustes e as abas fora do dia a dia (GitHub, GitLab, Gmail, Drive, Contatos, Status API,
+  Modelos, Agentes, Atividade, Clima, Mapa, Mercado, Steam e Leituras) passam a ser carregadas só na primeira vez
+  que são abertas: o JavaScript lido na abertura caiu de 1.081 KiB para 745 KiB (307 → 228 KiB com gzip).
 - **Chamadas de rede mais rápidas e leves**: GitHub, GitLab, Google, Steam, Mercado, Clima e Mapa passam a usar
   um cliente HTTP por serviço durante toda a sessão, em vez de criar um novo (com thread e certificados) a cada
   pedido; as conexões ficam abertas entre as páginas e atualizações, sem refazer o handshake TLS toda vez.
