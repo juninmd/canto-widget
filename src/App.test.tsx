@@ -250,6 +250,15 @@ test("the pop-up asks the widget to open a tab", async () => {
   expect(document.getElementById("aba-settings")?.getAttribute("aria-selected")).toBe("true");
 });
 
+test("a tab loaded on demand renders its content and drops the placeholder", async () => {
+  render(<App />);
+  await settle();
+  await act(async () => listeners["canto://open-tab"]({ payload: "settings" }));
+  for (let i = 0; i < 20 && !screen.queryByLabelText("buscar ajuste"); i++) await settle();
+  expect(screen.getByLabelText("buscar ajuste")).toBeTruthy();
+  expect(screen.queryByRole("status", { name: "Ajustes" }) === null).toBe(true);
+});
+
 test("Ctrl+K opens the global search; picking a note result jumps to Notes with the query seeded", async () => {
   render(<App />);
   await settle();
