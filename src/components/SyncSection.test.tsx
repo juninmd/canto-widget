@@ -82,3 +82,25 @@ test("'parar' asks first; Esc keeps the folder and puts focus back on 'parar'", 
   expect(screen.getByText("D:\\Dropbox\\canto")).toBeTruthy();
   expect(document.activeElement?.textContent).toBe("parar");
 });
+
+test("starting 'sincronizar agora' while 'parar' is asking closes the question, so 'sim' can't run alongside it", async () => {
+  responses.sync_get = () => Promise.resolve("D:\\Dropbox\\canto");
+  let finish: (v: unknown) => void = () => {};
+  responses.sync_now = () => new Promise((r) => (finish = r));
+  let cleared = false;
+  responses.sync_clear = () => {
+    cleared = true;
+    return Promise.resolve(null);
+  };
+  await open();
+  fireEvent.click(screen.getByText("parar"));
+  await act(async () => {
+    fireEvent.click(screen.getByText("sincronizar agora"));
+  });
+  expect(screen.queryByText("sim, parar")).toBeNull();
+  expect((screen.getByText("parar") as HTMLButtonElement).disabled).toBe(true);
+  await act(async () => finish(null));
+  expect(cleared).toBe(false);
+  expect(screen.queryByText("sim, parar")).toBeNull();
+  expect((screen.getByText("parar") as HTMLButtonElement).disabled).toBe(false);
+});

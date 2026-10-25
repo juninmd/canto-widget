@@ -19,12 +19,19 @@ export default function ConfirmButton({ ask, yes, onConfirm, disabled, className
   const trigger = useRef<HTMLButtonElement>(null);
   const was = useRef(false);
 
+  // Another action started meanwhile: the question no longer holds, so it closes instead of firing alongside it.
+  useEffect(() => {
+    if (!disabled) return;
+    was.current = false;
+    setAsking(false);
+  }, [disabled]);
+
   useEffect(() => {
     if (was.current && !asking) trigger.current?.focus();
     was.current = asking;
   }, [asking]);
 
-  if (!asking) {
+  if (!asking || disabled) {
     return (
       <button ref={trigger} type="button" disabled={disabled} aria-label={ariaLabel} onClick={() => setAsking(true)} className={className}>
         {children}
@@ -49,7 +56,9 @@ export default function ConfirmButton({ ask, yes, onConfirm, disabled, className
       </button>
       <button
         type="button"
+        disabled={disabled}
         onClick={() => {
+          if (disabled) return;
           was.current = false;
           setAsking(false);
           onConfirm();
