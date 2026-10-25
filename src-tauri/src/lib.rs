@@ -160,6 +160,7 @@ pub mod subtask;
 pub mod sync;
 pub mod task_order;
 pub mod task_reminder;
+pub mod text_fold;
 pub mod traffic;
 pub mod traffic_cache;
 pub mod traffic_feed;

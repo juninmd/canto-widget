@@ -23,10 +23,14 @@ pub struct ClipList {
 
 #[tauri::command(async)]
 pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> {
-    let q = query.trim().to_lowercase();
+    let q = crate::text_fold::fold(query.trim());
     let hist = state.clip_load()?;
-    let items =
-        hist.items.iter().filter(|i| q.is_empty() || i.text.to_lowercase().contains(&q)).map(ClipView::from).collect();
+    let items = hist
+        .items
+        .iter()
+        .filter(|i| q.is_empty() || crate::text_fold::contains(&i.text, &q))
+        .map(ClipView::from)
+        .collect();
     Ok(ClipList { items, max_pinned: hist.max_pinned })
 }
 

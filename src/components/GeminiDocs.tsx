@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type GeminiDoc } from "../lib/api";
 import { useWindowVisible } from "../lib/useWindowVisible";
+import { fold, foldIncludes } from "../lib/fold";
 import { LOCALE, t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
 import { NoteIcon } from "./Icons";
@@ -48,8 +49,8 @@ export default function GeminiDocs({ query, quietWhenEmpty = false }: { query: s
   // Coming back to the window refreshes the list in place: the notes show up minutes after a meeting ends.
   useEffect(() => (visible ? load() : undefined), [visible, load]);
 
-  const q = query.trim().toLowerCase();
-  const shown = (docs ?? []).filter((d) => !q || `${d.meeting} ${d.title}`.toLowerCase().includes(q));
+  const q = fold(query.trim());
+  const shown = (docs ?? []).filter((d) => !q || foldIncludes(`${d.meeting} ${d.title}`, q));
   // The tab's own empty state already speaks; a second empty line under it would stack two.
   if (quietWhenEmpty && docs !== null && !error && shown.length === 0) return null;
 
