@@ -3,10 +3,12 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 let biometrics: unknown = null;
+let wrongPassword = false;
 const calls: string[] = [];
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
     calls.push(cmd);
+    if (cmd === "vault_unlock" && wrongPassword) return Promise.reject("senha incorreta");
     return Promise.resolve(cmd === "biometric_status" ? biometrics : null);
   },
 }));
@@ -16,6 +18,7 @@ const { default: Lock } = await import("./Lock");
 afterEach(() => {
   cleanup();
   biometrics = null;
+  wrongPassword = false;
   calls.length = 0;
 });
 
@@ -38,6 +41,24 @@ test("mismatched passwords explain how to fix it", () => {
   fireEvent.change(screen.getByLabelText("repita a senha"), { target: { value: "4321" } });
   fireEvent.click(screen.getByRole("button", { name: "Criar cofre" }));
   expect(screen.getByRole("alert").textContent).toContain("mesma senha");
+  const again = screen.getByLabelText("repita a senha");
+  expect(document.activeElement === again).toBe(true);
+  expect(again.getAttribute("aria-describedby")).toBe(screen.getByRole("alert").id);
+});
+
+test("a wrong password puts the focus back on the field, selected, and marks it invalid", async () => {
+  wrongPassword = true;
+  render(<Lock exists onOpen={() => {}} />);
+  const field = screen.getByLabelText("senha mestra") as HTMLInputElement;
+  fireEvent.change(field, { target: { value: "errada" } });
+  (screen.getByRole("button", { name: "Destrancar" }) as HTMLButtonElement).focus();
+  await act(async () => {
+    fireEvent.submit(field.form!);
+  });
+  expect(screen.getByRole("alert").textContent).toContain("senha incorreta");
+  expect(document.activeElement === field).toBe(true);
+  expect([field.selectionStart, field.selectionEnd]).toEqual([0, "errada".length]);
+  expect(field.getAttribute("aria-invalid")).toBe("true");
 });
 
 test("with Windows Hello enabled, a button unlocks without typing the password", async () => {

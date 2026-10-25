@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api, errText, type BiometricStatus } from "../lib/api";
 import { t } from "../i18n";
 
@@ -11,6 +11,15 @@ export default function Lock({ exists, onOpen }: Props) {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [bio, setBio] = useState<BiometricStatus | null>(null);
+  const passwordField = useRef<HTMLInputElement>(null);
+  const confirmField = useRef<HTMLInputElement>(null);
+
+  // After a failure the focus would stay on a disabled button: send it back to the field to retype, already selected.
+  function retry(field: HTMLInputElement | null, message: string) {
+    setError(message);
+    field?.focus();
+    field?.select();
+  }
 
   useEffect(() => {
     if (!exists) return;
@@ -27,7 +36,7 @@ export default function Lock({ exists, onOpen }: Props) {
       await api.biometricUnlock();
       onOpen();
     } catch (e) {
-      setError(errText(e));
+      retry(passwordField.current, errText(e));
     } finally {
       setBusy(false);
     }
@@ -37,7 +46,7 @@ export default function Lock({ exists, onOpen }: Props) {
     e.preventDefault();
     setError("");
     if (!exists && password !== confirm) {
-      setError(t("lock.mismatch"));
+      retry(confirmField.current, t("lock.mismatch"));
       return;
     }
     setBusy(true);
@@ -47,7 +56,7 @@ export default function Lock({ exists, onOpen }: Props) {
       setConfirm("");
       onOpen(!exists);
     } catch (e) {
-      setError(errText(e));
+      retry(passwordField.current, errText(e));
     } finally {
       setBusy(false);
     }
@@ -69,9 +78,12 @@ export default function Lock({ exists, onOpen }: Props) {
         </p>
       </div>
       <input
+        ref={passwordField}
         autoFocus
         type={showPassword ? "text" : "password"}
         aria-label={t("lock.password")}
+        aria-invalid={error !== "" || undefined}
+        aria-describedby={error ? "lock-error" : undefined}
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder={t("lock.password")}
@@ -79,8 +91,11 @@ export default function Lock({ exists, onOpen }: Props) {
       />
       {!exists && (
         <input
+          ref={confirmField}
           type={showPassword ? "text" : "password"}
           aria-label={t("lock.confirm")}
+          aria-invalid={error !== "" || undefined}
+          aria-describedby={error ? "lock-error" : undefined}
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           placeholder={t("lock.confirm")}
@@ -98,7 +113,7 @@ export default function Lock({ exists, onOpen }: Props) {
         {!exists && <span className="ml-auto text-faint">{t("lock.minLength")}</span>}
       </label>
       {error && (
-        <p role="alert" className="text-xs text-danger">
+        <p id="lock-error" role="alert" className="text-xs text-danger">
           {error}
         </p>
       )}

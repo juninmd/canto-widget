@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Tela de bloqueio e resumo melhores no teclado.** Senha errada devolve o foco ao campo, já selecionada para
+  redigitar, e o marca como inválido para leitores de tela (senhas diferentes levam ao campo de repetir). No resumo,
+  hoje/semana/mês viram uma parada só de Tab, trocada com as setas, Home e End; e copiar duas vezes seguidas não
+  apaga mais o "copiado" antes da hora.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
