@@ -8,6 +8,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 ### Adicionado
 
 - **Trecho da busca nas notas.** Quando o termo buscado aparece só no meio de uma nota longa, o card mostra o trecho em volta dele, com o termo destacado, em vez do começo da nota.
+- **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
+  um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
+  endereços de links ficam de fora da conta.
 - **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
   está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
   senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
@@ -136,6 +139,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
 
 ### Corrigido
+
+- **Leituras: remover um feed pede confirmação.** O ✕ de um feed agora vira **remover o feed** e só remove no segundo
+  clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
+  para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os
+  botões dos cartões voltaram ao tamanho do resto do texto.
 
 - **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
   sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
