@@ -42,6 +42,8 @@ export default function GmailTab({ onNotice }: Props) {
   useFlip(list, summary?.important.map((m) => m.id).join());
 
   const latest = useRef(0);
+  const pending = useRef(new Set<string>());
+  const [shownFor, setShownFor] = useState("");
 
   // Only the newest request lands: a slow answer for an earlier view or search must not replace the current one.
   const load = useCallback(async (which: GmailView, query: string) => {
@@ -51,6 +53,7 @@ export default function GmailTab({ onNotice }: Props) {
       const next = await api.gmailSummary(which, query);
       if (ticket !== latest.current) return;
       setSummary(next);
+      setShownFor(`${which}\u0000${query}`);
       setError("");
     } catch (e) {
       if (ticket === latest.current) setError(errText(e));
@@ -78,6 +81,10 @@ export default function GmailTab({ onNotice }: Props) {
   const openLink = (url: string) => void api.openLink(url).catch((e) => setError(errText(e)));
   // A mail that leaves the view is swept out its own way first, then the list closes the gap; a failure puts it back.
   const act = (ids: string[], action: GmailAction, extra?: () => Promise<unknown>, notice?: string) => {
+    // A second click while the first is on its way would send it twice (and create the task twice).
+    const busy = `${action}:${ids.join()}`;
+    if (pending.current.has(busy)) return;
+    pending.current.add(busy);
     const run = async () => {
       try {
         await extra?.();
@@ -89,16 +96,23 @@ export default function GmailTab({ onNotice }: Props) {
         if (done) onNotice(done);
       } catch (e) {
         setError(errText(e));
+      } finally {
+        pending.current.delete(busy);
       }
     };
     if (!leavesView(view, action)) return void run();
     setExits((x) => ({ ...x, ...Object.fromEntries(ids.map((id) => [id, action])) }));
-    return void leave(ids.length > 1 ? BATCH : ids[0], run);
+    return void leave(ids.length > 1 ? BATCH : ids[0], run).finally(() => pending.current.delete(busy));
   };
   const toTask = (mail: GmailMail) => {
     const add = () => api.gtasksAdd(mail.subject || mail.from);
     if (mail.unread) return act([mail.id], "read", add, t("gmail.toTaskDone"));
-    add().then(() => onNotice(t("gmail.toTaskDone")), (e) => setError(errText(e)));
+    const busy = `task:${mail.id}`;
+    if (pending.current.has(busy)) return;
+    pending.current.add(busy);
+    add()
+      .then(() => onNotice(t("gmail.toTaskDone")), (e) => setError(errText(e)))
+      .finally(() => pending.current.delete(busy));
   };
   const toggle = (id: string) =>
     setSelected((s) => {
@@ -108,6 +122,8 @@ export default function GmailTab({ onNotice }: Props) {
     });
 
   const mails = summary.important;
+  // Until the picked view or search answers, the list on screen is the previous one's: dim it and keep it out of reach.
+  const stale = shownFor !== `${view}\u0000${search}`;
   const now = new Date();
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
@@ -171,6 +187,7 @@ export default function GmailTab({ onNotice }: Props) {
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />
       </label>
+      <div aria-busy={stale} inert={stale} className={`flex flex-col gap-2 transition-opacity ${stale ? "opacity-60" : ""}`}>
       {mails.length === 0 ? (
         <p key={view} className="wx-glass wx-rise flex items-center gap-2 p-3 text-xs text-muted">
           <span aria-hidden="true" className="canto-float inline-block text-base">📭</span>
@@ -194,6 +211,7 @@ export default function GmailTab({ onNotice }: Props) {
           ))}
         </ul>
       )}
+      </div>
       {selected.size > 0 && (
         <GmailBulkBar
           count={selected.size}

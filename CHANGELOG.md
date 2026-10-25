@@ -139,6 +139,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Gmail e Drive mais firmes.** Ao trocar de visão, busca ou pasta, a lista anterior fica esmaecida e fora de alcance
+  até a nova chegar (um clique numa pasta antiga não entra mais no caminho errado); um clique duplo em **virar
+  tarefa**, estrela ou **marcar como lido** só vale uma vez; assuntos, remetentes e nomes de arquivo longos mostram o
+  texto inteiro ao passar o mouse; e as ações de cada e-mail e o **abrir** de cada arquivo dizem a qual item se referem
+  para leitores de tela.
 - **Leituras: remover um feed pede confirmação.** O ✕ de um feed agora vira **remover o feed** e só remove no segundo
   clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
   para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os

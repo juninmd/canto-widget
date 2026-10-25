@@ -157,3 +157,45 @@ test("a slow answer for an earlier view does not replace the view picked after i
   await new Promise((r) => setTimeout(r, 30));
   expect(screen.queryByText("Resposta atrasada") === null).toBe(true);
 });
+
+test("while another view loads, the old list is dimmed and its actions are out of reach", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await screen.findByText("Contrato revisado");
+  let late: (s: GmailSummary) => void = () => {};
+  summary = new Promise((resolve) => (late = resolve));
+  fireEvent.click(screen.getByText("Com estrela"));
+  await waitFor(() => expect(calls).toContainEqual({ cmd: "gmail_summary", args: { view: "starred", search: "" } }));
+  const busy = document.querySelector("[aria-busy=true]");
+  expect(busy?.hasAttribute("inert")).toBe(true);
+  expect(busy?.textContent).toContain("Contrato revisado");
+  late({ unread: 3, important: [{ ...INBOX.important[1], id: "s1", subject: "Só as com estrela" }] });
+  expect(await screen.findByText("Só as com estrela")).toBeTruthy();
+  expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
+});
+
+test("a double click on an action sends it once and creates one task", async () => {
+  summary = { unread: 1, important: [INBOX.important[0], { ...INBOX.important[1], unread: false }] };
+  render(<GmailTab onNotice={() => {}} />);
+  const toTask = await screen.findAllByText("virar tarefa");
+  fireEvent.click(toTask[0]);
+  fireEvent.click(toTask[0]);
+  fireEvent.click(toTask[1]);
+  fireEvent.click(toTask[1]);
+  await waitFor(() => expect(calls.filter((c) => c.cmd === "gtasks_add")).toHaveLength(2));
+  await new Promise((r) => setTimeout(r, 30));
+  expect(calls.filter((c) => c.cmd === "gtasks_add")).toEqual([
+    { cmd: "gtasks_add", args: { title: "Contrato revisado" } },
+    { cmd: "gtasks_add", args: { title: "Fatura de outubro" } },
+  ]);
+  expect(calls.filter((c) => c.cmd === "gmail_modify")).toHaveLength(1);
+});
+
+test("each row's actions are grouped under its subject, which keeps its full text on hover", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  const subject = await screen.findByText("Contrato revisado");
+  expect(subject.getAttribute("title")).toBe("Contrato revisado");
+  const group = screen.getByLabelText("Contrato revisado");
+  expect(group.getAttribute("role")).toBe("group");
+  expect(group.textContent).toContain("arquivar");
+  expect(screen.getByText("Marina Lopes").getAttribute("title")).toBe("Marina Lopes");
+});

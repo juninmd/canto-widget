@@ -60,5 +60,7 @@ export function useDrivePages(filter: DriveFilter, kind: DriveKind, search: stri
     if (current?.next && !busy.current) void fetchPage(current.next, current);
   }, [current, fetchPage]);
 
-  return { files: shown?.page.files ?? null, next: current?.next ?? "", error, loading, reload, more };
+  // `stale`: the files on screen are still the previous folder's or filter's while this one loads.
+  const stale = shown !== null && current === null;
+  return { files: shown?.page.files ?? null, stale, next: current?.next ?? "", error, loading, reload, more };
 }

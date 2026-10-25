@@ -1,9 +1,10 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
-import type { DriveFile } from "../lib/api";
+import type { DriveFile, DrivePage } from "../lib/api";
 
 type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
+let hold: Promise<DrivePage> | null = null;
 
 const FILES: DriveFile[] = [
   { id: "1", name: "Roadmap Q4 2026", kind: "doc", link: "https://docs.google.com/document/d/1/edit", modified: "2026-10-01T14:20:00Z", starred: true, editor: "", folder: "https://drive.google.com/drive/folders/f1", size: 0 },
@@ -19,7 +20,7 @@ mock.module("@tauri-apps/api/core", () => ({
     calls.push({ cmd, args });
     if (cmd === "gdrive_quota") return Promise.resolve({ used: 4_509_715_660, limit: 16_106_127_360 });
     if (cmd !== "gdrive_list") return Promise.resolve(null);
-    if (args.folder === "f1") return Promise.resolve({ files: [INSIDE], next: "" });
+    if (args.folder === "f1") return hold ?? Promise.resolve({ files: [INSIDE], next: "" });
     if (args.page === "p2") return Promise.resolve({ files: [LATER], next: "" });
     return Promise.resolve({ files: [FOLDER, ...FILES], next: "p2" });
   },
@@ -31,6 +32,7 @@ const list = (filter: string, kind = "", search = "", folder = "", page = "") =>
 
 beforeEach(() => {
   calls.length = 0;
+  hold = null;
   forgetPages();
 });
 afterEach(cleanup);
@@ -112,4 +114,28 @@ test("a file's folder opens and its link copies", async () => {
   fireEvent.click(screen.getByLabelText("copiar link de Roadmap Q4 2026"));
   await waitFor(() => expect(notices).toEqual(["Link copiado"]));
   expect(writes).toEqual(["https://docs.google.com/document/d/1/edit"]);
+});
+
+test("while a folder loads, the previous listing is dimmed and out of reach so a stale row can't push onto the path", async () => {
+  render(<GDriveTab onNotice={() => {}} />);
+  await screen.findByText("Roadmap Q4 2026");
+  let answer: (page: DrivePage) => void = () => {};
+  hold = new Promise((resolve) => (answer = resolve));
+  fireEvent.click(screen.getByLabelText("entrar na pasta Projetos"));
+  await waitFor(() => expect(calls.at(-1)).toEqual(list("all", "", "", "f1")));
+  const busy = document.querySelector("[aria-busy=true]");
+  expect(busy?.hasAttribute("inert")).toBe(true);
+  expect(busy?.textContent).toContain("Roadmap Q4 2026");
+  answer({ files: [INSIDE], next: "" });
+  expect(await screen.findByText("Orçamento 2027")).toBeTruthy();
+  expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
+  expect(screen.getByRole("navigation", { name: "caminho da pasta" }).textContent).toBe("Meu Drive›Projetos");
+});
+
+test("a long file name keeps its full text on hover, and the open button says which file it opens", async () => {
+  render(<GDriveTab onNotice={() => {}} />);
+  const name = await screen.findByText("Roadmap Q4 2026");
+  expect(name.getAttribute("title")).toBe("Roadmap Q4 2026");
+  expect(screen.getByText("abrir").getAttribute("aria-describedby")).toBe(name.id);
+  expect(screen.getByLabelText("entrar na pasta Projetos").getAttribute("title")).toBe("Projetos");
 });
