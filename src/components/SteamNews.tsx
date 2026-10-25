@@ -65,14 +65,20 @@ export default function SteamNews({ onRead }: { onRead: (unread: number) => void
   );
   const { data, error, busy, run } = useSteamView(load);
   const [readError, setReadError] = useState("");
+  const [marking, setMarking] = useState(false);
 
+  /** One request per press: a double click would otherwise mark and reload twice. */
   async function markRead() {
+    if (marking) return;
+    setMarking(true);
     try {
       await api.steamNewsRead();
       setReadError("");
       await run(false);
     } catch (e) {
       setReadError(errText(e));
+    } finally {
+      setMarking(false);
     }
   }
 
@@ -96,7 +102,12 @@ export default function SteamNews({ onRead }: { onRead: (unread: number) => void
         />
         <span className="ml-auto flex gap-1">
           {data.unread > 0 && (
-            <button type="button" onClick={() => void markRead()} className="canto-hit min-h-7 rounded-lg border border-edge px-2 text-xs text-muted hover:bg-hover hover:text-fg">
+            <button
+              type="button"
+              onClick={() => void markRead()}
+              disabled={marking}
+              className="canto-hit min-h-7 rounded-lg border border-edge px-2 text-xs text-muted hover:bg-hover hover:text-fg disabled:opacity-50"
+            >
               {t("steam.news.read")}
             </button>
           )}
@@ -110,7 +121,9 @@ export default function SteamNews({ onRead }: { onRead: (unread: number) => void
           </button>
         </span>
       </div>
-      {(error || readError) && <ErrorBanner message={error || readError} onRetry={() => void run(true)} busy={busy} />}
+      {(error || readError) && (
+        <ErrorBanner message={error || readError} onRetry={() => void (error ? run(true) : markRead())} busy={error ? busy : marking} />
+      )}
       {data.items.length === 0 ? (
         <p className="text-xs text-faint">{t("steam.news.empty")}</p>
       ) : (
