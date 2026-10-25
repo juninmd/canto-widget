@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Cliques duplos não repetem ações em Transcrições, Clima e Mapa.** Salvar a pasta das transcrições, escolher a
+  cidade com Enter duas vezes e remover um trajeto pelo ✕ agora disparam uma única chamada; **esquecer a cidade** que
+  falhar mostra o motivo em vez de sumir em silêncio, e o rótulo **copiado** do visualizador não é mais cortado por um
+  timer antigo nem dispara depois de fechar a transcrição.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
