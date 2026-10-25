@@ -105,6 +105,8 @@ export const app = {
   "settings.password.submit": "trocar senha",
   "settings.password.submitting": "trocando...",
   "settings.password.cancel": "cancelar",
+  "settings.password.same": "a nova senha é igual à atual",
+  "settings.password.capsLock": "Caps Lock está ativado",
 
   "settings.language.title": "Idioma",
   "settings.language.auto": "Automático (sistema)",
@@ -210,6 +212,7 @@ export const app = {
   "shortcuts.new": "nova tarefa ou novo card",
   "shortcuts.lock": "trancar o cofre",
   "shortcuts.rename": "renomear a tarefa em foco",
+  "shortcuts.moveTask": "subir ou descer a tarefa em foco",
   "shortcuts.privacy": "ativar ou desativar o modo privacidade (borra clipboard e notas)",
   "shortcuts.toggle": "mostrar ou esconder o widget, de qualquer app",
   "shortcuts.fullscreen": "entrar ou sair da tela cheia",

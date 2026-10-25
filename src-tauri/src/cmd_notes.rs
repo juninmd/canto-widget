@@ -5,6 +5,7 @@ use tauri_plugin_dialog::DialogExt;
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
 use crate::model::{next_version, now_ms, Note, NoteLink};
+use crate::text_fold::{contains, fold};
 use crate::vault::AppState;
 
 pub const PAGE_DEFAULT: usize = 50;
@@ -25,7 +26,7 @@ pub fn notes_search(state: State<'_, AppState>, query: String, limit: Option<usi
 
 /// Sorts references and clones only the page: the webview never receives the whole vault.
 pub fn page(notes: &[Note], query: &str, limit: usize) -> NotesPage {
-    let q = query.trim().to_lowercase();
+    let q = fold(query.trim());
     let mut hits: Vec<&Note> = notes.iter().filter(|n| q.is_empty() || note_matches(n, &q)).collect();
     hits.sort_by_key(|n| order(n));
     NotesPage { total: hits.len(), items: hits.into_iter().take(limit.clamp(1, PAGE_MAX)).cloned().collect() }
@@ -51,14 +52,13 @@ pub fn check_size(title: &str, body: &str, before: (usize, usize)) -> Result<()>
     Ok(())
 }
 
-/// `#tag` filters by the exact tag (clicking a tag); anything else searches title, body and tags.
-pub fn note_matches(n: &Note, needle_lower: &str) -> bool {
-    if let Some(tag) = needle_lower.strip_prefix('#').filter(|t| !t.is_empty()) {
-        return n.tags.iter().any(|t| t == tag);
+/// `#tag` filters by the whole tag (clicking a tag); anything else searches title, body and tags.
+/// `needle` comes from [`fold`]: accents and case don't matter, so "reuniao" finds "Reunião".
+pub fn note_matches(n: &Note, needle: &str) -> bool {
+    if let Some(tag) = needle.strip_prefix('#').filter(|t| !t.is_empty()) {
+        return n.tags.iter().any(|t| fold(t) == tag);
     }
-    n.title.to_lowercase().contains(needle_lower)
-        || n.body.to_lowercase().contains(needle_lower)
-        || n.tags.iter().any(|t| t.to_lowercase().contains(needle_lower))
+    contains(&n.title, needle) || contains(&n.body, needle) || n.tags.iter().any(|t| contains(t, needle))
 }
 
 pub fn validate_link(link: &NoteLink) -> Result<()> {

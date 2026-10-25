@@ -11,6 +11,7 @@ export const uiForgeStatus = {
   "uiStatus.filter.ok": "Operacionais",
   "uiStatus.filter.maintenance": "Manutenção",
   "uiStatus.filter.empty": "nenhum serviço neste filtro",
+  "uiStatus.none": "não deu para ler nenhuma página de status agora; confira a conexão e tente de novo",
   "uiStatus.bar": "{down} fora do ar, {warn} instáveis, {maint} em manutenção, {ok} operacionais",
   "uiStatus.add": "+ endereço",
   "uiStatus.emptyAdd": "adicionar endpoint",

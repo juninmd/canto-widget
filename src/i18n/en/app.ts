@@ -110,6 +110,8 @@ export const app: Record<keyof typeof source, string> = {
   "settings.password.submit": "change password",
   "settings.password.submitting": "changing...",
   "settings.password.cancel": "cancel",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on",
 
   "settings.language.title": "Language",
   "settings.language.auto": "Automatic (system)",
@@ -215,6 +217,7 @@ export const app: Record<keyof typeof source, string> = {
   "shortcuts.new": "new task or new card",
   "shortcuts.lock": "lock the vault",
   "shortcuts.rename": "rename the focused task",
+  "shortcuts.moveTask": "move the focused task up or down",
   "shortcuts.privacy": "turn privacy mode on or off (blurs clipboard and notes)",
   "shortcuts.toggle": "show or hide the widget, from any app",
   "shortcuts.fullscreen": "enter or exit full screen",

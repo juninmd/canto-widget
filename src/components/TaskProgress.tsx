@@ -22,6 +22,8 @@ export default function TaskProgress({ done, total }: { done: number; total: num
     if (complete && !was.current) setBurst((n) => n + 1);
     was.current = complete;
   }, [complete]);
+  // An empty day already says so below; "0 de 0" next to it would read as data.
+  if (total === 0) return null;
   return (
     <div className="flex items-center gap-2">
       <div

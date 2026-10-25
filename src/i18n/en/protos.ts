@@ -5,6 +5,7 @@ export const protos: Record<keyof typeof source, string> = {
   "protos.market.usd": "Dollar",
   "protos.market.eur": "Euro",
   "protos.market.loading": "checking the quotes",
+  "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "protos.market.source": "data: Yahoo Finance",
   "protos.market.gbp": "Pound",
   "protos.market.jpy": "Yen",

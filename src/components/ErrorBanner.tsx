@@ -1,5 +1,6 @@
 import { api } from "../lib/api";
 import { t } from "../i18n";
+import Spinner from "./Spinner";
 
 /** A Google refusal that says an API is off ends with the console page that turns it on. */
 const CONSOLE = /https:\/\/console\.(?:developers|cloud)\.google\.com\/\S+$/;
@@ -24,8 +25,10 @@ export default function ErrorBanner({ message, onRetry, busy = false }: { messag
         type="button"
         onClick={onRetry}
         disabled={busy}
-        className="canto-hit min-h-[24px] shrink-0 rounded-md border border-danger/60 px-2 font-semibold text-danger hover:bg-danger/10 disabled:opacity-50"
+        aria-busy={busy}
+        className="canto-hit inline-flex min-h-[24px] shrink-0 items-center gap-1 rounded-md border border-danger/60 px-2 font-semibold text-danger hover:bg-danger/10 disabled:opacity-50"
       >
+        {busy && <Spinner />}
         {t("common.retry")}
       </button>
     </div>
