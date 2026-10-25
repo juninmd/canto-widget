@@ -49,13 +49,16 @@ pub fn retryable(error: &FetchError) -> bool {
 }
 
 fn client() -> Result<reqwest::blocking::Client, FetchError> {
-    crate::net::client_builder()
-        .user_agent(UA)
-        .timeout(Duration::from_secs(TIMEOUT_S))
-        // The Web API key rides in the query string: a redirect would hand it to whatever host answers.
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .map_err(|e| FetchError::Network(e.to_string()))
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            .user_agent(UA)
+            .timeout(Duration::from_secs(TIMEOUT_S))
+            // The Web API key rides in the query string: a redirect would hand it to whatever host answers.
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+    })
+    .map_err(|e| FetchError::Network(e.to_string()))
 }
 
 /// `without_url`: a reqwest error's Display carries the whole URL, and the Web API URL holds the key.
