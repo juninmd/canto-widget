@@ -157,3 +157,40 @@ test("a slow answer for an earlier view does not replace the view picked after i
   await new Promise((r) => setTimeout(r, 30));
   expect(screen.queryByText("Resposta atrasada") === null).toBe(true);
 });
+
+test("a double click on mark as read sends one request, and the row's actions wait for it", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  const button = (await screen.findAllByText("marcar como lido"))[0];
+  fireEvent.click(button);
+  fireEvent.click(button);
+  fireEvent.click(screen.getByLabelText("dar estrela em Contrato revisado"));
+  expect(await screen.findByText("marcar como não lido")).toBeTruthy();
+  expect(calls.filter((c) => c.cmd === "gmail_modify")).toEqual([{ cmd: "gmail_modify", args: { ids: ["m1"], action: "read" } }]);
+  expect(document.querySelector("[data-gmail-unread]")?.textContent).toBe("26");
+  await waitFor(() => expect(document.querySelector("[aria-busy]") === null).toBe(true));
+});
+
+test("j/k walk the mail from the keyboard, s stars and e archives the focused one", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  const first = await screen.findByLabelText("selecionar Contrato revisado");
+  first.focus();
+  fireEvent.keyDown(first, { key: "j" });
+  const second = screen.getByLabelText("selecionar Fatura de outubro");
+  expect(document.activeElement === second).toBe(true);
+  fireEvent.keyDown(second, { key: "k" });
+  expect(document.activeElement === first).toBe(true);
+  fireEvent.keyDown(first, { key: "s" });
+  expect(await screen.findByLabelText("tirar a estrela de Contrato revisado")).toBeTruthy();
+  expect(calls).toContainEqual({ cmd: "gmail_modify", args: { ids: ["m1"], action: "star" } });
+  fireEvent.keyDown(first, { key: "e" });
+  expect(document.activeElement === second).toBe(true);
+  await waitFor(() => expect(screen.queryByText("Contrato revisado") === null).toBe(true));
+  expect(calls).toContainEqual({ cmd: "gmail_modify", args: { ids: ["m1"], action: "archive" } });
+  fireEvent.keyDown(second, { key: "x" });
+  expect(await screen.findByLabelText("1 selecionados")).toBeTruthy();
+});
+
+test("/ reaches the Gmail search like the other tabs", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  expect((await screen.findByLabelText("buscar no Gmail")).getAttribute("data-shortcut")).toBe("search");
+});

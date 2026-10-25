@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Gmail pelo teclado, sem ação em dobro.** Com o foco num e-mail, **J/K** (ou as setas) andam pela lista, **X** seleciona, **S** dá estrela, **U** alterna lido, **E** arquiva, **#** manda para a lixeira e **O** abre no Gmail; o foco passa para o vizinho quando o e-mail sai. Um clique duplo em "marcar como lido", estrela, arquivar ou lixeira agora envia um pedido só: as ações do e-mail esperam a resposta. **/** também foca a busca no Gmail, no Drive e nos Contatos.
 - **Drive com todos os arquivos e pastas, página a página.** O novo filtro **Todos** (o padrão) mostra o Meu Drive
   inteiro, pastas primeiro; uma pasta abre ali mesmo, com o caminho de volta no topo. Todas as listas carregam a
   **próxima página** ao rolar (ou em **carregar mais**), em vez de parar nos 30 primeiros, e pastas já vistas voltam

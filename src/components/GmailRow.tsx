@@ -4,7 +4,7 @@ import { initials, shortWhen } from "../lib/google";
 import { avatarTone } from "../lib/agenda";
 import { t } from "../i18n";
 
-export const MINI = "canto-hit rounded-md px-2 py-0.5 text-[11px]";
+export const MINI = "canto-hit rounded-md px-2 py-0.5 text-[11px] disabled:opacity-60";
 /** How a row leaves, so the motion says where the mail went. */
 const EXIT: Partial<Record<GmailAction, string>> = { archive: "canto-archive", trash: "canto-trash" };
 
@@ -13,6 +13,8 @@ type Props = {
   index: number;
   now: Date;
   selected: boolean;
+  /** A request for this mail is on its way: the actions wait for it. */
+  busy: boolean;
   leaving: GmailAction | null;
   onSelect: () => void;
   onAct: (action: GmailAction) => void;
@@ -21,7 +23,7 @@ type Props = {
 };
 
 /** One mail: tap the avatar to select it, the star toggles in place, and the actions sit under the snippet. */
-export default function GmailRow({ mail, index, now, selected, leaving, onSelect, onAct, onTask, onOpen }: Props) {
+export default function GmailRow({ mail, index, now, selected, busy, leaving, onSelect, onAct, onTask, onOpen }: Props) {
   const exit = leaving ? (EXIT[leaving] ?? "canto-swipe") : "";
   const label = mail.subject || mail.from;
   return (
@@ -29,6 +31,7 @@ export default function GmailRow({ mail, index, now, selected, leaving, onSelect
       data-gmail-mail={mail.id}
       data-flip={mail.id}
       data-selected={selected || undefined}
+      aria-busy={busy || undefined}
       className={`wx-rise grid ${exit ? `${exit} pointer-events-none` : ""} grid-cols-[2rem_1fr_auto] gap-x-2 p-2.5 transition-colors ${selected ? "bg-accent/10" : ""}`}
       style={{ "--i": Math.min(index + 1, 12) } as CSSProperties}
     >
@@ -36,6 +39,8 @@ export default function GmailRow({ mail, index, now, selected, leaving, onSelect
         type="button"
         aria-pressed={selected}
         aria-label={t("gmail.select", { subject: label })}
+        aria-keyshortcuts="J K X S U E # O"
+        data-gmail-focus
         onClick={onSelect}
         className={`canto-hit row-span-3 grid size-8 place-items-center rounded-full text-[11px] font-bold text-fg transition-transform ${selected ? "bg-accent text-ink" : avatarTone(mail.from)}`}
       >
@@ -52,6 +57,7 @@ export default function GmailRow({ mail, index, now, selected, leaving, onSelect
           aria-pressed={mail.starred}
           aria-label={t(mail.starred ? "gmail.unstar" : "gmail.star", { subject: label })}
           onClick={() => onAct(mail.starred ? "unstar" : "star")}
+          disabled={busy}
           className={`canto-hit grid size-5 place-items-center rounded text-sm leading-none ${mail.starred ? "text-warn" : "text-faint hover:text-warn"}`}
         >
           <span key={String(mail.starred)} aria-hidden="true" className={mail.starred ? "canto-star inline-block" : "inline-block"}>
@@ -67,13 +73,13 @@ export default function GmailRow({ mail, index, now, selected, leaving, onSelect
             {t("gmail.open")}
           </button>
         )}
-        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => onAct(mail.unread ? "read" : "unread")}>
+        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => onAct(mail.unread ? "read" : "unread")} disabled={busy}>
           {t(mail.unread ? "gmail.markRead" : "gmail.markUnread")}
         </button>
-        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => onAct("archive")}>
+        <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={() => onAct("archive")} disabled={busy}>
           {t("gmail.archive")}
         </button>
-        <button type="button" className={`${MINI} bg-edge/60 hover:bg-danger/20 hover:text-danger`} onClick={() => onAct("trash")}>
+        <button type="button" className={`${MINI} bg-edge/60 hover:bg-danger/20 hover:text-danger`} onClick={() => onAct("trash")} disabled={busy}>
           {t("gmail.trash")}
         </button>
         <button type="button" className={`${MINI} bg-edge/60 hover:bg-hover`} onClick={onTask}>

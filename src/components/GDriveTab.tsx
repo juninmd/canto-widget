@@ -122,6 +122,7 @@ export default function GDriveTab({ onNotice }: Props) {
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t("gdrive.search")}
           aria-label={t("gdrive.search")}
+          data-shortcut="search"
           maxLength={100}
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />

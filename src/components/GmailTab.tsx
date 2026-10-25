@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { api, errText, type GmailAction, type GmailMail, type GmailSummary, type GmailView } from "../lib/api";
 import { composeLink } from "../lib/contactExtras";
 import { googleGate } from "../lib/google";
@@ -37,6 +37,9 @@ export default function GmailTab({ onNotice }: Props) {
   const [alerts, setAlerts] = useState(false);
   const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
   const [exits, setExits] = useState<Record<string, GmailAction>>({});
+  // Mail with a request on its way: a second click (double click, or a key held down) waits for the first answer.
+  const [pending, setPending] = useState<ReadonlySet<string>>(new Set());
+  const inFlight = useRef(new Set<string>());
   const { leaving, leave } = useExit();
   const list = useRef<HTMLUListElement>(null);
   useFlip(list, summary?.important.map((m) => m.id).join());
@@ -77,7 +80,15 @@ export default function GmailTab({ onNotice }: Props) {
 
   const openLink = (url: string) => void api.openLink(url).catch((e) => setError(errText(e)));
   // A mail that leaves the view is swept out its own way first, then the list closes the gap; a failure puts it back.
-  const act = (ids: string[], action: GmailAction, extra?: () => Promise<unknown>, notice?: string) => {
+  const act = (all: string[], action: GmailAction, extra?: () => Promise<unknown>, notice?: string) => {
+    const ids = all.filter((id) => !inFlight.current.has(id));
+    if (ids.length === 0) return;
+    for (const id of ids) inFlight.current.add(id);
+    setPending(new Set(inFlight.current));
+    const settle = () => {
+      for (const id of ids) inFlight.current.delete(id);
+      setPending(new Set(inFlight.current));
+    };
     const run = async () => {
       try {
         await extra?.();
@@ -89,11 +100,21 @@ export default function GmailTab({ onNotice }: Props) {
         if (done) onNotice(done);
       } catch (e) {
         setError(errText(e));
+      } finally {
+        settle();
       }
     };
     if (!leavesView(view, action)) return void run();
     setExits((x) => ({ ...x, ...Object.fromEntries(ids.map((id) => [id, action])) }));
-    return void leave(ids.length > 1 ? BATCH : ids[0], run);
+    // useExit drops a second leave for the same key without running it; release the ids in that case too.
+    let ran = false;
+    const start = () => {
+      ran = true;
+      return run();
+    };
+    return void leave(ids.length > 1 ? BATCH : ids[0], start).finally(() => {
+      if (!ran) settle();
+    });
   };
   const toTask = (mail: GmailMail) => {
     const add = () => api.gtasksAdd(mail.subject || mail.from);
@@ -109,6 +130,37 @@ export default function GmailTab({ onNotice }: Props) {
 
   const mails = summary.important;
   const now = new Date();
+  // Gmail's own keys, while focus is on a mail: j/k (or arrows) walk the list, x selects, s stars, u toggles read,
+  // e archives, # trashes, o opens. Buttons keep Enter and Space.
+  const onListKey = (e: KeyboardEvent<HTMLUListElement>) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const row = (e.target as HTMLElement).closest<HTMLElement>("[data-gmail-mail]");
+    const mail = row && mails.find((m) => m.id === row.dataset.gmailMail);
+    if (!row || !mail) return;
+    const rows = [...(list.current?.querySelectorAll<HTMLElement>("[data-gmail-mail]") ?? [])];
+    const at = rows.indexOf(row);
+    const focusRow = (i: number) => rows[i]?.querySelector<HTMLElement>("[data-gmail-focus]")?.focus();
+    const step = e.key === "j" || e.key === "ArrowDown" ? 1 : e.key === "k" || e.key === "ArrowUp" ? -1 : 0;
+    if (step) {
+      e.preventDefault();
+      focusRow(at + step);
+      return;
+    }
+    const run: Record<string, () => void> = {
+      x: () => toggle(mail.id),
+      s: () => act([mail.id], mail.starred ? "unstar" : "star"),
+      u: () => act([mail.id], mail.unread ? "read" : "unread"),
+      e: () => act([mail.id], "archive"),
+      "#": () => act([mail.id], "trash"),
+      o: () => mail.link && openLink(mail.link),
+    };
+    const fn = run[e.key];
+    if (!fn) return;
+    e.preventDefault();
+    // The row is about to leave: hand focus to its neighbour so the keyboard keeps its place.
+    if (e.key === "e" || e.key === "#") focusRow(at + 1 < rows.length ? at + 1 : at - 1);
+    fn();
+  };
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
       {error && <ErrorBanner message={error} busy={loading} onRetry={() => void load(view, search)} />}
@@ -167,6 +219,7 @@ export default function GmailTab({ onNotice }: Props) {
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t("gmail.search")}
           aria-label={t("gmail.search")}
+          data-shortcut="search"
           maxLength={100}
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />
@@ -177,7 +230,7 @@ export default function GmailTab({ onNotice }: Props) {
           {search ? t("gmail.noMatch") : t(EMPTY[view])}
         </p>
       ) : (
-        <ul ref={list} key={view} className="wx-glass shrink-0 divide-y divide-edge overflow-hidden">
+        <ul ref={list} key={view} onKeyDown={onListKey} className="wx-glass shrink-0 divide-y divide-edge overflow-hidden">
           {mails.map((mail, index) => (
             <GmailRow
               key={mail.id}
@@ -185,6 +238,7 @@ export default function GmailTab({ onNotice }: Props) {
               index={index}
               now={now}
               selected={selected.has(mail.id)}
+              busy={pending.has(mail.id)}
               leaving={leaving.has(mail.id) || (leaving.has(BATCH) && selected.has(mail.id)) ? (exits[mail.id] ?? "read") : null}
               onSelect={() => toggle(mail.id)}
               onAct={(action) => act([mail.id], action)}
