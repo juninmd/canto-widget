@@ -421,6 +421,7 @@
   "time.sec": "{n} s",
   "time.h": "{h}h",
   "time.hMin": "{h}h {mm}m",
+  "shortcuts.moveTask": "move the focused task up or down",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
 }
