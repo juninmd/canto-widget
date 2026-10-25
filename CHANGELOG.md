@@ -136,6 +136,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Lista do seletor de modelos sem linhas espremidas.** Em **Modelos IA → Comparar**, as opções do **+ modelo**
+  não encolhem mais quando a lista rola: cada linha mantém a altura e o respiro.
 - **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
   sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
   lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
