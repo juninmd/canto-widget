@@ -16,6 +16,8 @@ let top: SteamTop;
 let wishlist: SteamWishlist;
 let fail = "";
 let failStatus = "";
+/** Holds a matching call open until the test releases it, to race answers or double clicks. */
+let hold: ((cmd: string, args: Record<string, unknown>) => Promise<void> | null) | null = null;
 
 const CAPSULE = "data:image/png;base64,iVBORw0KGgo=";
 
@@ -34,6 +36,14 @@ globalThis.IntersectionObserver = class {
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
     calls.push({ cmd, args });
+    const held = hold?.(cmd, args);
+    if (held) return held.then(() => answer(cmd, args));
+    return answer(cmd, args);
+  },
+}));
+
+function answer(cmd: string, args: Record<string, unknown>): Promise<unknown> {
+  {
     if (cmd === "steam_status") return failStatus ? Promise.reject(failStatus) : Promise.resolve(status);
     if (cmd === "steam_image") return Promise.resolve(CAPSULE);
     if (fail && cmd.startsWith("steam_")) return Promise.reject(fail);
@@ -77,8 +87,8 @@ mock.module("@tauri-apps/api/core", () => ({
       default:
         return Promise.resolve(null);
     }
-  },
-}));
+  }
+}
 
 const { default: SteamTab } = await import("./SteamTab");
 
@@ -130,6 +140,7 @@ const rows = () => [...document.querySelectorAll("[data-steam]")].map((li) => li
 
 beforeEach(() => {
   calls.length = 0;
+  hold = null;
   fail = "";
   failStatus = "";
   status = { configured: true, steamid: "76561190000000000", has_key: false, name: "", region: "br", watching: false };
@@ -271,6 +282,31 @@ test("o catálogo searches with the term that was typed", async () => {
     { term: "", page: 0, sort: "reviews", onlySale: false, force: false },
     { term: "portal", page: 0, sort: "reviews", onlySale: false, force: false },
   ]);
+});
+
+/** A promise and the function that settles it. */
+function gate() {
+  let open = () => {};
+  const promise = new Promise<void>((resolve) => (open = resolve));
+  return { promise, open };
+}
+
+test("o catálogo drops a slower answer for an older search instead of overwriting the newer one", async () => {
+  const slow = gate();
+  hold = (cmd, args) => (cmd === "steam_catalog" && args.term === "slow" ? slow.promise : null);
+  await show();
+  await click(screen.getByRole("tab", { name: "catálogo" }));
+  fireEvent.change(screen.getByTestId("steam-search"), { target: { value: "slow" } });
+  await click(screen.getByRole("button", { name: "buscar no catálogo" }));
+  catalog = { ...catalog, items: [game(620, "Portal 2", "R$33,99")], has_more: false };
+  fireEvent.change(screen.getByTestId("steam-search"), { target: { value: "portal" } });
+  await click(screen.getByRole("button", { name: "buscar no catálogo" }));
+  expect(rows()).toEqual(["620"]);
+
+  catalog = { ...catalog, items: [game(1, "Stale", "R$1,00")] };
+  await act(async () => slow.open());
+  await act(async () => {});
+  expect(rows()).toEqual(["620"]);
 });
 
 test("o catálogo pede outra busca quando o filtro ou a ordem mudam", async () => {
@@ -424,6 +460,20 @@ test("desconectar pergunta antes e só então esquece a conta", async () => {
   expect(screen.queryByRole("alert")).toBeNull();
 });
 
+test("a double click on the disconnect confirm sends one request", async () => {
+  const slow = gate();
+  hold = (cmd) => (cmd === "steam_disconnect" ? slow.promise : null);
+  await show();
+  await click(screen.getByRole("button", { name: "desconectar" }));
+  const confirm = screen.getByRole("button", { name: "desconectar" });
+  await click(confirm);
+  await click(confirm);
+  expect(calls.filter((c) => c.cmd === "steam_disconnect").length).toBe(1);
+  await act(async () => slow.open());
+  await act(async () => {});
+  expect(screen.getByText("Conectar à Steam")).toBeTruthy();
+});
+
 test("a failed list keeps the retry banner on screen", async () => {
   fail = "steam: HTTP 500";
   await show();
@@ -495,6 +545,27 @@ test("atualizações opens the newest changelog, links to Steam and marks everyt
   expect(screen.queryByRole("button", { name: "marcar como lidas" }) === null).toBe(true);
   await click(screen.getByRole("button", { name: "instalados" }));
   expect(calls.filter((c) => c.cmd === "steam_news").at(-1)?.args).toEqual({ filter: "installed", force: false });
+});
+
+test("marcar como lidas sends one request per press and its retry marks again", async () => {
+  const slow = gate();
+  hold = (cmd) => (cmd === "steam_news_read" ? slow.promise : null);
+  await show();
+  await click(screen.getByRole("tab", { name: "atualizações" }));
+  const mark = screen.getByRole("button", { name: "marcar como lidas" });
+  await click(mark);
+  await click(mark);
+  expect(calls.filter((c) => c.cmd === "steam_news_read").length).toBe(1);
+  // The first press fails: the banner's retry marks again instead of only reloading the list.
+  fail = "steam: HTTP 500";
+  await act(async () => slow.open());
+  await act(async () => {});
+  expect(screen.getByRole("alert").textContent).toContain("HTTP 500");
+  hold = null;
+  fail = "";
+  await click(screen.getByRole("button", { name: "tentar de novo" }));
+  expect(calls.filter((c) => c.cmd === "steam_news_read").length).toBe(2);
+  expect(screen.queryByRole("alert") === null).toBe(true);
 });
 
 test("desejos lists the whole wishlist, sets 75% sales on fire and pages", async () => {
