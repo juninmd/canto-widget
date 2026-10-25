@@ -56,10 +56,6 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
           .then((all) => {
             if (!isLatest(id)) return;
             setTasks(all.filter((x) => foldIncludes(x.title, low)));
-          })
-          .catch((e) => {
-            if (!isLatest(id)) return;
-            onError(errText(e));
           }),
         api
           .notesSearch(q, CAP)
@@ -67,20 +63,12 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
             if (!isLatest(id)) return;
             setNotes(page.items);
             setNotesTotal(page.total);
-          })
-          .catch((e) => {
-            if (!isLatest(id)) return;
-            onError(errText(e));
           }),
         api
           .clipList(q)
           .then((list) => {
             if (!isLatest(id)) return;
             setClips(list.items);
-          })
-          .catch((e) => {
-            if (!isLatest(id)) return;
-            onError(errText(e));
           }),
       ];
       void Promise.allSettled(lookups).then((done) => {
