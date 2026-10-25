@@ -215,6 +215,7 @@ export const app: Record<keyof typeof source, string> = {
   "shortcuts.new": "nueva tarea o nueva tarjeta",
   "shortcuts.lock": "bloquear la bóveda",
   "shortcuts.rename": "renombrar la tarea enfocada",
+  "shortcuts.moveTask": "subir o bajar la tarea enfocada",
   "shortcuts.privacy": "activar o desactivar el modo privacidad (difumina portapapeles y notas)",
   "shortcuts.toggle": "mostrar u ocultar el widget, desde cualquier app",
   "shortcuts.fullscreen": "entrar o salir de pantalla completa",
