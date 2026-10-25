@@ -3,6 +3,9 @@
 - **Teclado- **Teclado no menu de adiar e na folha "mais" do celular.** O menu ▾ de adiar um aviso abre já no tempo atual,
   as setas percorrem as opções e Esc devolve o foco ao botão; a folha de abas do celular abre na aba atual, mantém
   o Tab dentro dela e, ao fechar, devolve o foco ao botão **mais** em vez de perdê-lo.
+- **Teclado no menu de adiar e na folha "mais" do celular.** O menu ▾ de adiar um aviso abre já no tempo atual,
+  as setas percorrem as opções e Esc devolve o foco ao botão; a folha de abas do celular abre na aba atual, mantém
+  o Tab dentro dela e, ao fechar, devolve o foco ao botão **mais** em vez de perdê-lo.
 - **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
   longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
   fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
