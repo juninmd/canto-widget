@@ -110,6 +110,8 @@ export const app: Record<keyof typeof source, string> = {
   "settings.password.submit": "change password",
   "settings.password.submitting": "changing...",
   "settings.password.cancel": "cancel",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on",
 
   "settings.language.title": "Language",
   "settings.language.auto": "Automatic (system)",

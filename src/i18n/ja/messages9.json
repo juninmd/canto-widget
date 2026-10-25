@@ -410,5 +410,7 @@
   "gdrive.more": "load more",
   "gdrive.loadingMore": "loading more…",
   "google.enableApi": "enable the API",
-  "shortcuts.moveTask": "move the focused task up or down"
+  "shortcuts.moveTask": "move the focused task up or down",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on"
 }
