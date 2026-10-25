@@ -90,6 +90,12 @@ export default function TaskRow({
             e.preventDefault();
             onDelete();
           }
+          // Alt+↑/↓ moves the task from anywhere in the row; the grip already handles its own arrows (defaultPrevented).
+          const arrow = e.key === "ArrowUp" ? -1 : e.key === "ArrowDown" ? 1 : 0;
+          if (draggable && arrow && e.altKey && !e.ctrlKey && !e.metaKey && !e.shiftKey && !typing && !e.defaultPrevented) {
+            e.preventDefault();
+            onMove(arrow);
+          }
         }}
         className={`group relative flex items-start gap-3 rounded-xl py-2 pl-7 pr-2.5 hover:bg-hover focus-within:bg-hover ${isNew ? ENTER_CLASS : ""} ${
           isLeaving ? EXIT_CLASS : ""
