@@ -12,6 +12,14 @@ test("wraps every case-insensitive match in <mark>", () => {
   expect(marks[1]?.textContent).toBe("leite");
 });
 
+test("a query without accents marks the accented word whole, and vice versa", () => {
+  render(<p>{highlight("Pauta da Reunião de ação", "reuniao")}</p>);
+  expect(screen.getByText("Reunião").tagName).toBe("MARK");
+  cleanup();
+  render(<p>{highlight("proxima acao", "Ação")}</p>);
+  expect(screen.getByText("acao").tagName).toBe("MARK");
+});
+
 test("an empty or #tag query is left unhighlighted", () => {
   render(<p>{highlight("comprar leite", "")}</p>);
   expect(document.querySelectorAll("mark").length).toBe(0);

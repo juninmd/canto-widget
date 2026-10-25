@@ -365,6 +365,35 @@ test("arrow keys on the grip move the task one slot", async () => {
   expect(calls.find((c) => c.cmd === "tasks_reorder")?.args).toEqual({ day: "2026-09-09", ids: ["t3", "t1"] });
 });
 
+test("Alt+arrow moves the task from its checkbox, and the grip moves it only once", async () => {
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
+  await mount();
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("pagar conta"), { key: "ArrowUp", altKey: true });
+  });
+  expect(calls.filter((c) => c.cmd === "tasks_reorder").map((c) => c.args)).toEqual([{ day: "2026-09-09", ids: ["t3", "t1"] }]);
+  calls.length = 0;
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("arrastar comprar leite para reordenar"), { key: "ArrowDown", altKey: true });
+  });
+  expect(calls.filter((c) => c.cmd === "tasks_reorder").length).toBe(1);
+});
+
+test("Alt+arrow while renaming leaves the order alone, and a bare arrow on the checkbox does not move", async () => {
+  extraTask = { ...baseTask, id: "t3", title: "pagar conta", created_at: 2, updated_at: 2 };
+  await mount();
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("comprar leite"), { key: "ArrowDown" });
+  });
+  await act(async () => {
+    fireEvent.doubleClick(rowText("comprar leite"));
+  });
+  await act(async () => {
+    fireEvent.keyDown(screen.getByLabelText("novo título de comprar leite"), { key: "ArrowDown", altKey: true });
+  });
+  expect(calls.find((c) => c.cmd === "tasks_reorder")).toBeUndefined();
+});
+
 test("with a priority filter, reordering the visible tasks keeps the hidden ones in their slots", async () => {
   task = { ...task, priority: "low" };
   extraTask = { ...baseTask, id: "t3", title: "pagar conta", priority: "low", created_at: 3, updated_at: 3 };

@@ -49,8 +49,26 @@ export function createFocusStore(deps: Deps) {
   /** Seconds this run has added on top of what the vault already holds. */
   const unflushed = () => (running ? pending(running) : 0);
   const totalSecs = () => (running ? running.savedSecs + pending(running) : 0);
+  /**
+   * Ms until the run's total next reaches `offsetMs` past a multiple of `periodMs`: where the clock (or the minute
+   * count) changes.
+   */
+  const msToNext = (periodMs: number, offsetMs = 0) => {
+    if (!running) return periodMs;
+    const elapsed = running.savedSecs * 1000 + Math.max(0, deps.now() - running.flushedAt) - offsetMs;
+    return periodMs - (((elapsed % periodMs) + periodMs) % periodMs);
+  };
 
-  async function flush(announce: boolean) {
+  // One flush at a time: two overlapping ones (a double-click on pause, the minute timer racing a stop) would read the
+  // same flushedAt and save the same seconds twice.
+  let queue: Promise<void> = Promise.resolve();
+  function flush(announce: boolean): Promise<void> {
+    const next = queue.then(() => flushNow(announce));
+    queue = next.catch(() => {});
+    return next;
+  }
+
+  async function flushNow(announce: boolean) {
     const r = running;
     if (!r) return;
     const secs = pending(r);
@@ -73,6 +91,7 @@ export function createFocusStore(deps: Deps) {
     get: () => running,
     unflushed,
     totalSecs,
+    msToNext,
     setHandlers(h: { onError?: (e: unknown) => void; onSaved?: () => void }) {
       onError = h.onError ?? onError;
       onSaved = h.onSaved ?? onSaved;
