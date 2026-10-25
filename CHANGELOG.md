@@ -14,6 +14,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
   um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
   endereços de links ficam de fora da conta.
@@ -126,6 +128,23 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o que foi copiado quando a aba aparece, o backup e a exportação de nota usam o seletor de arquivos do sistema e
   o Canto pede a permissão de notificações na primeira abertura. O CI passa a compilar o crate para Android e iOS.
   Ainda não há desbloqueio biométrico no celular. Veja [docs/mobile.md](docs/mobile.md).
+- **Aba Contatos, com a sua agenda do Google**: a People API, somente leitura (`contacts.readonly`), com o mesmo
+  login da Agenda. Mostra o total de contatos, busca ao digitar (nome, empresa, cargo, e-mail ou telefone, sem
+  ligar para acentos), filtros com contagem (Todos, Favoritos, Com e-mail, Com telefone), seções de A a Z com
+  avatar em iniciais e, ao abrir um contato, copiar e-mail ou telefone com um clique e abrir no Google Contatos.
+  Começa oculta, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar o
+  escopo novo, e a **People API** precisa estar ativa no projeto do Google Cloud.
+
+- **Gmail, Google Tarefas e Drive no Canto**, com o mesmo login Google da Agenda (o token continua no cofre e
+  nunca chega à webview). A aba **Gmail** mostra quantos e-mails estão sem ler na caixa de entrada e os não lidos
+  que o próprio Gmail marcou como importantes, com abrir no Gmail, marcar como lido e virar tarefa; o aviso
+  opcional **só dos importantes** toca uma notificação do sistema para cada e-mail importante novo (checado a cada
+  2 min). A aba **Drive** lista arquivos recentes, com estrela ou compartilhados comigo, com busca por nome e
+  abertura no navegador, lendo só os metadados. A aba **Tarefas** ganha a seção **Google Tarefas**, com as tarefas
+  abertas da lista padrão, a data (vencidas em vermelho), captura direta no Google e concluir com um clique; sem
+  login Google ela não aparece. O Keep ficou de fora: não há API para contas pessoais. Gmail e Drive começam
+  ocultas, a um clique em Ajustes. Quem já estava conectado precisa **reconectar o Google** para liberar os escopos
+  novos (`gmail.modify`, `tasks`, `drive.metadata.readonly`).
 
 ### Corrigido
 

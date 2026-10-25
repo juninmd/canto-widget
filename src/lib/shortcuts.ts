@@ -43,6 +43,7 @@ export const SHORTCUT_GROUPS: { title: string; items: Shortcut[] }[] = [
       { keys: ["Alt", "L"], description: t("shortcuts.lock") },
       { keys: ["Alt", "P"], description: t("shortcuts.privacy") },
       { keys: ["F2"], description: t("shortcuts.rename") },
+      { keys: ["Alt", "↑/↓"], description: t("shortcuts.moveTask") },
     ],
   },
   {
