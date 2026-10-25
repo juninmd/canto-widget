@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Agenda e GitHub não engolem mais erros nem agendam em dobro.** Um duplo clique em **+ tarefa** numa janela livre
+  da Agenda agendava a tarefa duas vezes (e avisava duas vezes); agora o segundo clique espera o primeiro. Quando o
+  link do Meet, do evento, de um anexo ou da página de token do GitHub não abre (sem navegador padrão, por exemplo),
+  o motivo aparece em vez de o clique não fazer nada.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
