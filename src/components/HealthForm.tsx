@@ -44,7 +44,7 @@ export default function HealthForm({ onSave, onCancel }: { onSave: (e: HealthEnd
       {e.kind === "http" ? (
         <label className="flex flex-col gap-1">
           {t("health.field.url")}
-          <input value={e.url ?? ""} onChange={(ev) => set({ url: ev.target.value })} placeholder="https://api.exemplo.dev/health" className={FIELD} />
+          <input value={e.url ?? ""} onChange={(ev) => set({ url: ev.target.value })} placeholder="https://api.example.com/health" className={FIELD} />
         </label>
       ) : (
         <div className="grid grid-cols-[1fr_5.5rem] gap-2">

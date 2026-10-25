@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { LOCALE, t } from "../i18n";
 import { hourlyHeat, peakWindow, secsLabel } from "../lib/activity";
 import type { Day } from "../lib/activityView";
+import { hourLabel } from "../lib/clockLabel";
 
 /** Hours of the day against the last days: the darker the cell, the more active time in that hour. */
 export default function ActivityHeat({ days }: { days: Day[] }) {
@@ -29,7 +30,7 @@ export default function ActivityHeat({ days }: { days: Day[] }) {
           <div key={r.day} className="contents">
             <span className="flex items-center truncate">{name(r.day)}</span>
             {cols.map((h) => (
-              <span key={h} title={`${name(r.day)} ${h}h`} className="canto-heat h-[17px] rounded bg-accent" style={{ "--i": h, opacity: r.hours[h] ? 0.16 + (r.hours[h] / max) * 0.84 : 0.06 } as CSSProperties} />
+              <span key={h} title={`${name(r.day)} ${hourLabel(h)}`} className="canto-heat h-[17px] rounded bg-accent" style={{ "--i": h, opacity: r.hours[h] ? 0.16 + (r.hours[h] / max) * 0.84 : 0.06 } as CSSProperties} />
             ))}
           </div>
         ))}
@@ -39,7 +40,7 @@ export default function ActivityHeat({ days }: { days: Day[] }) {
           <tr>
             <td />
             {cols.map((h) => (
-              <th key={h} scope="col">{h}h</th>
+              <th key={h} scope="col">{hourLabel(h)}</th>
             ))}
           </tr>
         </thead>
