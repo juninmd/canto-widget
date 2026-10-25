@@ -409,5 +409,7 @@
   "gdrive.enter": "open folder {name}",
   "gdrive.more": "load more",
   "gdrive.loadingMore": "loading more…",
-  "google.enableApi": "enable the API"
+  "google.enableApi": "enable the API",
+  "settings.password.same": "the new password is the same as the current one",
+  "settings.password.capsLock": "Caps Lock is on"
 }
