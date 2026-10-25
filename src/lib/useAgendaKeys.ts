@@ -15,6 +15,8 @@ export function useAgendaKeys(active: boolean, run: (k: AgendaKey) => void) {
       const typing = !!el && (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName));
       const key = KEYS[e.key];
       if (!key || typing || e.ctrlKey || e.metaKey || e.altKey) return;
+      // Joining opens a browser window: holding J must not open one per repeat, nor fire behind an open dialog.
+      if (key === "join" && (e.repeat || !!el?.closest?.('[role="dialog"], [aria-modal="true"]') || !!document.querySelector('[aria-modal="true"]'))) return;
       e.preventDefault();
       ref.current(key);
     };

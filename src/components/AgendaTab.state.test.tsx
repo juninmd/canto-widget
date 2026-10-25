@@ -165,6 +165,22 @@ test("j opens today's Meet in progress, but not while typing and not on another 
   });
   expect(calls.filter((c) => c.cmd === "open_link").map((c) => c.args?.url)).toEqual([call.meet]);
   await act(async () => {
+    fireEvent.keyDown(window, { key: "j", repeat: true });
+    fireEvent.keyDown(window, { key: "j", repeat: true });
+  });
+  expect(count("open_link")).toBe(1);
+  const dialog = document.createElement("div");
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  const inside = document.createElement("button");
+  dialog.appendChild(inside);
+  document.body.appendChild(dialog);
+  await act(async () => {
+    fireEvent.keyDown(inside, { key: "j" });
+  });
+  dialog.remove();
+  expect(count("open_link")).toBe(1);
+  await act(async () => {
     fireEvent.keyDown(window, { key: "]" });
   });
   await act(async () => {
