@@ -101,7 +101,7 @@ pub fn list(dir: &Path, query: &str) -> Result<Vec<TranscriptMeta>> {
     let Ok(entries) = std::fs::read_dir(dir) else {
         return Ok(vec![]);
     };
-    let q = query.trim().to_lowercase();
+    let q = crate::text_fold::fold(query.trim());
     let mut out = Vec::new();
     for entry in entries.flatten() {
         let path = entry.path();
@@ -116,7 +116,7 @@ pub fn list(dir: &Path, query: &str) -> Result<Vec<TranscriptMeta>> {
             clean_subtitles(&read_prefix(&path, cap))
         };
         let name = entry.file_name().to_string_lossy().to_string();
-        if !q.is_empty() && !name.to_lowercase().contains(&q) && !content.to_lowercase().contains(&q) {
+        if !q.is_empty() && !crate::text_fold::contains(&name, &q) && !crate::text_fold::contains(&content, &q) {
             continue;
         }
         out.push(TranscriptMeta {
