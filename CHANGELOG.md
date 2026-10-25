@@ -7,6 +7,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
+  foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
 - **Busca sem acento e sem caixa.** "acao" acha "Ação" e "reuniao" acha "Reunião" (e o contrário) nas notas, no histórico do clipboard, nas transcrições, na busca global de tarefas, nos docs do Gemini e nas notas ligadas a uma reunião; o destaque `<mark>` marca a palavra acentuada inteira.
 - **Início mais leve das três janelas.** Cada janela carrega só o próprio código: o pop-up de alerta e a captura
   rápida não analisam mais o widget inteiro (de 1085 kB para 405 kB e 331 kB de JS), e só o catálogo do idioma
