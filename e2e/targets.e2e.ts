@@ -44,8 +44,9 @@ test("the checkbox has a name and a 24 px target around its 20 px circle", async
   const box = page.getByRole("checkbox", { name: "Revisar o PR" });
   const circle = (await box.boundingBox())!;
   const target = (await box.locator("xpath=..").boundingBox())!;
-  expect(target.width).toBeGreaterThanOrEqual(24);
-  expect(target.height).toBeGreaterThanOrEqual(24);
+  // Rounded: an entry animation's transform can leave the box a few millionths of a pixel short (23.99997).
+  expect(Math.round(target.width)).toBeGreaterThanOrEqual(24);
+  expect(Math.round(target.height)).toBeGreaterThanOrEqual(24);
   // A click on the label's edge, outside the circle, still toggles the task.
   await page.mouse.click(circle.x - 1.5, circle.y + circle.height / 2);
   await expect.poll(async () => (await calls(page)).some((c) => c.cmd === "task_toggle")).toBe(true);
