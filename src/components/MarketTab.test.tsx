@@ -99,6 +99,18 @@ test("a period that fails to load says so and keeps the day's curve", async () =
   expect(move()).toContain("hoje");
 });
 
+test("a period that failed can be retried without leaving it", async () => {
+  history = new Error("sem resposta do Yahoo Finance");
+  render(<MarketTab />);
+  fireEvent.click(await screen.findByRole("button", { name: "1A" }));
+  await screen.findByText(/não deu para ler esse período/);
+  history = { points: [5.0, 5.2, 5.4237], times: [1, 2, 3] };
+  fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
+  await waitFor(() => expect(screen.queryByText(/não deu para ler esse período/) === null).toBe(true));
+  await waitFor(() => expect(move()).toContain("+8,47%"));
+  expect(calls.filter((c) => c.cmd === "market_history").length).toBe(2);
+});
+
 test("refreshing forces a new reading past the cache", async () => {
   render(<MarketTab />);
   fireEvent.click(await screen.findByRole("button", { name: "atualizar" }));
@@ -116,4 +128,15 @@ test("a failed refresh keeps the last quotes on screen under the error", async (
   render(<MarketTab />);
   expect(await screen.findByRole("alert")).toBeTruthy();
   expect(hero()).toBe("USD/BRL");
+});
+
+test("an answer with no quotes and no error says so with a retry instead of an endless skeleton", async () => {
+  view = { quotes: [], fetched_at: 0, error: null };
+  render(<MarketTab />);
+  expect(await screen.findByText(/nenhuma cotação chegou agora/)).toBeTruthy();
+  expect(screen.queryByText("consultando as cotações")).toBeNull();
+  view = LIVE;
+  fireEvent.click(screen.getByText("tentar de novo"));
+  await screen.findByText("Abertura");
+  expect(calls.map((c) => c.args.force)).toEqual([false, true]);
 });

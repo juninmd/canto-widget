@@ -33,7 +33,7 @@ export default function ActivityWeek({ series, goalMin }: { series: ReturnType<t
         {hourMarks.map((h) => (
           <g key={h}>
             <line x1={PAD.left} x2={W - PAD.right} y1={y(h * 3600)} y2={y(h * 3600)} className="stroke-fg/10" />
-            <text x={PAD.left - 5} y={y(h * 3600) + 3} textAnchor="end" className="fill-faint font-mono text-[9.5px]">{h}h</text>
+            <text x={PAD.left - 5} y={y(h * 3600) + 3} textAnchor="end" className="fill-faint font-mono text-[9.5px]">{t("time.h", { h })}</text>
           </g>
         ))}
         {series.map((d, i) => {
