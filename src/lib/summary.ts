@@ -2,6 +2,7 @@ import type { AgendaItem, ForgeItem, GeminiDoc, Task } from "./api";
 import { hour } from "./agenda";
 import { LOCALE, t } from "../i18n";
 import { minutesOf } from "./focus";
+import { hoursMinutes } from "./clockLabel";
 
 /** Local midnight of a `YYYY-MM-DD` day, in ms. */
 export function dayStart(day: string): number {
@@ -40,7 +41,7 @@ export function meetingMinutes(agenda: AgendaItem[]): number {
 export function duration(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return h === 0 ? `${m} min` : `${h}h${m ? String(m).padStart(2, "0") : ""}`;
+  return h === 0 ? t("time.min", { n: m }) : m ? hoursMinutes(h, m) : t("time.h", { h });
 }
 
 export type DayForges = { opened?: ForgeItem[]; merged?: ForgeItem[]; reviewed?: ForgeItem[]; closed?: ForgeItem[] };
