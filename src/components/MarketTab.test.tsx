@@ -129,3 +129,14 @@ test("a failed refresh keeps the last quotes on screen under the error", async (
   expect(await screen.findByRole("alert")).toBeTruthy();
   expect(hero()).toBe("USD/BRL");
 });
+
+test("an answer with no quotes and no error says so with a retry instead of an endless skeleton", async () => {
+  view = { quotes: [], fetched_at: 0, error: null };
+  render(<MarketTab />);
+  expect(await screen.findByText(/nenhuma cotação chegou agora/)).toBeTruthy();
+  expect(screen.queryByText("consultando as cotações")).toBeNull();
+  view = LIVE;
+  fireEvent.click(screen.getByText("tentar de novo"));
+  await screen.findByText("Abertura");
+  expect(calls.map((c) => c.args.force)).toEqual([false, true]);
+});
