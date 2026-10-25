@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type ClipItem, type Note, type Task } from "../lib/api";
 import { useLatestRequest } from "../lib/useLatestRequest";
+import { fold, foldIncludes } from "../lib/fold";
 import { t } from "../i18n";
 import type { Tab } from "./TabBar";
 
@@ -48,15 +49,39 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
     }
     const timer = setTimeout(() => {
       const id = bump();
-      const low = q.toLowerCase();
+      const low = fold(q);
       const lookups = [
-        api.tasksForDay(today).then((all) => isLatest(id) && setTasks(all.filter((x) => x.title.toLowerCase().includes(low)))),
-        api.notesSearch(q, CAP).then((page) => {
-          if (!isLatest(id)) return;
-          setNotes(page.items);
-          setNotesTotal(page.total);
-        }),
-        api.clipList(q).then((list) => isLatest(id) && setClips(list.items)),
+        api
+          .tasksForDay(today)
+          .then((all) => {
+            if (!isLatest(id)) return;
+            setTasks(all.filter((x) => foldIncludes(x.title, low)));
+          })
+          .catch((e) => {
+            if (!isLatest(id)) return;
+            onError(errText(e));
+          }),
+        api
+          .notesSearch(q, CAP)
+          .then((page) => {
+            if (!isLatest(id)) return;
+            setNotes(page.items);
+            setNotesTotal(page.total);
+          })
+          .catch((e) => {
+            if (!isLatest(id)) return;
+            onError(errText(e));
+          }),
+        api
+          .clipList(q)
+          .then((list) => {
+            if (!isLatest(id)) return;
+            setClips(list.items);
+          })
+          .catch((e) => {
+            if (!isLatest(id)) return;
+            onError(errText(e));
+          }),
       ];
       void Promise.allSettled(lookups).then((done) => {
         if (!isLatest(id)) return;

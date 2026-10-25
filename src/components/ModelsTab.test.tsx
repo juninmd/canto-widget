@@ -189,6 +189,16 @@ test("the picker adds a model by search and the presets fill the comparison", as
   expect(JSON.parse(localStorage.getItem("canto.models.compare")!)).toEqual(["n", "a", "o"]);
 });
 
+test("picker options keep their height in the scrolling list", async () => {
+  localStorage.setItem("canto.models.compare", JSON.stringify(["a"]));
+  await show();
+  await act(async () => fireEvent.click(screen.getByText("Comparar · 1")));
+  await act(async () => fireEvent.click(screen.getByText("+ modelo")));
+  const option = screen.getByText("Orca Think").closest("button")!;
+  // canto-hit sets min-height, which drops the flex min-height:auto floor; without shrink-0 a long list crushes the rows.
+  expect(option.className.split(" ")).toContain("shrink-0");
+});
+
 test("rows from a backend without the sheet still open and compare", async () => {
   view = connected({ models: models.map(({ id, name, creator, score, price, speed, rank, badge }) => ({ id, name, creator, score, price, speed, rank, badge }) as ModelRow) });
   await show();
