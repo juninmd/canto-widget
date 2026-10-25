@@ -7,11 +7,14 @@ const resized: number[] = [];
 const emitted: { event: string; payload?: unknown }[] = [];
 let payload: unknown[] = [];
 let pending: unknown[] = [];
+/** When set, `alert_payload` answers with these promises in order, so a test controls when each read lands. */
+let reads: Promise<unknown>[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: { height?: number }) => {
     calls.push(cmd);
     if (cmd === "alert_resize" && args?.height) resized.push(args.height);
+    if (cmd === "alert_payload" && reads.length) return reads.shift();
     return Promise.resolve(cmd === "alert_payload" ? payload : cmd === "alert_settle" ? pending : null);
   },
 }));
@@ -49,6 +52,7 @@ beforeEach(() => {
   emitted.length = 0;
   payload = [];
   pending = [];
+  reads = [];
 });
 afterEach(cleanup);
 
@@ -187,4 +191,26 @@ test("um link do markdown abre no navegador pelo mesmo caminho dos outros", asyn
   fireEvent.click(screen.getByRole("button", { name: "o PR" }));
   await settle();
   expect(calls).toContain("open_link");
+});
+
+test("an older read that answers last does not replace the newer alerts", async () => {
+  let first!: (v: unknown) => void;
+  let second!: (v: unknown) => void;
+  reads = [new Promise((r) => (first = r)), new Promise((r) => (second = r))];
+  render(<AlertWindow />);
+  await act(async () => listeners["canto://alert"]());
+  await act(async () => second([alert("task:t2", { title: "reunião nova" })]));
+  await act(async () => first([]));
+  await settle();
+  expect(screen.getByRole("alertdialog").textContent).toContain("reunião nova");
+});
+
+test("a failed read keeps the cards on screen instead of failing silently", async () => {
+  payload = [alert("task:t1")];
+  render(<AlertWindow />);
+  await settle();
+  reads = [Promise.reject("ipc fora")];
+  await act(async () => listeners["canto://alert"]());
+  await settle();
+  expect(screen.getByRole("alertdialog")).toBeTruthy();
 });

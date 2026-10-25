@@ -1,5 +1,5 @@
 /** Steam helpers that don't need the network: the store link, a readable playtime and the money. */
-import { LOCALE, type MessageKey } from "../i18n";
+import { LOCALE, t, type MessageKey } from "../i18n";
 import type { SteamRow } from "./api";
 
 /** Where a row opens: the store page of the game. */
@@ -29,11 +29,11 @@ export function gameTitle(row: { appid: number; name: string }): string {
  *  The hours carry the language's thousands separator, since a library adds up to four digits. */
 export function playtime(minutes: number): string {
   const total = Math.max(0, Math.trunc(minutes));
-  if (total < 60) return `${total} min`;
+  if (total < 60) return t("time.min", { n: total });
   const hours = Math.floor(total / 60);
   const rest = total % 60;
   const written = new Intl.NumberFormat(LOCALE).format(hours);
-  return rest === 0 ? `${written} h` : `${written} h ${rest} min`;
+  return rest === 0 ? t("agenda.free.h", { h: written }) : t("agenda.free.hMin", { h: written, n: rest });
 }
 
 /** Cents in the region's currency, written the way the chosen language writes money ("R$ 45,00").
