@@ -16,6 +16,7 @@ import { google } from "./google";
 import { weather } from "./weather";
 import { map } from "./map";
 import { uiModelsActivity } from "./uiModelsActivity";
+import { uiFormats } from "./uiFormats";
 
 /** One file per area so features can be translated (and reviewed) independently. */
-export const ptBR = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google } as const;
+export const ptBR = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats } as const;
