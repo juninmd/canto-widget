@@ -132,6 +132,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Subtarefas e Google Tarefas não perdem o foco nem o texto.** Excluir uma subtarefa ou concluir uma tarefa do
+  Google pelo teclado leva o foco para o item vizinho (ou para o campo de captura), em vez de jogá-lo para o topo da
+  janela; o campo do Google Tarefas continua focado enquanto salva, pronto para a próxima; e uma subtarefa que falha
+  ao salvar devolve o texto digitado ao campo.
 - **Gmail abre na Entrada e diz quando a API está desligada.** A aba começava em **Importantes**, que só lista os
   não lidos marcados como importantes e por isso costumava parecer vazia; agora abre em **Entrada**. Quando a Gmail
   API (ou outra API do Google) está desativada no projeto do Google Cloud, o aviso traz o botão **ativar a API**, que
