@@ -1,11 +1,12 @@
 import type { HealthEndpoint, HealthKind, HealthSample, HealthView } from "./healthTypes";
+import { t } from "../i18n";
 
 export const INTERVALS = [30, 60, 300] as const;
 export const LIMITS = [200, 300, 500, 800, 1000, 2000] as const;
 /** Same as `CERT_WARN_DAYS` in `health.rs`. */
 export const CERT_WARN_DAYS = 14;
 
-export const everyLabel = (secs: number) => (secs >= 60 ? `${secs / 60} min` : `${secs} s`);
+export const everyLabel = (secs: number) => (secs >= 60 ? t("time.min", { n: secs / 60 }) : t("time.sec", { n: secs }));
 
 export function blankEndpoint(kind: HealthKind): HealthEndpoint {
   return {
