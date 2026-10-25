@@ -11,6 +11,7 @@ export default function MarketHero({ quote }: { quote: MarketQuote }) {
   const [range, setRange] = useState<MarketRange>("1d");
   const [history, setHistory] = useState<{ key: string; curve: MarketHistory } | null>(null);
   const [failed, setFailed] = useState("");
+  const [attempt, setAttempt] = useState(0);
   const key = `${quote.symbol}|${range}`;
 
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function MarketHero({ quote }: { quote: MarketQuote }) {
     return () => {
       live = false;
     };
-  }, [quote.symbol, range, key]);
+  }, [quote.symbol, range, key, attempt]);
 
   const longer = range !== "1d" && history?.key === key && failed !== key ? history.curve : null;
   const loading = range !== "1d" && !longer && failed !== key;
@@ -91,7 +92,22 @@ export default function MarketHero({ quote }: { quote: MarketQuote }) {
           time={(seconds) => pointTime(shown, seconds)}
         />
       </div>
-      {failed === key && <p className="text-[11px] text-warn">{t("protos.market.history_error")}</p>}
+      {failed === key && (
+        <p className="flex items-center gap-2 text-[11px] text-warn">
+          <span className="min-w-0 flex-1">{t("protos.market.history_error")}</span>
+          <button
+            type="button"
+            data-market-retry
+            onClick={() => {
+              setFailed("");
+              setAttempt((n) => n + 1);
+            }}
+            className="canto-hit shrink-0 rounded-md px-1.5 font-semibold hover:bg-hover"
+          >
+            {t("common.retry")}
+          </button>
+        </p>
+      )}
       <MarketStats quote={quote} />
     </section>
   );
