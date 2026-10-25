@@ -31,6 +31,21 @@ fn filtering_happens_before_the_cut_so_old_matches_are_counted() {
 }
 
 #[test]
+fn the_search_ignores_accents_and_case_both_ways() {
+    let list = vec![
+        Note { id: "a".into(), title: "Pauta da Reunião".into(), ..Default::default() },
+        Note { id: "b".into(), title: "plano".into(), body: "proxima acao: ligar".into(), ..Default::default() },
+        Note { id: "c".into(), title: "x".into(), tags: vec!["inspiração".into()], ..Default::default() },
+    ];
+    let ids = |q: &str| page(&list, q, 50).items.into_iter().map(|n| n.id).collect::<Vec<_>>();
+    assert_eq!(ids("reuniao"), ["a"]);
+    assert_eq!(ids("REUNIÃO"), ["a"]);
+    assert_eq!(ids("Ação"), ["b", "c"], "an accented query must also find plain text (and the tag inspiração)");
+    assert_eq!(ids("inspiracao"), ["c"]);
+    assert_eq!(ids("#inspiracao"), ["c"], "a #tag filter typed without the accent");
+}
+
+#[test]
 fn a_zero_or_absurd_limit_is_clamped_instead_of_emptying_or_flooding_the_list() {
     assert_eq!(page(&notes(5), "", 0).items.len(), 1);
     assert_eq!(page(&notes(900), "", usize::MAX).items.len(), 500);

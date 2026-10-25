@@ -3,14 +3,12 @@ import type { WeatherDay } from "../lib/api";
 import { moon, moonPath } from "../lib/moon";
 import { clock, hourOf } from "../lib/weather";
 import { t } from "../i18n";
+import { duration } from "../lib/summary";
 
 const W = 140;
 const BASE = 62;
 
-function hm(hours: number): string {
-  const h = Math.floor(hours);
-  return `${h}h${String(Math.round((hours - h) * 60)).padStart(2, "0")}`;
-}
+const hm = (hours: number) => duration(Math.round(hours * 60));
 
 /** Where the sun is on today's arc, how much daylight is left, and the moon's phase as seen from the city's hemisphere. */
 export default function WeatherAstro({ today, nowAt, lat, index }: { today: WeatherDay | undefined; nowAt: string; lat: number; index: number }) {
