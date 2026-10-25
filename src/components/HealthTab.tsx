@@ -24,22 +24,28 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
   const [busy, setBusy] = useState(false);
   const mounted = useRef(true);
   const { bump, isLatest } = useLatestRequest();
+  const writes = useRef(0);
 
-  // The 10 s poll can be in flight during a save: its older list must not undo the edit on screen.
+  // Writes order among themselves; a poll never invalidates a write, and any write that starts or lands during
+  // a poll voids it, since Rust may have read the list before the write reached it.
   const run = useCallback(
-    async (call: () => Promise<HealthView[]>): Promise<boolean> => {
-      const id = bump();
+    async (call: () => Promise<HealthView[]>, poll = false): Promise<boolean> => {
+      const id = poll ? 0 : bump();
+      const epoch = poll ? writes.current : ++writes.current;
+      const fresh = () => (poll ? epoch === writes.current : isLatest(id));
       try {
         const list = await call();
-        if (mounted.current && isLatest(id)) {
+        if (mounted.current && fresh()) {
           if (Array.isArray(list)) setViews(list);
           setError("");
         }
         return true;
       } catch (e) {
         // A failed save is shown even if a poll started meanwhile, or the form would stay open in silence.
-        if (mounted.current) setError(errText(e));
+        if (mounted.current && (!poll || fresh())) setError(errText(e));
         return false;
+      } finally {
+        if (!poll) writes.current += 1;
       }
     },
     [bump, isLatest],
@@ -47,8 +53,8 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
 
   useEffect(() => {
     mounted.current = true;
-    void run(api.healthList);
-    const timer = setInterval(() => void run(api.healthList), POLL_MS);
+    void run(api.healthList, true);
+    const timer = setInterval(() => void run(api.healthList, true), POLL_MS);
     return () => {
       mounted.current = false;
       clearInterval(timer);

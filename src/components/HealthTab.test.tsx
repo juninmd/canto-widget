@@ -192,3 +192,32 @@ test("a slower, older answer does not undo a newer edit on screen", async () => 
   await act(async () => finish(before));
   expect((screen.getByLabelText("latência alta acima de") as HTMLSelectElement).value).toBe("800");
 });
+
+test("a poll that overlaps a save neither discards the save nor brings the old list back", async () => {
+  const realInterval = globalThis.setInterval;
+  let tick: () => void = () => {};
+  globalThis.setInterval = ((fn: () => void) => ((tick = fn), 0)) as unknown as typeof setInterval;
+  try {
+    await mount();
+    const before = views;
+    let saved: () => void = () => {};
+    let polled: (list: HealthView[]) => void = () => {};
+    override = (cmd) => {
+      if (cmd === "health_save") return new Promise((resolve) => (saved = () => resolve([...before, view({ ...api, id: "n", name: "Fila" }, "unknown", [])])));
+      if (cmd === "health_list") return new Promise((resolve) => (polled = resolve));
+      return undefined;
+    };
+    fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+    const form = screen.getByRole("form", { name: "novo endpoint" });
+    fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Fila" } });
+    fireEvent.change(within(form).getByLabelText("endereço (http ou https)"), { target: { value: "https://fila.exemplo.dev" } });
+    await act(async () => fireEvent.submit(form));
+    await act(async () => tick());
+    await act(async () => saved());
+    expect(screen.getByText("Fila")).toBeTruthy();
+    await act(async () => polled(before));
+    expect(screen.getByText("Fila")).toBeTruthy();
+  } finally {
+    globalThis.setInterval = realInterval;
+  }
+});
