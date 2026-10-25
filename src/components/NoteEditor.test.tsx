@@ -209,3 +209,16 @@ test("a 50 KB note opens in the editor without stalling", () => {
   expect(performance.now() - start).toBeLessThan(3000);
   expect(box.querySelectorAll("pre").length).toBeGreaterThan(500);
 });
+
+test("a word count follows the body and adds reading time once the note is long", async () => {
+  mount("um **dois** [três](https://exemplo.com) ![](canto-img:ab)");
+  expect(screen.getByTestId("note-word-count").textContent).toBe("3 palavras");
+  click("editar o markdown");
+  const raw = screen.getByLabelText("markdown do card");
+  act(() => void fireEvent.change(raw, { target: { value: "sozinha" } }));
+  await waitFor(() => expect(screen.getByTestId("note-word-count").textContent).toBe("1 palavra"));
+  act(() => void fireEvent.change(raw, { target: { value: "palavra ".repeat(450) } }));
+  await waitFor(() => expect(screen.getByTestId("note-word-count").textContent).toBe("450 palavras · ~2 min de leitura"));
+  act(() => void fireEvent.change(raw, { target: { value: "" } }));
+  await waitFor(() => expect(screen.queryByTestId("note-word-count") === null).toBe(true));
+});
