@@ -10,6 +10,7 @@ import NoteLinkInput from "./NoteLinkInput";
 import NoteLinkRow from "./NoteLinkRow";
 import NoteThumbs from "./NoteThumbs";
 import NoteToolbar from "./NoteToolbar";
+import NoteWordCount from "./NoteWordCount";
 
 // Mirrors MAX_TITLE_CHARS in cmd_notes.rs; the backend is the real guard.
 const MAX_TITLE = 300;
@@ -177,6 +178,7 @@ export default function NoteEditor({ draft, original, tasks, agenda, onChange, o
         onClick={() => editor.commands.focus()}
       />
       {raw && <NoteThumbs body={draft.body} />}
+      <NoteWordCount body={draft.body} />
       <input
         ref={fileRef}
         type="file"
