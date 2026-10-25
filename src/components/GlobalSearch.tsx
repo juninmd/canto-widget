@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { api, errText, type ClipItem, type Note, type Task } from "../lib/api";
 import { useLatestRequest } from "../lib/useLatestRequest";
+import { fold, foldIncludes } from "../lib/fold";
 import { t } from "../i18n";
 import type { Tab } from "./TabBar";
 
@@ -40,10 +41,10 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
     }
     const timer = setTimeout(() => {
       const id = bump();
-      const low = q.toLowerCase();
+      const low = fold(q);
       void api
         .tasksForDay(today)
-        .then((all) => isLatest(id) && setTasks(all.filter((x) => x.title.toLowerCase().includes(low))))
+        .then((all) => isLatest(id) && setTasks(all.filter((x) => foldIncludes(x.title, low))))
         .catch((e) => isLatest(id) && onError(errText(e)));
       void api
         .notesSearch(q, CAP)
