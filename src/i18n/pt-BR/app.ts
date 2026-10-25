@@ -105,6 +105,8 @@ export const app = {
   "settings.password.submit": "trocar senha",
   "settings.password.submitting": "trocando...",
   "settings.password.cancel": "cancelar",
+  "settings.password.same": "a nova senha é igual à atual",
+  "settings.password.capsLock": "Caps Lock está ativado",
 
   "settings.language.title": "Idioma",
   "settings.language.auto": "Automático (sistema)",
