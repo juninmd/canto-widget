@@ -9,7 +9,7 @@ describe("splitPastedTasks", () => {
   });
 
   test("each non-blank line becomes one task, in order", () => {
-    expect(splitPastedTasks("comprar leite\r\n\r\nligar 14:00\rrevisar PR")).toEqual([
+    expect(splitPastedTasks("comprar leite\r\n\r\nligar 14:00\rrevisar PR")?.lines).toEqual([
       "comprar leite",
       "ligar 14:00",
       "revisar PR",
@@ -18,7 +18,7 @@ describe("splitPastedTasks", () => {
 
   test("list and checklist markers are dropped, the text after them stays", () => {
     const pasted = "- comprar leite\n* [ ] ligar\n- [x] feito\n1. primeiro\n2) segundo\n• ponto\n☐ caixa\n-5 graus";
-    expect(splitPastedTasks(pasted)).toEqual([
+    expect(splitPastedTasks(pasted)?.lines).toEqual([
       "comprar leite",
       "ligar",
       "feito",
@@ -31,11 +31,14 @@ describe("splitPastedTasks", () => {
   });
 
   test("tokens the quick-add understands survive, inner spaces collapse", () => {
-    expect(splitPastedTasks("  Daily   às 9h30 !alta\nDeploy\t18:00")).toEqual(["Daily às 9h30 !alta", "Deploy 18:00"]);
+    expect(splitPastedTasks("  Daily   às 9h30 !alta\nDeploy\t18:00")?.lines).toEqual(["Daily às 9h30 !alta", "Deploy 18:00"]);
   });
 
-  test("a huge paste is capped", () => {
+  test("a huge paste is capped and says how many lines were left out", () => {
     const many = Array.from({ length: PASTE_TASK_LIMIT + 10 }, (_, i) => `tarefa ${i}`).join("\n");
-    expect(splitPastedTasks(many)).toHaveLength(PASTE_TASK_LIMIT);
+    const split = splitPastedTasks(many);
+    expect(split?.lines).toHaveLength(PASTE_TASK_LIMIT);
+    expect(split?.dropped).toBe(10);
+    expect(splitPastedTasks("a\nb")?.dropped).toBe(0);
   });
 });

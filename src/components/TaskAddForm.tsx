@@ -3,6 +3,7 @@ import { t } from "../i18n";
 import { api, errText } from "../lib/api";
 import { parseQuickTask } from "../lib/quickAdd";
 import { splitPastedTasks } from "../lib/pasteTasks";
+import { useToast } from "../lib/toast";
 import type { TokenEdit } from "../lib/quickAddTokens";
 import { PlusIcon } from "./Icons";
 import TaskQuickChips from "./TaskQuickChips";
@@ -14,6 +15,9 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
   const [title, setTitle] = useState("");
   const [select, setSelect] = useState<{ start: number; end: number } | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  const busy = useRef(false);
+  const queued = useRef<string[]>([]);
+  const toast = useToast();
 
   // A chip steals focus; hand it back with the inserted token selected so typing replaces the placeholder time.
   useEffect(() => {
@@ -42,39 +46,55 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
     return null;
   }
 
-  async function add(e: React.FormEvent) {
-    e.preventDefault();
-    if (!title.trim()) return;
-    let failure: string | null;
-    try {
-      failure = await create(title);
-    } catch (err) {
-      onError(errText(err));
-      return;
-    }
-    // The task exists from here on: clearing the field keeps a retry from adding a duplicate.
+  // Runs one line or a pasted list in order; a line that fails comes back to the field with the ones after it
+  // queued, so Enter retries them instead of losing them. The busy flag keeps a second Enter or paste from
+  // interleaving with a list still being created.
+  async function batch(lines: string[]) {
+    busy.current = true;
+    queued.current = [];
     setTitle("");
-    await reload();
+    let failure: string | null = null;
+    let created = 0;
+    try {
+      for (const [i, line] of lines.entries()) {
+        try {
+          failure = (await create(line)) ?? failure;
+          created++;
+        } catch (err) {
+          failure = errText(err);
+          setTitle(line);
+          queued.current = lines.slice(i + 1);
+          break;
+        }
+      }
+      if (created) await reload();
+    } finally {
+      busy.current = false;
+    }
+    if (queued.current.length) toast({ message: t("tasks.pasteLeft", { n: queued.current.length + 1 }) });
     if (failure) onError(failure);
   }
 
-  // A list pasted into the empty field becomes one task per line instead of one long title.
-  async function paste(e: React.ClipboardEvent<HTMLInputElement>) {
-    if (title.trim()) return;
-    const lines = splitPastedTasks(e.clipboardData.getData("text/plain"));
-    if (!lines) return;
+  function add(e: React.FormEvent) {
     e.preventDefault();
-    let failure: string | null = null;
-    for (const line of lines) {
-      try {
-        failure = (await create(line)) ?? failure;
-      } catch (err) {
-        failure = errText(err);
-        break;
-      }
-    }
-    await reload();
-    if (failure) onError(failure);
+    if (busy.current || !title.trim()) return;
+    void batch([title, ...queued.current]);
+  }
+
+  // A list pasted into the empty field becomes one task per line instead of one long title.
+  function paste(e: React.ClipboardEvent<HTMLInputElement>) {
+    if (title.trim()) return;
+    const split = splitPastedTasks(e.clipboardData.getData("text/plain"));
+    if (!split) return;
+    e.preventDefault();
+    if (busy.current) return;
+    if (split.dropped) toast({ message: t("tasks.pasteCapped", { n: split.lines.length, dropped: split.dropped }) });
+    void batch(split.lines);
+  }
+
+  function edit(value: string) {
+    if (!value) queued.current = [];
+    setTitle(value);
   }
 
   return (
@@ -88,7 +108,7 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
             ref={input}
             value={title}
             data-shortcut="new"
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => edit(e.target.value)}
             onPaste={paste}
             placeholder={t("tasks.addPlaceholder")}
             className="canto-field w-full py-2 pl-9 pr-3 text-sm"
