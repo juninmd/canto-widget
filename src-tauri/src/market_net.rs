@@ -7,13 +7,16 @@ const CHART: &str = "https://query1.finance.yahoo.com/v8/finance/chart/";
 const TIMEOUT_S: u64 = 10;
 
 fn client() -> Result<reqwest::blocking::Client, String> {
-    crate::net::client_builder()
-        // Yahoo answers 429 to clients without a browser-like agent.
-        .user_agent("Mozilla/5.0 (canto-widget)")
-        .timeout(Duration::from_secs(TIMEOUT_S))
-        .redirect(reqwest::redirect::Policy::none())
-        .build()
-        .map_err(|e| e.to_string())
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            // Yahoo answers 429 to clients without a browser-like agent.
+            .user_agent("Mozilla/5.0 (canto-widget)")
+            .timeout(Duration::from_secs(TIMEOUT_S))
+            .redirect(reqwest::redirect::Policy::none())
+            .build()
+    })
+    .map_err(|e| e.to_string())
 }
 
 fn fetch(client: &reqwest::blocking::Client, ticker: &str, range: &str, interval: &str) -> Option<Vec<u8>> {

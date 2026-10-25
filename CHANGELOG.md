@@ -11,6 +11,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   uma tarefa, na ordem; marcadores de lista (`-`, `*`, `[ ]`, `[x]`, `1.`, `•`) somem e hora e `!alta` de cada
   linha continuam valendo. Até 50 linhas por vez (um aviso diz quantas ficaram de fora); se uma linha falhar, ela
   volta ao campo com as seguintes na fila e **Enter** tenta de novo. Uma linha só continua colando como antes.
+- **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
+  um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
+  endereços de links ficam de fora da conta.
 - **Trocar a senha mestra ficou mais à prova de erro.** O formulário em **Segurança** avisa quando o **Caps Lock**
   está ativado, recusa na hora uma senha nova curta demais ou igual à atual, marca e foca o campo com problema (a
   senha atual errada volta selecionada para redigitar), fecha com **Esc** devolvendo o foco ao botão e informa ao
@@ -140,6 +143,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Leituras: remover um feed pede confirmação.** O ✕ de um feed agora vira **remover o feed** e só remove no segundo
+  clique (Esc ou sair do botão desiste); um erro ao remover aparece em vez de sumir em silêncio. O **+** ganhou nome
+  para leitores de tela e foca o endereço ao abrir, um clique duplo em **marcar como lido** não desfaz a marcação, e os
+  botões dos cartões voltaram ao tamanho do resto do texto.
+
 - **Steam e Mercado mais firmes.** Na Steam, uma resposta lenta de uma busca, página ou filtro anterior não
   sobrescreve mais a lista que você pediu por último (nem um **ver mais** antigo entra na busca nova); **marcar como
   lidas** e a confirmação de **desconectar** mandam um pedido só, mesmo com clique duplo, e o **tentar de novo** de
@@ -167,6 +175,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Chamadas de rede mais rápidas e leves**: GitHub, GitLab, Google, Steam, Mercado, Clima e Mapa passam a usar
+  um cliente HTTP por serviço durante toda a sessão, em vez de criar um novo (com thread e certificados) a cada
+  pedido; as conexões ficam abertas entre as páginas e atualizações, sem refazer o handshake TLS toda vez.
 - **Pop-up de notificações compacto.** A janela do aviso agora tem a altura do cartão (antes ficava fixa em
   420 × 380, com espaço vazio entre o título e os botões), então o resto do canto da tela continua clicável. Foto
   de quem mandou (ou ícone do tipo) à esquerda, uma linha de contexto (repo#número · há quanto tempo), título,
@@ -368,6 +379,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Tarefas e avisos sem redesenho à toa**: voltar à aba Tarefas (ou outra janela salvar algo) relia o dia e
+  redesenhava todas as linhas mesmo sem mudança (~50–85 ms a mais com 1000 tarefas), e cada foco da janela trocava
+  a lista de avisos e redesenhava o app inteiro. Agora uma resposta idêntica mantém a lista atual e o React pula
+  o redesenho.
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
