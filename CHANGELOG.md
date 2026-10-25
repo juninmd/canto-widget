@@ -356,6 +356,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Área de transferência parada não redesenha a lista**: a busca de fundo a cada 2,5 s trocava a lista mesmo
+  sem nada novo, e cada cartão era reclassificado e redesenhado (~107 ms por ciclo com 1000 itens). Agora a
+  lista só é trocada quando um item muda de verdade.
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
