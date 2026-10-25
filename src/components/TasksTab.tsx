@@ -17,6 +17,7 @@ import EmptyState from "./EmptyState";
 import Skeleton from "./Skeleton";
 import TaskAddForm from "./TaskAddForm";
 import { useTaskBulk } from "../lib/useTaskBulk";
+import { keepIfSame } from "../lib/sameData";
 import { ChecklistIcon } from "./Icons";
 import TaskDoneHeader from "./TaskDoneHeader";
 
@@ -55,7 +56,9 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     try {
       const list = await api.tasksForDay(today);
       if (!isLatest(id)) return;
-      setTasks(list);
+      // Most reloads (tab switch, another window saving) bring back the same day: keep the old
+      // array so React skips re-rendering every row and the badge effect does not fire again.
+      setTasks((prev) => keepIfSame(prev, list));
       setLoadedFor(today);
     } catch (e) {
       onError(errText(e));
