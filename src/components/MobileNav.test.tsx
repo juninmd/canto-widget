@@ -44,3 +44,20 @@ test("Escape and a tap on the backdrop close the sheet", () => {
   fireEvent.click(screen.getByRole("dialog").parentElement!);
   expect(screen.queryByRole("dialog")).toBeNull();
 });
+
+test("the sheet opens on the current tab, keeps Tab inside and hands focus back to the menu button", () => {
+  render(<Harness start="settings" />);
+  const menu = screen.getByRole("button", { name: /Ajustes/ });
+  fireEvent.click(menu);
+  const buttons = [...screen.getByRole("dialog").querySelectorAll("button")];
+  const last = buttons[buttons.length - 1];
+  expect(document.activeElement?.textContent).toBe("Ajustes");
+  last.focus();
+  fireEvent.keyDown(last, { key: "Tab" });
+  expect(document.activeElement === buttons[0]).toBe(true);
+  fireEvent.keyDown(buttons[0], { key: "Tab", shiftKey: true });
+  expect(document.activeElement === last).toBe(true);
+  fireEvent.keyDown(window, { key: "Escape" });
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.activeElement === menu).toBe(true);
+});
