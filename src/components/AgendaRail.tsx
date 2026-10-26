@@ -16,6 +16,7 @@ type Props = {
   open: string | null;
   onToggle: (id: string) => void;
   onSchedule: (task: Task, time: string) => void;
+  onOpen: (url: string) => void;
 };
 
 const DOT = "absolute left-[1px] top-3 h-3 w-3 rounded-full border-2 bg-panel";
@@ -31,7 +32,7 @@ function Row({ tone, dot, children }: { tone?: string; dot?: string; children: R
 }
 
 /** Reuniões, tarefas com horário e janelas livres numa linha só; o que já passou fica recolhido. */
-export default function AgendaRail({ items, tasks, now, live = true, clashes, open, onToggle, onSchedule }: Props) {
+export default function AgendaRail({ items, tasks, now, live = true, clashes, open, onToggle, onSchedule, onOpen }: Props) {
   const { past, upcoming } = railEntries(items, tasks, now);
   const [showPast, setShowPast] = useState<boolean | null>(null);
   // Nothing left to look at: the finished meetings are the whole answer, so they start open.
@@ -46,7 +47,7 @@ export default function AgendaRail({ items, tasks, now, live = true, clashes, op
       const live = e.start <= at && at < e.end;
       return (
         <Row key={e.id} tone={`${ended ? "opacity-60" : ""} ${clashes.has(e.id) ? "before:bg-danger" : ""}`} dot={live ? "border-accent bg-accent" : "border-sky-400"}>
-          <AgendaCard event={e.item} conflicts={clashes.get(e.id)} open={open === e.id} onToggle={() => onToggle(e.id)} />
+          <AgendaCard event={e.item} conflicts={clashes.get(e.id)} open={open === e.id} onToggle={() => onToggle(e.id)} onOpen={onOpen} />
         </Row>
       );
     }
