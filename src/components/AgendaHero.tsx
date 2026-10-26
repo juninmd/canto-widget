@@ -1,4 +1,4 @@
-import { api, type AgendaItem } from "../lib/api";
+import type { AgendaItem } from "../lib/api";
 import { duration } from "../lib/agendaFree";
 import { hour, status } from "../lib/agenda";
 import { heroOf } from "../lib/agendaRail";
@@ -8,10 +8,10 @@ import AgendaRing from "./AgendaRing";
 // The halo starts when there is still time to wrap up and join, not one minute before.
 const SOON_MS = 15 * 60_000;
 
-type Props = { items: AgendaItem[]; now: Date; /** False on other days: "in 1h30" would be measured from a made-up clock. */ relative?: boolean; clashes: Map<string, string[]>; onDetails: (id: string) => void };
+type Props = { items: AgendaItem[]; now: Date; /** False on other days: "in 1h30" would be measured from a made-up clock. */ relative?: boolean; clashes: Map<string, string[]>; onDetails: (id: string) => void; onOpen: (url: string) => void };
 
 /** The one thing to look at: the meeting in progress, else the next one, else how the day went. */
-export default function AgendaHero({ items, now, relative = true, clashes, onDetails }: Props) {
+export default function AgendaHero({ items, now, relative = true, clashes, onDetails, onOpen }: Props) {
   const hero = heroOf(items, now);
   if (!hero) return null;
   if (hero.kind === "done") {
@@ -58,7 +58,7 @@ export default function AgendaHero({ items, now, relative = true, clashes, onDet
       )}
       <div className="mt-2 flex flex-wrap items-center gap-2">
         {e.meet && (
-          <button type="button" onClick={() => void api.openLink(e.meet)} className={`canto-hit min-h-7 rounded-lg px-3 text-xs font-bold ${live ? "bg-accent text-on-accent" : "bg-edge text-fg"}`}>
+          <button type="button" onClick={() => onOpen(e.meet)} className={`canto-hit min-h-7 rounded-lg px-3 text-xs font-bold ${live ? "bg-accent text-on-accent" : "bg-edge text-fg"}`}>
             {t("agenda.joinMeet")}
           </button>
         )}
