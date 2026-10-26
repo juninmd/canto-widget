@@ -14,6 +14,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Android não envia o cofre para a nuvem.** O Backup Automático do Google e a transferência entre aparelhos deixam de copiar o diretório de dados (cofre cifrado e tokens selados); a cópia de segurança continua sendo o `.canto` exportado.
 - **Colar uma lista cria uma tarefa por linha.** Cole várias linhas no campo de nova tarefa vazio e cada uma vira
   uma tarefa, na ordem; marcadores de lista (`-`, `*`, `[ ]`, `[x]`, `1.`, `•`) somem e hora e `!alta` de cada
   linha continuam valendo. Até 50 linhas por vez (um aviso diz quantas ficaram de fora); se uma linha falhar, ela
