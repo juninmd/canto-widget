@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Android não envia o cofre para a nuvem.** O Backup Automático do Google e a transferência entre aparelhos deixam de copiar o diretório de dados (cofre cifrado e tokens selados); a cópia de segurança continua sendo o `.canto` exportado.
 - **Primeiro uso sem telas enganosas.** Status API sem nenhuma página lida e Mercado sem nenhuma cotação agora dizem
   isso com um **tentar de novo**, em vez de "0 com problema · 0 operacionais" ou um esqueleto que nunca some; o dia
   sem tarefas some com o "0 de 0"; e o botão **abrir Ajustes** da Agenda sem Google (e o aviso de atualização) abre
