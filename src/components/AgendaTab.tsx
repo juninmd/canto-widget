@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, errText, todayLocal, type Task } from "../lib/api";
 import { t } from "../i18n";
 import AgendaDayBar from "./AgendaDayBar";
@@ -77,15 +77,21 @@ export default function AgendaTab({
   };
   useAgendaKeys(view !== "meetings", (k) => pickDay(k === "today" ? today : shiftDay(day, k === "prev" ? -1 : 1)));
 
+  // A double click on "+ task" would book it twice and toast twice before the list reloads.
+  const booking = useRef(new Set<string>());
   function schedule(task: Task, time: string) {
+    if (booking.current.has(task.id)) return;
+    booking.current.add(task.id);
     api
       .taskSetSchedule(task.id, time, task.repetir ?? null)
       .then(() => {
         setReloadTasks((n) => n + 1);
         onBooked?.(t("agenda.booked", { title: task.title, time }));
       })
-      .catch((e) => onError(errText(e)));
+      .catch((e) => onError(errText(e)))
+      .finally(() => booking.current.delete(task.id));
   }
+  const openLink = (url: string) => void api.openLink(url).catch((e) => onError(errText(e)));
 
   const refresh = () => {
     void reload();
@@ -129,7 +135,7 @@ export default function AgendaTab({
         <div key={`today-${day}`} className="flex-1 space-y-3 overflow-y-auto pr-1 motion-safe:animate-aba">
           {hasDay && (
             <>
-              <AgendaHero items={items} now={at} relative={isToday} clashes={clashes} onDetails={setOpen} />
+              <AgendaHero items={items} now={at} relative={isToday} clashes={clashes} onDetails={setOpen} onOpen={openLink} />
               <AgendaRibbon items={items} tasks={tasks} now={at} />
               {allDay.length > 0 && (
                 <ul className="flex flex-wrap gap-1.5">
@@ -140,7 +146,7 @@ export default function AgendaTab({
                   ))}
                 </ul>
               )}
-              <AgendaRail items={items} tasks={tasks} now={at} live={isToday} clashes={clashes} open={open} onToggle={(id) => setOpen(open === id ? null : id)} onSchedule={schedule} />
+              <AgendaRail items={items} tasks={tasks} now={at} live={isToday} clashes={clashes} open={open} onToggle={(id) => setOpen(open === id ? null : id)} onSchedule={schedule} onOpen={openLink} />
             </>
           )}
           {!hasDay && loading && !error && <Skeleton label={t("agenda.loading")} />}
