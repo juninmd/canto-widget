@@ -150,6 +150,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
+- **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
+- **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
+- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop-up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
 - **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
   longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
   fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
