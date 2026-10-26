@@ -1,14 +1,16 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import type { AgendaItem, Task } from "../lib/api";
 import type { Agenda } from "../lib/useAgenda";
 
 const calls: { cmd: string; args?: Record<string, unknown> }[] = [];
 let tasks: Task[] = [];
+let overrides: Record<string, () => Promise<unknown>> = {};
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
+    if (overrides[cmd]) return overrides[cmd]();
     return Promise.resolve(cmd === "tasks_for_day" ? tasks : null);
   },
 }));
@@ -24,13 +26,19 @@ const task = (id: string, extra: Partial<Task> = {}): Task => ({ id, title: id, 
 const agenda = (items: AgendaItem[]): Agenda => ({ items, loading: false, error: "", reload: () => Promise.resolve() });
 const clock = (h: number, m = 0) => () => new Date(2026, 8, 30, h, m);
 
+let errors: string[] = [];
+let booked: string[] = [];
+
 async function show(items: AgendaItem[], now = clock(8, 50)) {
-  render(<AgendaTab agenda={agenda(items)} today="2026-09-30" now={now} onError={() => {}} />);
+  render(<AgendaTab agenda={agenda(items)} today="2026-09-30" now={now} onError={(m) => errors.push(m)} onBooked={(m) => booked.push(m)} />);
   await act(async () => {});
 }
 
 beforeEach(() => {
   calls.length = 0;
+  overrides = {};
+  errors = [];
+  booked = [];
   localStorage.removeItem("canto.agendaView");
   tasks = [task("Revisar PR", { hora: "09:15", estimate_min: 30 }), task("Escrever changelog", { estimate_min: 30 })];
 });
@@ -101,4 +109,33 @@ test("an open task in the tray books itself into the first free slot", async () 
     fireEvent.click(screen.getByTitle("agendar Escrever changelog às 09:45"));
   });
   expect(calls.find((c) => c.cmd === "task_set_schedule")?.args).toEqual({ id: "Escrever changelog", time: "09:45", repeat: null });
+});
+
+test("a double click on a free gap books the task once", async () => {
+  let release = () => {};
+  overrides.task_set_schedule = () => new Promise((resolve) => (release = () => resolve(null)));
+  await show([ev("Daily do time", 9, 0, 9, 30), ev("Revisão", 11, 0, 12, 0)], clock(8, 50));
+  const book = screen.getByTitle("encaixar Escrever changelog às 09:45");
+  fireEvent.click(book);
+  fireEvent.click(book);
+  await act(async () => release());
+  expect(calls.filter((c) => c.cmd === "task_set_schedule").length).toBe(1);
+  expect(booked.length).toBe(1);
+});
+
+test("a task whose booking failed can be booked again", async () => {
+  overrides.task_set_schedule = () => Promise.reject("sem conexão");
+  await show([ev("Daily do time", 9, 0, 9, 30), ev("Revisão", 11, 0, 12, 0)], clock(8, 50));
+  await act(async () => fireEvent.click(screen.getByTitle("encaixar Escrever changelog às 09:45")));
+  await act(async () => fireEvent.click(screen.getByTitle("encaixar Escrever changelog às 09:45")));
+  expect(calls.filter((c) => c.cmd === "task_set_schedule").length).toBe(2);
+  expect(errors).toEqual(["sem conexão", "sem conexão"]);
+});
+
+test("a Meet link that fails to open says so instead of vanishing", async () => {
+  overrides.open_link = () => Promise.reject("nenhum navegador padrão");
+  await show([ev("Planejamento", 10, 0, 11, 0, { meet: "https://meet.example.com/x" })], clock(10, 20));
+  const hero = screen.getByRole("region", { name: "agora" });
+  await act(async () => fireEvent.click(within(hero).getByText("entrar no Meet")));
+  expect(errors).toEqual(["nenhum navegador padrão"]);
 });
