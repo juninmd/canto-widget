@@ -117,6 +117,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   que são abertas: o JavaScript lido na abertura caiu de 1.081 KiB para 745 KiB (307 → 228 KiB com gzip).
 ### Adicionado
 
+- **Android não envia o cofre para a nuvem.** O Backup Automático do Google e a transferência entre aparelhos deixam de copiar o diretório de dados (cofre cifrado e tokens selados); a cópia de segurança continua sendo o `.canto` exportado.
 - **Aba Leituras (RSS e Atom)**: cole os endereços dos feeds e leia tudo num só lugar, com **contagem de não
   lidos**, o mais novo primeiro, o **favicon** da origem, a idade e um resumo em cada cartão — e a **miniatura**
   quando a entrada tem uma. Tudo é baixado pelo Rust e entregue à interface como `data:`, então a janela nunca
