@@ -565,3 +565,23 @@ test("switching to the commenters view loads comments and displays the catalog",
   expect(screen.getByText("Que app legal! Vou testar")).toBeTruthy();
 });
 
+test("a token page that fails to open shows the reason next to the field", async () => {
+  responses.github_status = () => Promise.resolve({ connected: false, login: "", source: "", device_flow: false });
+  responses.open_link = () => Promise.reject("nenhum navegador padrão");
+  await mount();
+  await act(async () => fireEvent.click(screen.getByText("criar token")));
+  expect(screen.getByRole("alert").textContent).toBe("nenhum navegador padrão");
+});
+
+test("in the device flow, a failed 'abrir' says so while the code stays on screen", async () => {
+  responses.github_status = () => Promise.resolve({ connected: false, login: "", source: "", device_flow: true });
+  responses.github_device_start = () => Promise.resolve({ user_code: "ABCD-1234", url: "https://github.com/login/device" });
+  responses.github_device_finish = () => new Promise(() => {});
+  responses.open_link = () => Promise.reject("nenhum navegador padrão");
+  await mount();
+  await act(async () => fireEvent.click(screen.getByText("entrar com o GitHub")));
+  await act(async () => fireEvent.click(screen.getByText("abrir github.com/login/device")));
+  expect(screen.getByText("ABCD-1234")).toBeTruthy();
+  expect(screen.getByRole("alert").textContent).toBe("nenhum navegador padrão");
+});
+

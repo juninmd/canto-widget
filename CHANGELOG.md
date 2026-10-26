@@ -310,6 +310,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop-up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
+- **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
+- **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
+- **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
 - **Janela deslizando de lado**: escolher uma aba pelo menu **mais** empurrava o cabeçalho 112 px para a esquerda; a
   cópia invisível da barra, usada só para medir as abas, agora fica recortada.
 - **Trancar com falha**: se o Rust não conseguir trancar o cofre, a tela avisa e relê o estado real em vez de fingir
