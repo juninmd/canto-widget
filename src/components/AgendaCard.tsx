@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { api, type AgendaItem } from "../lib/api";
+import type { AgendaItem } from "../lib/api";
 import { hour, people, status } from "../lib/agenda";
 import { t } from "../i18n";
 import AgendaGuests from "./AgendaGuests";
@@ -7,9 +7,9 @@ import Avatar from "./Avatar";
 import RsvpBadge, { ConflictBadge } from "./RsvpBadge";
 import { useGuestPhotos } from "../lib/useGuestPhotos";
 
-type Props = { event: AgendaItem; conflicts?: string[]; open: boolean; onToggle: () => void };
+type Props = { event: AgendaItem; conflicts?: string[]; open: boolean; onToggle: () => void; onOpen: (url: string) => void };
 
-export default function AgendaCard({ event: e, conflicts = [], open, onToggle }: Props) {
+export default function AgendaCard({ event: e, conflicts = [], open, onToggle, onOpen }: Props) {
   const { label, now } = status(e);
   const detailsId = useId();
   const attachments = e.attachments ?? [];
@@ -61,7 +61,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
                 <li key={a.url}>
                   <button
                     type="button"
-                    onClick={() => void api.openLink(a.url)}
+                    onClick={() => onOpen(a.url)}
                     title={a.url}
                     className="w-full truncate rounded bg-edge px-2 py-1 text-left text-fg hover:bg-line"
                   >
@@ -72,7 +72,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
             </ul>
           )}
           {e.link && (
-            <button type="button" onClick={() => void api.openLink(e.link)} className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
+            <button type="button" onClick={() => onOpen(e.link)} className="canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
               {t("agenda.openInCalendar")}
             </button>
           )}
@@ -82,7 +82,7 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle }:
       {e.meet && (
         <button
           type="button"
-          onClick={() => void api.openLink(e.meet)}
+          onClick={() => onOpen(e.meet)}
           className={`mt-1.5 min-h-7 rounded px-2.5 text-xs font-semibold ${now ? "bg-accent text-on-accent" : "bg-edge text-fg"}`}
         >
           {t("agenda.joinMeet")}

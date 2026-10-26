@@ -57,6 +57,8 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
     }
   }
 
+  const openPage = (url: string) => void api.openLink(url).catch((e) => setError(errText(e)));
+
   async function copyCode(code: string) {
     try {
       await navigator.clipboard.writeText(code);
@@ -79,12 +81,17 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
         <button type="button" onClick={() => void copyCode(deviceCode.user_code)} className="canto-hit min-h-7 rounded-lg border border-edge px-3 text-fg hover:bg-hover active:bg-active">
           {copied ? t("github.codeCopied") : t("github.copyCode")}
         </button>
-        <button type="button" onClick={() => void api.openLink(deviceCode.url).catch(() => {})} className="canto-hit min-h-7 rounded-lg bg-edge px-3 text-fg hover:bg-active active:bg-active">
+        <button type="button" onClick={() => openPage(deviceCode.url)} className="canto-hit min-h-7 rounded-lg bg-edge px-3 text-fg hover:bg-active active:bg-active">
           {t("github.openUrl", { url: deviceCode.url.replace("https://", "") })}
         </button>
         <button type="button" onClick={() => void api.githubDeviceCancel().catch(() => {})} className="canto-hit min-h-7 self-center rounded-md px-1.5 hover:bg-hover active:bg-active">
           {t("github.cancel")}
         </button>
+        {error && (
+          <p role="alert" className="text-danger">
+            {error}
+          </p>
+        )}
       </div>
     );
   }
@@ -112,7 +119,7 @@ export default function GithubConnect({ device, onConnected }: { device: boolean
         />
         <p className="text-[11px] text-faint">
           {t("github.tokenHint")} <em>{t("github.readOnly")}</em>.{" "}
-          <button type="button" onClick={() => void api.openLink(TOKEN_URL)} className="canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
+          <button type="button" onClick={() => openPage(TOKEN_URL)} className="canto-hit rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active">
             {t("github.createToken")}
           </button>
         </p>
