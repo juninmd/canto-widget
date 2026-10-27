@@ -7,15 +7,19 @@ type Props = { name: string; text: string; query: string; privacy: boolean; onBa
 export default function TranscriptViewer({ name, text, query, privacy, onBack, onError }: Props) {
   const back = useRef<HTMLButtonElement>(null);
   const [copied, setCopied] = useState(false);
+  // One "copied" timer at a time, cleared when leaving: a stale one would flip the label early or fire after unmount.
+  const copiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const mask = privacy ? "blur-sm select-none" : "";
 
   useEffect(() => back.current?.focus(), []);
+  useEffect(() => () => clearTimeout(copiedTimer.current), []);
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      clearTimeout(copiedTimer.current);
+      copiedTimer.current = setTimeout(() => setCopied(false), 1500);
     } catch {
       onError(t("transcripts.copyFailed"));
     }
