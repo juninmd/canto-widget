@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useQuerySeed } from "../lib/useQuerySeed";
 import { api, errText, type ClipItem } from "../lib/api";
 import { useUndo } from "../lib/useUndo";
@@ -96,14 +96,43 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
     loadedFor,
   );
 
-  async function run(fn: () => Promise<unknown>) {
+  // A double click must not fire the same action twice: two pins would pin and unpin, two copies race.
+  const busy = useRef(new Set<string>());
+  async function run(fn: () => Promise<unknown>, key?: string) {
+    if (key) {
+      if (busy.current.has(key)) return;
+      busy.current.add(key);
+    }
     try {
       await fn();
       await reload();
     } catch (e) {
       onError(errText(e));
+    } finally {
+      if (key) busy.current.delete(key);
     }
   }
+
+  // Up/Down (and Home/End) walk the cards; from the search box, Down enters the list. Enter on a card copies it.
+  function onListKey(e: KeyboardEvent) {
+    const cards = Array.from(list.current?.querySelectorAll<HTMLElement>("[data-clip-copy]") ?? []);
+    if (cards.length === 0) return;
+    const at = cards.indexOf(document.activeElement as HTMLElement);
+    if (at < 0) return;
+    const to = { ArrowDown: Math.min(at + 1, cards.length - 1), ArrowUp: at - 1, Home: 0, End: cards.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    if (to < 0) searchBox.current?.focus();
+    else cards[to].focus();
+  }
+  function onSearchKey(e: KeyboardEvent) {
+    if (e.key !== "ArrowDown") return;
+    const first = list.current?.querySelector<HTMLElement>("[data-clip-copy]");
+    if (!first) return;
+    e.preventDefault();
+    first.focus();
+  }
+  const searchBox = useRef<HTMLInputElement>(null);
 
   const filtering = query || kindFilter !== "all";
 
@@ -116,7 +145,9 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
             <SearchIcon />
           </span>
           <input
+            ref={searchBox}
             value={query}
+            onKeyDown={onSearchKey}
             data-shortcut="search"
             aria-label={t("clipboard.searchLabel")}
             onChange={(e) => setQuery(e.target.value)}
@@ -142,7 +173,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
       )}
       <ClipKindChips counts={counts} total={items.length} value={kindFilter} onChange={setKindFilter} />
 
-      <div ref={list} className="flex-1 space-y-3 overflow-y-auto pr-1">
+      <div ref={list} onKeyDown={onListKey} className="flex-1 space-y-3 overflow-y-auto pr-1">
         <ClipGroups
           items={visible}
           card={(i) => (
@@ -156,15 +187,15 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
                 run(async () => {
                   await api.clipCopy(i.id);
                   flashCopied(i.id);
-                })
+                }, `copy:${i.id}`)
               }
               onCopyAs={(mode) =>
                 run(async () => {
                   await api.clipCopyAs(i.id, mode);
                   flashCopied(i.id);
-                })
+                }, `copy:${i.id}`)
               }
-              onPin={() => run(() => api.clipPin(i.id))}
+              onPin={() => run(() => api.clipPin(i.id), `pin:${i.id}`)}
               onDelete={() =>
                 void leave(i.id, () => run(async () => undoable(await api.clipDelete(i.id), t("clipboard.itemDeleted"))))
               }

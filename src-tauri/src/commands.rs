@@ -30,12 +30,13 @@ pub fn vault_status(state: State<'_, AppState>) -> Status {
 
 #[tauri::command(async)]
 pub fn vault_create(state: State<'_, AppState>, password: String) -> Result<()> {
-    state.create(&password)
+    // The master password arrives from IPC as a plain String: wiped on return, like in `vault_change_password`.
+    state.create(&zeroize::Zeroizing::new(password))
 }
 
 #[tauri::command(async)]
 pub fn vault_unlock(state: State<'_, AppState>, password: String) -> Result<()> {
-    state.unlock(&password)?;
+    state.unlock(&zeroize::Zeroizing::new(password))?;
     crate::unlock_log::record(&state.dir, "password", now_ms());
     Ok(())
 }

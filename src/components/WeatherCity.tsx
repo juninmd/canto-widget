@@ -28,23 +28,41 @@ export default function WeatherCity({ onSaved, onBack, onForgotten }: Props) {
   const [error, setError] = useState("");
   const [working, setWorking] = useState(false);
   const [saving, setSaving] = useState(false);
+  // State lags a render behind: two clicks (or Enter twice) before it lands would save the city twice.
+  const busy = useRef(false);
   const latest = useRef(0);
   const [recent] = useState(recentCities);
   const [popular] = useState(popularCities);
 
-  async function pick(place: WeatherPlace) {
+  async function guarded(work: () => Promise<void>) {
+    if (busy.current) return;
+    busy.current = true;
     setSaving(true);
     try {
+      await work();
+    } catch (e) {
+      setError(errText(e));
+    } finally {
+      busy.current = false;
+      setSaving(false);
+    }
+  }
+
+  const pick = (place: WeatherPlace) =>
+    guarded(async () => {
       const view = await api.weatherSetPlace(place);
       rememberCity(place);
       setError("");
       onSaved(view);
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setSaving(false);
-    }
-  }
+    });
+
+  /** Forgetting can fail too (disk, permissions): the reason shows in the picker instead of vanishing. */
+  const forget = (done: (view: WeatherView) => void) =>
+    guarded(async () => {
+      const view = await api.weatherClear();
+      setError("");
+      done(view);
+    });
 
   /** Answers that arrive after a newer request started are dropped, so a slow reply never overwrites a fresh one. */
   async function search(name: string, solo: boolean) {
@@ -206,7 +224,7 @@ export default function WeatherCity({ onSaved, onBack, onForgotten }: Props) {
         <button
           type="button"
           disabled={saving}
-          onClick={() => void api.weatherClear().then(onForgotten)}
+          onClick={() => void forget(onForgotten)}
           className="canto-hit mt-auto min-h-[28px] self-start rounded-md px-2 text-[11px] text-faint hover:bg-hover hover:text-fg active:bg-active"
         >
           {t("weather.forget")}
