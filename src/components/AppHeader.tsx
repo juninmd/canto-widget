@@ -1,4 +1,4 @@
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { hideWindow } from "../lib/windowShown";
 import { IS_MOBILE, TOGGLE_LABEL } from "../lib/platform";
 import { PALETTE_KEYS } from "../lib/shortcuts";
 import type { Mode } from "../lib/windowMode";
@@ -124,7 +124,7 @@ export default function AppHeader(p: Props) {
             </button>
             <button
               type="button"
-              onClick={() => void getCurrentWindow().hide()}
+              onClick={() => void hideWindow()}
               className={BUTTON}
               title={t("app.hide.title", { shortcut: TOGGLE_LABEL })}
               aria-label={t("app.hide")}

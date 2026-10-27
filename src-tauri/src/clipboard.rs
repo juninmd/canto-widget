@@ -155,7 +155,7 @@ impl AppState {
         let Some(session) = guard.as_ref() else {
             return Ok(());
         };
-        let plain = serde_json::to_vec(hist)?;
+        let plain = zeroize::Zeroizing::new(serde_json::to_vec(hist)?);
         let blob = SealedBlob::seal(session.key(), session.salt(), &plain, CLIP_AAD, now_ms())?;
         store::write_json_atomic(&store::clip_path(&self.dir), &blob)
     }
