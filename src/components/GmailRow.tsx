@@ -52,7 +52,7 @@ export default function GmailRow({ mail, index, now, selected, busy, leaving, on
       </button>
       <span className={`flex min-w-0 items-center gap-1.5 text-xs text-fg ${mail.unread ? "font-semibold" : ""}`}>
         {mail.unread && <span role="img" aria-label={t("gmail.unreadDot")} className="canto-ping relative size-1.5 shrink-0 rounded-full bg-accent" />}
-        <span className="truncate">{mail.from}</span>
+        <span title={mail.from} className="truncate">{mail.from}</span>
       </span>
       <span className="flex items-center gap-1">
         <span className="text-[10px] tabular-nums text-faint">{shortWhen(new Date(mail.date), now)}</span>
@@ -69,9 +69,9 @@ export default function GmailRow({ mail, index, now, selected, busy, leaving, on
           </span>
         </button>
       </span>
-      <span className={`col-span-2 truncate text-xs ${mail.unread ? "text-fg" : "text-muted"}`}>{mail.subject}</span>
+      <span title={mail.subject || undefined} className={`col-span-2 truncate text-xs ${mail.unread ? "text-fg" : "text-muted"}`}>{mail.subject}</span>
       <span className="col-span-2 truncate text-[11px] text-muted">{mail.snippet}</span>
-      <span className="col-span-2 col-start-2 mt-1 flex flex-wrap gap-1">
+      <span role="group" aria-label={label} className="col-span-2 col-start-2 mt-1 flex flex-wrap gap-1">
         {mail.link && (
           <button type="button" className={`${MINI} bg-accent/15 text-accent-text hover:bg-accent/25`} onClick={onOpen}>
             {t("gmail.open")}

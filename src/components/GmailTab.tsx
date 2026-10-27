@@ -45,6 +45,8 @@ export default function GmailTab({ onNotice }: Props) {
   useFlip(list, summary?.important.map((m) => m.id).join());
 
   const latest = useRef(0);
+  const taskBusy = useRef(new Set<string>());
+  const [shownFor, setShownFor] = useState("");
 
   // Only the newest request lands: a slow answer for an earlier view or search must not replace the current one.
   const load = useCallback(async (which: GmailView, query: string) => {
@@ -54,6 +56,7 @@ export default function GmailTab({ onNotice }: Props) {
       const next = await api.gmailSummary(which, query);
       if (ticket !== latest.current) return;
       setSummary(next);
+      setShownFor(`${which}\u0000${query}`);
       setError("");
     } catch (e) {
       if (ticket === latest.current) setError(errText(e));
@@ -119,7 +122,12 @@ export default function GmailTab({ onNotice }: Props) {
   const toTask = (mail: GmailMail) => {
     const add = () => api.gtasksAdd(mail.subject || mail.from);
     if (mail.unread) return act([mail.id], "read", add, t("gmail.toTaskDone"));
-    add().then(() => onNotice(t("gmail.toTaskDone")), (e) => setError(errText(e)));
+    const busy = `task:${mail.id}`;
+    if (taskBusy.current.has(busy)) return;
+    taskBusy.current.add(busy);
+    add()
+      .then(() => onNotice(t("gmail.toTaskDone")), (e) => setError(errText(e)))
+      .finally(() => taskBusy.current.delete(busy));
   };
   const toggle = (id: string) =>
     setSelected((s) => {
@@ -129,6 +137,11 @@ export default function GmailTab({ onNotice }: Props) {
     });
 
   const mails = summary.important;
+  // Until the picked view or search answers, the list on screen is the previous one's: dim it and keep it out of reach,
+  // and if that answer fails, leave only the error banner rather than mail from a view the user left.
+  const outdated = shownFor !== `${view}\u0000${search}`;
+  const failed = outdated && error !== "" && !loading;
+  const stale = outdated && !failed;
   const now = new Date();
   // Gmail's own keys, while focus is on a mail: j/k (or arrows) walk the list, x selects, s stars, u toggles read,
   // e archives, # trashes, o opens. Buttons keep Enter and Space.
@@ -229,7 +242,8 @@ export default function GmailTab({ onNotice }: Props) {
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />
       </label>
-      {mails.length === 0 ? (
+      <div aria-busy={stale} inert={stale} className={`flex flex-col gap-2 transition-opacity ${stale ? "opacity-60" : ""}`}>
+      {failed ? null : mails.length === 0 ? (
         <p key={view} className="wx-glass wx-rise flex items-center gap-2 p-3 text-xs text-muted">
           <span aria-hidden="true" className="canto-float inline-block text-base">📭</span>
           {search ? t("gmail.noMatch") : t(EMPTY[view])}
@@ -253,6 +267,7 @@ export default function GmailTab({ onNotice }: Props) {
           ))}
         </ul>
       )}
+      </div>
       {selected.size > 0 && (
         <GmailBulkBar
           count={selected.size}

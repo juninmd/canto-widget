@@ -33,7 +33,7 @@ export default function GDriveTab({ onNotice }: Props) {
   const [quota, setQuota] = useState<DriveQuota | null>(null);
   const [failure, setFailure] = useState("");
   const folder = path.at(-1)?.id ?? "";
-  const { files, next, error: listError, loading, reload, more } = useDrivePages(filter, kind, search, folder);
+  const { files, stale, next, error: listError, loading, reload, more } = useDrivePages(filter, kind, search, folder);
   const error = failure || listError;
   const browsing = folder !== "" || filter === "all";
 
@@ -157,6 +157,7 @@ export default function GDriveTab({ onNotice }: Props) {
                 type="button"
                 aria-current={i === all.length - 1 ? "location" : undefined}
                 onClick={() => (i === 0 && filter !== "all" ? choose("all") : setPath(path.slice(0, i)))}
+                title={crumb.name}
                 className="canto-hit max-w-40 truncate rounded px-1 hover:bg-hover hover:text-fg aria-[current]:font-semibold aria-[current]:text-fg"
               >
                 {crumb.name}
@@ -175,6 +176,8 @@ export default function GDriveTab({ onNotice }: Props) {
           }}
         />
       )}
+      {/* A row of the previous folder clicked while the next one loads would push onto the wrong path. */}
+      <div aria-busy={stale} inert={stale} className={`flex flex-col gap-2 transition-opacity ${stale ? "opacity-60" : ""}`}>
       {files === null ? (
         !error && <Skeleton label={t("google.fetching")} rows={5} />
       ) : files.length === 0 ? (
@@ -202,6 +205,7 @@ export default function GDriveTab({ onNotice }: Props) {
           </section>
         ))
       )}
+      </div>
       {next && files && <GDriveMore key={files.length} loading={loading} onMore={more} />}
     </div>
   );

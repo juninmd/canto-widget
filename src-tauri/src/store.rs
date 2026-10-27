@@ -1,6 +1,7 @@
 use base64::{engine::general_purpose::STANDARD as B64, Engine};
 use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
+use zeroize::Zeroizing;
 
 use crate::crypto::{random_salt, VaultKey};
 use crate::error::{AppError, Result};
@@ -56,13 +57,14 @@ impl SealedBlob {
         B64.decode(&self.salt).map_err(|e| AppError::Format(e.to_string()))
     }
 
-    pub fn open(&self, key: &VaultKey, aad: &[u8]) -> Result<Vec<u8>> {
+    /// The plaintext is wiped when dropped, so every caller (vault, configs, clipboard, backups) gets it for free.
+    pub fn open(&self, key: &VaultKey, aad: &[u8]) -> Result<Zeroizing<Vec<u8>>> {
         if self.version != FORMAT_VERSION {
             return Err(AppError::Format(format!("versão de cofre {} não suportada", self.version)));
         }
         let nonce = B64.decode(&self.nonce).map_err(|e| AppError::Format(e.to_string()))?;
         let ct = B64.decode(&self.ciphertext).map_err(|e| AppError::Format(e.to_string()))?;
-        self.decrypt_parts(key, &nonce, &ct, aad)
+        self.decrypt_parts(key, &nonce, &ct, aad).map(Zeroizing::new)
     }
 
     fn decrypt_parts(&self, key: &VaultKey, nonce: &[u8], ct: &[u8], aad: &[u8]) -> Result<Vec<u8>> {
@@ -173,6 +175,18 @@ mod tests {
         let d = std::env::temp_dir().join(format!("canto-store-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         d
+    }
+
+    #[test]
+    fn opened_plaintext_is_wiped_when_dropped() {
+        // Compile-time guard: `open` handing back a bare Vec again would leave the vault in freed heap.
+        fn wiped_on_drop<T: zeroize::ZeroizeOnDrop>(_: &T) {}
+        let salt = new_salt();
+        let key = VaultKey::derive("senha-mestra", &salt).unwrap();
+        let blob = SealedBlob::seal(&key, &salt, b"nota secreta", VAULT_AAD, 1).unwrap();
+        let plain = blob.open(&key, VAULT_AAD).unwrap();
+        wiped_on_drop(&plain);
+        assert_eq!(plain.as_slice(), b"nota secreta");
     }
 
     #[test]

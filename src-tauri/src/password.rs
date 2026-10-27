@@ -141,7 +141,7 @@ fn reencrypt(path: &Path, aad: &[u8], old: &VaultKey, new: &VaultKey, salt: &[u8
     let Some(blob) = store::read_json::<SealedBlob>(path)? else {
         return Ok(None);
     };
-    let plain = Zeroizing::new(blob.open(old, aad)?);
+    let plain = blob.open(old, aad)?;
     let blob = SealedBlob::seal(new, salt, &plain, aad, blob.updated_at)?;
     Ok(Some(Reencrypted { path: path.to_path_buf(), blob }))
 }

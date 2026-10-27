@@ -167,7 +167,7 @@ test("a double click on mark as read sends one request, and the row's actions wa
   expect(await screen.findByText("marcar como não lido")).toBeTruthy();
   expect(calls.filter((c) => c.cmd === "gmail_modify")).toEqual([{ cmd: "gmail_modify", args: { ids: ["m1"], action: "read" } }]);
   expect(document.querySelector("[data-gmail-unread]")?.textContent).toBe("26");
-  await waitFor(() => expect(document.querySelector("[aria-busy]") === null).toBe(true));
+  await waitFor(() => expect(document.querySelector("[aria-busy=true]") === null).toBe(true));
 });
 
 test("j/k walk the mail from the keyboard, s stars and e archives the focused one", async () => {
@@ -219,4 +219,60 @@ test("a busy mail keeps focus on its buttons and a second e neither moves focus 
   expect(document.activeElement === star).toBe(true);
   await screen.findByLabelText("tirar a estrela de Contrato revisado");
   expect(calls.filter((c) => c.cmd === "gmail_modify")).toEqual([{ cmd: "gmail_modify", args: { ids: ["m1"], action: "star" } }]);
+});
+
+test("while another view loads, the old list is dimmed and its actions are out of reach", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await screen.findByText("Contrato revisado");
+  let late: (s: GmailSummary) => void = () => {};
+  summary = new Promise((resolve) => (late = resolve));
+  fireEvent.click(screen.getByText("Com estrela"));
+  await waitFor(() => expect(calls).toContainEqual({ cmd: "gmail_summary", args: { view: "starred", search: "" } }));
+  const busy = document.querySelector("[aria-busy=true]");
+  expect(busy?.hasAttribute("inert")).toBe(true);
+  expect(busy?.textContent).toContain("Contrato revisado");
+  late({ unread: 3, important: [{ ...INBOX.important[1], id: "s1", subject: "Só as com estrela" }] });
+  expect(await screen.findByText("Só as com estrela")).toBeTruthy();
+  expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
+});
+
+test("when the new view fails, the old list goes and only the error stays, with nothing left busy", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  await screen.findByText("Contrato revisado");
+  summary = new Error("falha de rede");
+  fireEvent.click(screen.getByText("Com estrela"));
+  expect(await screen.findByText(/falha de rede/)).toBeTruthy();
+  await waitFor(() => expect(screen.queryByText("Contrato revisado") === null).toBe(true));
+  expect(document.querySelector("[aria-busy=true]") === null).toBe(true);
+  expect(document.querySelector("[inert]") === null).toBe(true);
+  summary = INBOX;
+  fireEvent.click(screen.getByText("tentar de novo"));
+  expect(await screen.findByText("Contrato revisado")).toBeTruthy();
+});
+
+test("a double click on an action sends it once and creates one task", async () => {
+  summary = { unread: 1, important: [INBOX.important[0], { ...INBOX.important[1], unread: false }] };
+  render(<GmailTab onNotice={() => {}} />);
+  const toTask = await screen.findAllByText("virar tarefa");
+  fireEvent.click(toTask[0]);
+  fireEvent.click(toTask[0]);
+  fireEvent.click(toTask[1]);
+  fireEvent.click(toTask[1]);
+  await waitFor(() => expect(calls.filter((c) => c.cmd === "gtasks_add")).toHaveLength(2));
+  await new Promise((r) => setTimeout(r, 30));
+  expect(calls.filter((c) => c.cmd === "gtasks_add")).toEqual([
+    { cmd: "gtasks_add", args: { title: "Contrato revisado" } },
+    { cmd: "gtasks_add", args: { title: "Fatura de outubro" } },
+  ]);
+  expect(calls.filter((c) => c.cmd === "gmail_modify")).toHaveLength(1);
+});
+
+test("each row's actions are grouped under its subject, which keeps its full text on hover", async () => {
+  render(<GmailTab onNotice={() => {}} />);
+  const subject = await screen.findByText("Contrato revisado");
+  expect(subject.getAttribute("title")).toBe("Contrato revisado");
+  const group = screen.getByLabelText("Contrato revisado");
+  expect(group.getAttribute("role")).toBe("group");
+  expect(group.textContent).toContain("arquivar");
+  expect(screen.getByText("Marina Lopes").getAttribute("title")).toBe("Marina Lopes");
 });

@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MOD_KEY } from "../lib/platform";
+import { useCopied } from "../lib/useCopied";
 import { api, errText, type AgendaItem, type ForgeOpened, type VaultPeriod } from "../lib/api";
 import { periodBounds } from "../lib/period";
 import { periodSummary } from "../lib/periodSummary";
@@ -23,7 +24,7 @@ export default function PeriodReport({
   const [vault, setVault] = useState<VaultPeriod | null>(null);
   const [agenda, setAgenda] = useState<{ items: AgendaItem[]; error?: string } | null>(null);
   const [forges, setForges] = useState<ForgeOpened | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, flash] = useCopied();
   // A parent re-render hands a new onError; that must not refetch the whole period.
   const reportError = useRef(onError);
   reportError.current = onError;
@@ -59,8 +60,7 @@ export default function PeriodReport({
   async function copy() {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      flash("text");
     } catch {
       onError(t("summary.copyFailed", { mod: MOD_KEY }));
     }
