@@ -21,11 +21,16 @@ export default function TranscriptFolder({ dir, editing, onEdit, onClose, onSave
 /** Mounted only while editing, so every edit starts from the saved path. */
 function FolderForm({ dir, onClose, onSave }: Pick<Props, "dir" | "onClose" | "onSave">) {
   const [draft, setDraft] = useState(dir);
+  // A double Enter or click would save the same path twice and reload the list twice.
+  const [saving, setSaving] = useState(false);
   return (
     <form
+      aria-busy={saving}
       onSubmit={(e) => {
         e.preventDefault();
-        void onSave(draft);
+        if (saving) return;
+        setSaving(true);
+        void onSave(draft).finally(() => setSaving(false));
       }}
       onKeyDown={(e) => {
         if (e.key !== "Escape") return;
@@ -41,7 +46,7 @@ function FolderForm({ dir, onClose, onSave }: Pick<Props, "dir" | "onClose" | "o
         onChange={(e) => setDraft(e.target.value)}
         className="canto-field min-w-0 flex-1 px-2 py-1 text-[11px]"
       />
-      <button type="submit" className="canto-hit rounded-lg bg-accent px-2 text-[11px] font-semibold text-on-accent">
+      <button type="submit" disabled={saving} className="canto-hit rounded-lg disabled:opacity-60 bg-accent px-2 text-[11px] font-semibold text-on-accent">
         {t("transcripts.saveDir")}
       </button>
       <button type="button" onClick={onClose} className="canto-hit rounded-lg bg-edge px-2 text-[11px] text-fg">
