@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useId, type CSSProperties } from "react";
 import type { DriveFile } from "../lib/api";
 import { formatBytes } from "../lib/driveExtras";
 import { shortWhen } from "../lib/google";
@@ -28,6 +28,7 @@ type Props = {
 /** One file or folder: the kind badge tilts on hover, a folder opens in place, and the parent and link are a click away. */
 export default function GDriveRow({ file, index, now, onOpen, onCopy, onEnter }: Props) {
   const isFolder = file.kind === "folder";
+  const nameId = useId();
   const when = shortWhen(new Date(file.modified), now);
   const who = file.editor ? t("gdrive.byOther", { name: file.editor, when }) : t("gdrive.byYou", { when });
   return (
@@ -41,11 +42,11 @@ export default function GDriveRow({ file, index, now, onOpen, onCopy, onEnter }:
       </span>
       <span className="flex min-w-0 flex-1 flex-col">
         {isFolder ? (
-          <button type="button" onClick={() => onEnter(file)} aria-label={t("gdrive.enter", { name: file.name })} className="truncate text-left text-xs font-medium text-fg hover:underline">
+          <button type="button" onClick={() => onEnter(file)} aria-label={t("gdrive.enter", { name: file.name })} title={file.name} className="truncate text-left text-xs font-medium text-fg hover:underline">
             {file.name}
           </button>
         ) : (
-          <span className="truncate text-xs text-fg">{file.name}</span>
+          <span id={nameId} title={file.name} className="truncate text-xs text-fg">{file.name}</span>
         )}
         <span className="truncate text-[11px] text-faint">{file.size > 0 ? `${who} · ${formatBytes(file.size)}` : who}</span>
       </span>
@@ -70,6 +71,7 @@ export default function GDriveRow({ file, index, now, onOpen, onCopy, onEnter }:
         <button
           type="button"
           onClick={() => onOpen(file.link)}
+          aria-describedby={nameId}
           className="canto-hit rounded-md bg-accent/15 px-2 py-0.5 text-[11px] text-accent-text hover:bg-accent/25"
         >
           {t("gdrive.open")}

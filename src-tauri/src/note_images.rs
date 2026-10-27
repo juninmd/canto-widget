@@ -132,7 +132,7 @@ impl AppState {
         let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let blob: SealedBlob = store::read_json(&path)?.ok_or_else(unavailable)?;
-        let plain = Zeroizing::new(blob.open(session.key(), NOTE_IMAGE_AAD).map_err(|_| unavailable())?);
+        let plain = blob.open(session.key(), NOTE_IMAGE_AAD).map_err(|_| unavailable())?;
         let mime = sniff(&plain).ok_or_else(unavailable)?;
         Ok(format!("data:{mime};base64,{}", B64.encode(&*plain)))
     }

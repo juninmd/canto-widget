@@ -20,14 +20,21 @@ const ROW = "canto-hit grid w-full grid-cols-[30px_1fr_auto] items-center gap-x-
 export default function MapTrips({ status, routes, selected, onSelect, onChanged, live }: Props) {
   const [adding, setAdding] = useState(false);
   const [error, setError] = useState("");
+  // The trip being removed: a second click on its ✕ would ask Rust to drop a trip that is already gone.
+  const [removing, setRemoving] = useState<string | null>(null);
   const byId = new Map(routes.map((r) => [r.trip, r]));
   const longest = Math.max(1, ...routes.map((r) => r.minutes));
 
   async function remove(trip: TrafficTrip) {
+    if (removing) return;
+    setRemoving(trip.id);
     try {
       onChanged(await api.trafficRemoveTrip(trip.id));
+      setError("");
     } catch (e) {
       setError(errText(e));
+    } finally {
+      setRemoving(null);
     }
   }
 
@@ -73,8 +80,10 @@ export default function MapTrips({ status, routes, selected, onSelect, onChanged
             <button
               type="button"
               aria-label={t("map.trips.remove", { name: trip.name })}
+              aria-disabled={removing !== null}
+              aria-busy={removing === trip.id}
               onClick={() => void remove(trip)}
-              className="canto-hit absolute -right-1 -top-1 hidden h-5 w-5 items-center justify-center rounded-full border border-edge bg-panel text-[10px] text-faint hover:text-danger group-hover:flex group-focus-within:flex"
+              className="canto-hit absolute -right-1 -top-1 hidden h-5 w-5 items-center justify-center rounded-full border border-edge bg-panel text-[10px] text-faint hover:text-danger aria-disabled:opacity-60 group-hover:flex group-focus-within:flex"
             >
               ✕
             </button>

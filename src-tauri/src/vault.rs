@@ -160,7 +160,7 @@ impl AppState {
     }
 
     fn persist(&self, session: &Session, data: &VaultData) -> Result<()> {
-        let plain = serde_json::to_vec(data)?;
+        let plain = Zeroizing::new(serde_json::to_vec(data)?);
         let blob = SealedBlob::seal(&session.key, &session.salt, &plain, VAULT_AAD, now_ms())?;
         store::write_json_atomic(&store::vault_path(&self.dir), &blob)
     }
@@ -234,7 +234,7 @@ impl AppState {
         match store::read_json::<SealedBlob>(path)? {
             None => Ok(None),
             Some(blob) => {
-                let plain = Zeroizing::new(blob.open(&session.key, aad)?);
+                let plain = blob.open(&session.key, aad)?;
                 Ok(Some(serde_json::from_slice(&plain)?))
             }
         }

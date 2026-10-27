@@ -112,6 +112,7 @@ pub fn watch(app: AppHandle) {
             } else {
                 None
             };
+            app.state::<crate::meeting_cache::Upcoming>().publish(refresh.as_deref(), locked);
             let alerted = app.state::<Alerted>();
             for event in step(&mut items, refresh, locked, now_ms()) {
                 if alerted.first(&event) {
