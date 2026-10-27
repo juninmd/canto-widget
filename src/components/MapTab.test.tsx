@@ -8,6 +8,7 @@ const calls: Call[] = [];
 let view: TrafficView;
 let failGet = "";
 let settle: () => void = () => {};
+let removeGate: (() => void) | null = null;
 
 const ORIGIN = { name: "Rua Fictícia, 100", detail: "Aurora", lat: -23.5, lon: -46.6 };
 const TRIP = { id: "t1", name: "Trabalho", icon: "work" as const, to: { name: "Av. Aurora, 900", detail: "", lat: -23.45, lon: -46.55 } };
@@ -43,6 +44,7 @@ mock.module("@tauri-apps/api/core", () => ({
     if (cmd === "traffic_get") return failGet ? Promise.reject(failGet) : Promise.resolve(view);
     if (cmd === "traffic_map") return Promise.resolve({ zoom: 14, tiles: [], source: "tomtom" });
     if (cmd === "traffic_departures") return Promise.resolve(DEPARTURES);
+    if (cmd === "traffic_remove_trip") return new Promise((r) => (removeGate = () => r({ ...view.status, trips: [] })));
     if (cmd === "traffic_set_origin") return new Promise((r) => (settle = () => r(view.status)));
     if (cmd === "traffic_set_key") return Promise.resolve(view.status satisfies TrafficStatus);
     return Promise.resolve(null);
@@ -133,4 +135,19 @@ test("a refresh that fails keeps the map and says why, instead of failing silent
   await act(async () => fireEvent.click(screen.getByText("atualizar")));
   expect(screen.getByRole("alert").textContent).toContain("TomTom recusou a chave");
   expect(screen.getByText("38%")).toBeTruthy();
+});
+
+test("a double click on a trip's remove button asks Rust once", async () => {
+  view = LIVE;
+  await show();
+  const x = screen.getByLabelText("remover Trabalho") as HTMLButtonElement;
+  x.focus();
+  fireEvent.click(x);
+  fireEvent.click(x);
+  expect(calls.filter((c) => c.cmd === "traffic_remove_trip").length).toBe(1);
+  // aria-disabled, not disabled: the focused button keeps focus, so a failure doesn't drop keyboard users to <body>.
+  expect(x.getAttribute("aria-disabled")).toBe("true");
+  expect(x.disabled).toBe(false);
+  expect(document.activeElement === x).toBe(true);
+  await act(async () => removeGate!());
 });

@@ -1,5 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { focusStore, type Running } from "./focus";
+import { useWindowVisible } from "./useWindowVisible";
 
 export function useRunning(): Running | null {
   return useSyncExternalStore(focusStore.subscribe, focusStore.get);
@@ -15,8 +16,11 @@ const SLACK_MS = 15;
  */
 export function useTick(active: boolean, periodMs = 1000, offsetMs = 0): number {
   const [now, setNow] = useState(Date.now);
+  // The tracked time lives in `focusStore`, so a hidden clock skips nothing; it reads the total on return.
+  const visible = useWindowVisible();
+  const on = active && visible;
   useEffect(() => {
-    if (!active) return;
+    if (!on) return;
     let id: ReturnType<typeof setTimeout>;
     const arm = () => {
       id = setTimeout(() => {
@@ -27,6 +31,6 @@ export function useTick(active: boolean, periodMs = 1000, offsetMs = 0): number 
     setNow(Date.now());
     arm();
     return () => clearTimeout(id);
-  }, [active, periodMs, offsetMs]);
+  }, [on, periodMs, offsetMs]);
   return now;
 }
