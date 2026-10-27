@@ -65,3 +65,23 @@ test("an agenda that fails is named, and the rest of the report still comes", as
   expect(screen.getByText(/reuniões fora do relatório: entre com o Google/)).toBeTruthy();
   expect(screen.getByText(/Fechar sprint/)).toBeTruthy();
 });
+
+test("the period choice is one Tab stop and the arrows move it", async () => {
+  await mount();
+  const [day, week, month] = ["hoje", "semana", "mês"].map((name) => screen.getByRole("radio", { name }));
+  expect([day, week, month].map((r) => r.tabIndex)).toEqual([0, -1, -1]);
+  await act(async () => {
+    fireEvent.keyDown(day, { key: "ArrowRight" });
+  });
+  expect(week.getAttribute("aria-checked")).toBe("true");
+  expect(document.activeElement === week).toBe(true);
+  await act(async () => {
+    fireEvent.keyDown(week, { key: "End" });
+  });
+  expect(month.getAttribute("aria-checked")).toBe("true");
+  await act(async () => {
+    fireEvent.keyDown(month, { key: "ArrowRight" });
+  });
+  expect(day.getAttribute("aria-checked")).toBe("true");
+  expect([day, week, month].map((r) => r.tabIndex)).toEqual([0, -1, -1]);
+});

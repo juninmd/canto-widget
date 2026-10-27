@@ -98,6 +98,7 @@ pub mod market;
 pub mod market_net;
 pub mod meet;
 pub mod meeting_alert;
+pub mod meeting_cache;
 pub mod mention_alerts;
 pub mod mention_feed;
 pub mod mention_sender;
@@ -241,6 +242,7 @@ pub fn run() {
             app.manage(morning_digest::MorningDigest::load(&dir));
             app.manage(activity_watch::ActivityState::load(&dir));
             app.manage(meeting_alert::Alerted::default());
+            app.manage(meeting_cache::Upcoming::default());
             app.manage(alert_log::AlertLog::default());
             app.manage(fullscreen_guard::FullscreenHold::load(&dir));
             app.manage(task_reminder::ReminderLead::default());
@@ -509,6 +511,7 @@ fn on_window_event(win: &tauri::Window, event: &tauri::WindowEvent) {
         tauri::WindowEvent::CloseRequested { api, .. } => {
             api.prevent_close();
             let _ = win.hide();
+            let _ = tauri::Emitter::emit_to(win, win.label(), window::SHOWN_EVENT, false);
         }
         // Quick capture is a transient pop-up: left behind on top of other apps it covers what is under it.
         tauri::WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW => {
