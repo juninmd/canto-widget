@@ -4,6 +4,7 @@ import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 import { summarize } from "../lib/health";
 import { worstFirst } from "../lib/healthSort";
 import { useLatestRequest } from "../lib/useLatestRequest";
+import { useWindowVisible } from "../lib/useWindowVisible";
 import { t } from "../i18n";
 import HealthDetail from "./HealthDetail";
 import HealthForm from "./HealthForm";
@@ -25,6 +26,7 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
   const mounted = useRef(true);
   const { bump, isLatest } = useLatestRequest();
   const writes = useRef(0);
+  const visible = useWindowVisible();
 
   // Writes order among themselves; a poll never invalidates a write, and any write that starts or lands during
   // a poll voids it, since Rust may have read the list before the write reached it.
@@ -53,13 +55,18 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
 
   useEffect(() => {
     mounted.current = true;
-    void run(api.healthList, true);
-    const timer = setInterval(() => void run(api.healthList, true), POLL_MS);
     return () => {
       mounted.current = false;
-      clearInterval(timer);
     };
-  }, [run]);
+  }, []);
+
+  // Only paints tiles: Rust's health watch keeps probing and alerting while hidden; back on screen, read at once.
+  useEffect(() => {
+    if (!visible) return;
+    void run(api.healthList, true);
+    const timer = setInterval(() => void run(api.healthList, true), POLL_MS);
+    return () => clearInterval(timer);
+  }, [run, visible]);
 
   const save = (e: HealthEndpoint) => run(() => api.healthSave(e));
   const sum = views ? summarize(views) : null;
