@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getCurrentWindow } from "@tauri-apps/api/window";
+import { hideWindow } from "./windowShown";
 import { listen } from "@tauri-apps/api/event";
 import { api } from "./api";
 import { useFullscreen } from "./useFullscreen";
@@ -54,7 +54,7 @@ function useDesktopMode() {
 
   const setMode = useCallback(
     async (next: Mode) => {
-      if (next === "hidden") return getCurrentWindow().hide();
+      if (next === "hidden") return hideWindow();
       if (next === "mini") {
         // Rust leaves fullscreen itself before shrinking.
         await api.windowMiniSet(true);
