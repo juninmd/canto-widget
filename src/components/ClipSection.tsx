@@ -45,6 +45,7 @@ export default function ClipSection({ onError }: { onError: (m: string) => void 
           value={text}
           onChange={(e) => void edit(e.target.value)}
           aria-label={t("clipboard.maxPinnedLabel")}
+          aria-invalid={parseMaxPinned(text) === null}
           className="canto-field w-20 !rounded-md px-1.5 py-0.5"
         />
       </label>

@@ -7,12 +7,14 @@ const calls: Call[] = [];
 const clip = (id: string, preview: string, pinned = false) => ({ id, preview, chars: preview.length, kept: preview.length, truncated: false, copied_at: 1, pinned });
 let items = [clip("c1", "primeiro"), clip("c2", "segundo"), clip("c3", "fixado", true)];
 let listing: (() => Promise<unknown>) | null = null;
+let pinning: (() => Promise<unknown>) | null = null;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push({ cmd, args });
     if (cmd === "clip_list") return listing ? listing() : Promise.resolve({ items, max_pinned: 100 });
     if (cmd === "clip_clear") return Promise.resolve("chave-limpar");
+    if (cmd === "clip_pin" && pinning) return pinning();
     return Promise.resolve(null);
   },
 }));
@@ -38,6 +40,7 @@ beforeEach(() => {
   errors.length = 0;
   items = [clip("c1", "primeiro"), clip("c2", "segundo"), clip("c3", "fixado", true)];
   listing = null;
+  pinning = null;
   try {
     localStorage.clear();
   } catch {
@@ -133,4 +136,38 @@ test("copying a second item restarts the flash instead of the first timer cuttin
   await copy("segundo");
   await act(async () => void (await new Promise((r) => setTimeout(r, 600))));
   expect(screen.getAllByRole("status").some((s) => s.textContent === "copiado ✓")).toBe(true);
+});
+
+test("a double click on pin sends one pin, not a pin and an unpin", async () => {
+  let release: (v: unknown) => void = () => {};
+  pinning = () => new Promise((r) => (release = r));
+  await show();
+  const pin = screen.getAllByLabelText("fixar no histórico")[0];
+  await act(async () => {
+    fireEvent.click(pin);
+    fireEvent.click(pin);
+  });
+  expect(calls.filter((c) => c.cmd === "clip_pin").length).toBe(1);
+  await act(async () => release(null));
+  await act(async () => {
+    fireEvent.click(pin);
+  });
+  expect(calls.filter((c) => c.cmd === "clip_pin").length).toBe(2);
+});
+
+test("arrow keys walk the cards and Down from the search enters the list", async () => {
+  await show();
+  const search = screen.getByLabelText("buscar no clipboard") as HTMLInputElement;
+  const cards = () => Array.from(document.querySelectorAll<HTMLElement>("[data-clip-copy]"));
+  search.focus();
+  fireEvent.keyDown(search, { key: "ArrowDown" });
+  expect(document.activeElement === cards()[0]).toBe(true);
+  fireEvent.keyDown(cards()[0], { key: "ArrowDown" });
+  expect(document.activeElement === cards()[1]).toBe(true);
+  fireEvent.keyDown(cards()[1], { key: "End" });
+  expect(document.activeElement === cards()[cards().length - 1]).toBe(true);
+  fireEvent.keyDown(document.activeElement as HTMLElement, { key: "Home" });
+  expect(document.activeElement === cards()[0]).toBe(true);
+  fireEvent.keyDown(cards()[0], { key: "ArrowUp" });
+  expect(document.activeElement === search).toBe(true);
 });

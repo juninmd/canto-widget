@@ -5,18 +5,15 @@ use std::time::Duration;
 #[cfg(desktop)]
 use tauri::menu::MenuItem;
 use tauri::{AppHandle, Manager, State};
-use time::format_description::well_known::Rfc3339;
 
 use crate::calendar::AgendaItem;
 use crate::model::now_ms;
 use crate::vault::AppState;
-use crate::{badge, cmd_extras, cmd_forges, next_meeting};
+use crate::{badge, cmd_forges};
 
 pub const JOIN_ITEM_ID: &str = "join_meeting";
-/// Background poll cadence; the badge's forge half is cheap (5 min cache), the agenda half is one light GET.
+/// Background poll cadence; the badge's forge half is cheap (5 min cache), the agenda half reads `meeting_cache`.
 const TICK: Duration = Duration::from_secs(90);
-/// Google Calendar window ahead of "now": far enough to always have a next meeting queued.
-const LOOKAHEAD_MS: i64 = 6 * 60 * 60 * 1000;
 
 /// Kept in `AppHandle` state so the background thread and the tray's menu-click handler share it.
 #[cfg(desktop)]
@@ -53,7 +50,7 @@ fn tick(app: &AppHandle) {
         return;
     }
 
-    let meeting = fetch_next_meeting(app);
+    let meeting = cached_next_meeting(app);
     update_menu(app, meeting.as_ref());
     *state.next_meeting.lock().unwrap() = meeting;
 
@@ -63,15 +60,8 @@ fn tick(app: &AppHandle) {
     badge::apply(app, (reviews + tasks + mentions).min(u32::MAX as u64) as u32);
 }
 
-fn fetch_next_meeting(app: &AppHandle) -> Option<AgendaItem> {
-    let now = now_ms();
-    let (time_min, time_max) = (to_rfc3339(now)?, to_rfc3339(now + LOOKAHEAD_MS)?);
-    let items = cmd_extras::agenda(&app.state::<AppState>(), &time_min, &time_max, 20).ok()?;
-    next_meeting::next_with_meet(&items, now).cloned()
-}
-
-fn to_rfc3339(ms: i64) -> Option<String> {
-    time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).ok()?.format(&Rfc3339).ok()
+fn cached_next_meeting(app: &AppHandle) -> Option<AgendaItem> {
+    app.state::<crate::meeting_cache::Upcoming>().next_with_meet(now_ms())
 }
 
 pub fn no_meeting_label() -> &'static str {

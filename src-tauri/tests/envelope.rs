@@ -16,7 +16,7 @@ fn envelope_does_not_leak_plaintext_content() {
     assert!(!on_disk.contains("senha-mestra"));
 
     let back = blob.open(&key, VAULT_AAD).unwrap();
-    assert_eq!(String::from_utf8(back).unwrap(), secret);
+    assert_eq!(std::str::from_utf8(&back).unwrap(), secret);
 }
 
 #[test]
