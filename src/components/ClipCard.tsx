@@ -39,7 +39,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
         <ClipKindTile kind={kind} color={kind === "color" ? i.preview.trim() : undefined} blur={privacy} />
         <div className="min-w-0 flex-1">
           {/* The button's ::after stretches over the whole card, so a click anywhere copies; the actions sit above it. */}
-          <button type="button" className="block w-full text-left outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-accent" title={copyTitle} onClick={onCopy}>
+          <button type="button" data-clip-copy className="block w-full text-left outline-none after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-accent" title={copyTitle} onClick={onCopy}>
             {kind === "color" ? (
               <span className={`block font-mono text-xs text-fg ${mask}`}>{i.preview.trim()}</span>
             ) : kind === "code" || kind === "json" ? (
