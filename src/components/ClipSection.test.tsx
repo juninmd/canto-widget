@@ -66,3 +66,10 @@ test("clearing or zeroing the limit while typing saves nothing, and a late reply
   });
   expect(calls.at(-1)).toEqual({ cmd: "clip_set_max_pinned", args: { max: 25 } });
 });
+
+test("a value the limit cannot take is flagged as invalid", async () => {
+  await show();
+  expect(input().getAttribute("aria-invalid")).toBe("false");
+  fireEvent.change(input(), { target: { value: "0" } });
+  expect(input().getAttribute("aria-invalid")).toBe("true");
+});

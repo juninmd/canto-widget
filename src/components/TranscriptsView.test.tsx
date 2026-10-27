@@ -7,6 +7,7 @@ const file = { name: "daily.txt", modified_at: 1_760_000_000_000, size: 40, prev
 let files = [file];
 let geminiError = false;
 let readGate: (() => void) | null = null;
+let setDirGate: (() => void) | null = null;
 const calls: { cmd: string; args?: Record<string, unknown> }[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -15,6 +16,7 @@ mock.module("@tauri-apps/api/core", () => ({
     if (cmd === "transcripts_dir") return Promise.resolve(FULL);
     if (cmd === "transcripts_list") return Promise.resolve(files);
     if (cmd === "gemini_docs") return geminiError ? Promise.reject("entre com o Google") : Promise.resolve([]);
+    if (cmd === "transcripts_set_dir") return new Promise((r) => (setDirGate = () => r(null)));
     if (cmd === "transcript_read") return new Promise((r) => (readGate = () => r("o deploy saiu ontem")));
     return Promise.resolve(null);
   },
@@ -125,4 +127,32 @@ test("a failed Gemini read offers a retry that asks again", async () => {
   });
   expect(calls.filter((c) => c.cmd === "gemini_docs")).toHaveLength(2);
   expect(screen.queryByRole("alert")).toBeNull();
+});
+
+test("saving the folder twice in a row sends it once and the button waits", async () => {
+  await mount();
+  fireEvent.click(screen.getByRole("button", { name: /pasta:/ }));
+  fireEvent.change(screen.getByLabelText("pasta das transcrições"), { target: { value: "D:/outra" } });
+  const ok = screen.getByRole("button", { name: "ok" }) as HTMLButtonElement;
+  fireEvent.click(ok);
+  fireEvent.click(ok);
+  expect(calls.filter((c) => c.cmd === "transcripts_set_dir").length).toBe(1);
+  expect(ok.disabled).toBe(true);
+  await act(async () => setDirGate!());
+  await settle();
+});
+
+test("copying again restarts the copied label instead of an older timer cutting it short", async () => {
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: () => Promise.resolve() }, configurable: true });
+  await mount();
+  await openFile();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "copiar" }));
+  });
+  await act(() => new Promise((r) => setTimeout(r, 1000)));
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "copiado" }));
+  });
+  await act(() => new Promise((r) => setTimeout(r, 700)));
+  expect(screen.getByRole("button", { name: "copiado" })).toBeTruthy();
 });
