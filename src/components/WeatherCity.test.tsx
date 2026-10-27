@@ -8,6 +8,8 @@ const calls: Call[] = [];
 const saved: WeatherView[] = [];
 let results: WeatherPlace[] = [];
 let failure = "";
+let clearFailure = "";
+let saveGate: (() => void) | null = null;
 
 const LONDON: WeatherPlace = { city: "Londres", admin1: "Inglaterra", country: "Reino Unido", lat: 51.5, lon: -0.1 };
 const CATAMARCA: WeatherPlace = { city: "Londres", admin1: "Catamarca", country: "Argentina", lat: -27.0, lon: -67.0 };
@@ -17,8 +19,11 @@ mock.module("@tauri-apps/api/core", () => ({
     calls.push({ cmd, args });
     if (cmd === "weather_search") return failure ? Promise.reject(failure) : Promise.resolve(results);
     if (cmd === "weather_set_place") {
-      return Promise.resolve({ place: args.place, forecast: null, fetched_at: 1, error: null } as WeatherView);
+      const view = { place: args.place, forecast: null, fetched_at: 1, error: null } as WeatherView;
+      if (saveGate === null) return Promise.resolve(view);
+      return new Promise((r) => (saveGate = () => r(view)));
     }
+    if (cmd === "weather_clear") return clearFailure ? Promise.reject(clearFailure) : Promise.resolve({ place: null } as unknown as WeatherView);
     return Promise.resolve(null);
   },
 }));
@@ -45,6 +50,8 @@ beforeEach(() => {
   saved.length = 0;
   results = [];
   failure = "";
+  clearFailure = "";
+  saveGate = null;
 });
 afterEach(() => {
   cleanup();
@@ -186,4 +193,36 @@ test("voltar only exists when there is a saved city to go back to", async () => 
   cleanup();
   await show();
   expect(screen.queryByRole("button", { name: /voltar/ })).toBeNull();
+});
+
+test("Enter twice while the city is saving saves it once", async () => {
+  results = [LONDON, CATAMARCA];
+  saveGate = () => {};
+  await show();
+  await type("Londres");
+  await wait(400);
+  await act(async () => {
+    fireEvent.keyDown(field(), { key: "Enter" });
+    fireEvent.keyDown(field(), { key: "Enter" });
+  });
+  expect(calls.filter((c) => c.cmd === "weather_set_place").length).toBe(1);
+  await act(async () => saveGate!());
+  expect(saved.length).toBe(1);
+});
+
+test("a failed forget explains why and keeps the picker open", async () => {
+  clearFailure = "disco cheio";
+  const forgotten: WeatherView[] = [];
+  render(<WeatherCity onSaved={() => {}} onBack={() => {}} onForgotten={(v) => forgotten.push(v)} />);
+  await act(async () => {
+    fireEvent.click(screen.getByText("esquecer a cidade"));
+  });
+  expect(screen.getByRole("alert").textContent).toContain("disco cheio");
+  expect(forgotten.length).toBe(0);
+  clearFailure = "";
+  await act(async () => {
+    fireEvent.click(screen.getByText("esquecer a cidade"));
+  });
+  expect(forgotten.length).toBe(1);
+  expect(screen.queryByRole("alert") === null).toBe(true);
 });
