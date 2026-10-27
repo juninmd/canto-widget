@@ -35,10 +35,18 @@ pub fn toggle(app: &tauri::AppHandle) -> tauri::Result<()> {
         return Ok(());
     };
     if win.is_visible()? {
-        win.hide()?;
-        return Ok(());
+        return hide(&win);
     }
     show(app)
+}
+
+/// Frozen event name: `src/lib/windowShown.ts` pauses the UI-only polls on it (WebView2 keeps the page "visible").
+pub const SHOWN_EVENT: &str = "canto://window-shown";
+
+/// Hides the main window and tells its webview, which may not notice on its own.
+pub fn hide<R: tauri::Runtime>(win: &tauri::WebviewWindow<R>) -> tauri::Result<()> {
+    win.hide()?;
+    win.emit_to(win.label(), SHOWN_EVENT, false)
 }
 
 pub fn show(app: &tauri::AppHandle) -> tauri::Result<()> {
@@ -48,6 +56,7 @@ pub fn show(app: &tauri::AppHandle) -> tauri::Result<()> {
     #[cfg(desktop)]
     crate::window_state::place(&win)?;
     win.show()?;
+    win.emit_to(win.label(), SHOWN_EVENT, true)?;
     win.set_focus()?;
     Ok(())
 }
@@ -234,6 +243,18 @@ mod tests {
         let conf: serde_json::Value = serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
         let alert = conf["app"]["windows"].as_array().unwrap().iter().find(|w| w["label"] == super::ALERT_WINDOW);
         assert_eq!(alert.unwrap()["width"], super::ALERT_WIDTH);
+    }
+
+    #[test]
+    fn every_rust_hide_of_the_widget_tells_the_webview_so_its_polls_sleep() {
+        let src = include_str!("window.rs");
+        let toggle = &src[src.find("pub fn toggle(").unwrap()..src.find("pub const SHOWN_EVENT").unwrap()];
+        assert!(toggle.contains("return hide(&win)") && !toggle.contains("win.hide()"));
+        let lib = include_str!("lib.rs");
+        let close = &lib[lib.find("CloseRequested").unwrap()..];
+        assert!(close[..300].contains("SHOWN_EVENT"), "closing hides the widget: the UI must hear it");
+        let ui = include_str!("../../src/lib/windowShown.ts");
+        assert!(ui.contains(&format!("\"{}\"", super::SHOWN_EVENT)), "the UI listens for the same literal");
     }
 
     #[test]

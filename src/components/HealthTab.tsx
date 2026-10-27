@@ -3,6 +3,7 @@ import { api, errText } from "../lib/api";
 import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 import { summarize } from "../lib/health";
 import { worstFirst } from "../lib/healthSort";
+import { useWindowVisible } from "../lib/useWindowVisible";
 import { t } from "../i18n";
 import HealthDetail from "./HealthDetail";
 import HealthForm from "./HealthForm";
@@ -22,6 +23,7 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const mounted = useRef(true);
+  const visible = useWindowVisible();
 
   const apply = useCallback((list: HealthView[] | null | undefined) => {
     if (mounted.current && Array.isArray(list)) setViews(list);
@@ -41,13 +43,18 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
 
   useEffect(() => {
     mounted.current = true;
-    void run(api.healthList);
-    const timer = setInterval(() => void run(api.healthList), POLL_MS);
     return () => {
       mounted.current = false;
-      clearInterval(timer);
     };
-  }, [run]);
+  }, []);
+
+  // Only paints tiles: Rust's health watch keeps probing and alerting while hidden; back on screen, read at once.
+  useEffect(() => {
+    if (!visible) return;
+    void run(api.healthList);
+    const timer = setInterval(() => void run(api.healthList), POLL_MS);
+    return () => clearInterval(timer);
+  }, [run, visible]);
 
   const save = (e: HealthEndpoint) => run(() => api.healthSave(e));
   const sum = views ? summarize(views) : null;

@@ -1,6 +1,7 @@
 import { t } from "../i18n";
 import { useEffect, useMemo, useState } from "react";
 import { MOD_KEY } from "../lib/platform";
+import { useCopied } from "../lib/useCopied";
 import { api, errText, type AgendaItem, type ForgeOpened, type GeminiDoc, type Task } from "../lib/api";
 import { dayStart, daySummary } from "../lib/summary";
 
@@ -56,13 +57,12 @@ export default function DaySummary({
       live = false;
     };
   }, [day]);
-  const [copied, setCopied] = useState(false);
+  const [copied, flash] = useCopied();
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      flash("text");
     } catch {
       onError(t("summary.copyFailed", { mod: MOD_KEY }));
     }
