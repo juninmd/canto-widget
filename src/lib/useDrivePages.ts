@@ -48,6 +48,7 @@ export function useDrivePages(filter: DriveFilter, kind: DriveKind, search: stri
       request.current++;
       busy.current = false;
       setLoading(false);
+      setError("");
       setShown({ key, page: hit });
       return;
     }
@@ -60,5 +61,8 @@ export function useDrivePages(filter: DriveFilter, kind: DriveKind, search: stri
     if (current?.next && !busy.current) void fetchPage(current.next, current);
   }, [current, fetchPage]);
 
-  return { files: shown?.page.files ?? null, next: current?.next ?? "", error, loading, reload, more };
+  // `stale`: the previous folder's files stay on screen while this one loads; if it fails they go, as they'd lead elsewhere.
+  const failed = current === null && error !== "";
+  const stale = shown !== null && current === null && !failed;
+  return { files: failed ? null : (shown?.page.files ?? null), stale, next: current?.next ?? "", error, loading, reload, more };
 }

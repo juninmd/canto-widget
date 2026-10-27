@@ -155,6 +155,20 @@ test("TCP takes a port, and removing sends the id", async () => {
   expect(calls.find((c) => c.cmd === "health_remove")?.args).toEqual({ id: "b" });
 });
 
+test("the tiles stop polling while the widget is hidden and read again the moment it is back", async () => {
+  const { setWindowShown } = await import("../lib/windowShown");
+  setWindowShown(false);
+  try {
+    await mount();
+    expect(calls.filter((c) => c.cmd === "health_list")).toEqual([]);
+    await act(async () => setWindowShown(true));
+    for (let i = 0; i < 3; i++) await act(async () => {});
+    expect(calls.filter((c) => c.cmd === "health_list").length).toBe(1);
+  } finally {
+    setWindowShown(true);
+  }
+});
+
 test("an empty list explains what to add", async () => {
   views = [];
   await mount();
