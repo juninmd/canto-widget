@@ -69,6 +69,9 @@ pub struct Task {
     /// Seconds spent in focus, added as the timer flushes. New field, same reasoning as `estimate_min`.
     #[serde(default)]
     pub tracked_secs: u32,
+    /// Rings when the app or Wi-Fi is met instead of at a clock time. New field, same reasoning as `estimate_min`.
+    #[serde(default)]
+    pub context: Option<crate::task_context::TaskContext>,
 }
 
 /// `day` for `Monthly`: 1-31, matched exactly (a 30-day month has no 31st, so it just doesn't fire that month).

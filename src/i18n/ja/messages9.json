@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "場所なし",
+  "tasks.context.app": "アプリを開いたとき",
+  "tasks.context.wifi": "Wi-Fiに接続したとき",
+  "tasks.context.of": "{title} を通知する場所",
+  "tasks.context.nameOf": "{title} のアプリまたはネットワーク名",
+  "tasks.context.chipApp": "{name} を開いたとき",
+  "tasks.context.chipWifi": "Wi-Fi {name} 接続時",
+  "search.groupAgenda": "今日の予定",
+  "search.groupTranscripts": "文字起こし"
 }
