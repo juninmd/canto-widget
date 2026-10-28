@@ -72,6 +72,13 @@ test("endpoints are listed worst first and the open one keeps its place", async 
   expect(screen.getAllByRole("region").map((r) => r.getAttribute("aria-label"))).toEqual(["Painel"]);
 });
 
+test("closed tiles keep their height in the scrolling list instead of shrinking under the next one", async () => {
+  await mount();
+  const tiles = [...document.querySelectorAll("button[aria-expanded=false]")].filter((b) => b.querySelector("b"));
+  expect(tiles.length).toBe(3);
+  for (const tile of tiles) expect(tile.classList.contains("shrink-0")).toBe(true);
+});
+
 test("'+ endereço' sits in the header, opens the form, and the empty state offers the same action", async () => {
   views = [];
   await mount();
