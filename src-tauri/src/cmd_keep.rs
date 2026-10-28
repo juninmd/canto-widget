@@ -72,10 +72,8 @@ pub fn store(state: &AppState, texts: &[String]) -> Result<KeepImport> {
 #[cfg(desktop)]
 fn read(_app: &tauri::AppHandle, picked: FilePath) -> Option<String> {
     let path = crate::picked::path(picked).ok()?;
-    if std::fs::metadata(&path).ok()?.len() > keep_import::MAX_FILE_BYTES {
-        return None;
-    }
-    std::fs::read_to_string(path).ok()
+    let bytes = crate::store::read_capped(&path, keep_import::MAX_FILE_BYTES, "").ok()?;
+    String::from_utf8(bytes).ok()
 }
 
 #[cfg(mobile)]
