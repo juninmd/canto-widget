@@ -563,6 +563,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Modelos IA voltam a trazer o ranking atual**: a Artificial Analysis passou a mandar a lista com notas em
+  `initialModels` e deixou em `models` só nomes, então a aba não achava o ranking novo (sem Gemini 4 Carbon nem
+  GPT-6 Astra). Agora vale a maior lista com Intelligence Index sob qualquer chave terminada em "models".
 - **Clima e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
