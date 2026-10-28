@@ -130,6 +130,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   que são abertas: o JavaScript lido na abertura caiu de 1.081 KiB para 745 KiB (307 → 228 KiB com gzip).
 ### Adicionado
 
+- **Gmail pelo teclado, sem ação em dobro.** Com o foco num e-mail, **J/K** (ou as setas) andam pela lista, **X** seleciona, **S** dá estrela, **U** alterna lido, **E** arquiva, **#** manda para a lixeira e **O** abre no Gmail; o foco passa para o vizinho quando o e-mail sai. Um clique duplo em "marcar como lido", estrela, arquivar ou lixeira agora envia um pedido só: as ações do e-mail esperam a resposta. **/** também foca a busca no Gmail, no Drive e nos Contatos.
 - **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
   revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**
   devolve o foco ao botão. Os botões do **Não perturbe** e as opções de **tela cheia** e **pedidos de revisão** ficam
