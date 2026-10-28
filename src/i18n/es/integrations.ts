@@ -228,6 +228,8 @@ export const integrations: Record<keyof typeof source, string> = {
   "google.signOutLabel": "cerrar sesión de {account}",
   "google.signingOut": "cerrando sesión...",
   "google.signOut": "cerrar sesión",
+  "google.signOutAsk": "¿cerrar sesión de esta cuenta? la agenda de Google desaparece de Canto hasta que vuelvas a entrar",
+  "google.signOutYes": "sí, cerrar sesión",
   "google.heading": "Google Calendar",
   "google.intro": "Opcional. La cuenta solo se usa para leer los eventos del día (solo lectura); ningún dato de la bóveda va a Google.",
   "google.ownCredentials": "usar tus propias credenciales OAuth (avanzado)",

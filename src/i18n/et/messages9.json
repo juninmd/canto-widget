@@ -435,5 +435,10 @@
   "tasks.context.chipWifi": "Wi-Fi-s {name}",
   "search.groupAgenda": "tänane kalender",
   "search.groupTranscripts": "transkriptsioonid",
+  "common.cancel": "cancel",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }
