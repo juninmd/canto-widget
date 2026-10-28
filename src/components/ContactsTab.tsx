@@ -141,6 +141,7 @@ export default function ContactsTab({ onNotice }: Props) {
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t("contacts.search")}
           aria-label={t("contacts.search")}
+          data-shortcut="search"
           maxLength={100}
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />
