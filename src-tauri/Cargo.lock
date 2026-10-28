@@ -506,6 +506,7 @@ dependencies = [
  "base64 0.23.1",
  "chrono",
  "feed-rs",
+ "libc",
  "objc2-foundation",
  "rand 0.10.3",
  "reqwest",
