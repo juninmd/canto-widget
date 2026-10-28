@@ -42,6 +42,10 @@ tauri-plugin-notification = "2"
 [features]
 default = []
 
+[target.'cfg(unix)'.dependencies]
+# Already in the lockfile through tauri: `O_NONBLOCK` for opening picked files and `mkfifo` in tests.
+libc = "0.2"
+
 [target.'cfg(windows)'.dependencies]
 # Same version tauri already pulls in: features only, no new crate in the lockfile.
 windows = { version = "0.62", features = [

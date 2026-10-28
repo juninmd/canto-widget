@@ -149,15 +149,50 @@ pub fn write_bytes_atomic(path: &Path, bytes: &[u8]) -> Result<()> {
         std::fs::create_dir_all(parent)?;
     }
     let tmp = tmp_path(path);
-    {
-        use std::io::Write;
-        let mut f = std::fs::File::create(&tmp)?;
-        f.write_all(bytes)?;
-        // Without flushing before the rename, a power loss could leave the new name pointing at empty content.
-        f.sync_all()?;
+    let written = write_private(&tmp, bytes).and_then(|_| std::fs::rename(&tmp, path));
+    if written.is_err() {
+        // A half-written temp would sit next to the vault forever; the original file is still intact.
+        let _ = std::fs::remove_file(&tmp);
     }
-    std::fs::rename(&tmp, path)?;
-    Ok(())
+    Ok(written?)
+}
+
+/// Owner-only (0600) on unix: the rename keeps the temp's mode, so a sealed file never lands readable by others.
+fn write_private(tmp: &Path, bytes: &[u8]) -> std::io::Result<()> {
+    use std::io::Write;
+    let mut options = std::fs::OpenOptions::new();
+    options.write(true).create(true).truncate(true);
+    #[cfg(unix)]
+    std::os::unix::fs::OpenOptionsExt::mode(&mut options, 0o600);
+    let mut f = options.open(tmp)?;
+    // `mode` only applies on creation: a stale temp left by a crash would otherwise keep its old mode.
+    #[cfg(unix)]
+    f.set_permissions(std::os::unix::fs::PermissionsExt::from_mode(0o600))?;
+    f.write_all(bytes)?;
+    // Without flushing before the rename, a power loss could leave the new name pointing at empty content.
+    f.sync_all()
+}
+
+/// Reads a file the user picked (or a synced folder holds) without trusting its size: the read stops past `max`
+/// even if the file grows meanwhile, and a FIFO or device posing as one is refused instead of blocking forever.
+pub fn read_capped(path: &Path, max: u64, too_big: &str) -> Result<Vec<u8>> {
+    use std::io::Read;
+    let mut options = std::fs::OpenOptions::new();
+    options.read(true);
+    // Opening a FIFO blocks until a writer shows up; non-blocking open returns at once, and the type is then
+    // checked on the handle itself, so nothing can be swapped in between the check and the read.
+    #[cfg(unix)]
+    std::os::unix::fs::OpenOptionsExt::custom_flags(&mut options, libc::O_NONBLOCK);
+    let file = options.open(path)?;
+    if !file.metadata()?.is_file() {
+        return Err(AppError::Config("não é um arquivo comum".into()));
+    }
+    let mut bytes = Vec::new();
+    file.take(max + 1).read_to_end(&mut bytes)?;
+    if bytes.len() as u64 > max {
+        return Err(AppError::Config(too_big.into()));
+    }
+    Ok(bytes)
 }
 
 /// Suffix instead of swapping the extension: exporting `x.canto`, `x.tmp` could be a user's own file and get overwritten.
@@ -168,7 +203,7 @@ fn tmp_path(path: &Path) -> PathBuf {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::*;
 
     fn tmpdir(name: &str) -> PathBuf {
@@ -218,6 +253,77 @@ mod tests {
         std::fs::write(dir.join("backup.tmp"), b"do usuario").unwrap();
         write_bytes_atomic(&dir.join("backup.canto"), b"envelope").unwrap();
         assert_eq!(std::fs::read(dir.join("backup.tmp")).unwrap(), b"do usuario");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn written_files_are_owner_only_even_over_a_stale_temp() {
+        use std::os::unix::fs::PermissionsExt;
+        let dir = tmpdir("modo");
+        std::fs::create_dir_all(&dir).unwrap();
+        let target = vault_path(&dir);
+        std::fs::write(tmp_path(&target), b"sobra de um crash").unwrap();
+        std::fs::set_permissions(tmp_path(&target), std::fs::Permissions::from_mode(0o644)).unwrap();
+        write_bytes_atomic(&target, b"selado").unwrap();
+        assert_eq!(std::fs::metadata(&target).unwrap().permissions().mode() & 0o777, 0o600);
+        assert_eq!(std::fs::read(&target).unwrap(), b"selado");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_failed_write_leaves_no_temp_behind() {
+        let dir = tmpdir("falha");
+        // Renaming a file over a non-empty directory always fails, after the temp was written.
+        let target = dir.join("ocupado");
+        std::fs::create_dir_all(target.join("dentro")).unwrap();
+        assert!(write_bytes_atomic(&target, b"x").is_err());
+        assert!(!tmp_path(&target).exists(), "temp file was left behind");
+        assert!(target.join("dentro").is_dir());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn capped_read_refuses_oversized_files_and_non_files() {
+        let dir = tmpdir("teto");
+        std::fs::create_dir_all(&dir).unwrap();
+        let file = dir.join("b.canto");
+        std::fs::write(&file, b"12345").unwrap();
+        assert_eq!(read_capped(&file, 5, "grande").unwrap(), b"12345");
+        assert!(matches!(read_capped(&file, 4, "grande"), Err(AppError::Config(m)) if m == "grande"));
+        assert!(read_capped(&dir, 1024, "grande").is_err(), "read a directory");
+        assert!(read_capped(&dir.join("nada"), 1024, "grande").is_err());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    /// Creates a real FIFO; with no writer, a blocking open on it would never return.
+    #[cfg(unix)]
+    pub(crate) fn make_fifo(path: &Path) {
+        use std::os::unix::ffi::OsStrExt;
+        let c = std::ffi::CString::new(path.as_os_str().as_bytes()).unwrap();
+        assert_eq!(unsafe { libc::mkfifo(c.as_ptr(), 0o600) }, 0, "mkfifo failed");
+    }
+
+    /// Runs `f` on a thread and fails the test if it hasn't returned in 5 s, instead of hanging the suite.
+    #[cfg(unix)]
+    pub(crate) fn within_5s<T: Send + 'static>(f: impl FnOnce() -> T + Send + 'static) -> T {
+        let (tx, rx) = std::sync::mpsc::channel();
+        std::thread::spawn(move || {
+            let _ = tx.send(f());
+        });
+        rx.recv_timeout(std::time::Duration::from_secs(5)).expect("blocked on the FIFO")
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn capped_read_refuses_a_fifo_without_blocking() {
+        let dir = tmpdir("fifo");
+        std::fs::create_dir_all(&dir).unwrap();
+        let fifo = dir.join("backup.canto");
+        make_fifo(&fifo);
+        let path = fifo.clone();
+        let res = within_5s(move || read_capped(&path, 1024, "grande"));
+        assert!(matches!(res, Err(AppError::Config(m)) if m == "não é um arquivo comum"));
         let _ = std::fs::remove_dir_all(&dir);
     }
 

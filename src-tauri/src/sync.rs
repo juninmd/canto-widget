@@ -89,7 +89,8 @@ pub fn poll_and_merge(state: &AppState) -> Result<Option<ImportSummary>> {
     }
     let prefs = load(&state.dir);
     let Some(folder) = prefs.pasta.as_deref().map(PathBuf::from) else { return Ok(None) };
-    let Ok(bytes) = std::fs::read(target(&folder)) else { return Ok(None) };
+    // Anyone with write access to the synced folder controls this file: an oversized one is skipped, not loaded.
+    let Ok(bytes) = store::read_capped(&target(&folder), backup::MAX_BYTES, "") else { return Ok(None) };
     if prefs.ultimo_hash.as_deref() == Some(hash(&bytes).as_str()) {
         return Ok(None);
     }
