@@ -186,6 +186,8 @@ export const app = {
   "settings.sync.change": "trocar pasta",
   "settings.sync.now": "sincronizar agora",
   "settings.sync.stop": "parar",
+  "settings.sync.stopAsk": "parar de sincronizar? a pasta e os arquivos nela ficam como estão",
+  "settings.sync.stopYes": "sim, parar",
   "settings.sync.merged": "mesclado: o cofre tem {tasks} tarefas e {notes} notas",
   "settings.sync.nothingNew": "nada novo para mesclar",
 
@@ -291,6 +293,7 @@ export const app = {
   "update.available": "Canto {version} disponível",
   "update.view": "ver",
   "common.retry": "tentar de novo",
+  "common.cancel": "cancelar",
   "common.refresh": "atualizar",
   "common.refreshing": "atualizando",
   "common.updatedAt": "atualizado às {time}",

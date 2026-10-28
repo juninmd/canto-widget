@@ -434,5 +434,10 @@
   "tasks.context.chipApp": "{name} खुलने पर",
   "tasks.context.chipWifi": "Wi-Fi {name} पर",
   "search.groupAgenda": "आज का एजेंडा",
-  "search.groupTranscripts": "ट्रांसक्रिप्ट"
+  "search.groupTranscripts": "ट्रांसक्रिप्ट",
+  "common.cancel": "cancel",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop"
 }
