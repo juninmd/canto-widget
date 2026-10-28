@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "ללא מקום",
+  "tasks.context.app": "בפתיחת האפליקציה",
+  "tasks.context.wifi": "בהתחברות ל-Wi-Fi",
+  "tasks.context.of": "היכן להזכיר את {title}",
+  "tasks.context.nameOf": "שם האפליקציה או הרשת של {title}",
+  "tasks.context.chipApp": "בפתיחת {name}",
+  "tasks.context.chipWifi": "ב-Wi-Fi ‏{name}",
+  "search.groupAgenda": "יומן להיום",
+  "search.groupTranscripts": "תמלולים"
 }

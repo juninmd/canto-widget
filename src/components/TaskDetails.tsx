@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { t } from "../i18n";
 import { api } from "../lib/api";
-import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
+import type { ExtendedRepeat, Priority, Repeat, Task, TaskContext } from "../lib/api";
 import { REPEAT_LABEL } from "../lib/reminders";
 import { nextPriority, PRIORITY_DOT, PRIORITY_LABEL, PRIORITY_PILL } from "../lib/priority";
 import RepeatControl from "./RepeatControl";
+import TaskContextControl from "./TaskContextControl";
 import { CHIP } from "./chip";
 import { ClockIcon, PullIcon } from "./Icons";
 import { FocusBadge } from "./FocusControls";
 import { ESTIMATES } from "../lib/focus";
 import { useRunning } from "../lib/useFocus";
+import { contextLabel } from "../lib/taskContext";
 
 const PRIORITIES: Priority[] = ["high", "medium", "low"];
 
@@ -25,6 +27,7 @@ export default function TaskDetails({
   onLinkPr,
   onPriority,
   onEstimate,
+  onContext,
   onClose,
 }: {
   task: Task;
@@ -33,6 +36,7 @@ export default function TaskDetails({
   onLinkPr: (url: string | null) => void;
   onPriority: (priority: Priority | null) => void;
   onEstimate: (minutes: number | null) => void;
+  onContext: (context: TaskContext | null) => void;
   onClose: () => void;
 }) {
   const [prUrl, setPrUrl] = useState(task.pr_url ?? "");
@@ -82,6 +86,7 @@ export default function TaskDetails({
             </option>
           ))}
       </select>
+      <TaskContextControl task={task} onChange={onContext} />
       <label className="flex flex-1 items-center gap-1">
         {t("tasks.prLabel")}
         <input
@@ -138,7 +143,7 @@ export function TaskMeta({ task }: { task: Task }) {
   const subtasks = task.subtasks && task.subtasks.length > 0;
   const running = useRunning()?.id === task.id;
   const focused = running || !!task.estimate_min || (task.tracked_secs ?? 0) >= 60;
-  if (!task.priority && !timed && !subtasks && !task.pr_url && !focused) return null;
+  if (!task.priority && !timed && !subtasks && !task.pr_url && !focused && !task.context) return null;
   return (
     <span className="mt-1 flex flex-wrap items-center gap-1">
       {task.priority && (
@@ -159,6 +164,7 @@ export function TaskMeta({ task }: { task: Task }) {
           {task.extended_repeat && <span aria-label={t("repeat.repeats", { label: extendedLabel(task.extended_repeat) })}> ↻</span>}
         </span>
       )}
+      {task.context && <span className={CHIP}>{contextLabel(task.context)}</span>}
       {focused && <FocusBadge task={task} />}
       {subtasks && (
         <span className={`${CHIP} tabular-nums`} title={t("tasks.subtasks")}>

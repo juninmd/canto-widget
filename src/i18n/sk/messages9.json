@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "žiadne miesto",
+  "tasks.context.app": "pri otvorení aplikácie",
+  "tasks.context.wifi": "pri pripojení k Wi-Fi",
+  "tasks.context.of": "kde pripomenúť {title}",
+  "tasks.context.nameOf": "názov aplikácie alebo siete pre {title}",
+  "tasks.context.chipApp": "pri otvorení {name}",
+  "tasks.context.chipWifi": "na Wi-Fi {name}",
+  "search.groupAgenda": "dnešný program",
+  "search.groupTranscripts": "prepisy"
 }
