@@ -222,6 +222,7 @@ export const app = {
   "shortcuts.settings": "abrir os ajustes",
   "shortcuts.agendaDays": "agenda: dia anterior ou próximo",
   "shortcuts.agendaToday": "agenda: voltar para hoje",
+  "shortcuts.agendaJoin": "agenda: entrar na reunião atual ou que começa em até 15 min",
 
   "palette.label": "paleta de comandos",
   "palette.placeholder": "digite uma ação…",

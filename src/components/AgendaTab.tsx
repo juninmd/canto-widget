@@ -11,7 +11,7 @@ import AgendaToolbar from "./AgendaToolbar";
 import AgendaViewTabs from "./AgendaViewTabs";
 import ErrorBanner from "./ErrorBanner";
 import { conflicts, freeLabel, nextFree } from "../lib/agendaFree";
-import { minuteOf } from "../lib/agendaRail";
+import { meetToJoin, minuteOf } from "../lib/agendaRail";
 import { dayBlocks, unscheduled } from "../lib/dayPlan";
 import Skeleton from "./Skeleton";
 import type { Agenda } from "../lib/useAgenda";
@@ -82,7 +82,12 @@ export default function AgendaTab({
     setView(v);
     saveView(v);
   };
-  useAgendaKeys(view !== "meetings", (k) => pickDay(k === "today" ? today : shiftDay(day, k === "prev" ? -1 : 1)));
+  useAgendaKeys(view !== "meetings", (k) => {
+    if (k !== "join") return pickDay(k === "today" ? today : shiftDay(day, k === "prev" ? -1 : 1));
+    // Another day's clock is made up: only today's meeting in progress (or about to start) is joinable.
+    const meet = isToday ? meetToJoin(items, now())?.meet : null;
+    if (meet) void api.openLink(meet).catch((e) => onError(errText(e)));
+  });
 
   // A double click on "+ task" would book it twice and toast twice before the list reloads.
   const booking = useRef(new Set<string>());
