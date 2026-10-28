@@ -16,58 +16,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o redesenho.
 ### Adicionado
 
-- **Blocos de código nas notas**: trechos entre
-- **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
-  atualiza o texto da nota.
-- **Aviso quando um serviço cai**: o sino de cada card (serviços com status ao vivo do Statuspage) liga uma
-  notificação do sistema quando o serviço fica instável ou fora do ar, inclusive com o cofre trancado. A escolha
-  fica em `status_alertas.json`, fora do cofre (é só a lista de páginas públicas a consultar, a cada 3 min).
-- **Status API em mini cards**: grade de dois por linha, cada card com a cor e a palavra do estado (operacional,
-  instável, fora do ar, manutenção, incidente recente, sem resposta), o último incidente e a descrição ao vivo;
-  o cabeçalho resume quantos estão com problema. Clicar abre o histórico do serviço na largura toda.
-- **Convidados em mini cards**: nos detalhes do evento, cada convidado vira um card numa grade de dois, com
-  avatar, resposta (ícone e palavra: aceitou, talvez, recusou, aguardando), etiquetas de organizador, opcional e
-  você; quem recusou aparece esmaecido. "Aceitou" usa a cor de sucesso da skin, não o destaque (que é vermelho na Hueco Mundo).
-- **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do
-  diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora
-  seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o
-  Google vê um aviso para sair e entrar de novo (o escopo é novo).
-- **Aviso de revisão pedida**: com o cofre aberto e o GitHub conectado, uma notificação do sistema avisa
-  quando alguém pede sua revisão ("Revisão pedida: dono/repo#12 título"), conferido a cada 5 min. A primeira
-  leitura só memoriza o que já estava lá. Vem ligado; desliga em Ajustes → Revisões no GitHub.
-- **CI no card do PR**: na aba GitHub, cada PR mostra um selo com o CI do último commit (passou, falhou,
-  rodando ou sem CI), juntando GitHub Actions/check runs e commit statuses. São até 20 PRs por vez, com cache
-  por commit na memória (1 min enquanto roda, 15 min quando termina) para não gastar o limite da API; o link
-  "ver CI" segue para os PRs que ficaram de fora. O selo de CI pede as permissões *Checks* e *Commit statuses*
-  (leitura) no token. Só GitHub por enquanto.
-- **Imagens nas notas**: cole (Ctrl+V), arraste ou use "anexar imagem" no editor; ela aparece no meio do
-  texto. PNG, JPEG, GIF ou WebP de até 2 MB, cada uma cifrada num arquivo próprio em
-  `note-images/` (o cofre não fica mais pesado de gravar). Acompanham a troca de senha; **não entram no backup
-  `.canto` nem na pasta sincronizada**, então a nota restaurada em outra máquina mostra "imagem indisponível".
-  Imagens que nenhuma nota usa mais são apagadas depois de um dia.
-- **Modo não perturbe**: em Ajustes (30 min, 1 h, 2 h, até amanhã às 8h ou até desligar), pelo tray (1 h) ou pela paleta de comandos,
-  silencia avisos de reunião, lembretes de tarefa, alertas de status e toda notificação do sistema. Uma lua na
-  barra do topo mostra até quando vai; um clique desliga. O estado fica em `nao_perturbe.json`, fora do cofre,
-  sobrevive a reinício e expira sozinho.
-- **Paleta de comandos** (`Ctrl+Shift+P`, `Cmd+Shift+P` no macOS): todas as ações do app pelo nome, com busca
-  aproximada que ignora acentos — ir para cada aba visível, nova tarefa, nova nota, busca global, entrar na
-  próxima reunião, copiar o resumo do dia, abrir ajustes, trocar de tema, modo privacidade, tela cheia, esconder e
-  trancar o cofre. Setas escolhem, `Enter` executa, `Esc` fecha e devolve o foco. `Ctrl+K` segue sendo a busca
-  global de conteúdo. Aparece na ajuda de atalhos (`?`).
-- **Conflito na agenda**: eventos com horário que se sobrepõem ganham o selo "conflito", com o título do outro
-  evento na dica e no nome acessível. Eventos que só encostam (um termina quando o outro começa) não contam.
-- **Próximo tempo livre na agenda**: no topo da aba, "próximo tempo livre: 14:30–16:00 (1 h 30 min)",
-  "livre agora até 15:00" ou "livre pelo resto do dia". Conta só janelas de 15 min ou mais até as 19:00 (depois
-  disso, até a meia-noite) e ignora eventos de dia inteiro e convites que você recusou.
-- **Resumo do dia mais completo**: além dos PRs/MRs abertos, lista os **mergeados** e os **revisados/aprovados
-  por mim** no dia (GitHub e GitLab), e o título das reuniões traz o **tempo total** (sobreposições contam uma
-  vez; eventos de dia inteiro ficam fora).
-- **Relatório da semana e do mês**: o resumo ganhou um seletor **hoje / semana / mês**. A semana vai de segunda
-  até hoje e o mês do dia 1º até hoje; o relatório sai em markdown, com panorama, uma linha por dia útil (na
-  semana), tarefas concluídas, notas criadas ou editadas, reuniões agrupadas por título com o tempo total e
-  os PRs/MRs abertos, mergeados e revisados no período, com link. A agenda do período é paginada (até 1.000
-  eventos) e listas longas dizem quantos itens ficaram de fora. Como o Canto não guarda a hora da conclusão, uma
-  tarefa concluída conta no dia a que pertence.
 - **Editor de notas visual (WYSIWYG)**: as abas "escrever"/"visualizar" deram lugar a um editor que já mostra a
   nota formatada, com uma barra compacta (negrito, itálico, código, título, lista, lista numerada, checklist, bloco
   de código, link e anexar imagem), atalhos `Ctrl+B`/`I`/`E`, `Ctrl+K` para link e os atalhos de markdown ao
@@ -381,21 +329,36 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
-- **Teclad- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
-  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
-  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
-  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
-  arrastava a largura da lista saiu.
-- **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
-- **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
-- **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
-- **Pop‑up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
-- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop‑up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
 - **"Mostrar- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
   arrastava a largura da lista saiu.
+- **Pop‑up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
+- **Teclad- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
+- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop-up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
+- **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
+- **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
+- **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
+- **Blocos de código nas notas**: trechos entre
+- **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma atualiza o texto da nota.
+- **Aviso quando um serviço cai**: o sino de cada card (serviços com status ao vivo do Statuspage) liga uma notificação do sistema quando o serviço fica instável ou fora do ar, inclusive com o cofre trancado. A escolha fica em `status_alertas.json`, fora do cofre (é só a lista de páginas públicas a consultar, a cada 3 min).
+- **Status API em mini cards**: grade de dois por linha, cada card com a cor e a palavra do estado (operacional, instável, fora do ar, manutenção, incidente recente, sem resposta), o último incidente e a descrição ao vivo; o cabeçalho resume quantos estão com problema. Clicar abre o histórico do serviço na largura toda.
+- **Convidados em mini cards**: nos detalhes do evento, cada convidado vira um card numa grade de dois, com avatar, resposta (ícone e palavra: aceitou, talvez, recusou, aguardando), etiquetas de organizador, opcional e você; quem recusou aparece esmaecido. "Aceitou" usa a cor de sucesso da skin, não o destaque (que é vermelho na Hueco Mundo).
+- **Foto dos convidados**: nos detalhes do evento, colegas do Google Workspace aparecem com a foto do diretório (People API, escopo `directory.readonly`); quem não tem foto, contas pessoais e convidados de fora seguem com as iniciais. As fotos ficam só na memória e somem ao trancar o cofre. Quem já tinha conectado o Google vê um aviso para sair e entrar de novo (o escopo é novo).
+- **Aviso de revisão pedida**: com o cofre aberto e o GitHub conectado, uma notificação do sistema avisa quando alguém pede sua revisão ("Revisão pedida: dono/repo#12 título"), conferido a cada 5 min. A primeira leitura só memoriza o que já estava lá. Vem ligado; desliga em Ajustes → Revisões no GitHub.
+- **CI no card do PR**: na aba GitHub, cada PR mostra um selo com o CI do último commit (passou, falhou, rodando ou sem CI), juntando GitHub Actions/check runs e commit statuses. São até 20 PRs por vez, com cache por commit na memória (1 min enquanto roda, 15 min quando termina) para não gastar o limite da API; o link "ver CI" segue para os PRs que ficaram de fora. O selo de CI pede as permissões *Checks* e *Commit statuses* (leitura) no token. Só GitHub por enquanto.
+- **Imagens nas notas**: cole (Ctrl+V), arraste ou use "anexar imagem" no editor; ela aparece no meio do texto. PNG, JPEG, GIF ou WebP de até 2 MB, cada uma cifrada num arquivo próprio em `note-images/` (o cofre não fica mais pesado de gravar). Acompanham a troca de senha; **não entram no backup `.canto` nem na pasta sincronizada**, então a nota restaurada em outra máquina mostra "imagem indisponível". Imagens que nenhuma nota usa mais são apagadas depois de um dia.
+- **Modo não perturbe**: em Ajustes (30 min, 1 h, 2 h, até amanhã às 8h ou até desligar), pelo tray (1 h) ou pela paleta de comandos, silencia avisos de reunião, lembretes de tarefa, alertas de status e toda notificação do sistema. Uma lua na barra do topo mostra até quando vai; um clique desliga. O estado fica em `nao_perturbe.json`, fora do cofre, sobrevive a reinício e expira sozinho.
+- **Paleta de comandos** (`Ctrl+Shift+P`, `Cmd+Shift+P` no macOS): todas as ações do app pelo nome, com busca aproximada que ignora acentos — ir para cada aba visível, nova tarefa, nova nota, busca global, entrar na próxima reunião, copiar o resumo do dia, abrir ajustes, trocar de tema, modo privacidade, tela cheia, esconder e trancar o cofre. Setas escolhem, `Enter` executa, `Esc` fecha e devolve o foco. `Ctrl+K` segue sendo a busca global de conteúdo. Aparece na ajuda de atalhos (`?`).
+- **Conflito na agenda**: eventos com horário que se sobrepõem ganham o selo "conflito", com o título do outro evento na dica e no nome acessível. Eventos que só encostam (um termina quando o outro começa) não contam.
+- **Próximo tempo livre na agenda**: no topo da aba, "próximo tempo livre: 14:30–16:00 (1 h 30 min)", "livre agora até 15:00" ou "livre pelo resto do dia". Conta só janelas de 15 min ou mais até as 19:00 (depois disso, até a meia-noite) e ignora eventos de dia inteiro e convites que você recusou.
+- **Resumo do dia mais completo**: além dos PRs/MRs abertos, lista os **mergeados** e os **revisados/aprovados por mim** no dia (GitHub e GitLab), e o título das reuniões traz o **tempo total** (sobreposições contam uma vez; eventos de dia inteiro ficam fora).
+- **Relatório da semana e do mês**: o resumo ganhou um seletor **hoje / semana / mês**. A semana vai de segunda até hoje e o mês do dia 1º até hoje; o relatório sai em markdown, com panorama, uma linha por dia útil (na semana), tarefas concluídas, notas criadas ou editadas, reuniões agrupadas por título com o tempo total e os PRs/MRs abertos, mergeados e revisados no período, com link. A agenda do período é paginada (até 1.000 eventos) e listas longas dizem quantos itens ficaram de fora. Como o Canto não guarda a hora da conclusão, uma tarefa concluída conta no dia a que pertence.
 - **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
   longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
   fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
