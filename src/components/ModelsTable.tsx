@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ModelRow } from "../lib/api";
 import { formatContext, formatPrice, formatReleased, formatScore, formatSeconds, formatSpeed } from "../lib/models";
 import { METRICS, SERIES, bestValue, value, type MetricKey } from "../lib/modelsCompare";
@@ -52,7 +52,8 @@ function lines(rows: readonly ModelRow[]): Line[] {
 /** Every field side by side, best value per row in the accent; "só diferenças" hides the rows where all agree. */
 export default function ModelsTable({ rows }: { rows: readonly ModelRow[] }) {
   const [onlyDiff, setOnlyDiff] = useState(false);
-  const shown = lines(rows).filter((l) => !onlyDiff || new Set(l.cells).size > 1);
+  const all = useMemo(() => lines(rows), [rows]);
+  const shown = onlyDiff ? all.filter((l) => new Set(l.cells).size > 1) : all;
   let group = "";
   return (
     <>
@@ -67,9 +68,9 @@ export default function ModelsTable({ rows }: { rows: readonly ModelRow[] }) {
         <table className="w-full border-collapse text-[10.5px] tabular-nums">
           <thead>
             <tr>
-              <th className="sticky left-0 bg-panel" />
+              <td className="sticky left-0 bg-panel" />
               {rows.map((r, i) => (
-                <th key={r.id} className="px-2 py-1.5 text-right font-semibold whitespace-nowrap text-fg">
+                <th key={r.id} scope="col" className="px-2 py-1.5 text-right font-semibold whitespace-nowrap text-fg">
                   <i aria-hidden="true" className="mr-1 inline-block size-[7px] rounded-full" style={{ background: SERIES[i] }} />
                   {r.name}
                 </th>
@@ -89,7 +90,9 @@ export default function ModelsTable({ rows }: { rows: readonly ModelRow[] }) {
                   </tr>
                 ),
                 <tr key={l.label}>
-                  <td className="sticky left-0 border-t border-edge bg-panel px-2 py-1.5 whitespace-nowrap text-faint">{l.label}</td>
+                  <th scope="row" className="sticky left-0 border-t border-edge bg-panel px-2 py-1.5 text-left font-normal whitespace-nowrap text-faint">
+                    {l.label}
+                  </th>
                   {l.cells.map((c, i) => (
                     <td key={rows[i].id} className={`border-t border-edge px-2 py-1.5 text-right whitespace-nowrap ${l.best[i] ? "font-bold text-accent-text" : "text-fg"}`}>
                       {c}

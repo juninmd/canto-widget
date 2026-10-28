@@ -44,6 +44,26 @@ test("the capture adds straight to Google Tasks", async () => {
   expect(calls).toContainEqual({ cmd: "gtasks_add", args: { title: "Enviar proposta" } });
 });
 
+test("checking a task off from the keyboard moves focus to the next one", async () => {
+  render(<GoogleTasksSection today="2026-10-21" onError={() => {}} />);
+  const first = await screen.findByRole("button", { name: "concluir Renovar seguro do carro" });
+  first.focus();
+  fireEvent.click(first);
+  await waitFor(() => expect(screen.queryByText("Renovar seguro do carro") === null).toBe(true));
+  expect(document.activeElement === screen.getByRole("button", { name: "concluir Comprar presente da Lia" })).toBe(true);
+});
+
+test("the capture keeps focus while it saves, so the next task can be typed right away", async () => {
+  render(<GoogleTasksSection today="2026-10-21" onError={() => {}} />);
+  const input = (await screen.findByLabelText("adicionar no Google Tarefas…")) as HTMLInputElement;
+  input.focus();
+  fireEvent.change(input, { target: { value: "Enviar proposta" } });
+  fireEvent.submit(input);
+  expect(input.disabled).toBe(false);
+  expect(await screen.findByText("Enviar proposta")).toBeTruthy();
+  expect(document.activeElement === input).toBe(true);
+});
+
 test("without a Google login the section stays out of the Tasks tab, silently", async () => {
   listed = "entre com o Google para ver a agenda";
   const errors: string[] = [];
