@@ -18,6 +18,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 - **Busca global em mais fontes**: além de tarefas de hoje, notas e clipboard, o `Ctrl+K` agora busca na agenda de hoje (já carregada, sem chamada ao Google) e nas transcrições de reunião. Cada resultado é clicável e as setas ↑/↓ percorrem o campo e todos os resultados; uma transcrição abre Agenda › Reuniões com a busca preenchida. Uma pasta de transcrições ilegível vira grupo vazio, não aviso de erro.
 - **Lembrete por contexto**: nos detalhes da tarefa, em vez de um horário ela pode esperar o app em foco ("ao abrir o app", ex.: Slack) ou a rede Wi‑Fi ("ao entrar no Wi‑Fi"). Com o cofre aberto, o Canto confere a cada 15 s e toca o aviso (com som e notificação, como os de horário) uma vez por dia por tarefa aberta de hoje ou atrasada. Nada é consultado enquanto nenhuma tarefa aberta tem contexto, e o nome do app fica só no cofre criptografado (campo novo `context`, ignorado por versões antigas). O nome do app segue o do registro de atividade (`Code`, `Slack`, `Safari`; sem diferença de maiúsculas nem de `.exe`). Wi‑Fi: Windows (`netsh`), Linux (`nmcli`/`iwgetid`) e macOS (`networksetup`; o macOS 14.4+ só informa a rede com a permissão de localização). Em Linux com Wayland o app em foco não é visível, então só o Wi‑Fi funciona. A linha da tarefa mostra “ao abrir Slack” ou “no Wi‑Fi Escritorio”.
+- **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
+  revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**
+  devolve o foco ao botão. Os botões do **Não perturbe** e as opções de **tela cheia** e **pedidos de revisão** ficam
+  travados enquanto salvam, então um clique duplo não manda dois pedidos nem deixa o estado invertido.
 - **Blocos de código nas notas**: trechos entre
 - **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
   atualiza o texto da nota.
@@ -383,27 +387,27 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Horas e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
 - **Busca gl- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
   arrastava a largura da lista saiu.
-- **"Mostrar- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
-  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
-  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
-  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
-  arrastava a largura da lista saiu.
-- **Pop‑up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **Teclad- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
   arrastava a largura da lista saiu.
-- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop-up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
 - **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
-- **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
 - **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
-- **Horas e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+- **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
+- **Pop‑up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
+- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop‑up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
+- **"Mostrar- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
