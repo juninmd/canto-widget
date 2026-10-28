@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type WeatherPlace, type WeatherView } from "../lib/api";
 import { dayHours, fetchedClock, weekday } from "../lib/weather";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ErrorBanner from "./ErrorBanner";
@@ -20,18 +21,26 @@ export default function WeatherTab() {
   const [loading, setLoading] = useState(false);
   const [changing, setChanging] = useState(false);
   const [day, setDay] = useState(0);
+  const { bump, isLatest } = useLatestRequest();
 
-  const load = useCallback(async (force: boolean) => {
-    setLoading(true);
-    try {
-      setView(await api.weatherGet(force));
-      setError("");
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // The refresh event, the mount read and the refresh button can overlap: only the newest reply lands.
+  const load = useCallback(
+    async (force: boolean) => {
+      const id = bump();
+      setLoading(true);
+      try {
+        const next = await api.weatherGet(force);
+        if (!isLatest(id)) return;
+        setView(next);
+        setError("");
+      } catch (e) {
+        if (isLatest(id)) setError(errText(e));
+      } finally {
+        if (isLatest(id)) setLoading(false);
+      }
+    },
+    [bump, isLatest],
+  );
 
   useEffect(() => {
     void load(false);
@@ -57,6 +66,7 @@ export default function WeatherTab() {
   const { place, forecast } = view;
   return (
     <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
+      {error && <ErrorBanner message={error} busy={loading} onRetry={() => void load(true)} />}
       {view.error && (
         <p role="alert" className="text-xs text-danger">
           {view.error}
