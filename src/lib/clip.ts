@@ -1,5 +1,5 @@
 import { LOCALE, t } from "../i18n";
-import type { ClipMode } from "./api";
+import type { ClipItem, ClipMode } from "./api";
 
 export type ClipKind = "link" | "color" | "json" | "email" | "phone" | "code" | "text";
 
@@ -82,4 +82,13 @@ export function parseMaxPinned(text: string): number | null {
   if (!/^\d+$/.test(text.trim())) return null;
   const next = Math.min(1000, Number(text));
   return next < 1 ? null : next;
+}
+
+/** Whether two clip lists show the same thing, so an idle poll can keep the old array and skip a re-render. */
+export function sameClips(a: ClipItem[], b: ClipItem[]): boolean {
+  if (a.length !== b.length) return false;
+  return a.every((x, n) => {
+    const y = b[n];
+    return x.id === y.id && x.preview === y.preview && x.pinned === y.pinned && x.copied_at === y.copied_at && x.kept === y.kept && x.chars === y.chars && x.truncated === y.truncated;
+  });
 }
