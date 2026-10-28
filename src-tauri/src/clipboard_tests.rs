@@ -181,3 +181,12 @@ fn concurrent_updates_do_not_lose_each_other() {
     assert_eq!(st.clip_load().unwrap().items.len(), 8, "a load-save race dropped an entry");
     let _ = std::fs::remove_dir_all(&st.dir);
 }
+
+#[test]
+fn a_copied_token_stays_out_of_the_history() {
+    let mut h = hist(&["nota"]);
+    let token = format!("glpat-{}", "x1".repeat(12));
+    assert!(!h.push(&token, "tok".into()));
+    assert_eq!(h.items.len(), 1);
+    assert!(h.push(&format!("token: {token}"), "ctx".into()));
+}

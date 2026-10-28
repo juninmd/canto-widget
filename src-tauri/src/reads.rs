@@ -220,8 +220,9 @@ pub fn fetch(url: &str) -> Result<Vec<u8>, String> {
         _ => {}
     }
     let mut bytes = Vec::new();
+    // The read error wraps reqwest's, whose text names the feed URL, and a private feed keeps its token there.
     std::io::Read::read_to_end(&mut std::io::Read::take(res, MAX_FEED_BYTES as u64 + 1), &mut bytes)
-        .map_err(|e| e.to_string())?;
+        .map_err(|_| "o feed parou de responder no meio".to_string())?;
     if bytes.len() > MAX_FEED_BYTES {
         return Err("o feed é grande demais".into());
     }
