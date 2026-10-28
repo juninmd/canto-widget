@@ -4,6 +4,8 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 const calls: string[] = [];
 let failStatus = false;
+let heldStatus: Promise<unknown> | null = null;
+let blankWeek = false;
 const day = new Date(2026, 8, 30).getTime() / 1000;
 const summary = {
   spans: [{ app: "Code", start: day + 9 * 3600, end: day + 11 * 3600 }],
@@ -18,6 +20,12 @@ const empty = { spans: [], apps: [], total_secs: 0, idle: [], idle_secs: 0, focu
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
     calls.push(cmd);
+    if (cmd === "activity_status" && heldStatus) {
+      const held = heldStatus;
+      heldStatus = null;
+      return held;
+    }
+    if (cmd === "activity_summary" && blankWeek) return Promise.resolve(empty);
     if (cmd === "activity_status") return failStatus ? Promise.reject("cofre ocupado") : Promise.resolve({ supported: true, enabled: true });
     if (cmd === "activity_summary") return Promise.resolve((args?.fromMs as number) === day * 1000 ? summary : empty);
     return Promise.resolve(null);
@@ -44,6 +52,8 @@ beforeEach(() => {
   localStorage.clear();
   calls.length = 0;
   failStatus = false;
+  heldStatus = null;
+  blankWeek = false;
   setHidden(false);
 });
 afterEach(() => {
@@ -137,4 +147,18 @@ test("the palette's refresh request reloads the week", async () => {
   await act(async () => requestRefresh("activity"));
   await settle();
   expect(calls.filter((c) => c === "activity_summary").length).toBe(before + 7);
+});
+
+test("a slower, older load does not replace the week a newer refresh brought", async () => {
+  const { requestRefresh } = await import("../lib/refreshEvent");
+  let late: (v: unknown) => void = () => {};
+  heldStatus = new Promise((resolve) => (late = resolve));
+  await mount();
+  await act(async () => requestRefresh("activity"));
+  await settle();
+  expect(screen.getAllByText("Code").length).toBeGreaterThan(0);
+  blankWeek = true;
+  await act(async () => late({ supported: true, enabled: true }));
+  await settle();
+  expect(screen.getAllByText("Code").length).toBeGreaterThan(0);
 });

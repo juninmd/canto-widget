@@ -3,6 +3,7 @@ import { api, errText } from "../lib/api";
 import type { HealthEndpoint, HealthView } from "../lib/healthTypes";
 import { summarize } from "../lib/health";
 import { worstFirst } from "../lib/healthSort";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { useWindowVisible } from "../lib/useWindowVisible";
 import { t } from "../i18n";
 import HealthDetail from "./HealthDetail";
@@ -23,22 +24,33 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const mounted = useRef(true);
+  const { bump, isLatest } = useLatestRequest();
+  const writes = useRef(0);
   const visible = useWindowVisible();
 
-  const apply = useCallback((list: HealthView[] | null | undefined) => {
-    if (mounted.current && Array.isArray(list)) setViews(list);
-  }, []);
-
+  // Writes order among themselves; a poll never invalidates a write, and any write that starts or lands during
+  // a poll voids it, since Rust may have read the list before the write reached it.
   const run = useCallback(
-    async (call: () => Promise<HealthView[]>) => {
+    async (call: () => Promise<HealthView[]>, poll = false): Promise<boolean> => {
+      const id = poll ? 0 : bump();
+      const epoch = poll ? writes.current : ++writes.current;
+      const fresh = () => (poll ? epoch === writes.current : isLatest(id));
       try {
-        apply(await call());
-        if (mounted.current) setError("");
+        const list = await call();
+        if (mounted.current && fresh()) {
+          if (Array.isArray(list)) setViews(list);
+          setError("");
+        }
+        return true;
       } catch (e) {
-        if (mounted.current) setError(errText(e));
+        // A failed save is shown even if a poll started meanwhile, or the form would stay open in silence.
+        if (mounted.current && (!poll || fresh())) setError(errText(e));
+        return false;
+      } finally {
+        if (!poll) writes.current += 1;
       }
     },
-    [apply],
+    [bump, isLatest],
   );
 
   useEffect(() => {
@@ -51,8 +63,8 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
   // Only paints tiles: Rust's health watch keeps probing and alerting while hidden; back on screen, read at once.
   useEffect(() => {
     if (!visible) return;
-    void run(api.healthList);
-    const timer = setInterval(() => void run(api.healthList), POLL_MS);
+    void run(api.healthList, true);
+    const timer = setInterval(() => void run(api.healthList, true), POLL_MS);
     return () => clearInterval(timer);
   }, [run, visible]);
 
@@ -84,9 +96,10 @@ export default function HealthTab({ toolbar }: { toolbar?: HTMLElement | null })
             {adding && (
               <HealthForm
                 onCancel={() => setAdding(false)}
-                onSave={(e) => {
-                  setAdding(false);
-                  void save(e);
+                onSave={async (e) => {
+                  const ok = await save(e);
+                  if (ok && mounted.current) setAdding(false);
+                  return ok;
                 }}
               />
             )}
