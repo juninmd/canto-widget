@@ -16,6 +16,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o redesenho.
 ### Adicionado
 
+- **Tokens copiados ficam fora do histórico do Clipboard.** Uma cópia que é só um token de formato conhecido
+  (GitHub, GitLab, Google, Anthropic, Slack, AWS, JWT) ou um bloco de chave privada não entra no histórico, como já
+  acontecia com o que gerenciadores de senha marcam como oculto; um texto que só menciona o token continua sendo
+  guardado. Erros de rede do Google, da TomTom e dos feeds não repetem mais a URL (onde vão chave e dados da busca),
+  e os tokens do GitHub e do Google não aparecem mais em nenhuma saída de depuração.
 - **Gmail pelo teclado, sem ação em dobro.** Com o foco num e-mail, **J/K** (ou as setas) andam pela lista, **X** seleciona, **S** dá estrela, **U** alterna lido, **E** arquiva, **#** manda para a lixeira e **O** abre no Gmail; o foco passa para o vizinho quando o e-mail sai. Um clique duplo em "marcar como lido", estrela, arquivar ou lixeira agora envia um pedido só: as ações do e-mail esperam a resposta. **/** também foca a busca no Gmail, no Drive e nos Contatos.
 - **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
   revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**
@@ -23,11 +28,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   travados enquanto salvam, então um clique duplo não manda dois pedidos nem deixa o estado invertido.
 - **Busca global em mais fontes**: além de tarefas de hoje, notas e clipboard, o `Ctrl+K` agora busca na agenda de hoje (já carregada, sem chamada ao Google) e nas transcrições de reunião. Cada resultado é clicável e as setas ↑/↓ percorrem o campo e todos os resultados; uma transcrição abre Agenda › Reuniões com a busca preenchida. Uma pasta de transcrições ilegível vira grupo vazio, não aviso de erro.
 - **Lembrete por contexto**: nos detalhes da tarefa, em vez de um horário ela pode esperar o app em foco ("ao abrir o app", ex.: Slack) ou a rede Wi‑Fi ("ao entrar no Wi‑Fi"). Com o cofre aberto, o Canto confere a cada 15 s e toca o aviso (com som e notificação, como os de horário) uma vez por dia por tarefa aberta de hoje ou atrasada. Nada é consultado enquanto nenhuma tarefa aberta tem contexto, e o nome do app fica só no cofre criptografado (campo novo `context`, ignorado por versões antigas). O nome do app segue o do registro de atividade (`Code`, `Slack`, `Safari`; sem diferença de maiúsculas nem de `.exe`). Wi‑Fi: Windows (`netsh`), Linux (`nmcli`/`iwgetid`) e macOS (`networksetup`; o macOS 14.4+ só informa a rede com a permissão de localização). Em Linux com Wayland o app em foco não é visível, então só o Wi‑Fi funciona. A linha da tarefa mostra “ao abrir Slack” ou “no Wi‑Fi Escritorio”.
-- **Tokens copiados ficam fora do histórico do Clipboard.** Uma cópia que é só um token de formato conhecido
-  (GitHub, GitLab, Google, Anthropic, Slack, AWS, JWT) ou um bloco de chave privada não entra no histórico, como já
-  acontecia com o que gerenciadores de senha marcam como oculto; um texto que só menciona o token continua sendo
-  guardado. Erros de rede do Google, da TomTom e dos feeds não repetem mais a URL (onde vão chave e dados da busca),
-  e os tokens do GitHub e do Google não aparecem mais em nenhuma saída de depuração.
 - **Blocos de código nas notas**: trechos entre
 - **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
   atualiza o texto da nota.
@@ -411,17 +411,22 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
   arrastava a largura da lista saiu.
+- **"Mostrar- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
+- **Pop‑up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **Teclad- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
   arrastava a largura da lista saiu.
+- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop-up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
 - **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
-- **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
 - **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
-- **Pop‑up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
-- **Carrossel de notificações navegável:** com muitos avisos, a tira do topo do pop‑up cortava os últimos sem jeito de chegar a eles. Agora tem setas ‹ ›, contador ("2 de 5"), ← → no teclado, rolagem com a roda do mouse e arrastando, e o aviso escolhido sempre rola para a vista.
-- **"Mostrar- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+- **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
+- **Clima e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que

@@ -2,10 +2,13 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { WeatherView } from "../lib/api";
+import { requestRefresh } from "../lib/refreshEvent";
 
 type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
 let view: WeatherView;
+/** Replies handed out, in order, before falling back to `view`: lets a test fail or delay one read. */
+const replies: Promise<WeatherView>[] = [];
 
 const EMPTY: WeatherView = { place: null, forecast: null, fetched_at: 0, error: null };
 const SAVED: WeatherView = {
@@ -46,7 +49,7 @@ const SAVED: WeatherView = {
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown> = {}) => {
     calls.push({ cmd, args });
-    if (cmd === "weather_get") return Promise.resolve(view);
+    if (cmd === "weather_get") return replies.shift() ?? Promise.resolve(view);
     if (cmd === "weather_clear") return Promise.resolve(EMPTY);
     return Promise.resolve(null);
   },
@@ -61,6 +64,7 @@ async function show() {
 
 beforeEach(() => {
   calls.length = 0;
+  replies.length = 0;
   view = EMPTY;
 });
 afterEach(cleanup);
@@ -196,4 +200,26 @@ test("a failed reading is shown above the card that is still there", async () =>
   expect(screen.getByRole("alert").textContent).toBe("sem resposta da Open-Meteo");
   expect(screen.getByText("São Paulo · Brasil")).toBeTruthy();
   expect(screen.getByRole("button", { name: "trocar de cidade" })).toBeTruthy();
+});
+
+test("a refresh that fails keeps the card and says why, with a retry", async () => {
+  view = SAVED;
+  await show();
+  replies.push(Promise.reject("sem conexão"));
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "atualizar" })));
+  expect(screen.getByRole("alert").textContent).toContain("sem conexão");
+  expect(screen.getByText("São Paulo · Brasil")).toBeTruthy();
+  await act(async () => fireEvent.click(screen.getByText("tentar de novo")));
+  expect(screen.queryByRole("alert") === null).toBe(true);
+});
+
+test("a slow first read that arrives after a refresh does not bring the old city back", async () => {
+  let late: (v: WeatherView) => void = () => {};
+  replies.push(new Promise((r) => (late = r)));
+  view = SAVED;
+  render(<WeatherTab />);
+  await act(async () => requestRefresh("weather"));
+  expect(screen.getByText("São Paulo · Brasil")).toBeTruthy();
+  await act(async () => late(EMPTY));
+  expect(screen.getByText("São Paulo · Brasil")).toBeTruthy();
 });
