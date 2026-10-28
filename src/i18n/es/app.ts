@@ -191,6 +191,8 @@ export const app: Record<keyof typeof source, string> = {
   "settings.sync.change": "cambiar carpeta",
   "settings.sync.now": "sincronizar ahora",
   "settings.sync.stop": "detener",
+  "settings.sync.stopAsk": "¿dejar de sincronizar? la carpeta y sus archivos quedan como están",
+  "settings.sync.stopYes": "sí, detener",
   "settings.sync.merged": "combinado: la bóveda tiene {tasks} tareas y {notes} notas",
   "settings.sync.nothingNew": "nada nuevo que combinar",
 
@@ -296,6 +298,7 @@ export const app: Record<keyof typeof source, string> = {
   "update.available": "Canto {version} disponible",
   "update.view": "ver",
   "common.retry": "intentar de nuevo",
+  "common.cancel": "cancelar",
   "common.refresh": "actualizar",
   "common.refreshing": "actualizando",
   "common.updatedAt": "actualizado a las {time}",

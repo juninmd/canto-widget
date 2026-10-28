@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DND_CHOICES, useDoNotDisturb } from "../lib/doNotDisturb";
 import { useSectionError } from "../lib/useSectionError";
 import { t, LOCALE } from "../i18n";
@@ -6,6 +7,19 @@ import { SettingsSection } from "./SettingsSection";
 export default function DoNotDisturbSection({ onError }: { onError: (m: string) => void }) {
   const { error, fail, clear } = useSectionError(onError);
   const { state, start, stop } = useDoNotDisturb(fail);
+  const [busy, setBusy] = useState(false);
+
+  // One request at a time: a double click would otherwise send two `dnd_set` and flash the state.
+  async function send(call: () => Promise<void>) {
+    if (busy) return;
+    setBusy(true);
+    clear();
+    try {
+      await call();
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
     <SettingsSection id="dnd-title" title={t("settings.dnd.title")} error={error}>
@@ -21,11 +35,9 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
           </span>
           <button
             type="button"
-            onClick={() => {
-              clear();
-              void stop();
-            }}
-            className="min-h-7 rounded-lg border border-edge px-2.5 text-muted hover:text-fg"
+            disabled={busy}
+            onClick={() => void send(stop)}
+            className="min-h-7 rounded-lg border border-edge px-2.5 text-muted hover:text-fg disabled:opacity-40"
           >
             {t("settings.dnd.turnOff")}
           </button>
@@ -36,11 +48,9 @@ export default function DoNotDisturbSection({ onError }: { onError: (m: string) 
             <button
               key={choice}
               type="button"
-              onClick={() => {
-                clear();
-                void start(choice);
-              }}
-              className="min-h-7 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg"
+              disabled={busy}
+              onClick={() => void send(() => start(choice))}
+              className="min-h-7 rounded-lg border border-edge px-2.5 text-xs text-muted hover:text-fg disabled:opacity-40"
             >
               {t(`settings.dnd.${choice}`)}
             </button>

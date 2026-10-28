@@ -8,6 +8,7 @@ import { SettingsSection } from "./SettingsSection";
 /** On/off for the OS notification Rust sends when someone asks for the user's review on GitHub. */
 export default function ReviewAlertsSection({ onError }: { onError: (m: string) => void }) {
   const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [saving, setSaving] = useState(false);
   const connected = useGithubConnected();
   const { error, fail, clear } = useSectionError(onError);
 
@@ -18,13 +19,18 @@ export default function ReviewAlertsSection({ onError }: { onError: (m: string) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Held while saving: a second click before Rust answers would race the first and could leave the opposite state.
   async function toggle(next: boolean) {
+    if (saving) return;
+    setSaving(true);
     clear();
     try {
       setEnabled(await api.reviewAlertsSet(next));
     } catch (e) {
       fail(e);
       await load();
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -34,7 +40,7 @@ export default function ReviewAlertsSection({ onError }: { onError: (m: string) 
         <input
           type="checkbox"
           checked={enabled ?? false}
-          disabled={enabled === null}
+          disabled={enabled === null || saving}
           onChange={(e) => void toggle(e.target.checked)}
           className="canto-box"
         />
