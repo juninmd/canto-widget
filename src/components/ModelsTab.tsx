@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFlip } from "../lib/useFlip";
 import { api, errText, type ModelsView } from "../lib/api";
 import { SORTS, availableFilters, withSheet, filterModels, sortModels, type ModelFilter, type ModelSort } from "../lib/models";
@@ -53,6 +53,13 @@ export default function ModelsTab() {
     void load(false);
   }, [load]);
 
+  // Toggling a sheet or the loading flag re-renders the tab; the ranking and the compare set only change with their inputs.
+  const all = view?.models;
+  const offered = useMemo(() => (all ? availableFilters(all) : []), [all]);
+  const rows = useMemo(() => (all ? sortModels(filterModels(all, filters.filter((f) => offered.includes(f))), sort) : []), [all, filters, offered, sort]);
+  const marked = useMemo(() => (all ? picked.filter((id) => all.some((m) => m.id === id)) : []), [all, picked]);
+  const max = useMemo(() => Math.max(0, ...(all ?? []).map((m) => m.score)), [all]);
+
   async function toggleAlerts() {
     if (!view) return;
     const next = !view.alerts;
@@ -76,16 +83,6 @@ export default function ModelsTab() {
     );
   }
 
-  const offered = availableFilters(view.models);
-  const rows = sortModels(
-    filterModels(
-      view.models,
-      filters.filter((f) => offered.includes(f)),
-    ),
-    sort,
-  );
-  const marked = picked.filter((id) => view.models.some((m) => m.id === id));
-  const max = Math.max(0, ...view.models.map((m) => m.score));
   const nextAt = new Date(view.next_fetch_at).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
   const bell = view.alerts ? t("models.alertOff") : t("models.alertOn");
   const problem = error || view.error;
@@ -198,7 +195,7 @@ export default function ModelsTab() {
       <div className="flex items-center justify-between gap-2 text-[10px] text-faint">
         <span>
           {t("models.source")}{" "}
-          <button type="button" onClick={() => void api.openLink(SITE).catch(() => {})} className={LINK}>
+          <button type="button" onClick={() => void api.openLink(SITE).catch((e) => setError(errText(e)))} className={LINK}>
             artificialanalysis.ai
           </button>
         </span>

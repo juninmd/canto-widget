@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import type { ModelRow } from "../lib/api";
 import { BAR_METRICS, METRICS, SERIES, bestValue, value, verdicts, type Verdict } from "../lib/modelsCompare";
 import { formatScore } from "../lib/models";
@@ -50,7 +51,8 @@ function Bars({ rows }: { rows: readonly ModelRow[] }) {
 
 /** Side by side: who leads in a sentence, the shape of each model, one bar per metric and the full table. */
 export default function ModelsCompare({ rows, picked, onChange }: { rows: readonly ModelRow[]; picked: readonly string[]; onChange: (ids: string[]) => void }) {
-  const chosen = picked.map((id) => rows.find((r) => r.id === id)).filter((r): r is ModelRow => r !== undefined);
+  // Stable while the pick is unchanged, so the full table below keeps its memoized lines.
+  const chosen = useMemo(() => picked.map((id) => rows.find((r) => r.id === id)).filter((r): r is ModelRow => r !== undefined), [rows, picked]);
   const color = (id: string) => SERIES[chosen.findIndex((r) => r.id === id)];
   const name = (id: string) => chosen.find((r) => r.id === id)?.name ?? id;
   return (
