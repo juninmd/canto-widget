@@ -393,6 +393,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Contatos- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
 - **Lockfile do Flatpak sem o happy-dom vulnerável.** O `packaging/flatpak/yarn.lock` foi regerado a partir do
   `bun.lock` e deixa o happy-dom 20.14.5 (GHSA-834v-8h66-3h79, execução de código pelo alias de import) pelo
   21.0.4, voltando a bater versão a versão com o que o CI testa.

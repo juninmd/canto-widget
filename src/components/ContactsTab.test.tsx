@@ -4,7 +4,7 @@ import type { ContactsView } from "../lib/api";
 
 type Call = { cmd: string; args: Record<string, unknown> };
 const calls: Call[] = [];
-let reply: ContactsView | string;
+let reply: ContactsView | string | Promise<ContactsView>;
 
 const PHOTO = "https://lh3.googleusercontent.com/contacts/marina=s96-c";
 const NONE = { nickname: "", department: "", birthday: null, addresses: [], urls: [], relations: [], note: "" };
@@ -27,6 +27,7 @@ mock.module("@tauri-apps/api/core", () => ({
     calls.push({ cmd, args });
     if (cmd === "contact_photos") return Promise.resolve({ [PHOTO]: "data:image/png;base64,AA", "https://lh3.googleusercontent.com/x": "javascript:1" });
     if (cmd !== "contacts_list") return Promise.resolve(null);
+    if (reply instanceof Promise) return reply;
     return typeof reply === "string" ? Promise.reject(reply) : Promise.resolve(reply);
   },
 }));
@@ -157,4 +158,17 @@ test("without photos no photo call is made", async () => {
   render(<ContactsTab onNotice={() => {}} />);
   await screen.findByText("Ana Souza");
   expect(calls.some((c) => c.cmd === "contact_photos")).toBe(false);
+});
+
+test("a slower, older load does not replace a newer refresh", async () => {
+  const { requestRefresh } = await import("../lib/refreshEvent");
+  let late: (v: ContactsView) => void = () => {};
+  reply = new Promise<ContactsView>((resolve) => (late = resolve));
+  render(<ContactsTab onNotice={() => {}} />);
+  reply = { ...VIEW, total: 9 };
+  requestRefresh("contacts");
+  await waitFor(() => expect(document.querySelector("[data-contacts-total]")?.textContent).toBe("9"));
+  late(VIEW);
+  await new Promise((r) => setTimeout(r, 0));
+  expect(document.querySelector("[data-contacts-total]")?.textContent).toBe("9");
 });
