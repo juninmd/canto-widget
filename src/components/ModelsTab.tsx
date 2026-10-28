@@ -90,7 +90,9 @@ export default function ModelsTab() {
   return (
     <div className="flex h-full flex-col gap-2">
       <div className="flex items-center justify-between gap-2 text-[11px] text-faint">
-        <span className="truncate font-medium text-muted">{view.total > 0 ? t("models.header", { n: view.total }) : t("models.headerEmpty")}</span>
+        <span className="truncate font-medium text-muted">{view.total > 0 ? t("models.header", { n: view.total }) : t("models.headerEmpty")}
+          {view.index && ` · v${view.index}`}
+        </span>
         <span className="flex shrink-0 items-center gap-3">
           {view.fetched_at > 0 && <span>{t("models.updatedAgo", { ago: timeAgo(view.fetched_at) })}</span>}
           <button type="button" onClick={() => void load(true)} disabled={loading} title={t("models.nextFetchTitle")} className={LINK}>

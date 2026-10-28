@@ -30,7 +30,7 @@ const models = [
 ];
 
 function connected(extra: Partial<ModelsView> = {}): ModelsView {
-  return { alerts: false, models, total: 187, fetched_at: Date.now() - 2 * 3_600_000, next_fetch_at: Date.now() + 3_600_000, throttled: false, error: null, ...extra };
+  return { alerts: false, models, total: 187, fetched_at: Date.now() - 2 * 3_600_000, next_fetch_at: Date.now() + 3_600_000, throttled: false, error: null, index: "5.0", ...extra };
 }
 
 async function show() {
@@ -48,7 +48,7 @@ afterEach(cleanup);
 
 test("lists the ranking with rank, creator, badges, score, price and speed", async () => {
   await show();
-  expect(screen.getByText("Intelligence Index · 187 modelos")).toBeTruthy();
+  expect(screen.getByText("Intelligence Index · 187 modelos · v5.0")).toBeTruthy();
   expect(screen.getByText("atualizado há 2 h")).toBeTruthy();
   expect(names()).toEqual(["a", "n", "o", "b"]);
   expect(screen.getByTitle("posição 1 no ranking").className).toContain("bg-accent");

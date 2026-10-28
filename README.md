@@ -319,7 +319,7 @@ Also has 🎙️ **Meetings**, a sub-tab of the Agenda next to List and Day: Gem
 the last two weeks, plus `.vtt`, `.srt`, `.txt` and `.md` transcripts from a local folder, cleaned up and searchable.
 
 🤖 **AI models** (on the tab bar by default, **no API key or account**): LLMs ranked by the
-[Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index**, read from its public leaderboard page,
+[Artificial Analysis](https://artificialanalysis.ai) **Intelligence Index** (v5.0), read from its public leaderboard page,
 with a score bar, creator, price per 1M tokens, speed and context window, sortable by intelligence, price, speed,
 context or release date and filterable by open weights or reasoning. Tap a model for its **full sheet** (release
 date, context, open or closed weights, reasoning, input/output/blended price, speed, time to first token,

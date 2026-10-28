@@ -234,6 +234,8 @@ export type ModelsView = {
   next_fetch_at: number;
   throttled: boolean;
   error: string | null;
+  /** Intelligence Index version the ranking follows, e.g. `5.0`. */
+  index: string;
 };
 
 /** A game on any Steam list; `price` and `original` come from Steam already localized to the region. */

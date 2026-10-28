@@ -9,6 +9,9 @@ use serde_json::Value;
 use crate::models_fields::{self, Details};
 
 pub const URL: &str = "https://artificialanalysis.ai/leaderboards/models";
+/// Version of the Intelligence Index the page publishes. Scores aren't comparable across versions, so a bump
+/// reseeds the top 10 instead of alerting on every reshuffle.
+pub const INDEX_VERSION: &str = "5.0";
 const TIMEOUT_S: u64 = 20;
 const MAX_TEXT: usize = 120;
 /// Opens each Next.js flight chunk: a JSON string literal holding a slice of the payload.

@@ -20,6 +20,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
 ### Alterado
 
+- **Modelos IA no Intelligence Index v5.0**: a Artificial Analysis lançou a v5.0 do índice (9 avaliações, notas
+  numa escala nova, topo em 58). O cabeçalho da aba mostra a versão e a primeira leitura numa versão nova só
+  re-semeia o top 10, sem disparar alertas nem selos "novo"/"subiu" para cada modelo que mudou de lugar.
 - **Menos CPU, bateria e rede com o widget escondido**: no Windows, esconder o widget pela bandeja, pelo atalho
   ou pelo botão agora pausa de verdade as atualizações que só desenham a tela (Endpoints, Atividade, Mapa,
   Área de transferência e o relógio do foco), que voltam na hora ao reabrir. A bandeja deixa de pedir a agenda

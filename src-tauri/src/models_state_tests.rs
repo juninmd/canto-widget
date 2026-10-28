@@ -94,6 +94,20 @@ fn changes_leave_badges_that_last_7_days() {
 }
 
 #[test]
+fn a_new_index_version_reseeds_without_alerts() {
+    let mut cfg = ModelsConfig::default();
+    refresh(&mut cfg, T0, false, || Ok(list(12)));
+    cfg.index = "4.0".into();
+    let mut next = list(12);
+    next[11].score = 95.0;
+    let out = refresh(&mut cfg, T0 + FLOOR_MS, false, || Ok(next));
+    assert!(out.changes.is_empty(), "scores of another version aren't comparable");
+    assert_eq!(cfg.index, crate::models_feed::INDEX_VERSION);
+    assert!(cfg.badges.is_empty());
+    assert_eq!(cfg.top.as_ref().unwrap()[0], "a11");
+}
+
+#[test]
 fn the_ranking_is_sealed_on_disk_and_survives_a_password_change() {
     let dir = std::env::temp_dir().join(format!("canto-models-{}-{}", std::process::id(), now_ms()));
     let st = AppState::new(dir);

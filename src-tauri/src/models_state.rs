@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
-use crate::models_feed::{FetchError, Model};
+use crate::models_feed::{FetchError, Model, INDEX_VERSION};
 use crate::models_rank::{self, Change};
 use crate::store::{self, MODELS_AAD};
 use crate::vault::AppState;
@@ -46,6 +46,9 @@ pub struct ModelsConfig {
     pub top: Option<Vec<String>>,
     #[serde(default)]
     pub badges: Vec<Badge>,
+    /// `INDEX_VERSION` the stored `top` was ranked under; empty in files written before it existed.
+    #[serde(default)]
+    pub index: String,
 }
 
 impl AppState {
@@ -104,6 +107,11 @@ pub fn refresh(
 
 fn apply(cfg: &mut ModelsConfig, models: Vec<Model>, now: i64) -> Vec<Change> {
     let ranked = models_rank::rank(models);
+    if cfg.index != INDEX_VERSION {
+        cfg.top = None;
+        cfg.badges.clear();
+        cfg.index = INDEX_VERSION.to_string();
+    }
     let changes = models_rank::diff(cfg.top.as_deref(), &ranked);
     cfg.top = Some(models_rank::top_ids(&ranked));
     cfg.total = ranked.len();
@@ -135,6 +143,7 @@ pub struct ModelsView {
     pub next_fetch_at: i64,
     pub throttled: bool,
     pub error: Option<String>,
+    pub index: &'static str,
 }
 
 pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
@@ -152,6 +161,7 @@ pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
         next_fetch_at: next_fetch_at(cfg),
         throttled: outcome.throttled,
         error: outcome.error,
+        index: INDEX_VERSION,
     }
 }
 
