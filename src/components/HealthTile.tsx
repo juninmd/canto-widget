@@ -8,7 +8,9 @@ const BORDER = { up: "border-t-ok", slow: "border-t-warn", down: "border-t-dange
 const BIG = { up: "text-fg", slow: "text-warn", down: "text-danger", unknown: "text-faint" } as const;
 const TONE: Record<HealthState, StateTone> = { up: "ok", slow: "warn", down: "bad", unknown: "neutral" };
 
-/** Closed state of an endpoint: its state as a word, the latest latency, the last 24 readings as bars and one line of numbers. */
+/** Closed state of an endpoint: its state as a word, the latest latency, the last 24 readings as bars and one line of numbers.
+ *  `shrink-0`: the list is a scrolling flex column and `canto-hit` sets min-height, which drops the flex
+ *  `min-height: auto` floor; without it the tiles shrink to fit and the next one covers the latency and bars. */
 export default function HealthTile({ view, onOpen }: { view: HealthView; onOpen: () => void }) {
   const { endpoint: e, health, samples } = view;
   const last = lastOf(samples);
@@ -19,7 +21,7 @@ export default function HealthTile({ view, onOpen }: { view: HealthView; onOpen:
       type="button"
       aria-expanded={false}
       onClick={onOpen}
-      className={`canto-hit flex min-w-0 flex-col gap-1.5 rounded-xl border border-t-[3px] border-edge bg-panel p-2.5 text-left hover:bg-hover ${BORDER[health]}`}
+      className={`canto-hit flex min-w-0 shrink-0 flex-col gap-1.5 rounded-xl border border-t-[3px] border-edge bg-panel p-2.5 text-left hover:bg-hover ${BORDER[health]}`}
     >
       <span className="flex items-center gap-2">
         <b className="min-w-0 flex-1 text-xs [overflow-wrap:anywhere]">{e.name}</b>

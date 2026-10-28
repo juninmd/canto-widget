@@ -393,6 +393,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Clima e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
 - **Contatos- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
@@ -401,11 +406,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Lockfile do Flatpak sem o happy-dom vulnerável.** O `packaging/flatpak/yarn.lock` foi regerado a partir do
   `bun.lock` e deixa o happy-dom 20.14.5 (GHSA-834v-8h66-3h79, execução de código pelo alias de import) pelo
   21.0.4, voltando a bater versão a versão com o que o CI testa.
-- **Horas e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
-  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
-  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
-  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
-  arrastava a largura da lista saiu.
 - **Busca gl- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
@@ -426,7 +426,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Pop-up de notificação sem a borda de cima:** a janela media o cartão no meio da animação de entrada (ainda em 98%) e ficava alguns pixels mais baixa; agora usa a altura real do cartão.
 - **O filtro "buscar ajuste" não cobre mais o menu das abas:** a barra lateral expandida passou a ficar acima do campo fixo de busca de Ajustes.
 - **Falhas TCP no Windows:** conexão recusada e tempo esgotado usam o tipo do erro, mantendo a mensagem pt-BR esperada independentemente do idioma do sistema operacional.
-- **Clima e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+- **Horas e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
   fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
