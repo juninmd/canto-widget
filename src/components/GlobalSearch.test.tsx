@@ -5,9 +5,11 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 type Deferred = { resolve: (v: unknown) => void };
 let notesQueue: Deferred[] = [];
 let notesArgs: unknown[] = [];
+let failAll = false;
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args?: Record<string, unknown>) => {
+    if (failAll) return Promise.reject("cofre bloqueado");
     if (cmd === "notes_search") {
       notesArgs.push(args);
       return new Promise((resolve) => notesQueue.push({ resolve }));
@@ -24,6 +26,7 @@ afterEach(() => {
   cleanup();
   notesQueue = [];
   notesArgs = [];
+  failAll = false;
 });
 
 async function wait(ms: number) {
@@ -32,8 +35,8 @@ async function wait(ms: number) {
   });
 }
 
-function mount() {
-  render(<GlobalSearch today="2026-09-20" privacy={false} onNavigate={() => {}} onClose={() => {}} onError={() => {}} />);
+function mount(onError: (m: string) => void = () => {}) {
+  render(<GlobalSearch today="2026-09-20" privacy={false} onNavigate={() => {}} onClose={() => {}} onError={onError} />);
   return screen.getByPlaceholderText("buscar em tarefas de hoje, agenda, notas, transcrições e clipboard");
 }
 
@@ -83,4 +86,43 @@ test("clearing the query drops previous results instead of waiting for them", as
 
   expect(screen.queryByText("nota tardia")).toBeNull();
   expect(screen.getByText("digite para buscar em todas as fontes ao mesmo tempo")).toBeTruthy();
+});
+
+test("'nada encontrado' waits for the lookups to settle instead of flashing while they run", async () => {
+  const input = mount();
+
+  fireEvent.change(input, { target: { value: "vazio" } });
+  await wait(200);
+  expect(screen.queryByText("nada encontrado")).toBeNull();
+
+  await act(async () => {
+    notesQueue[0].resolve({ total: 0, items: [] });
+  });
+  expect(screen.getByText("nada encontrado")).toBeTruthy();
+});
+
+test("a failing search reports one error, not one per lookup", async () => {
+  failAll = true;
+  const errors: string[] = [];
+  const input = mount((m) => errors.push(m));
+
+  fireEvent.change(input, { target: { value: "algo" } });
+  await wait(200);
+
+  expect(errors).toEqual(["cofre bloqueado"]);
+});
+
+test("closing the search hands focus back to where it was", () => {
+  const opener = document.createElement("button");
+  document.body.appendChild(opener);
+  opener.focus();
+
+  const { unmount } = render(
+    <GlobalSearch today="2026-09-20" privacy={false} onNavigate={() => {}} onClose={() => {}} onError={() => {}} />,
+  );
+  expect(document.activeElement === opener).toBe(false);
+  unmount();
+
+  expect(document.activeElement === opener).toBe(true);
+  opener.remove();
 });
