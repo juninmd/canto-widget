@@ -67,6 +67,17 @@ test("until turned off sends no end", async () => {
   expect(screen.getByRole("status").textContent).toBe("ativo até desligar");
 });
 
+test("a double click on a duration sends a single request", async () => {
+  render(<DoNotDisturbSection onError={() => {}} />);
+  await settle();
+  const button = screen.getByRole("button", { name: "2 h" }) as HTMLButtonElement;
+  fireEvent.click(button);
+  expect(button.disabled).toBe(true);
+  fireEvent.click(button);
+  await settle();
+  expect(calls.filter((c) => c.cmd === "dnd_set").length).toBe(1);
+});
+
 test("a rejected end surfaces the error from Rust", async () => {
   const errors: string[] = [];
   const { api } = await import("../lib/api");

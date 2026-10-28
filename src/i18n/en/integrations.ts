@@ -228,6 +228,8 @@ export const integrations: Record<keyof typeof source, string> = {
   "google.signOutLabel": "sign out of {account}",
   "google.signingOut": "signing out...",
   "google.signOut": "sign out",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
   "google.heading": "Google Calendar",
   "google.intro": "Optional. The account is only used to read the day's events (read-only); no vault data goes to Google.",
   "google.ownCredentials": "use your own OAuth credentials (advanced)",
