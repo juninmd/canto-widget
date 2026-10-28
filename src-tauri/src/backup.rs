@@ -8,7 +8,7 @@ use crate::vault::AppState;
 
 pub const EXTENSION: &str = "canto";
 /// A tasks-and-notes vault runs a few KB; the cap only stops a wrong file picked in the dialog from being read whole into RAM.
-const MAX_BYTES: u64 = 32 * 1024 * 1024;
+pub const MAX_BYTES: u64 = 32 * 1024 * 1024;
 /// Daily and pre-import copies combined.
 pub const KEEP: usize = 10;
 
@@ -30,12 +30,9 @@ pub fn export(dir: &Path, destination: &Path) -> Result<()> {
 
 /// Last-write-wins with tombstones, so reimporting the same file changes nothing; the prior state is kept in `backups/`.
 pub fn import(state: &AppState, source: &Path) -> Result<ImportSummary> {
-    let size = std::fs::metadata(source)?.len();
-    if size > MAX_BYTES {
-        return Err(AppError::Config("arquivo grande demais para ser um backup do Canto".into()));
-    }
-    let blob: SealedBlob = serde_json::from_slice(&std::fs::read(source)?)
-        .map_err(|_| AppError::Format("o arquivo não é um backup do Canto".into()))?;
+    let bytes = store::read_capped(source, MAX_BYTES, "arquivo grande demais para ser um backup do Canto")?;
+    let blob: SealedBlob =
+        serde_json::from_slice(&bytes).map_err(|_| AppError::Format("o arquivo não é um backup do Canto".into()))?;
     let incoming = state.open_envelope(&blob)?;
     // Only after opening: a wrong password leaves no useless copy behind.
     save(&state.dir, &format!("{}T{}-import", today_utc(), now_ms()))?;
