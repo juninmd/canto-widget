@@ -152,3 +152,17 @@ test("paginates large lists of commenters with show more button", async () => {
   expect(screen.queryByRole("button", { name: /Mostrar mais/ })).toBeNull();
   expect(screen.getByText(/@user_25/)).toBeTruthy();
 });
+
+test("search is labelled, cards expose their pressed state and comments open from a real button", async () => {
+  render(<PrCommentersCatalog commenters={sampleCommenters} />);
+
+  expect(screen.getByLabelText("Buscar pessoa ou comentário…")).toBeTruthy();
+  const grid = screen.getByRole("region", { name: "Catálogo de comentaristas" });
+  const cardBtn = within(grid).getByText(/@joaorafaelsoarest/).closest("button")!;
+  expect(cardBtn.getAttribute("aria-pressed")).toBe("false");
+  await act(async () => {
+    fireEvent.click(cardBtn);
+  });
+  expect(cardBtn.getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByText(/Que app legal! Vou testar/).tagName).toBe("BUTTON");
+});
