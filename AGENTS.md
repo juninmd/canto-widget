@@ -51,6 +51,7 @@ src-tauri/src/
   biometric.rs, hello.rs  Windows Hello unlock
   routine.rs, snooze.rs, notification.rs   reminders, recurring tasks, snoozing, OS notifications
   clipboard.rs, clip_os.rs        clipboard history (size caps, previews), OS change counter and secret skip list
+  clip_secret.rs                  copies shaped like a token or private key never enter the history
   window.rs, window_state.rs      corner anchoring, saved position, fullscreen
   window_mode.rs                  mini mode: the window shrinks into a right-edge dock (geometry, tray toggle, `window_mini_*`)
   alert_log.rs                    in-memory log of what became of each alert today (never on disk)
