@@ -85,6 +85,7 @@ export default function PrCommentersCatalog({ commenters, loading }: Props) {
           setPrsCount(PR_PAGE_SIZE);
         }}
         placeholder={t("forge.commenters.searchPlaceholder")}
+        aria-label={t("forge.commenters.searchPlaceholder")}
         className="w-full rounded-xl border border-edge bg-ink/60 px-2.5 py-1.5 text-xs text-fg placeholder:text-faint focus:border-line focus:outline-none"
       />
 
@@ -101,6 +102,7 @@ export default function PrCommentersCatalog({ commenters, loading }: Props) {
                 <button
                   key={c.login}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => {
                     setSelectedLogin(active ? null : c.login);
                     setPrsCount(PR_PAGE_SIZE);
@@ -153,7 +155,7 @@ export default function PrCommentersCatalog({ commenters, loading }: Props) {
                   <div className="flex items-center justify-between gap-2 mb-1.5">
                     <button
                       type="button"
-                      onClick={() => void api.openLink(pr.url)}
+                      onClick={() => void api.openLink(pr.url).catch(() => {})}
                       className="flex items-center gap-1.5 text-left font-medium text-xs text-fg hover:text-accent-text transition-colors truncate"
                     >
                       <span className="shrink-0 text-accent-text"><PullIcon /></span>
@@ -168,12 +170,15 @@ export default function PrCommentersCatalog({ commenters, loading }: Props) {
                           <span className="font-medium text-muted">{`@${cm.author}`}</span>
                           <span>{timeAgo(cm.created_at)}</span>
                         </div>
-                        <p
-                          className="line-clamp-2 text-fg/90 cursor-pointer hover:text-fg hover:underline"
-                          onClick={() => void api.openLink(cm.url)}
+                        {/* A real button: the comment opens from the keyboard too, not only with a click. */}
+                        <button
+                          type="button"
+                          title={cm.url}
+                          onClick={() => void api.openLink(cm.url).catch(() => {})}
+                          className="line-clamp-2 w-full rounded-md text-left text-fg/90 hover:text-fg hover:underline"
                         >
                           {cm.body}
-                        </p>
+                        </button>
                       </div>
                     ))}
                   </div>
