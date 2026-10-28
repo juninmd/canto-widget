@@ -117,14 +117,19 @@ fn payload(html: &str) -> String {
     out
 }
 
-/// The first `"models":[...]` whose items carry an `intelligenceIndex`; item by item, so one malformed model
-/// is dropped instead of failing the whole list.
+/// The longest list under a key ending in "models" (`"models"`, `"initialModels"`...) whose items carry an
+/// `intelligenceIndex`: the page also ships plain name lists. Item by item, so one malformed model is dropped
+/// instead of failing the whole list.
 pub fn parse_page(html: &str) -> std::result::Result<Vec<Model>, FetchError> {
     let data = payload(html);
-    let list = data.match_indices("\"models\":[").find_map(|(i, m)| {
-        let mut items = serde_json::Deserializer::from_str(&data[i + m.len() - 1..]).into_iter::<Vec<Value>>();
-        items.next()?.ok().filter(|l| l.first().is_some_and(|first| first.get("intelligenceIndex").is_some()))
-    });
+    let list = data
+        .match_indices("odels\":[")
+        .filter(|(i, _)| *i > 1 && matches!(&data[i - 1..*i], "m" | "M"))
+        .filter_map(|(i, m)| {
+            let mut items = serde_json::Deserializer::from_str(&data[i + m.len() - 1..]).into_iter::<Vec<Value>>();
+            items.next()?.ok().filter(|l| l.first().is_some_and(|first| first.get("intelligenceIndex").is_some()))
+        })
+        .max_by_key(|l| l.len());
     match list {
         Some(list) => Ok(list.iter().filter_map(model).collect()),
         None => Err(FetchError::Other("a página mudou de formato".into())),
