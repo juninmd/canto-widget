@@ -50,6 +50,7 @@ pub mod cmd_weather;
 pub mod commands;
 pub mod contact_photos;
 pub mod contacts;
+pub mod context_reminder;
 pub mod crypto;
 pub mod do_not_disturb;
 pub mod drive;
@@ -159,6 +160,7 @@ pub mod steam_wish;
 pub mod store;
 pub mod subtask;
 pub mod sync;
+pub mod task_context;
 pub mod task_order;
 pub mod task_reminder;
 pub mod text_fold;
@@ -176,6 +178,7 @@ pub mod updater;
 pub mod vault;
 pub mod weather;
 pub mod weather_state;
+pub mod wifi_os;
 pub mod window;
 #[cfg(desktop)]
 pub mod window_mode;
@@ -264,6 +267,7 @@ pub fn run() {
             tray_live::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
+            context_reminder::watch(app.handle().clone());
             steam_alert::watch(app.handle().clone());
             status_alert::watch(app.handle().clone());
             gmail_alert::watch(app.handle().clone());
@@ -336,6 +340,7 @@ pub fn run() {
             note_images::note_image_get,
             routine::task_set_schedule,
             routine::task_set_extended_repeat,
+            task_context::task_set_context,
             task_reminder::reminder_lead_set,
             lang::language_set,
             commands::item_delete,
