@@ -434,5 +434,10 @@
   "tasks.context.chipApp": "เมื่อเปิด {name}",
   "tasks.context.chipWifi": "เมื่ออยู่บน Wi-Fi {name}",
   "search.groupAgenda": "ตารางวันนี้",
-  "search.groupTranscripts": "ข้อความถอดเสียง"
+  "search.groupTranscripts": "ข้อความถอดเสียง",
+  "common.cancel": "cancel",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop"
 }
