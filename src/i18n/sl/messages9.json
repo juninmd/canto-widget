@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "brez mesta",
+  "tasks.context.app": "ob odprtju aplikacije",
+  "tasks.context.wifi": "ob povezavi z Wi-Fi",
+  "tasks.context.of": "kje opomniti za {title}",
+  "tasks.context.nameOf": "ime aplikacije ali omrežja za {title}",
+  "tasks.context.chipApp": "ob odprtju {name}",
+  "tasks.context.chipWifi": "na Wi-Fi {name}",
+  "search.groupAgenda": "današnji urnik",
+  "search.groupTranscripts": "prepisi"
 }
