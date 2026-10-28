@@ -419,6 +419,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o grupo certo e rola até a seção.
 - **Alt+↑/↓ move a tarefa de qualquer ponto da linha.** Antes só a alça de arrastar aceitava as setas; agora, com o
   foco na caixa de marcar (ou em qualquer botão da linha), Alt+↑/↓ sobe ou desce a tarefa, e a ajuda de atalhos (?) mostra o atalho.
+- **Gmail pelo teclado, sem ação em dobro.** Com o foco num e-mail, **J/K** (ou as setas) andam pela lista, **X** seleciona, **S** dá estrela, **U** alterna lido, **E** arquiva, **#** manda para a lixeira e **O** abre no Gmail; o foco passa para o vizinho quando o e-mail sai. Um clique duplo em "marcar como lido", estrela, arquivar ou lixeira agora envia um pedido só: as ações do e-mail esperam a resposta. **/** também foca a busca no Gmail, no Drive e nos Contatos.
 - **Contador de palavras no editor de notas.** Abaixo do texto aparece quantas palavras o card tem e, a partir de
   um minuto, o tempo estimado de leitura. Marcação Markdown, números de lista, caixas de tarefa, imagens e
   endereços de links ficam de fora da conta.
@@ -551,6 +552,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Lockfile do Flatpak sem o happy-dom vulnerável.** O `packaging/flatpak/yarn.lock` foi regerado a partir do
+  `bun.lock` e deixa o happy-dom 20.14.5 (GHSA-834v-8h66-3h79, execução de código pelo alias de import) pelo
+  21.0.4, voltando a bater versão a versão com o que o CI testa.
 - **Horas e - **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
@@ -600,10 +604,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **A busca de notas mostra o trecho onde o termo aparece.** Quando a palavra buscada está no meio de uma nota
   longa, o card passa a exibir a linha do resultado (com "…" no início) em vez das primeiras linhas, e o termo
   fica destacado mesmo com acento ou maiúscula diferentes: buscar "acao" mostra e marca "Ação".
-- **Lockfile do Flatpak sem o happy-dom vulnerável.** O `packaging/flatpak/yarn.lock` foi regerado a partir do
-  `bun.lock` e deixa o happy-dom 20.14.5 (GHSA-834v-8h66-3h79, execução de código pelo alias de import) pelo
-  21.0.4, voltando a bater versão a versão com o que o CI testa.
-
 - **Teclado no menu de adiar e na folha "mais" do celular.** O menu ▾ de adiar um aviso abre já no tempo atual,
   as setas percorrem as opções e Esc devolve o foco ao botão; a folha de abas do celular abre na aba atual, mantém
   o Tab dentro dela e, ao fechar, devolve o foco ao botão **mais** em vez de perdê-lo.
