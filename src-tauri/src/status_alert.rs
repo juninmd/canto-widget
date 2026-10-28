@@ -1,6 +1,7 @@
 //! Opt-in OS notifications when a Status API service goes down or degrades. Only services with a current
 //! state (Statuspage's endpoint or a per-component state log) can be watched; plain history can't say "now".
 //! Public data and no vault access: keeps working while the vault is locked.
+use crate::resilient::LockExt;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -38,7 +39,7 @@ impl StatusAlerts {
     }
 
     fn snapshot(&self) -> Vec<String> {
-        let mut ids: Vec<String> = self.ids.lock().unwrap().iter().cloned().collect();
+        let mut ids: Vec<String> = self.ids.lock_safe().iter().cloned().collect();
         ids.sort();
         ids
     }
@@ -75,14 +76,14 @@ pub fn status_alerts_set(alerts: State<'_, StatusAlerts>, ids: Vec<String>) -> R
     if let Some(bad) = ids.iter().find(|id| !watchable(id)) {
         return Err(AppError::Config(format!("serviço sem status ao vivo: {bad}")));
     }
-    *alerts.ids.lock().unwrap() = ids.into_iter().collect();
+    *alerts.ids.lock_safe() = ids.into_iter().collect();
     let saved = Saved { ids: alerts.snapshot() };
     crate::store::write_json_atomic(&alerts.path, &saved)?;
     Ok(saved.ids)
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("status-alert", move || {
         let mut last: HashMap<String, String> = HashMap::new();
         loop {
             let ids = app.state::<StatusAlerts>().snapshot();
@@ -169,7 +170,7 @@ mod tests {
         std::fs::write(dir.join(FILE), r#"{"ids":["github","aws","nope"]}"#).unwrap();
         let alerts = StatusAlerts::load(&dir);
         assert_eq!(alerts.snapshot(), ["github"]);
-        *alerts.ids.lock().unwrap() = ["azion".to_string(), "github".to_string()].into();
+        *alerts.ids.lock_safe() = ["azion".to_string(), "github".to_string()].into();
         crate::store::write_json_atomic(&alerts.path, &Saved { ids: alerts.snapshot() }).unwrap();
         assert_eq!(StatusAlerts::load(&dir).snapshot(), ["azion", "github"]);
         std::fs::remove_dir_all(&dir).unwrap();

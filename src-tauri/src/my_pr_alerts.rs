@@ -1,5 +1,6 @@
 //! Pop-up alerts about the user's own open GitHub PRs: CI that just turned red, and PRs nobody reviewed for
 //! too long. Holds the settings of every own-work alert (`own_work_alerts.rs` reads them). Polls the same cached lists the tab uses, only with GitHub connected and the vault open.
+use crate::resilient::LockExt;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -95,13 +96,13 @@ impl MyPrAlerts {
     }
 
     pub fn get(&self) -> Config {
-        self.cfg.lock().unwrap().clone()
+        self.cfg.lock_safe().clone()
     }
 
     fn set(&self, mut cfg: Config) -> Result<Config> {
         cfg.stalled_hours = cfg.stalled_hours.clamp(1, MAX_HOURS);
         crate::store::write_json_atomic(&self.path, &cfg)?;
-        *self.cfg.lock().unwrap() = cfg.clone();
+        *self.cfg.lock_safe() = cfg.clone();
         Ok(cfg)
     }
 }
@@ -164,7 +165,7 @@ fn check_stalled(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, ho
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("my-pr-alerts", move || {
         let mut mem = Memory::default();
         let mut last: Option<Instant> = None;
         loop {

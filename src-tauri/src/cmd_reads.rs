@@ -1,5 +1,6 @@
 //! Leituras tab commands: the feeds saved next to the vault, the merged list with a 15 min floor, and the
 //! thumbnails/favicons as `data:` URLs — the webview has no permission to reach a remote origin.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::sync::Mutex;
@@ -70,14 +71,14 @@ impl ReadsState {
     }
 
     fn save(&self) -> Result<()> {
-        let saved = Saved { feeds: self.feeds.lock().unwrap().clone(), read: self.read.lock().unwrap().clone() };
+        let saved = Saved { feeds: self.feeds.lock_safe().clone(), read: self.read.lock_safe().clone() };
         crate::store::write_json_atomic(&self.path, &saved)
     }
 
     /// What the UI gets: the cached list with the read marks applied at this instant.
     fn view(&self, at: i64) -> ReadsView {
-        let read = self.read.lock().unwrap();
-        let cached = self.cached.lock().unwrap();
+        let read = self.read.lock_safe();
+        let cached = self.cached.lock_safe();
         let Some(cached) = cached.as_ref() else {
             return ReadsView { feeds: Vec::new(), items: Vec::new(), fetched_at: at };
         };
@@ -89,7 +90,7 @@ impl ReadsState {
     }
 
     fn refresh(&self) -> ReadsView {
-        let feeds = self.feeds.lock().unwrap().clone();
+        let feeds = self.feeds.lock_safe().clone();
         let found = std::thread::scope(|scope| {
             let handles: Vec<_> = feeds
                 .iter()
@@ -126,9 +127,9 @@ impl ReadsState {
         let mut seen = std::collections::HashSet::new();
         items.retain(|article| seen.insert(article.id.clone()));
         items.truncate(MAX_ITEMS);
-        *self.items.lock().unwrap() = items.clone();
+        *self.items.lock_safe() = items.clone();
         let at = now_ms();
-        *self.cached.lock().unwrap() = Some(Cached { at, feeds: views.clone(), items });
+        *self.cached.lock_safe() = Some(Cached { at, feeds: views.clone(), items });
         self.view(at)
     }
 }
@@ -138,7 +139,7 @@ pub async fn reads_get(app: AppHandle, force: bool) -> ReadsView {
     run(move || {
         let state = app.state::<ReadsState>();
         if !force {
-            let fresh = state.cached.lock().unwrap().as_ref().map(|cached| cached.at);
+            let fresh = state.cached.lock_safe().as_ref().map(|cached| cached.at);
             if let Some(at) = fresh {
                 if now_ms() - at < TTL_MS {
                     return Ok::<_, AppError>(state.view(at));
@@ -162,7 +163,7 @@ pub async fn reads_add(app: AppHandle, feed: String) -> Result<ReadsView> {
     run(move || {
         let state = app.state::<ReadsState>();
         {
-            let feeds = state.feeds.lock().unwrap();
+            let feeds = state.feeds.lock_safe();
             if feeds.contains(&feed) {
                 drop(feeds);
                 return Ok(state.refresh());
@@ -176,7 +177,7 @@ pub async fn reads_add(app: AppHandle, feed: String) -> Result<ReadsView> {
         if articles.is_empty() {
             return Err(AppError::Config("o feed não tem entradas".into()));
         }
-        state.feeds.lock().unwrap().push(feed);
+        state.feeds.lock_safe().push(feed);
         state.save()?;
         Ok(state.refresh())
     })
@@ -187,7 +188,7 @@ pub async fn reads_add(app: AppHandle, feed: String) -> Result<ReadsView> {
 pub async fn reads_remove(app: AppHandle, feed: String) -> Result<ReadsView> {
     run(move || {
         let state = app.state::<ReadsState>();
-        state.feeds.lock().unwrap().retain(|saved| saved != &feed);
+        state.feeds.lock_safe().retain(|saved| saved != &feed);
         state.save()?;
         Ok(state.refresh())
     })
@@ -198,7 +199,7 @@ pub async fn reads_remove(app: AppHandle, feed: String) -> Result<ReadsView> {
 pub fn reads_mark(app: AppHandle, id: String, read: bool) -> Result<ReadsView> {
     let state = app.state::<ReadsState>();
     {
-        let mut marks = state.read.lock().unwrap();
+        let mut marks = state.read.lock_safe();
         marks.retain(|saved| saved != &id);
         if read {
             marks.push(id);
@@ -208,7 +209,7 @@ pub fn reads_mark(app: AppHandle, id: String, read: bool) -> Result<ReadsView> {
         }
     }
     state.save()?;
-    let at = state.cached.lock().unwrap().as_ref().map_or(0, |cached| cached.at);
+    let at = state.cached.lock_safe().as_ref().map_or(0, |cached| cached.at);
     Ok(state.view(at))
 }
 
@@ -217,12 +218,12 @@ pub fn reads_mark(app: AppHandle, id: String, read: bool) -> Result<ReadsView> {
 pub async fn reads_thumb(app: AppHandle, id: String) -> Option<String> {
     run(move || {
         let state = app.state::<ReadsState>();
-        if let Some(hit) = state.thumbs.lock().unwrap().get(&id) {
+        if let Some(hit) = state.thumbs.lock_safe().get(&id) {
             return Ok::<_, AppError>(hit.clone());
         }
-        let url = state.items.lock().unwrap().iter().find(|article| article.id == id).and_then(|a| a.image.clone());
+        let url = state.items.lock_safe().iter().find(|article| article.id == id).and_then(|a| a.image.clone());
         let data = url.and_then(|url| crate::account::download_image(&url));
-        state.thumbs.lock().unwrap().insert(id, data.clone());
+        state.thumbs.lock_safe().insert(id, data.clone());
         Ok(data)
     })
     .await
@@ -235,13 +236,13 @@ pub async fn reads_thumb(app: AppHandle, id: String) -> Option<String> {
 pub async fn reads_favicon(app: AppHandle, host: String) -> Option<String> {
     run(move || {
         let state = app.state::<ReadsState>();
-        if let Some(hit) = state.icons.lock().unwrap().get(&host) {
+        if let Some(hit) = state.icons.lock_safe().get(&host) {
             return Ok::<_, AppError>(hit.clone());
         }
         let data = reads::is_public_host(&host)
             .then(|| format!("https://{host}{FAVICON}"))
             .and_then(|url| crate::account::download_image(&url));
-        state.icons.lock().unwrap().insert(host, data.clone());
+        state.icons.lock_safe().insert(host, data.clone());
         Ok(data)
     })
     .await
@@ -265,10 +266,10 @@ mod tests {
         std::fs::write(dir.join(FILE), r#"{"feeds":["https://ok.test/feed","file:///etc/passwd"],"read":["aaaa"]}"#)
             .unwrap();
         let state = ReadsState::load(&dir);
-        assert_eq!(state.feeds.lock().unwrap().clone(), ["https://ok.test/feed"]);
-        assert_eq!(state.read.lock().unwrap().clone(), ["aaaa"]);
+        assert_eq!(state.feeds.lock_safe().clone(), ["https://ok.test/feed"]);
+        assert_eq!(state.read.lock_safe().clone(), ["aaaa"]);
         {
-            let mut marks = state.read.lock().unwrap();
+            let mut marks = state.read.lock_safe();
             for i in 0..MAX_READ + 5 {
                 marks.push(format!("id{i}"));
             }
@@ -276,8 +277,8 @@ mod tests {
                 marks.remove(0);
             }
         }
-        assert_eq!(state.read.lock().unwrap().len(), MAX_READ);
-        assert_eq!(state.read.lock().unwrap().first().map(String::as_str), Some("id5"));
+        assert_eq!(state.read.lock_safe().len(), MAX_READ);
+        assert_eq!(state.read.lock_safe().first().map(String::as_str), Some("id5"));
         std::fs::remove_dir_all(&dir).unwrap();
     }
 
@@ -285,13 +286,13 @@ mod tests {
     fn a_mark_survives_a_restart_and_can_be_undone() {
         let dir = dir("marks");
         let state = ReadsState::load(&dir);
-        state.read.lock().unwrap().push("abc".into());
+        state.read.lock_safe().push("abc".into());
         state.save().unwrap();
-        assert_eq!(ReadsState::load(&dir).read.lock().unwrap().clone(), ["abc"]);
+        assert_eq!(ReadsState::load(&dir).read.lock_safe().clone(), ["abc"]);
         let state = ReadsState::load(&dir);
-        state.read.lock().unwrap().retain(|saved| saved != "abc");
+        state.read.lock_safe().retain(|saved| saved != "abc");
         state.save().unwrap();
-        assert!(ReadsState::load(&dir).read.lock().unwrap().is_empty());
+        assert!(ReadsState::load(&dir).read.lock_safe().is_empty());
         std::fs::remove_dir_all(&dir).unwrap();
     }
 }

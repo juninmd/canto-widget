@@ -1,5 +1,6 @@
 //! Contact photos for the Contatos tab: downloaded from Google's CDN in Rust and handed over as `data:` URLs, so the
 //! CSP keeps blocking remote images. The People API's `photos` field comes with `contacts.readonly`: no new scope.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -22,16 +23,16 @@ pub struct ContactPhotos(Mutex<HashMap<String, String>>);
 
 impl ContactPhotos {
     pub fn clear(&self) {
-        self.0.lock().unwrap().clear();
+        self.0.lock_safe().clear();
     }
 
     fn get(&self, urls: &[String]) -> HashMap<String, String> {
-        let known = self.0.lock().unwrap();
+        let known = self.0.lock_safe();
         urls.iter().filter_map(|u| Some((u.clone(), known.get(u)?.clone()))).collect()
     }
 
     fn put(&self, found: Vec<(String, String)>) {
-        let mut known = self.0.lock().unwrap();
+        let mut known = self.0.lock_safe();
         if known.len() + found.len() > MAX_ENTRIES {
             known.clear();
         }

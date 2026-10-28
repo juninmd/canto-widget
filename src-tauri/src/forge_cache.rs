@@ -1,5 +1,6 @@
 //! Forge lists kept in RAM while the vault is open, plus a guard that stops short of the API's rate limit.
 //! RAM only: titles are private and a disk copy would need re-sealing on every password change.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -80,7 +81,7 @@ impl ForgeCache {
     ) -> Result<ForgeList> {
         let full = format!("{forge}|{key}");
         let generation = {
-            let mut g = self.inner.lock().unwrap();
+            let mut g = self.inner.lock_safe();
             if let Some(e) = g.entries.get_mut(&full) {
                 e.used = now;
                 if !force && now - e.at < TTL_MS {
@@ -99,7 +100,7 @@ impl ForgeCache {
         // Lock released: the network call must not block the other tab's lookups.
         match fetch() {
             Ok((list, quota)) => {
-                let mut g = self.inner.lock().unwrap();
+                let mut g = self.inner.lock_safe();
                 if g.generation != generation {
                     return Ok(ForgeList { fetched_at: now, ..list });
                 }
@@ -113,7 +114,7 @@ impl ForgeCache {
                 Ok(out)
             }
             Err(AppError::RateLimited { message, reset_at }) => {
-                let mut g = self.inner.lock().unwrap();
+                let mut g = self.inner.lock_safe();
                 if g.generation != generation {
                     return Err(AppError::RateLimited { message, reset_at });
                 }
@@ -129,7 +130,7 @@ impl ForgeCache {
 
     pub fn forget(&self, forge: &str) {
         let prefix = format!("{forge}|");
-        let mut g = self.inner.lock().unwrap();
+        let mut g = self.inner.lock_safe();
         g.entries.retain(|k, _| !k.starts_with(&prefix));
         g.quotas.remove(forge);
         g.generation += 1;
@@ -137,7 +138,7 @@ impl ForgeCache {
     }
 
     pub fn clear(&self) {
-        let mut g = self.inner.lock().unwrap();
+        let mut g = self.inner.lock_safe();
         g.entries.clear();
         g.quotas.clear();
         g.generation += 1;

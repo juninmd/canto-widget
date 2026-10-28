@@ -1,4 +1,5 @@
 //! Interface choices mirrored to disk: the webview's own storage can come back empty after an update.
+use crate::resilient::LockExt;
 use std::collections::BTreeMap;
 use std::path::Path;
 use std::sync::Mutex;
@@ -55,13 +56,13 @@ fn set(dir: &Path, key: &str, value: &str) -> Result<()> {
 
 #[tauri::command]
 pub fn prefs_get(state: State<AppState>, lock: State<PrefsLock>) -> Result<Prefs> {
-    let _guard = lock.0.lock().unwrap();
+    let _guard = lock.0.lock_safe();
     Ok(load(&state.dir).into_iter().filter(|(k, _)| known(k)).collect())
 }
 
 #[tauri::command]
 pub fn prefs_set(state: State<AppState>, lock: State<PrefsLock>, key: String, value: String) -> Result<()> {
-    let _guard = lock.0.lock().unwrap();
+    let _guard = lock.0.lock_safe();
     set(&state.dir, &key, &value)
 }
 

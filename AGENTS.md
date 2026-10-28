@@ -77,6 +77,8 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
 - One feature per module; commands are thin, logic is a pure function with a unit test.
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`); body explains why.
+- Rust: `Mutex` goes through `resilient::LockExt::lock_safe()` (never `lock().unwrap()`, which poisons after one
+  panic) and long-lived background threads through `resilient::supervise`, which restarts them after a panic.
 - Every behavior change ships with a test that fails before and passes after, plus a `CHANGELOG.md` entry under
   **Não publicado** (and README when user-visible).
 - **Any new or changed UI adds or updates a screenshot in `docs/prints/` and the README** (features table, tour,

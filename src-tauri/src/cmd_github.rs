@@ -1,4 +1,5 @@
 //! GitHub tab commands. The token stays encrypted in `github.json` and never reaches the webview.
+use crate::resilient::LockExt;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use std::time::Duration;
@@ -52,7 +53,7 @@ pub struct GithubState {
 
 /// A ready-to-use token, refreshed first if it's about to expire.
 pub fn valid_token(state: &AppState, gh: &GithubState, now: i64) -> Result<Zeroizing<String>> {
-    let _one_at_a_time = gh.refreshing.lock().unwrap();
+    let _one_at_a_time = gh.refreshing.lock_safe();
     let mut cfg = state.github_config()?.ok_or_else(|| AppError::Github("conecte sua conta do GitHub".into()))?;
     if cfg.tokens.expired(now) {
         if cfg.tokens.refresh_token.is_empty() || cfg.client_id.is_empty() {
@@ -75,7 +76,7 @@ fn same_credential(renewed: &GithubConfig, on_disk: Option<&GithubConfig>) -> bo
 
 /// Under the refresh lock, so a renewal in flight can't write the previous account back over this one.
 fn store_login(state: &AppState, gh: &GithubState, cfg: &GithubConfig) -> Result<()> {
-    let _one_at_a_time = gh.refreshing.lock().unwrap();
+    let _one_at_a_time = gh.refreshing.lock_safe();
     state.save_github(cfg)?;
     state.forges.forget(FORGE);
     Ok(())
@@ -129,13 +130,13 @@ pub async fn github_device_start(app: tauri::AppHandle) -> Result<DeviceCode> {
         return Err(AppError::Locked);
     }
     // A double click must not leave two watchers polling GitHub for 15 min.
-    if app.state::<GithubState>().flow.lock().unwrap().as_ref().is_some_and(|f| now_ms() < f.expires_at) {
+    if app.state::<GithubState>().flow.lock_safe().as_ref().is_some_and(|f| now_ms() < f.expires_at) {
         return Err(AppError::Github("já há um login em andamento".into()));
     }
     run(move || {
         let d = auth::start(client_id)?;
         let expires_at = now_ms() + d.expires_in as i64 * 1000;
-        *app.state::<GithubState>().flow.lock().unwrap() =
+        *app.state::<GithubState>().flow.lock_safe() =
             Some(Flow { device_code: d.device_code, interval: d.interval, expires_at, client_id });
         Ok(DeviceCode { user_code: d.user_code, url: d.verification_uri, expires_in_s: d.expires_in })
     })
@@ -150,12 +151,12 @@ pub async fn github_device_finish(app: tauri::AppHandle) -> Result<String> {
 
 fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
     let current = |gh: &GithubState| {
-        gh.flow.lock().unwrap().as_ref().map(|f| (f.device_code.clone(), f.interval, f.expires_at, f.client_id))
+        gh.flow.lock_safe().as_ref().map(|f| (f.device_code.clone(), f.interval, f.expires_at, f.client_id))
     };
     let (code, mut interval, expires_at, client_id) =
         current(gh).ok_or_else(|| AppError::Github("nenhum login em andamento".into()))?;
     let end = |r: Result<String>| {
-        *gh.flow.lock().unwrap() = None;
+        *gh.flow.lock_safe() = None;
         r
     };
     loop {
@@ -188,7 +189,7 @@ fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
 
 #[tauri::command]
 pub fn github_device_cancel(gh: State<'_, GithubState>) {
-    *gh.flow.lock().unwrap() = None;
+    *gh.flow.lock_safe() = None;
 }
 
 /// Only forgets the token on this computer; revoking is done on GitHub (Settings → Applications/Tokens).
@@ -201,7 +202,7 @@ fn disconnect(state: &AppState, gh: &GithubState) -> Result<()> {
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
-    let _one_at_a_time = gh.refreshing.lock().unwrap();
+    let _one_at_a_time = gh.refreshing.lock_safe();
     match std::fs::remove_file(store::github_path(&state.dir)) {
         Err(e) if e.kind() != std::io::ErrorKind::NotFound => return Err(e.into()),
         _ => state.forges.forget(FORGE),

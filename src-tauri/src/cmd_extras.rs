@@ -112,7 +112,7 @@ pub fn watch_clipboard(_app: tauri::AppHandle) {}
 /// Only decrypts the history when the text actually changed, else it would pay a read + AES-GCM of the whole file 50 times a minute.
 #[cfg(desktop)]
 pub fn watch_clipboard(app: tauri::AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("clipboard-watch", move || {
         let mut seen = ClipWatch::default();
         loop {
             std::thread::sleep(std::time::Duration::from_millis(1200));

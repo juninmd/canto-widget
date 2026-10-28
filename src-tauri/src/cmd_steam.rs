@@ -1,5 +1,6 @@
 //! Steam commands: the connection (SteamID64, an optional Web API key and the storefront), the store
 //! lists and the capsules. The list shapes live in `steam_lists.rs`.
+use crate::resilient::LockExt;
 use std::sync::Mutex;
 
 use tauri::{AppHandle, Manager};
@@ -53,7 +54,7 @@ pub async fn steam_connect(app: AppHandle, steam_id: String, api_key: String) ->
             return Err(AppError::Locked);
         }
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let key = api_key.trim().to_string();
         let typed = steam_id::classify(&steam_id).ok_or_else(|| {
             AppError::Config("informe o SteamID64 (17 dígitos), o link do perfil ou o nome de perfil".into())
@@ -86,7 +87,7 @@ pub fn steam_disconnect(app: AppHandle) -> Result<SteamStatus> {
         return Err(AppError::Locked);
     }
     let lock = app.state::<SteamLock>();
-    let _guard = lock.0.lock().unwrap();
+    let _guard = lock.0.lock_safe();
     let previous = state.steam_config()?.unwrap_or_default();
     state.save_steam(&SteamConfig { region: previous.region, ..Default::default() })?;
     state.steam.clear();
@@ -103,7 +104,7 @@ pub fn steam_region_set(app: AppHandle, region: String) -> Result<SteamStatus> {
     }
     let chosen = steam_region::parse(&region).ok_or_else(|| AppError::Config("região da loja desconhecida".into()))?;
     let lock = app.state::<SteamLock>();
-    let _guard = lock.0.lock().unwrap();
+    let _guard = lock.0.lock_safe();
     let mut cfg = connected(&state)?;
     cfg.region = chosen.code.to_string();
     state.save_steam(&cfg)?;
@@ -123,7 +124,7 @@ pub async fn steam_deals(app: AppHandle, page: usize, force: bool) -> Result<Ste
         let region = steam::region_of(&cfg);
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let key = format!("deals:{}:{}", cfg.steamid, region.code);
         // The wishlist scan is the expensive half, so it is what the cache holds; the page is sliced
         // out of it, and only that page asks for titles, capsules and scores.
@@ -140,7 +141,7 @@ pub async fn steam_trending(app: AppHandle, force: bool) -> Result<SteamList> {
         let region = steam::region_of(&connected(&state)?);
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let key = format!("trending:{}", region.code);
         state.steam.get_or(&key, force, now_ms(), || lists::trending(&region))
     })
@@ -166,7 +167,7 @@ pub async fn steam_catalog(
         let region = steam::region_of(&connected(&state)?);
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let key = format!("catalog:{}:{page}:{sort}:{only_sale}:{}", region.code, term.trim().to_lowercase());
         state.steam.get_or(&key, force, now_ms(), || lists::catalog(&term, page, &region, order, only_sale))
     })

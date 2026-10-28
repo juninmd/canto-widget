@@ -1,5 +1,6 @@
 //! The user's endpoints, their readings and the timer that takes them. Endpoints are sealed on disk (hosts can be
 //! internal); readings stay in memory. Nothing runs while the vault is locked, because the list is sealed.
+use crate::resilient::LockExt;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::sync::Mutex;
 use std::time::Duration;
@@ -38,7 +39,7 @@ pub struct View {
 
 impl HealthState {
     pub fn ensure_loaded(&self, state: &AppState) -> Result<()> {
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         if !inner.loaded {
             inner.endpoints = state.sealed(&store::health_path(&state.dir), health::AAD)?.unwrap_or_default();
             inner.loaded = true;
@@ -48,11 +49,11 @@ impl HealthState {
 
     /// Forgets everything held in memory so the next unlock reads the file again.
     pub fn reset(&self) {
-        *self.0.lock().unwrap() = Inner::default();
+        *self.0.lock_safe() = Inner::default();
     }
 
     pub fn views(&self) -> Vec<View> {
-        let inner = self.0.lock().unwrap();
+        let inner = self.0.lock_safe();
         inner
             .endpoints
             .iter()
@@ -64,13 +65,13 @@ impl HealthState {
     }
 
     pub fn find(&self, id: &str) -> Option<Endpoint> {
-        self.0.lock().unwrap().endpoints.iter().find(|e| e.id == id).cloned()
+        self.0.lock_safe().endpoints.iter().find(|e| e.id == id).cloned()
     }
 
     /// Adds or replaces (by id) and persists; an edited target starts a fresh history.
     pub fn save(&self, state: &AppState, mut ep: Endpoint) -> Result<()> {
         ep = health::validate(ep)?;
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         match inner.endpoints.iter().position(|e| e.id == ep.id && !ep.id.is_empty()) {
             Some(i) => {
                 if inner.endpoints[i].target != ep.target {
@@ -94,7 +95,7 @@ impl HealthState {
     }
 
     pub fn remove(&self, state: &AppState, id: &str) -> Result<()> {
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         inner.endpoints.retain(|e| e.id != id);
         inner.history.remove(id);
         inner.trackers.remove(id);
@@ -103,7 +104,7 @@ impl HealthState {
 
     /// Endpoints whose last reading is older than their interval and that no probe is already taking.
     fn due(&self, now_ms: i64) -> Vec<Endpoint> {
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         let due: Vec<Endpoint> = inner
             .endpoints
             .iter()
@@ -121,9 +122,16 @@ impl HealthState {
         due
     }
 
+    /// Takes one reading and records it; the slot `due` reserved is freed even if `probe` panics, or the
+    /// endpoint would stay "running" and never be probed again.
+    pub fn probe_once(&self, ep: &Endpoint, probe: impl FnOnce() -> Sample) -> Vec<Alert> {
+        let _slot = Slot { state: self, id: &ep.id };
+        self.record(ep, probe())
+    }
+
     /// Stores a reading and returns the alerts it triggers; a reading for a removed endpoint is dropped.
     pub fn record(&self, ep: &Endpoint, sample: Sample) -> Vec<Alert> {
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         inner.running.remove(&ep.id);
         let Some(current) = inner.endpoints.iter().find(|e| e.id == ep.id).cloned() else { return Vec::new() };
         let history = inner.history.entry(ep.id.clone()).or_default();
@@ -164,8 +172,19 @@ pub fn alert_event(ep: &Endpoint, alert: &Alert) -> AgendaItem {
     }
 }
 
+struct Slot<'a> {
+    state: &'a HealthState,
+    id: &'a str,
+}
+
+impl Drop for Slot<'_> {
+    fn drop(&mut self) {
+        self.state.0.lock_safe().running.remove(self.id);
+    }
+}
+
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("health-watch", move || loop {
         std::thread::sleep(TICK);
         let (Some(state), Some(health)) = (app.try_state::<AppState>(), app.try_state::<HealthState>()) else {
             continue;
@@ -180,9 +199,9 @@ pub fn watch(app: AppHandle) {
         for ep in health.due(crate::model::now_ms()) {
             let app = app.clone();
             std::thread::spawn(move || {
-                let sample = crate::health_probe::probe(&ep, crate::model::now_ms());
                 let Some(health) = app.try_state::<HealthState>() else { return };
-                for alert in health.record(&ep, sample) {
+                let alerts = health.probe_once(&ep, || crate::health_probe::probe(&ep, crate::model::now_ms()));
+                for alert in alerts {
                     let _ = crate::window::open_alert(&app, alert_event(&ep, &alert));
                 }
             });

@@ -27,7 +27,7 @@ pub fn start(app: AppHandle, dir: PathBuf) {
 
 /// Without this, an unlocked vault would survive any amount of time away from the machine.
 fn watch_idle(app: AppHandle) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("auto-lock", move || loop {
         std::thread::sleep(IDLE_POLL);
         let Some(state) = app.try_state::<AppState>() else {
             continue;
@@ -53,7 +53,7 @@ pub fn lock_from_tray(app: &AppHandle) {
 /// Position and size hit disk at most every 2s, not on every dragged pixel.
 #[cfg(desktop)]
 fn watch_window_state(app: AppHandle, dir: PathBuf) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("window-state", move || loop {
         std::thread::sleep(WINDOW_STATE_POLL);
         if let Err(e) = app.state::<crate::window_state::WindowState>().save_if_dirty(&dir) {
             eprintln!("posicao da janela nao gravou: {e}");
@@ -63,7 +63,7 @@ fn watch_window_state(app: AppHandle, dir: PathBuf) {
 
 /// Daily copy of the encrypted envelope; doesn't need the vault unlocked.
 fn watch_backup(dir: PathBuf) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("daily-backup", move || loop {
         if let Err(e) = backup::daily(&dir, &backup::today_utc()) {
             eprintln!("backup diario falhou: {e}");
         }
@@ -73,7 +73,7 @@ fn watch_backup(dir: PathBuf) {
 
 /// Merges in whatever showed up in a synced folder; a no-op without one configured or while locked.
 fn watch_sync(app: AppHandle) {
-    std::thread::spawn(move || loop {
+    crate::resilient::supervise("folder-sync", move || loop {
         std::thread::sleep(SYNC_POLL);
         let Some(state) = app.try_state::<AppState>() else {
             continue;

@@ -1,4 +1,5 @@
 //! Master password change: everything the old key protects is re-encrypted with the new one.
+use crate::resilient::LockExt;
 use serde::Serialize;
 use std::path::{Path, PathBuf};
 use tauri::State;
@@ -30,7 +31,7 @@ impl AppState {
             return Err(AppError::Config("a nova senha é igual à atual".into()));
         }
         // Held start to finish: no watcher writes with the old key mid-change.
-        let mut guard = self.session.lock().unwrap();
+        let mut guard = self.session.lock_safe();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         let vault: SealedBlob = store::read_json(&store::vault_path(&self.dir))?.ok_or(AppError::NotFound)?;
         VaultKey::derive(current_password, &session.salt)

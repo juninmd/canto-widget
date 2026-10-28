@@ -1,5 +1,6 @@
 //! "Modelos IA" tab commands: the Artificial Analysis ranking from its public page, no account or key. Every
 //! fetch goes through `models_state::refresh` and its 3 h floor.
+use crate::resilient::LockExt;
 use std::sync::Mutex;
 
 use tauri::{AppHandle, Manager};
@@ -32,7 +33,7 @@ pub(crate) fn refresh_and_save(app: &AppHandle, mut cfg: ModelsConfig, force: bo
 pub async fn models_get(app: AppHandle, force: bool) -> Result<ModelsView> {
     run(move || {
         let lock = app.state::<ModelsLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let state = app.state::<AppState>();
         state.touch();
         let cfg = state.models_config()?.unwrap_or_default();
@@ -45,7 +46,7 @@ pub async fn models_get(app: AppHandle, force: bool) -> Result<ModelsView> {
 #[tauri::command(async)]
 pub fn models_alerts_set(app: AppHandle, enabled: bool) -> Result<bool> {
     let lock = app.state::<ModelsLock>();
-    let _guard = lock.0.lock().unwrap();
+    let _guard = lock.0.lock_safe();
     let state = app.state::<AppState>();
     state.touch();
     let mut cfg = state.models_config()?.unwrap_or_default();

@@ -2,6 +2,7 @@
 //! for a game installed here or played lately. Rung from Rust so a hidden webview still gets them, and
 //! only while the vault is open: what was announced is sealed. Off by default, like the activity log.
 //! What to ring about is decided in `steam_watch.rs`.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
@@ -39,11 +40,11 @@ impl SteamAlerts {
     /// Drops the RAM copy. Also called on every locked tick, so nothing lingers; the timer restarts
     /// with it, which is what makes an unlock look at the prices again.
     pub fn forget(&self) {
-        *self.0.lock().unwrap() = Inner::default();
+        *self.0.lock_safe() = Inner::default();
     }
 
     fn with<T>(&self, state: &AppState, f: impl FnOnce(&mut SteamWatch) -> T) -> Result<T> {
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         if !state.is_unlocked() {
             // The key that opens the file is gone, so nothing of it may stay in RAM either.
             *inner = Inner::default();
@@ -67,7 +68,7 @@ impl SteamAlerts {
     }
 
     fn flush(&self, state: &AppState) -> Result<()> {
-        let inner = self.0.lock().unwrap();
+        let inner = self.0.lock_safe();
         match inner.watch.as_ref() {
             Some(watch) => state.save_sealed(&store::steam_deals_path(&state.dir), AAD, watch),
             None => Ok(()),
@@ -76,18 +77,18 @@ impl SteamAlerts {
 
     /// The first tick after an unlock, then one scan every `CHECK_MS`.
     fn due(&self, now: i64) -> bool {
-        let inner = self.0.lock().unwrap();
+        let inner = self.0.lock_safe();
         inner.checked_at == 0 || now - inner.checked_at >= CHECK_MS
     }
 
     fn checked(&self, now: i64) {
-        self.0.lock().unwrap().checked_at = now;
+        self.0.lock_safe().checked_at = now;
     }
 
     /// Whether the alerts are on right now. The switch is the user's and can move while the wishlist
     /// is being fetched, so the scan re-reads it before ringing.
     fn on(&self) -> bool {
-        self.0.lock().unwrap().watch.as_ref().is_some_and(|watch| watch.watching)
+        self.0.lock_safe().watch.as_ref().is_some_and(|watch| watch.watching)
     }
 
     /// When the updates were last marked as read (ms), for the "new" dots in the pane.
@@ -106,7 +107,7 @@ impl SteamAlerts {
         let region = region_of(cfg);
         let Ok(ids) = feed::wishlist(&cfg.steamid) else { return false };
         let Ok(prices) = feed::prices(&ids, &region) else { return false };
-        let current = self.0.lock().unwrap().watch.clone().unwrap_or_default();
+        let current = self.0.lock_safe().watch.clone().unwrap_or_default();
         let (ring, next) = hot_deals(&current, &prices, region.code, &cfg.steamid);
         if next.hot != current.hot || next.region != current.region || next.steamid != current.steamid {
             let written = self.with(state, |watch| {
@@ -144,7 +145,7 @@ impl SteamAlerts {
                 titles.insert(item.appid, (item.game.clone(), item.title.clone()));
             }
         }
-        let seen = self.0.lock().unwrap().watch.as_ref().map(|w| w.news.clone()).unwrap_or_default();
+        let seen = self.0.lock_safe().watch.as_ref().map(|w| w.news.clone()).unwrap_or_default();
         let (ring, next) = new_updates(&seen, &latest);
         if next != seen {
             let _ = self.with(state, |watch| watch.news = next).and_then(|()| self.flush(state));
@@ -179,7 +180,7 @@ pub fn steam_watch_set(app: AppHandle, enabled: bool) -> Result<bool> {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("steam-alert", move || {
         let mut failed: Option<Instant> = None;
         loop {
             std::thread::sleep(POLL);
@@ -199,7 +200,7 @@ pub fn watch(app: AppHandle) {
                 continue;
             }
             let lock = app.state::<crate::cmd_steam::SteamLock>();
-            let _guard = lock.0.lock().unwrap();
+            let _guard = lock.0.lock_safe();
             if alerts.scan(&app, &state, &cfg) {
                 failed = None;
                 alerts.checked(now_ms());

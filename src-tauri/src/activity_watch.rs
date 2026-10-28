@@ -1,5 +1,6 @@
 //! The sampler thread and the commands around it. Off by default: nothing is recorded until the user opts in,
 //! and nothing at all while the vault is locked (the log is sealed, so it could not be saved anyway).
+use crate::resilient::LockExt;
 use std::path::Path;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
@@ -46,12 +47,12 @@ impl ActivityState {
     }
 
     fn drop_log(&self) {
-        *self.log.lock().unwrap() = None;
+        *self.log.lock_safe() = None;
     }
 
     /// Runs `f` on the log, reading it from disk the first time after an unlock.
     fn with_log<T>(&self, state: &AppState, f: impl FnOnce(&mut Log) -> T) -> Result<T> {
-        let mut guard = self.log.lock().unwrap();
+        let mut guard = self.log.lock_safe();
         if guard.is_none() {
             let path = store::activity_path(&state.dir);
             // An unreadable file is a lost log, not a reason to stop sampling.
@@ -68,7 +69,7 @@ impl ActivityState {
     }
 
     fn flush(&self, state: &AppState) -> Result<()> {
-        let guard = self.log.lock().unwrap();
+        let guard = self.log.lock_safe();
         match guard.as_ref() {
             Some(log) => state.save_sealed(&store::activity_path(&state.dir), ACTIVITY_AAD, log),
             None => Ok(()),
@@ -101,7 +102,7 @@ pub fn or_fullscreen(name: Option<String>, notification_state: Option<i32>) -> O
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("activity-watch", move || {
         let mut last_flush = 0;
         loop {
             std::thread::sleep(Duration::from_secs(INTERVAL_SECS as u64));

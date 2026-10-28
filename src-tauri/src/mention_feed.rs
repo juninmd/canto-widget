@@ -1,4 +1,5 @@
 //! The mentions subtab: where the user was @-mentioned, by whom, with a preview of the text and the author's photo.
+use crate::resilient::LockExt;
 use std::collections::HashMap;
 use std::sync::{LazyLock, Mutex};
 
@@ -127,7 +128,7 @@ pub fn github_lights(items: &[ForgeItem], known: &HashMap<String, Mentioned>) ->
 
 /// What an earlier lookup already found for these threads; never asks GitHub (for the badge, which runs often).
 pub fn github_known(items: &[ForgeItem], names_len: usize) -> HashMap<String, Mentioned> {
-    let cache = FOUND.lock().unwrap_or_else(|e| e.into_inner());
+    let cache = FOUND.lock_safe();
     items.iter().filter_map(|i| Some((i.reference.clone(), cache.get(&found_key(i, names_len))?.clone()))).collect()
 }
 
@@ -140,7 +141,7 @@ pub fn github_found(token: &str, names: &[String], items: &[ForgeItem]) -> HashM
     // The names are part of the key: switching team mentions on must not reuse a lookup made without them.
     let key = |i: &ForgeItem| found_key(i, names.len());
     let todo: Vec<&ForgeItem> = {
-        let cache = FOUND.lock().unwrap_or_else(|e| e.into_inner());
+        let cache = FOUND.lock_safe();
         items.iter().filter(|i| !cache.contains_key(&key(i))).collect()
     };
     let looked: Vec<(String, Mentioned)> = std::thread::scope(|s| {
@@ -158,7 +159,7 @@ pub fn github_found(token: &str, names: &[String], items: &[ForgeItem]) -> HashM
             .collect();
         handles.into_iter().flat_map(|h| h.join().unwrap_or_default()).collect()
     });
-    let mut cache = FOUND.lock().unwrap_or_else(|e| e.into_inner());
+    let mut cache = FOUND.lock_safe();
     if cache.len() + looked.len() > FOUND_MAX {
         cache.clear();
     }
@@ -168,7 +169,7 @@ pub fn github_found(token: &str, names: &[String], items: &[ForgeItem]) -> HashM
 
 /// Photos become `data:` URLs (the CSP allows no remote image) and are remembered per URL.
 pub fn resolve_photos(rows: &mut [MentionRow], trusted: impl Fn(&str) -> bool) {
-    let mut cache = AVATARS.lock().unwrap_or_else(|e| e.into_inner());
+    let mut cache = AVATARS.lock_safe();
     if cache.len() > AVATARS_MAX {
         cache.clear();
     }

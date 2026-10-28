@@ -1,3 +1,4 @@
+use crate::resilient::LockExt;
 use tauri::{Manager, State};
 
 use crate::drive::{self, DriveTokens};
@@ -77,7 +78,7 @@ pub async fn drive_disconnect(app: tauri::AppHandle) -> Result<()> {
 
 fn disconnect(state: &AppState) -> Result<()> {
     let revoked = {
-        let _serial = state.drive_lock.lock().unwrap();
+        let _serial = state.drive_lock.lock_safe();
         let mut cfg = state.drive_config()?;
         let revoked = cfg.tokens.take();
         forget_account(&mut cfg);

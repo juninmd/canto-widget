@@ -1,5 +1,6 @@
 //! Opt-in OS notifications when the AI models top 10 changes. Rung from Rust so a hidden webview still gets
 //! them; needs the vault unlocked (the config is sealed). Off by default.
+use crate::resilient::LockExt;
 use std::time::{Duration, Instant};
 
 use tauri::{AppHandle, Manager};
@@ -68,7 +69,7 @@ fn event(change: &Change, en: bool) -> AgendaItem {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("models-alert", move || {
         let mut failed: Option<Instant> = None;
         loop {
             std::thread::sleep(POLL);
@@ -76,7 +77,7 @@ pub fn watch(app: AppHandle) {
                 continue;
             }
             let lock = app.state::<ModelsLock>();
-            let _guard = lock.0.lock().unwrap();
+            let _guard = lock.0.lock_safe();
             // No `touch()`: a background read must not keep the vault from auto-locking.
             let Ok(Some(cfg)) = app.state::<AppState>().models_config() else { continue };
             if !watch_due(&cfg, now_ms()) {

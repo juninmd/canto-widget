@@ -213,7 +213,7 @@ fn check_gitlab(app: &AppHandle, state: &AppState, mem: &mut Memory) {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("mention-alerts", move || {
         let mut mem = Memory::default();
         let mut last: Option<Instant> = None;
         loop {

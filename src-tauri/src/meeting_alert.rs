@@ -1,5 +1,6 @@
 //! Meeting alerts driven from Rust. The webview's `setInterval` is suspended while the window is hidden
 //! (WKWebView on macOS, App Nap), so a widget parked in the tray never fired "reunião começando" there.
+use crate::resilient::LockExt;
 use std::collections::HashSet;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
@@ -34,7 +35,7 @@ impl Alerted {
         if event.id.starts_with(TASK_PREFIX) {
             return true;
         }
-        let mut set = self.0.lock().unwrap();
+        let mut set = self.0.lock_safe();
         if set.len() >= MAX_REMEMBERED {
             set.clear();
         }
@@ -96,7 +97,7 @@ pub fn step(cache: &mut Vec<AgendaItem>, refresh: Option<Vec<AgendaItem>>, locke
 pub fn watch(app: AppHandle) {
     #[cfg(target_os = "macos")]
     keep_timers_on_time();
-    std::thread::spawn(move || {
+    crate::resilient::supervise("meeting-alert", move || {
         let mut items: Vec<AgendaItem> = Vec::new();
         let mut fetched: Option<Instant> = None;
         loop {

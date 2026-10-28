@@ -1,6 +1,7 @@
 //! The Steam commands of the redesigned tab: "jogue agora" (and launching a game), the updates, the
 //! most played chart and the whole wishlist. The shapes live in `steam_play.rs`, `steam_news.rs`,
 //! `steam_top.rs` and `steam_wish.rs`; these only fetch, cache and page.
+use crate::resilient::LockExt;
 use std::collections::{HashMap, HashSet};
 use std::sync::Mutex;
 
@@ -45,7 +46,7 @@ pub async fn steam_play(app: AppHandle, filter: String, term: String, page: usiz
         let cfg = connected(&state)?;
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let games = state.steam.get_or(&format!("play:{}", cfg.steamid), force, now_ms(), || library(&cfg))?;
         Ok(play::page(&games, &filter, &term, page, !cfg.api_key.is_empty()))
     })
@@ -88,7 +89,7 @@ pub async fn steam_news(app: AppHandle, filter: String, force: bool) -> Result<S
         let cfg = connected(&state)?;
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let now = now_ms();
         let items: Vec<NewsItem> = state.steam.get_or(&format!("news:{}", cfg.steamid), force, now, || {
             let oldest = now / 1000 - NEWS_DAYS * 86_400;
@@ -125,7 +126,7 @@ type Charts = (i64, HashMap<u32, u32>, HashMap<u32, u32>);
 impl TopHistory {
     /// Keeps the last two distinct charts and answers the older one.
     fn previous(&self, updated: i64, ranks: &[Rank]) -> HashMap<u32, u32> {
-        let mut inner = self.0.lock().unwrap();
+        let mut inner = self.0.lock_safe();
         if inner.0 != updated {
             let current: HashMap<u32, u32> = ranks.iter().map(|r| (r.appid, r.rank)).collect();
             inner.2 = std::mem::replace(&mut inner.1, current);
@@ -146,7 +147,7 @@ pub async fn steam_top(app: AppHandle, page: usize, only_mine: bool, force: bool
         let region = steam::region_of(&cfg);
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let now = now_ms();
         let (ranks, updated): (Vec<Rank>, i64) =
             state.steam.get_or("charts", force, now, || feed::charts().map_err(failed))?;
@@ -193,7 +194,7 @@ pub async fn steam_wishlist(app: AppHandle, page: usize, sort: String, force: bo
         let region = steam::region_of(&cfg);
         state.touch();
         let lock = app.state::<SteamLock>();
-        let _guard = lock.0.lock().unwrap();
+        let _guard = lock.0.lock_safe();
         let key = format!("wish:{}:{}", cfg.steamid, region.code);
         let entries = state.steam.get_or(&key, force, now_ms(), || {
             let ids = feed::wishlist(&cfg.steamid).map_err(failed)?;

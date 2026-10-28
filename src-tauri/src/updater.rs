@@ -1,4 +1,5 @@
 //! Updates from signed GitHub releases. The webview gets these two commands, never the updater plugin itself.
+use crate::resilient::LockExt;
 use std::sync::{Arc, Mutex};
 
 use serde::Serialize;
@@ -63,7 +64,7 @@ pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdat
     let update = app
         .updater_builder()
         .version_comparator(move |running, remote| {
-            *seen.lock().unwrap() = Some(remote.version.to_string());
+            *seen.lock_safe() = Some(remote.version.to_string());
             remote.version > running
         })
         // Windows closes the app to run the installer: keys leave memory first.
@@ -73,13 +74,13 @@ pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdat
         .check()
         .await
         .map_err(failed)?;
-    let published = published.lock().unwrap().take();
+    let published = published.lock_safe().take();
     let info = summarize(
         &current,
         published,
         update.as_ref().map(|u| (u.body.as_deref().unwrap_or_default(), u.date.map(|d| d.date().to_string()))),
     );
-    *pending.0.lock().unwrap() = update;
+    *pending.0.lock_safe() = update;
     Ok(info)
 }
 
@@ -88,8 +89,7 @@ pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdat
 pub async fn update_install(app: tauri::AppHandle, pending: State<'_, PendingUpdate>) -> Result<()> {
     let update = pending
         .0
-        .lock()
-        .unwrap()
+        .lock_safe()
         .take()
         .ok_or_else(|| AppError::Update("nenhuma atualização pendente: verifique de novo".into()))?;
     let (mut downloaded, emitter) = (0u64, app.clone());

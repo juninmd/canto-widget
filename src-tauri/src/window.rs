@@ -1,3 +1,4 @@
+use crate::resilient::LockExt;
 use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, WebviewWindow};
 
 use crate::calendar::AgendaItem;
@@ -74,8 +75,8 @@ pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()
     crate::notification::send(app, &event);
     let Some(state) = app.try_state::<crate::vault::AppState>() else { return Ok(()) };
     {
-        let mut current = state.alert.lock().unwrap();
-        alert_queue::push(&mut current, &mut queue(app).0.lock().unwrap(), event);
+        let mut current = state.alert.lock_safe();
+        alert_queue::push(&mut current, &mut queue(app).0.lock_safe(), event);
     }
     // A full-screen app in front (a game) must keep the foreground: the pop-up rings when it leaves.
     if crate::fullscreen_guard::hold(app) {
@@ -98,17 +99,17 @@ pub fn present_pending(app: &tauri::AppHandle) -> tauri::Result<()> {
 /// Every pending alert, for the overlay to list.
 pub fn alert_list(app: &tauri::AppHandle) -> Vec<AgendaItem> {
     let Some(state) = app.try_state::<crate::vault::AppState>() else { return Vec::new() };
-    let current = state.alert.lock().unwrap();
-    alert_queue::all(&current, &queue(app).0.lock().unwrap())
+    let current = state.alert.lock_safe();
+    alert_queue::all(&current, &queue(app).0.lock_safe())
 }
 
 /// Dismissing, snoozing or completing an alert drops just that one; the others stay on the overlay.
 pub fn take_alert(app: &tauri::AppHandle, id: &str) -> Option<AgendaItem> {
     let state = app.try_state::<crate::vault::AppState>()?;
     let removed = {
-        let mut current = state.alert.lock().unwrap();
+        let mut current = state.alert.lock_safe();
         let queue = queue(app);
-        let mut pending = queue.0.lock().unwrap();
+        let mut pending = queue.0.lock_safe();
         let removed = alert_queue::remove(&mut current, &mut pending, id);
         // Hidden under the lock: an alert ringing in between must not be hidden right after it showed.
         if current.is_none() {
@@ -125,9 +126,9 @@ pub fn take_alert(app: &tauri::AppHandle, id: &str) -> Option<AgendaItem> {
 pub fn take_all_alerts(app: &tauri::AppHandle) -> Vec<AgendaItem> {
     let Some(state) = app.try_state::<crate::vault::AppState>() else { return Vec::new() };
     let drained = {
-        let mut current = state.alert.lock().unwrap();
+        let mut current = state.alert.lock_safe();
         let queue = queue(app);
-        let mut pending = queue.0.lock().unwrap();
+        let mut pending = queue.0.lock_safe();
         hide_alert_window(app);
         alert_queue::drain(&mut current, &mut pending)
     };
@@ -142,8 +143,8 @@ pub fn settle_alert(app: &tauri::AppHandle) -> Vec<AgendaItem> {
         hide_alert_window(app);
         return Vec::new();
     };
-    let current = state.alert.lock().unwrap();
-    let list = alert_queue::all(&current, &queue(app).0.lock().unwrap());
+    let current = state.alert.lock_safe();
+    let list = alert_queue::all(&current, &queue(app).0.lock_safe());
     if list.is_empty() {
         hide_alert_window(app);
     }
@@ -223,7 +224,7 @@ mod tests {
         for f in ["fn take_alert(", "fn take_all_alerts(", "fn settle_alert("] {
             let body = &src[src.find(f).unwrap()..];
             let body = &body[..body.find("\n}\n").unwrap()];
-            let locked = &body[body.find("alert.lock()").unwrap()..];
+            let locked = &body[body.find("alert.lock_safe()").unwrap()..];
             assert!(
                 locked.contains("hide_alert_window("),
                 "{f} must hide under the lock, or an alert ringing in between ends up hidden"

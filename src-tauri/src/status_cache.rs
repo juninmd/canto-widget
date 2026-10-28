@@ -1,5 +1,6 @@
 //! Keeps the last fetch of every status feed in RAM: no secrets, so a disk cache buys nothing
 //! and would just add a re-seal path for public data.
+use crate::resilient::LockExt;
 use std::sync::Mutex;
 
 use crate::status_feed::StatusResult;
@@ -18,7 +19,7 @@ pub struct StatusCache(Mutex<Option<Entry>>);
 impl StatusCache {
     pub fn get(&self, force: bool, now: i64, fetch: impl FnOnce() -> Vec<StatusResult>) -> Vec<StatusResult> {
         if !force {
-            if let Some(e) = self.0.lock().unwrap().as_ref() {
+            if let Some(e) = self.0.lock_safe().as_ref() {
                 if now - e.at < TTL_MS {
                     return e.results.clone();
                 }
@@ -26,7 +27,7 @@ impl StatusCache {
         }
         // Lock released while fetching: the network calls must not block another tab's lookups.
         let results = fetch();
-        *self.0.lock().unwrap() = Some(Entry { results: results.clone(), at: now });
+        *self.0.lock_safe() = Some(Entry { results: results.clone(), at: now });
         results
     }
 }

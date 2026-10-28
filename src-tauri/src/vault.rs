@@ -1,3 +1,4 @@
+use crate::resilient::LockExt;
 use std::path::PathBuf;
 use std::sync::Mutex;
 use zeroize::Zeroizing;
@@ -75,11 +76,11 @@ impl AppState {
     }
 
     pub fn touch(&self) {
-        *self.last_active.lock().unwrap() = now_ms();
+        *self.last_active.lock_safe() = now_ms();
     }
 
     pub fn idle_ms(&self) -> i64 {
-        now_ms() - *self.last_active.lock().unwrap()
+        now_ms() - *self.last_active.lock_safe()
     }
 
     /// Returns `true` only on the lock transition, so the watchdog notifies the UI once per lock.
@@ -114,7 +115,7 @@ impl AppState {
         let session = Session { key, password: Zeroizing::new(password.to_string()), salt, data: VaultData::default() };
         self.persist(&session, &session.data)?;
         self.sync_after_persist();
-        *self.session.lock().unwrap() = Some(session);
+        *self.session.lock_safe() = Some(session);
         self.touch();
         Ok(())
     }
@@ -126,8 +127,7 @@ impl AppState {
         let plain = blob.open(&key, VAULT_AAD)?;
         let data: VaultData = serde_json::from_slice(&plain)?;
         crate::password::finish_interrupted(&self.dir, &salt)?;
-        *self.session.lock().unwrap() =
-            Some(Session { key, password: Zeroizing::new(password.to_string()), salt, data });
+        *self.session.lock_safe() = Some(Session { key, password: Zeroizing::new(password.to_string()), salt, data });
         self.touch();
         // Best-effort: images of notes deleted before the last lock are no longer undoable.
         let _ = self.note_images_gc(crate::note_images::ORPHAN_GRACE);
@@ -138,25 +138,25 @@ impl AppState {
 
     /// Copy of the session password, to encrypt it with biometrics. Never leaves the process.
     pub(crate) fn session_password(&self) -> Result<Zeroizing<String>> {
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         Ok(session.password.clone())
     }
 
     pub fn lock(&self) {
-        *self.session.lock().unwrap() = None;
+        *self.session.lock_safe() = None;
         self.trash.clear();
         self.forges.clear();
         self.guest_photos.clear();
         self.contact_photos.clear();
         self.steam.clear();
         self.traffic.clear();
-        *self.next_meeting.lock().unwrap() = None;
-        *self.badge_tasks.lock().unwrap() = 0;
+        *self.next_meeting.lock_safe() = None;
+        *self.badge_tasks.lock_safe() = 0;
     }
 
     pub fn is_unlocked(&self) -> bool {
-        self.session.lock().unwrap().is_some()
+        self.session.lock_safe().is_some()
     }
 
     fn persist(&self, session: &Session, data: &VaultData) -> Result<()> {
@@ -181,7 +181,7 @@ impl AppState {
     /// lock before syncing" invariant. `f` reports whether it actually changed the data, since
     /// `in_background` and `mutate_if` must skip persist/sync entirely when nothing did.
     fn with_session<T>(&self, f: impl FnOnce(&mut VaultData) -> (T, bool)) -> Result<T> {
-        let mut guard = self.session.lock().unwrap();
+        let mut guard = self.session.lock_safe();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         // Mutating a draft keeps memory equal to disk when persist fails; the clone is small next to the re-seal.
         let mut draft = session.data.clone();
@@ -220,7 +220,7 @@ impl AppState {
 
     pub fn read<T>(&self, f: impl FnOnce(&VaultData) -> T) -> Result<T> {
         self.touch();
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         Ok(f(&session.data))
     }
@@ -229,7 +229,7 @@ impl AppState {
     /// doesn't exist yet (a config never saved). Shared by drive/GitHub/GitLab config, which used
     /// to hand-copy this same open-and-decode shape three times.
     pub fn sealed<T: serde::de::DeserializeOwned>(&self, path: &std::path::Path, aad: &[u8]) -> Result<Option<T>> {
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         match store::read_json::<SealedBlob>(path)? {
             None => Ok(None),
@@ -242,7 +242,7 @@ impl AppState {
 
     /// Seals `value` with the session key and writes it atomically to `path`.
     pub fn save_sealed<T: serde::Serialize>(&self, path: &std::path::Path, aad: &[u8], value: &T) -> Result<()> {
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let plain = Zeroizing::new(serde_json::to_vec(value)?);
         let blob = SealedBlob::seal(&session.key, &session.salt, &plain, aad, now_ms())?;
@@ -251,7 +251,7 @@ impl AppState {
 
     /// Uses the envelope's own salt, not the session's: a backup made on another machine has its own salt.
     pub fn open_envelope(&self, blob: &SealedBlob) -> Result<VaultData> {
-        let guard = self.session.lock().unwrap();
+        let guard = self.session.lock_safe();
         let session = guard.as_ref().ok_or(AppError::Locked)?;
         let key = VaultKey::derive(&session.password, &blob.salt_bytes()?)?;
         let plain = blob.open(&key, VAULT_AAD).map_err(|e| match e {
