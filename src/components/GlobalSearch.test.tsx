@@ -14,7 +14,7 @@ mock.module("@tauri-apps/api/core", () => ({
       notesArgs.push(args);
       return new Promise((resolve) => notesQueue.push({ resolve }));
     }
-    if (cmd === "tasks_for_day") return Promise.resolve([]);
+    if (cmd === "tasks_for_day" || cmd === "transcripts_list") return Promise.resolve([]);
     if (cmd === "clip_list") return Promise.resolve({ items: [], max_pinned: 0 });
     return Promise.resolve(null);
   },
@@ -37,7 +37,7 @@ async function wait(ms: number) {
 
 function mount(onError: (m: string) => void = () => {}) {
   render(<GlobalSearch today="2026-09-20" privacy={false} onNavigate={() => {}} onClose={() => {}} onError={onError} />);
-  return screen.getByPlaceholderText("buscar em tarefas de hoje, notas e clipboard");
+  return screen.getByPlaceholderText("buscar em tarefas de hoje, agenda, notas, transcrições e clipboard");
 }
 
 test("a stale search response never overwrites a newer query's results", async () => {
@@ -85,7 +85,7 @@ test("clearing the query drops previous results instead of waiting for them", as
   });
 
   expect(screen.queryByText("nota tardia")).toBeNull();
-  expect(screen.getByText("digite para buscar nas três abas ao mesmo tempo")).toBeTruthy();
+  expect(screen.getByText("digite para buscar em todas as fontes ao mesmo tempo")).toBeTruthy();
 });
 
 test("'nada encontrado' waits for the lookups to settle instead of flashing while they run", async () => {

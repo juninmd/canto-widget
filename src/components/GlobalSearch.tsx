@@ -1,23 +1,29 @@
 import { useEffect, useRef, useState } from "react";
-import { api, errText, type ClipItem, type Note, type Task } from "../lib/api";
+import { api, errText, type AgendaItem, type ClipItem, type Note, type Task, type TranscriptMeta } from "../lib/api";
 import { useLatestRequest } from "../lib/useLatestRequest";
 import { fold, foldIncludes } from "../lib/fold";
 import { t } from "../i18n";
 import type { Tab } from "./TabBar";
+import { Group, Row } from "./GlobalSearchGroup";
 
 const CAP = 5;
+
+/** Meeting transcripts live inside the Agenda tab; the jump tells App which of its two views to open. */
+export type SearchTarget = Tab | "transcripts";
 
 type Props = {
   today: string;
   privacy: boolean;
-  onNavigate: (tab: Tab, query: string) => void;
+  /** Today's events as the agenda already loaded them: searching them costs no Google call. */
+  agenda?: readonly AgendaItem[];
+  onNavigate: (target: SearchTarget, query: string) => void;
   onClose: () => void;
   onError: (m: string) => void;
 };
 
-/** Only tasks (today) and notes/clipboard (both tab-wide, not day-scoped) are searched: the app has
- * no day-navigation UI yet, so a match on another day's task would have nowhere to jump to. */
-export default function GlobalSearch({ today, privacy, onNavigate, onClose, onError }: Props) {
+/** Only today's tasks are searched (a task of another day has nowhere to jump to); notes, clipboard and
+ * transcripts are tab-wide. Everything stays local: no source here makes a network call. */
+export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, onClose, onError }: Props) {
   const [query, setQuery] = useState("");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -27,6 +33,8 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
   const [settled, setSettled] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const previous = useRef<Element | null>(null);
+  const [transcripts, setTranscripts] = useState<TranscriptMeta[]>([]);
+  const dialog = useRef<HTMLDivElement>(null);
   const { bump, isLatest } = useLatestRequest();
   const mask = privacy ? "blur-sm select-none" : "";
 
@@ -45,6 +53,7 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       setNotesTotal(0);
       setClips([]);
       setSettled("");
+      setTranscripts([]);
       return;
     }
     const timer = setTimeout(() => {
@@ -78,13 +87,28 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
         const failed = done.find((r) => r.status === "rejected");
         if (failed) onError(errText((failed as PromiseRejectedResult).reason));
       });
+      // A folder that was never chosen is an empty search here, not an error worth interrupting for.
+      void api
+        .transcriptsList(q)
+        .then((list) => isLatest(id) && setTranscripts(list))
+        .catch(() => isLatest(id) && setTranscripts([]));
     }, 150);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, today]);
 
-  function go(tab: Tab) {
-    onNavigate(tab, query.trim());
+  const go = (target: SearchTarget) => onNavigate(target, query.trim());
+  const low = fold(query.trim());
+  const events = low ? agenda.filter((e) => foldIncludes(e.title, low)) : [];
+
+  /** Arrows walk the input and then every result, so a result is never a mouse-only target. */
+  function walk(e: React.KeyboardEvent) {
+    const step = { ArrowDown: 1, ArrowUp: -1 }[e.key];
+    if (!step) return;
+    const stops = [input.current, ...(dialog.current?.querySelectorAll<HTMLElement>("[data-row]") ?? [])];
+    const at = stops.indexOf(document.activeElement as HTMLElement);
+    e.preventDefault();
+    stops[Math.min(Math.max(at + step, 0), stops.length - 1)]?.focus();
   }
 
   return (
@@ -92,11 +116,12 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       role="dialog"
       aria-modal="true"
       aria-label={t("search.label")}
+      ref={dialog}
       onKeyDown={(e) => {
         if (e.key === "Escape") {
           e.stopPropagation();
           onClose();
-        }
+        } else walk(e);
       }}
       className="absolute inset-0 z-40 flex flex-col gap-3 rounded-2xl bg-panel p-4 text-fg motion-safe:animate-surgir motion-reduce:animate-fade"
     >
@@ -113,68 +138,52 @@ export default function GlobalSearch({ today, privacy, onNavigate, onClose, onEr
       <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
         {!query.trim() ? (
           <p className="px-1 text-xs text-muted">{t("search.hint")}</p>
-        ) : tasks.length === 0 && notes.length === 0 && clips.length === 0 ? (
+        ) : !(tasks.length || notes.length || clips.length || transcripts.length || events.length) ? (
           settled === query.trim() && <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
         ) : (
           <>
-            <Group title={t("search.groupTasks")} empty={tasks.length === 0} onOpen={() => go("tasks")}>
-              {tasks.slice(0, CAP).map((task) => (
-                <li key={task.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
-                  {task.title}
-                </li>
-              ))}
-            </Group>
-            <Group
-              title={t("search.groupNotes")}
-              empty={notes.length === 0}
-              more={notesTotal > CAP ? notesTotal - CAP : 0}
-              onOpen={() => go("notes")}
-            >
-              {notes.map((n) => (
-                <li key={n.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
-                  {n.title || t("search.untitled")}
-                </li>
-              ))}
-            </Group>
-            <Group title={t("search.groupClipboard")} empty={clips.length === 0} onOpen={() => go("clipboard")}>
-              {clips.slice(0, CAP).map((c) => (
-                <li key={c.id} className={`truncate px-2.5 py-1.5 text-xs text-fg ${mask}`}>
-                  {c.preview}
-                </li>
-              ))}
-            </Group>
+            {tasks.length > 0 && (
+              <Group title={t("search.groupTasks")} onOpen={() => go("tasks")}>
+                {tasks.slice(0, CAP).map((x) => (
+                  <Row key={x.id} text={x.title} mask={mask} onOpen={() => go("tasks")} />
+                ))}
+              </Group>
+            )}
+            {events.length > 0 && (
+              <Group title={t("search.groupAgenda")} more={Math.max(events.length - CAP, 0)} onOpen={() => go("agenda")}>
+                {events.slice(0, CAP).map((e) => (
+                  <Row key={e.id} text={e.title} mask={mask} onOpen={() => go("agenda")} />
+                ))}
+              </Group>
+            )}
+            {notes.length > 0 && (
+              <Group title={t("search.groupNotes")} more={Math.max(notesTotal - CAP, 0)} onOpen={() => go("notes")}>
+                {notes.map((n) => (
+                  <Row key={n.id} text={n.title || t("search.untitled")} mask={mask} onOpen={() => go("notes")} />
+                ))}
+              </Group>
+            )}
+            {transcripts.length > 0 && (
+              <Group
+                title={t("search.groupTranscripts")}
+                more={Math.max(transcripts.length - CAP, 0)}
+                onOpen={() => go("transcripts")}
+              >
+                {transcripts.slice(0, CAP).map((x) => (
+                  <Row key={x.name} text={x.name} mask={mask} onOpen={() => go("transcripts")} />
+                ))}
+              </Group>
+            )}
+            {clips.length > 0 && (
+              <Group title={t("search.groupClipboard")} onOpen={() => go("clipboard")}>
+                {clips.slice(0, CAP).map((c) => (
+                  <Row key={c.id} text={c.preview} mask={mask} onOpen={() => go("clipboard")} />
+                ))}
+              </Group>
+            )}
           </>
         )}
       </div>
     </div>
-  );
-}
-
-function Group({
-  title,
-  empty,
-  more,
-  onOpen,
-  children,
-}: {
-  title: string;
-  empty: boolean;
-  more?: number;
-  onOpen: () => void;
-  children: React.ReactNode;
-}) {
-  if (empty) return null;
-  return (
-    <section className="mb-3 last:mb-0">
-      <button
-        type="button"
-        onClick={onOpen}
-        className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-faint hover:text-accent-text"
-      >
-        {title} →
-      </button>
-      <ul className="divide-y divide-edge rounded-lg border border-edge bg-ink/40">{children}</ul>
-      {!!more && <p className="mt-1 px-1 text-[11px] text-faint">{t("search.more", { n: more })}</p>}
-    </section>
   );
 }

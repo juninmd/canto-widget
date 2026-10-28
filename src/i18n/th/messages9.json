@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "ไม่มีสถานที่",
+  "tasks.context.app": "เมื่อเปิดแอป",
+  "tasks.context.wifi": "เมื่อเชื่อมต่อ Wi-Fi",
+  "tasks.context.of": "จะเตือน {title} ที่ไหน",
+  "tasks.context.nameOf": "ชื่อแอปหรือเครือข่ายของ {title}",
+  "tasks.context.chipApp": "เมื่อเปิด {name}",
+  "tasks.context.chipWifi": "เมื่ออยู่บน Wi-Fi {name}",
+  "search.groupAgenda": "ตารางวันนี้",
+  "search.groupTranscripts": "ข้อความถอดเสียง"
 }

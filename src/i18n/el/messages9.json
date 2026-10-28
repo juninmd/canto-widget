@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "χωρίς τοποθεσία",
+  "tasks.context.app": "όταν ανοίγει η εφαρμογή",
+  "tasks.context.wifi": "όταν συνδέεται στο Wi-Fi",
+  "tasks.context.of": "πού να υπενθυμίσει το {title}",
+  "tasks.context.nameOf": "όνομα εφαρμογής ή δικτύου για το {title}",
+  "tasks.context.chipApp": "όταν ανοίγει το {name}",
+  "tasks.context.chipWifi": "στο Wi-Fi {name}",
+  "search.groupAgenda": "ατζέντα σήμερα",
+  "search.groupTranscripts": "απομαγνητοφωνήσεις"
 }

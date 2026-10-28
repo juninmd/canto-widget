@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "tanpa tempat",
+  "tasks.context.app": "saat membuka aplikasi",
+  "tasks.context.wifi": "saat tersambung ke Wi-Fi",
+  "tasks.context.of": "di mana mengingatkan {title}",
+  "tasks.context.nameOf": "nama aplikasi atau jaringan untuk {title}",
+  "tasks.context.chipApp": "saat membuka {name}",
+  "tasks.context.chipWifi": "di Wi-Fi {name}",
+  "search.groupAgenda": "agenda hari ini",
+  "search.groupTranscripts": "transkrip"
 }
