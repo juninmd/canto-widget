@@ -165,7 +165,7 @@ pub(crate) fn client() -> Result<reqwest::blocking::Client> {
 }
 
 pub(crate) fn network(e: reqwest::Error) -> AppError {
-    AppError::Github(format!("sem resposta do GitHub: {e}"))
+    AppError::Github(format!("sem resposta do GitHub: {}", crate::error::net_text(e)))
 }
 
 pub(crate) fn response<T: for<'de> Deserialize<'de>>(res: reqwest::blocking::Response) -> Result<T> {
