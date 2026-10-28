@@ -5,7 +5,7 @@ import { useUndo } from "../lib/useUndo";
 import { useLatestRequest } from "../lib/useLatestRequest";
 import { EXIT_CLASS, useNewIds, useExit } from "../lib/motion";
 import { useFlip } from "../lib/useFlip";
-import { clipKind, kindCounts } from "../lib/clip";
+import { clipKind, kindCounts, sameClips } from "../lib/clip";
 import { t } from "../i18n";
 import ClipCard from "./ClipCard";
 import EmptyState from "./EmptyState";
@@ -30,6 +30,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
   useQuerySeed(initialQuery, querySeq, setQuery);
   const [kindFilter, setKindFilter] = useState<KindFilter>("all");
   const [items, setItems] = useState<ClipItem[]>([]);
+  const shown = useRef(items);
   const [copied, flashCopied] = useCopied();
   const [confirmingClear, setConfirmingClear] = useState(false);
   const visibleWindow = useWindowVisible();
@@ -47,7 +48,8 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
     try {
       const list = await api.clipList(q);
       if (!isLatest(id)) return;
-      setItems(list.items);
+      // The 2.5s poll mostly brings back the same list: keeping the old array lets React skip the whole re-render.
+      if (!sameClips(shown.current, list.items)) setItems((shown.current = list.items));
       setLoadedFor(q);
       lastError.current = "";
     } catch (e) {
