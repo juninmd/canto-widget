@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "ingen sted",
+  "tasks.context.app": "når appen åpnes",
+  "tasks.context.wifi": "når Wi-Fi kobles til",
+  "tasks.context.of": "hvor {title} skal minne deg på det",
+  "tasks.context.nameOf": "navn på app eller nettverk for {title}",
+  "tasks.context.chipApp": "når {name} åpnes",
+  "tasks.context.chipWifi": "på Wi-Fi {name}",
+  "search.groupAgenda": "dagens kalender",
+  "search.groupTranscripts": "transkripsjoner"
 }

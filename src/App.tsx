@@ -63,6 +63,7 @@ import NotificationsPanel from "./components/NotificationsPanel";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
 import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
+import { saveView } from "./lib/agendaView";
 
 export default function App() {
   return (
@@ -314,13 +315,16 @@ function Canto() {
         <GlobalSearch
           today={today}
           privacy={privacy}
+          agenda={agenda.items}
           onError={setError}
           onClose={() => setSearchOpen(false)}
           onNavigate={(target, q) => {
-            setJumpQuery(q);
+            const destination = target === "transcripts" ? "agenda" : target;
+            if (destination === "agenda") saveView(target === "transcripts" ? "meetings" : "today");
+            setJumpQuery(target === "agenda" ? "" : q);
             setJumpSeq((n) => n + 1);
             setSettingsFocus(null);
-            setTab(target);
+            setTab(destination);
             setSearchOpen(false);
           }}
         />
@@ -418,7 +422,7 @@ function Canto() {
               {tab === "clipboard" && (
                 <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
               )}
-              {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} onError={setError} onOpenSettings={() => openSettingsAt("google")} onBooked={(message) => notify({ message })} />}
+              {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} onOpenSettings={() => openSettingsAt("google")} onBooked={(message) => notify({ message })} />}
               {tab === "github" && <GithubTab onError={setError} />}
               {tab === "gitlab" && <GitlabTab onError={setError} />}
               {tab === "steam" && <SteamTab onError={setError} />}
