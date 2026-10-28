@@ -38,7 +38,7 @@ pub fn get(client: &reqwest::blocking::Client, url: reqwest::Url) -> Result<Vec<
         s if !(200..300).contains(&s) => {
             Err(format!("{} {s}", crate::lang::tr("a TomTom respondeu", "TomTom answered")))
         }
-        _ => res.bytes().map(|b| b.to_vec()).map_err(|e| e.to_string()),
+        _ => res.bytes().map(|b| b.to_vec()).map_err(crate::error::net_text),
     }
 }
 

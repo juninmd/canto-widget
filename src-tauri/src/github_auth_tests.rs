@@ -59,3 +59,16 @@ fn renews_one_minute_before_expiring() {
     assert!(!t.expired(100_000 - SLACK_MS - 1));
     assert!(t.expired(100_000 - SLACK_MS));
 }
+
+#[test]
+fn debug_output_hides_the_tokens_and_the_device_code() {
+    let t = Tokens { access_token: "ghu_live".into(), refresh_token: String::new(), expires_at: 7 };
+    let shown = format!("{t:?} {:?}", PollResult::Ready(t.clone()));
+    assert!(!shown.contains("ghu_live"), "{shown}");
+    assert!(shown.contains("<redacted>") && shown.contains("<empty>") && shown.contains("expires_at: 7"), "{shown}");
+
+    let v = json!({"device_code": "dev-secret", "user_code": "ABCD-1234", "verification_uri": "https://github.com/login/device"});
+    let req: DeviceRequest = serde_json::from_value(v).unwrap();
+    let shown = format!("{req:?}");
+    assert!(!shown.contains("dev-secret") && shown.contains("ABCD-1234"), "{shown}");
+}

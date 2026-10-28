@@ -16,6 +16,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o redesenho.
 ### Adicionado
 
+- **Tokens copiados ficam fora do histórico do Clipboard.** Uma cópia que é só um token de formato conhecido
+  (GitHub, GitLab, Google, Anthropic, Slack, AWS, JWT) ou um bloco de chave privada não entra no histórico, como já
+  acontecia com o que gerenciadores de senha marcam como oculto; um texto que só menciona o token continua sendo
+  guardado. Erros de rede do Google, da TomTom e dos feeds não repetem mais a URL (onde vão chave e dados da busca),
+  e os tokens do GitHub e do Google não aparecem mais em nenhuma saída de depuração.
 - **Gmail pelo teclado, sem ação em dobro.** Com o foco num e-mail, **J/K** (ou as setas) andam pela lista, **X** seleciona, **S** dá estrela, **U** alterna lido, **E** arquiva, **#** manda para a lixeira e **O** abre no Gmail; o foco passa para o vizinho quando o e-mail sai. Um clique duplo em "marcar como lido", estrela, arquivar ou lixeira agora envia um pedido só: as ações do e-mail esperam a resposta. **/** também foca a busca no Gmail, no Drive e nos Contatos.
 - **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
   revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**

@@ -29,6 +29,20 @@ pub enum AppError {
 
 pub type Result<T> = std::result::Result<T, AppError>;
 
+/// What a manual `Debug` prints in place of a credential: whether there is one, never its value.
+pub(crate) fn redact(secret: &str) -> &'static str {
+    if secret.is_empty() {
+        "<empty>"
+    } else {
+        "<redacted>"
+    }
+}
+
+/// A reqwest error worded without its URL, which can carry an API key or the user's own data in the query.
+pub(crate) fn net_text(e: reqwest::Error) -> String {
+    e.without_url().to_string()
+}
+
 impl AppError {
     /// The text for `code`. Split out of `Display` so a test can assert two languages without touching the
     /// process-wide one. A language with no translation of the English text falls back to it, exactly like the
@@ -122,5 +136,21 @@ mod tests {
         assert_eq!(AppError::Io("disco cheio".into()).text("pt-BR"), "erro de arquivo: disco cheio");
         assert_eq!(AppError::Github("403".into()).text("en"), "github: 403");
         assert_eq!(AppError::RateLimited { message: "espere".into(), reset_at: 0 }.text("en"), "espere");
+    }
+
+    #[test]
+    fn a_network_error_never_carries_the_query_string() {
+        // Port 1 on loopback refuses at once: a real reqwest error, no network needed.
+        let client = crate::net::client_builder().build().unwrap();
+        let e = client.get("http://127.0.0.1:1/tile.png?key=sekrit-value").send().unwrap_err();
+        assert!(e.to_string().contains("sekrit-value"), "reqwest stopped echoing the URL: {e}");
+        let text = net_text(e);
+        assert!(!text.contains("sekrit-value") && !text.contains("127.0.0.1"), "{text}");
+    }
+
+    #[test]
+    fn redact_says_whether_there_is_a_secret_and_nothing_else() {
+        assert_eq!(redact(""), "<empty>");
+        assert_eq!(redact("ghp_x"), "<redacted>");
     }
 }
