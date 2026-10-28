@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { api, errText, type TrafficSpot, type TrafficStatus, type TrafficView } from "../lib/api";
 import { fetchedClock } from "../lib/weather";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { useWindowVisible } from "../lib/useWindowVisible";
 import { t } from "../i18n";
@@ -26,19 +27,28 @@ export default function MapTab() {
   const [changing, setChanging] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [focused, setFocused] = useState<number | null>(null);
+  const [saving, setSaving] = useState(false);
   const visible = useWindowVisible();
+  const { bump, isLatest } = useLatestRequest();
 
-  const load = useCallback(async (force: boolean) => {
-    setLoading(true);
-    try {
-      setView(await api.trafficGet(force));
-      setError("");
-    } catch (e) {
-      setError(errText(e));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // The poll, the refresh event and a settings change can overlap: only the newest reply lands.
+  const load = useCallback(
+    async (force: boolean) => {
+      const id = bump();
+      setLoading(true);
+      try {
+        const next = await api.trafficGet(force);
+        if (!isLatest(id)) return;
+        setView(next);
+        setError("");
+      } catch (e) {
+        if (isLatest(id)) setError(errText(e));
+      } finally {
+        if (isLatest(id)) setLoading(false);
+      }
+    },
+    [bump, isLatest],
+  );
 
   useEffect(() => {
     void load(false);
@@ -55,6 +65,16 @@ export default function MapTab() {
     setChanging(false);
     void load(false);
   };
+
+  /** One save at a time: a double click on a place would otherwise set the origin twice. */
+  function pickOrigin(spot: TrafficSpot) {
+    if (saving) return;
+    setSaving(true);
+    void api
+      .trafficSetOrigin(spot)
+      .then(changed, (e) => setError(errText(e)))
+      .finally(() => setSaving(false));
+  }
 
   if (view === null) {
     return error ? <ErrorBanner message={error} onRetry={() => void load(false)} /> : <Skeleton label={t("map.loading")} rows={4} />;
@@ -78,7 +98,8 @@ export default function MapTab() {
         <MapPlacePicker
           label={t("map.origin.label")}
           shortcut={suggested ? { spot: suggested, label: t("map.origin.use", { city: suggested.name }) } : null}
-          onPick={(spot: TrafficSpot) => void api.trafficSetOrigin(spot).then(changed, (e) => setError(errText(e)))}
+          disabled={saving}
+          onPick={pickOrigin}
         />
         {error && (
           <p role="alert" className="text-xs text-danger">
@@ -105,7 +126,7 @@ export default function MapTab() {
         stamp={view.fetched_at}
         updated={t("map.live", { time: fetchedClock(view.fetched_at || Date.now()) })}
       />
-      {view.error && <ErrorBanner message={view.error} busy={loading} onRetry={() => void load(true)} />}
+      {(error || view.error) && <ErrorBanner message={error || view.error!} busy={loading} onRetry={() => void load(true)} />}
       {!status.has_key && <MapKey onSaved={changed} />}
       {live && <MapPulse slowdown={reading.slowdown} history={view.history} now={view.fetched_at} />}
       {status.has_key && (
