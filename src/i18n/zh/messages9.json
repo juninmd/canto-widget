@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "无地点",
+  "tasks.context.app": "打开应用时",
+  "tasks.context.wifi": "连接 Wi-Fi 时",
+  "tasks.context.of": "在何处提醒 {title}",
+  "tasks.context.nameOf": "{title} 的应用或网络名称",
+  "tasks.context.chipApp": "打开 {name} 时",
+  "tasks.context.chipWifi": "在 Wi-Fi {name} 上",
+  "search.groupAgenda": "今日日程",
+  "search.groupTranscripts": "会议记录"
 }
