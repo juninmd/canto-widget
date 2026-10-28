@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { clipKind, kindCounts, parseMaxPinned, sizeLabel } from "./clip";
+import { clipKind, kindCounts, parseMaxPinned, sameClips, sizeLabel } from "./clip";
 
 describe("clipKind", () => {
   test("a lone URL is a link, but a sentence containing one is text", () => {
@@ -58,4 +58,17 @@ test("parseMaxPinned accepts whole numbers up to 1000 and ignores a keystroke in
   expect(parseMaxPinned(" 7 ")).toBe(7);
   expect(parseMaxPinned("5000")).toBe(1000);
   for (const bad of ["", "0", "-3", "1.5", "abc"]) expect(parseMaxPinned(bad)).toBeNull();
+});
+
+describe("sameClips", () => {
+  const a = { id: "c1", preview: "oi", chars: 2, kept: 2, truncated: false, copied_at: 1, pinned: false };
+  test("fresh copies of the same clips are the same list", () => {
+    expect(sameClips([a], [{ ...a }])).toBe(true);
+    expect(sameClips([], [])).toBe(true);
+  });
+  test("a new clip, a pin or a re-copy is a change", () => {
+    expect(sameClips([a], [a, { ...a, id: "c2" }])).toBe(false);
+    expect(sameClips([a], [{ ...a, pinned: true }])).toBe(false);
+    expect(sameClips([a], [{ ...a, copied_at: 2 }])).toBe(false);
+  });
 });
