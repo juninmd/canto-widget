@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText, type GTask } from "../lib/api";
 import { dueDay, googleGate, isLate } from "../lib/google";
 import { t } from "../i18n";
@@ -21,6 +21,8 @@ export default function GoogleTasksSection({ today, onError }: Props) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [open, setOpen] = useState(savedOpen);
+  const field = useRef<HTMLInputElement>(null);
+  const list = useRef<HTMLUListElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -39,7 +41,7 @@ export default function GoogleTasksSection({ today, onError }: Props) {
 
   const add = async () => {
     const title = draft.trim();
-    if (!title) return;
+    if (!title || busy) return;
     setBusy(true);
     try {
       const task = await api.gtasksAdd(title);
@@ -52,6 +54,10 @@ export default function GoogleTasksSection({ today, onError }: Props) {
     }
   };
   const complete = async (task: GTask) => {
+    // The checked row leaves under the focus: hand it to the next row's box, the previous one's, or the capture.
+    const boxes = [...(list.current?.querySelectorAll<HTMLButtonElement>("button[data-gtask-done]") ?? [])];
+    const at = boxes.findIndex((b) => b.dataset.gtaskDone === task.id);
+    if (at >= 0 && boxes[at] === document.activeElement) (boxes[at + 1] ?? boxes[at - 1] ?? field.current)?.focus();
     setTasks((list) => list?.filter((x) => x.id !== task.id) ?? null);
     try {
       await api.gtasksComplete(task.id);
@@ -95,8 +101,10 @@ export default function GoogleTasksSection({ today, onError }: Props) {
           >
             <input
               value={draft}
+              ref={field}
               onChange={(e) => setDraft(e.target.value)}
-              disabled={busy}
+              readOnly={busy}
+              aria-busy={busy}
               maxLength={1024}
               placeholder={t("gtasks.add")}
               aria-label={t("gtasks.add")}
@@ -104,11 +112,12 @@ export default function GoogleTasksSection({ today, onError }: Props) {
             />
           </form>
           {tasks.length === 0 && <p className="px-1 py-1 text-[11px] text-faint">{t("gtasks.empty")}</p>}
-          <ul>
+          <ul ref={list}>
             {tasks.map((task) => (
               <li key={task.id} data-gtask={task.id} className="flex items-center gap-2 rounded-md px-1 py-1 text-xs hover:bg-hover">
                 <button
                   type="button"
+                  data-gtask-done={task.id}
                   onClick={() => void complete(task)}
                   aria-label={t("gtasks.complete", { title: task.title })}
                   className="canto-hit group grid shrink-0 place-items-center"

@@ -434,5 +434,10 @@
   "tasks.context.chipApp": "{name}을(를) 열 때",
   "tasks.context.chipWifi": "Wi-Fi {name}에서",
   "search.groupAgenda": "오늘 일정",
-  "search.groupTranscripts": "회의록"
+  "search.groupTranscripts": "회의록",
+  "common.cancel": "cancel",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop"
 }

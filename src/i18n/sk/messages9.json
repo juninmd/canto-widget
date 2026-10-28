@@ -434,5 +434,10 @@
   "tasks.context.chipApp": "pri otvorení {name}",
   "tasks.context.chipWifi": "na Wi-Fi {name}",
   "search.groupAgenda": "dnešný program",
-  "search.groupTranscripts": "prepisy"
+  "search.groupTranscripts": "prepisy",
+  "common.cancel": "cancel",
+  "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
+  "google.signOutYes": "yes, sign out",
+  "settings.sync.stopAsk": "stop syncing? the folder and its files stay as they are",
+  "settings.sync.stopYes": "yes, stop"
 }
