@@ -52,10 +52,10 @@ fn nothing_is_fetched_again_within_3_hours_even_when_forced() {
 #[test]
 fn http_errors_spend_the_window_but_a_network_failure_does_not() {
     let mut cfg = ModelsConfig::default();
-    let out = refresh(&mut cfg, T0, false, || Err(FetchError::Network("offline".into())));
+    let out = refresh(&mut cfg, T0, false, || Err::<Page, _>(FetchError::Network("offline".into())));
     assert_eq!(cfg.tried_at, 0);
     assert!(out.error.unwrap().contains("offline"));
-    let out = refresh(&mut cfg, T0, false, || Err(FetchError::RateLimited));
+    let out = refresh(&mut cfg, T0, false, || Err::<Page, _>(FetchError::RateLimited));
     assert_eq!((cfg.tried_at, out.error.as_deref()), (T0, Some("limite de buscas atingido, tente mais tarde")));
     assert!(!due(&cfg, T0 + 60_000));
 }
@@ -97,14 +97,18 @@ fn changes_leave_badges_that_last_7_days() {
 fn a_new_index_version_reseeds_without_alerts() {
     let mut cfg = ModelsConfig::default();
     refresh(&mut cfg, T0, false, || Ok(list(12)));
-    cfg.index = "4.0".into();
+    let page = |models, v: &str| Page { models, index: Some(v.into()) };
     let mut next = list(12);
     next[11].score = 95.0;
-    let out = refresh(&mut cfg, T0 + FLOOR_MS, false, || Ok(next));
+    let out = refresh(&mut cfg, T0 + FLOOR_MS, false, || Ok(page(next.clone(), "5.0")));
     assert!(out.changes.is_empty(), "scores of another version aren't comparable");
-    assert_eq!(cfg.index, crate::models_feed::INDEX_VERSION);
+    assert_eq!(cfg.index, "5.0");
     assert!(cfg.badges.is_empty());
     assert_eq!(cfg.top.as_ref().unwrap()[0], "a11");
+    next[10].score = 96.0;
+    let out = refresh(&mut cfg, T0 + 2 * FLOOR_MS, false, || Ok(next.clone()));
+    assert_eq!(out.changes.len(), 1, "a page that names no version keeps comparing");
+    assert_eq!(view(&cfg, T0, Outcome::default()).index, "5.0");
 }
 
 #[test]
