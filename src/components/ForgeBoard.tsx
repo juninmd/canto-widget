@@ -108,7 +108,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                       list={focusList(lists, key, focus, ci)}
                       login={login}
                       filtered={isFiltered(gh.filter) || focus === "failing"}
-                      loadingMore={gh.loadingMore === key}
+                      loadingMore={gh.loadingMore.includes(key)}
                       onMore={() => void gh.more(key)}
                       ci={ci}
                       conflicts={conflicts}
