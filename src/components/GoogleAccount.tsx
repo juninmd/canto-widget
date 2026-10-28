@@ -1,16 +1,17 @@
 import type { DriveStatus } from "../lib/api";
 import { t } from "../i18n";
+import ConfirmButton from "./ConfirmButton";
 
 type Props = { status: DriveStatus; busy: boolean; signingOut: boolean; onSignOut: () => void };
 
-/** Connected account card: who it is, with sign-out always in view. */
+/** Connected account card: who it is, with sign-out always in view (it revokes the token, so it asks first). */
 export default function GoogleAccount({ status, busy, signingOut, onSignOut }: Props) {
   const name = status.name?.trim() || status.email || t("google.connectedAccount");
   // Only image data: URLs go in the <img>; CSP blocks the rest, and the initial covers the gap.
   const photo = status.avatar?.startsWith("data:image/") ? status.avatar : "";
 
   return (
-    <div className="mt-1 flex items-center gap-3 rounded-lg border border-edge bg-ink/60 p-2">
+    <div className="mt-1 flex flex-wrap items-center gap-3 rounded-lg border border-edge bg-ink/60 p-2">
       {photo ? (
         <img src={photo} alt="" referrerPolicy="no-referrer" className="size-9 shrink-0 rounded-full object-cover" />
       ) : (
@@ -28,15 +29,16 @@ export default function GoogleAccount({ status, busy, signingOut, onSignOut }: P
           </p>
         )}
       </div>
-      <button
-        type="button"
+      <ConfirmButton
+        ask={t("google.signOutAsk")}
+        yes={t("google.signOutYes")}
         disabled={busy}
-        onClick={onSignOut}
-        aria-label={t("google.signOutLabel", { account: status.email || name })}
+        onConfirm={onSignOut}
+        ariaLabel={t("google.signOutLabel", { account: status.email || name })}
         className="shrink-0 rounded-lg border border-line px-2.5 py-1 text-xs text-fg hover:border-danger hover:text-danger disabled:opacity-40"
       >
         {signingOut ? t("google.signingOut") : t("google.signOut")}
-      </button>
+      </ConfirmButton>
     </div>
   );
 }

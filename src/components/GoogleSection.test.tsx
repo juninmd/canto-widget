@@ -47,13 +47,25 @@ test("connected account shows photo, name and email", async () => {
 
 test("signing out disconnects and returns to the sign-in state", async () => {
   await mount();
+  fireEvent.click(screen.getByLabelText("sair da conta ana@exemplo.com"));
+  expect(calls).not.toContain("drive_disconnect");
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "sair da conta ana@exemplo.com" }));
+    fireEvent.click(screen.getByText("sim, sair"));
   });
   expect(calls).toContain("drive_disconnect");
   expect(screen.getByText("pronto para entrar")).toBeTruthy();
   expect(screen.getByRole("button", { name: "entrar com o Google" })).toBeTruthy();
   expect(screen.queryByText("Ana Souza")).toBeNull();
+});
+
+test("sign-out asks first: cancelling keeps the account and revokes nothing", async () => {
+  await mount();
+  fireEvent.click(screen.getByLabelText("sair da conta ana@exemplo.com"));
+  expect(screen.getByText("sair desta conta? a agenda do Google some do Canto até você entrar de novo")).toBeTruthy();
+  fireEvent.click(screen.getByText("cancelar"));
+  expect(calls).not.toContain("drive_disconnect");
+  expect(screen.getByText("Ana Souza")).toBeTruthy();
+  expect(document.activeElement?.getAttribute("aria-label")).toBe("sair da conta ana@exemplo.com");
 });
 
 test("a photo that isn't an image data: URL doesn't become an <img>; shows the initial instead", async () => {

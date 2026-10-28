@@ -29,13 +29,20 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
   const [notes, setNotes] = useState<Note[]>([]);
   const [notesTotal, setNotesTotal] = useState(0);
   const [clips, setClips] = useState<ClipItem[]>([]);
-  const [transcripts, setTranscripts] = useState<TranscriptMeta[]>([]);
+  // The query whose three lookups all settled: "nada encontrado" waits for it instead of flashing while they run.
+  const [settled, setSettled] = useState("");
   const input = useRef<HTMLInputElement>(null);
+  const previous = useRef<Element | null>(null);
+  const [transcripts, setTranscripts] = useState<TranscriptMeta[]>([]);
   const dialog = useRef<HTMLDivElement>(null);
   const { bump, isLatest } = useLatestRequest();
   const mask = privacy ? "blur-sm select-none" : "";
 
-  useEffect(() => input.current?.focus(), []);
+  useEffect(() => {
+    previous.current = document.activeElement;
+    input.current?.focus();
+    return () => (previous.current as HTMLElement | null)?.focus?.();
+  }, []);
 
   useEffect(() => {
     const q = query.trim();
@@ -45,28 +52,41 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
       setNotes([]);
       setNotesTotal(0);
       setClips([]);
+      setSettled("");
       setTranscripts([]);
       return;
     }
     const timer = setTimeout(() => {
       const id = bump();
       const low = fold(q);
-      void api
-        .tasksForDay(today)
-        .then((all) => isLatest(id) && setTasks(all.filter((x) => foldIncludes(x.title, low))))
-        .catch((e) => isLatest(id) && onError(errText(e)));
-      void api
-        .notesSearch(q, CAP)
-        .then((page) => {
-          if (!isLatest(id)) return;
-          setNotes(page.items);
-          setNotesTotal(page.total);
-        })
-        .catch((e) => isLatest(id) && onError(errText(e)));
-      void api
-        .clipList(q)
-        .then((list) => isLatest(id) && setClips(list.items))
-        .catch((e) => isLatest(id) && onError(errText(e)));
+      const lookups = [
+        api
+          .tasksForDay(today)
+          .then((all) => {
+            if (!isLatest(id)) return;
+            setTasks(all.filter((x) => foldIncludes(x.title, low)));
+          }),
+        api
+          .notesSearch(q, CAP)
+          .then((page) => {
+            if (!isLatest(id)) return;
+            setNotes(page.items);
+            setNotesTotal(page.total);
+          }),
+        api
+          .clipList(q)
+          .then((list) => {
+            if (!isLatest(id)) return;
+            setClips(list.items);
+          }),
+      ];
+      void Promise.allSettled(lookups).then((done) => {
+        if (!isLatest(id)) return;
+        setSettled(q);
+        // One toast per search: a locked vault fails all three lookups with the same message.
+        const failed = done.find((r) => r.status === "rejected");
+        if (failed) onError(errText((failed as PromiseRejectedResult).reason));
+      });
       // A folder that was never chosen is an empty search here, not an error worth interrupting for.
       void api
         .transcriptsList(q)
@@ -119,7 +139,7 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
         {!query.trim() ? (
           <p className="px-1 text-xs text-muted">{t("search.hint")}</p>
         ) : !(tasks.length || notes.length || clips.length || transcripts.length || events.length) ? (
-          <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
+          settled === query.trim() && <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
         ) : (
           <>
             {tasks.length > 0 && (

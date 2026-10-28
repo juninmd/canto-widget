@@ -16,6 +16,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   o redesenho.
 ### Adicionado
 
+- **Ajustes pedem confirmação antes de desfazer uma conta ou a sincronização.** **Sair** da conta Google (que
+  revoga o acesso) e **parar** a pasta sincronizada agora perguntam ali mesmo antes de agir; **cancelar** ou **Esc**
+  devolve o foco ao botão. Os botões do **Não perturbe** e as opções de **tela cheia** e **pedidos de revisão** ficam
+  travados enquanto salvam, então um clique duplo não manda dois pedidos nem deixa o estado invertido.
 - **Busca global em mais fontes**: além de tarefas de hoje, notas e clipboard, o `Ctrl+K` agora busca na agenda de hoje (já carregada, sem chamada ao Google) e nas transcrições de reunião. Cada resultado é clicável e as setas ↑/↓ percorrem o campo e todos os resultados; uma transcrição abre Agenda › Reuniões com a busca preenchida. Uma pasta de transcrições ilegível vira grupo vazio, não aviso de erro.
 - **Lembrete por contexto**: nos detalhes da tarefa, em vez de um horário ela pode esperar o app em foco ("ao abrir o app", ex.: Slack) ou a rede Wi‑Fi ("ao entrar no Wi‑Fi"). Com o cofre aberto, o Canto confere a cada 15 s e toca o aviso (com som e notificação, como os de horário) uma vez por dia por tarefa aberta de hoje ou atrasada. Nada é consultado enquanto nenhuma tarefa aberta tem contexto, e o nome do app fica só no cofre criptografado (campo novo `context`, ignorado por versões antigas). O nome do app segue o do registro de atividade (`Code`, `Slack`, `Safari`; sem diferença de maiúsculas nem de `.exe`). Wi‑Fi: Windows (`netsh`), Linux (`nmcli`/`iwgetid`) e macOS (`networksetup`; o macOS 14.4+ só informa a rede com a permissão de localização). Em Linux com Wayland o app em foco não é visível, então só o Wi‑Fi funciona. A linha da tarefa mostra “ao abrir Slack” ou “no Wi‑Fi Escritorio”.
 - **Blocos de código nas notas**: trechos entre
@@ -383,6 +387,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Busca gl- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
+  (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
+  card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
+  fecha e devolve o foco ao sino). O modo Maximizado passa a dar a janela inteira à aba aberta: a divisória que
+  arrastava a largura da lista saiu.
 - **"Mostrar- **Avisos em tela própria**: a coluna de notificações do modo Maximizado vira a tela que o **sino** do cabeçalho
   (sempre visível, com o contador quando há pendentes) abre sobre a janela inteira, no Normal e no Maximizado, com um
   card por aviso pendente em grade, **dispensar todas** e o que foi **resolvido hoje** embaixo (`Esc` ou **voltar**
