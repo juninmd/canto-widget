@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "niciun loc",
+  "tasks.context.app": "la deschiderea aplicației",
+  "tasks.context.wifi": "la conectarea la Wi-Fi",
+  "tasks.context.of": "unde să reamintească {title}",
+  "tasks.context.nameOf": "numele aplicației sau al rețelei pentru {title}",
+  "tasks.context.chipApp": "la deschiderea {name}",
+  "tasks.context.chipWifi": "pe Wi-Fi {name}",
+  "search.groupAgenda": "agenda de azi",
+  "search.groupTranscripts": "transcrieri"
 }
