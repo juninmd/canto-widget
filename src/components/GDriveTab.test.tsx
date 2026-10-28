@@ -153,6 +153,8 @@ test("a long file name keeps its full text on hover, and the open button says wh
   render(<GDriveTab onNotice={() => {}} />);
   const name = await screen.findByText("Roadmap Q4 2026");
   expect(name.getAttribute("title")).toBe("Roadmap Q4 2026");
-  expect(screen.getByText("abrir").getAttribute("aria-describedby")).toBe(name.id);
+  // The next page can land meanwhile and bring its own "abrir"; pick the one that names this file.
+  const open = screen.getAllByRole("button", { name: "abrir" }).find((b) => b.getAttribute("aria-describedby") === name.id);
+  expect(open).toBeTruthy();
   expect(screen.getByLabelText("entrar na pasta Projetos").getAttribute("title")).toBe("Projetos");
 });
