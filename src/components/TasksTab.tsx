@@ -182,6 +182,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         focusStore.setEstimate(task.id, minutes);
         void run(() => api.taskSetEstimate(task.id, minutes));
       }}
+      onContext={(context) => void run(() => api.taskSetContext(task.id, context))}
       onSubtasksChange={reload}
       onError={onError}
     />

@@ -44,8 +44,11 @@ mock.module("@tauri-apps/api/core", () => ({
             : { total: 0, items: [] },
         );
       case "tasks_for_day":
-      case "transcripts_list":
         return Promise.resolve([]);
+      case "transcripts_list":
+        return Promise.resolve(
+          args?.query === "retro" ? [{ name: "retro-da-sprint.md", modified_at: 1, size: 10, preview: "" }] : [],
+        );
       case "clip_list":
         return Promise.resolve({ items: [], max_pinned: 100 });
       case "drive_status":
@@ -269,7 +272,7 @@ test("Ctrl+K opens the global search; picking a note result jumps to Notes with 
   const dialog = screen.getByRole("dialog", { name: "busca global" });
 
   await act(async () => {
-    fireEvent.change(screen.getByPlaceholderText("buscar em tarefas de hoje, notas e clipboard"), {
+    fireEvent.change(screen.getByPlaceholderText("buscar em tarefas de hoje, agenda, notas, transcrições e clipboard"), {
       target: { value: "reuniao" },
     });
     jest.advanceTimersByTime(150);
@@ -283,6 +286,30 @@ test("Ctrl+K opens the global search; picking a note result jumps to Notes with 
   expect(dialog.isConnected, "the overlay should have closed").toBe(false);
   expect(screen.getByRole("tab", { name: "Notas" }).getAttribute("aria-selected")).toBe("true");
   expect((screen.getByLabelText("buscar notas") as HTMLInputElement).value).toBe("reuniao");
+});
+
+test("a transcript result jumps to the Agenda tab, on the meetings view, with the query seeded", async () => {
+  localStorage.setItem("canto.agendaView", "today");
+  render(<App />);
+  await settle();
+
+  await act(async () => {
+    fireEvent.keyDown(document.body, { key: "k", code: "KeyK", ctrlKey: true });
+  });
+  await act(async () => {
+    fireEvent.change(screen.getByPlaceholderText("buscar em tarefas de hoje, agenda, notas, transcrições e clipboard"), {
+      target: { value: "retro" },
+    });
+    jest.advanceTimersByTime(150);
+    await Promise.resolve();
+  });
+  await settle();
+
+  fireEvent.click(screen.getByRole("button", { name: "retro-da-sprint.md" }));
+  await settle();
+
+  expect(screen.getByRole("tab", { name: "Agenda" }).getAttribute("aria-selected")).toBe("true");
+  expect((screen.getByLabelText("buscar nas transcrições") as HTMLInputElement).value).toBe("retro");
 });
 
 test("creating the vault shows onboarding once; a later unlock never shows it again", async () => {
