@@ -18,7 +18,10 @@ export function useForgeLists(source: ForgeSource, forge: Forge) {
   const [loading, setLoading] = useState(false);
   // A new filter hides the old list while it loads; if the search fails, that list and filter come back as they were.
   const [replacing, setReplacing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState<ForgeSection | null>(null);
+  // Each section paginates on its own: one section's reply must not clear another's "carregando…", and a second
+  // click on a section already fetching its next page is ignored (it would ask for the same page twice).
+  const [loadingMore, setLoadingMore] = useState<readonly ForgeSection[]>([]);
+  const inFlight = useRef(new Map<ForgeSection, object>());
   const [error, setError] = useState("");
   const pages = useRef(FIRST_PAGES);
   // A reply for an older filter must not overwrite the list of the current one.
@@ -32,6 +35,8 @@ export function useForgeLists(source: ForgeSource, forge: Forge) {
     setError("");
     setLoading(true);
     setReplacing(!keep);
+    inFlight.current.clear();
+    setLoadingMore([]);
     try {
       const fresh = await src.current.lists(next, force);
       if (!isLatest(id)) return;
@@ -50,9 +55,12 @@ export function useForgeLists(source: ForgeSource, forge: Forge) {
 
   const more = useCallback(
     async (section: ForgeSection) => {
+      if (inFlight.current.has(section)) return;
+      const token = {};
+      inFlight.current.set(section, token);
       const id = currentId();
       const page = pages.current[section] + 1;
-      setLoadingMore(section);
+      setLoadingMore([...inFlight.current.keys()]);
       try {
         const got = await src.current.section(section, page, filter);
         if (!isLatest(id)) return;
@@ -61,7 +69,10 @@ export function useForgeLists(source: ForgeSource, forge: Forge) {
       } catch (e) {
         if (isLatest(id)) setError(errText(e));
       } finally {
-        setLoadingMore(null);
+        if (inFlight.current.get(section) === token) {
+          inFlight.current.delete(section);
+          setLoadingMore([...inFlight.current.keys()]);
+        }
       }
     },
     [filter],
@@ -69,6 +80,8 @@ export function useForgeLists(source: ForgeSource, forge: Forge) {
 
   const clear = useCallback(() => {
     bump();
+    inFlight.current.clear();
+    setLoadingMore([]);
     setLists(null);
     setFilter(NO_FILTER);
     patchForgeCache(forge, { lists: null, filter: NO_FILTER });
