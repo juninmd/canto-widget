@@ -88,3 +88,13 @@ fn the_index_version_is_read_from_the_page() {
     assert_eq!(index_version("Intelligence Index v12.").as_deref(), Some("12"));
     assert_eq!(index_version("Intelligence Index"), None);
 }
+
+#[test]
+fn the_scored_initial_models_win_over_a_plain_name_list() {
+    let body = r#"{"initialModels":[{"slug":"carbon","name":"Gemini 4 Carbon","intelligenceIndex":59.4},
+      {"slug":"argon","name":"Gemini 4 Argon","intelligenceIndex":null}],
+      "nav":{"models":[{"slug":"carbon","name":"Gemini 4 Carbon","releaseSlug":"x"}]},
+      "chart":{"topModels":[{"slug":"old","name":"Antigo","intelligenceIndex":40}]}}"#;
+    let models = parse_page(&page(body)).unwrap();
+    assert_eq!(models.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(), ["carbon"]);
+}
