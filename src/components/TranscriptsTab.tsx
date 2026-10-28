@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { api, errText, type TranscriptMeta } from "../lib/api";
 import { highlight } from "../lib/highlight";
 import { useLatestRequest } from "../lib/useLatestRequest";
+import { useQuerySeed } from "../lib/useQuerySeed";
 import EmptyState from "./EmptyState";
 import GeminiDocs from "./GeminiDocs";
 import { NoteIcon, SearchIcon } from "./Icons";
@@ -10,10 +11,13 @@ import TranscriptFolder from "./TranscriptFolder";
 import TranscriptViewer from "./TranscriptViewer";
 import { LOCALE, t } from "../i18n";
 
-export default function TranscriptsTab({ privacy = false, onError }: { privacy?: boolean; onError: (m: string) => void }) {
+type Props = { privacy?: boolean; initialQuery?: string; querySeq?: number; onError: (m: string) => void };
+
+export default function TranscriptsTab({ privacy = false, initialQuery, querySeq, onError }: Props) {
   const [dir, setDir] = useState("");
   const [editingDir, setEditingDir] = useState(false);
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery ?? "");
+  useQuerySeed(initialQuery, querySeq, setQuery);
   const [items, setItems] = useState<TranscriptMeta[]>([]);
   const [open, setOpen] = useState<{ name: string; text: string } | null>(null);
   // Folder error stays in the tab, next to the folder: it's context, not a loose alert (NN/g).
