@@ -221,7 +221,11 @@ OneDrive, 동기화...), 시스템 및 **업데이트** 섹션에서 **설치된
 
 | 첫 실행 환영 | 글로벌 검색(`Ctrl+K`) | 자체 호스팅 GitLab 탭 | 회의 알림 |
 |---|---|---|---|
-| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across today's tasks, agenda, notes, transcripts and clipboard at once](docs/prints/melhorias/busca-global-fontes.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+
+| Context reminder on a task | Search result jumping to a transcript |
+|---|---|
+| ![Tasks waiting for an app or a Wi-Fi, with the app picker open on a task](docs/prints/melhorias/lembrete-por-contexto.png) | ![A transcript picked in the global search opens the Meetings view with the query filled in](docs/prints/melhorias/busca-global-transcricao.png) |
 
 | 하위 작업, 우선순위 및 PR이 있는 작업 | 노트 편집자 | 더 많은 클립보드 유형 | 보안: 자동 잠금 및 잠금 해제 |
 |---|---|---|---|

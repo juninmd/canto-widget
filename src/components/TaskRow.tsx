@@ -1,5 +1,5 @@
 import { t } from "../i18n";
-import type { ExtendedRepeat, Priority, Repeat, Task } from "../lib/api";
+import type { ExtendedRepeat, Priority, Repeat, Task, TaskContext } from "../lib/api";
 import TaskDetails, { TaskBadge, TaskMeta } from "./TaskDetails";
 import TaskSubtasks from "./TaskSubtasks";
 import { CrossIcon, GripIcon } from "./Icons";
@@ -33,6 +33,7 @@ type Props = {
   onLinkPr: (url: string | null) => void;
   onPriority: (priority: Priority | null) => void;
   onEstimate: (minutes: number | null) => void;
+  onContext: (context: TaskContext | null) => void;
   onSubtasksChange: () => void;
   onError: (m: string) => void;
   dragging: boolean;
@@ -64,6 +65,7 @@ export default function TaskRow({
   onLinkPr,
   onPriority,
   onEstimate,
+  onContext,
   onSubtasksChange,
   onError,
   dragging,
@@ -190,6 +192,7 @@ export default function TaskRow({
             onLinkPr={onLinkPr}
             onPriority={onPriority}
             onEstimate={onEstimate}
+            onContext={onContext}
             onClose={onToggleDetails}
           />
           <TaskSubtasks taskId={task.id} subtasks={task.subtasks ?? []} onError={onError} onChange={onSubtasksChange} />

@@ -135,6 +135,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Busca global em mais fontes**: além de tarefas de hoje, notas e clipboard, o `Ctrl+K` agora busca na agenda de hoje (já carregada, sem chamada ao Google) e nas transcrições de reunião. Cada resultado é clicável e as setas ↑/↓ percorrem o campo e todos os resultados; uma transcrição abre Agenda › Reuniões com a busca preenchida. Uma pasta de transcrições ilegível vira grupo vazio, não aviso de erro.
+- **Lembrete por contexto**: nos detalhes da tarefa, em vez de um horário ela pode esperar o app em foco ("ao abrir o app", ex.: Slack) ou a rede Wi‑Fi ("ao entrar no Wi‑Fi"). Com o cofre aberto, o Canto confere a cada 15 s e toca o aviso (com som e notificação, como os de horário) uma vez por dia por tarefa aberta de hoje ou atrasada. Nada é consultado enquanto nenhuma tarefa aberta tem contexto, e o nome do app fica só no cofre criptografado (campo novo `context`, ignorado por versões antigas). O nome do app segue o do registro de atividade (`Code`, `Slack`, `Safari`; sem diferença de maiúsculas nem de `.exe`). Wi‑Fi: Windows (`netsh`), Linux (`nmcli`/`iwgetid`) e macOS (`networksetup`; o macOS 14.4+ só informa a rede com a permissão de localização). Em Linux com Wayland o app em foco não é visível, então só o Wi‑Fi funciona. A linha da tarefa mostra “ao abrir Slack” ou “no Wi‑Fi Escritorio”.
 - **Blocos de código nas notas**: trechos entre
 - **Checklist nas notas**: linhas `- [ ]` e `- [x]` viram caixas de seleção na visualização; marcar uma
   atualiza o texto da nota.

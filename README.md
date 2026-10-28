@@ -76,7 +76,7 @@ sends a notification, with **snooze 10 min**.
 ### ✅ Tasks that remind you
 
 A daily checklist with time and recurrence (every day, weekdays or weekly). Type **`Daily at 9:30am`** and the
-reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. **Paste a list** (one item per line, with or without `-`, `[ ]` or `1.`) into the empty field and each line becomes its own task. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
+reminder is already set; add **`!high`** (or `!alta`, `!média`, `!baixa`) for the priority, or click the dot on the row to cycle it. **Paste a list** (one item per line, with or without `-`, `[ ]` or `1.`) into the empty field and each line becomes its own task. Long titles wrap instead of being cut off. **Focus timer** on any task: give it an estimate, press ▶ and a bar pinned under every tab counts the time against it (red once you go over); the time is saved to the vault every minute. **Day summary** ready to paste (tasks, focused time, meetings with total time, PRs/MRs opened, merged, reviewed and closed without merging), a **weekly and monthly report** in markdown, and **pull over pending items** from yesterday. **Context reminders**: instead of a time, a task can wait for an app to come to the front or for a Wi-Fi network to be joined ("when I open Slack", "when I get to the office"); it rings once a day and nothing is checked while no open task has one. **Quick capture** (`Ctrl+Alt+N`, `Ctrl+Cmd+N` on macOS) jots a task or a note from any app, without opening the widget.
 
 </td>
 </tr>
@@ -371,7 +371,11 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | First-run welcome | Global search (`Ctrl+K`) | Self-hosted GitLab tab | Meeting alert |
 |---|---|---|---|
-| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across today's tasks, agenda, notes, transcripts and clipboard at once](docs/prints/melhorias/busca-global-fontes.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+
+| Context reminder on a task | Search result jumping to a transcript |
+|---|---|
+| ![Tasks waiting for an app or a Wi-Fi, with the app picker open on a task](docs/prints/melhorias/lembrete-por-contexto.png) | ![A transcript picked in the global search opens the Meetings view with the query filled in](docs/prints/melhorias/busca-global-transcricao.png) |
 
 | Task with subtasks, priority and PR | Note editor | More clipboard types | Security: auto-lock and unlocks |
 |---|---|---|---|
