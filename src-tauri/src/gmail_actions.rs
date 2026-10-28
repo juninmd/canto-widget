@@ -64,7 +64,7 @@ pub fn modify(token: &str, ids: &[String], action: &str) -> Result<()> {
     let body = serde_json::json!({ "ids": ids, "addLabelIds": add, "removeLabelIds": remove });
     let res = http.post(format!("{API}/messages/batchModify")).bearer_auth(token).json(&body).send();
     // batchModify answers 204 with no body, so it can't go through `send`'s JSON decoding.
-    let res = res.map_err(|e| AppError::Drive(e.to_string()))?;
+    let res = res.map_err(|e| AppError::Drive(crate::error::net_text(e)))?;
     let status = res.status().as_u16();
     if (200..300).contains(&status) {
         Ok(())

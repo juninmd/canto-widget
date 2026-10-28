@@ -117,17 +117,17 @@ fn page(
     let res = crate::net::client_builder()
         .timeout(std::time::Duration::from_secs(30))
         .build()
-        .map_err(|e| AppError::Drive(e.to_string()))?
+        .map_err(|e| AppError::Drive(crate::error::net_text(e)))?
         .get(API)
         .bearer_auth(token)
         .query(&query)
         .send()
-        .map_err(|e| AppError::Drive(e.to_string()))?;
+        .map_err(|e| AppError::Drive(crate::error::net_text(e)))?;
     if !res.status().is_success() {
         let status = res.status();
         return Err(AppError::Drive(format!("calendar respondeu {status}: {}", res.text().unwrap_or_default())));
     }
-    let list: EventList = res.json().map_err(|e| AppError::Drive(e.to_string()))?;
+    let list: EventList = res.json().map_err(|e| AppError::Drive(crate::error::net_text(e)))?;
     Ok((list.items.into_iter().filter_map(RawEvent::into_item).collect(), list.next_page_token))
 }
 

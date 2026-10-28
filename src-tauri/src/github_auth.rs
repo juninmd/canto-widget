@@ -1,7 +1,7 @@
 //! GitHub login: a personal token pasted by the user, or a GitHub App device flow.
 use serde::{Deserialize, Serialize};
 
-use crate::error::{AppError, Result};
+use crate::error::{redact, AppError, Result};
 use crate::github::{client, network};
 use crate::model::now_ms;
 
@@ -17,7 +17,7 @@ pub fn embedded_client_id() -> Option<&'static str> {
         .filter(|id| !id.is_empty() && id.chars().all(|c| c.is_ascii_alphanumeric() || c == '.'))
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct Tokens {
     pub access_token: String,
     /// Empty when the app doesn't use expiring tokens (or it's a personal token).
@@ -26,6 +26,16 @@ pub struct Tokens {
     /// Epoch ms; 0 = doesn't expire.
     #[serde(default)]
     pub expires_at: i64,
+}
+
+impl std::fmt::Debug for Tokens {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Tokens")
+            .field("access_token", &redact(&self.access_token))
+            .field("refresh_token", &redact(&self.refresh_token))
+            .field("expires_at", &self.expires_at)
+            .finish()
+    }
 }
 
 impl Tokens {
@@ -44,7 +54,7 @@ pub fn validate_pat(raw: &str) -> Result<String> {
     Ok(t.to_string())
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct DeviceRequest {
     pub device_code: String,
     pub user_code: String,
@@ -53,6 +63,19 @@ pub struct DeviceRequest {
     pub expires_in: u64,
     #[serde(default = "five_s")]
     pub interval: u64,
+}
+
+/// The device code is what polls for the token, so it gets the same treatment as one.
+impl std::fmt::Debug for DeviceRequest {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DeviceRequest")
+            .field("device_code", &redact(&self.device_code))
+            .field("user_code", &self.user_code)
+            .field("verification_uri", &self.verification_uri)
+            .field("expires_in", &self.expires_in)
+            .field("interval", &self.interval)
+            .finish()
+    }
 }
 
 fn fifteen_min() -> u64 {

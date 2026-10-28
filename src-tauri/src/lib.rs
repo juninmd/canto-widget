@@ -17,6 +17,7 @@ pub mod calendar_event;
 pub mod capture;
 pub mod checks_cache;
 pub mod clip_os;
+pub mod clip_secret;
 pub mod clip_transform;
 pub mod clip_watch;
 pub mod clipboard;
