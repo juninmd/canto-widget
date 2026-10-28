@@ -226,6 +226,8 @@ export const integrations = {
   "google.signOutLabel": "sair da conta {account}",
   "google.signingOut": "saindo...",
   "google.signOut": "sair",
+  "google.signOutAsk": "sair desta conta? a agenda do Google some do Canto até você entrar de novo",
+  "google.signOutYes": "sim, sair",
   "google.heading": "Agenda do Google",
   "google.intro": "Opcional. A conta serve só para ler os eventos do dia (somente leitura); nenhum dado do cofre vai para o Google.",
   "google.ownCredentials": "usar credenciais OAuth próprias (avançado)",
