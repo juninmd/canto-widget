@@ -22,6 +22,7 @@ import { useDayAgenda } from "../lib/useDayAgenda";
 import { useDayTasks } from "../lib/useDayTasks";
 import { useAgendaKeys } from "../lib/useAgendaKeys";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
+import { useQuerySeed } from "../lib/useQuerySeed";
 import { readPicked, savePicked } from "../lib/agendaPicked";
 import { notConnected } from "../lib/agendaState";
 import { testEvent } from "../lib/agendaTestEvent";
@@ -38,6 +39,8 @@ export default function AgendaTab({
   now = systemNow,
   today = todayLocal(),
   version = 0,
+  initialQuery,
+  querySeq,
 }: {
   agenda: Agenda;
   onError: (m: string) => void;
@@ -47,6 +50,9 @@ export default function AgendaTab({
   now?: () => Date;
   today?: string;
   version?: number;
+  /** A global-search jump: the view it saved is applied and the transcripts search takes the query. */
+  initialQuery?: string;
+  querySeq?: number;
 }) {
   // Following `today` (null) keeps the tab on the live day across midnight; picking a date pins it.
   const [picked, setPicked] = useState<string | null>(readPicked);
@@ -68,6 +74,7 @@ export default function AgendaTab({
   const clashes = useMemo(() => conflicts(items), [items]);
   const allDay = items.filter((e) => e.all_day);
   const [view, setView] = useState<AgendaView>(readView);
+  useQuerySeed(initialQuery, querySeq, () => setView(readView()));
   const [reloadTasks, setReloadTasks] = useState(0);
   const { tasks, error: tasksError } = useDayTasks(day, view === "today", version, reloadTasks);
   const hasDay = items.length > 0 || tasks.some((k) => !k.done && k.hora);
@@ -129,7 +136,7 @@ export default function AgendaTab({
 
       {view === "meetings" ? (
         <div key="meetings" className="min-h-0 flex-1 motion-safe:animate-aba">
-          <TranscriptsTab privacy={privacy} onError={onError} />
+          <TranscriptsTab privacy={privacy} initialQuery={initialQuery} querySeq={querySeq} onError={onError} />
         </div>
       ) : (
         <div key={`today-${day}`} className="flex-1 space-y-3 overflow-y-auto pr-1 motion-safe:animate-aba">

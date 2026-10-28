@@ -425,5 +425,14 @@
   "uiStatus.none": "couldn't read any status page right now; check the connection and try again",
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
-  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again"
+  "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "कोई स्थान नहीं",
+  "tasks.context.app": "ऐप खुलने पर",
+  "tasks.context.wifi": "Wi-Fi से जुड़ने पर",
+  "tasks.context.of": "{title} कहाँ याद दिलाए",
+  "tasks.context.nameOf": "{title} के लिए ऐप या नेटवर्क का नाम",
+  "tasks.context.chipApp": "{name} खुलने पर",
+  "tasks.context.chipWifi": "Wi-Fi {name} पर",
+  "search.groupAgenda": "आज का एजेंडा",
+  "search.groupTranscripts": "ट्रांसक्रिप्ट"
 }
