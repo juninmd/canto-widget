@@ -4,6 +4,7 @@ import { birthdaysToday, contactCard, isBirthday, upcomingBirthdays } from "../l
 import { filterContacts, groupByLetter, subtitle, type ContactFilter } from "../lib/contacts";
 import { googleGate } from "../lib/google";
 import { useContactPhotos } from "../lib/useContactPhotos";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import { t } from "../i18n";
 import ContactAvatar from "./ContactAvatar";
@@ -33,18 +34,23 @@ export default function ContactsTab({ onNotice }: Props) {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState("");
   const [flash, setFlash] = useState("");
+  const { bump, isLatest } = useLatestRequest();
 
+  // A refresh event can land while a manual reload is in flight: only the newest answer is applied.
   const load = useCallback(async () => {
+    const id = bump();
     setLoading(true);
     try {
-      setView(await api.contactsList());
+      const next = await api.contactsList();
+      if (!isLatest(id)) return;
+      setView(next);
       setError("");
     } catch (e) {
-      setError(errText(e));
+      if (isLatest(id)) setError(errText(e));
     } finally {
-      setLoading(false);
+      if (isLatest(id)) setLoading(false);
     }
-  }, []);
+  }, [bump, isLatest]);
 
   useEffect(() => {
     void load();
