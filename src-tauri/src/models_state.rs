@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
-use crate::models_feed::{FetchError, Model};
+use crate::models_feed::{FetchError, Model, Page};
 use crate::models_rank::{self, Change};
 use crate::store::{self, MODELS_AAD};
 use crate::vault::AppState;
@@ -46,6 +46,9 @@ pub struct ModelsConfig {
     pub top: Option<Vec<String>>,
     #[serde(default)]
     pub badges: Vec<Badge>,
+    /// Intelligence Index version the stored `top` was ranked under, as the page names it; empty until known.
+    #[serde(default)]
+    pub index: String,
 }
 
 impl AppState {
@@ -80,30 +83,36 @@ pub struct Outcome {
 }
 
 /// Calls `fetch` only when the floor allows; a network failure (no answer) doesn't spend the window.
-pub fn refresh(
+pub fn refresh<P: Into<Page>>(
     cfg: &mut ModelsConfig,
     now: i64,
     force: bool,
-    fetch: impl FnOnce() -> std::result::Result<Vec<Model>, FetchError>,
+    fetch: impl FnOnce() -> std::result::Result<P, FetchError>,
 ) -> Outcome {
     if !due(cfg, now) {
         return Outcome { throttled: force, ..Default::default() };
     }
-    let result = fetch();
+    let result = fetch().map(Into::into);
     if !matches!(result, Err(FetchError::Network(_))) {
         cfg.tried_at = now;
     }
     match result {
-        Ok(models) if models.is_empty() => {
+        Ok(page) if page.models.is_empty() => {
             Outcome { error: Some("nenhum modelo com Intelligence Index na página".into()), ..Default::default() }
         }
-        Ok(models) => Outcome { changes: apply(cfg, models, now), ..Default::default() },
+        Ok(page) => Outcome { changes: apply(cfg, page, now), ..Default::default() },
         Err(e) => Outcome { error: Some(e.message()), ..Default::default() },
     }
 }
 
-fn apply(cfg: &mut ModelsConfig, models: Vec<Model>, now: i64) -> Vec<Change> {
-    let ranked = models_rank::rank(models);
+/// A new index version rescales every score, so it only reseeds the top 10; an unnamed version changes nothing.
+fn apply(cfg: &mut ModelsConfig, page: Page, now: i64) -> Vec<Change> {
+    let ranked = models_rank::rank(page.models);
+    if let Some(index) = page.index.filter(|v| *v != cfg.index) {
+        cfg.top = None;
+        cfg.badges.clear();
+        cfg.index = index;
+    }
     let changes = models_rank::diff(cfg.top.as_deref(), &ranked);
     cfg.top = Some(models_rank::top_ids(&ranked));
     cfg.total = ranked.len();
@@ -135,6 +144,7 @@ pub struct ModelsView {
     pub next_fetch_at: i64,
     pub throttled: bool,
     pub error: Option<String>,
+    pub index: String,
 }
 
 pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
@@ -152,6 +162,7 @@ pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
         next_fetch_at: next_fetch_at(cfg),
         throttled: outcome.throttled,
         error: outcome.error,
+        index: cfg.index.clone(),
     }
 }
 

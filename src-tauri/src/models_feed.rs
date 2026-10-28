@@ -9,6 +9,9 @@ use serde_json::Value;
 use crate::models_fields::{self, Details};
 
 pub const URL: &str = "https://artificialanalysis.ai/leaderboards/models";
+/// Names the index version ("Intelligence Index v5.0 incorporates..."), when the leaderboard doesn't.
+pub const VERSION_URL: &str = "https://artificialanalysis.ai/models";
+const VERSION_TAG: &str = "Intelligence Index v";
 const TIMEOUT_S: u64 = 20;
 const MAX_TEXT: usize = 120;
 /// Opens each Next.js flight chunk: a JSON string literal holding a slice of the payload.
@@ -27,6 +30,19 @@ pub struct Model {
     /// Absent from rankings sealed before the sheet existed: they read back empty until the next fetch.
     #[serde(flatten)]
     pub details: Details,
+}
+
+/// One reading: the models plus the index version the page names, so a new version needs no code change.
+#[derive(Debug, Default, PartialEq)]
+pub struct Page {
+    pub models: Vec<Model>,
+    pub index: Option<String>,
+}
+
+impl From<Vec<Model>> for Page {
+    fn from(models: Vec<Model>) -> Self {
+        Page { models, index: None }
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -115,18 +131,39 @@ pub fn parse_page(html: &str) -> std::result::Result<Vec<Model>, FetchError> {
     }
 }
 
-pub fn fetch() -> std::result::Result<Vec<Model>, FetchError> {
+/// The highest `Intelligence Index vX.Y` the page names; `None` when it names none.
+pub fn index_version(html: &str) -> Option<String> {
+    html.match_indices(VERSION_TAG)
+        .filter_map(|(i, _)| {
+            let v: String =
+                html[i + VERSION_TAG.len()..].chars().take_while(|c| c.is_ascii_digit() || *c == '.').collect();
+            let v = v.trim_end_matches('.');
+            v.starts_with(|c: char| c.is_ascii_digit()).then(|| v.to_string())
+        })
+        .max_by(|a, b| {
+            let parts = |s: &str| s.split('.').map(|p| p.parse::<u32>().unwrap_or(0)).collect::<Vec<_>>();
+            parts(a).cmp(&parts(b))
+        })
+}
+
+pub fn fetch() -> std::result::Result<Page, FetchError> {
     let client = crate::net::client_builder()
         .user_agent("Mozilla/5.0 (compatible; canto-widget)")
         .timeout(Duration::from_secs(TIMEOUT_S))
         .build()
         .map_err(|e| FetchError::Network(e.to_string()))?;
     let res = client.get(URL).send().map_err(|e| FetchError::Network(e.to_string()))?;
-    match res.status().as_u16() {
-        429 => Err(FetchError::RateLimited),
-        s if !(200..300).contains(&s) => Err(FetchError::Other(format!("HTTP {s}"))),
-        _ => parse_page(&res.text().map_err(|e| FetchError::Other(e.to_string()))?),
-    }
+    let html = match res.status().as_u16() {
+        429 => return Err(FetchError::RateLimited),
+        s if !(200..300).contains(&s) => return Err(FetchError::Other(format!("HTTP {s}"))),
+        _ => res.text().map_err(|e| FetchError::Other(e.to_string()))?,
+    };
+    let models = parse_page(&html)?;
+    let index = index_version(&html).or_else(|| {
+        let res = client.get(VERSION_URL).send().ok().filter(|r| r.status().is_success())?;
+        index_version(&res.text().ok()?)
+    });
+    Ok(Page { models, index })
 }
 
 #[cfg(test)]

@@ -76,3 +76,15 @@ fn a_ranking_sealed_before_the_sheet_still_reads() {
     let json = serde_json::to_value(&old).unwrap();
     assert!(json.get("context").is_some(), "the sheet is flattened for the webview");
 }
+
+#[test]
+fn the_index_version_is_read_from_the_page() {
+    assert_eq!(
+        index_version("<p>Artificial Analysis Intelligence Index v5.0 incorporates 9 evaluations.</p>").as_deref(),
+        Some("5.0")
+    );
+    let both = "Intelligence Index v4.10 ... Intelligence Index v4.9 ... Intelligence Index v.";
+    assert_eq!(index_version(both).as_deref(), Some("4.10"));
+    assert_eq!(index_version("Intelligence Index v12.").as_deref(), Some("12"));
+    assert_eq!(index_version("Intelligence Index"), None);
+}
