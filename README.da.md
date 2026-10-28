@@ -221,7 +221,11 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 
 | Førstegangs velkomst | Global søgning (`Ctrl+K`) | Selvvært fanen GitLab | Mødevarsling |
 |---|---|---|---|
-| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across tasks, notes and clipboard at once](docs/prints/app/20-busca-global.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+| ![Onboarding with the essential shortcuts](docs/prints/app/19-onboarding.png) | ![Search across today's tasks, agenda, notes, transcripts and clipboard at once](docs/prints/melhorias/busca-global-fontes.png) | ![Review requested, assigned and issues on self-hosted GitLab](docs/prints/app/21-gitlab.png) | ![Meeting alert with join Meet and snooze](docs/prints/app/07-aviso-reuniao.png) |
+
+| Context reminder on a task | Search result jumping to a transcript |
+|---|---|
+| ![Tasks waiting for an app or a Wi-Fi, with the app picker open on a task](docs/prints/melhorias/lembrete-por-contexto.png) | ![A transcript picked in the global search opens the Meetings view with the query filled in](docs/prints/melhorias/busca-global-transcricao.png) |
 
 | Opgave med delopgaver, prioritet og PR | Note editor | Flere udklipsholdertyper | Sikkerhed: automatisk låsning og oplåsning |
 |---|---|---|---|

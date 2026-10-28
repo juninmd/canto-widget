@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "কোনো স্থান নয়",
+  "tasks.context.app": "অ্যাপ খুললে",
+  "tasks.context.wifi": "Wi-Fi-তে যুক্ত হলে",
+  "tasks.context.of": "{title} কোথায় মনে করানো হবে",
+  "tasks.context.nameOf": "{title}-এর অ্যাপ বা নেটওয়ার্কের নাম",
+  "tasks.context.chipApp": "{name} খুললে",
+  "tasks.context.chipWifi": "Wi-Fi {name}-এ",
+  "search.groupAgenda": "আজকের এজেন্ডা",
+  "search.groupTranscripts": "ট্রান্সক্রিপ্ট",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

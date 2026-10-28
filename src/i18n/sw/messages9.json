@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "hakuna mahali",
+  "tasks.context.app": "programu inapofunguliwa",
+  "tasks.context.wifi": "unapounganishwa na Wi-Fi",
+  "tasks.context.of": "wapi pa kukumbusha {title}",
+  "tasks.context.nameOf": "jina la programu au mtandao wa {title}",
+  "tasks.context.chipApp": "{name} inapofunguliwa",
+  "tasks.context.chipWifi": "kwenye Wi-Fi {name}",
+  "search.groupAgenda": "ratiba ya leo",
+  "search.groupTranscripts": "manukuu",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

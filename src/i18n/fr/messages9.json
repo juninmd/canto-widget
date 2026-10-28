@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "aucun lieu",
+  "tasks.context.app": "à l'ouverture de l'appli",
+  "tasks.context.wifi": "à la connexion au Wi-Fi",
+  "tasks.context.of": "où rappeler {title}",
+  "tasks.context.nameOf": "nom de l'appli ou du réseau pour {title}",
+  "tasks.context.chipApp": "à l'ouverture de {name}",
+  "tasks.context.chipWifi": "sur le Wi-Fi {name}",
+  "search.groupAgenda": "agenda du jour",
+  "search.groupTranscripts": "transcriptions",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

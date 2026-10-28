@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "장소 없음",
+  "tasks.context.app": "앱을 열 때",
+  "tasks.context.wifi": "Wi-Fi에 연결할 때",
+  "tasks.context.of": "{title} 알림 장소",
+  "tasks.context.nameOf": "{title}의 앱 또는 네트워크 이름",
+  "tasks.context.chipApp": "{name}을(를) 열 때",
+  "tasks.context.chipWifi": "Wi-Fi {name}에서",
+  "search.groupAgenda": "오늘 일정",
+  "search.groupTranscripts": "회의록",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

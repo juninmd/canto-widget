@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "yer yok",
+  "tasks.context.app": "uygulama açılınca",
+  "tasks.context.wifi": "Wi-Fi'ye bağlanınca",
+  "tasks.context.of": "{title} nerede hatırlatsın",
+  "tasks.context.nameOf": "{title} için uygulama veya ağ adı",
+  "tasks.context.chipApp": "{name} açılınca",
+  "tasks.context.chipWifi": "{name} Wi-Fi'sinde",
+  "search.groupAgenda": "bugünün ajandası",
+  "search.groupTranscripts": "transkriptler",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

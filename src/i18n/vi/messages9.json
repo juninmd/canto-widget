@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "không có nơi",
+  "tasks.context.app": "khi mở ứng dụng",
+  "tasks.context.wifi": "khi kết nối Wi-Fi",
+  "tasks.context.of": "nhắc {title} ở đâu",
+  "tasks.context.nameOf": "tên ứng dụng hoặc mạng của {title}",
+  "tasks.context.chipApp": "khi mở {name}",
+  "tasks.context.chipWifi": "trên Wi-Fi {name}",
+  "search.groupAgenda": "lịch hôm nay",
+  "search.groupTranscripts": "bản ghi",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

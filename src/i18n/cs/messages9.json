@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "žádné místo",
+  "tasks.context.app": "při otevření aplikace",
+  "tasks.context.wifi": "při připojení k Wi-Fi",
+  "tasks.context.of": "kde připomenout {title}",
+  "tasks.context.nameOf": "název aplikace nebo sítě pro {title}",
+  "tasks.context.chipApp": "při otevření {name}",
+  "tasks.context.chipWifi": "na Wi-Fi {name}",
+  "search.groupAgenda": "dnešní agenda",
+  "search.groupTranscripts": "přepisy",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

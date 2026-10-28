@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "без място",
+  "tasks.context.app": "при отваряне на приложение",
+  "tasks.context.wifi": "при свързване с Wi-Fi",
+  "tasks.context.of": "къде да напомня за {title}",
+  "tasks.context.nameOf": "име на приложението или мрежата за {title}",
+  "tasks.context.chipApp": "при отваряне на {name}",
+  "tasks.context.chipWifi": "на Wi-Fi {name}",
+  "search.groupAgenda": "програма за днес",
+  "search.groupTranscripts": "преписи",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }

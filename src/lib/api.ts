@@ -51,7 +51,11 @@ export type Task = {
   estimate_min?: number | null;
   /** Seconds spent in focus. */
   tracked_secs?: number;
+  /** Rings when this app comes to the front or this Wi-Fi is joined, instead of at a clock time. */
+  context?: TaskContext | null;
 };
+
+export type TaskContext = { kind: "app" | "wifi"; name: string };
 
 export type NoteLink = { kind: "task"; id: string; label: string } | { kind: "event"; id: string; label: string };
 
@@ -530,6 +534,7 @@ export const api = {
   /** Hides the quick-capture window (Esc or after saving). */
   captureClose: () => invoke<void>("capture_close"),
   taskSetEstimate: (id: string, minutes: number | null) => invoke<void>("task_set_estimate", { id, minutes }),
+  taskSetContext: (id: string, context: TaskContext | null) => invoke<void>("task_set_context", { id, context }),
   taskAddTime: (id: string, secs: number) => invoke<void>("task_add_time", { id, secs }),
   activityStatus: () => invoke<ActivityStatus>("activity_status"),
   activitySetEnabled: (enabled: boolean) => invoke<void>("activity_set_enabled", { enabled }),

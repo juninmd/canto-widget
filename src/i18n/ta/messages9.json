@@ -426,5 +426,14 @@
   "protos.market.empty": "no quotes came in right now; check the connection and try again",
   "tasks.pasteCapped": "only the first {n} lines became tasks ({dropped} left out)",
   "tasks.pasteLeft": "{n} lines were not added; press Enter to try again",
+  "tasks.context.none": "இடம் இல்லை",
+  "tasks.context.app": "ஆப்ஸைத் திறக்கும்போது",
+  "tasks.context.wifi": "Wi-Fi இணைக்கும்போது",
+  "tasks.context.of": "{title}-ஐ எங்கே நினைவூட்ட வேண்டும்",
+  "tasks.context.nameOf": "{title}-க்கான ஆப் அல்லது நெட்வொர்க் பெயர்",
+  "tasks.context.chipApp": "{name} திறக்கும்போது",
+  "tasks.context.chipWifi": "Wi-Fi {name}-இல்",
+  "search.groupAgenda": "இன்றைய நிகழ்ச்சிநிரல்",
+  "search.groupTranscripts": "எழுத்துப்படிகள்",
   "shortcuts.agendaJoin": "calendar: join the meeting in progress or starting within 15 min"
 }
