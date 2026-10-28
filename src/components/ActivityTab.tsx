@@ -10,6 +10,7 @@ import { dayStart } from "../lib/summary";
 import { useToast } from "../lib/toast";
 import { clockLabel } from "../lib/clockLabel";
 import { useWindowVisible } from "../lib/useWindowVisible";
+import { useLatestRequest } from "../lib/useLatestRequest";
 import { useRefreshEvent } from "../lib/useRefreshEvent";
 import ErrorBanner from "./ErrorBanner";
 import ActivityBar, { type Period } from "./ActivityBar";
@@ -44,22 +45,28 @@ export default function ActivityTab({ today, onError }: { today: string; onError
   const start = dayStart(today);
   setCategoryOverrides(cats);
 
+  const { bump, isLatest } = useLatestRequest();
+
+  // The poll, the refresh button and a new day can overlap: a slower, older week must not replace a newer one.
   const load = useCallback(async () => {
+    const id = bump();
     setBusy(true);
     try {
       const st = await api.activityStatus();
+      if (!isLatest(id)) return;
       setStatus(st);
       if (!st.enabled) return;
       const days = [0, 1, 2, 3, 4, 5, 6].map((i) => start - i * DAY_MS);
       const sums = await Promise.all(days.map((d) => api.activitySummary(d, d + DAY_MS)));
+      if (!isLatest(id)) return;
       setWeek(sums.map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs, focus: s.focus })));
       setFetchedAt(Date.now());
       setLoadError("");
     } catch (e) {
       // Shown as a banner: the 60 s poll would otherwise raise the same toast every minute.
-      setLoadError(errText(e));
+      if (isLatest(id)) setLoadError(errText(e));
     } finally {
-      setBusy(false);
+      if (isLatest(id)) setBusy(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start]);
