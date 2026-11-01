@@ -112,3 +112,15 @@ export function resolvedToday(list: readonly ResolvedAlert[], now = new Date()):
 export function senderName(e: AgendaItem): string {
   return e.sender?.name || e.sender?.login || "";
 }
+
+/** The sender's profile page: GitHub, or the GitLab instance the alert's link points at. */
+export function senderProfile(e: AgendaItem): string {
+  const login = e.sender?.login;
+  if (!login) return "";
+  if (e.tag !== "gitlab") return `https://github.com/${encodeURIComponent(login)}`;
+  try {
+    return `${new URL(e.link).origin}/${encodeURIComponent(login)}`;
+  } catch {
+    return "";
+  }
+}

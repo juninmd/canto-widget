@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { api, type AgendaItem } from "../lib/api";
 import { hour, people, status as agendaStatus, tally } from "../lib/agenda";
-import { kindOf, levelLabel, prLabel, senderName, toneOf } from "../lib/alerts";
+import { kindOf, levelLabel, prLabel, senderName, senderProfile, toneOf } from "../lib/alerts";
 import { block, inlineMarkdown, type Render } from "../lib/markdown";
 import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
@@ -41,12 +41,31 @@ const KIND_ICON: Record<string, ReactNode> = {
   mention: <span className="text-base font-semibold leading-none">@</span>,
 };
 
+/** Opens the sender's profile in the browser; plain content when the profile address is unknown. */
+function ProfileLink({ event, children }: { event: AgendaItem; children: ReactNode }) {
+  const url = senderProfile(event);
+  if (!url) return <>{children}</>;
+  return (
+    <button
+      type="button"
+      data-profile
+      title={`@${event.sender?.login ?? ""}`}
+      onClick={() => void api.openLink(url)}
+      className="flex min-w-0 cursor-pointer items-center rounded-full hover:opacity-80 focus-visible:outline-2 focus-visible:outline-accent"
+    >
+      {children}
+    </button>
+  );
+}
+
 /** Who sent it (photo or initials) or what kind it is, in the alert's tone, on the left of the card. */
 function Badge({ event, kind, tone }: { event: AgendaItem; kind: string; tone: (typeof TONE)[keyof typeof TONE] }) {
   if (event.sender) {
     return (
       <span className="relative row-span-2 self-start">
-        <Avatar name={senderName(event)} email={event.sender.login} photo={event.sender.avatar} size="lg" />
+        <ProfileLink event={event}>
+          <Avatar name={senderName(event)} email={event.sender.login} photo={event.sender.avatar} size="lg" />
+        </ProfileLink>
         <span
           aria-hidden="true"
           className={`absolute -bottom-1 -right-1 grid size-4 place-items-center rounded-full ring-2 ring-panel [&_svg]:size-2.5 ${tone.dot} text-on-accent`}
@@ -158,7 +177,9 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         )}
         {forge && sender && (
           <span className="flex min-w-0 items-baseline gap-1">
-            <b className="truncate font-semibold text-fg">{name}</b>
+            <ProfileLink event={event}>
+              <b className="truncate font-semibold text-fg">{name}</b>
+            </ProfileLink>
             {sender.name && <span className="truncate">@{sender.login}</span>}
           </span>
         )}

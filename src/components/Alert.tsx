@@ -7,8 +7,9 @@ import AlertActions from "./AlertActions";
 import AlertDetail from "./AlertDetail";
 import AlertStrip, { TONE } from "./AlertStrip";
 import { CrossIcon } from "./Icons";
+import AlertFx from "./AlertFx";
 import WeatherAlertFx from "./WeatherAlertFx";
-import { weatherEnter, weatherSky } from "../lib/weatherFx";
+import { alertFx } from "../lib/alertFx";
 
 type Props = {
   events: AgendaItem[];
@@ -100,8 +101,9 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
   });
 
   const tone = TONE[toneOf(event)];
-  const weather = kindOf(event) === "weather";
-  const severe = weather && event.tag === "severe";
+  const fx = alertFx(event);
+  // Red tone = something is wrong now: the border pulses and the sky gets more of everything.
+  const severe = fx.intense && toneOf(event) === "danger";
 
   return (
     <div className="absolute inset-x-0 bottom-0 z-50 flex">
@@ -110,18 +112,18 @@ export default function Alert({ events, onDismiss, onCompleted, onOpenModels, on
         role="alertdialog"
         aria-modal="true"
         aria-label={label}
-        style={weather ? ({ "--wx-sky": weatherSky(event.id) } as CSSProperties) : undefined}
+        style={{ "--wx-sky": fx.sky } as CSSProperties}
         className={`relative isolate flex w-full flex-col gap-2 overflow-hidden rounded-2xl border bg-panel p-3 text-fg shadow-2xl ${tone.border} ${
-          weather ? `${weatherEnter(event.id)} ${severe ? "wx-severe" : ""}` : "motion-safe:animate-surgir motion-reduce:animate-fade"
+          `${fx.enter} ${severe ? "wx-severe" : ""}`
         }`}
       >
-        {weather && (
-          <>
-            <span aria-hidden="true" className="wx-sky pointer-events-none absolute inset-0 -z-20" />
-            <WeatherAlertFx key={event.id + String(severe)} id={event.id} severe={severe} />
-            {severe && <span aria-hidden="true" className={`wx-alarm pointer-events-none absolute inset-0 -z-10 rounded-2xl`} />}
-          </>
+        <span aria-hidden="true" className="wx-sky pointer-events-none absolute inset-0 -z-20" />
+        {fx.scene === "weather" ? (
+          <WeatherAlertFx key={event.id + String(severe)} id={event.id} severe={severe} />
+        ) : (
+          <AlertFx key={event.id + fx.scene + String(fx.intense)} scene={fx.scene} tone={fx.tone} intense={fx.intense} />
         )}
+        {severe && <span aria-hidden="true" className="wx-alarm pointer-events-none absolute inset-0 -z-10 rounded-2xl" />}
         <span
           aria-hidden="true"
           className={`pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-current to-transparent opacity-10 ${tone.text}`}

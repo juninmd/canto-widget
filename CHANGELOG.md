@@ -7,6 +7,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Efeitos em todos os avisos do pop-up**: o céu animado do clima agora vale para cada tipo de aviso, com entrada
+  própria e fundo em canvas. Reunião: anéis que se expandem do ícone (mais rápidos nos últimos 2 minutos). Tarefa:
+  ticks flutuando. PR: blocos vermelhos caindo e faixa piscando no CI que falhou, ramos que se separam no conflito,
+  estrelas na aprovação, bolhas nos comentários. Status: batimento cardíaco (acelera quando o serviço cai). Modelo
+  novo: estrelas. Menção: bolhas. Resumo do dia: sol nascendo. Todo aviso vermelho pulsa a borda. Respeita
+  "reduzir movimento" do sistema.
+
 - **Avisos do clima**: a aba Clima ganhou um cartão "Avisos do clima" com 11 tipos para ligar um a um —
   tempestade (evitar sair), chuva (levar guarda-chuva), calor (beber água; calor extremo: evitar sair das 11h às
   16h), frio (agasalho), vento forte, UV alto, ar poluído, neblina, ar seco, neve e virada de tempo amanhã. O aviso
