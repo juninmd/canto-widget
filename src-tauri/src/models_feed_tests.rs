@@ -39,7 +39,8 @@ fn missing_or_zero_measures_leave_the_field_empty() {
 #[test]
 fn a_page_without_the_model_list_is_an_error_not_an_empty_ranking() {
     let err = parse_page("<html>outra coisa</html>").unwrap_err();
-    assert_eq!(err, FetchError::Other("a página mudou de formato".into()));
+    assert_eq!(err, FetchError::Format);
+    assert!(!err.message().starts_with("sem resposta"), "the site answered: it's the format, not the network");
     let other = page(r#"{"models":[{"slug":"x","name":"sem índice"}]}"#);
     assert!(parse_page(&other).is_err());
 }

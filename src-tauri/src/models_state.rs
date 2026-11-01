@@ -46,6 +46,9 @@ pub struct ModelsConfig {
     pub top: Option<Vec<String>>,
     #[serde(default)]
     pub badges: Vec<Badge>,
+    /// Why the last answered fetch failed; kept until one succeeds, so the cached list reads as stale.
+    #[serde(default)]
+    pub error: Option<String>,
     /// Intelligence Index version the stored `top` was ranked under, as the page names it; empty until known.
     #[serde(default)]
     pub index: String,
@@ -96,13 +99,19 @@ pub fn refresh<P: Into<Page>>(
     if !matches!(result, Err(FetchError::Network(_))) {
         cfg.tried_at = now;
     }
-    match result {
-        Ok(page) if page.models.is_empty() => {
-            Outcome { error: Some("nenhum modelo com Intelligence Index na página".into()), ..Default::default() }
+    let error = match result {
+        Ok(page) if page.models.is_empty() => "nenhum modelo com Intelligence Index na página".to_string(),
+        Ok(page) => {
+            cfg.error = None;
+            return Outcome { changes: apply(cfg, page, now), ..Default::default() };
         }
-        Ok(page) => Outcome { changes: apply(cfg, page, now), ..Default::default() },
-        Err(e) => Outcome { error: Some(e.message()), ..Default::default() },
-    }
+        Err(FetchError::Network(e)) => {
+            return Outcome { error: Some(FetchError::Network(e).message()), ..Default::default() }
+        }
+        Err(e) => e.message(),
+    };
+    cfg.error = Some(error.clone());
+    Outcome { error: Some(error), ..Default::default() }
 }
 
 /// A new index version rescales every score, so it only reseeds the top 10; an unnamed version changes nothing.
@@ -161,7 +170,7 @@ pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
         fetched_at: cfg.fetched_at,
         next_fetch_at: next_fetch_at(cfg),
         throttled: outcome.throttled,
-        error: outcome.error,
+        error: outcome.error.or_else(|| cfg.error.clone()),
         index: cfg.index.clone(),
     }
 }
