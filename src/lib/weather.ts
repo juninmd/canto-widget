@@ -126,3 +126,10 @@ export function hourOf(at: string): number {
   const match = /T(\d{2}):(\d{2})/.exec(at);
   return match ? Number(match[1]) + Number(match[2]) / 60 : Number.NaN;
 }
+
+const ALERT_SKY: Record<string, WeatherCondition> = { storm: "storm", rain: "rain", snow: "snow", fog: "fog", wind: "cloudy", air: "fog", cold: "cloudy", swing: "cloudy" };
+
+/** The sky drawn on a weather alert's badge, from its id (`weather:<kind>`): heat, UV and dry air get the sun. */
+export function weatherAlertCondition(id: string): WeatherCondition {
+  return ALERT_SKY[id.slice(id.indexOf(":") + 1)] ?? "clear";
+}

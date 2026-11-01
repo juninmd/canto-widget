@@ -66,6 +66,19 @@ export const BellIcon = ({ on }: { on: boolean }) => (
   </svg>
 );
 
+export const BellOffIcon = () => (
+  <svg {...base}>
+    <path d="M6 8a6 6 0 0 1 9.5-4.9M18 8c0 4 1.5 6 2 7H5.5M10.3 21a1.94 1.94 0 0 0 3.4 0M3 3l18 18" />
+  </svg>
+);
+
+export const ForecastIcon = () => (
+  <svg {...base}>
+    <path d="M7 18a4 4 0 0 1-.6-7.96A5.5 5.5 0 0 1 17 8.5a4.5 4.5 0 0 1 .5 9z" />
+    <path d="M12 12v4m0 0 2-2m-2 2-2-2" />
+  </svg>
+);
+
 export const MoonIcon = () => (
   <svg {...base}>
     <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />

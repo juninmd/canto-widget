@@ -6,6 +6,8 @@ import { timeAgo } from "../lib/time";
 import { t } from "../i18n";
 import Avatar from "./Avatar";
 import { ChevronIcon } from "./Icons";
+import WeatherIcon from "./WeatherIcon";
+import { weatherAlertCondition } from "../lib/weather";
 
 export const TONE: Record<Tone, { dot: string; text: string; card: string; ring: string; border: string }> = {
   danger: { dot: "bg-danger", text: "text-danger", card: "border-danger/50 bg-danger/10", ring: "ring-danger", border: "border-danger" },
@@ -27,6 +29,8 @@ export function summary(e: AgendaItem): string {
       return e.sender ? t("alert.mentionedBy", { name: senderName(e) }) : t("alert.mentioned");
     case "digest":
       return t("alert.digestSummary");
+    case "weather":
+      return e.description ?? "";
     case "task":
       return t("alert.taskReminder");
     default:
@@ -43,6 +47,7 @@ export default function AlertStrip({ items, selected, onSelect }: Props) {
   const row = useRef<HTMLDivElement>(null);
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
   const index = Math.max(0, items.findIndex((e) => e.id === selected));
+  const severe = items.filter((e) => toneOf(e) === "danger").length;
 
   // The picked card scrolls into view, whether it came from an arrow, the keyboard or a new alert arriving.
   useEffect(() => {
@@ -121,6 +126,8 @@ export default function AlertStrip({ items, selected, onSelect }: Props) {
               <span className="flex items-center gap-1.5">
                 {e.sender ? (
                   <Avatar name={senderName(e)} email={e.sender.login} photo={e.sender.avatar} />
+                ) : kindOf(e) === "weather" ? (
+                  <WeatherIcon condition={weatherAlertCondition(e.id)} className="size-5 shrink-0" />
                 ) : (
                   <span aria-hidden="true" className={`size-1.5 shrink-0 rounded-full ${tone.dot}`} />
                 )}
@@ -134,6 +141,12 @@ export default function AlertStrip({ items, selected, onSelect }: Props) {
       <button type="button" onClick={() => step(1)} aria-label={t("alert.next")} className={ARROW}>
         <ChevronIcon dir="right" />
       </button>
+      {severe > 0 && (
+        <span className="flex shrink-0 items-center gap-1 rounded-full bg-danger/15 px-1.5 text-[10.5px] font-semibold leading-[18px] text-danger">
+          <span aria-hidden="true" className="size-1.5 animate-pulse rounded-full bg-danger" />
+          {t("alert.severeCount", { n: severe })}
+        </span>
+      )}
       <span aria-live="polite" className="shrink-0 px-1 font-mono text-[10.5px] tabular-nums text-faint">
         {t("alert.position", { n: index + 1, total: items.length })}
       </span>

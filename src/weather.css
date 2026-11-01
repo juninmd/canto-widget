@@ -290,3 +290,27 @@
     transform: scaleY(0);
   }
 }
+
+/* Weather alert pop-up: how the card arrives, the sky tint, and the pulse of a severe one. */
+.wx-enter-drop { animation: wx-e-drop 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.3); }
+.wx-enter-shake { animation: wx-e-shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+.wx-enter-gust { animation: wx-e-gust 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.wx-enter-rise { animation: wx-e-rise 0.7s ease-out; }
+.wx-enter-frost { animation: wx-e-frost 0.8s ease-out; }
+.wx-enter-mist { animation: wx-e-mist 0.9s ease-out; }
+.wx-enter-glow { animation: wx-e-glow 0.7s ease-out; }
+.wx-sky { background: linear-gradient(160deg, color-mix(in srgb, var(--wx-sky) 55%, transparent), transparent 70%); }
+.wx-alarm { box-shadow: inset 0 0 40px color-mix(in srgb, var(--color-danger) 40%, transparent); animation: wx-alarm 1.2s ease-in-out infinite; }
+.wx-severe { animation: wx-glow-ring 1.6s ease-in-out infinite; }
+@keyframes wx-e-drop { from { transform: translateY(-40px); opacity: 0; } 60% { transform: translateY(4px); } }
+@keyframes wx-e-shake { from { transform: translateY(16px); opacity: 0; } 30% { transform: translateX(-6px); opacity: 1; } 45% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 75% { transform: translateX(3px); } }
+@keyframes wx-e-gust { from { transform: translateX(-60px) skewX(8deg); opacity: 0; } 70% { transform: translateX(6px) skewX(-2deg); } }
+@keyframes wx-e-rise { from { transform: translateY(24px); opacity: 0; filter: blur(3px) saturate(1.6); } }
+@keyframes wx-e-frost { from { opacity: 0; filter: blur(4px) brightness(1.6); transform: scale(0.97); } }
+@keyframes wx-e-mist { from { opacity: 0; filter: blur(10px); } }
+@keyframes wx-e-glow { from { opacity: 0; transform: scale(0.94); filter: brightness(1.8); } }
+@keyframes wx-alarm { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+@keyframes wx-glow-ring { 50% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 30%, transparent), 0 0 28px color-mix(in srgb, var(--color-danger) 28%, transparent); } }
+@media (prefers-reduced-motion: reduce) {
+  .wx-enter-drop, .wx-enter-shake, .wx-enter-gust, .wx-enter-rise, .wx-enter-frost, .wx-enter-mist, .wx-enter-glow, .wx-alarm, .wx-severe { animation: none; }
+}

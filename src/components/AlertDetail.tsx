@@ -11,6 +11,8 @@ import AlertPrep from "./AlertPrep";
 import Avatar from "./Avatar";
 import { CalendarIcon, CheckIcon, ClockIcon, PullIcon, PulseIcon } from "./Icons";
 import { TONE } from "./AlertStrip";
+import WeatherIcon from "./WeatherIcon";
+import { weatherAlertCondition } from "../lib/weather";
 
 /** A labeled box under the title; it scrolls on its own past `max-h-56`, so a long one never pushes the actions off. */
 function Box({ label, aside, children }: { label: string; aside?: ReactNode; children: ReactNode }) {
@@ -51,6 +53,16 @@ function Badge({ event, kind, tone }: { event: AgendaItem; kind: string; tone: (
         >
           {KIND_ICON[kind]}
         </span>
+      </span>
+    );
+  }
+  if (kind === "weather") {
+    return (
+      <span aria-hidden="true" className="row-span-3 flex w-9 flex-col items-center gap-1 self-start">
+        <span className={`grid size-9 place-items-center rounded-xl border ${tone.card} ${tone.text}`}>
+          <WeatherIcon condition={weatherAlertCondition(event.id)} className="size-7" />
+        </span>
+        <span className={`max-w-[3.5rem] text-center font-mono text-[11px] font-semibold leading-tight tabular-nums ${tone.text}`}>{event.organizer}</span>
       </span>
     );
   }
@@ -163,6 +175,12 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             {event.organizer && <Chip>{event.organizer}</Chip>}
           </>
         )}
+        {kind === "weather" && (
+          <>
+            <Chip tone={tone.text}>{event.tag === "severe" ? t("alert.weather.severe") : t("alert.weather.watch")}</Chip>
+            {event.start && <Chip>{timeAgo(event.start)}</Chip>}
+          </>
+        )}
         {(kind === "meeting" || kind === "task") && (
           <>
             <Chip tone={tone.text}>{hour(event)}</Chip>
@@ -172,7 +190,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         )}
       </div>
       {detailed && (
-        <div className="col-start-2">
+        <div className={kind === "weather" ? "col-span-full" : "col-start-2"}>
           <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
             {event.description && <Description text={event.description} />}
             {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}

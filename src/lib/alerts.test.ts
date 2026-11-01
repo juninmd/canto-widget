@@ -53,3 +53,11 @@ test("the morning summary is its own calm kind, ranked after a red CI and named 
   const ci: AgendaItem = { ...item("pr:ci:o/r#1"), tag: "ci" };
   expect(sortAlerts([digest, ci]).map((e) => e.id)).toEqual(["pr:ci:o/r#1", "digest:morning:2026-10-12"]);
 });
+
+test("weather alerts warn, and a severe one goes to the top in the danger tone", () => {
+  const rain: AgendaItem = item("weather:rain");
+  const storm: AgendaItem = { ...item("weather:storm"), tag: "severe" };
+  expect(kindOf(rain)).toBe("weather");
+  expect([toneOf(rain), toneOf(storm)]).toEqual(["warn", "danger"]);
+  expect(sortAlerts([rain, storm]).map((e) => e.id)).toEqual(["weather:storm", "weather:rain"]);
+});

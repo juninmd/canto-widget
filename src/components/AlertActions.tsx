@@ -1,10 +1,12 @@
 import { forwardRef } from "react";
+import { emit } from "@tauri-apps/api/event";
 import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
-import { kindOf, STATUS_PREFIX } from "../lib/alerts";
+import { kindOf, STATUS_PREFIX, WEATHER_PREFIX } from "../lib/alerts";
 import { TASK_PREFIX } from "../lib/reminders";
 import { t } from "../i18n";
 import SnoozeButton from "./SnoozeButton";
-import { CrossIcon } from "./Icons";
+import { OPEN_TAB_EVENT } from "../lib/alertEvents";
+import { BellOffIcon, CrossIcon, ForecastIcon } from "./Icons";
 
 type Props = {
   event: AgendaItem;
@@ -22,8 +24,9 @@ type Props = {
 };
 
 const PRIMARY =
-  "h-8 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-semibold text-on-accent shadow-md shadow-accent/30 transition hover:brightness-110";
-const SECONDARY = "h-8 whitespace-nowrap rounded-lg bg-edge px-3 text-[13px] text-fg transition hover:brightness-125";
+  "inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-semibold text-on-accent shadow-md shadow-accent/30 transition hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[.97]";
+const SECONDARY =
+  "inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg border border-line/60 bg-edge px-3 text-[13px] text-fg transition hover:-translate-y-px hover:brightness-125 active:translate-y-0 active:scale-[.97]";
 
 /** Buttons change with the kind of alert: only calendar events and tasks can be snoozed, only services muted. */
 const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
@@ -35,8 +38,13 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
   const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, () => onDismiss());
   const mute = async () => {
     try {
-      const watched = await api.statusAlertsGet();
-      await api.statusAlertsSet(watched.filter((id) => id !== event.id.slice(STATUS_PREFIX.length)));
+      if (kind === "weather") {
+        const on = await api.weatherAlertsGet();
+        await api.weatherAlertsSet(on.filter((k) => k !== event.id.slice(WEATHER_PREFIX.length)));
+      } else {
+        const watched = await api.statusAlertsGet();
+        await api.statusAlertsSet(watched.filter((id) => id !== event.id.slice(STATUS_PREFIX.length)));
+      }
     } finally {
       onDismiss("muted");
     }
@@ -90,6 +98,21 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.openStatus")}
         </button>
       )}
+      {kind === "weather" && (
+        <button
+          ref={primary}
+          type="button"
+          onClick={() => {
+            void emit(OPEN_TAB_EVENT, "weather");
+            void api.mainShow();
+            onDismiss("done");
+          }}
+          className={`${PRIMARY} ${event.tag === "severe" ? "!bg-danger !shadow-danger/30 !text-white" : ""}`}
+        >
+          <ForecastIcon />
+          {t("alert.openForecast")}
+        </button>
+      )}
       {kind === "model" && onOpenModels && (
         <button
           ref={primary}
@@ -113,8 +136,9 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.openCalendar")}
         </button>
       )}
-      {kind === "status" && (
-        <button type="button" onClick={() => void mute()} className={SECONDARY}>
+      {(kind === "status" || kind === "weather") && (
+        <button type="button" onClick={() => void mute()} title={kind === "weather" ? t("alert.weatherMuteTitle") : undefined} className={SECONDARY}>
+          <BellOffIcon />
           {t("alert.silence")}
         </button>
       )}
