@@ -50,6 +50,8 @@ pub enum FetchError {
     RateLimited,
     /// No HTTP answer at all (offline, DNS, timeout): doesn't spend the fetch window.
     Network(String),
+    /// The page answered but no scored list was found in it: the site changed, not the network.
+    Format,
     Other(String),
 }
 
@@ -57,6 +59,7 @@ impl FetchError {
     pub fn message(&self) -> String {
         match self {
             FetchError::RateLimited => "limite de buscas atingido, tente mais tarde".into(),
+            FetchError::Format => "a Artificial Analysis mudou o formato da página; atualize o Canto".into(),
             FetchError::Network(e) | FetchError::Other(e) => format!("sem resposta da Artificial Analysis: {e}"),
         }
     }
@@ -132,7 +135,7 @@ pub fn parse_page(html: &str) -> std::result::Result<Vec<Model>, FetchError> {
         .max_by_key(|l| l.len());
     match list {
         Some(list) => Ok(list.iter().filter_map(model).collect()),
-        None => Err(FetchError::Other("a página mudou de formato".into())),
+        None => Err(FetchError::Format),
     }
 }
 

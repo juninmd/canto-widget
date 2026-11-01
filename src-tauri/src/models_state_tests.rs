@@ -71,6 +71,18 @@ fn an_empty_answer_keeps_the_previous_ranking() {
 }
 
 #[test]
+fn a_format_failure_stays_on_the_tab_until_a_fetch_succeeds() {
+    let mut cfg = ModelsConfig::default();
+    refresh(&mut cfg, T0, false, || Ok(list(12)));
+    refresh(&mut cfg, T0 + FLOOR_MS, false, || Err::<Page, _>(FetchError::Format));
+    let later = view(&cfg, T0 + FLOOR_MS + 60_000, Outcome::default());
+    assert!(later.error.as_deref().is_some_and(|e| e.contains("formato")), "cached list shown as stale");
+    assert_eq!(later.models.len(), 12);
+    refresh(&mut cfg, T0 + 2 * FLOOR_MS, false, || Ok(list(12)));
+    assert_eq!(view(&cfg, T0 + 2 * FLOOR_MS, Outcome::default()).error, None);
+}
+
+#[test]
 fn a_clock_set_backwards_does_not_block_fetching() {
     let cfg = ModelsConfig { tried_at: T0, ..Default::default() };
     assert!(due(&cfg, T0 - 1));
