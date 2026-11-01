@@ -12,6 +12,9 @@ pub const FLOOR_MS: i64 = 3 * 3_600_000;
 pub const BADGE_MS: i64 = 7 * 86_400_000;
 /// Bounds what is sealed and sent to the webview; the rest of the list only counts toward `total`.
 pub const MAX_LIST: usize = 50;
+/// Bumped when the page reader changes: a ranking read by an older build is refetched at once instead of
+/// waiting out its floor (an update that fixes the reader must not keep showing the stale list for 3 h).
+pub const READER: u32 = 2;
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -46,6 +49,9 @@ pub struct ModelsConfig {
     pub top: Option<Vec<String>>,
     #[serde(default)]
     pub badges: Vec<Badge>,
+    /// `READER` of the build that last reached the page; 0 in files written before it existed.
+    #[serde(default)]
+    pub reader: u32,
     /// Why the last answered fetch failed; kept until one succeeds, so the cached list reads as stale.
     #[serde(default)]
     pub error: Option<String>,
@@ -66,11 +72,11 @@ impl AppState {
 
 /// A clock set backwards must not lock the user out for days.
 pub fn due(cfg: &ModelsConfig, now: i64) -> bool {
-    cfg.tried_at == 0 || now >= cfg.tried_at + FLOOR_MS || now < cfg.tried_at
+    cfg.tried_at == 0 || cfg.reader != READER || now >= cfg.tried_at + FLOOR_MS || now < cfg.tried_at
 }
 
 pub fn next_fetch_at(cfg: &ModelsConfig) -> i64 {
-    if cfg.tried_at == 0 {
+    if cfg.tried_at == 0 || cfg.reader != READER {
         0
     } else {
         cfg.tried_at + FLOOR_MS
@@ -98,6 +104,7 @@ pub fn refresh<P: Into<Page>>(
     let result = fetch().map(Into::into);
     if !matches!(result, Err(FetchError::Network(_))) {
         cfg.tried_at = now;
+        cfg.reader = READER;
     }
     let error = match result {
         Ok(page) if page.models.is_empty() => "nenhum modelo com Intelligence Index na página".to_string(),

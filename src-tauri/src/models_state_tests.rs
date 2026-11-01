@@ -83,6 +83,16 @@ fn a_format_failure_stays_on_the_tab_until_a_fetch_succeeds() {
 }
 
 #[test]
+fn a_ranking_read_by_an_older_build_is_refetched_at_once() {
+    let mut cfg = ModelsConfig { tried_at: T0, fetched_at: T0 - 15 * 86_400_000, ..Default::default() };
+    assert!(due(&cfg, T0 + 60_000), "file from before the reader fix");
+    assert_eq!(next_fetch_at(&cfg), 0);
+    refresh(&mut cfg, T0 + 60_000, false, || Ok(list(12)));
+    assert_eq!((cfg.reader, cfg.fetched_at), (READER, T0 + 60_000));
+    assert!(!due(&cfg, T0 + 120_000), "then the floor holds again");
+}
+
+#[test]
 fn a_clock_set_backwards_does_not_block_fetching() {
     let cfg = ModelsConfig { tried_at: T0, ..Default::default() };
     assert!(due(&cfg, T0 - 1));

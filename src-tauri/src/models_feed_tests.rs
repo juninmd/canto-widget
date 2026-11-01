@@ -99,3 +99,18 @@ fn the_scored_initial_models_win_over_a_plain_name_list() {
     let models = parse_page(&page(body)).unwrap();
     assert_eq!(models.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(), ["carbon"]);
 }
+
+/// Smoke test against the live page: `cargo test --lib live_leaderboard -- --ignored --nocapture`.
+#[test]
+#[ignore = "network"]
+fn live_leaderboard() {
+    let page = fetch().expect("the leaderboard answers and has a scored list");
+    let mut models = page.models;
+    models.sort_by(|a, b| b.score.total_cmp(&a.score));
+    for m in models.iter().take(10) {
+        println!("{:>6.2}  {}  ({})", m.score, m.name, m.id);
+    }
+    println!("{} models, index {:?}", models.len(), page.index);
+    assert!(models.len() >= 30, "only {} scored models", models.len());
+    assert!(page.index.is_some(), "no Intelligence Index version on the page");
+}
