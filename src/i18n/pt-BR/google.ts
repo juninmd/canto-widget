@@ -159,4 +159,8 @@ export const google = {
   "alert.kind.weather": "clima",
   "alert.outcome.weather": "aviso de clima visto",
   "alert.weatherMuteTitle": "desligar este tipo de aviso do clima",
+  "alert.openForecast": "ver previsão",
+  "alert.weather.severe": "grave",
+  "alert.weather.watch": "atenção",
+  "alert.severeCount": "{n} grave",
 } as const;

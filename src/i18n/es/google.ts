@@ -160,4 +160,8 @@ export const google: Record<keyof typeof source, string> = {
   "alert.kind.weather": "clima",
   "alert.outcome.weather": "aviso del clima visto",
   "alert.weatherMuteTitle": "desactivar este tipo de aviso del clima",
+  "alert.openForecast": "ver pronóstico",
+  "alert.weather.severe": "grave",
+  "alert.weather.watch": "atención",
+  "alert.severeCount": "{n} grave",
 };

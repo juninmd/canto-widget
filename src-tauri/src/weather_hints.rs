@@ -41,10 +41,12 @@ pub struct Hint {
     pub severe: bool,
     pub title: String,
     pub body: String,
+    /// The one number or hour that sums the hint up ("41°", "62 km/h", "UV 9"), shown big on the pop-up.
+    pub value: String,
 }
 
 fn hint(kind: &'static str, severe: bool, title: &str, body: String) -> Hint {
-    Hint { kind, severe, title: title.to_string(), body }
+    Hint { kind, severe, title: title.to_string(), body, value: String::new() }
 }
 
 /// `HH:MM` of an hour the API sent as `YYYY-MM-DDTHH:MM`.
@@ -243,6 +245,37 @@ fn swing(f: &Forecast) -> Option<Hint> {
     })
 }
 
+fn value(kind: &str, f: &Forecast) -> String {
+    let soon = &f.hours[..f.hours.len().min(SOON)];
+    let today = &f.hours[..f.hours.len().min(TODAY)];
+    let first = |c: Condition| soon.iter().chain(today).find(|h| h.condition == c).map(clock).unwrap_or_default();
+    match kind {
+        "rain" => format!("{}%", soon.iter().map(|h| h.rain).max().unwrap_or(0)),
+        "storm" => {
+            if matches!(f.now.condition, Condition::Storm) {
+                tr("agora", "now").to_string()
+            } else {
+                first(Condition::Storm)
+            }
+        }
+        "heat" => format!("{}°", deg(today.iter().map(|h| h.feels).fold(f.now.feels, f64::max))),
+        "cold" => format!("{}°", deg(today.iter().map(|h| h.feels).fold(f.now.feels, f64::min))),
+        "wind" => format!(
+            "{} km/h",
+            deg(soon.iter().map(|h| h.wind).fold(f.now.gusts.unwrap_or(f.now.wind).max(f.now.wind), f64::max))
+        ),
+        "uv" => format!("UV {}", deg(f.days.first().map_or(0.0, |d| d.uv))),
+        "air" => format!("AQI {}", f.air.unwrap_or(0)),
+        "fog" => format!("{:.1} km", f.now.visibility.unwrap_or(0.0)),
+        "dry" => format!("{}%", f.now.humidity),
+        "snow" => first(Condition::Snow),
+        _ => match (f.days.first(), f.days.get(1)) {
+            (Some(a), Some(b)) => format!("{}° → {}°", deg(a.max), deg(b.max)),
+            _ => String::new(),
+        },
+    }
+}
+
 /// Every hint the forecast gives right now, worst first. A storm already says "stay in", so rain stays quiet then.
 pub fn hints(f: &Forecast) -> Vec<Hint> {
     let soon = &f.hours[..f.hours.len().min(SOON)];
@@ -265,6 +298,9 @@ pub fn hints(f: &Forecast) -> Vec<Hint> {
     .into_iter()
     .flatten()
     .collect();
+    for h in &mut out {
+        h.value = value(h.kind, f);
+    }
     out.sort_by_key(|h| !h.severe);
     out
 }

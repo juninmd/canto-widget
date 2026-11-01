@@ -12,6 +12,13 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   16h), frio (agasalho), vento forte, UV alto, ar poluído, neblina, ar seco, neve e virada de tempo amanhã. O aviso
   chega pelo pop-up de alertas, no máximo uma vez por dia por tipo (de novo só se piorar), e à noite só os graves.
   "silenciar" no pop-up desliga aquele tipo. Tudo vem da previsão que a aba já busca, sem chamada extra.
+- **Pop-up do clima animado**: cada aviso ganha um céu em canvas atrás do cartão (chuva, raios, neve, calor, vento,
+  raios UV, fumaça e névoa), um ícone do céu e uma chegada própria (chuva cai, tempestade treme, frio congela...).
+  O aviso grave é bem mais intenso: chuva forte vira **alagamento** (a água sobe no cartão com ondas e respingos),
+  tempestade com raios em sequência, vento com folhas, calor avermelhando as bordas, e a borda pulsa no tom de
+  perigo. O número principal (41°, 62 km/h, UV 9...) aparece sob o ícone, a faixa de pendentes mostra o ícone de
+  cada aviso e quantos são graves, e os botões ganharam ícones e "ver previsão" abre a aba Clima. Respeita
+  "reduzir movimento" do sistema e pausa com a janela oculta.
 
 ### Desempenho
 

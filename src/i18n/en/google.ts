@@ -160,4 +160,8 @@ export const google: Record<keyof typeof source, string> = {
   "alert.kind.weather": "weather",
   "alert.outcome.weather": "weather alert seen",
   "alert.weatherMuteTitle": "turn off this kind of weather alert",
+  "alert.openForecast": "view forecast",
+  "alert.weather.severe": "severe",
+  "alert.weather.watch": "heads up",
+  "alert.severeCount": "{n} severe",
 };

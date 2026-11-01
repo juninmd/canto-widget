@@ -179,3 +179,20 @@ fn severe_hints_come_first() {
     f.hours[5].feels = 42.0;
     assert_eq!(kinds(&f), ["heat", "dry"]);
 }
+
+#[test]
+fn every_hint_carries_the_number_it_is_about() {
+    let mut f = calm();
+    f.hours[3].rain = 70;
+    assert_eq!(hints(&f)[0].value, "70%");
+    let mut f = calm();
+    f.hours[5].feels = 41.0;
+    f.now.gusts = Some(62.0);
+    f.days[0].uv = 9.0;
+    f.air = Some(120);
+    let by: std::collections::HashMap<_, _> = hints(&f).into_iter().map(|h| (h.kind, h.value)).collect();
+    assert_eq!(by["heat"], "41°");
+    assert_eq!(by["wind"], "62 km/h");
+    assert_eq!(by["uv"], "UV 9");
+    assert_eq!(by["air"], "AQI 120");
+}

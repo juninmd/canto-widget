@@ -97,6 +97,8 @@ pub fn alert_event(hint: &Hint) -> AgendaItem {
         id: format!("{WEATHER_PREFIX}{}", hint.kind),
         title: hint.title.clone(),
         description: hint.body.clone(),
+        // The pop-up shows it big under the icon; weather alerts have no organizer of their own.
+        organizer: hint.value.clone(),
         start: chrono::Utc::now().to_rfc3339(),
         tag: if hint.severe { "severe".into() } else { String::new() },
         ..Default::default()
@@ -137,7 +139,7 @@ mod tests {
     use super::*;
 
     fn hint(kind: &'static str, severe: bool) -> Hint {
-        Hint { kind, severe, title: "t".into(), body: "b".into() }
+        Hint { kind, severe, title: "t".into(), body: "b".into(), value: "41°".into() }
     }
 
     fn saved(kinds: &[&str]) -> Saved {
@@ -189,6 +191,7 @@ mod tests {
         let event = alert_event(&hint("storm", true));
         assert_eq!(event.id, "weather:storm");
         assert_eq!(event.tag, "severe");
+        assert_eq!(event.organizer, "41°");
         assert_eq!(crate::notification::content(&event).1, "t: b");
     }
 }
