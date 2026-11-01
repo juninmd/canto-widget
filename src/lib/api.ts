@@ -385,6 +385,9 @@ export type WeatherForecast = {
   /** US AQI; null when the air-quality call failed. */
   air?: number | null;
 };
+/** Same order as `KINDS` in `weather_hints.rs`. */
+export const WEATHER_ALERT_KINDS = ["storm", "rain", "heat", "cold", "wind", "uv", "air", "fog", "dry", "snow", "swing"] as const;
+export type WeatherAlertKind = (typeof WEATHER_ALERT_KINDS)[number];
 export type WeatherView = {
   place: WeatherPlace | null;
   forecast: WeatherForecast | null;
@@ -782,6 +785,9 @@ export const api = {
   /** Saves the chosen coordinates; the names come along as display text. */
   weatherSetPlace: (place: WeatherPlace) => invoke<WeatherView>("weather_set_place", { place }),
   weatherClear: () => invoke<WeatherView>("weather_clear"),
+  /** The weather alert kinds switched on (`WEATHER_ALERT_KINDS`); Rust rings them for the saved city. */
+  weatherAlertsGet: () => invoke<string[]>("weather_alerts_get"),
+  weatherAlertsSet: (kinds: string[]) => invoke<string[]>("weather_alerts_set", { kinds }),
 
   /** Leituras: the saved feeds, newest first; thumbnails and favicons come as `data:` URLs, by id/host. */
   readsGet: (force = false) => invoke<ReadsView>("reads_get", { force }),

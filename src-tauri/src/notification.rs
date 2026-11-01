@@ -15,6 +15,8 @@ pub const PR_PREFIX: &str = "pr:";
 pub const MENTION_PREFIX: &str = "mention:";
 /// Same prefix as `DIGEST_PREFIX` in the UI's `alerts.ts`: the morning summary of the day.
 pub const DIGEST_PREFIX: &str = "digest:";
+/// Same prefix as `WEATHER_PREFIX` in the UI's `alerts.ts`: the forecast asks for an umbrella, water, a jacket...
+pub const WEATHER_PREFIX: &str = "weather:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
@@ -28,6 +30,9 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
     }
     if event.id.starts_with(MODEL_PREFIX) {
         return (crate::lang::tr("Modelo de IA", "AI model"), format!("{}: {}", event.title, event.tag));
+    }
+    if event.id.starts_with(WEATHER_PREFIX) {
+        return (crate::lang::tr("Clima", "Weather"), format!("{}: {}", event.title, event.description));
     }
     if event.id.starts_with(DIGEST_PREFIX) {
         let lines = event.description.lines().collect::<Vec<_>>().join(" · ");

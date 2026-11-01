@@ -12,8 +12,10 @@ export const PR_PREFIX = "pr:";
 export const MENTION_PREFIX = "mention:";
 /** Same prefix as `DIGEST_PREFIX` in `notification.rs`: the morning summary of the day. */
 export const DIGEST_PREFIX = "digest:";
+/** Same prefix as `WEATHER_PREFIX` in `notification.rs`: the forecast asks for an umbrella, water, a jacket... */
+export const WEATHER_PREFIX = "weather:";
 
-export type AlertKind = "status" | "model" | "pr" | "mention" | "digest" | "task" | "meeting";
+export type AlertKind = "status" | "model" | "pr" | "mention" | "digest" | "weather" | "task" | "meeting";
 export type Tone = "danger" | "warn" | "accent" | "muted";
 
 export function kindOf(e: AgendaItem): AlertKind {
@@ -22,6 +24,7 @@ export function kindOf(e: AgendaItem): AlertKind {
   if (e.id.startsWith(PR_PREFIX)) return "pr";
   if (e.id.startsWith(MENTION_PREFIX)) return "mention";
   if (e.id.startsWith(DIGEST_PREFIX)) return "digest";
+  if (e.id.startsWith(WEATHER_PREFIX)) return "weather";
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
 }
 
@@ -53,6 +56,8 @@ export function toneOf(e: AgendaItem): Tone {
       return e.tag === "maintenance" ? "muted" : "warn";
     case "model":
       return "muted";
+    case "weather":
+      return e.tag === "severe" ? "danger" : "warn";
     case "pr":
       return PR_TONE[e.tag ?? ""] ?? "warn";
     default:

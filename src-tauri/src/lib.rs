@@ -178,6 +178,8 @@ pub mod unlock_log;
 pub mod updater;
 pub mod vault;
 pub mod weather;
+pub mod weather_alert;
+pub mod weather_hints;
 pub mod weather_state;
 pub mod wifi_os;
 pub mod window;
@@ -235,6 +237,7 @@ pub fn run() {
             app.manage(health_watch::HealthState::default());
             app.manage(harness_cache::HarnessCache::default());
             app.manage(weather_state::WeatherState::load(&dir));
+            app.manage(weather_alert::WeatherAlerts::load(&dir));
             app.manage(cmd_market::MarketState::default());
             app.manage(cmd_reads::ReadsState::load(&dir));
             app.manage(cmd_models::ModelsLock::default());
@@ -274,6 +277,7 @@ pub fn run() {
             gmail_alert::watch(app.handle().clone());
             health_watch::watch(app.handle().clone());
             models_alert::watch(app.handle().clone());
+            weather_alert::watch(app.handle().clone());
             do_not_disturb::watch(app.handle().clone());
             fullscreen_guard::watch(app.handle().clone());
             review_alert::watch(app.handle().clone());
@@ -459,6 +463,8 @@ pub fn run() {
             cmd_weather::weather_search,
             cmd_weather::weather_set_place,
             cmd_weather::weather_clear,
+            weather_alert::weather_alerts_get,
+            weather_alert::weather_alerts_set,
             cmd_reads::reads_get,
             cmd_reads::reads_add,
             cmd_reads::reads_remove,

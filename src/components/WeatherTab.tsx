@@ -13,6 +13,7 @@ import WeatherHero from "./WeatherHero";
 import WeatherHours from "./WeatherHours";
 import WeatherAstro from "./WeatherAstro";
 import WeatherNowcast from "./WeatherNowcast";
+import WeatherAlerts from "./WeatherAlerts";
 
 /** The weather of one city: the sky now, the next two hours, the details, the hours of the picked day, the days, sun and moon. */
 export default function WeatherTab() {
@@ -87,6 +88,7 @@ export default function WeatherTab() {
           />
           {forecast.days.length > 0 && <WeatherDays days={forecast.days} selected={day} onPick={setDay} index={11} />}
           <WeatherAstro today={forecast.days[0]} nowAt={forecast.hours[0]?.at ?? ""} lat={place.lat} index={12} />
+          <WeatherAlerts index={13} />
         </>
       ) : (
         <FailedCard place={place} loading={loading} onRefresh={() => void load(true)} onChange={() => setChanging(true)} />

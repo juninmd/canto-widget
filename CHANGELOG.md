@@ -5,6 +5,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Avisos do clima**: a aba Clima ganhou um cartão "Avisos do clima" com 11 tipos para ligar um a um —
+  tempestade (evitar sair), chuva (levar guarda-chuva), calor (beber água; calor extremo: evitar sair das 11h às
+  16h), frio (agasalho), vento forte, UV alto, ar poluído, neblina, ar seco, neve e virada de tempo amanhã. O aviso
+  chega pelo pop-up de alertas, no máximo uma vez por dia por tipo (de novo só se piorar), e à noite só os graves.
+  "silenciar" no pop-up desliga aquele tipo. Tudo vem da previsão que a aba já busca, sem chamada extra.
+
 ### Desempenho
 
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de

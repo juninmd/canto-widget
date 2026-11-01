@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
 import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
-import { kindOf, STATUS_PREFIX } from "../lib/alerts";
+import { kindOf, STATUS_PREFIX, WEATHER_PREFIX } from "../lib/alerts";
 import { TASK_PREFIX } from "../lib/reminders";
 import { t } from "../i18n";
 import SnoozeButton from "./SnoozeButton";
@@ -35,8 +35,13 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
   const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, () => onDismiss());
   const mute = async () => {
     try {
-      const watched = await api.statusAlertsGet();
-      await api.statusAlertsSet(watched.filter((id) => id !== event.id.slice(STATUS_PREFIX.length)));
+      if (kind === "weather") {
+        const on = await api.weatherAlertsGet();
+        await api.weatherAlertsSet(on.filter((k) => k !== event.id.slice(WEATHER_PREFIX.length)));
+      } else {
+        const watched = await api.statusAlertsGet();
+        await api.statusAlertsSet(watched.filter((id) => id !== event.id.slice(STATUS_PREFIX.length)));
+      }
     } finally {
       onDismiss("muted");
     }
@@ -113,8 +118,8 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.openCalendar")}
         </button>
       )}
-      {kind === "status" && (
-        <button type="button" onClick={() => void mute()} className={SECONDARY}>
+      {(kind === "status" || kind === "weather") && (
+        <button type="button" onClick={() => void mute()} title={kind === "weather" ? t("alert.weatherMuteTitle") : undefined} className={SECONDARY}>
           {t("alert.silence")}
         </button>
       )}

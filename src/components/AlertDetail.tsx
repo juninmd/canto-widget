@@ -11,6 +11,8 @@ import AlertPrep from "./AlertPrep";
 import Avatar from "./Avatar";
 import { CalendarIcon, CheckIcon, ClockIcon, PullIcon, PulseIcon } from "./Icons";
 import { TONE } from "./AlertStrip";
+import WeatherIcon from "./WeatherIcon";
+import { weatherAlertCondition } from "../lib/weather";
 
 /** A labeled box under the title; it scrolls on its own past `max-h-56`, so a long one never pushes the actions off. */
 function Box({ label, aside, children }: { label: string; aside?: ReactNode; children: ReactNode }) {
@@ -59,7 +61,7 @@ function Badge({ event, kind, tone }: { event: AgendaItem; kind: string; tone: (
       aria-hidden="true"
       className={`row-span-2 grid size-9 place-items-center self-start rounded-xl border [&_svg]:size-[18px] ${tone.card} ${tone.text}`}
     >
-      {KIND_ICON[kind]}
+      {kind === "weather" ? <WeatherIcon condition={weatherAlertCondition(event.id)} className="size-7" /> : KIND_ICON[kind]}
     </span>
   );
 }
