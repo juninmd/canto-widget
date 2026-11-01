@@ -130,7 +130,11 @@ fn assigned(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, login: 
     };
     let list = work_events::others_only(list, login);
     let (fresh, next) = review_alert::advance(seen.assigned.as_ref(), &list);
-    let events = work_events::assigned_events(&fresh, crate::lang::english());
+    let mut events = work_events::assigned_events(&fresh, crate::lang::english());
+    // Whoever assigned it has no photo in the search result; GitHub serves one for any login.
+    for s in events.iter_mut().filter_map(|e| e.sender.as_mut()).filter(|s| s.avatar.is_empty()) {
+        s.avatar = format!("https://avatars.githubusercontent.com/{}?s=64", s.login);
+    }
     ring(app, events, &mut seen.avatars);
     seen.assigned = Some(next);
 }
