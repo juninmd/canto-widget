@@ -581,6 +581,9 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Modelos IA voltam a trazer o ranking atual**: a Artificial Analysis passou a mandar a lista com notas em
   `initialModels` e deixou em `models` só nomes, então a aba não achava o ranking novo (sem Gemini 4 Carbon nem
   GPT-6 Astra). Agora vale a maior lista com Intelligence Index sob qualquer chave terminada em "models".
+- **Modelos IA buscam o ranking logo depois de atualizar o app**: a lista salva por uma versão com o leitor antigo
+  ficava na tela (até "atualizado há 15 d") esperando o intervalo de 3 h. Agora um ranking lido por um leitor anterior
+  é buscado de novo na hora; depois disso o intervalo volta a valer.
 - **Modelos IA avisam quando a lista está velha**: se a busca falha porque a página mudou de formato, a aba diz
   isso ("atualize o Canto", e não mais "sem resposta") e o aviso fica visível sobre o ranking salvo até uma busca dar
   certo, em vez de sumir e deixar a lista antiga parecendo atual.
