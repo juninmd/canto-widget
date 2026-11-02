@@ -60,6 +60,8 @@ src-tauri/src/
   steam_lists.rs, cmd_steam.rs   the four Steam sub-tabs and their commands; steam_store.rs/steam_url.rs read the
                                  store, steam_region.rs picks the storefront, steam_review.rs words the buckets
   steam_alert.rs                  opt-in OS alert when a wishlist game gets cheaper (last prices sealed)
+  sysmon.rs, sysmon_probe.rs      Sistema tab (desktop only): one snapshot of CPU, GPU, memory, disks, network, battery and
+                                 apps (sysinfo + starship-battery); sysmon_hints.rs/sysmon_alert.rs ring opt-in system alerts
 src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)
 ```
 

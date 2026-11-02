@@ -1,7 +1,14 @@
 import { useRef } from "react";
 
 type Tab<K extends string> = { key: K; label: string; badge?: number; tone?: "hot" | "info" };
-type Props<K extends string> = { label: string; tabs: Tab<K>[]; value: K; onChange: (key: K) => void };
+type Props<K extends string> = {
+  label: string;
+  tabs: Tab<K>[];
+  value: K;
+  onChange: (key: K) => void;
+  /** Tighter padding, for a switch with many short labels (Sistema has seven). */
+  dense?: boolean;
+};
 
 const STEP: Record<string, (i: number, n: number) => number> = {
   ArrowRight: (i, n) => (i + 1) % n,
@@ -14,7 +21,7 @@ const STEP: Record<string, (i: number, n: number) => number> = {
  * The small segmented switch under a tab's header (Status API, GitHub, GitLab, Steam). WAI-ARIA tabs like TabBar:
  * one Tab stop on the selected tab, arrows/Home/End move and select.
  */
-export default function SubTabs<K extends string>({ label, tabs, value, onChange }: Props<K>) {
+export default function SubTabs<K extends string>({ label, tabs, value, onChange, dense = false }: Props<K>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   // An unknown value would leave no Tab stop at all: the first tab takes it instead.
   const stop = Math.max(0, tabs.findIndex((s) => s.key === value));
@@ -33,7 +40,7 @@ export default function SubTabs<K extends string>({ label, tabs, value, onChange
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className="flex max-w-full shrink-0 gap-0.5 self-start overflow-x-auto rounded-xl border border-edge bg-ink/60 p-0.5 text-xs"
+      className={`flex max-w-full shrink-0 gap-0.5 overflow-x-auto rounded-xl border border-edge bg-ink/60 p-0.5 text-xs ${dense ? "self-stretch" : "self-start"}`}
     >
       {tabs.map((s, i) => (
         <button
@@ -46,7 +53,7 @@ export default function SubTabs<K extends string>({ label, tabs, value, onChange
           aria-selected={value === s.key}
           tabIndex={i === stop ? 0 : -1}
           onClick={() => onChange(s.key)}
-          className={`canto-hit min-h-7 shrink-0 whitespace-nowrap rounded-lg px-3 transition-colors ${value === s.key ? "bg-raised font-semibold text-accent-text shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
+          className={`canto-hit min-h-7 shrink-0 whitespace-nowrap rounded-lg ${dense ? "flex-auto px-2" : "px-3"} transition-colors ${value === s.key ? "bg-raised font-semibold text-accent-text shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
         >
           {s.label}
           {!!s.badge && (

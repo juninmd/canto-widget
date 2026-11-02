@@ -38,6 +38,7 @@ const KIND_ICON: Record<string, ReactNode> = {
   status: <PulseIcon size={18} />,
   digest: <ClockIcon />,
   model: <PulseIcon size={18} />,
+  system: <PulseIcon size={18} />,
   mention: <span className="text-base font-semibold leading-none">@</span>,
 };
 
@@ -196,9 +197,10 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             {event.organizer && <Chip>{event.organizer}</Chip>}
           </>
         )}
-        {kind === "weather" && (
+        {(kind === "weather" || kind === "system") && (
           <>
             <Chip tone={tone.text}>{event.tag === "severe" ? t("alert.weather.severe") : t("alert.weather.watch")}</Chip>
+            {kind === "system" && event.organizer && <Chip>{event.organizer}</Chip>}
             {event.start && <Chip>{timeAgo(event.start)}</Chip>}
           </>
         )}
@@ -211,7 +213,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         )}
       </div>
       {detailed && (
-        <div className={kind === "weather" ? "col-span-full" : "col-start-2"}>
+        <div className={kind === "weather" || kind === "system" ? "col-span-full" : "col-start-2"}>
           <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
             {event.description && <Description text={event.description} />}
             {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}

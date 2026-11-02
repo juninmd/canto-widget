@@ -10,6 +10,7 @@ export const WeatherTab = lazy(() => import("./WeatherTab"));
 export const MapTab = lazy(() => import("./MapTab"));
 export const ReadsTab = lazy(() => import("./ReadsTab"));
 export const MarketTab = lazy(() => import("./MarketTab"));
+export const SystemTab = lazy(() => import("./SystemTab"));
 export const GmailTab = lazy(() => import("./GmailTab"));
 export const GDriveTab = lazy(() => import("./GDriveTab"));
 export const ContactsTab = lazy(() => import("./ContactsTab"));

@@ -161,6 +161,16 @@ pub mod steam_wish;
 pub mod store;
 pub mod subtask;
 pub mod sync;
+#[cfg(desktop)]
+pub mod sysmon;
+#[cfg(desktop)]
+pub mod sysmon_alert;
+#[cfg(desktop)]
+pub mod sysmon_hints;
+#[cfg(desktop)]
+pub mod sysmon_probe;
+#[cfg(desktop)]
+pub mod sysmon_procs;
 pub mod task_context;
 pub mod task_order;
 pub mod task_reminder;
@@ -259,6 +269,8 @@ pub fn run() {
             {
                 app.manage(updater::PendingUpdate::default());
                 app.manage(window_state::WindowState::load(&dir));
+                app.manage(sysmon::SystemMonitor::default());
+                app.manage(sysmon_alert::SystemAlerts::load(&dir));
                 global_shortcuts::register(app.handle())?;
                 build_tray(app.handle())?;
             }
@@ -269,6 +281,8 @@ pub fn run() {
             cmd_extras::watch_clipboard(app.handle().clone());
             #[cfg(desktop)]
             tray_live::watch(app.handle().clone());
+            #[cfg(desktop)]
+            sysmon_alert::watch(app.handle().clone());
             meeting_alert::watch(app.handle().clone());
             task_reminder::watch(app.handle().clone());
             context_reminder::watch(app.handle().clone());
@@ -465,6 +479,12 @@ pub fn run() {
             cmd_weather::weather_clear,
             weather_alert::weather_alerts_get,
             weather_alert::weather_alerts_set,
+            #[cfg(desktop)]
+            sysmon::system_get,
+            #[cfg(desktop)]
+            sysmon_alert::system_alerts_get,
+            #[cfg(desktop)]
+            sysmon_alert::system_alerts_set,
             cmd_reads::reads_get,
             cmd_reads::reads_add,
             cmd_reads::reads_remove,

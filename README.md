@@ -626,6 +626,31 @@ endpoint, keyless and fetched by Rust, kept in memory for 15 min (↻ forces a n
 
 <sub>All screenshots use fictitious data.</sub>
 
+## 🖥️ System
+
+**Sistema** watches the machine itself, in one tab split into sub-tabs instead of six new tabs on the bar:
+**Overview** (a card each for CPU, GPU, memory, system disk and network; each card opens its sub-tab), **CPU** (usage
+and temperature over the last minute, clock, 1-minute average and peak, and the apps using it most), **GPU** (usage
+and video memory per card), **Memory** (how full it is, the pressure in words, swap, and the apps holding it, their
+processes added up as "Browser (61)"), **Disk** (the system volume, read and write speed with totals since boot, and
+every other volume with its free space), **Network** (download and upload now and over the last minute) and
+**Power** (battery charge and state, time left, power draw, temperature, cycles, voltage and how much of its design
+capacity is left). It reads every 2 s only while the tab is on screen; nothing leaves the machine or is written to
+disk. **System alerts** (off by default, one switch per kind) ring through the same pop-up as the weather: memory
+above 90%, system disk almost full, CPU maxed for 5 minutes, CPU above 85 °C, battery below 20% off the charger and a
+worn battery (under 80% of its design capacity). Each kind waits its own cooldown before repeating, sooner only if it
+gets worse. The tab starts hidden, one checkbox away in Settings, and is desktop-only.
+
+| Overview | CPU | Memory |
+|---|---|---|
+| <img src="docs/prints/app/123-sistema-geral.png" alt="System tab overview: CPU 54% with a curve, GPU 34%, memory 90% with elevated pressure, system disk 87% used and network download and upload curves"> | <img src="docs/prints/app/124-sistema-cpu.png" alt="CPU sub-tab: usage and temperature curves, frequency, 1-minute average and peak tiles and the apps sorted by CPU"> | <img src="docs/prints/app/125-sistema-memoria.png" alt="Memory sub-tab: 57.7 GB of 64 GB in use with elevated pressure and swap, and the apps sorted by memory with their process counts"> |
+
+| Disk | Power | Alerts |
+|---|---|---|
+| <img src="docs/prints/app/126-sistema-disco.png" alt="Disk sub-tab: the system disk 87% used, read and write speeds with totals since boot and curves, and two more volumes with free space"> | <img src="docs/prints/app/127-sistema-energia.png" alt="Power sub-tab: battery at 90% plugged in and not charging, details with power draw, temperature, capacity health 84.1%, cycles and voltage, and full-charge against design capacity"> | <img src="docs/prints/app/128-sistema-avisos.png" alt="System alerts card open with six switches, three of them on"><img src="docs/prints/app/129-aviso-sistema.png" alt="Alert pop-up: system disk almost full, severe, 96%, with open System and mute buttons"> |
+
+<sub>All screenshots use fictitious data.</sub>
+
 ## ⚖️ Compared to what's out there
 
 None of the tools researched cover more than two of these fronts at once. Sources and details in

@@ -70,5 +70,21 @@
   "more alerts in the Steam tab": "avisos más en la pestaña Steam",
   "new update": "nueva actualización",
   "now": "ahora",
-  "was": "antes"
+  "was": "antes",
+  "System": "Sistema",
+  "{used} of {total} in use.": "{used} de {total} en uso.",
+  "{app} takes the most.": "{app} es lo que más ocupa.",
+  "Memory almost full": "Memoria casi llena",
+  "Only {free} left on {mount}.": "Solo quedan {free} libres en {mount}.",
+  "Disk almost full": "Disco casi lleno",
+  "Above {p}% for {m} minutes.": "Por encima del {p}% durante {m} minutos.",
+  "{app} uses the most.": "{app} es lo que más usa.",
+  "CPU maxed out": "CPU al límite",
+  "Check the airflow and what is loading the CPU.": "Revisa la ventilación y qué está cargando la CPU.",
+  "CPU running hot": "CPU muy caliente",
+  "About {m} min left. Plug in the charger.": "Quedan unos {m} min. Conecta el cargador.",
+  "Plug in the charger.": "Conecta el cargador.",
+  "Battery low": "Batería baja",
+  "It holds {full} of {design} Wh, {h}% of what it held new.": "Guarda {full} de {design} Wh, el {h}% de lo que guardaba nueva.",
+  "Battery worn": "Batería desgastada"
 }

@@ -1,12 +1,12 @@
 import { forwardRef } from "react";
 import { emit } from "@tauri-apps/api/event";
 import { api, type AgendaItem, type AlertOutcome } from "../lib/api";
-import { kindOf, STATUS_PREFIX, WEATHER_PREFIX } from "../lib/alerts";
+import { kindOf, STATUS_PREFIX, SYSTEM_PREFIX, WEATHER_PREFIX } from "../lib/alerts";
 import { TASK_PREFIX } from "../lib/reminders";
 import { t } from "../i18n";
 import SnoozeButton from "./SnoozeButton";
 import { OPEN_TAB_EVENT } from "../lib/alertEvents";
-import { BellOffIcon, CrossIcon, ForecastIcon } from "./Icons";
+import { BellOffIcon, CrossIcon, ForecastIcon, PulseIcon } from "./Icons";
 
 type Props = {
   event: AgendaItem;
@@ -41,6 +41,9 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
       if (kind === "weather") {
         const on = await api.weatherAlertsGet();
         await api.weatherAlertsSet(on.filter((k) => k !== event.id.slice(WEATHER_PREFIX.length)));
+      } else if (kind === "system") {
+        const on = await api.systemAlertsGet();
+        await api.systemAlertsSet(on.filter((k) => k !== event.id.slice(SYSTEM_PREFIX.length)));
       } else {
         const watched = await api.statusAlertsGet();
         await api.statusAlertsSet(watched.filter((id) => id !== event.id.slice(STATUS_PREFIX.length)));
@@ -113,6 +116,21 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.openForecast")}
         </button>
       )}
+      {kind === "system" && (
+        <button
+          ref={primary}
+          type="button"
+          onClick={() => {
+            void emit(OPEN_TAB_EVENT, "system");
+            void api.mainShow();
+            onDismiss("done");
+          }}
+          className={`${PRIMARY} ${event.tag === "severe" ? "!bg-danger !shadow-danger/30 !text-white" : ""}`}
+        >
+          <PulseIcon size={14} />
+          {t("alert.openSystem")}
+        </button>
+      )}
       {kind === "model" && onOpenModels && (
         <button
           ref={primary}
@@ -136,8 +154,13 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.openCalendar")}
         </button>
       )}
-      {(kind === "status" || kind === "weather") && (
-        <button type="button" onClick={() => void mute()} title={kind === "weather" ? t("alert.weatherMuteTitle") : undefined} className={SECONDARY}>
+      {(kind === "status" || kind === "weather" || kind === "system") && (
+        <button
+          type="button"
+          onClick={() => void mute()}
+          title={kind === "weather" ? t("alert.weatherMuteTitle") : kind === "system" ? t("alert.systemMuteTitle") : undefined}
+          className={SECONDARY}
+        >
           <BellOffIcon />
           {t("alert.silence")}
         </button>

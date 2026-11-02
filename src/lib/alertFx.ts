@@ -43,6 +43,8 @@ export function alertFx(e: AgendaItem, now = new Date()): AlertFxSpec {
       return spec("pulse", danger ? "shake" : "drop", danger ? "#4a1d2a" : e.tag === "maintenance" ? "#2a3340" : "#4a3418");
     case "model":
       return spec("sparks", "glow", "#4a2a5e");
+    case "system":
+      return spec("pulse", danger ? "shake" : "rise", danger ? "#4a1d2a" : "#4a3418");
     default:
       return spec("rays", "mist", "#5a3a12");
   }
