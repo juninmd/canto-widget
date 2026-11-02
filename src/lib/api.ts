@@ -1,10 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "./forgeTypes";
 import type { HealthEndpoint, HealthView } from "./healthTypes";
+import type { SystemSnapshot } from "./systemTypes";
 import { t } from "../i18n";
 
 export type * from "./forgeTypes";
 export type * from "./healthTypes";
+export type * from "./systemTypes";
+export { SYSTEM_ALERT_KINDS } from "./systemTypes";
 
 // wire keys mirror the synced vault format (frozen across app versions)
 /** `dia` of `semanal`: 0 = Sunday ... 6 = Saturday. */
@@ -788,6 +791,12 @@ export const api = {
   /** The weather alert kinds switched on (`WEATHER_ALERT_KINDS`); Rust rings them for the saved city. */
   weatherAlertsGet: () => invoke<string[]>("weather_alerts_get"),
   weatherAlertsSet: (kinds: string[]) => invoke<string[]>("weather_alerts_set", { kinds }),
+
+  /** Sistema: a fresh reading of CPU, GPU, memory, disks, network, battery and the heaviest apps, with the last minute. */
+  systemGet: () => invoke<SystemSnapshot>("system_get"),
+  /** The system alert kinds switched on (`SYSTEM_ALERT_KINDS`); Rust checks them once a minute. */
+  systemAlertsGet: () => invoke<string[]>("system_alerts_get"),
+  systemAlertsSet: (kinds: string[]) => invoke<string[]>("system_alerts_set", { kinds }),
 
   /** Leituras: the saved feeds, newest first; thumbnails and favicons come as `data:` URLs, by id/host. */
   readsGet: (force = false) => invoke<ReadsView>("reads_get", { force }),

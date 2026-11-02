@@ -37,6 +37,7 @@ import {
   GmailTab,
   MapTab,
   MarketTab,
+  SystemTab,
   ModelsTab,
   ReadsTab,
   SettingsTab,
@@ -432,6 +433,7 @@ function Canto() {
               {tab === "weather" && <WeatherTab />}
               {tab === "map" && <MapTab />}
               {tab === "market" && <MarketTab />}
+              {tab === "system" && <SystemTab />}
               {tab === "gmail" && <GmailTab onNotice={(message) => notify({ message })} />}
               {tab === "gdrive" && <GDriveTab onNotice={(message) => notify({ message })} />}
               {tab === "contacts" && <ContactsTab onNotice={(message) => notify({ message })} />}

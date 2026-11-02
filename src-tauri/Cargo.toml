@@ -71,6 +71,10 @@ tauri-plugin-single-instance = "2.4.4"
 # Sem o recurso `zip`, que só serve a pacotes comprimidos (Tauri v1): o manifesto publica o .exe do NSIS e o
 # AppImage puros (scripts/release-manifest.ts), e o zip 4.x vulnerável (RUSTSEC-2026-0367/68/69) sai da árvore.
 tauri-plugin-updater = { version = "2", default-features = false, features = ["rustls-tls", "system-proxy"] }
+# Sistema tab: CPU, GPU, memory, disks, network and processes (MIT, no rayon) and the laptop battery (ISC, no
+# Android backend).
+sysinfo = { version = "0.40", default-features = false, features = ["component", "disk", "gpu", "network", "system"] }
+starship-battery = "0.12"
 
 [target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
 # The pickers hand back content URIs and security-scoped URLs, which only this plugin can open (picked.rs); the

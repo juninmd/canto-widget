@@ -5,16 +5,16 @@ import { IS_MOBILE } from "./platform";
 const KEY = "canto.hiddenTabs";
 const KNOWN_KEY = "canto.knownTabs";
 
-/** Needs the desktop's focused-app probe, which a phone has no counterpart for. */
-export const DESKTOP_ONLY_TABS: readonly Tab[] = ["activity"];
+/** Need desktop probes (the focused app, the machine's sensors) that a phone has no counterpart for. */
+export const DESKTOP_ONLY_TABS: readonly Tab[] = ["activity", "system"];
 
 const offered = TABS.filter((t) => !IS_MOBILE || !DESKTOP_ONLY_TABS.includes(t.id));
 
 /** Ajustes can't be hidden: it's the only way back to the other tabs. */
 export const HIDEABLE = offered.filter((t) => t.id !== "settings");
 
-/** Eighteen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes, Clima, Mapa, Mercado, Leituras, Gmail, Drive and Contatos start hidden, one checkbox away in Ajustes. */
-const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts"];
+/** Eighteen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes, Clima, Mapa, Mercado, Leituras, Gmail, Drive, Contatos and Sistema start hidden, one checkbox away in Ajustes. */
+const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts", "system"];
 
 /** Nothing saved yet means the default; unknown ids (a tab removed in an update) and corrupt data are ignored. */
 export function parseHidden(raw: string | null): Tab[] {
@@ -28,7 +28,7 @@ export function parseHidden(raw: string | null): Tab[] {
 }
 
 /** Shipped after people could save their hidden list; before `canto.knownTabs` existed, these were the unknown ones. */
-const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts"];
+const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts", "system"];
 
 /** A tab hidden by default stays hidden for someone who saved a choice before it existed, instead of crowding their bar. */
 export function hideNewTabs(hidden: Tab[], rawKnown: string | null): Tab[] {

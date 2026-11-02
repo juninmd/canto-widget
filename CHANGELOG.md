@@ -7,6 +7,17 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Sistema** (inspirada no MangoDisk): uma aba só, com sub-abas **Geral, CPU, GPU, Memória, Disco, Rede e
+  Energia**, em vez de seis abas novas na barra. Geral mostra um cartão por parte da máquina (cada um abre a sua
+  sub-aba); CPU traz uso e temperatura do último minuto, frequência, média e pico; Memória mostra a pressão e os
+  apps que mais ocupam, com os processos somados ("Navegador (61)"); Disco traz o volume do sistema, leitura e
+  escrita com totais e os outros volumes; Rede, download e upload; Energia, carga, estado, potência, temperatura,
+  ciclos, tensão e saúde da bateria. Lê a cada 2 s só com a aba na tela; nada sai da máquina nem vai para o disco.
+  Começa escondida (Ajustes → Abas) e só existe no desktop.
+- **Avisos do sistema** no mesmo pop-up do clima, desligados por padrão: memória acima de 90%, disco do sistema
+  quase cheio, CPU no limite por 5 min, CPU acima de 85 °C, bateria abaixo de 20% fora da tomada e bateria
+  desgastada. Cada tipo espera um tempo antes de repetir (de novo antes só se piorar); "silenciar" desliga o tipo.
+
 - **Efeitos em todos os avisos do pop-up**: o céu animado do clima agora vale para cada tipo de aviso, com entrada
   própria e fundo em canvas. Reunião: anéis que se expandem do ícone (mais rápidos nos últimos 2 minutos). Tarefa:
   ticks flutuando. PR: blocos vermelhos caindo e faixa piscando no CI que falhou, ramos que se separam no conflito,
