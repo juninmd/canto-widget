@@ -1,0 +1,35 @@
+name: Performance
+
+# The scale harness has time budgets (vault re-seal, search, first page); a weekly run catches a slow drift
+# that no single PR shows. It is not a PR gate: shared runners are too noisy for that.
+on:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scale:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Tauri system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+      - uses: dtolnay/rust-toolchain@89b12181fb390509a0842a86cc55eeb8eb928c1d # stable
+      - uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          workspaces: src-tauri -> target
+          shared-key: release-scale
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+      # generate_context! embeds ../dist at compile time, so the frontend must be built first.
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      - run: bun install --frozen-lockfile && bun run build
+      - run: cargo test --release --locked --test scale -- --ignored --nocapture
+        working-directory: src-tauri

@@ -310,6 +310,11 @@ Master password change, Windows Hello, `.canto` backup, a synced folder with aut
 OneDrive, Syncthing...), start with the system and the **Updates** section, with the **installed version** and
 the **latest published** one side by side and a button to update and restart.
 
+**Backup reminder:** the daily copy sits in the app folder, so Settings → Data and accounts shows how long ago you
+last exported a `.canto` file and warns (never exported, or 30+ days) to save one outside that folder.
+
+<img src="docs/prints/app/130-backup-lembrete.png" alt="Backup section in Settings warning that the last exported backup is 45 days old, between the export and import buttons and the automatic daily copy note" width="420">
+
 </td>
 <td><img src="docs/prints/app/18-atualizacoes.png" alt="Settings showing installed version, latest published version and the update button"></td>
 </tr>

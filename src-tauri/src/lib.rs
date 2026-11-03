@@ -7,11 +7,11 @@ pub mod autolock;
 #[cfg(desktop)]
 pub mod autostart;
 pub mod background;
-pub mod boot;
 pub mod backup;
 pub mod badge;
 pub mod biometric;
 pub mod blocking;
+pub mod boot;
 pub mod calendar;
 pub mod calendar_event;
 #[cfg(desktop)]

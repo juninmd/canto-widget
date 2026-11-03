@@ -44,3 +44,22 @@ test("a different password reaches the user via the error banner", async () => {
   expect(errors).toEqual(["o backup foi criado com outra senha mestra"]);
   expect(screen.queryByText(/mesclado/)).toBeNull();
 });
+
+test("asks for a first export, then shows how old the last one is", async () => {
+  localStorage.clear();
+  responses.backup_export = () => Promise.resolve("/tmp/cofre.canto");
+  await click("exportar");
+  expect(screen.getByText(/exportado há 0 dia/)).toBeTruthy();
+  expect(screen.queryByText(/Nenhum backup exportado/)).toBeNull();
+});
+
+test("a never exported vault and a stale export both warn", () => {
+  localStorage.clear();
+  render(<BackupSection onError={() => {}} />);
+  expect(screen.getByRole("status").textContent).toMatch(/Nenhum backup exportado/);
+  cleanup();
+  localStorage.setItem("canto.lastExport", String(Date.now() - 45 * 86_400_000));
+  render(<BackupSection onError={() => {}} />);
+  expect(screen.getByRole("status").textContent).toMatch(/há 45 dias/);
+  localStorage.clear();
+});
