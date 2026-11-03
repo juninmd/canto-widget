@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Lembrete de backup**: Ajustes → Dados e contas mostra há quantos dias você exportou o último `.canto` e avisa
+  quando nunca exportou ou passou de 30 dias. A cópia diária fica na pasta do app, então só a exportação protege
+  contra perder o disco. Só o horário da exportação fica guardado na máquina; nada vai para o cofre.
+
 - **Aba Sistema** (inspirada no MangoDisk): uma aba só, com sub-abas **Geral, CPU, GPU, Memória, Disco, Rede e
   Energia**, em vez de seis abas novas na barra. Geral mostra um cartão por parte da máquina (cada um abre a sua
   sub-aba); CPU traz uso e temperatura do último minuto, frequência, média e pico; Memória mostra a pressão e os
@@ -52,6 +56,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Abas de protótipo Hábitos e Snippets**: saíram as duas telas de maquete, os rótulos nos 42 idiomas, os prints e
   os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
 ### Alterado
+
+- **Código dividido, sem mudar o comportamento**: `lib.rs` virou `boot.rs` (estado e watchers) e `tray.rs` (bandeja
+  e eventos da janela); `App.tsx` ganhou `TabContent` e `useAppEvents`. Um teste novo (`sealed_files`) falha se um
+  arquivo selado novo ficar fora da troca de senha mestra, e um e2e novo cobre destrancar, trocar a senha e o
+  lembrete de backup. Um workflow semanal (`perf.yml`) roda o harness de carga em release.
 
 - **Modelos IA seguem a versão do Intelligence Index sozinhos**: a versão (hoje v5.0) é lida da própria página
   da Artificial Analysis e aparece no cabeçalho da aba. Quando sai uma versão nova, a primeira leitura só

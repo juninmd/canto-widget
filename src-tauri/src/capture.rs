@@ -43,7 +43,7 @@ mod tests {
 
     #[test]
     fn capture_hides_when_it_loses_focus() {
-        let lib = include_str!("lib.rs");
+        let lib = include_str!("tray.rs");
         let at = lib.find("WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW").expect("blur arm");
         assert!(lib[at..at + 200].contains("win.hide()"), "a forgotten capture pop-up must not stay on top");
     }

@@ -251,7 +251,7 @@ mod tests {
         let src = include_str!("window.rs");
         let toggle = &src[src.find("pub fn toggle(").unwrap()..src.find("pub const SHOWN_EVENT").unwrap()];
         assert!(toggle.contains("return hide(&win)") && !toggle.contains("win.hide()"));
-        let lib = include_str!("lib.rs");
+        let lib = include_str!("tray.rs");
         let close = &lib[lib.find("CloseRequested").unwrap()..];
         assert!(close[..300].contains("SHOWN_EVENT"), "closing hides the widget: the UI must hear it");
         let ui = include_str!("../../src/lib/windowShown.ts");

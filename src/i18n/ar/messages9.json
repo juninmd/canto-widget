@@ -545,5 +545,8 @@
   "alert.kind.system": "system",
   "alert.outcome.system": "system alert seen",
   "alert.openSystem": "open System",
-  "alert.systemMuteTitle": "turn off this kind of system alert"
+  "alert.systemMuteTitle": "turn off this kind of system alert",
+  "settings.backup.never": "No backup exported yet: the daily copy lives in the app folder, so export one outside it.",
+  "settings.backup.last": "Last backup exported {days} day(s) ago.",
+  "settings.backup.stale": "Last backup exported {days} days ago: export a fresh one outside the app folder."
 }

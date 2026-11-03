@@ -44,3 +44,10 @@ test("the CI rust job and the release verify share one debug cache key and env",
     expect(text).toMatch(/CARGO_PROFILE_DEV_DEBUG: line-tables-only\r?\n/);
   }
 });
+
+// The budgets live in the ignored scale test; if the weekly run stops executing it, a slow drift goes unseen.
+test("perf.yml runs the ignored scale harness in release mode on a schedule", () => {
+  const text = readFileSync(new URL("../.github/workflows/perf.yml", import.meta.url), "utf8");
+  expect(text).toContain("schedule:");
+  expect(text).toMatch(/cargo test --release[^\n]*--test scale -- --ignored/);
+});

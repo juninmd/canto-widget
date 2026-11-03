@@ -54,5 +54,5 @@ fn toasts_wait_too_because_they_can_also_pull_a_game_out_of_full_screen() {
 
 #[test]
 fn the_watcher_is_started_with_the_other_ones() {
-    assert!(include_str!("lib.rs").contains("fullscreen_guard::watch("));
+    assert!(include_str!("boot.rs").contains("fullscreen_guard::watch("));
 }

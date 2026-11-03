@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { backupAge, markExported, readLastExport } from "../lib/backupReminder";
 import { api } from "../lib/api";
 import { useSectionError } from "../lib/useSectionError";
 import { t } from "../i18n";
@@ -8,6 +9,8 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
   const [busy, setBusy] = useState("");
   const [info, setInfo] = useState("");
   const { error, fail, clear } = useSectionError(onError);
+  const [lastExport, setLastExport] = useState(readLastExport);
+  const age = backupAge(lastExport);
 
   // `fn` returns "" when the user cancels the dialog: cancelling is neither error nor success.
   async function run(label: string, fn: () => Promise<string>) {
@@ -25,6 +28,10 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
 
   const doExport = async () => {
     const where = await api.backupExport();
+    if (where) {
+      markExported();
+      setLastExport(readLastExport());
+    }
     return where ? t("settings.backup.saved", { path: where }) : "";
   };
 
@@ -57,6 +64,9 @@ export default function BackupSection({ onError }: { onError: (m: string) => voi
           {busy === "imp" ? t("settings.backup.importing") : t("settings.backup.import")}
         </button>
       </div>
+      <p role={age.kind === "ok" ? undefined : "status"} className={`text-[11px] ${age.kind === "ok" ? "text-faint" : "text-warn"}`}>
+        {age.kind === "never" ? t("settings.backup.never") : t(age.kind === "stale" ? "settings.backup.stale" : "settings.backup.last", { days: age.days })}
+      </p>
       <p className="text-[11px] text-faint">{t("settings.backup.auto")}</p>
       {info && <p className="break-all text-[11px] text-accent-text">{info}</p>}
     </SettingsSection>
