@@ -1,8 +1,7 @@
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useClearOnLock } from "./lib/useClearOnLock";
 import { IS_MOBILE, MOD_KEY } from "./lib/platform";
 import { hideWindow } from "./lib/windowShown";
-import { listen } from "@tauri-apps/api/event";
 import { api, errText } from "./lib/api";
 import { useVaultStatus } from "./lib/useVaultStatus";
 import { useOnline, useOnReconnect } from "./lib/useOnline";
@@ -23,34 +22,12 @@ import Onboarding from "./components/Onboarding";
 import { markOnboardingSeen, onboardingSeen } from "./lib/onboarding";
 import { useToday } from "./lib/useToday";
 import Lock from "./components/Lock";
-import TasksTab from "./components/TasksTab";
-import NotesTab from "./components/NotesTab";
 import type { SectionId } from "./lib/settingsGroups";
-import ClipboardTab from "./components/ClipboardTab";
-import {
-  ActivityTab,
-  AgentsTab,
-  ContactsTab,
-  GDriveTab,
-  GithubTab,
-  GitlabTab,
-  GmailTab,
-  MapTab,
-  MarketTab,
-  SystemTab,
-  ModelsTab,
-  ReadsTab,
-  SettingsTab,
-  StatusTab,
-  SteamTab,
-  WeatherTab,
-} from "./components/lazyTabs";
-import AgendaTab from "./components/AgendaTab";
 import { useHiddenTabs, visibleTabs } from "./lib/tabs";
 import { useTabLayout } from "./lib/tabLayout";
 import { useReminderLead } from "./lib/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
-import TabBar, { panelId, TABS, type Tab } from "./components/TabBar";
+import TabBar, { panelId, type Tab } from "./components/TabBar";
 import TabRail from "./components/TabRail";
 import MobileNav from "./components/MobileNav";
 import FocusBar from "./components/FocusBar";
@@ -58,12 +35,13 @@ import { focusStore } from "./lib/focus";
 import AppHeader from "./components/AppHeader";
 import ErrorBanner from "./components/ErrorBanner";
 import Skeleton from "./components/Skeleton";
+import TabContent from "./components/TabContent";
+import { useAppEvents } from "./lib/useAppEvents";
 import MiniRail from "./components/MiniRail";
 import FocusedAlert from "./components/FocusedAlert";
 import NotificationsPanel from "./components/NotificationsPanel";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
-import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
 import { saveView } from "./lib/agendaView";
 
 export default function App() {
@@ -178,49 +156,8 @@ function Canto() {
     [refresh],
   );
 
-  // Rust locks the vault on its own after a period of inactivity; the UI needs to know.
-  useEffect(() => {
-    const stop = listen<number>("canto://auto-lock", (e) => {
-      focusStore.discard();
-      notify({ message: e.payload > 0 ? t("app.autoLocked", { min: e.payload }) : t("app.lockedFromTray") });
-      void refresh();
-    });
-    return () => {
-      void stop.then((f) => f());
-    };
-  }, [refresh, notify]);
-
-  // Deliberate use postpones auto-lock. Throttled: one signal per window is enough.
-  useEffect(() => {
-    if (!status?.unlocked) return;
-    let next = 0;
-    const mark = () => {
-      const now = Date.now();
-      if (now < next) return;
-      next = now + 30_000;
-      void api.touch().catch(() => {});
-    };
-    window.addEventListener("pointerdown", mark);
-    window.addEventListener("keydown", mark);
-    return () => {
-      window.removeEventListener("pointerdown", mark);
-      window.removeEventListener("keydown", mark);
-    };
-  }, [status?.unlocked]);
-
-  // The pop-up lives in its own window: what it changes here arrives as events.
-  useEffect(() => {
-    const done = listen(TASKS_CHANGED_EVENT, () => setTasksVersion((v) => v + 1));
-    const open = listen<Tab>(OPEN_TAB_EVENT, (e) => {
-      changeTab(e.payload);
-      // The tab lives in the full window, not in the dock.
-      void setModeRef.current("normal").catch(() => {});
-    });
-    return () => {
-      void done.then((f) => f());
-      void open.then((f) => f());
-    };
-  }, [changeTab]);
+  const bumpTasks = useCallback(() => setTasksVersion((v) => v + 1), []);
+  useAppEvents({ unlocked: status?.unlocked === true, notify, refresh, changeTab, onTasksChanged: bumpTasks, openNormal: setModeRef });
 
   async function lock() {
     try {
@@ -405,56 +342,32 @@ function Canto() {
               aria-labelledby={`aba-${tab}`}
               className="min-h-0 flex-1 p-3 motion-safe:animate-aba motion-reduce:animate-fade"
             >
-              <Suspense fallback={<Skeleton label={TABS.find((item) => item.id === tab)?.label ?? tab} />}>
-              {tab === "tasks" && <TasksTab today={today} version={tasksVersion} agenda={agenda.items} onError={setError} />}
-              {tab === "notes" && (
-                <NotesTab
-                  today={today}
-                  agenda={agenda.items}
-                  privacy={privacy}
-                  initialQuery={jumpQuery}
-                  querySeq={jumpSeq}
-                  onOpenTasks={() => changeTab("tasks")}
-                  onOpenAgenda={() => changeTab("agenda")}
-                  onError={setError}
-                  note={noteDraft}
-                />
-              )}
-              {tab === "clipboard" && (
-                <ClipboardTab privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} />
-              )}
-              {tab === "agenda" && <AgendaTab agenda={agenda} today={today} version={tasksVersion} privacy={privacy} initialQuery={jumpQuery} querySeq={jumpSeq} onError={setError} onOpenSettings={() => openSettingsAt("google")} onBooked={(message) => notify({ message })} />}
-              {tab === "github" && <GithubTab onError={setError} />}
-              {tab === "gitlab" && <GitlabTab onError={setError} />}
-              {tab === "steam" && <SteamTab onError={setError} />}
-              {tab === "status" && <StatusTab />}
-              {tab === "models" && <ModelsTab />}
-              {tab === "agents" && <AgentsTab onError={setError} />}
-              {tab === "weather" && <WeatherTab />}
-              {tab === "map" && <MapTab />}
-              {tab === "market" && <MarketTab />}
-              {tab === "system" && <SystemTab />}
-              {tab === "gmail" && <GmailTab onNotice={(message) => notify({ message })} />}
-              {tab === "gdrive" && <GDriveTab onNotice={(message) => notify({ message })} />}
-              {tab === "contacts" && <ContactsTab onNotice={(message) => notify({ message })} />}
-              {tab === "reads" && <ReadsTab onError={setError} />}
-              {tab === "activity" && <ActivityTab today={today} onError={setError} />}
-              {tab === "settings" && (
-                <SettingsTab
-                  onError={setError}
-                  hiddenTabs={hiddenTabs}
-                  onHiddenTabs={setHiddenTabs}
-                  layout={layout}
-                  onLayout={setLayout}
-                  pinned={pinned}
-                  onPinned={setPinned}
-                  reminderLead={reminderLead}
-                  onReminderLead={setReminderLead}
-                  onShowShortcuts={() => setHelpOpen(true)}
-                  focus={settingsFocus}
-                />
-              )}
-              </Suspense>
+              <TabContent
+                tab={tab}
+                today={today}
+                tasksVersion={tasksVersion}
+                agenda={agenda}
+                noteDraft={noteDraft}
+                privacy={privacy}
+                jumpQuery={jumpQuery}
+                jumpSeq={jumpSeq}
+                settingsFocus={settingsFocus}
+                settings={{
+                  hiddenTabs,
+                  onHiddenTabs: setHiddenTabs,
+                  layout,
+                  onLayout: setLayout,
+                  pinned,
+                  onPinned: setPinned,
+                  reminderLead,
+                  onReminderLead: setReminderLead,
+                }}
+                onError={setError}
+                onNotice={(message) => notify({ message })}
+                onChangeTab={changeTab}
+                onOpenSettingsAt={openSettingsAt}
+                onShowShortcuts={() => setHelpOpen(true)}
+              />
             </main>
             <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
           </div>

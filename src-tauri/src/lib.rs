@@ -7,6 +7,7 @@ pub mod autolock;
 #[cfg(desktop)]
 pub mod autostart;
 pub mod background;
+pub mod boot;
 pub mod backup;
 pub mod badge;
 pub mod biometric;
@@ -182,6 +183,7 @@ pub mod traffic_search;
 pub mod traffic_tiles;
 pub mod transcripts;
 pub mod trash;
+pub mod tray;
 pub mod tray_live;
 pub mod unlock_log;
 #[cfg(desktop)]
@@ -202,14 +204,6 @@ pub mod work_events;
 #[cfg(desktop)]
 pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
 
-#[cfg(desktop)]
-use tauri::menu::{Menu, MenuItem};
-#[cfg(desktop)]
-use tauri::tray::TrayIconBuilder;
-use tauri::Manager;
-
-use crate::vault::AppState;
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let builder = tauri::Builder::default();
@@ -228,100 +222,7 @@ pub fn run() {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
-        .setup(|app| {
-            // A tray widget: no Dock icon or Cmd+Tab entry (`skipTaskbar` is a no-op on macOS). The bundle's
-            // Info.plist (LSUIElement) covers launch; this covers `tauri dev` and any later policy reset.
-            #[cfg(target_os = "macos")]
-            {
-                app.set_activation_policy(tauri::ActivationPolicy::Accessory);
-                app.set_dock_visibility(false);
-            }
-            let dir = app.path().app_data_dir()?;
-            std::fs::create_dir_all(&dir)?;
-            app.manage(AppState::new(dir.clone()));
-            app.manage(prefs::PrefsLock::default());
-            app.manage(cmd_github::GithubState::default());
-            app.manage(status_cache::StatusCache::default());
-            app.manage(status_alert::StatusAlerts::load(&dir));
-            app.manage(gmail_alert::GmailAlerts::load(&dir));
-            app.manage(health_watch::HealthState::default());
-            app.manage(harness_cache::HarnessCache::default());
-            app.manage(weather_state::WeatherState::load(&dir));
-            app.manage(weather_alert::WeatherAlerts::load(&dir));
-            app.manage(cmd_market::MarketState::default());
-            app.manage(cmd_reads::ReadsState::load(&dir));
-            app.manage(cmd_models::ModelsLock::default());
-            app.manage(cmd_steam::SteamLock::default());
-            app.manage(cmd_steam_more::TopHistory::default());
-            app.manage(do_not_disturb::DoNotDisturb::load(&dir));
-            app.manage(review_alert::ReviewAlerts::load(&dir));
-            app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
-            app.manage(mentions_state::MentionsUnread::default());
-            app.manage(morning_digest::MorningDigest::load(&dir));
-            app.manage(activity_watch::ActivityState::load(&dir));
-            app.manage(meeting_alert::Alerted::default());
-            app.manage(meeting_cache::Upcoming::default());
-            app.manage(alert_log::AlertLog::default());
-            app.manage(fullscreen_guard::FullscreenHold::load(&dir));
-            app.manage(task_reminder::ReminderLead::default());
-            app.manage(steam_alert::SteamAlerts::default());
-            #[cfg(desktop)]
-            {
-                app.manage(updater::PendingUpdate::default());
-                app.manage(window_state::WindowState::load(&dir));
-                app.manage(sysmon::SystemMonitor::default());
-                app.manage(sysmon_alert::SystemAlerts::load(&dir));
-                global_shortcuts::register(app.handle())?;
-                build_tray(app.handle())?;
-            }
-            startup::create_windows(app.handle())?;
-            #[cfg(mobile)]
-            notification::ask_permission(app.handle().clone());
-            background::start(app.handle().clone(), dir.clone());
-            cmd_extras::watch_clipboard(app.handle().clone());
-            #[cfg(desktop)]
-            tray_live::watch(app.handle().clone());
-            #[cfg(desktop)]
-            sysmon_alert::watch(app.handle().clone());
-            meeting_alert::watch(app.handle().clone());
-            task_reminder::watch(app.handle().clone());
-            context_reminder::watch(app.handle().clone());
-            steam_alert::watch(app.handle().clone());
-            status_alert::watch(app.handle().clone());
-            gmail_alert::watch(app.handle().clone());
-            health_watch::watch(app.handle().clone());
-            models_alert::watch(app.handle().clone());
-            weather_alert::watch(app.handle().clone());
-            do_not_disturb::watch(app.handle().clone());
-            fullscreen_guard::watch(app.handle().clone());
-            review_alert::watch(app.handle().clone());
-            my_pr_alerts::watch(app.handle().clone());
-            mention_alerts::watch(app.handle().clone());
-            own_work_alerts::watch(app.handle().clone());
-            morning_digest::watch(app.handle().clone());
-            activity_watch::watch(app.handle().clone());
-            // Debug build depends on vite being up: registering it on boot would open a broken widget.
-            #[cfg(all(desktop, not(debug_assertions)))]
-            if let Err(e) = autostart::ensure_default(app.handle()) {
-                // The OS registration being unavailable must not stop the widget from opening.
-                eprintln!("autostart indisponivel: {e}");
-            }
-
-            #[cfg(desktop)]
-            if let Some(win) = app.get_webview_window("main") {
-                win.set_always_on_top(app.state::<window_state::WindowState>().cfg().always_on_top)?;
-                // Otherwise the global shortcut can't bring the widget over another app's fullscreen Space.
-                #[cfg(target_os = "macos")]
-                win.set_visible_on_all_workspaces(true)?;
-                window_state::place(&win)?;
-                // Boot startup stays in the tray only: nothing pops up on the user's screen.
-                if !autostart::started_by_system() {
-                    win.show()?;
-                    win.set_focus()?;
-                }
-            }
-            Ok(())
-        })
+        .setup(boot::setup)
         .invoke_handler(tauri::generate_handler![
             commands::vault_status,
             #[cfg(desktop)]
@@ -531,81 +432,8 @@ pub fn run() {
         ])
         .on_window_event(|_win, _event| {
             #[cfg(desktop)]
-            on_window_event(_win, _event);
+            tray::on_window_event(_win, _event);
         })
         .run(tauri::generate_context!())
         .expect("erro ao iniciar o Canto");
-}
-
-#[cfg(desktop)]
-fn on_window_event(win: &tauri::Window, event: &tauri::WindowEvent) {
-    match event {
-        // Closing hides the widget; quitting for real only from the tray.
-        tauri::WindowEvent::CloseRequested { api, .. } => {
-            api.prevent_close();
-            let _ = win.hide();
-            let _ = tauri::Emitter::emit_to(win, win.label(), window::SHOWN_EVENT, false);
-        }
-        // Quick capture is a transient pop-up: left behind on top of other apps it covers what is under it.
-        tauri::WindowEvent::Focused(false) if win.label() == capture::CAPTURE_WINDOW => {
-            let _ = win.hide();
-        }
-        tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {
-            window_state::record(win);
-        }
-        _ => {}
-    }
-}
-
-#[cfg(desktop)]
-fn build_tray(app: &tauri::AppHandle) -> tauri::Result<()> {
-    let toggle = MenuItem::with_id(app, "toggle", lang::toggle_label(), true, None::<&str>)?;
-    let join = MenuItem::with_id(app, tray_live::JOIN_ITEM_ID, tray_live::no_meeting_label(), false, None::<&str>)?;
-    let dnd_label = do_not_disturb::tray_label(do_not_disturb::current(app));
-    let dnd = MenuItem::with_id(app, do_not_disturb::TRAY_ITEM_ID, dnd_label, true, None::<&str>)?;
-    let mini = MenuItem::with_id(app, "mini", lang::tr("Modo mini", "Mini mode"), true, None::<&str>)?;
-    let lock = MenuItem::with_id(app, "lock", lang::tr("Trancar cofre", "Lock vault"), true, None::<&str>)?;
-    let quit = MenuItem::with_id(app, "quit", lang::tr("Sair", "Quit"), true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &mini, &join, &dnd, &lock, &quit])?;
-    app.manage(tray_live::JoinMenuItem(join));
-    app.manage(do_not_disturb::DndMenuItem(dnd));
-    app.manage(lang::TrayLabels { toggle, mini, lock, quit });
-
-    TrayIconBuilder::with_id("canto-tray")
-        .icon(app.default_window_icon().cloned().unwrap())
-        .tooltip("Canto")
-        .menu(&menu)
-        .show_menu_on_left_click(false)
-        .on_menu_event(|app, event| match event.id.as_ref() {
-            "toggle" => {
-                let _ = window::toggle(app);
-            }
-            "mini" => {
-                let _ = window_mode::toggle_mini(app);
-            }
-            tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
-            do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),
-            "lock" => {
-                background::lock_from_tray(app);
-            }
-            "quit" => {
-                if let Ok(dir) = app.path().app_data_dir() {
-                    let _ = app.state::<window_state::WindowState>().save_if_dirty(&dir);
-                }
-                app.exit(0)
-            }
-            _ => {}
-        })
-        .on_tray_icon_event(|tray, event| {
-            if let tauri::tray::TrayIconEvent::Click {
-                button: tauri::tray::MouseButton::Left,
-                button_state: tauri::tray::MouseButtonState::Up,
-                ..
-            } = event
-            {
-                let _ = window::toggle(tray.app_handle());
-            }
-        })
-        .build(app)?;
-    Ok(())
 }
