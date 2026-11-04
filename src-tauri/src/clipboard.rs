@@ -140,6 +140,26 @@ impl AppState {
         }
     }
 
+    /// Cheap fingerprint of the history (lock state + file stamp and size): the tab's poll asks this
+    /// every 2.5s and only pays the read + AES-GCM + JSON of `clip_load` when it changed. Any writer
+    /// (watcher, restore, password change) replaces the file, so it moves the stamp too.
+    pub fn clip_revision(&self) -> String {
+        if !self.is_unlocked() {
+            return "locked".into();
+        }
+        match std::fs::metadata(store::clip_path(&self.dir)) {
+            Ok(meta) => {
+                let stamp = meta
+                    .modified()
+                    .ok()
+                    .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+                    .map_or(0, |d| d.as_nanos());
+                format!("{stamp}:{}", meta.len())
+            }
+            Err(_) => "empty".into(),
+        }
+    }
+
     /// Load-modify-save under `clip_lock`; saves only when `f` reports a change.
     pub fn clip_update<T>(&self, f: impl FnOnce(&mut ClipHistory) -> Result<(T, bool)>) -> Result<T> {
         let _serial = self.clip_lock.lock_safe();
