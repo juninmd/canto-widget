@@ -617,6 +617,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **O widget volta a aparecer ao clicar na bandeja depois de um Win+D.** Minimizar a janela (Win+D ou "mostrar área
+  de trabalho") a deixava visível para o sistema e invisível na tela: o clique da bandeja, do atalho ou do ícone do
+  app escondia em vez de trazer de volta e, como o widget não tem botão na barra de tarefas, não havia de onde
+  recuperá-lo. A janela também voltava no tamanho da miniatura (160x28), gravado como se fosse a sua escolha. Agora o
+  clique restaura a janela minimizada, ela aparece mesmo que o reposicionamento falhe e um tamanho impossível volta
+  ao padrão.
 - **Modelos IA voltam a trazer o ranking atual**: a Artificial Analysis passou a mandar a lista com notas em
   `initialModels` e deixou em `models` só nomes, então a aba não achava o ranking novo (sem Gemini 4 Carbon nem
   GPT-6 Astra). Agora vale a maior lista com Intelligence Index sob qualquer chave terminada em "models".

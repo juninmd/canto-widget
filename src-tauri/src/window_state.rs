@@ -104,6 +104,13 @@ fn areas(win: &WebviewWindow) -> Vec<Area> {
         .collect()
 }
 
+/// A saved size the window cannot possibly have — the iconic 160x28 rect a minimize used to record, a corrupted
+/// file — would reopen the widget as a sliver, so it falls back to the default.
+pub fn usable_size(size: Option<(f64, f64)>) -> (f64, f64) {
+    let (min_w, min_h) = crate::window_mode::NORMAL_MIN;
+    size.filter(|&(w, h)| w >= min_w && h >= min_h).unwrap_or((DEFAULT_WIDTH, DEFAULT_HEIGHT))
+}
+
 pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
     // In fullscreen the OS owns the rectangle; touching it would kick the window out of that mode.
     if win.is_fullscreen()? {
@@ -117,7 +124,7 @@ pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
         return crate::window_mode::place_mini(win, crate::window_mode::MINI_DEFAULT);
     }
     crate::window_mode::restore_limits(win)?;
-    let size = cfg.size.unwrap_or((DEFAULT_WIDTH, DEFAULT_HEIGHT));
+    let size = usable_size(cfg.size);
     win.set_size(LogicalSize::new(size.0, size.1))?;
     match cfg.position.filter(|&p| fits(p, size, &areas(win))) {
         Some((x, y)) => win.set_position(LogicalPosition::new(x, y)),
@@ -131,6 +138,10 @@ pub fn record(win: &tauri::Window) {
     };
     // Fullscreen size isn't a user preference: saving it would make the widget reopen giant.
     if window_state.cfg().mini || win.is_fullscreen().unwrap_or(false) {
+        return;
+    }
+    // A minimized window reports the shell's iconic rect (160x28 at -32000), never the size the user chose.
+    if win.is_minimized().unwrap_or(false) {
         return;
     }
     let (Ok(pos), Ok(size)) = (win.outer_position(), win.inner_size()) else {
@@ -222,6 +233,25 @@ mod tests {
         assert_eq!(cfg.position, Some((10.0, 20.0)));
         assert_eq!(cfg.size, Some((300.0, 400.0)));
         assert!(!cfg.always_on_top);
+    }
+
+    #[test]
+    fn a_size_the_window_cannot_have_falls_back_to_the_default() {
+        assert_eq!(
+            usable_size(Some((160.0, 28.0))),
+            (DEFAULT_WIDTH, DEFAULT_HEIGHT),
+            "the iconic rect would reopen the widget as a sliver"
+        );
+        assert_eq!(usable_size(None), (DEFAULT_WIDTH, DEFAULT_HEIGHT));
+        assert_eq!(usable_size(Some((300.0, 900.0))), (DEFAULT_WIDTH, DEFAULT_HEIGHT), "below the declared minimum");
+        assert_eq!(usable_size(Some((498.0, 768.0))), (498.0, 768.0));
+    }
+
+    #[test]
+    fn a_minimized_window_never_saves_its_iconic_geometry() {
+        let src = include_str!("window_state.rs").replace('\r', "");
+        let body = &src[src.find("pub fn record(").unwrap()..src.find("#[tauri::command]").unwrap()];
+        assert!(body.contains("is_minimized()"), "the 160x28 shell rect would be saved as the widget size");
     }
 
     #[test]

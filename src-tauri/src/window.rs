@@ -31,11 +31,17 @@ pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)
     Ok(Some((x, y)))
 }
 
+/// A window the shell minimized (Win+D, "mostrar área de trabalho") still counts as visible to the OS, so it has to
+/// be brought back instead of hidden: with `skipTaskbar` there is no taskbar button to restore it from.
+pub fn should_show(visible: bool, minimized: bool) -> bool {
+    !visible || minimized
+}
+
 pub fn toggle(app: &tauri::AppHandle) -> tauri::Result<()> {
     let Some(win) = app.get_webview_window("main") else {
         return Ok(());
     };
-    if win.is_visible()? {
+    if !should_show(win.is_visible()?, win.is_minimized()?) {
         return hide(&win);
     }
     show(app)
@@ -54,8 +60,14 @@ pub fn show(app: &tauri::AppHandle) -> tauri::Result<()> {
     let Some(win) = app.get_webview_window("main") else {
         return Ok(());
     };
+    // Show alone leaves a minimized window minimized; it must be restored before the placement applies again.
     #[cfg(desktop)]
-    crate::window_state::place(&win)?;
+    if win.is_minimized()? {
+        win.unminimize()?;
+    }
+    // Placement is cosmetic: a failing resize must never leave the widget hidden.
+    #[cfg(desktop)]
+    let _ = crate::window_state::place(&win);
     win.show()?;
     win.emit_to(win.label(), SHOWN_EVENT, true)?;
     win.set_focus()?;
@@ -199,6 +211,24 @@ fn present_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn a_minimized_widget_comes_back_instead_of_hiding() {
+        // Win+D minimizes the widget, and the OS still reports it as visible.
+        assert!(super::should_show(true, true), "a tray click hid a minimized window instead of restoring it");
+        assert!(!super::should_show(true, false), "a window on screen must still hide on a click");
+        assert!(super::should_show(false, true));
+        assert!(super::should_show(false, false));
+    }
+
+    #[test]
+    fn showing_restores_a_minimized_window() {
+        let src = include_str!("window.rs").replace('\r', "");
+        let body = &src[src.find("pub fn show(").unwrap()..];
+        let body = &body[..body.find("\n}\n").unwrap()];
+        assert!(body.contains("unminimize()"), "show() alone leaves a minimized window off screen");
+        assert!(!body.contains("place(&win)?"), "a failed resize would keep the widget hidden");
+    }
+
     #[test]
     fn alert_rings_in_its_own_window_and_never_shows_the_widget() {
         let src = include_str!("window.rs");

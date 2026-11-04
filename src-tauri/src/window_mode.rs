@@ -7,7 +7,7 @@ use crate::window_state::{Area, WindowState};
 pub const MODE_EVENT: &str = "canto://window-mode";
 
 /// Same as `minWidth`/`minHeight` of the main window in `tauri.conf.json` (a test keeps them equal).
-const NORMAL_MIN: (f64, f64) = (360.0, 440.0);
+pub const NORMAL_MIN: (f64, f64) = (360.0, 440.0);
 /// Collapsed dock: the colored bars plus a hit area; the UI asks for more room on hover.
 pub const MINI_DEFAULT: (f64, f64) = (24.0, 64.0);
 const MINI_MIN: (f64, f64) = (16.0, 32.0);
@@ -84,8 +84,11 @@ pub fn set_mini(app: &tauri::AppHandle, enabled: bool) -> tauri::Result<()> {
 pub fn toggle_mini(app: &tauri::AppHandle) -> tauri::Result<()> {
     let enabled = app.try_state::<WindowState>().is_some_and(|s| s.cfg().mini);
     set_mini(app, !enabled)?;
-    if app.get_webview_window("main").is_some_and(|w| !w.is_visible().unwrap_or(true)) {
-        crate::window::show(app)?;
+    if let Some(win) = app.get_webview_window("main") {
+        // A window the shell minimized counts as visible and would leave the new dock off screen.
+        if crate::window::should_show(win.is_visible()?, win.is_minimized()?) {
+            crate::window::show(app)?;
+        }
     }
     Ok(())
 }
