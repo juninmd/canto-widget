@@ -190,3 +190,23 @@ fn a_copied_token_stays_out_of_the_history() {
     assert_eq!(h.items.len(), 1);
     assert!(h.push(&format!("token: {token}"), "ctx".into()));
 }
+
+#[test]
+fn revision_moves_only_when_the_history_does() {
+    let dir = std::env::temp_dir().join(format!("canto-clip-rev-{}-{}", std::process::id(), now_ms()));
+    let st = AppState::new(dir);
+    st.create("senha-mestra").unwrap();
+    let empty = st.clip_revision();
+    assert_eq!(empty, st.clip_revision(), "an idle poll must see the same revision");
+    st.clip_update(|h| Ok(((), h.push("um", "id1".into())))).unwrap();
+    let one = st.clip_revision();
+    assert_ne!(one, empty);
+    // The same text again saves nothing, so the poll keeps skipping the decrypt.
+    st.clip_update(|h| Ok(((), h.push("um", "id2".into())))).unwrap();
+    assert_eq!(st.clip_revision(), one);
+    st.clip_update(|h| Ok(((), h.push("dois", "id3".into())))).unwrap();
+    assert_ne!(st.clip_revision(), one);
+    st.lock();
+    assert_eq!(st.clip_revision(), "locked");
+    let _ = std::fs::remove_dir_all(&st.dir);
+}

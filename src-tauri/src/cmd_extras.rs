@@ -19,11 +19,20 @@ use crate::vault::AppState;
 pub struct ClipList {
     pub items: Vec<ClipView>,
     pub max_pinned: usize,
+    /// Stamp taken before the read: a copy landing mid-read moves it again, so the next poll refetches.
+    pub revision: String,
+}
+
+/// See `AppState::clip_revision`: one `stat`, no decryption.
+#[tauri::command]
+pub fn clip_revision(state: State<'_, AppState>) -> String {
+    state.clip_revision()
 }
 
 #[tauri::command(async)]
 pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> {
     let q = crate::text_fold::fold(query.trim());
+    let revision = state.clip_revision();
     let hist = state.clip_load()?;
     let items = hist
         .items
@@ -31,7 +40,7 @@ pub fn clip_list(state: State<'_, AppState>, query: String) -> Result<ClipList> 
         .filter(|i| q.is_empty() || crate::text_fold::contains(&i.text, &q))
         .map(ClipView::from)
         .collect();
-    Ok(ClipList { items, max_pinned: hist.max_pinned })
+    Ok(ClipList { items, max_pinned: hist.max_pinned, revision })
 }
 
 /// Clamped so a typo (`0`, a huge number) can't lock pinning out or defeat the cap's purpose.

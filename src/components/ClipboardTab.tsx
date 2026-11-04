@@ -43,11 +43,15 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
 
   // The 150ms debounce and the 2.5s background poll can both be in flight at once; without this
   // guard, an older (slower) reply could land after a newer one and overwrite fresher data.
+  // The history stamp the shown list came from, per query; `null` forces a fetch.
+  const seenRev = useRef<{ q: string; rev: string } | null>(null);
+
   async function reload(q = query) {
     const id = bump();
     try {
       const list = await api.clipList(q);
       if (!isLatest(id)) return;
+      seenRev.current = list.revision ? { q, rev: list.revision } : null;
       // The 2.5s poll mostly brings back the same list: keeping the old array lets React skip the whole re-render.
       if (!sameClips(shown.current, list.items)) setItems((shown.current = list.items));
       setLoadedFor(q);
@@ -59,6 +63,16 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
         onError(message);
       }
     }
+  }
+
+  // The 2.5s tick asks only for the stamp; decrypting and re-reading the whole history waits for a real change.
+  async function poll(q: string) {
+    const seen = seenRev.current;
+    if (seen && seen.q === q) {
+      const rev = await api.clipRevision().catch(() => null);
+      if (rev && rev === seen.rev && seenRev.current === seen) return;
+    }
+    await reload(q);
   }
 
   const pinnedCount = items.filter((i) => i.pinned).length;
@@ -73,7 +87,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
     // A hidden window has nobody watching the list; coming back reloads at once.
     if (!visibleWindow) return;
     const timer = setTimeout(() => void reload(query), 150);
-    const tick = setInterval(() => void reload(query), 2500);
+    const tick = setInterval(() => void poll(query), 2500);
     return () => {
       clearTimeout(timer);
       clearInterval(tick);

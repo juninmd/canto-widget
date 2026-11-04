@@ -5,6 +5,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Aba Clipboard gasta bem menos CPU parada**: a checagem a cada 2,5 s agora só lê um carimbo do arquivo
+  (~1 µs) e só decifra e recarrega o histórico quando algo foi copiado; antes refazia leitura, AES-GCM e JSON
+  do histórico inteiro (~2 ms com 1,3 MB) e o envio da lista ao app 24 vezes por minuto.
+
 ### Adicionado
 
 - **Aba Sistema redesenhada**: uma faixa de saúde no topo diz se está tudo em ordem ou quais partes pedem

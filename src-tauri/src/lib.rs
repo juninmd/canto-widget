@@ -269,6 +269,7 @@ pub fn run() {
             cmd_drive::drive_disconnect,
             cmd_drive::drive_connect,
             cmd_extras::clip_list,
+            cmd_extras::clip_revision,
             cmd_extras::clip_copy,
             cmd_extras::clip_capture,
             cmd_extras::clip_copy_as,

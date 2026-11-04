@@ -128,7 +128,8 @@ export const UPDATE_PROGRESS_EVENT = "canto://update-progress";
 
 // `preview` is the first 500 characters; copying fetches the stored text in Rust.
 export type ClipItem = { id: string; preview: string; chars: number; kept: number; truncated: boolean; copied_at: number; pinned: boolean };
-export type ClipList = { items: ClipItem[]; max_pinned: number };
+/** `revision` is absent from older backends and mocks; then every poll refetches. */
+export type ClipList = { items: ClipItem[]; max_pinned: number; revision?: string };
 export type TranscriptMeta = { name: string; modified_at: number; size: number; preview: string };
 export type AgendaItem = {
   id: string;
@@ -608,6 +609,8 @@ export const api = {
   driveDisconnect: () => invoke<void>("drive_disconnect"),
 
   clipList: (query: string) => invoke<ClipList>("clip_list", { query }),
+  /** A stamp of the history that costs one `stat`; the list is only fetched (and decrypted) again when it moves. */
+  clipRevision: () => invoke<string | null>("clip_revision"),
   /** Phones only: reads the clipboard once; the desktop watches it in the background. */
   clipCapture: () => invoke<void>("clip_capture"),
   clipCopy: (id: string) => invoke<void>("clip_copy", { id }),
