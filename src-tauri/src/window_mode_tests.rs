@@ -48,3 +48,10 @@ fn an_alert_in_mini_mode_goes_to_the_dock_instead_of_the_pop_up() {
     let open = &src[src.find("pub fn open_alert(").unwrap()..src.find("pub fn present_pending(").unwrap()];
     assert!(open.contains("present_pending(app)"), "open_alert must go through the dock check");
 }
+
+#[test]
+fn choosing_the_dock_from_the_tray_restores_a_minimized_window() {
+    let src = include_str!("window_mode.rs");
+    let body = &src[src.find("pub fn toggle_mini(").unwrap()..src.find("#[tauri::command]").unwrap()];
+    assert!(body.contains("should_show("), "a minimized window counts as visible and would leave the dock off screen");
+}
