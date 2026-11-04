@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Aba Sistema redesenhada**: uma faixa de saúde no topo diz se está tudo em ordem ou quais partes pedem
+  atenção (cada uma abre a sua sub-aba); a Geral virou medidores em anel para CPU, memória, disco e GPU; as
+  sub-abas ganharam ícones; o menu `···` pausa e retoma a leitura, lê na hora, copia um resumo da máquina e leva
+  aos avisos; a lista de apps tem filtro por nome, troca CPU/Memória e "ver todos"; os volumes filtram por SSD, HD
+  e removíveis. Números e arcos animam a cada leitura (sem animação com movimento reduzido).
+
 - **Lembrete de backup**: Ajustes → Dados e contas mostra há quantos dias você exportou o último `.canto` e avisa
   quando nunca exportou ou passou de 30 dias. A cópia diária fica na pasta do app, então só a exportação protege
   contra perder o disco. Só o horário da exportação fica guardado na máquina; nada vai para o cofre.

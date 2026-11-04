@@ -62,6 +62,59 @@ test("the overview shows every part of the machine with its share", async () => 
   expect(screen.getByText("66,0 GB livres de 512 GB")).toBeTruthy();
   expect(screen.getByText("Wi-Fi")).toBeTruthy();
   expect(screen.getByText("ligado há 3 d 4 h")).toBeTruthy();
+  expect(screen.getByText("1 ponto de atenção")).toBeTruthy();
+  expect(screen.getByText("Memória em 90%")).toBeTruthy();
+});
+
+test("a health chip opens the part that needs a look", async () => {
+  await open();
+  await act(async () => {
+    fireEvent.click(screen.getByText("Memória em 90%"));
+  });
+  expect(document.querySelector("[data-system-tab]")?.getAttribute("data-system-tab")).toBe("memory");
+});
+
+test("the actions menu pauses the readings and resumes them", async () => {
+  await open();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("Ações do sistema"));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByText("Pausar leitura"));
+  });
+  expect(screen.getByText("Pausado")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("Ações do sistema"));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByText("Retomar leitura"));
+  });
+  expect(screen.getByText("Ao vivo")).toBeTruthy();
+});
+
+test("the apps filter narrows the list and says when nothing matches", async () => {
+  localStorage.setItem("canto.systemSub", "cpu");
+  await open();
+  const input = screen.getByLabelText("Filtrar apps");
+  await act(async () => {
+    fireEvent.change(input, { target: { value: "codigo" } });
+  });
+  expect(document.querySelectorAll("[data-system-apps] li").length).toBe(1);
+  await act(async () => {
+    fireEvent.change(input, { target: { value: "zzz" } });
+  });
+  expect(screen.getByText("Nenhum app com \u201czzz\u201d.")).toBeTruthy();
+});
+
+test("volume chips filter the other disks by kind", async () => {
+  snap = { ...BASE, disks: [...BASE.disks, { name: "Pen", mount: "E:\\", fs: "FAT32", total: 32 * GB, available: 10 * GB, system: false, removable: true, ssd: null }] };
+  localStorage.setItem("canto.systemSub", "disk");
+  await open();
+  await act(async () => {
+    fireEvent.click(screen.getByText("Removíveis"));
+  });
+  expect(screen.getByText("E:\\")).toBeTruthy();
+  expect(screen.queryByText("D:\\") === null).toBe(true);
 });
 
 test("a card opens its sub-tab, and the choice is remembered", async () => {

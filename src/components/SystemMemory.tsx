@@ -4,6 +4,7 @@ import { t } from "../i18n";
 import { Big, Card, Foot, Meter } from "./SystemBits";
 import SystemSpark from "./SystemSpark";
 import SystemApps from "./SystemApps";
+import { SubIcon } from "./SystemIcons";
 
 const PRESSURE_TEXT = { normal: "text-ok", elevated: "text-warn", high: "text-danger" };
 
@@ -15,6 +16,8 @@ export default function SystemMemory({ snap, sort, onSort }: { snap: SystemSnaps
     <div className="flex flex-col gap-2" data-system-memory>
       <Card
         index={0}
+        icon={<SubIcon sub="memory" />}
+        level={level(mem, 90, 95)}
         title={
           <>
             {t("system.sub.memory")}

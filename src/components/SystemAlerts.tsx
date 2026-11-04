@@ -2,17 +2,20 @@ import { useEffect, useState, type CSSProperties } from "react";
 import { api, errText, SYSTEM_ALERT_KINDS, type SystemAlertKind } from "../lib/api";
 import { t } from "../i18n";
 import { BellIcon } from "./Icons";
+import { Badge } from "./SystemBits";
 
 const CHIP = "canto-hit flex min-h-[28px] items-center gap-1.5 rounded-md border px-2 text-left text-[11.5px] transition";
 
 /** Which system alerts ring: one switch per kind, folded by default so the numbers stay first. */
-export default function SystemAlerts({ index }: { index: number }) {
+export default function SystemAlerts({ index, open, onOpen }: { index: number; open: boolean; onOpen: (open: boolean) => void }) {
   const [on, setOn] = useState<string[] | null>(null);
-  const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    api.systemAlertsGet().then((kinds) => setOn(kinds ?? []), (e) => setError(errText(e)));
+    api.systemAlertsGet().then(
+      (kinds) => setOn(kinds ?? []),
+      (e) => setError(errText(e)),
+    );
   }, []);
 
   async function save(next: string[]) {
@@ -33,11 +36,14 @@ export default function SystemAlerts({ index }: { index: number }) {
   const all = list.length === SYSTEM_ALERT_KINDS.length;
 
   return (
-    <section data-system-alerts className="wx-glass wx-rise flex shrink-0 flex-col gap-2 p-2" style={{ "--i": index } as CSSProperties}>
-      <button type="button" aria-expanded={open} onClick={() => setOpen(!open)} className="canto-hit flex min-h-[28px] items-center gap-2 rounded-md text-left text-xs text-fg">
-        <span className={list.length > 0 ? "text-accent-text" : "text-faint"}>
-          <BellIcon on={list.length > 0} />
-        </span>
+    <section data-system-alerts id="system-alerts" className="wx-glass wx-rise flex shrink-0 flex-col gap-2 p-2.5" style={{ "--i": index } as CSSProperties}>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => onOpen(!open)}
+        className="canto-hit flex min-h-[28px] items-center gap-2 rounded-md text-left text-xs text-fg"
+      >
+        <Badge icon={<BellIcon on={list.length > 0} />} />
         <span className="flex-1 font-semibold">{t("system.alerts.title")}</span>
         <span className="text-[11px] text-muted tabular-nums">
           {list.length > 0 ? t("system.alerts.count", { n: list.length, total: SYSTEM_ALERT_KINDS.length }) : t("system.alerts.off")}
@@ -47,7 +53,7 @@ export default function SystemAlerts({ index }: { index: number }) {
         </span>
       </button>
       {open && (
-        <>
+        <div className="canto-unfold flex flex-col gap-2">
           <p className="text-[11px] leading-snug text-muted">{t("system.alerts.hint")}</p>
           <div className="grid grid-cols-2 gap-1">
             {SYSTEM_ALERT_KINDS.map((kind) => {
@@ -67,10 +73,15 @@ export default function SystemAlerts({ index }: { index: number }) {
               );
             })}
           </div>
-          <button type="button" disabled={on === null} onClick={() => void save(all ? [] : [...SYSTEM_ALERT_KINDS])} className="canto-hit self-end rounded-md px-2 text-[11px] text-accent-text hover:bg-hover">
+          <button
+            type="button"
+            disabled={on === null}
+            onClick={() => void save(all ? [] : [...SYSTEM_ALERT_KINDS])}
+            className="canto-hit self-end rounded-md px-2 text-[11px] text-accent-text hover:bg-hover"
+          >
             {all ? t("system.alerts.none") : t("system.alerts.all")}
           </button>
-        </>
+        </div>
       )}
       {error && (
         <p role="alert" className="text-[11px] text-danger">
