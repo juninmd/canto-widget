@@ -22,8 +22,58 @@ export function Big({ value, unit, level }: { value: string; unit?: string; leve
   );
 }
 
+/** A round gauge for a share, the number in its middle; the arc sweeps in and then follows each reading. */
+export function Ring({ value, level = "ok", size = 64, children, label }: { value: number; level?: Level; size?: number; children?: ReactNode; label?: string }) {
+  const share = Math.max(0, Math.min(100, value));
+  const tone = { ok: "var(--color-accent)", warn: "var(--color-warn)", danger: "var(--color-danger)" }[level];
+  return (
+    <div
+      className="relative grid shrink-0 place-items-center"
+      style={{ width: size, height: size }}
+      role="meter"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(share)}
+      aria-label={label}
+    >
+      <svg viewBox="0 0 36 36" className="absolute inset-0 -rotate-90" aria-hidden="true">
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--color-edge)" strokeWidth="3" />
+        <circle
+          cx="18"
+          cy="18"
+          r="15.5"
+          fill="none"
+          stroke={tone}
+          strokeWidth="3"
+          strokeLinecap="round"
+          pathLength={100}
+          strokeDasharray="100"
+          className="canto-ring"
+          style={{ strokeDashoffset: 100 - share } as CSSProperties}
+        />
+      </svg>
+      <span className="relative tabular-nums">{children}</span>
+    </div>
+  );
+}
+
+const TONE_BADGE: Record<Level, string> = { ok: "bg-accent/12 text-accent-text", warn: "bg-warn/15 text-warn", danger: "bg-danger/15 text-danger" };
+
+/** The tinted square an icon sits in at the head of a card. */
+export function Badge({ icon, level = "ok" }: { icon: ReactNode; level?: Level }) {
+  return (
+    <span aria-hidden="true" className={`grid size-6 shrink-0 place-items-center rounded-lg transition-colors duration-500 ${TONE_BADGE[level]}`}>
+      {icon}
+    </span>
+  );
+}
+
 type CardProps = {
   title: ReactNode;
+  /** Drawn in a tinted badge before the title. */
+  icon?: ReactNode;
+  /** Tints the icon badge and the card's edge when the part needs a look. */
+  level?: Level;
   aside?: ReactNode;
   /** Opens the card's sub-tab; the card is then one big button. */
   onOpen?: () => void;
@@ -33,11 +83,12 @@ type CardProps = {
 };
 
 /** The glass card every section of the tab is drawn in. */
-export function Card({ title, aside, onOpen, index = 0, className = "", children }: CardProps) {
+export function Card({ title, icon, level = "ok", aside, onOpen, index = 0, className = "", children }: CardProps) {
   const head = (
     <div className="flex items-start justify-between gap-2">
-      <h3 className="flex min-w-0 items-center gap-1 text-[12px] font-semibold text-fg">
-        {title}
+      <h3 className="flex min-w-0 items-center gap-2 text-[12px] font-semibold text-fg">
+        {icon && <Badge icon={icon} level={level} />}
+        <span className="min-w-0 truncate">{title}</span>
         {onOpen && (
           <span aria-hidden="true" className="text-faint transition-transform group-hover:translate-x-0.5">
             ›
@@ -48,10 +99,11 @@ export function Card({ title, aside, onOpen, index = 0, className = "", children
     </div>
   );
   const style = { "--i": index } as CSSProperties;
-  const base = `wx-glass wx-rise flex min-w-0 flex-col gap-2 p-3 text-left ${className}`;
+  const edge = level === "danger" ? "border-danger/40" : level === "warn" ? "border-warn/35" : "";
+  const base = `wx-glass wx-rise flex min-w-0 flex-col gap-2 p-3 text-left ${edge} ${className}`;
   if (onOpen) {
     return (
-      <button type="button" onClick={onOpen} style={style} className={`group ${base} canto-hit transition-colors hover:border-line/60 hover:bg-hover/40`}>
+      <button type="button" onClick={onOpen} style={style} className={`group ${base} canto-hit canto-raise transition-colors hover:border-line/60 hover:bg-hover/40`}>
         {head}
         {children}
       </button>

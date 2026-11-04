@@ -1,7 +1,9 @@
 import { fixed, minutesLabel, percent } from "../lib/system";
+import CountUp from "./CountUp";
 import type { SystemBattery, SystemSnapshot } from "../lib/systemTypes";
 import { t } from "../i18n";
 import { Card, Meter, Row } from "./SystemBits";
+import { SubIcon } from "./SystemIcons";
 
 function BatteryGlyph({ b }: { b: SystemBattery }) {
   const low = b.percent <= 20 && b.state === "discharging";
@@ -10,7 +12,16 @@ function BatteryGlyph({ b }: { b: SystemBattery }) {
     <svg viewBox="0 0 64 32" className="h-10 w-20 shrink-0" aria-hidden="true">
       <rect x="1.5" y="1.5" width="55" height="29" rx="7" fill="none" stroke="var(--color-line)" strokeWidth="2" />
       <rect x="58" y="10" width="4.5" height="12" rx="2" fill="var(--color-line)" />
-      <rect x="5" y="5" width={Math.max(3, (48 * b.percent) / 100)} height="22" rx="4.5" className="canto-grow-x" fill={low ? "var(--color-danger)" : "var(--color-accent)"} opacity="0.85" />
+      <rect
+        x="5"
+        y="5"
+        width={Math.max(3, (48 * b.percent) / 100)}
+        height="22"
+        rx="4.5"
+        className="canto-grow-x"
+        fill={low ? "var(--color-danger)" : "var(--color-accent)"}
+        opacity="0.85"
+      />
       {plugged && <path d="M31 7l-7 10h6l-2 8 8-11h-6z" fill="var(--color-ink)" stroke="var(--color-fg)" strokeWidth="1.2" strokeLinejoin="round" />}
     </svg>
   );
@@ -21,7 +32,7 @@ export default function SystemPower({ snap }: { snap: SystemSnapshot }) {
   const b = snap.battery;
   if (!b) {
     return (
-      <Card index={0} title={t("system.sub.power")}>
+      <Card index={0} icon={<SubIcon sub="power" />} title={t("system.sub.power")}>
         <p className="text-[11.5px] leading-snug text-muted">{t("system.power.none")}</p>
       </Card>
     );
@@ -30,20 +41,23 @@ export default function SystemPower({ snap }: { snap: SystemSnapshot }) {
   const worn = b.health > 0 && b.health < 80;
   return (
     <div className="flex flex-col gap-2" data-system-power>
-      <section className="wx-glass wx-rise flex flex-col items-center gap-2 p-4">
-        <div className="flex items-center gap-3">
+      <section className="wx-glass wx-rise relative flex flex-col items-center gap-2 overflow-hidden p-4">
+        <span aria-hidden="true" className="pointer-events-none absolute -top-10 left-1/2 size-40 -translate-x-1/2 rounded-full bg-accent/15 blur-3xl" />
+        <div className="relative flex items-center gap-3">
           <BatteryGlyph b={b} />
-          <span className="tabular-nums text-fg">
-            <span className="text-[34px] font-semibold leading-none">{fixed(b.percent)}</span>
+          <span className="relative tabular-nums text-fg">
+            <span className="text-[34px] font-semibold leading-none">
+              <CountUp value={b.percent} format={(n) => fixed(n)} />
+            </span>
             <span className="ml-0.5 text-sm text-muted">%</span>
           </span>
         </div>
-        <span className="rounded-full border border-edge px-2.5 py-0.5 text-[11px] text-muted">
+        <span className="relative rounded-full border border-edge bg-ink/40 px-2.5 py-0.5 text-[11px] text-muted">
           {t(`system.power.state.${b.state}`)}
           {time && ` · ${time}`}
         </span>
       </section>
-      <Card index={1} title={t("system.power.details")}>
+      <Card index={1} icon={<SubIcon sub="power" />} title={t("system.power.details")}>
         <dl>
           {b.rate_w > 0 && <Row label={t("system.power.rate")} value={`${fixed(b.rate_w, 1)} W`} />}
           {b.temp_c !== null && <Row label={t("system.power.temp")} value={`${fixed(b.temp_c)} °C`} />}

@@ -1,4 +1,4 @@
-import type { SystemApp, SystemDisk } from "./systemTypes";
+import type { SystemApp, SystemDisk, SystemSnapshot } from "./systemTypes";
 import { LOCALE } from "../i18n";
 
 const UNITS = ["B", "KB", "MB", "GB", "TB"];
@@ -71,4 +71,45 @@ export function uptimeLabel(secs: number): string {
 
 export function fixed(value: number, digits = 0): string {
   return value.toLocaleString(LOCALE, { minimumFractionDigits: digits, maximumFractionDigits: digits });
+}
+
+export type SystemPart = "cpu" | "cpu_temp" | "memory" | "disk" | "gpu" | "battery";
+export type Issue = { part: SystemPart; level: Exclude<Level, "ok">; value: number };
+
+/** What needs a look right now, worst first: the same marks the cards color in yellow and red. */
+export function issues(snap: SystemSnapshot): Issue[] {
+  const out: Issue[] = [];
+  const push = (part: SystemPart, value: number, lvl: Level) => lvl !== "ok" && out.push({ part, level: lvl, value });
+  push("cpu", snap.cpu.usage, level(snap.cpu.usage, 80, 95));
+  if (snap.cpu.temp_c !== null) push("cpu_temp", snap.cpu.temp_c, level(snap.cpu.temp_c, 85, 95));
+  const mem = percent(snap.memory.used, snap.memory.total);
+  push("memory", mem, level(mem, 90, 95));
+  const disk = systemDisk(snap.disks);
+  if (disk) {
+    const used = percent(disk.total - disk.available, disk.total);
+    push("disk", used, level(used, 90, 95));
+  }
+  const gpu = snap.gpus[0];
+  if (gpu?.usage != null) push("gpu", gpu.usage, level(gpu.usage, 85, 97));
+  const b = snap.battery;
+  if (b && b.state === "discharging") push("battery", b.percent, b.percent <= 10 ? "danger" : b.percent <= 20 ? "warn" : "ok");
+  return out.sort((a, b) => (a.level === b.level ? 0 : a.level === "danger" ? -1 : 1));
+}
+
+/** The worst level among the issues, "ok" with none. */
+export const worst = (list: Issue[]): Level => list[0]?.level ?? "ok";
+
+export type DiskFilter = "all" | "ssd" | "hdd" | "removable";
+
+export function diskKind(d: SystemDisk): Exclude<DiskFilter, "all"> | null {
+  return d.removable ? "removable" : d.ssd === true ? "ssd" : d.ssd === false ? "hdd" : null;
+}
+
+export const filterDisks = (disks: SystemDisk[], by: DiskFilter) => (by === "all" ? disks : disks.filter((d) => diskKind(d) === by));
+
+/** Apps whose name holds the query, ignoring case and accents. */
+export function matchApps(apps: SystemApp[], query: string): SystemApp[] {
+  const fold = (s: string) => s.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+  const q = fold(query.trim());
+  return q ? apps.filter((a) => fold(a.name).includes(q)) : apps;
 }

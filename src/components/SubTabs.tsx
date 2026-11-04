@@ -1,6 +1,6 @@
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 
-type Tab<K extends string> = { key: K; label: string; badge?: number; tone?: "hot" | "info" };
+type Tab<K extends string> = { key: K; label: string; badge?: number; tone?: "hot" | "info"; icon?: ReactNode };
 type Props<K extends string> = {
   label: string;
   tabs: Tab<K>[];
@@ -8,6 +8,8 @@ type Props<K extends string> = {
   onChange: (key: K) => void;
   /** Tighter padding, for a switch with many short labels (Sistema has seven). */
   dense?: boolean;
+  /** Tabs with an icon show only it until selected; the label stays the tab's name for readers and tooltips. */
+  iconsOnly?: boolean;
 };
 
 const STEP: Record<string, (i: number, n: number) => number> = {
@@ -21,10 +23,13 @@ const STEP: Record<string, (i: number, n: number) => number> = {
  * The small segmented switch under a tab's header (Status API, GitHub, GitLab, Steam). WAI-ARIA tabs like TabBar:
  * one Tab stop on the selected tab, arrows/Home/End move and select.
  */
-export default function SubTabs<K extends string>({ label, tabs, value, onChange, dense = false }: Props<K>) {
+export default function SubTabs<K extends string>({ label, tabs, value, onChange, dense = false, iconsOnly = false }: Props<K>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   // An unknown value would leave no Tab stop at all: the first tab takes it instead.
-  const stop = Math.max(0, tabs.findIndex((s) => s.key === value));
+  const stop = Math.max(
+    0,
+    tabs.findIndex((s) => s.key === value),
+  );
 
   function onKeyDown(e: React.KeyboardEvent) {
     const step = STEP[e.key];
@@ -53,9 +58,19 @@ export default function SubTabs<K extends string>({ label, tabs, value, onChange
           aria-selected={value === s.key}
           tabIndex={i === stop ? 0 : -1}
           onClick={() => onChange(s.key)}
+          title={iconsOnly && s.icon ? s.label : undefined}
           className={`canto-hit min-h-7 shrink-0 whitespace-nowrap rounded-lg ${dense ? "flex-auto px-2" : "px-3"} transition-colors ${value === s.key ? "bg-raised font-semibold text-accent-text shadow-[var(--shadow-raised)]" : "text-muted hover:bg-hover hover:text-fg active:bg-active"}`}
         >
-          {s.label}
+          {s.icon ? (
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className={`inline-grid transition-transform ${value === s.key ? "scale-110" : ""}`}>
+                {s.icon}
+              </span>
+              <span className={iconsOnly && value !== s.key ? "sr-only" : "canto-fade"}>{s.label}</span>
+            </span>
+          ) : (
+            s.label
+          )}
           {!!s.badge && (
             <span
               aria-hidden="true"

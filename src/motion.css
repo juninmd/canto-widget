@@ -201,6 +201,17 @@
     transform-origin: top;
     animation: canto-unfold 240ms var(--ease-entrar) backwards;
   }
+  /* Sistema: o arco do medidor varre do zero ao entrar e segue cada leitura; o cartao clicavel sobe um pouco. */
+  .canto-ring {
+    transition: stroke-dashoffset 700ms var(--ease-entrar), stroke 400ms linear;
+    animation: canto-ring 900ms var(--ease-entrar) calc(var(--i, 0) * 70ms) backwards;
+  }
+  .canto-raise {
+    transition: transform 200ms var(--ease-entrar), background-color 200ms var(--ease-entrar), border-color 200ms linear;
+  }
+  .canto-raise:hover {
+    transform: translateY(-2px);
+  }
   .canto-lift {
     transition: transform 200ms var(--ease-entrar), background-color 200ms var(--ease-entrar);
   }
@@ -423,5 +434,10 @@
   from {
     opacity: 0;
     transform: scaleY(0.85) translateY(-4px);
+  }
+}
+@keyframes canto-ring {
+  from {
+    stroke-dashoffset: 100;
   }
 }
