@@ -3,10 +3,13 @@ export const WINDOW_SHOWN_EVENT = "canto://window-shown";
 
 /** Whether the main window is on screen. WebView2 keeps `document.hidden` false after `hide()`, so this is tracked by hand. */
 let shown = true;
+/** Set once the shell says "hidden"/"shown" or the UI hides: the late `isVisible` answer must not undo it. */
+let authoritative = false;
 const subscribers = new Set<() => void>();
 let wired = false;
 
 export function setWindowShown(next: boolean) {
+  authoritative = true;
   if (shown === next) return;
   shown = next;
   for (const run of subscribers) run();
@@ -27,6 +30,13 @@ function wire() {
   // Loaded lazily so a tab that only reads visibility pulls no Tauri module; outside Tauri the DOM still applies.
   void import("@tauri-apps/api/event")
     .then(({ listen }) => listen<boolean>(WINDOW_SHOWN_EVENT, (e) => setWindowShown(e.payload !== false)))
+    .catch(() => {});
+  // The alert pop-up starts hidden and never sees a "shown" event, so ask the shell instead of assuming.
+  void import("@tauri-apps/api/window")
+    .then(({ getCurrentWindow }) => getCurrentWindow().isVisible())
+    .then((visible) => {
+      if (!authoritative) setWindowShown(visible);
+    })
     .catch(() => {});
 }
 

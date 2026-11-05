@@ -189,6 +189,8 @@ pub fn resize_alert(app: &tauri::AppHandle, height: f64) -> tauri::Result<()> {
 fn hide_alert_window(app: &tauri::AppHandle) {
     if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
         let _ = win.hide();
+        // The pop-up's webview keeps animating while hidden (WebView2 still reports the page as visible).
+        let _ = win.emit_to(win.label(), SHOWN_EVENT, false);
     }
 }
 
@@ -204,6 +206,7 @@ fn present_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
             anchor_bottom_right(&win)?;
             win.show()?;
         }
+        let _ = win.emit_to(win.label(), SHOWN_EVENT, true);
     }
     app.emit(ALERT_EVENT, ())?;
     Ok(())
@@ -297,5 +300,16 @@ mod tests {
         assert_eq!(alert["visible"], false, "hidden until an alert rings");
         let caps = include_str!("../capabilities/default.json");
         assert!(caps.contains("\"alert\""), "the pop-up needs the IPC permissions");
+    }
+
+    #[test]
+    fn the_popup_animation_follows_its_own_window() {
+        // WebView2 keeps the alert page "visible" after hide(), so a hidden pop-up would animate for hours.
+        let src = include_str!("window.rs").replace('\r', "");
+        let hidden = &src[src.find("fn hide_alert_window(").unwrap()..];
+        let hidden = &hidden[..hidden.find("\n}\n").unwrap()];
+        assert!(hidden.contains("SHOWN_EVENT"), "a hidden pop-up must be told to stop its animation");
+        let shown = &src[src.find("fn present_alert(").unwrap()..src.find("#[cfg(test)]").unwrap()];
+        assert!(shown.contains("SHOWN_EVENT, true"), "a shown pop-up must resume its animation");
     }
 }

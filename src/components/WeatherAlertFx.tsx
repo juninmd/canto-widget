@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { weatherAlertKind, type WeatherFxKind } from "../lib/weatherFx";
+import { subscribeWindowShown, windowShown } from "../lib/windowShown";
 
 type Particle = { x: number; y: number; v: number; r: number; a: number; s: number };
 
@@ -232,16 +233,16 @@ export default function WeatherAlertFx({ id, severe }: { id: string; severe: boo
       }
       raf = requestAnimationFrame(frame);
     };
-    const pause = () => {
+    const restart = () => {
       cancelAnimationFrame(raf);
-      if (!document.hidden) frame();
+      if (windowShown()) frame();
     };
-    document.addEventListener("visibilitychange", pause);
+    const stopWatching = subscribeWindowShown(restart);
     frame();
     return () => {
+      stopWatching();
       cancelAnimationFrame(raf);
       observer?.disconnect();
-      document.removeEventListener("visibilitychange", pause);
     };
   }, [kind, severe]);
 

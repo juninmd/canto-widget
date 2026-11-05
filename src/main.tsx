@@ -8,12 +8,20 @@ import { IS_MOBILE } from "./lib/platform";
 import { syncPrefs } from "./lib/prefsMirror";
 import { RTL_LANGUAGES } from "./i18n/languages";
 import { loadWindowRoot, windowKind } from "./lib/windowRoot";
+import { subscribeWindowShown, windowShown } from "./lib/windowShown";
 import "./styles.css";
 
 document.documentElement.lang = LANGUAGE;
 // Styles keyed on this reach the page behind the safe areas, which no component owns.
 if (IS_MOBILE) document.documentElement.dataset.mobile = "";
 document.documentElement.dir = RTL_LANGUAGES.includes(LANGUAGE) ? "rtl" : "ltr";
+// WebView2 keeps the page "visible" after `hide()`, so the shell flag is what stops the endless CSS animations.
+const paintMotion = () => {
+  if (windowShown()) delete document.documentElement.dataset.windowHidden;
+  else document.documentElement.dataset.windowHidden = "";
+};
+paintMotion();
+subscribeWindowShown(paintMotion);
 applySkin(loadSkin());
 applyDensity(loadDensity());
 // Stays at boot, not in the picker: the system theme can change with Settings closed.
