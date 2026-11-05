@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Widget escondido para de animar**: o céu do Clima, o fundo animado do pop-up de avisos e as animações
+  infinitas das abas param assim que a janela vai para a bandeja ou o pop-up se fecha. O WebView2 continua
+  dizendo que a página está visível depois de `hide()`, então o céu seguia desenhando a 60 fps atrás da janela
+  escondida (CPU e GPU em cima, janela translúcida recomposta à toa) e o aviso pendente animava por horas num
+  pop-up invisível.
+
 - **Aba Clipboard gasta bem menos CPU parada**: a checagem a cada 2,5 s agora só lê um carimbo do arquivo
   (~1 µs) e só decifra e recarrega o histórico quando algo foi copiado; antes refazia leitura, AES-GCM e JSON
   do histórico inteiro (~2 ms com 1,3 MB) e o envio da lista ao app 24 vezes por minuto.

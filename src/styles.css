@@ -495,3 +495,10 @@ html[data-mobile] body {
 html[data-mobile] :is(input, textarea, select) {
   font-size: 16px;
 }
+
+/* Janela escondida na bandeja: o WebView2 segue "visivel" e as animacoes infinitas queimariam CPU atras dela. */
+html[data-window-hidden] *,
+html[data-window-hidden] *::before,
+html[data-window-hidden] *::after {
+  animation-play-state: paused !important;
+}

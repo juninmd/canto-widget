@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { WeatherCondition } from "../lib/api";
 import { Sky } from "../lib/sky";
+import { subscribeWindowShown, windowShown } from "../lib/windowShown";
 
 const moving = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: no-preference)").matches;
 
@@ -24,7 +25,7 @@ export default function WeatherSky({ condition, night }: { condition: WeatherCon
     };
     const start = () => {
       cancelAnimationFrame(frame);
-      if (moving() && !document.hidden) frame = requestAnimationFrame(loop);
+      if (moving() && windowShown()) frame = requestAnimationFrame(loop);
       else sky.draw(performance.now(), true);
     };
     const fit = () => {
@@ -36,11 +37,11 @@ export default function WeatherSky({ condition, night }: { condition: WeatherCon
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(fit);
     observer?.observe(el);
     fit();
-    document.addEventListener("visibilitychange", start);
+    const stopWatching = subscribeWindowShown(start);
     return () => {
+      stopWatching();
       cancelAnimationFrame(frame);
       observer?.disconnect();
-      document.removeEventListener("visibilitychange", start);
     };
   }, [condition, night]);
 

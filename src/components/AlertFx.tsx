@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { TONE_RGB, type FxScene } from "../lib/alertFx";
 import type { Tone } from "../lib/alerts";
+import { subscribeWindowShown, windowShown } from "../lib/windowShown";
 
 type P = { x: number; y: number; v: number; r: number; a: number; s: number };
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
@@ -181,16 +182,16 @@ export default function AlertFx({ scene, tone, intense }: { scene: FxScene; tone
       draw[scene]({ ctx, w, h, t, p, rgb: TONE_RGB[tone], hot: intense });
       raf = requestAnimationFrame(frame);
     };
-    const visibility = () => {
+    const restart = () => {
       cancelAnimationFrame(raf);
-      if (!document.hidden) frame();
+      if (windowShown()) frame();
     };
-    document.addEventListener("visibilitychange", visibility);
+    const stopWatching = subscribeWindowShown(restart);
     frame();
     return () => {
+      stopWatching();
       cancelAnimationFrame(raf);
       observer?.disconnect();
-      document.removeEventListener("visibilitychange", visibility);
     };
   }, [scene, tone, intense]);
 

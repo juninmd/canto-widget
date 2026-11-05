@@ -3,6 +3,7 @@ import { afterEach, expect, mock, test } from "bun:test";
 let hides = 0;
 mock.module("@tauri-apps/api/window", () => ({
   getCurrentWindow: () => ({
+    isVisible: () => Promise.resolve(true),
     hide: () => {
       hides += 1;
       return Promise.resolve();
