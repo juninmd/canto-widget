@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { weatherAlertKind, type WeatherFxKind } from "../lib/weatherFx";
 import { subscribeWindowShown, windowShown } from "../lib/windowShown";
+import { canvasDpr } from "../lib/canvasDpr";
 
 type Particle = { x: number; y: number; v: number; r: number; a: number; s: number };
 
@@ -17,7 +18,7 @@ export default function WeatherAlertFx({ id, severe }: { id: string; severe: boo
     const ctx = cv?.getContext?.("2d");
     if (!cv || !ctx || typeof requestAnimationFrame === "undefined") return;
     if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = canvasDpr(window.devicePixelRatio || 1);
     let w = 0;
     let h = 0;
     const size = () => {

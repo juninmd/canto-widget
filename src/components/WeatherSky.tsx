@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { WeatherCondition } from "../lib/api";
 import { Sky } from "../lib/sky";
 import { subscribeWindowShown, windowShown } from "../lib/windowShown";
+import { canvasDpr } from "../lib/canvasDpr";
 
 const moving = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: no-preference)").matches;
 
@@ -30,7 +31,7 @@ export default function WeatherSky({ condition, night }: { condition: WeatherCon
     };
     const fit = () => {
       const box = el.getBoundingClientRect();
-      sky.resize(box.width, box.height, Math.min(2, window.devicePixelRatio || 1));
+      sky.resize(box.width, box.height, canvasDpr(window.devicePixelRatio || 1));
       sky.set(condition, night);
       start();
     };

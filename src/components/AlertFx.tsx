@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { TONE_RGB, type FxScene } from "../lib/alertFx";
 import type { Tone } from "../lib/alerts";
 import { subscribeWindowShown, windowShown } from "../lib/windowShown";
+import { canvasDpr } from "../lib/canvasDpr";
 
 type P = { x: number; y: number; v: number; r: number; a: number; s: number };
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
@@ -160,7 +161,7 @@ export default function AlertFx({ scene, tone, intense }: { scene: FxScene; tone
     const ctx = cv?.getContext?.("2d");
     if (!cv || !ctx || typeof requestAnimationFrame === "undefined") return;
     if (typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = canvasDpr(window.devicePixelRatio || 1);
     let w = 0;
     let h = 0;
     const size = () => {
