@@ -84,6 +84,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   segurando o lock da sessão, então qualquer leitura ou gravação esperava por ela. A senha agora é copiada para fora
   do lock antes da derivação: uma leitura concorrente caiu de **535 ms para 32 µs** enquanto o backup abre.
 
+- **Canvases dos avisos gastam até 75% menos VRAM em tela retina/4K**: o fundo animado do aviso e o do aviso de
+  clima usavam o `devicePixelRatio` sem teto; num monitor 3× o canvas de 420×380 virava 1,44 milhão de pixels
+  (5,5 MB) e num 4× 2,55 milhões (9,7 MB). Agora os três canvases dividem o mesmo teto de 2× já usado pelo céu do
+  Clima: o mesmo aviso fica em 638 mil pixels (2,4 MB), com a mesma aparência.
+
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
