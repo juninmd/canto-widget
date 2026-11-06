@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Contador de palavras encontra números em qualquer plataforma**: "são 24 h" voltou a contar 3 palavras mesmo
+  quando o ICU da máquina não marca números como palavras; a contagem do editor agora é igual no Windows e no
+  Linux, sem custo no caminho normal.
+
 - **Tarefa só com prioridade não vira "!alta"**: digitar apenas `!alta` na captura rápida ou na lista criava uma
   tarefa chamada "!alta" e jogava a prioridade fora. Agora o campo pede um título, mantém o texto digitado e não
   cria nada.
