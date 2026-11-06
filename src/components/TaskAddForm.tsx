@@ -36,6 +36,8 @@ export default function TaskAddForm({ today, reload, onError }: Props) {
   /** Creates one quick-add line; null when it all landed, else the error to show. */
   async function create(raw: string): Promise<string | null> {
     const quick = parseQuickTask(raw);
+    // A line with only "!alta" has no title: throw so the batch puts it back in the field for the user to fix.
+    if (!quick.title.trim()) throw new Error(t("tasks.renameEmpty"));
     const created = await api.taskAdd(quick.title, today);
     try {
       if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
