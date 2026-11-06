@@ -18,16 +18,24 @@ pub fn fold(s: &str) -> String {
 }
 
 /// `needle_folded` must already be folded: callers fold the query once, not once per item.
-/// Plain ASCII on both sides (most notes and clips) is compared in place, without allocating a folded copy.
+/// An ASCII hit is checked in place first, even in non-ASCII text: folding is only needed when that miss could
+/// still be hiding accents ("reuniao" for "reunião"), so most searches never allocate a folded copy.
 pub fn contains(haystack: &str, needle_folded: &str) -> bool {
     if needle_folded.is_empty() {
         return true;
     }
-    if haystack.is_ascii() && needle_folded.is_ascii() {
-        let needle = needle_folded.as_bytes();
-        return haystack.as_bytes().windows(needle.len()).any(|w| w.eq_ignore_ascii_case(needle));
+    if needle_folded.is_ascii() && in_place(haystack, needle_folded) {
+        return true;
+    }
+    if haystack.is_ascii() {
+        return false;
     }
     fold(haystack).contains(needle_folded)
+}
+
+fn in_place(haystack: &str, needle: &str) -> bool {
+    let (hay, need) = (haystack.as_bytes(), needle.as_bytes());
+    need.len() <= hay.len() && hay.windows(need.len()).any(|w| w.eq_ignore_ascii_case(need))
 }
 
 fn base(c: char) -> Option<char> {
@@ -89,5 +97,13 @@ mod tests {
         assert!(contains("Comprar LEITE", &fold("leite")));
         assert!(!contains("lei", &fold("leite")));
         assert!(contains("qualquer", ""));
+    }
+
+    #[test]
+    fn an_ascii_query_hits_accented_text_without_folding_it() {
+        // The in-place path finds the ASCII substring; the miss still falls back to the fold ("reuniao").
+        assert!(contains("Reunião de planejamento com o time", &fold("planejamento")));
+        assert!(contains("Reunião de planejamento com o time", &fold("reuniao")));
+        assert!(!contains("Reunião de planejamento com o time", &fold("orçamento")));
     }
 }
