@@ -48,6 +48,7 @@ describe("parseQuickTask", () => {
   test("an exclamation that is not a priority stays in the title", () => {
     expect(parseQuickTask("Comemorar!!")).toEqual({ title: "Comemorar!!", time: null });
     expect(parseQuickTask("Ler !importante")).toEqual({ title: "Ler !importante", time: null });
-    expect(parseQuickTask("!alta")).toEqual({ title: "!alta", time: null });
+    // A priority token with nothing else is not a title; the caller asks for one instead of saving "!alta".
+    expect(parseQuickTask("!alta")).toEqual({ title: "", time: null, priority: "high" });
   });
 });

@@ -99,11 +99,27 @@ const meetingIn = (minutes: number) => ({
   link: "",
 });
 
+/** The one test that needs real timers (module loading is I/O, not a mocked timer). */
+let realTimers = false;
+
 /** Lets React settle command promises before continuing. */
 async function settle() {
   for (let i = 0; i < 5; i++) {
     await act(async () => {
       await Promise.resolve();
+    });
+  }
+}
+
+/** Polls a real timer: a lazy chunk load can take longer than any fixed number of microtasks. */
+async function waitFor<T>(read: () => T | null, timeoutMs = 3_000): Promise<T> {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const value = read();
+    if (value) return value;
+    if (Date.now() > deadline) throw new Error("o elemento não apareceu dentro do tempo");
+    await act(async () => {
+      await new Promise((done) => setTimeout(done, 10));
     });
   }
 }
@@ -119,15 +135,18 @@ beforeEach(() => {
   fullscreenOn = false;
   hidden = false;
   localStorage.clear();
+  realTimers = false;
   // Before render: the alert clock is created when App mounts.
   jest.useFakeTimers();
 });
 
 afterEach(() => {
   cleanup();
-  // The note editor tears down on a timer; left pending under fake timers it stalls later files' waitFor.
-  jest.runOnlyPendingTimers();
-  jest.useRealTimers();
+  if (!realTimers) {
+    // The note editor tears down on a timer; left pending under fake timers it stalls later files' waitFor.
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  }
 });
 
 test("warns of the meeting with the user on the tasks tab", async () => {
@@ -254,11 +273,13 @@ test("the pop-up asks the widget to open a tab", async () => {
 });
 
 test("a tab loaded on demand renders its content and drops the placeholder", async () => {
+  realTimers = true;
+  jest.useRealTimers();
   render(<App />);
   await settle();
   await act(async () => listeners["canto://open-tab"]({ payload: "settings" }));
-  for (let i = 0; i < 20 && !screen.queryByLabelText("buscar ajuste"); i++) await settle();
-  expect(screen.getByLabelText("buscar ajuste")).toBeTruthy();
+  const search = await waitFor(() => screen.queryByLabelText("buscar ajuste"));
+  expect(search).toBeTruthy();
   expect(screen.queryByRole("status", { name: "Ajustes" }) === null).toBe(true);
 });
 

@@ -7,6 +7,14 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Contador de palavras encontra números em qualquer plataforma**: "são 24 h" voltou a contar 3 palavras mesmo
+  quando o ICU da máquina não marca números como palavras; a contagem do editor agora é igual no Windows e no
+  Linux, sem custo no caminho normal.
+
+- **Tarefa só com prioridade não vira "!alta"**: digitar apenas `!alta` na captura rápida ou na lista criava uma
+  tarefa chamada "!alta" e jogava a prioridade fora. Agora o campo pede um título, mantém o texto digitado e não
+  cria nada.
+
 - **Widget escondido para de animar**: o céu do Clima, o fundo animado do pop-up de avisos e as animações
   infinitas das abas param assim que a janela vai para a bandeja ou o pop-up se fecha. O WebView2 continua
   dizendo que a página está visível depois de `hide()`, então o céu seguia desenhando a 60 fps atrás da janela
@@ -61,6 +69,20 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   "reduzir movimento" do sistema e pausa com a janela oculta.
 
 ### Desempenho
+
+- **Build do frontend ~10× mais rápido**: o Tailwind varria os ~1,8 MB de READMEs traduzidos e o CHANGELOG atrás
+  de classes que só existem em `src/` e `index.html`. Com as fontes declaradas explicitamente, o `vite build` caiu
+  de 162 s para 16 s neste Windows, e o CSS final só perdeu duas classes mortas (`shadow` e `!visible`, que nenhuma
+  tela usa).
+
+- **Busca de notas ~40× mais rápida quando o termo está no texto**: a busca comparava cada nota dobrando acentos de
+  todo o corpo (~11 MB no cofre de 5 mil notas) mesmo quando o termo ASCII estava lá. Agora tenta primeiro a
+  comparação no lugar e só dobra o texto quando pode haver acento escondendo a palavra; "planejamento" caiu de
+  75,5 ms para 1,9 ms, e termos ausentes mantêm o mesmo tempo e o mesmo resultado.
+
+- **Importar backup não congela mais as outras telas**: abrir um `.canto` deriva a chave com Argon2id (~200–500 ms)
+  segurando o lock da sessão, então qualquer leitura ou gravação esperava por ela. A senha agora é copiada para fora
+  do lock antes da derivação: uma leitura concorrente caiu de **535 ms para 32 µs** enquanto o backup abre.
 
 - **Canvases dos avisos gastam até 75% menos VRAM em tela retina/4K**: o fundo animado do aviso e o do aviso de
   clima usavam o `devicePixelRatio` sem teto; num monitor 3× o canvas de 420×380 virava 1,44 milhão de pixels

@@ -125,6 +125,38 @@ fn mutate_releases_the_session_lock_before_the_slow_synced_folder_write() {
     let _ = std::fs::remove_dir_all(&pasta);
 }
 
+/// Regression for the backup import: the envelope has its own salt, so the key is derived again with Argon2id.
+/// That must not run under the session lock, or every read/mutation waits for it.
+#[test]
+fn opening_a_backup_does_not_hold_the_session_lock_while_the_key_is_derived() {
+    let st = Arc::new(state("abre-backup-lock"));
+    st.create("senha-mestra").unwrap();
+    let salt = store::new_salt();
+    let key = VaultKey::derive("senha-mestra", &salt).unwrap();
+    let plain = serde_json::to_vec(&VaultData::default()).unwrap();
+    let blob = SealedBlob::seal(&key, &salt, &plain, VAULT_AAD, now_ms()).unwrap();
+
+    let _delay = test_hooks::slow_derive(200);
+    let worker = {
+        let st = st.clone();
+        std::thread::spawn(move || st.open_envelope(&blob).map(|d| d.tasks.len()))
+    };
+    // Long enough for the worker to be inside the derivation.
+    std::thread::sleep(std::time::Duration::from_millis(50));
+
+    let started = std::time::Instant::now();
+    st.read(|d| d.tasks.len()).unwrap();
+    let elapsed = started.elapsed();
+    worker.join().unwrap().unwrap();
+
+    println!("read() durante open_envelope: {elapsed:?} (derivacao de 200 ms)");
+    assert!(
+        elapsed < std::time::Duration::from_millis(100),
+        "read() esperou {elapsed:?} pelo lock: a derivacao da chave do backup ainda o segura"
+    );
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
 #[test]
 fn failed_persist_leaves_memory_as_it_was_on_disk() {
     let st = state("persist-falha");
