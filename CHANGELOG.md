@@ -75,6 +75,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   de 162 s para 16 s neste Windows, e o CSS final só perdeu duas classes mortas (`shadow` e `!visible`, que nenhuma
   tela usa).
 
+- **Busca de notas ~40× mais rápida quando o termo está no texto**: a busca comparava cada nota dobrando acentos de
+  todo o corpo (~11 MB no cofre de 5 mil notas) mesmo quando o termo ASCII estava lá. Agora tenta primeiro a
+  comparação no lugar e só dobra o texto quando pode haver acento escondendo a palavra; "planejamento" caiu de
+  75,5 ms para 1,9 ms, e termos ausentes mantêm o mesmo tempo e o mesmo resultado.
+
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
