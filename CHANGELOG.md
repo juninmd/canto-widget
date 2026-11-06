@@ -62,6 +62,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Importar backup não congela mais as outras telas**: abrir um `.canto` deriva a chave com Argon2id (~200–500 ms)
+  segurando o lock da sessão, então qualquer leitura ou gravação esperava por ela. A senha agora é copiada para fora
+  do lock antes da derivação: uma leitura concorrente caiu de **535 ms para 32 µs** enquanto o backup abre.
+
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.

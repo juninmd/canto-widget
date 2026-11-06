@@ -251,9 +251,12 @@ impl AppState {
 
     /// Uses the envelope's own salt, not the session's: a backup made on another machine has its own salt.
     pub fn open_envelope(&self, blob: &SealedBlob) -> Result<VaultData> {
-        let guard = self.session.lock_safe();
-        let session = guard.as_ref().ok_or(AppError::Locked)?;
-        let key = VaultKey::derive(&session.password, &blob.salt_bytes()?)?;
+        // Argon2id takes hundreds of ms; copying the password out of the lock first keeps every other command
+        // responsive while the backup key is derived.
+        let password = self.session_password()?;
+        #[cfg(test)]
+        test_hooks::delay_before_derive();
+        let key = VaultKey::derive(&password, &blob.salt_bytes()?)?;
         let plain = blob.open(&key, VAULT_AAD).map_err(|e| match e {
             AppError::WrongPassword => AppError::Config("o backup foi criado com outra senha mestra".into()),
             other => other,
@@ -270,6 +273,7 @@ mod test_hooks {
     use std::sync::atomic::{AtomicU64, Ordering};
 
     static DELAY_MS: AtomicU64 = AtomicU64::new(0);
+    static DERIVE_DELAY_MS: AtomicU64 = AtomicU64::new(0);
 
     pub(super) struct SlowSync;
 
@@ -279,13 +283,33 @@ mod test_hooks {
         }
     }
 
+    pub(super) struct SlowDerive;
+
+    impl Drop for SlowDerive {
+        fn drop(&mut self) {
+            DERIVE_DELAY_MS.store(0, Ordering::SeqCst);
+        }
+    }
+
     pub(super) fn slow_sync(ms: u64) -> SlowSync {
         DELAY_MS.store(ms, Ordering::SeqCst);
         SlowSync
     }
 
+    pub(super) fn slow_derive(ms: u64) -> SlowDerive {
+        DERIVE_DELAY_MS.store(ms, Ordering::SeqCst);
+        SlowDerive
+    }
+
     pub(super) fn delay_before_sync() {
         let ms = DELAY_MS.load(Ordering::SeqCst);
+        if ms > 0 {
+            std::thread::sleep(std::time::Duration::from_millis(ms));
+        }
+    }
+
+    pub(super) fn delay_before_derive() {
+        let ms = DERIVE_DELAY_MS.load(Ordering::SeqCst);
         if ms > 0 {
             std::thread::sleep(std::time::Duration::from_millis(ms));
         }
