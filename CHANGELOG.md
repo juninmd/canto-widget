@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Tarefa só com prioridade não vira "!alta"**: digitar apenas `!alta` na captura rápida ou na lista criava uma
+  tarefa chamada "!alta" e jogava a prioridade fora. Agora o campo pede um título, mantém o texto digitado e não
+  cria nada.
+
 - **Widget escondido para de animar**: o céu do Clima, o fundo animado do pop-up de avisos e as animações
   infinitas das abas param assim que a janela vai para a bandeja ou o pop-up se fecha. O WebView2 continua
   dizendo que a página está visível depois de `hide()`, então o céu seguia desenhando a 60 fps atrás da janela

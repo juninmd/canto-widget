@@ -31,6 +31,12 @@ export default function CaptureWindow() {
   async function save(asNote: boolean) {
     const raw = text.trim();
     if (!raw || busy.current) return;
+    const quick = parseQuickTask(raw);
+    // "!alta" alone carries no title; saving it would create a task named "!alta" with no priority.
+    if (!asNote && !quick.title.trim()) {
+      setError(t("tasks.renameEmpty"));
+      return;
+    }
     busy.current = true;
     setSaving(asNote ? "note" : "task");
     setError("");
@@ -39,7 +45,6 @@ export default function CaptureWindow() {
         await api.noteSave({ title: raw, body: "", tags: [] });
       } else {
         // Same quick-add syntax as the task list: "Daily às 9h30 !alta" sets the time and priority too.
-        const quick = parseQuickTask(raw);
         const created = await api.taskAdd(quick.title, todayLocal());
         // Cleared before the rest: a failed time or priority must not leave the text to be saved twice.
         setText("");

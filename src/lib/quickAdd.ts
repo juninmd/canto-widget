@@ -26,7 +26,8 @@ export function takePriority(input: string): { rest: string; priority?: Priority
 export function parseQuickTask(raw: string): QuickTask {
   const { rest, priority } = takePriority(raw);
   const parsed = parseTime(rest);
-  return priority && parsed.title ? { ...parsed, priority } : priority ? { title: raw.trim(), time: null } : parsed;
+  // "!alta" alone leaves an empty title on purpose: the caller must ask for one instead of saving "!alta".
+  return priority ? { ...parsed, priority } : parsed;
 }
 
 function parseTime(input: string): QuickTask {
