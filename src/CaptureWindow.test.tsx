@@ -79,6 +79,14 @@ test("an empty field saves nothing", async () => {
   expect(calls).toEqual([]);
 });
 
+test("a line with only a priority asks for a title instead of saving '!alta'", async () => {
+  fireEvent.change(input(), { target: { value: "!alta" } });
+  await press({ key: "Enter" });
+  expect(cmds()).not.toContain("task_add");
+  expect(input().value).toBe("!alta");
+  expect(screen.getByRole("alert").textContent).toContain("não pode ficar vazio");
+});
+
 test("Esc closes without saving", async () => {
   fireEvent.change(input(), { target: { value: "rascunho" } });
   await press({ key: "Escape" });
