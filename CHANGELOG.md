@@ -62,6 +62,11 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Build do frontend ~10× mais rápido**: o Tailwind varria os ~1,8 MB de READMEs traduzidos e o CHANGELOG atrás
+  de classes que só existem em `src/` e `index.html`. Com as fontes declaradas explicitamente, o `vite build` caiu
+  de 162 s para 16 s neste Windows, e o CSS final só perdeu duas classes mortas (`shadow` e `!visible`, que nenhuma
+  tela usa).
+
 - **Edição que não muda nada não reescreve o cofre**: salvar uma tarefa sem alterar nada, ou o cronômetro de
   foco devolver os mesmos segundos, re-selava o cofre inteiro (~120 ms com 22 MB) e congelava a janela. Agora o
   dado é comparado com o que já está em memória e o arquivo só é reescrito quando muda de verdade.
