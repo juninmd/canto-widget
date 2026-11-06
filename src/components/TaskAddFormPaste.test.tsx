@@ -68,6 +68,14 @@ test("pasting a list into the empty field creates one task per line, with its ti
   expect(field.value).toBe("");
 });
 
+test("a line with only a priority asks for a title and creates nothing", async () => {
+  const field = mount();
+  await paste(field, "!alta\ncomprar leite");
+  expect(added()).toEqual([]);
+  expect(errors).toEqual(["o título não pode ficar vazio"]);
+  expect(field.value).toBe("!alta");
+});
+
 test("a single line, or a paste into a field already being typed, is left to the input", async () => {
   const field = mount();
   await paste(field, "só uma linha");
