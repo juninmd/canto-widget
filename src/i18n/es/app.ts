@@ -310,6 +310,7 @@ export const app: Record<keyof typeof source, string> = {
   "common.offline": "sin conexión",
   "common.offlineStale": "Sin conexión. Mostrando los últimos datos guardados.",
   "common.loadFailed": "No se pudo cargar. {error}",
+  "common.crashed": "Algo salió mal en esta ventana.",
   "common.staleFailed": "No se pudo actualizar. Mostrando los datos de {time}. {error}",
   "capture.title": "captura rápida",
   "capture.placeholder": "¿qué quieres recordar?",

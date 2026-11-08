@@ -305,6 +305,7 @@ export const app = {
   "common.offline": "sem conexão",
   "common.offlineStale": "Sem conexão. Mostrando os últimos dados salvos.",
   "common.loadFailed": "Não foi possível carregar. {error}",
+  "common.crashed": "Algo deu errado nesta janela.",
   "common.staleFailed": "Não foi possível atualizar. Mostrando os dados de {time}. {error}",
   "capture.title": "captura rápida",
   "capture.placeholder": "o que você quer lembrar?",

@@ -3,24 +3,28 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { t } from "../i18n";
 
 type Props = { children: ReactNode };
-type State = { error: string | null };
+type State = { failed: boolean };
 
 /**
  * Every Canto window is transparent and always on top: a render error would unmount everything and leave an
  * invisible window that still swallows clicks, so a crash draws a solid panel the user can reload or hide.
  */
 export default class WindowBoundary extends Component<Props, State> {
-  state: State = { error: null };
+  state: State = { failed: false };
 
-  static getDerivedStateFromError(error: unknown): State {
-    return { error: error instanceof Error ? error.message : String(error) };
+  static getDerivedStateFromError(): State {
+    return { failed: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.error(error);
   }
 
   render() {
-    if (this.state.error === null) return this.props.children;
+    if (!this.state.failed) return this.props.children;
     return (
       <div role="alert" className="flex h-screen flex-col justify-center gap-3 rounded-2xl border border-edge bg-panel p-4 text-fg">
-        <p className="text-sm">{t("common.loadFailed", { error: this.state.error })}</p>
+        <p className="text-sm">{t("common.crashed")}</p>
         <div className="flex gap-2">
           <button
             type="button"

@@ -28,7 +28,7 @@ export default function SystemDisk({ snap }: { snap: SystemSnapshot }) {
           level={level(used, 90, 95)}
           title={
             <>
-              {t("system.sub.disk")} <span className="font-normal text-muted">{main.system ? t("system.disk.system") : main.mount}</span>
+              {t("system.sub.disk")} <span className="font-normal text-muted">{main.system ? t("system.disk.systemTag") : main.mount}</span>
             </>
           }
           aside={<Big value={fixed(used)} unit="%" level={level(used, 90, 95)} />}

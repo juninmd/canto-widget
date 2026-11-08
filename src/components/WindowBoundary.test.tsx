@@ -27,7 +27,8 @@ test("a render error leaves a solid panel instead of an invisible window that ea
     </WindowBoundary>,
   );
   quiet.mockRestore();
-  expect(screen.getByRole("alert").textContent).toContain("Não foi possível carregar. aba quebrou");
+  expect(screen.getByRole("alert").textContent).toContain("Algo deu errado nesta janela.");
+  expect(screen.getByRole("alert").textContent).not.toContain("aba quebrou");
   fireEvent.click(screen.getByRole("button", { name: "fechar" }));
   expect(hidden).toBe(1);
   expect(screen.getByRole("button", { name: "tentar de novo" })).toBeTruthy();

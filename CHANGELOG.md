@@ -7,6 +7,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Janela com erro não mostra o erro técnico**: uma falha de renderização exibia a mensagem crua do motor (ex.: "Cannot read properties of null") no painel em português. Agora mostra um texto simples e o erro vai para o console.
+
+- **"Disco do sistema" sem repetição**: o painel de disco mostrava "Disco disco do sistema"; agora mostra "Disco sistema".
+
 - **Contador de palavras encontra números em qualquer plataforma**: "são 24 h" voltou a contar 3 palavras mesmo
   quando o ICU da máquina não marca números como palavras; a contagem do editor agora é igual no Windows e no
   Linux, sem custo no caminho normal.

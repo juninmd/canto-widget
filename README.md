@@ -436,7 +436,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
-| ![My endpoints worst first, with state pills, a plus-address button and the add form](docs/prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](docs/prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](docs/prints/app/107-atividade-meta.png) |
+| ![My endpoints worst first, with state pills, a plus-address button](docs/prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](docs/prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](docs/prints/app/107-atividade-meta.png) |
 
 | AI models: the full sheet | AI models: Compare | AI models: metric by metric |
 |---|---|---|
@@ -452,7 +452,7 @@ And **Follow system**, which switches between light and dark along with the OS. 
 
 | A window that fails shows itself instead of blocking clicks invisibly |
 |---|
-| ![The alert window after a rendering error: a solid panel with the error, "try again" and "close"](docs/prints/app/100-janela-com-erro.png) |
+| ![The alert window after a rendering error: a solid panel with a short message, "try again" and "close"](docs/prints/app/100-janela-com-erro.png) |
 
 | Task reminder | Change master password | Status API (opt-in tab) | Language: English, Portuguese or Spanish |
 |---|---|---|---|
