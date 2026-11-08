@@ -29,6 +29,7 @@ export const system = {
   "system.memory.pressure.high": "High pressure",
   "system.memory.swap": "Swap {used} of {total}",
   "system.disk.system": "system disk",
+  "system.disk.systemTag": "system",
   "system.disk.free": "{free} free of {total}",
   "system.disk.activity": "Disk activity",
   "system.disk.allDisks": "all disks",

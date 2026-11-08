@@ -95,6 +95,7 @@
   "common.offline": "offline",
   "common.offlineStale": "No connection. Showing the last saved data.",
   "common.loadFailed": "Could not load. {error}",
+  "common.crashed": "Something went wrong in this window.",
   "common.staleFailed": "Could not refresh. Showing the data from {time}. {error}",
   "capture.title": "quick capture",
   "capture.placeholder": "what do you want to remember?",

@@ -3,24 +3,24 @@ import { goTab, mockTauri } from "./mock";
 
 test("render and capture commenters catalog", async ({ page }) => {
   const item = {
-    repo: "juninmd/canto-widget",
+    repo: "dev-exemplo/canto-widget",
     number: 7,
-    reference: "juninmd/canto-widget#7",
+    reference: "dev-exemplo/canto-widget#7",
     title: "feat: lembretes e recorrência de tarefas, Windows Hello, janela persistente",
-    url: "https://github.com/juninmd/canto-widget/pull/7",
+    url: "https://github.com/dev-exemplo/canto-widget/pull/7",
     created_at: "2026-09-15T03:32:30Z",
     updated_at: "2026-09-15T10:26:50Z",
     comments: 2,
     is_pr: true,
     draft: false,
-    author: "juninmd",
+    author: "dev-exemplo",
   };
 
   const empty = { total: 0, items: [] };
 
   await mockTauri(page, {
     fixed: {
-      github_status: { connected: true, login: "juninmd", source: "pat", device_flow: false },
+      github_status: { connected: true, login: "dev-exemplo", source: "pat", device_flow: false },
       github_lists: {
         assigned: empty,
         my_prs: { total: 1, items: [item] },
@@ -30,12 +30,12 @@ test("render and capture commenters catalog", async ({ page }) => {
       github_pr_comments: [
         {
           id: 5678637273,
-          author: "joaorafaelsoarest",
+          author: "colega-exemplo",
           author_type: "User",
           avatar_url: "",
           body: "Que app legal! Vou testar 🗡️",
           created_at: "2026-09-15T10:26:50Z",
-          url: "https://github.com/juninmd/canto-widget/pull/7#issuecomment-5678637273",
+          url: "https://github.com/dev-exemplo/canto-widget/pull/7#issuecomment-5678637273",
         },
         {
           id: 5674322398,
@@ -44,7 +44,7 @@ test("render and capture commenters catalog", async ({ page }) => {
           avatar_url: "",
           body: "❌ The last analysis has failed.",
           created_at: "2026-09-15T03:33:54Z",
-          url: "https://github.com/juninmd/canto-widget/pull/7#issuecomment-5674322398",
+          url: "https://github.com/dev-exemplo/canto-widget/pull/7#issuecomment-5674322398",
         },
       ],
     },
@@ -62,7 +62,7 @@ test("render and capture commenters catalog", async ({ page }) => {
 
   // Verify catalog header and cards
   await expect(page.getByText("Catálogo de comentaristas")).toBeVisible();
-  const card = page.getByRole("button", { name: /@joaorafaelsoarest/ });
+  const card = page.getByRole("button", { name: /@colega-exemplo/ });
   await expect(card).toBeVisible();
 
   // Take screenshot: Catalog overview
@@ -70,8 +70,8 @@ test("render and capture commenters catalog", async ({ page }) => {
     path: "docs/prints/28-comentarios-pr.png",
   });
 
-  // Click on @joaorafaelsoarest card
+  // Click on @colega-exemplo card
   await card.click();
-  await expect(page.getByText("Filtrando por @joaorafaelsoarest")).toBeVisible();
+  await expect(page.getByText("Filtrando por @colega-exemplo")).toBeVisible();
   await expect(page.getByText("Que app legal! Vou testar 🗡️")).toBeVisible();
 });
