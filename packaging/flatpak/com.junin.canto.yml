@@ -1,7 +1,7 @@
 # Prepared, not verified: Flathub builds from source in an offline sandbox, so both dependency trees must be
 # vendored first. The JS side (flatpak-node-generator, which only reads package-lock.json/yarn.lock/
 # pnpm-lock.yaml) is unblocked because `bun install --yarn` writes the yarn.lock next to this manifest with the
-# same 196 resolved packages (see packaging/README.md). Two generated files are still missing, and until they
+# same 196 resolved packages (see docs/readmes/packaging/README.md). Two generated files are still missing, and until they
 # are committed flatpak-builder cannot run this manifest: generated-sources.json and cargo-sources.json.
 id: com.junin.canto
 runtime: org.freedesktop.Platform

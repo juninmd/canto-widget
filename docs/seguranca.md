@@ -1,6 +1,6 @@
 # Segurança e dados
 
-[← voltar ao README](../README.pt-BR.md)
+[← voltar ao README](readmes/README.pt-BR.md)
 
 ## Modelo de segurança
 
