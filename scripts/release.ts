@@ -23,13 +23,23 @@ export function commitTitle(message: string): string {
   return lines[0]?.startsWith("Merge pull request") ? lines[1] ?? lines[0] : lines[0] ?? "";
 }
 
+function lineBump(line: string): ReleaseBump | undefined {
+  if (/^[a-z][\w-]*(?:\([^\r\n()]+\))?!:/i.test(line)) return "major";
+  const type = /^([a-z][\w-]*)(?:\([^\r\n()]+\))?:/i.exec(line)?.[1]?.toLowerCase();
+  if (type === "feat") return "minor";
+  if (type === "fix" || type === "perf" || type === "refactor") return "patch";
+  return undefined;
+}
+
 export function releaseBump(message: string): ReleaseBump | undefined {
   const title = commitTitle(message);
-  if (/^[a-z][\w-]*(?:\([^\r\n()]+\))?!:/i.test(title) || /^BREAKING[ -]CHANGE\s*:/im.test(message)) return "major";
-  const type = /^([a-z][\w-]*)(?:\([^\r\n()]+\))?:/i.exec(title)?.[1]?.toLowerCase();
-  if (type === "feat") return "minor";
-  if (type === "fix") return "patch";
-  return undefined;
+  if (/^BREAKING[ -]CHANGE\s*:/im.test(message)) return "major";
+  let bump = lineBump(title);
+  for (const line of message.split(/\r?\n/).slice(1)) {
+    const bullet = /^[*-]\s+(.+)$/.exec(line.trim())?.[1];
+    if (bullet) bump = strongestBump(bump, lineBump(bullet));
+  }
+  return bump;
 }
 
 export function bumpVersion(version: string, bump: ReleaseBump): string {

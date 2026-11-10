@@ -45,6 +45,9 @@ test("reads the conventional title and breaking footer from merge commits", () =
   expect(releaseBump("Merge pull request #31 from feature\n\nfeat(settings): compact mode")).toBe("minor");
   expect(releaseBump("Merge pull request #32 from refactor\n\nrefactor: vault\n\nBREAKING CHANGE: new envelope")).toBe("major");
   expect(releaseBump("chore: refresh dependencies")).toBeUndefined();
+  expect(releaseBump("perf: speed up startup")).toBe("patch");
+  expect(releaseBump("refactor: split modules")).toBe("patch");
+  expect(releaseBump("refactor: split\n\n* feat: add filter")).toBe("minor");
 });
 
 test("retries drafts and skips published releases with complete installers", () => {
