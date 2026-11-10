@@ -1,9 +1,9 @@
 @import "tailwindcss" source(none);
-@import "./noteEditor.css";
-@import "./weather.css";
-@import "./map.css";
+@import "./features/notes/noteEditor.css";
+@import "./features/weather/weather.css";
+@import "./features/map/map.css";
 @import "./motion.css";
-@import "./steam.css";
+@import "./features/steam/steam.css";
 
 /* Without source(none) Tailwind scans ~1.8 MB of translated READMEs and the CHANGELOG for classes only in src/. */
 @source "../index.html";

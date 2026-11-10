@@ -13,7 +13,7 @@ mock.module("@tauri-apps/api/core", () => ({
 }));
 
 const { syncPrefs, mirrorPref, restart } = await import("./prefsMirror");
-const { parseHidden } = await import("./tabs");
+const { parseHidden } = await import("../shell/tabs");
 let reloads = 0;
 restart.now = () => void reloads++;
 

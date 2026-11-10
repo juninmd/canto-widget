@@ -1,13 +1,13 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "./forgeTypes";
-import type { HealthEndpoint, HealthView } from "./healthTypes";
-import type { SystemSnapshot } from "./systemTypes";
+import type { ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "../features/forge/forgeTypes";
+import type { HealthEndpoint, HealthView } from "../features/health/healthTypes";
+import type { SystemSnapshot } from "../features/system/systemTypes";
 import { t } from "../i18n";
 
-export type * from "./forgeTypes";
-export type * from "./healthTypes";
-export type * from "./systemTypes";
-export { SYSTEM_ALERT_KINDS } from "./systemTypes";
+export type * from "../features/forge/forgeTypes";
+export type * from "../features/health/healthTypes";
+export type * from "../features/system/systemTypes";
+export { SYSTEM_ALERT_KINDS } from "../features/system/systemTypes";
 
 // wire keys mirror the synced vault format (frozen across app versions)
 /** `dia` of `semanal`: 0 = Sunday ... 6 = Saturday. */

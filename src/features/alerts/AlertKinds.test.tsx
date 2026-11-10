@@ -1,0 +1,382 @@
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { act } from "react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import type { AgendaItem } from "../../lib/api";
+
+const calls: string[] = [];
+const args: Record<string, unknown>[] = [];
+let watched: string[] = [];
+let rang = 0;
+
+mock.module("@tauri-apps/api/core", () => ({
+  invoke: (cmd: string, a?: Record<string, unknown>) => {
+    calls.push(cmd);
+    args.push(a ?? {});
+    if (cmd === "status_alerts_get") return Promise.resolve(watched);
+    if (cmd === "status_alerts_set") return Promise.resolve((a as { ids: string[] }).ids);
+    return Promise.resolve(null);
+  },
+}));
+mock.module("./sound", () => ({ playAlert: () => void (rang += 1) }));
+
+const { default: Alert } = await import("./Alert");
+
+const base = { end: "", all_day: false, location: "", meet: "", link: "" };
+
+const meeting: AgendaItem = {
+  ...base,
+  id: "e1",
+  title: "Daily",
+  start: new Date(Date.now() + 3 * 60_000).toISOString(),
+  meet: "https://meet.google.com/aaa-bbbb-ccc",
+};
+
+const outage: AgendaItem = {
+  ...base,
+  id: "status:github",
+  title: "GitHub",
+  start: new Date(Date.now() - 18 * 60_000).toISOString(),
+  link: "https://www.githubstatus.com",
+  description: "Partial System Outage",
+  tag: "major",
+};
+
+const model: AgendaItem = {
+  ...base,
+  id: "model:m1",
+  title: "Acme-7",
+  start: "",
+  organizer: "Acme AI",
+  description: "Acme AI · #2 com 92,5 pontos",
+  tag: "Novo no top 10 · #2",
+};
+
+type Handlers = { onDismiss?: (id: string) => void; onOpenModels?: () => void };
+
+function ui(events: AgendaItem[], handlers: Handlers = {}) {
+  return <Alert events={events} onDismiss={handlers.onDismiss ?? (() => {})} onOpenModels={handlers.onOpenModels} />;
+}
+
+async function show(events: AgendaItem[], handlers: Handlers = {}) {
+  let view!: ReturnType<typeof render>;
+  await act(async () => {
+    view = render(ui(events, handlers));
+  });
+  return view;
+}
+
+const cards = () => within(screen.getByRole("group", { name: "avisos pendentes" })).getAllByRole("button");
+
+beforeEach(() => {
+  calls.length = 0;
+  args.length = 0;
+  watched = [];
+  rang = 0;
+});
+
+afterEach(cleanup);
+
+test("a Status API alert says how bad and for how long, opens its page, and has no snooze", async () => {
+  await show([outage]);
+  expect(screen.getByText("serviço com problema")).toBeTruthy();
+  expect(screen.getByText("Partial System Outage")).toBeTruthy();
+  expect(screen.getByText("interrupção parcial")).toBeTruthy();
+  expect(screen.getByText("há 18 min")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByText("abrir página de status"));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://www.githubstatus.com" });
+});
+
+test("muting a service stops watching just that one and dismisses the alert", async () => {
+  watched = ["github", "aws"];
+  const closed: string[] = [];
+  await show([outage], { onDismiss: (id) => closed.push(id) });
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "silenciar" }));
+  });
+  expect(args[calls.indexOf("status_alerts_set")]).toEqual({ ids: ["aws"] });
+  expect(closed).toEqual(["status:github"]);
+});
+
+test("a new model shows its maker and rank and jumps to the Models tab", async () => {
+  let opened = false;
+  await show([model], { onOpenModels: () => (opened = true) });
+  expect(screen.getAllByText("Acme AI").length).toBeGreaterThan(0);
+  expect(screen.getAllByText("Novo no top 10 · #2").length).toBeGreaterThan(0);
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir aba Modelos" }));
+  });
+  expect(opened).toBe(true);
+});
+
+test("everything pending is listed with the worst first, and a click picks which one is detailed", async () => {
+  await show([model, meeting, outage]);
+  const list = cards();
+  expect(list.map((c) => c.textContent)).toEqual([
+    expect.stringContaining("GitHub"),
+    expect.stringContaining("Daily"),
+    expect.stringContaining("Acme-7"),
+  ]);
+  expect(list[0].getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByRole("button", { name: "abrir página de status" })).toBeTruthy();
+
+  await act(async () => {
+    list[1].focus(); // a real click focuses the button; fireEvent alone doesn't
+    fireEvent.click(list[1]);
+  });
+  expect(screen.getByRole("button", { name: "entrar no Meet" })).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "abrir página de status" })).toBeNull();
+  expect(document.activeElement === cards()[1], "picking from the strip must not pull focus away from it").toBe(true);
+});
+
+test("a worse alert arriving does not swap the card someone is acting on", async () => {
+  const { rerender } = await show([meeting, model]);
+  expect(screen.getByRole("button", { name: "entrar no Meet" })).toBeTruthy();
+
+  await act(async () => {
+    rerender(ui([meeting, model, outage]));
+  });
+
+  expect(screen.getByRole("button", { name: "entrar no Meet" })).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "abrir página de status" })).toBeNull();
+  expect(cards()[0].textContent).toContain("GitHub");
+});
+
+test("an alert that rings again after leaving the overlay sounds again", async () => {
+  const { rerender } = await show([meeting, outage]);
+  expect(rang).toBe(1);
+
+  await act(async () => {
+    rerender(ui([meeting, outage, model]));
+  });
+  expect(rang, "a newly arrived alert sounds").toBe(2);
+
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "fechar" }));
+  });
+  await act(async () => {
+    rerender(ui([meeting, model, outage]));
+  });
+  expect(rang, "the closed alert ringing again must not be silent").toBe(3);
+});
+
+const failingCi: AgendaItem = {
+  ...base,
+  start: "",
+  id: "pr:ci:acme/atlas#12",
+  title: "Corrige o parser de CSV",
+  organizer: "acme/atlas#12",
+  link: "https://github.com/acme/atlas/pull/12",
+  description: "O CI falhou neste pull request.",
+  tag: "ci",
+};
+
+const waiting: AgendaItem = {
+  ...failingCi,
+  id: "pr:stalled:acme/atlas#12",
+  start: new Date(Date.now() - 50 * 3_600_000).toISOString(),
+  description: "Sem revisão há 50 h.",
+  tag: "stalled",
+};
+
+test("a failing CI names the PR, opens it and has no snooze", async () => {
+  await show([failingCi]);
+  expect(screen.getAllByText("pull request").length).toBeGreaterThan(0);
+  expect(screen.getByText("CI falhou")).toBeTruthy();
+  expect(screen.getByText("acme/atlas#12")).toBeTruthy();
+  expect(screen.getByText("O CI falhou neste pull request.")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir PR" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/pull/12" });
+});
+
+test("a PR without a review says for how long it has waited", async () => {
+  await show([waiting]);
+  expect(screen.getByText("sem revisão")).toBeTruthy();
+  expect(screen.getByText("há 2 d")).toBeTruthy();
+});
+
+test("a red CI ranks above a stalled PR, and both above a meeting", async () => {
+  await show([meeting, waiting, failingCi]);
+  const texts = cards().map((c) => c.textContent ?? "");
+  expect(texts[0]).toContain("CI falhou");
+  expect(texts[1]).toContain("sem revisão");
+  expect(texts[2]).toContain("Daily");
+});
+
+test("a failing CI lists the jobs that broke, each opening its own page", async () => {
+  await show([
+    {
+      ...failingCi,
+      description: "2 falhou: build, lint.",
+      attachments: [
+        { title: "build · Run tests", url: "https://github.com/acme/atlas/runs/1", mime: "" },
+        { title: "ci/legado", url: "", mime: "" },
+      ],
+    },
+  ]);
+  expect(screen.getByText("✖ ci/legado").tagName).toBe("P");
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "✖ build · Run tests" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/runs/1" });
+});
+
+const mentionedOnGitlab: AgendaItem = {
+  ...base,
+  start: "",
+  id: "mention:gitlab:42",
+  title: "Falha no deploy de produção",
+  organizer: "acme/atlas",
+  link: "https://git.example.com/acme/atlas/-/issues/9",
+  description: "@ana: @voce consegue olhar isso hoje?",
+  tag: "gitlab",
+};
+
+test("a mention says where it happened, shows what was said and opens the thread", async () => {
+  await show([mentionedOnGitlab]);
+  expect(screen.getAllByText("você foi mencionado").length).toBeGreaterThan(0);
+  expect(screen.getByText("GitLab")).toBeTruthy();
+  expect(screen.getByText("acme/atlas")).toBeTruthy();
+  expect(screen.getByText("@ana: @voce consegue olhar isso hoje?")).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://git.example.com/acme/atlas/-/issues/9" });
+});
+
+test("a GitHub mention is tagged GitHub in the strip and the summary has no open button", async () => {
+  const gh: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:acme/atlas#3", tag: "github" };
+  const summary: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:summary", link: "", title: "5 menções novas" };
+  await show([gh, summary]);
+  expect(screen.getAllByText("mencionou você").length).toBe(2);
+  expect(screen.getByText("GitHub")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(cards()[1]);
+  });
+  expect(screen.queryByRole("button", { name: "abrir" })).toBeNull();
+});
+
+const ana = { name: "Ana Pires", login: "ana", avatar: "data:image/png;base64,AA==" };
+
+test("a mention shows who wrote it: photo, name and login in the pop-up and the name in the strip", async () => {
+  const gh: AgendaItem = { ...mentionedOnGitlab, id: "mention:github:acme/atlas#3", tag: "github", sender: ana };
+  await show([mentionedOnGitlab, gh]);
+  expect(screen.getAllByText("você foi mencionado").length).toBeGreaterThan(0);
+  expect(screen.getByText("Ana Pires mencionou você")).toBeTruthy();
+  expect(screen.getByText("mencionou você")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(cards()[1]);
+  });
+  const who = document.querySelector("[data-sender]")!;
+  expect(who.textContent).toContain("Ana Pires");
+  expect(who.textContent).toContain("@ana");
+  expect(who.querySelector("img")?.getAttribute("src")).toBe("data:image/png;base64,AA==");
+});
+
+test("a sender without a photo falls back to initials and one without a name shows the login", async () => {
+  const noPhoto: AgendaItem = { ...mentionedOnGitlab, sender: { ...ana, avatar: "" } };
+  await show([noPhoto]);
+  const who = document.querySelector("[data-sender]")!;
+  expect(who.querySelector("img")).toBeNull();
+  expect(who.textContent).toContain("AP");
+  cleanup();
+  await show([{ ...mentionedOnGitlab, sender: { name: "", login: "ana", avatar: "" } }]);
+  expect(document.querySelector("[data-sender]")!.textContent).toContain("ana");
+});
+
+test("an assignment says why it rang, where and when in one line, and who opened it, with no empty box", async () => {
+  await show([
+    {
+      ...failingCi,
+      id: "pr:assigned:acme/atlas#12",
+      start: new Date(Date.now() - 3 * 60_000).toISOString(),
+      description: "",
+      tag: "assigned",
+      sender: { name: "", login: "dependabot[bot]", avatar: "" },
+    },
+  ]);
+  const eyebrow = document.querySelector("[data-eyebrow]") as HTMLElement;
+  expect(eyebrow.textContent).toContain("acme/atlas#12");
+  expect(eyebrow.textContent).toContain("há 3 min");
+  expect(document.querySelector("[data-reason]")!.textContent).toBe("atribuído a você");
+  expect(document.querySelector("[data-sender]")!.textContent).toContain("dependabot[bot]");
+  expect(screen.queryByText("detalhes")).toBeNull();
+});
+
+const approved: AgendaItem = {
+  ...failingCi,
+  id: "pr:approved:acme/atlas#12",
+  description: "Marina Souza aprovou este PR.\nótimo trabalho",
+  tag: "approved",
+  sender: { name: "Marina Souza", login: "marina", avatar: "data:image/png;base64,iVBORw0KGgo=" },
+};
+
+test("an approval names who approved, with their photo, and still opens the PR", async () => {
+  await show([approved]);
+  expect(screen.getByText("aprovado")).toBeTruthy();
+  const who = document.querySelector("[data-sender]") as HTMLElement;
+  expect(who.textContent).toContain("Marina Souza");
+  expect(who.textContent).toContain("@marina");
+  expect(who.querySelector("img")?.getAttribute("src")).toMatch(/^data:image\/png/);
+  expect(screen.getByText(/ótimo trabalho/)).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir PR" }));
+  });
+  expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://github.com/acme/atlas/pull/12" });
+});
+
+test("a conflict outranks an approval in the pending list", async () => {
+  await show([approved, { ...failingCi, id: "pr:conflict:acme/atlas#13", tag: "conflict", title: "Outro PR" }]);
+  expect(cards()[0].textContent).toContain("Outro PR");
+});
+
+test("the day summary lists what is waiting, has no action but closing and says what it is", async () => {
+  const digest: AgendaItem = {
+    ...base,
+    start: "",
+    id: "digest:morning:2026-10-12",
+    title: "Resumo do dia",
+    description: "3 reuniões, a primeira às 10:30\n2 tarefas abertas\n1 revisão pedida",
+    tag: "digest",
+  };
+  await show([digest]);
+  expect(screen.getAllByText("resumo do dia").length).toBeGreaterThan(0);
+  expect(screen.getByText(/3 reuniões, a primeira às 10:30/)).toBeTruthy();
+  expect(screen.getByText(/1 revisão pedida/)).toBeTruthy();
+  expect(screen.getByRole("button", { name: "fechar" })).toBeTruthy();
+  expect(screen.queryByText(/adiar/)).toBeNull();
+});
+
+test("the strip is a carousel: arrows and ← → step through every alert and wrap around", async () => {
+  await show([outage, meeting, model]);
+  const picked = () => cards().findIndex((c) => c.getAttribute("aria-pressed") === "true");
+  expect(picked()).toBe(0);
+  expect(screen.getByText("1 de 3")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("próximo aviso"));
+  });
+  expect(picked()).toBe(1);
+  expect(screen.getByText("2 de 3")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("aviso anterior"));
+  });
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("aviso anterior"));
+  });
+  expect(picked(), "going back from the first lands on the last").toBe(2);
+
+  await act(async () => {
+    fireEvent.keyDown(cards()[2], { key: "ArrowRight" });
+  });
+  expect(picked()).toBe(0);
+  expect(document.activeElement === cards()[0], "the keyboard moves focus along with the pick").toBe(true);
+});

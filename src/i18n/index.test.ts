@@ -33,7 +33,7 @@ test("every selectable language has a full catalog, valid locale and intact plac
 });
 
 test("t fills placeholders and leaves unknown ones visible", async () => {
-  const { t } = await import("./index");
+  const { t } = await import(".");
   expect(t("status.updatedAgo", { ago: "agora" })).toBe("atualizado agora");
   expect(t("status.updatedAgo")).toBe("atualizado {ago}");
   expect(t("status.updatedAgo", { other: 1 })).toBe("atualizado {ago}");

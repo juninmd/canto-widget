@@ -1,48 +1,44 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useClearOnLock } from "./lib/useClearOnLock";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { useClearOnLock } from "./shell/useClearOnLock";
 import { IS_MOBILE, MOD_KEY } from "./lib/platform";
 import { hideWindow } from "./lib/windowShown";
 import { api, errText } from "./lib/api";
-import { useVaultStatus } from "./lib/useVaultStatus";
+import { useVaultStatus } from "./shell/useVaultStatus";
 import { useOnline, useOnReconnect } from "./lib/useOnline";
 import { requestRefresh } from "./lib/refreshEvent";
-import { useAgenda } from "./lib/useAgenda";
-import { useNoteDraft } from "./lib/useNoteDraft";
-import { useUpdateNotice } from "./lib/useUpdateNotice";
-import { useWindowMode } from "./lib/useWindowMode";
-import { useAlertList } from "./lib/useAlertList";
-import { focusShortcut, focusShortcutSoon, useShortcuts } from "./lib/shortcuts";
-import CommandPalette from "./components/CommandPalette";
-import { buildCommands, nextMeeting } from "./lib/paletteCommands";
-import { copyDaySummary } from "./lib/copySummary";
+import { useAgenda } from "./features/agenda/useAgenda";
+import { useNoteDraft } from "./features/notes/useNoteDraft";
+import { useUpdateNotice } from "./shell/useUpdateNotice";
+import { useWindowMode } from "./shell/useWindowMode";
+import { useAlertList } from "./features/alerts/useAlertList";
+import { focusShortcut, focusShortcutSoon, useShortcuts } from "./shell/shortcuts";
+import { buildCommands, nextMeeting } from "./shell/paletteCommands";
+import { copyDaySummary } from "./features/tasks/copySummary";
 import { applySkin } from "./lib/theme";
-import ShortcutsHelp from "./components/ShortcutsHelp";
-import GlobalSearch from "./components/GlobalSearch";
-import Onboarding from "./components/Onboarding";
-import { markOnboardingSeen, onboardingSeen } from "./lib/onboarding";
+import { markOnboardingSeen, onboardingSeen } from "./shell/onboardingSeen";
 import { useToday } from "./lib/useToday";
-import Lock from "./components/Lock";
-import type { SectionId } from "./lib/settingsGroups";
-import { useHiddenTabs, visibleTabs } from "./lib/tabs";
-import { useTabLayout } from "./lib/tabLayout";
-import { useReminderLead } from "./lib/reminderLead";
+import Lock from "./shell/Lock";
+import type { SectionId } from "./features/settings/settingsGroups";
+import { useHiddenTabs, visibleTabs } from "./shell/tabs";
+import { useTabLayout } from "./shell/tabLayout";
+import { useReminderLead } from "./features/alerts/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
-import TabBar, { panelId, type Tab } from "./components/TabBar";
-import TabRail from "./components/TabRail";
-import MobileNav from "./components/MobileNav";
-import FocusBar from "./components/FocusBar";
-import { focusStore } from "./lib/focus";
-import AppHeader from "./components/AppHeader";
+import TabBar, { panelId, type Tab } from "./shell/TabBar";
+import TabRail from "./shell/TabRail";
+import MobileNav from "./shell/MobileNav";
+import FocusBar from "./features/tasks/FocusBar";
+import { focusStore } from "./features/tasks/focus";
+import AppHeader from "./shell/AppHeader";
 import ErrorBanner from "./components/ErrorBanner";
 import Skeleton from "./components/Skeleton";
-import TabContent from "./components/TabContent";
-import { useAppEvents } from "./lib/useAppEvents";
-import MiniRail from "./components/MiniRail";
-import FocusedAlert from "./components/FocusedAlert";
-import NotificationsPanel from "./components/NotificationsPanel";
+import TabContent from "./shell/TabContent";
+import { useAppEvents } from "./shell/useAppEvents";
+import MiniRail from "./shell/MiniRail";
+import FocusedAlert from "./features/alerts/FocusedAlert";
+import { CommandPalette, GlobalSearch, NotificationsPanel, Onboarding, ShortcutsHelp, preloadOverlays } from "./shell/lazyOverlays";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
-import { saveView } from "./lib/agendaView";
+import { saveView } from "./features/agenda/agendaView";
 
 export default function App() {
   return (
@@ -110,6 +106,9 @@ function Canto() {
   // An auto-lock is Rust's, not a click on lock: the screen must not pop back up on the next unlock.
   useEffect(() => {
     if (!status?.unlocked) setAlertsOpen(false);
+  }, [status?.unlocked]);
+  useEffect(() => {
+    if (status?.unlocked) return preloadOverlays();
   }, [status?.unlocked]);
   // Set by a click on the dock: the normal window opens with that alert on top.
   const [focusId, setFocusId] = useState<string | null>(null);
@@ -240,58 +239,60 @@ function Canto() {
           : `h-screen bg-panel/95 backdrop-blur ${mode === "max" ? "" : "rounded-2xl border border-edge shadow-2xl"}`
       }`}
     >
-      {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
-      {onboardingOpen && status?.unlocked && (
-        <Onboarding
-          onClose={() => {
-            markOnboardingSeen();
-            setOnboardingOpen(false);
-          }}
-        />
-      )}
-      {searchOpen && status?.unlocked && (
-        <GlobalSearch
-          today={today}
-          privacy={privacy}
-          agenda={agenda.items}
-          onError={setError}
-          onClose={() => setSearchOpen(false)}
-          onNavigate={(target, q) => {
-            const destination = target === "transcripts" ? "agenda" : target;
-            if (destination === "agenda") saveView(target === "transcripts" ? "meetings" : "today");
-            setJumpQuery(target === "agenda" ? "" : q);
-            setJumpSeq((n) => n + 1);
-            setSettingsFocus(null);
-            setTab(destination);
-            setSearchOpen(false);
-          }}
-        />
-      )}
-      {alertsOpen && status?.unlocked && (
-        <NotificationsPanel
-          alerts={alerts}
-          log={log}
-          onGone={drop}
-          onRefresh={refreshAlerts}
-          onCompleted={() => setTasksVersion((v) => v + 1)}
-          onOpenModels={() => {
-            setAlertsOpen(false);
-            changeTab("models");
-          }}
-          onClose={() => setAlertsOpen(false)}
-        />
-      )}
-      {paletteOpen && status?.unlocked && (
-        <CommandPalette
-          commands={paletteCommands()}
-          onClose={() => setPaletteOpen(false)}
-          onRun={(cmd) => {
-            setPaletteOpen(false);
-            // Runs after the palette unmounts and hands focus back, so a focused field keeps it.
-            setTimeout(() => void Promise.resolve(cmd.run()).catch((e) => setError(errText(e))), 0);
-          }}
-        />
-      )}
+      <Suspense fallback={null}>
+        {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
+        {onboardingOpen && status?.unlocked && (
+          <Onboarding
+            onClose={() => {
+              markOnboardingSeen();
+              setOnboardingOpen(false);
+            }}
+          />
+        )}
+        {searchOpen && status?.unlocked && (
+          <GlobalSearch
+            today={today}
+            privacy={privacy}
+            agenda={agenda.items}
+            onError={setError}
+            onClose={() => setSearchOpen(false)}
+            onNavigate={(target, q) => {
+              const destination = target === "transcripts" ? "agenda" : target;
+              if (destination === "agenda") saveView(target === "transcripts" ? "meetings" : "today");
+              setJumpQuery(target === "agenda" ? "" : q);
+              setJumpSeq((n) => n + 1);
+              setSettingsFocus(null);
+              setTab(destination);
+              setSearchOpen(false);
+            }}
+          />
+        )}
+        {alertsOpen && status?.unlocked && (
+          <NotificationsPanel
+            alerts={alerts}
+            log={log}
+            onGone={drop}
+            onRefresh={refreshAlerts}
+            onCompleted={() => setTasksVersion((v) => v + 1)}
+            onOpenModels={() => {
+              setAlertsOpen(false);
+              changeTab("models");
+            }}
+            onClose={() => setAlertsOpen(false)}
+          />
+        )}
+        {paletteOpen && status?.unlocked && (
+          <CommandPalette
+            commands={paletteCommands()}
+            onClose={() => setPaletteOpen(false)}
+            onRun={(cmd) => {
+              setPaletteOpen(false);
+              // Runs after the palette unmounts and hands focus back, so a focused field keeps it.
+              setTimeout(() => void Promise.resolve(cmd.run()).catch((e) => setError(errText(e))), 0);
+            }}
+          />
+        )}
+      </Suspense>
       <AppHeader
         unlocked={status?.unlocked === true}
         online={online}

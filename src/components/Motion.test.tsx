@@ -1,10 +1,10 @@
 import { afterEach, expect, test } from "bun:test";
 import { useState } from "react";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
-import TabBar, { type Tab } from "./TabBar";
-import TaskProgress from "./TaskProgress";
-import PriceTick from "./PriceTick";
-import { CiPill } from "./ForgePills";
+import TabBar, { type Tab } from "../shell/TabBar";
+import TaskProgress from "../features/tasks/TaskProgress";
+import PriceTick from "../features/market/PriceTick";
+import { CiPill } from "../features/forge/ForgePills";
 import CountUp from "./CountUp";
 import { applySkin } from "../lib/theme";
 

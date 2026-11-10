@@ -86,7 +86,7 @@ mock.module("@tauri-apps/api/event", () => ({
 
 const { default: App } = await import("./App");
 // Notes loads its editor lazily; warming the module keeps that load off the fake clock below.
-await import("./components/NoteEditor");
+await import("./features/notes/NoteEditor");
 
 const meetingIn = (minutes: number) => ({
   id: "reuniao-1",
@@ -480,7 +480,12 @@ test("the bell on the maximized window opens the alerts screen", async () => {
   render(<App />);
   await settle();
   fireEvent.click(screen.getByRole("button", { name: "avisos pendentes: 1" }));
-  expect(within(screen.getByRole("dialog", { name: "notificações" })).getByText("pagar boleto")).toBeTruthy();
+  expect(within(await screen.findByRole("dialog", { name: "notificações" })).getByText("pagar boleto")).toBeTruthy();
+});
+
+test("the overlays stay out of the startup chunk", async () => {
+  const source = await Bun.file(new URL("./App.tsx", import.meta.url)).text();
+  expect(source).not.toMatch(/^import \w+ from "\.\/(shell\/(CommandPalette|GlobalSearch|ShortcutsHelp|Onboarding)|features\/alerts\/NotificationsPanel)";$/m);
 });
 
 test("closing a card in the alerts screen tells Rust and reads the log again", async () => {

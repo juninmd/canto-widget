@@ -1,12 +1,42 @@
 /** Markdown as React elements: never raw HTML, and a link only does what the caller says it does. */
-import type { ReactNode } from "react";
-import { Marked, type Token, type Tokens } from "marked";
+import { useEffect, useSyncExternalStore, type ReactNode } from "react";
+import type { Token, Tokens } from "marked";
 
-// Its own instance: the editor's markdown extension registers custom tokenizers on the shared one.
-export const markdown = new Marked({ gfm: true });
-// Alerts come from single-line sources (a comment, an incident, a summary of lines): a lone newline is
-// a line break there, the way GitHub renders it.
-export const inlineMarkdown = new Marked({ gfm: true, breaks: true });
+type Lexers = typeof import("./markdownLexer").lexers;
+export type LexerKind = keyof Lexers;
+
+let lexers: Lexers | null = null;
+let pending: Promise<void> | null = null;
+const listeners = new Set<() => void>();
+
+/** The parser is 60 kB the first paint never needs: it loads once, on idle or with the first text that wants it. */
+export function loadMarkdown(): Promise<void> {
+  pending ??= import("./markdownLexer").then((mod) => {
+    lexers = mod.lexers;
+    listeners.forEach((notify) => notify());
+  });
+  return pending;
+}
+
+const subscribe = (notify: () => void) => {
+  listeners.add(notify);
+  return () => void listeners.delete(notify);
+};
+
+/** One paragraph per line: what a text shows for the few milliseconds before the parser arrives. */
+export function plainTokens(text: string): Token[] {
+  return text
+    .split("\n")
+    .filter((line) => line.trim() !== "")
+    .map((line) => ({ type: "paragraph", raw: line, text: line, tokens: [{ type: "text", raw: line, text: line }] }) as Tokens.Paragraph);
+}
+
+/** The lexer of one flavor; plain lines until the parser has loaded, then the caller renders again. */
+export function useLexer(kind: LexerKind): (text: string) => Token[] {
+  const ready = useSyncExternalStore(subscribe, () => lexers !== null);
+  useEffect(() => void loadMarkdown(), []);
+  return ready && lexers ? lexers[kind] : plainTokens;
+}
 
 export type Render = {
   /** Plain text: a note preview highlights the search term, an alert shows it as it is. */

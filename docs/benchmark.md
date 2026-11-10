@@ -76,6 +76,36 @@ O que mudou: os comandos que leem ou gravam o cofre saíram da thread da janela,
 a interface; as notas chegam em páginas de 50 com **mostrar mais**; um card aceita até 100 mil caracteres
 (título, 300). Diferenças pequenas entre as colunas, fora as em negrito, são ruído de medição.
 
+## Inicialização da interface
+
+Medido em 2026-11-10 no bundle de produção (`bun run build`), Chromium 1243 headless em Linux x64, CPU 4× mais
+lenta (`Emulation.setCPUThrottlingRate`), IPC do Tauri simulado como nos testes e2e. Mediana de 21 aberturas a frio
+(contexto novo a cada uma), repetida com a ordem invertida; os dois lotes ficaram a menos de 6% um do outro.
+
+| Janela | Métrica | Antes | Depois | Diferença |
+|---|---|---|---|---|
+| Principal | JavaScript carregado antes da primeira tela | 529,2 KB (168,8 gzip) | 471,4 KB (153,8 gzip) | **−10,9%** |
+| Principal | Tempo de script até a barra de abas aparecer | 186 ms | 156 ms | **−16%** |
+| Principal | Tempo total até a barra de abas aparecer | 741 ms | 711 ms | −4% |
+| Pop-up de aviso | JavaScript carregado antes do aviso | 353,5 KB (116,3 gzip) | 307,5 KB (102,8 gzip) | **−13,0%** |
+| Pop-up de aviso | Tempo de script até o aviso aparecer | 232 ms | 163 ms | **−30%** |
+| Pop-up de aviso | Tempo total até o aviso aparecer | 724 ms | 623 ms | **−14%** |
+
+O que mudou: a paleta de comandos, a busca global, a ajuda de atalhos, o tour inicial e a tela de avisos viraram
+blocos próprios, e o interpretador de markdown (60 KB) deixou de ser importado pelas prévias de nota e pelos avisos.
+Tudo isso é buscado com a janela ociosa logo após destrancar, então o primeiro `Ctrl+K` abre como o segundo. Se uma
+nota ou aviso aparecer antes do interpretador chegar, o texto sai sem formatação por alguns milissegundos.
+
+Os números absolutos valem para esta máquina com CPU reduzida; o WebView do sistema carrega do disco, sem rede.
+O que se compara é a diferença. As telas abaixo são do bundle novo, com dados fictícios; a paleta ficou idêntica
+pixel a pixel à do bundle anterior.
+
+| Tarefas | Notas (markdown) | Paleta de comandos |
+|---|---|---|
+| ![Aba de tarefas](benchmark/inicio-tarefas.png) | ![Prévia de notas em markdown](benchmark/notas-markdown.png) | ![Paleta de comandos](benchmark/paleta-comandos.png) |
+
+![Pop-up de aviso com markdown](benchmark/alerta-markdown.png)
+
 ## Licença, preço e criptografia
 
 - **Todoist**: não é open source; planos Free/Pro $5–7/mês/Business $8–10/user; Quick Add com linguagem natural. [Todoist Pricing](https://ellieplanner.com/productivity-copilot/todoist-pricing), [GetApp](https://www.getapp.com/collaboration-software/a/todoist-for-business/)

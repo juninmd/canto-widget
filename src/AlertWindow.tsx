@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { emit, listen } from "@tauri-apps/api/event";
 import { api, type AgendaItem } from "./lib/api";
-import Alert from "./components/Alert";
-import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
+import Alert from "./features/alerts/Alert";
+import { OPEN_TAB_EVENT, TASKS_CHANGED_EVENT } from "./features/alerts/alertEvents";
 
 /** The pop-up's own window: it rings over a minimized or locked widget and never touches the vault window. */
 export default function AlertWindow() {
