@@ -14,7 +14,7 @@
 
 **[Features](#-features)** · **[Skins](#-six-skins)** · **[Install](#%EF%B8%8F-install)** · **[Security](#-security-at-a-glance)** · **[Documentation](#-documentation)**
 
-<sub>**English** · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [हिन्दी](README.hi.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [فارسی](README.fa.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Українська](README.uk.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Magyar](README.hu.md) · [Svenska](README.sv.md) · [Dansk](README.da.md) · [Norsk bokmål](README.nb.md) · [Suomi](README.fi.md) · [Ελληνικά](README.el.md) · [Български](README.bg.md) · [Hrvatski](README.hr.md) · [Српски](README.sr.md) · [Slovenščina](README.sl.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [Eesti](README.et.md) · [Bahasa Indonesia](README.id.md) · [Bahasa Melayu](README.ms.md) · [Tiếng Việt](README.vi.md) · [ไทย](README.th.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Kiswahili](README.sw.md) · [Català](README.ca.md)</sub>
+<sub>**English** · [Português](docs/readmes/README.pt-BR.md) · [Español](docs/readmes/README.es.md) · [Français](docs/readmes/README.fr.md) · [Italiano](docs/readmes/README.it.md) · [日本語](docs/readmes/README.ja.md) · [中文](docs/readmes/README.zh.md) · [Deutsch](docs/readmes/README.de.md) · [Русский](docs/readmes/README.ru.md) · [Türkçe](docs/readmes/README.tr.md) · [हिन्दी](docs/readmes/README.hi.md) · [العربية](docs/readmes/README.ar.md) · [עברית](docs/readmes/README.he.md) · [فارسی](docs/readmes/README.fa.md) · [한국어](docs/readmes/README.ko.md) · [Nederlands](docs/readmes/README.nl.md) · [Polski](docs/readmes/README.pl.md) · [Українська](docs/readmes/README.uk.md) · [Čeština](docs/readmes/README.cs.md) · [Slovenčina](docs/readmes/README.sk.md) · [Română](docs/readmes/README.ro.md) · [Magyar](docs/readmes/README.hu.md) · [Svenska](docs/readmes/README.sv.md) · [Dansk](docs/readmes/README.da.md) · [Norsk bokmål](docs/readmes/README.nb.md) · [Suomi](docs/readmes/README.fi.md) · [Ελληνικά](docs/readmes/README.el.md) · [Български](docs/readmes/README.bg.md) · [Hrvatski](docs/readmes/README.hr.md) · [Српски](docs/readmes/README.sr.md) · [Slovenščina](docs/readmes/README.sl.md) · [Lietuvių](docs/readmes/README.lt.md) · [Latviešu](docs/readmes/README.lv.md) · [Eesti](docs/readmes/README.et.md) · [Bahasa Indonesia](docs/readmes/README.id.md) · [Bahasa Melayu](docs/readmes/README.ms.md) · [Tiếng Việt](docs/readmes/README.vi.md) · [ไทย](docs/readmes/README.th.md) · [বাংলা](docs/readmes/README.bn.md) · [தமிழ்](docs/readmes/README.ta.md) · [Kiswahili](docs/readmes/README.sw.md) · [Català](docs/readmes/README.ca.md)</sub>
 
 </div>
 
@@ -695,7 +695,7 @@ Download the installer for your platform from **[Releases](https://github.com/ju
 > Automatic updates are verified against the project's own signature before running.
 
 Ready-made manifests for winget and Homebrew (plus a skeleton for Flatpak, currently blocked) live in
-[`packaging/`](packaging/README.md) — prepared and verified locally, but not yet published to those
+[`packaging/`](docs/readmes/packaging/README.md) — prepared and verified locally, but not yet published to those
 repositories: publishing is a manual decision and action by the maintainer.
 
 ## 📱 On your phone

@@ -90,7 +90,7 @@ def generate(code):
         iterator = iter(targets)
         translated_lines[i] = re.sub(r"\]\([^)]+\)", lambda _: f"]({next(iterator)})", translated)
     text = "\n".join(translated_lines) + "\n"
-    path = ROOT / f"README.{code}.md"
+    path = ROOT / "docs" / "readmes" / f"README.{code}.md"
     if code not in ["es", "fr", "it", "ja", "zh", "de", "ru", "tr", "hi"]:
         path.write_text(text, encoding="utf-8")
     print(f"{code}: {len(catalog)} UI messages, {len(NATIVE)} native labels, README ready", flush=True)
