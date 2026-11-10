@@ -37,8 +37,13 @@ and publishes a release after the checks pass.
 ```text
 src/                      React UI (one component per file, tests next to it)
   lib/api.ts              the only place that calls invoke(); IPC types live here
-  lib/                    pure logic (agenda, dayPlan, focus, activity, reminders, shortcuts, summary, theme, motion) + hooks
-  components/             MiniRail (dock), ModeSwitcher (mode menu), AlertCard/FocusedAlert/NotificationsPanel (the alerts screen the header bell opens), TabBar (overflow into a "mais" menu via lib/fitTabs); tabs (TasksTab, NotesTab, ClipboardTab, TranscriptsTab, AgendaTab, GithubTab, ActivityTab, SettingsTab) and sections
+  lib/, components/       shared only: pure helpers and hooks (theme, time, motion, markdown, toast) and UI primitives
+                          (Icons, Skeleton, Spinner, EmptyState, ErrorBanner, SubTabs); they never import a feature
+  shell/                  what frames every tab: TabBar (overflow into a "mais" menu via fitTabs), TabRail, MiniRail (dock),
+                          ModeSwitcher, AppHeader, Lock, lazyTabs and lazyOverlays (CommandPalette, GlobalSearch, ...)
+  features/<name>/        one folder per feature, components + logic + hooks + tests + CSS side by side: tasks, notes,
+                          clipboard, agenda, alerts (AlertCard/FocusedAlert/NotificationsPanel), forge (GitHub/GitLab),
+                          google, steam, weather, system, activity, settings, models, map, market, status, health, ...
 src-tauri/src/
   lib.rs                  plugin setup, tray, background watchers, invoke_handler list
   vault.rs, store.rs, crypto.rs   AppState/session, sealed envelopes, Argon2id + AES-256-GCM
@@ -77,6 +82,11 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   errors it returns (`lang::tr`, `AppError::text`), whose English text is the fallback. UI tests run in pt-BR (`src/test-setup.ts`).
 - Comments only for *why*, one line. No narrating comments, no section banners.
 - Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
+- **UI code lives where it is used.** A module only one feature needs goes in `src/features/<name>/`; it moves to
+  `src/lib` or `src/components` when a second feature needs it. Folders stay flat, and two modules in a folder never
+  differ only by letter case (`scripts/layout.test.ts` pins the three rules).
+- **The first paint loads only what it shows.** Tabs off the default bar (`shell/lazyTabs.ts`), overlays
+  (`shell/lazyOverlays.ts`) and the markdown parser (`lib/markdown.tsx`) load on demand and are fetched on idle.
 - One feature per module; commands are thin, logic is a pure function with a unit test.
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`); body explains why.
 - Rust: `Mutex` goes through `resilient::LockExt::lock_safe()` (never `lock().unwrap()`, which poisons after one
@@ -85,7 +95,7 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   **Não publicado** (and README when user-visible).
 - **Any new or changed UI adds or updates a screenshot in `docs/prints/` and the README** (features table, tour,
   or the "mais telas" section) in the same PR — fictitious data only, per Security rules. A tab hidden by
-  default (`DEFAULT_HIDDEN` in `src/lib/tabs.ts`) still needs one; skipping this is a scope gap, not optional.
+  default (`DEFAULT_HIDDEN` in `src/shell/tabs.ts`) still needs one; skipping this is a scope gap, not optional.
 - **`README.md` (English) is canonical.** `README.pt-BR.md` plus the other `README.<lang>.md` translations
   (es, fr, it, ja, zh, de, ru, tr, hi) don't need to change in the same PR — they drift and get refreshed
   separately. Never edit only a translation and leave `README.md` behind.

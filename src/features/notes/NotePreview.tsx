@@ -1,4 +1,4 @@
-import { block, markdown, type Render } from "../../lib/markdown";
+import { block, useLexer, type Render } from "../../lib/markdown";
 import { highlight } from "../../lib/highlight";
 import { stripImageRefs } from "./noteImages";
 import { noteSnippet } from "./noteSnippet";
@@ -17,7 +17,8 @@ function head(body: string, query: string): string {
 
 /** The start of a note rendered like the editor shows it (titles, lists, checklists, code), clipped to a few lines. */
 export default function NotePreview({ body, query, className = "", compact = false }: { body: string; query: string; className?: string; compact?: boolean }) {
-  const tokens = markdown.lexer(head(body, query)).filter((t) => t.type !== "space").slice(0, compact ? 3 : MAX_BLOCKS);
+  const lexer = useLexer("block");
+  const tokens = lexer(head(body, query)).filter((t) => t.type !== "space").slice(0, compact ? 3 : MAX_BLOCKS);
   if (tokens.length === 0) return null;
   // Links stay text: the whole card is already a button.
   const render: Render = { text: (text) => highlight(text, query) };

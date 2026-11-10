@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useClearOnLock } from "./shell/useClearOnLock";
 import { IS_MOBILE, MOD_KEY } from "./lib/platform";
 import { hideWindow } from "./lib/windowShown";
@@ -12,13 +12,9 @@ import { useUpdateNotice } from "./shell/useUpdateNotice";
 import { useWindowMode } from "./shell/useWindowMode";
 import { useAlertList } from "./features/alerts/useAlertList";
 import { focusShortcut, focusShortcutSoon, useShortcuts } from "./shell/shortcuts";
-import CommandPalette from "./shell/CommandPalette";
 import { buildCommands, nextMeeting } from "./shell/paletteCommands";
 import { copyDaySummary } from "./features/tasks/copySummary";
 import { applySkin } from "./lib/theme";
-import ShortcutsHelp from "./shell/ShortcutsHelp";
-import GlobalSearch from "./shell/GlobalSearch";
-import Onboarding from "./shell/Onboarding";
 import { markOnboardingSeen, onboardingSeen } from "./shell/onboardingSeen";
 import { useToday } from "./lib/useToday";
 import Lock from "./shell/Lock";
@@ -39,7 +35,7 @@ import TabContent from "./shell/TabContent";
 import { useAppEvents } from "./shell/useAppEvents";
 import MiniRail from "./shell/MiniRail";
 import FocusedAlert from "./features/alerts/FocusedAlert";
-import NotificationsPanel from "./features/alerts/NotificationsPanel";
+import { CommandPalette, GlobalSearch, NotificationsPanel, Onboarding, ShortcutsHelp, preloadOverlays } from "./shell/lazyOverlays";
 import { ToastProvider, useToast } from "./lib/toast";
 import { LANGUAGE, t } from "./i18n";
 import { saveView } from "./features/agenda/agendaView";
@@ -110,6 +106,9 @@ function Canto() {
   // An auto-lock is Rust's, not a click on lock: the screen must not pop back up on the next unlock.
   useEffect(() => {
     if (!status?.unlocked) setAlertsOpen(false);
+  }, [status?.unlocked]);
+  useEffect(() => {
+    if (status?.unlocked) return preloadOverlays();
   }, [status?.unlocked]);
   // Set by a click on the dock: the normal window opens with that alert on top.
   const [focusId, setFocusId] = useState<string | null>(null);
@@ -240,58 +239,60 @@ function Canto() {
           : `h-screen bg-panel/95 backdrop-blur ${mode === "max" ? "" : "rounded-2xl border border-edge shadow-2xl"}`
       }`}
     >
-      {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
-      {onboardingOpen && status?.unlocked && (
-        <Onboarding
-          onClose={() => {
-            markOnboardingSeen();
-            setOnboardingOpen(false);
-          }}
-        />
-      )}
-      {searchOpen && status?.unlocked && (
-        <GlobalSearch
-          today={today}
-          privacy={privacy}
-          agenda={agenda.items}
-          onError={setError}
-          onClose={() => setSearchOpen(false)}
-          onNavigate={(target, q) => {
-            const destination = target === "transcripts" ? "agenda" : target;
-            if (destination === "agenda") saveView(target === "transcripts" ? "meetings" : "today");
-            setJumpQuery(target === "agenda" ? "" : q);
-            setJumpSeq((n) => n + 1);
-            setSettingsFocus(null);
-            setTab(destination);
-            setSearchOpen(false);
-          }}
-        />
-      )}
-      {alertsOpen && status?.unlocked && (
-        <NotificationsPanel
-          alerts={alerts}
-          log={log}
-          onGone={drop}
-          onRefresh={refreshAlerts}
-          onCompleted={() => setTasksVersion((v) => v + 1)}
-          onOpenModels={() => {
-            setAlertsOpen(false);
-            changeTab("models");
-          }}
-          onClose={() => setAlertsOpen(false)}
-        />
-      )}
-      {paletteOpen && status?.unlocked && (
-        <CommandPalette
-          commands={paletteCommands()}
-          onClose={() => setPaletteOpen(false)}
-          onRun={(cmd) => {
-            setPaletteOpen(false);
-            // Runs after the palette unmounts and hands focus back, so a focused field keeps it.
-            setTimeout(() => void Promise.resolve(cmd.run()).catch((e) => setError(errText(e))), 0);
-          }}
-        />
-      )}
+      <Suspense fallback={null}>
+        {helpOpen && status?.unlocked && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
+        {onboardingOpen && status?.unlocked && (
+          <Onboarding
+            onClose={() => {
+              markOnboardingSeen();
+              setOnboardingOpen(false);
+            }}
+          />
+        )}
+        {searchOpen && status?.unlocked && (
+          <GlobalSearch
+            today={today}
+            privacy={privacy}
+            agenda={agenda.items}
+            onError={setError}
+            onClose={() => setSearchOpen(false)}
+            onNavigate={(target, q) => {
+              const destination = target === "transcripts" ? "agenda" : target;
+              if (destination === "agenda") saveView(target === "transcripts" ? "meetings" : "today");
+              setJumpQuery(target === "agenda" ? "" : q);
+              setJumpSeq((n) => n + 1);
+              setSettingsFocus(null);
+              setTab(destination);
+              setSearchOpen(false);
+            }}
+          />
+        )}
+        {alertsOpen && status?.unlocked && (
+          <NotificationsPanel
+            alerts={alerts}
+            log={log}
+            onGone={drop}
+            onRefresh={refreshAlerts}
+            onCompleted={() => setTasksVersion((v) => v + 1)}
+            onOpenModels={() => {
+              setAlertsOpen(false);
+              changeTab("models");
+            }}
+            onClose={() => setAlertsOpen(false)}
+          />
+        )}
+        {paletteOpen && status?.unlocked && (
+          <CommandPalette
+            commands={paletteCommands()}
+            onClose={() => setPaletteOpen(false)}
+            onRun={(cmd) => {
+              setPaletteOpen(false);
+              // Runs after the palette unmounts and hands focus back, so a focused field keeps it.
+              setTimeout(() => void Promise.resolve(cmd.run()).catch((e) => setError(errText(e))), 0);
+            }}
+          />
+        )}
+      </Suspense>
       <AppHeader
         unlocked={status?.unlocked === true}
         online={online}

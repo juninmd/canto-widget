@@ -74,6 +74,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Desempenho
 
+- **Abertura mais leve**: a paleta de comandos, a busca global, a ajuda de atalhos, o tour inicial, a tela de avisos e o interpretador de markdown saíram do código que roda antes da primeira tela; são buscados com a janela ociosa. No Chromium com CPU 4× mais lenta, o tempo de script até a janela aparecer caiu de 186 para 156 ms (−16%) e, no pop-up de aviso, de 232 para 163 ms (−30%). Medição e método em [docs/benchmark.md](docs/benchmark.md#inicialização-da-interface).
+
 - **Build do frontend ~10× mais rápido**: o Tailwind varria os ~1,8 MB de READMEs traduzidos e o CHANGELOG atrás
   de classes que só existem em `src/` e `index.html`. Com as fontes declaradas explicitamente, o `vite build` caiu
   de 162 s para 16 s neste Windows, e o CSS final só perdeu duas classes mortas (`shadow` e `!visible`, que nenhuma
@@ -105,6 +107,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Abas de protótipo Hábitos e Snippets**: saíram as duas telas de maquete, os rótulos nos 42 idiomas, os prints e
   os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
 ### Alterado
+
+- **Código da interface organizado por funcionalidade**: os 360 arquivos de `src/components` e os 242 de `src/lib` foram para `src/features/<nome>/` (componentes, lógica e testes lado a lado), `src/shell/` (o que emoldura as abas) e um núcleo compartilhado pequeno. Nada muda para quem usa; um teste impede que o código compartilhado volte a depender de uma funcionalidade e que dois arquivos da mesma pasta difiram só por maiúsculas (o que quebra no Windows e no macOS).
 
 - **Código dividido, sem mudar o comportamento**: `lib.rs` virou `boot.rs` (estado e watchers) e `tray.rs` (bandeja
   e eventos da janela); `App.tsx` ganhou `TabContent` e `useAppEvents`. Um teste novo (`sealed_files`) falha se um

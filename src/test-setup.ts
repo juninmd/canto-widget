@@ -9,3 +9,5 @@ localStorage.setItem("canto.language", "pt-BR");
 // The shown flag is module state shared by every file in the run: a test that hides the widget must not mute the next.
 const { setWindowShown } = await import("./lib/windowShown");
 afterEach(() => setWindowShown(true));
+// The parser arrives a tick after the first paint in the app; tests assert on the rendered markdown right away.
+await (await import("./lib/markdown")).loadMarkdown();

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { api, type AgendaItem } from "../../lib/api";
 import { hour, people, status as agendaStatus, tally } from "../agenda/agenda";
 import { kindOf, levelLabel, prLabel, senderName, senderProfile, toneOf } from "./alerts";
-import { block, inlineMarkdown, type Render } from "../../lib/markdown";
+import { block, useLexer, type Render } from "../../lib/markdown";
 import { timeAgo } from "../../lib/time";
 import { t } from "../../i18n";
 import AlertGuests from "./AlertGuests";
@@ -111,6 +111,7 @@ function Reason({ tone, children }: { tone: (typeof TONE)[keyof typeof TONE]; ch
 
 /** What a mention or a service writes: rendered as markdown (bold, lists, code) with its links openable. */
 function Description({ text }: { text: string }) {
+  const lexer = useLexer("inline");
   const render: Render = {
     text: (plain) => plain,
     link: (href, children, key) => (
@@ -126,8 +127,7 @@ function Description({ text }: { text: string }) {
   };
   return (
     <div className="space-y-1 break-words text-xs text-fg">
-      {inlineMarkdown
-        .lexer(text)
+      {lexer(text)
         .filter((tok) => tok.type !== "space")
         .map((tok, i) => block(tok, render, `d${i}`))}
     </div>
