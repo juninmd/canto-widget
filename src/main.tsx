@@ -1,13 +1,13 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import WindowBoundary from "./components/WindowBoundary";
+import WindowBoundary from "./shell/WindowBoundary";
 import { applySkin, loadSkin, followSystem } from "./lib/theme";
 import { applyDensity, loadDensity } from "./lib/density";
 import { LANGUAGE } from "./i18n";
 import { IS_MOBILE } from "./lib/platform";
 import { syncPrefs } from "./lib/prefsMirror";
 import { RTL_LANGUAGES } from "./i18n/languages";
-import { loadWindowRoot, windowKind } from "./lib/windowRoot";
+import { loadWindowRoot, windowKind } from "./shell/windowRoot";
 import { subscribeWindowShown, windowShown } from "./lib/windowShown";
 import "./styles.css";
 

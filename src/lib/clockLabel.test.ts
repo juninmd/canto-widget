@@ -1,9 +1,9 @@
 import { expect, test } from "bun:test";
 import { CATALOGS } from "../i18n/catalogs";
 import { hourLabel, hourTick, hoursMinutes } from "./clockLabel";
-import { currencySign } from "./market";
-import { duration } from "./summary";
-import { everyLabel } from "./health";
+import { currencySign } from "../features/market/market";
+import { duration } from "../features/tasks/summary";
+import { everyLabel } from "../features/health/health";
 
 const fill = (text: string, params: Record<string, string | number>) => text.replace(/\{(\w+)\}/g, (_, name: string) => String(params[name]));
 

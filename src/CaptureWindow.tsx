@@ -2,8 +2,8 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { emit, listen } from "@tauri-apps/api/event";
 import { t } from "./i18n";
 import { api, errText, todayLocal } from "./lib/api";
-import { CAPTURE_EVENT, TASKS_CHANGED_EVENT } from "./lib/alertEvents";
-import { parseQuickTask } from "./lib/quickAdd";
+import { CAPTURE_EVENT, TASKS_CHANGED_EVENT } from "./features/alerts/alertEvents";
+import { parseQuickTask } from "./features/tasks/quickAdd";
 import Spinner from "./components/Spinner";
 
 /** The shortcut's own window: Enter saves a task for today, Ctrl+Enter a note, Esc leaves without saving. */

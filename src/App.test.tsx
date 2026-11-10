@@ -86,7 +86,7 @@ mock.module("@tauri-apps/api/event", () => ({
 
 const { default: App } = await import("./App");
 // Notes loads its editor lazily; warming the module keeps that load off the fake clock below.
-await import("./components/NoteEditor");
+await import("./features/notes/NoteEditor");
 
 const meetingIn = (minutes: number) => ({
   id: "reuniao-1",

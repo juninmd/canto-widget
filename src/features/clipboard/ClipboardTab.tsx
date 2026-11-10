@@ -1,0 +1,235 @@
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { useQuerySeed } from "../../lib/useQuerySeed";
+import { api, errText, type ClipItem } from "../../lib/api";
+import { useUndo } from "../../lib/useUndo";
+import { useLatestRequest } from "../../lib/useLatestRequest";
+import { EXIT_CLASS, useNewIds, useExit } from "../../lib/motion";
+import { useFlip } from "../../lib/useFlip";
+import { clipKind, kindCounts, sameClips } from "./clip";
+import { t } from "../../i18n";
+import ClipCard from "./ClipCard";
+import EmptyState from "../../components/EmptyState";
+import Skeleton from "../../components/Skeleton";
+import ClipNote from "./ClipNote";
+import ClipClearConfirm from "./ClipClearConfirm";
+import ClipGroups from "./ClipGroups";
+import ClipKindChips, { type KindFilter } from "./ClipKindChips";
+import ClipAgendaMenu from "./ClipAgendaMenu";
+import { useCopied } from "../../lib/useCopied";
+import { useWindowVisible } from "../../lib/useWindowVisible";
+import { IS_MOBILE } from "../../lib/platform";
+import { ClipboardIcon, SearchIcon } from "../../components/Icons";
+
+// A clip copied elsewhere drops in from above, where it came from, and pushes the list down.
+const DROP_CLASS = "motion-safe:animate-cair motion-reduce:animate-fade";
+
+type Props = { privacy: boolean; initialQuery?: string; querySeq?: number; onError: (m: string) => void };
+
+export default function ClipboardTab({ privacy, initialQuery, querySeq, onError }: Props) {
+  const [query, setQuery] = useState(initialQuery ?? "");
+  useQuerySeed(initialQuery, querySeq, setQuery);
+  const [kindFilter, setKindFilter] = useState<KindFilter>("all");
+  const [items, setItems] = useState<ClipItem[]>([]);
+  const shown = useRef(items);
+  const [copied, flashCopied] = useCopied();
+  const [confirmingClear, setConfirmingClear] = useState(false);
+  const visibleWindow = useWindowVisible();
+  // The poll fails the same way every 2.5s; the person hears about a given failure once, until it recovers.
+  const lastError = useRef("");
+
+  const [loadedFor, setLoadedFor] = useState<string | null>(null);
+  const { leaving, leave } = useExit();
+  const { bump, isLatest } = useLatestRequest();
+
+  // The 150ms debounce and the 2.5s background poll can both be in flight at once; without this
+  // guard, an older (slower) reply could land after a newer one and overwrite fresher data.
+  // The history stamp the shown list came from, per query; `null` forces a fetch.
+  const seenRev = useRef<{ q: string; rev: string } | null>(null);
+
+  async function reload(q = query) {
+    const id = bump();
+    try {
+      const list = await api.clipList(q);
+      if (!isLatest(id)) return;
+      seenRev.current = list.revision ? { q, rev: list.revision } : null;
+      // The 2.5s poll mostly brings back the same list: keeping the old array lets React skip the whole re-render.
+      if (!sameClips(shown.current, list.items)) setItems((shown.current = list.items));
+      setLoadedFor(q);
+      lastError.current = "";
+    } catch (e) {
+      const message = errText(e);
+      if (isLatest(id) && message !== lastError.current) {
+        lastError.current = message;
+        onError(message);
+      }
+    }
+  }
+
+  // The 2.5s tick asks only for the stamp; decrypting and re-reading the whole history waits for a real change.
+  async function poll(q: string) {
+    const seen = seenRev.current;
+    if (seen && seen.q === q) {
+      const rev = await api.clipRevision().catch(() => null);
+      if (rev && rev === seen.rev && seenRev.current === seen) return;
+    }
+    await reload(q);
+  }
+
+  const pinnedCount = items.filter((i) => i.pinned).length;
+  // Under a search the list is partial, so only an unfiltered list says how much a clear removes.
+  const clearable = loadedFor === "" && !query ? items.length - pinnedCount : -1;
+  const counts = useMemo(() => kindCounts(items.map((i) => i.preview)), [items]);
+  const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
+  const list = useRef<HTMLDivElement>(null);
+  useFlip(list, visible.map((i) => `${i.id}:${i.pinned}`).join());
+
+  useEffect(() => {
+    // A hidden window has nobody watching the list; coming back reloads at once.
+    if (!visibleWindow) return;
+    const timer = setTimeout(() => void reload(query), 150);
+    const tick = setInterval(() => void poll(query), 2500);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(tick);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, visibleWindow]);
+
+  // A phone has no background watcher: what was copied elsewhere is picked up when the tab is on screen.
+  useEffect(() => {
+    if (!IS_MOBILE || !visibleWindow) return;
+    void api
+      .clipCapture()
+      .then(() => reload(query))
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visibleWindow]);
+
+  const undoable = useUndo(onError, () => reload());
+  // The clipboard watcher brings in new items every 2.5s: they slide in at the top.
+  const isNew = useNewIds(
+    items.map((i) => i.id),
+    loadedFor,
+  );
+
+  // A double click must not fire the same action twice: two pins would pin and unpin, two copies race.
+  const busy = useRef(new Set<string>());
+  async function run(fn: () => Promise<unknown>, key?: string) {
+    if (key) {
+      if (busy.current.has(key)) return;
+      busy.current.add(key);
+    }
+    try {
+      await fn();
+      await reload();
+    } catch (e) {
+      onError(errText(e));
+    } finally {
+      if (key) busy.current.delete(key);
+    }
+  }
+
+  // Up/Down (and Home/End) walk the cards; from the search box, Down enters the list. Enter on a card copies it.
+  function onListKey(e: KeyboardEvent) {
+    const cards = Array.from(list.current?.querySelectorAll<HTMLElement>("[data-clip-copy]") ?? []);
+    if (cards.length === 0) return;
+    const at = cards.indexOf(document.activeElement as HTMLElement);
+    if (at < 0) return;
+    const to = { ArrowDown: Math.min(at + 1, cards.length - 1), ArrowUp: at - 1, Home: 0, End: cards.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    if (to < 0) searchBox.current?.focus();
+    else cards[to].focus();
+  }
+  function onSearchKey(e: KeyboardEvent) {
+    if (e.key !== "ArrowDown") return;
+    const first = list.current?.querySelector<HTMLElement>("[data-clip-copy]");
+    if (!first) return;
+    e.preventDefault();
+    first.focus();
+  }
+  const searchBox = useRef<HTMLInputElement>(null);
+
+  const filtering = query || kindFilter !== "all";
+
+  return (
+    <div className="flex h-full flex-col gap-2">
+      <ClipNote />
+      <div className="flex items-center gap-2">
+        <div className="relative flex-1">
+          <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
+            <SearchIcon />
+          </span>
+          <input
+            ref={searchBox}
+            value={query}
+            onKeyDown={onSearchKey}
+            data-shortcut="search"
+            aria-label={t("clipboard.searchLabel")}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("clipboard.searchPlaceholder")}
+            className="canto-field w-full py-2 pl-9 pr-3 text-sm"
+          />
+        </div>
+        <ClipAgendaMenu
+          label={t("clipui.more")}
+          actions={[{ label: t("clipui.clearMenu"), danger: true, disabled: clearable === 0, onSelect: () => setConfirmingClear(true) }]}
+        />
+      </div>
+      {confirmingClear && (
+        <ClipClearConfirm
+          removing={clearable >= 0 ? clearable : null}
+          pinned={pinnedCount}
+          onCancel={() => setConfirmingClear(false)}
+          onConfirm={() => {
+            setConfirmingClear(false);
+            void run(async () => undoable(await api.clipClear(), t("clipboard.cleared")));
+          }}
+        />
+      )}
+      <ClipKindChips counts={counts} total={items.length} value={kindFilter} onChange={setKindFilter} />
+
+      <div ref={list} onKeyDown={onListKey} className="flex-1 space-y-3 overflow-y-auto pr-1">
+        <ClipGroups
+          items={visible}
+          card={(i) => (
+            <ClipCard
+              key={i.id}
+              item={i}
+              copied={copied === i.id}
+              privacy={privacy}
+              className={`${isNew(i.id) ? DROP_CLASS : ""} ${leaving.has(i.id) ? EXIT_CLASS : ""}`}
+              onCopy={() =>
+                run(async () => {
+                  await api.clipCopy(i.id);
+                  flashCopied(i.id);
+                }, `copy:${i.id}`)
+              }
+              onCopyAs={(mode) =>
+                run(async () => {
+                  await api.clipCopyAs(i.id, mode);
+                  flashCopied(i.id);
+                }, `copy:${i.id}`)
+              }
+              onPin={() => run(() => api.clipPin(i.id), `pin:${i.id}`)}
+              onDelete={() =>
+                void leave(i.id, () => run(async () => undoable(await api.clipDelete(i.id), t("clipboard.itemDeleted"))))
+              }
+            />
+          )}
+        />
+        {visible.length === 0 && (
+          <ul>
+            {loadedFor === null ? (
+              <li>
+                <Skeleton label={t("clipboard.loading")} />
+              </li>
+            ) : (
+              <EmptyState icon={filtering ? <SearchIcon /> : <ClipboardIcon />}>{filtering ? t("clipboard.emptySearch") : t("clipboard.empty")}</EmptyState>
+            )}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}

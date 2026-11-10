@@ -1,0 +1,244 @@
+import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { act } from "react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import type { HealthEndpoint, HealthView } from "./healthTypes";
+
+type Call = { cmd: string; args?: Record<string, unknown> };
+let calls: Call[] = [];
+let views: HealthView[] = [];
+let override: ((cmd: string) => Promise<unknown> | undefined) | null = null;
+
+const api: HealthEndpoint = {
+  id: "a", name: "API principal", kind: "http", url: "https://api.exemplo.dev/health",
+  every_secs: 60, limit_ms: 500, alert_down: true, alert_slow: true, alert_cert: false,
+};
+const sample = (ms: number | null, cert_days: number | null = null) => ({ at: 0, ms, err: ms === null ? "conexão recusada" : null, cert_days });
+const view = (endpoint: HealthEndpoint, health: HealthView["health"], samples: ReturnType<typeof sample>[]): HealthView => ({ endpoint, health, samples });
+
+mock.module("@tauri-apps/api/core", () => ({
+  invoke: (cmd: string, args?: Record<string, unknown>) => {
+    calls.push({ cmd, args });
+    const held = override?.(cmd);
+    if (held) return held;
+    if (cmd === "health_save") {
+      const e = args?.endpoint as HealthEndpoint;
+      views = e.id ? views.map((v) => (v.endpoint.id === e.id ? { ...v, endpoint: e } : v)) : [...views, view({ ...e, id: "new" }, "unknown", [])];
+      return Promise.resolve(views);
+    }
+    if (cmd === "health_remove") {
+      views = views.filter((v) => v.endpoint.id !== args?.id);
+      return Promise.resolve(views);
+    }
+    if (cmd === "health_list" || cmd === "health_check_now") return Promise.resolve(views);
+    return Promise.resolve(null);
+  },
+}));
+
+const { default: HealthTab } = await import("./HealthTab");
+
+async function mount() {
+  render(<HealthTab />);
+  for (let i = 0; i < 3; i++) await act(async () => {});
+}
+
+beforeEach(() => {
+  calls = [];
+  override = null;
+  views = [
+    view(api, "up", [sample(110), sample(130)]),
+    view({ ...api, id: "b", name: "Painel", url: "https://admin.exemplo.dev" }, "down", [sample(90), sample(null), sample(null)]),
+    view({ ...api, id: "c", name: "exemplo.dev", kind: "dns", url: undefined, host: "exemplo.dev", port: 443, alert_cert: true }, "up", [sample(20, 9)]),
+  ];
+});
+afterEach(cleanup);
+
+test("the list shows each endpoint's state as a word and the summary pills count what needs attention", async () => {
+  await mount();
+  expect(screen.getByText("API principal")).toBeTruthy();
+  expect(screen.getByText("fora do ar")).toBeTruthy();
+  expect(screen.getByText("certificado: 9 d")).toBeTruthy();
+  const pills = screen.getByRole("group", { name: "resumo dos endpoints" });
+  expect(within(pills).getByText("1 fora")).toBeTruthy();
+  expect(within(pills).getByText("0 lentos")).toBeTruthy();
+  expect(within(pills).getByText("1 a vencer")).toBeTruthy();
+  expect(within(pills).getByText("3 endpoints")).toBeTruthy();
+});
+
+test("endpoints are listed worst first and the open one keeps its place", async () => {
+  await mount();
+  const order = () => [...document.querySelectorAll("button[aria-expanded]")].map((b) => b.querySelector("b")?.textContent).filter(Boolean);
+  expect(order()).toEqual(["Painel", "exemplo.dev", "API principal"]);
+  fireEvent.click(screen.getByText("Painel"));
+  expect(screen.getAllByRole("region").map((r) => r.getAttribute("aria-label"))).toEqual(["Painel"]);
+});
+
+test("closed tiles keep their height in the scrolling list instead of shrinking under the next one", async () => {
+  await mount();
+  const tiles = [...document.querySelectorAll("button[aria-expanded=false]")].filter((b) => b.querySelector("b"));
+  expect(tiles.length).toBe(3);
+  for (const tile of tiles) expect(tile.classList.contains("shrink-0")).toBe(true);
+});
+
+test("'+ endereço' sits in the header, opens the form, and the empty state offers the same action", async () => {
+  views = [];
+  await mount();
+  expect(screen.queryByRole("group", { name: "resumo dos endpoints" })).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "adicionar endpoint" }));
+  expect(screen.getByRole("form", { name: "novo endpoint" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "+ endereço" }).getAttribute("aria-expanded")).toBe("true");
+  expect(screen.queryByText(/nenhum endpoint ainda/)).toBeNull();
+});
+
+test("clicking a tile opens it as a wide item with the chart, and clicking the header closes it", async () => {
+  await mount();
+  fireEvent.click(screen.getByText("API principal"));
+  const open = screen.getByRole("region", { name: "API principal" });
+  expect(within(open).getByRole("img", { name: "latência de API principal" })).toBeTruthy();
+  expect(within(open).getByText("https://api.exemplo.dev/health")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "recolher API principal" }));
+  expect(screen.queryByRole("region", { name: "API principal" })).toBeNull();
+});
+
+test("changing the limit or an alert saves the endpoint with the new value", async () => {
+  await mount();
+  fireEvent.click(screen.getByText("API principal"));
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("latência alta acima de"), { target: { value: "800" } });
+  });
+  expect((calls.find((c) => c.cmd === "health_save")?.args?.endpoint as HealthEndpoint).limit_ms).toBe(800);
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("avisar se ficar lento"));
+  });
+  expect((calls.filter((c) => c.cmd === "health_save").at(-1)?.args?.endpoint as HealthEndpoint).alert_slow).toBe(false);
+});
+
+test("the DNS kind asks for host and port and offers the certificate alert", async () => {
+  await mount();
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+  const form = screen.getByRole("form", { name: "novo endpoint" });
+  fireEvent.click(within(form).getByRole("button", { name: "DNS + certificado" }));
+  expect(within(form).getByLabelText("porta")).toBeTruthy();
+  expect(within(form).getByLabelText("avisar 14 dias antes do certificado vencer")).toBeTruthy();
+  fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Site" } });
+  fireEvent.change(within(form).getByLabelText("host"), { target: { value: "exemplo.dev" } });
+  await act(async () => {
+    fireEvent.click(within(form).getByRole("button", { name: "adicionar" }));
+  });
+  const saved = calls.find((c) => c.cmd === "health_save")?.args?.endpoint as HealthEndpoint;
+  expect(saved).toMatchObject({ id: "", name: "Site", kind: "dns", host: "exemplo.dev", port: 443, alert_cert: true });
+});
+
+test("a bad address stays in the form with the reason and nothing is sent", async () => {
+  await mount();
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+  const form = screen.getByRole("form", { name: "novo endpoint" });
+  fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "X" } });
+  fireEvent.change(within(form).getByLabelText("endereço (http ou https)"), { target: { value: "ftp://x.dev" } });
+  fireEvent.click(within(form).getByRole("button", { name: "adicionar" }));
+  expect(within(form).getByRole("alert").textContent).toContain("http:// ou https://");
+  expect(calls.some((c) => c.cmd === "health_save")).toBe(false);
+});
+
+test("TCP takes a port, and removing sends the id", async () => {
+  await mount();
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+  const form = screen.getByRole("form", { name: "novo endpoint" });
+  fireEvent.click(within(form).getByRole("button", { name: "TCP + porta" }));
+  fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Banco" } });
+  fireEvent.change(within(form).getByLabelText("host"), { target: { value: "db.interno" } });
+  fireEvent.change(within(form).getByLabelText("porta"), { target: { value: "5432" } });
+  await act(async () => {
+    fireEvent.click(within(form).getByRole("button", { name: "adicionar" }));
+  });
+  expect(calls.find((c) => c.cmd === "health_save")?.args?.endpoint).toMatchObject({ kind: "tcp", host: "db.interno", port: 5432 });
+
+  fireEvent.click(screen.getByText("Painel"));
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "remover" }));
+  });
+  expect(calls.find((c) => c.cmd === "health_remove")?.args).toEqual({ id: "b" });
+});
+
+test("the tiles stop polling while the widget is hidden and read again the moment it is back", async () => {
+  const { setWindowShown } = await import("../../lib/windowShown");
+  setWindowShown(false);
+  try {
+    await mount();
+    expect(calls.filter((c) => c.cmd === "health_list")).toEqual([]);
+    await act(async () => setWindowShown(true));
+    for (let i = 0; i < 3; i++) await act(async () => {});
+    expect(calls.filter((c) => c.cmd === "health_list").length).toBe(1);
+  } finally {
+    setWindowShown(true);
+  }
+});
+
+test("an empty list explains what to add", async () => {
+  views = [];
+  await mount();
+  expect(screen.getByText(/nenhum endpoint ainda/)).toBeTruthy();
+});
+
+test("a failed add keeps the form and what was typed, and a double submit sends one save", async () => {
+  await mount();
+  let fail: (reason: string) => void = () => {};
+  override = (cmd) => (cmd === "health_save" ? new Promise((_, reject) => (fail = reject)) : undefined);
+  fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+  const form = screen.getByRole("form", { name: "novo endpoint" });
+  fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Fila" } });
+  fireEvent.change(within(form).getByLabelText("endereço (http ou https)"), { target: { value: "https://fila.exemplo.dev" } });
+  await act(async () => {
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+  });
+  expect(calls.filter((c) => c.cmd === "health_save").length).toBe(1);
+  expect((within(form).getByRole("button", { name: "adicionar" }) as HTMLButtonElement).disabled).toBe(true);
+  await act(async () => fail("cofre ocupado"));
+  expect(screen.getByText("cofre ocupado")).toBeTruthy();
+  expect((screen.getByLabelText("nome") as HTMLInputElement).value).toBe("Fila");
+  expect((within(form).getByRole("button", { name: "adicionar" }) as HTMLButtonElement).disabled).toBe(false);
+});
+
+test("a slower, older answer does not undo a newer edit on screen", async () => {
+  await mount();
+  const before = views;
+  let finish: (list: HealthView[]) => void = () => {};
+  override = (cmd) => (cmd === "health_check_now" ? new Promise((resolve) => (finish = resolve)) : undefined);
+  fireEvent.click(screen.getByText("API principal"));
+  fireEvent.click(screen.getByRole("button", { name: "verificar agora" }));
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText("latência alta acima de"), { target: { value: "800" } });
+  });
+  expect((screen.getByLabelText("latência alta acima de") as HTMLSelectElement).value).toBe("800");
+  await act(async () => finish(before));
+  expect((screen.getByLabelText("latência alta acima de") as HTMLSelectElement).value).toBe("800");
+});
+
+test("a poll that overlaps a save neither discards the save nor brings the old list back", async () => {
+  const realInterval = globalThis.setInterval;
+  let tick: () => void = () => {};
+  globalThis.setInterval = ((fn: () => void) => ((tick = fn), 0)) as unknown as typeof setInterval;
+  try {
+    await mount();
+    const before = views;
+    let saved: () => void = () => {};
+    let polled: (list: HealthView[]) => void = () => {};
+    override = (cmd) => {
+      if (cmd === "health_save") return new Promise((resolve) => (saved = () => resolve([...before, view({ ...api, id: "n", name: "Fila" }, "unknown", [])])));
+      if (cmd === "health_list") return new Promise((resolve) => (polled = resolve));
+      return undefined;
+    };
+    fireEvent.click(screen.getByRole("button", { name: "+ endereço" }));
+    const form = screen.getByRole("form", { name: "novo endpoint" });
+    fireEvent.change(within(form).getByLabelText("nome"), { target: { value: "Fila" } });
+    fireEvent.change(within(form).getByLabelText("endereço (http ou https)"), { target: { value: "https://fila.exemplo.dev" } });
+    await act(async () => fireEvent.submit(form));
+    await act(async () => tick());
+    await act(async () => saved());
+    expect(screen.getByText("Fila")).toBeTruthy();
+    await act(async () => polled(before));
+    expect(screen.getByText("Fila")).toBeTruthy();
+  } finally {
+    globalThis.setInterval = realInterval;
+  }
+});

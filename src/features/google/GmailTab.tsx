@@ -1,0 +1,301 @@
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { api, errText, type GmailAction, type GmailMail, type GmailSummary, type GmailView } from "../../lib/api";
+import { composeLink } from "../contacts/contactExtras";
+import { googleGate } from "./google";
+import { afterAction, leavesView } from "./gmailView";
+import { useRefreshEvent } from "../../lib/useRefreshEvent";
+import { useExit } from "../../lib/motion";
+import { useFlip } from "../../lib/useFlip";
+import { t } from "../../i18n";
+import ErrorBanner from "../../components/ErrorBanner";
+import GmailBulkBar from "./GmailBulkBar";
+import GmailRow, { MINI } from "./GmailRow";
+import GoogleGate from "./GoogleGate";
+import { SearchIcon } from "../../components/Icons";
+import Skeleton from "../../components/Skeleton";
+
+type Props = { onNotice: (message: string) => void };
+
+const VIEWS: GmailView[] = ["inbox", "important", "unread", "starred"];
+const INBOX = "https://mail.google.com/mail/u/0/#inbox";
+const SEARCH_PAUSE_MS = 350;
+const BATCH = "\u0000batch";
+const EMPTY = { important: "gmail.none", unread: "gmail.empty.unread", starred: "gmail.empty.starred", inbox: "gmail.empty.inbox" } as const;
+const DONE: Partial<Record<GmailAction, "gmail.done.read" | "gmail.done.archive" | "gmail.done.trash">> = {
+  read: "gmail.done.read",
+  archive: "gmail.done.archive",
+  trash: "gmail.done.trash",
+};
+
+/** The inbox's unread count and one view of it (important, unread, starred, all), searchable, with single and batch actions. */
+export default function GmailTab({ onNotice }: Props) {
+  const [view, setView] = useState<GmailView>("inbox");
+  const [search, setSearch] = useState("");
+  const [summary, setSummary] = useState<GmailSummary | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [alerts, setAlerts] = useState(false);
+  const [selected, setSelected] = useState<ReadonlySet<string>>(new Set());
+  const [exits, setExits] = useState<Record<string, GmailAction>>({});
+  // Mail with a request on its way: a second click (double click, or a key held down) waits for the first answer.
+  const [pending, setPending] = useState<ReadonlySet<string>>(new Set());
+  const inFlight = useRef(new Set<string>());
+  const { leaving, leave } = useExit();
+  const list = useRef<HTMLUListElement>(null);
+  useFlip(list, summary?.important.map((m) => m.id).join());
+
+  const latest = useRef(0);
+  const taskBusy = useRef(new Set<string>());
+  const [shownFor, setShownFor] = useState("");
+
+  // Only the newest request lands: a slow answer for an earlier view or search must not replace the current one.
+  const load = useCallback(async (which: GmailView, query: string) => {
+    const ticket = ++latest.current;
+    setLoading(true);
+    try {
+      const next = await api.gmailSummary(which, query);
+      if (ticket !== latest.current) return;
+      setSummary(next);
+      setShownFor(`${which}\u0000${query}`);
+      setError("");
+    } catch (e) {
+      if (ticket === latest.current) setError(errText(e));
+    } finally {
+      if (ticket === latest.current) setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    setSelected(new Set());
+    const timer = setTimeout(() => void load(view, search), search ? SEARCH_PAUSE_MS : 0);
+    return () => clearTimeout(timer);
+  }, [load, view, search]);
+  useEffect(() => {
+    api.gmailAlertsGet().then(setAlerts, () => {});
+  }, []);
+  useRefreshEvent("gmail", () => void load(view, search));
+
+  const gate = googleGate(error);
+  if (gate) return <GoogleGate kind={gate} onConnected={() => void load(view, search)} />;
+  if (summary === null) {
+    return error ? <ErrorBanner message={error} busy={loading} onRetry={() => void load(view, search)} /> : <Skeleton label={t("google.fetching")} rows={4} />;
+  }
+
+  const openLink = (url: string) => void api.openLink(url).catch((e) => setError(errText(e)));
+  // A mail that leaves the view is swept out its own way first, then the list closes the gap; a failure puts it back.
+  const act = (all: string[], action: GmailAction, extra?: () => Promise<unknown>, notice?: string) => {
+    const ids = all.filter((id) => !inFlight.current.has(id));
+    if (ids.length === 0) return;
+    for (const id of ids) inFlight.current.add(id);
+    setPending(new Set(inFlight.current));
+    const settle = () => {
+      for (const id of ids) inFlight.current.delete(id);
+      setPending(new Set(inFlight.current));
+    };
+    const run = async () => {
+      try {
+        await extra?.();
+        await api.gmailModify(ids, action);
+        setSummary((s) => s && afterAction(s, ids, action, view));
+        setSelected((s) => new Set([...s].filter((id) => !ids.includes(id))));
+        const key = DONE[action];
+        const done = notice ?? (ids.length > 1 && key ? t(key) : undefined);
+        if (done) onNotice(done);
+      } catch (e) {
+        setError(errText(e));
+      } finally {
+        settle();
+      }
+    };
+    if (!leavesView(view, action)) return void run();
+    setExits((x) => ({ ...x, ...Object.fromEntries(ids.map((id) => [id, action])) }));
+    // useExit drops a second leave for the same key without running it; release the ids in that case too.
+    let ran = false;
+    const start = () => {
+      ran = true;
+      return run();
+    };
+    return void leave(ids.length > 1 ? BATCH : ids[0], start).finally(() => {
+      if (!ran) settle();
+    });
+  };
+  const toTask = (mail: GmailMail) => {
+    const add = () => api.gtasksAdd(mail.subject || mail.from);
+    if (mail.unread) return act([mail.id], "read", add, t("gmail.toTaskDone"));
+    const busy = `task:${mail.id}`;
+    if (taskBusy.current.has(busy)) return;
+    taskBusy.current.add(busy);
+    add()
+      .then(() => onNotice(t("gmail.toTaskDone")), (e) => setError(errText(e)))
+      .finally(() => taskBusy.current.delete(busy));
+  };
+  const toggle = (id: string) =>
+    setSelected((s) => {
+      const next = new Set(s);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+
+  const mails = summary.important;
+  // Until the picked view or search answers, the list on screen is the previous one's: dim it and keep it out of reach,
+  // and if that answer fails, leave only the error banner rather than mail from a view the user left.
+  const outdated = shownFor !== `${view}\u0000${search}`;
+  const failed = outdated && error !== "" && !loading;
+  const stale = outdated && !failed;
+  const now = new Date();
+  // Gmail's own keys, while focus is on a mail: j/k (or arrows) walk the list, x selects, s stars, u toggles read,
+  // e archives, # trashes, o opens. Buttons keep Enter and Space.
+  const onListKey = (e: KeyboardEvent<HTMLUListElement>) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const row = (e.target as HTMLElement).closest<HTMLElement>("[data-gmail-mail]");
+    const mail = row && mails.find((m) => m.id === row.dataset.gmailMail);
+    if (!row || !mail) return;
+    const rows = [...(list.current?.querySelectorAll<HTMLElement>("[data-gmail-mail]") ?? [])];
+    const at = rows.indexOf(row);
+    const focusRow = (i: number) => rows[i]?.querySelector<HTMLElement>("[data-gmail-focus]")?.focus();
+    const step = e.key === "j" || e.key === "ArrowDown" ? 1 : e.key === "k" || e.key === "ArrowUp" ? -1 : 0;
+    if (step) {
+      e.preventDefault();
+      focusRow(at + step);
+      return;
+    }
+    if (e.key === "x" || e.key === "o") {
+      e.preventDefault();
+      if (e.key === "x") toggle(mail.id);
+      else if (mail.link) openLink(mail.link);
+      return;
+    }
+    const actions: Record<string, GmailAction> = {
+      s: mail.starred ? "unstar" : "star",
+      u: mail.unread ? "read" : "unread",
+      e: "archive",
+      "#": "trash",
+    };
+    const action = actions[e.key];
+    if (!action) return;
+    e.preventDefault();
+    // A row about to leave the view hands focus to its neighbour so the keyboard keeps its place; a mail already
+    // waiting on a request stays put, since this key will be ignored.
+    if (!inFlight.current.has(mail.id) && leavesView(view, action)) focusRow(at + 1 < rows.length ? at + 1 : at - 1);
+    act([mail.id], action);
+  };
+  return (
+    <div className="flex h-full flex-col gap-2 overflow-y-auto pr-0.5">
+      {error && <ErrorBanner message={error} busy={loading} onRetry={() => void load(view, search)} />}
+      <section className="wx-glass wx-rise flex items-center justify-between gap-2 bg-gradient-to-br from-accent/15 via-accent/5 to-transparent p-3">
+        <div className="flex items-center gap-3">
+          <span aria-hidden="true" className="canto-float grid size-10 place-items-center rounded-xl bg-accent/15 text-xl">✉️</span>
+          <div>
+            <span className="text-[11px] text-muted">{t("gmail.inbox")}</span>
+            <p key={summary.unread} data-gmail-unread className="canto-roll text-3xl font-semibold leading-none tabular-nums tracking-tight text-fg">{summary.unread}</p>
+            <span className="text-[11px] text-muted">{t("gmail.unread")}</span>
+          </div>
+        </div>
+        <span className="flex flex-col items-end gap-1.5">
+          <span className="flex items-center gap-1">
+            <button type="button" onClick={() => openLink(composeLink())} className={`${MINI} bg-accent text-ink hover:opacity-90`}>
+              ✎ {t("gmail.compose")}
+            </button>
+            <button type="button" onClick={() => openLink(INBOX)} aria-label={t("gmail.openInbox")} className={`${MINI} bg-edge/60 hover:bg-hover`}>
+              ↗
+            </button>
+            <button
+              type="button"
+              onClick={() => void load(view, search)}
+              disabled={loading}
+              aria-label={t("google.refresh")}
+              className="canto-hit flex size-6 items-center justify-center rounded-full text-muted hover:bg-hover hover:text-fg disabled:opacity-60"
+            >
+              <span aria-hidden="true" className={`inline-block text-sm leading-none ${loading ? "wx-spin" : ""}`}>↻</span>
+            </button>
+          </span>
+          {view === "important" && (
+            <span key={mails.length} className="canto-pop rounded-full bg-warn/15 px-2 py-0.5 text-[11px] font-semibold text-warn">
+              {t("gmail.important", { n: mails.length })}
+            </span>
+          )}
+        </span>
+      </section>
+      <div role="group" className="flex flex-wrap gap-1.5">
+        {VIEWS.map((id) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={view === id}
+            onClick={() => setView(id)}
+            className="canto-hit rounded-full border border-edge px-2.5 py-0.5 text-[11px] text-muted aria-pressed:border-accent/50 aria-pressed:bg-accent/15 aria-pressed:text-accent-text"
+          >
+            {t(`gmail.view.${id}`)}
+          </button>
+        ))}
+      </div>
+      <label className="canto-field flex items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
+        <span aria-hidden="true" className="text-faint [&>svg]:size-3.5"><SearchIcon /></span>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t("gmail.search")}
+          aria-label={t("gmail.search")}
+          data-shortcut="search"
+          maxLength={100}
+          className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
+        />
+      </label>
+      <div aria-busy={stale} inert={stale} className={`flex flex-col gap-2 transition-opacity ${stale ? "opacity-60" : ""}`}>
+      {failed ? null : mails.length === 0 ? (
+        <p key={view} className="wx-glass wx-rise flex items-center gap-2 p-3 text-xs text-muted">
+          <span aria-hidden="true" className="canto-float inline-block text-base">📭</span>
+          {search ? t("gmail.noMatch") : t(EMPTY[view])}
+        </p>
+      ) : (
+        <ul ref={list} key={view} onKeyDown={onListKey} className="wx-glass shrink-0 divide-y divide-edge overflow-hidden">
+          {mails.map((mail, index) => (
+            <GmailRow
+              key={mail.id}
+              mail={mail}
+              index={index}
+              now={now}
+              selected={selected.has(mail.id)}
+              busy={pending.has(mail.id)}
+              leaving={leaving.has(mail.id) || (leaving.has(BATCH) && selected.has(mail.id)) ? (exits[mail.id] ?? "read") : null}
+              onSelect={() => toggle(mail.id)}
+              onAct={(action) => act([mail.id], action)}
+              onTask={() => toTask(mail)}
+              onOpen={() => openLink(mail.link)}
+            />
+          ))}
+        </ul>
+      )}
+      </div>
+      {selected.size > 0 && (
+        <GmailBulkBar
+          count={selected.size}
+          total={mails.length}
+          onAll={() => setSelected(new Set(mails.map((m) => m.id)))}
+          onClear={() => setSelected(new Set())}
+          onAct={(action) => act([...selected], action)}
+        />
+      )}
+      <label className="wx-glass flex cursor-pointer items-start gap-3 p-3 text-xs">
+        <span className="flex-1">
+          <span className="block text-fg">{t("gmail.alerts")}</span>
+          <span className="mt-0.5 block text-[11px] text-muted">{t("gmail.alertsHint")}</span>
+        </span>
+        <input
+          type="checkbox"
+          checked={alerts}
+          onChange={(e) => {
+            const on = e.target.checked;
+            setAlerts(on);
+            api.gmailAlertsSet(on).catch((err) => {
+              setAlerts(!on);
+              setError(errText(err));
+            });
+          }}
+          className="mt-0.5 size-4 accent-[var(--color-accent)]"
+        />
+      </label>
+    </div>
+  );
+}
