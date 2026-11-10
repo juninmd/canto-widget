@@ -1,6 +1,6 @@
 use super::*;
 use crate::forge::{ChecksStatus, ForgeItem};
-use crate::github_failures::FailedJob;
+use crate::github::failures::FailedJob;
 
 const NOW: i64 = 1_789_700_400_000; // 2026-09-18T03:00:00Z
 

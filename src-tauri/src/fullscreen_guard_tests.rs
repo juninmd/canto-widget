@@ -37,7 +37,7 @@ fn it_is_on_in_old_files_and_remembers_the_choice() {
 
 #[test]
 fn an_alert_in_a_game_waits_instead_of_taking_the_foreground() {
-    let src = include_str!("window.rs");
+    let src = include_str!("window/mod.rs");
     let body = &src[src.find("pub fn open_alert(").unwrap()..src.find("/// Every pending alert").unwrap()];
     let hold = body.find("fullscreen_guard::hold(app)").expect("open_alert must ask the guard");
     assert!(hold < body.find("present_pending(app)").unwrap(), "the pop-up would show before the guard speaks");

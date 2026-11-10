@@ -1,0 +1,175 @@
+//! What spans both forges: the PRs/MRs the user opened, merged, reviewed or closed, for the day summary and period report.
+use serde::Serialize;
+use tauri::Manager;
+
+use crate::blocking::run;
+use crate::error::{AppError, Result};
+use crate::forge::filter::{Activity, Window, ACTIVITIES};
+use crate::forge::{ForgeItem, ForgeList};
+use crate::model::now_ms;
+use crate::vault::AppState;
+
+const DAY_MS: i64 = 86_400_000;
+
+#[derive(Debug, Default, Serialize)]
+pub struct Opened {
+    pub items: Vec<ForgeItem>,
+    pub merged: Vec<ForgeItem>,
+    pub reviewed: Vec<ForgeItem>,
+    pub closed: Vec<ForgeItem>,
+    /// One line per distinct failure; the other forge's items still come.
+    pub errors: Vec<String>,
+    /// What each forge counted, past the first page the lists carry: a month can outgrow it.
+    pub totals: Totals,
+}
+
+#[derive(Debug, Default, Serialize, PartialEq)]
+pub struct Totals {
+    pub opened: u64,
+    pub merged: u64,
+    pub reviewed: u64,
+    pub closed: u64,
+}
+
+/// `since_ms` is local midnight from the UI; anything outside the last two days is refused rather than searched.
+#[tauri::command]
+pub async fn forges_opened_since(app: tauri::AppHandle, since_ms: i64) -> Result<Opened> {
+    let now = now_ms();
+    if !(now - 2 * DAY_MS..=now + 60_000).contains(&since_ms) {
+        return Err(AppError::Config("inicio do dia fora do intervalo".into()));
+    }
+    let w = Window::since(&rfc3339(since_ms)?);
+    run(move || activity(&app, &w)).await
+}
+
+/// Both forges, every activity, inside `w`; blocking, so callers run it off the async runtime.
+pub(crate) fn activity(app: &tauri::AppHandle, w: &Window) -> Result<Opened> {
+    let state = app.state::<AppState>();
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
+    let results = ACTIVITIES.into_iter().flat_map(|a| {
+        let gh = crate::github::cmd_lists::activity_since(app, a, w);
+        let gl = crate::gitlab::cmd::activity_since(&state, a, w);
+        [gh, gl].into_iter().flatten().map(move |r| (a, r))
+    });
+    Ok(combine(results))
+}
+
+/// Sum of "revisão pedida a mim" across every connected forge; a forge that fails or isn't
+/// connected just doesn't add to the total (used by the tray badge, not shown to the user directly).
+pub(crate) fn review_requested_total(app: &tauri::AppHandle) -> u64 {
+    let state = app.state::<AppState>();
+    [crate::github::cmd_lists::review_requested(app), crate::gitlab::cmd::review_requested(&state)]
+        .into_iter()
+        .flatten()
+        .filter_map(Result::ok)
+        .sum()
+}
+
+fn combine(results: impl Iterator<Item = (Activity, Result<ForgeList>)>) -> Opened {
+    let mut out = Opened::default();
+    for (activity, r) in results {
+        let list = match r {
+            Ok(list) => {
+                let total = list.total.max(list.items.len() as u64);
+                *match activity {
+                    Activity::Opened => &mut out.totals.opened,
+                    Activity::Merged => &mut out.totals.merged,
+                    Activity::Reviewed => &mut out.totals.reviewed,
+                    Activity::Closed => &mut out.totals.closed,
+                } += total;
+                list.items
+            }
+            Err(e) => {
+                let e = e.to_string();
+                if !out.errors.contains(&e) {
+                    out.errors.push(e);
+                }
+                continue;
+            }
+        };
+        match activity {
+            Activity::Opened => out.items.extend(list),
+            Activity::Merged => out.merged.extend(list),
+            Activity::Reviewed => out.reviewed.extend(list),
+            Activity::Closed => out.closed.extend(list),
+        }
+    }
+    for items in [&mut out.items, &mut out.merged, &mut out.reviewed, &mut out.closed] {
+        items.sort_by(|a, b| a.created_at.cmp(&b.created_at));
+    }
+    out
+}
+
+/// Built from numbers, never from user text: it goes straight into a search query.
+pub(crate) fn rfc3339(ms: i64) -> Result<String> {
+    let t =
+        time::OffsetDateTime::from_unix_timestamp(ms.div_euclid(1000)).map_err(|e| AppError::Config(e.to_string()))?;
+    Ok(format!(
+        "{:04}-{:02}-{:02}T{:02}:{:02}:{:02}+00:00",
+        t.year(),
+        u8::from(t.month()),
+        t.day(),
+        t.hour(),
+        t.minute(),
+        t.second()
+    ))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::forge::item;
+
+    #[test]
+    fn local_midnight_becomes_a_utc_timestamp_both_apis_accept() {
+        // 2026-09-18 00:00 in São Paulo (UTC-3).
+        assert_eq!(rfc3339(1_789_700_400_000).unwrap(), "2026-09-18T03:00:00+00:00");
+    }
+
+    #[test]
+    fn one_forge_failing_keeps_the_other_ones_items_in_opening_order() {
+        let gh = ForgeList { items: vec![item(2, "2026-09-18T15:00:00Z", "", 0)], ..Default::default() };
+        let gl = ForgeList { items: vec![item(1, "2026-09-18T12:00:00Z", "", 0)], ..Default::default() };
+        let out =
+            combine([(Activity::Opened, Ok(gh)), (Activity::Opened, err()), (Activity::Opened, Ok(gl))].into_iter());
+        assert_eq!(out.items.iter().map(|i| i.number).collect::<Vec<_>>(), vec![1, 2]);
+        assert_eq!(out.errors, vec!["gitlab: sem resposta"]);
+    }
+
+    fn err() -> Result<ForgeList> {
+        Err(AppError::Gitlab("sem resposta".into()))
+    }
+
+    #[test]
+    fn merged_and_reviewed_land_in_their_own_lists_and_a_repeated_failure_shows_once() {
+        let one = |n| ForgeList { items: vec![item(n, "2026-09-18T12:00:00Z", "", 0)], ..Default::default() };
+        let results = [
+            (Activity::Merged, Ok(one(3))),
+            (Activity::Reviewed, Ok(one(4))),
+            (Activity::Merged, err()),
+            (Activity::Reviewed, err()),
+        ];
+        let out = combine(results.into_iter());
+        assert!(out.items.is_empty());
+        assert_eq!((out.merged[0].number, out.reviewed[0].number), (3, 4));
+        assert_eq!(out.errors.len(), 1);
+    }
+
+    #[test]
+    fn closed_lands_in_its_own_list_and_total() {
+        let one = ForgeList { total: 3, items: vec![item(7, "2026-09-18T12:00:00Z", "", 0)], ..Default::default() };
+        let out = combine([(Activity::Closed, Ok(one))].into_iter());
+        assert_eq!((out.closed[0].number, out.totals.closed), (7, 3));
+        assert!(out.items.is_empty() && out.merged.is_empty());
+    }
+
+    #[test]
+    fn totals_count_past_the_first_page_and_add_both_forges() {
+        let gh = ForgeList { total: 45, items: vec![item(1, "2026-09-02T12:00:00Z", "", 0)], ..Default::default() };
+        let gl = ForgeList { total: 0, items: vec![item(2, "2026-09-03T12:00:00Z", "", 0)], ..Default::default() };
+        let out = combine([(Activity::Merged, Ok(gh)), (Activity::Merged, Ok(gl))].into_iter());
+        assert_eq!(out.totals, Totals { opened: 0, merged: 46, reviewed: 0, closed: 0 });
+    }
+}

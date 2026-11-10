@@ -108,6 +108,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
 ### Alterado
 
+- **Código Rust agrupado por funcionalidade**: `src-tauri/src` tinha 271 arquivos numa pasta só; 166 deles foram para 21 pastas (`steam/`, `github/`, `clipboard/`, `window/`, ...), sem o prefixo repetido (`steam_lists.rs` virou `steam/lists.rs`, os comandos ficam em `<funcionalidade>/cmd.rs`). Nomes de comandos IPC, arquivos em disco e AADs não mudam. Os testes que varrem o código-fonte (não perturbe, arquivos selados) passaram a percorrer as pastas.
+
 - **Código da interface organizado por funcionalidade**: os 360 arquivos de `src/components` e os 242 de `src/lib` foram para `src/features/<nome>/` (componentes, lógica e testes lado a lado), `src/shell/` (o que emoldura as abas) e um núcleo compartilhado pequeno. Nada muda para quem usa; um teste impede que o código compartilhado volte a depender de uma funcionalidade e que dois arquivos da mesma pasta difiram só por maiúsculas (o que quebra no Windows e no macOS).
 
 - **Código dividido, sem mudar o comportamento**: `lib.rs` virou `boot.rs` (estado e watchers) e `tray.rs` (bandeja

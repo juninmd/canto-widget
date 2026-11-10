@@ -2,7 +2,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::{AppError, Result};
-use crate::google_api::{check_id, client, send};
+use crate::google::api::{check_id, client, send};
 
 const API: &str = "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks";
 /// Google's own limit for a task title.

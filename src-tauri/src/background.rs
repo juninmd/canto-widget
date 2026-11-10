@@ -55,7 +55,7 @@ pub fn lock_from_tray(app: &AppHandle) {
 fn watch_window_state(app: AppHandle, dir: PathBuf) {
     crate::resilient::supervise("window-state", move || loop {
         std::thread::sleep(WINDOW_STATE_POLL);
-        if let Err(e) = app.state::<crate::window_state::WindowState>().save_if_dirty(&dir) {
+        if let Err(e) = app.state::<crate::window::state::WindowState>().save_if_dirty(&dir) {
             eprintln!("posicao da janela nao gravou: {e}");
         }
     });

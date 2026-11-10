@@ -1,0 +1,187 @@
+//! Sealed `modelos_ia.json`: the alert choice, the last ranking and the top 10 seen, plus the 3 h floor that
+//! keeps the public page from being hammered, whoever asks: the tab, "atualizar" or the watcher.
+use serde::{Deserialize, Serialize};
+
+use crate::error::Result;
+use crate::models::feed::{FetchError, Model, Page};
+use crate::models::rank::{self, Change};
+use crate::store::{self, MODELS_AAD};
+use crate::vault::AppState;
+
+pub const FLOOR_MS: i64 = 3 * 3_600_000;
+pub const BADGE_MS: i64 = 7 * 86_400_000;
+/// Bounds what is sealed and sent to the webview; the rest of the list only counts toward `total`.
+pub const MAX_LIST: usize = 50;
+/// Bumped when the page reader changes: a ranking read by an older build is refetched at once instead of
+/// waiting out its floor (an update that fixes the reader must not keep showing the stale list for 3 h).
+pub const READER: u32 = 2;
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum BadgeKind {
+    New,
+    Up,
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Badge {
+    pub id: String,
+    pub kind: BadgeKind,
+    pub at: i64,
+}
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct ModelsConfig {
+    #[serde(default)]
+    pub alerts: bool,
+    /// Ranked, at most `MAX_LIST`.
+    #[serde(default)]
+    pub models: Vec<Model>,
+    #[serde(default)]
+    pub total: usize,
+    #[serde(default)]
+    pub fetched_at: i64,
+    /// Last time the API answered, success or not: what the floor counts from.
+    #[serde(default)]
+    pub tried_at: i64,
+    /// Top 10 ids in order; `None` until the first reading, which only seeds.
+    #[serde(default)]
+    pub top: Option<Vec<String>>,
+    #[serde(default)]
+    pub badges: Vec<Badge>,
+    /// `READER` of the build that last reached the page; 0 in files written before it existed.
+    #[serde(default)]
+    pub reader: u32,
+    /// Why the last answered fetch failed; kept until one succeeds, so the cached list reads as stale.
+    #[serde(default)]
+    pub error: Option<String>,
+    /// Intelligence Index version the stored `top` was ranked under, as the page names it; empty until known.
+    #[serde(default)]
+    pub index: String,
+}
+
+impl AppState {
+    pub fn models_config(&self) -> Result<Option<ModelsConfig>> {
+        self.sealed(&store::models_path(&self.dir), MODELS_AAD)
+    }
+
+    pub fn save_models(&self, cfg: &ModelsConfig) -> Result<()> {
+        self.save_sealed(&store::models_path(&self.dir), MODELS_AAD, cfg)
+    }
+}
+
+/// A clock set backwards must not lock the user out for days.
+pub fn due(cfg: &ModelsConfig, now: i64) -> bool {
+    cfg.tried_at == 0 || cfg.reader != READER || now >= cfg.tried_at + FLOOR_MS || now < cfg.tried_at
+}
+
+pub fn next_fetch_at(cfg: &ModelsConfig) -> i64 {
+    if cfg.tried_at == 0 || cfg.reader != READER {
+        0
+    } else {
+        cfg.tried_at + FLOOR_MS
+    }
+}
+
+#[derive(Debug, Default, PartialEq)]
+pub struct Outcome {
+    pub changes: Vec<Change>,
+    /// Asked to refresh inside the floor: served from the cache instead.
+    pub throttled: bool,
+    pub error: Option<String>,
+}
+
+/// Calls `fetch` only when the floor allows; a network failure (no answer) doesn't spend the window.
+pub fn refresh<P: Into<Page>>(
+    cfg: &mut ModelsConfig,
+    now: i64,
+    force: bool,
+    fetch: impl FnOnce() -> std::result::Result<P, FetchError>,
+) -> Outcome {
+    if !due(cfg, now) {
+        return Outcome { throttled: force, ..Default::default() };
+    }
+    let result = fetch().map(Into::into);
+    if !matches!(result, Err(FetchError::Network(_))) {
+        cfg.tried_at = now;
+        cfg.reader = READER;
+    }
+    let error = match result {
+        Ok(page) if page.models.is_empty() => "nenhum modelo com Intelligence Index na página".to_string(),
+        Ok(page) => {
+            cfg.error = None;
+            return Outcome { changes: apply(cfg, page, now), ..Default::default() };
+        }
+        Err(FetchError::Network(e)) => {
+            return Outcome { error: Some(FetchError::Network(e).message()), ..Default::default() }
+        }
+        Err(e) => e.message(),
+    };
+    cfg.error = Some(error.clone());
+    Outcome { error: Some(error), ..Default::default() }
+}
+
+/// A new index version rescales every score, so it only reseeds the top 10; an unnamed version changes nothing.
+fn apply(cfg: &mut ModelsConfig, page: Page, now: i64) -> Vec<Change> {
+    let ranked = rank::rank(page.models);
+    if let Some(index) = page.index.filter(|v| *v != cfg.index) {
+        cfg.top = None;
+        cfg.badges.clear();
+        cfg.index = index;
+    }
+    let changes = rank::diff(cfg.top.as_deref(), &ranked);
+    cfg.top = Some(rank::top_ids(&ranked));
+    cfg.total = ranked.len();
+    cfg.models = ranked.into_iter().take(MAX_LIST).collect();
+    cfg.fetched_at = now;
+    cfg.badges.retain(|b| now - b.at < BADGE_MS && !changes.iter().any(|c| c.id() == b.id));
+    cfg.badges.extend(changes.iter().map(|c| Badge {
+        id: c.id().to_string(),
+        kind: if matches!(c, Change::Entered { .. }) { BadgeKind::New } else { BadgeKind::Up },
+        at: now,
+    }));
+    changes
+}
+
+#[derive(Debug, Serialize)]
+pub struct Row {
+    #[serde(flatten)]
+    pub model: Model,
+    pub rank: usize,
+    pub badge: Option<BadgeKind>,
+}
+
+#[derive(Debug, Default, Serialize)]
+pub struct ModelsView {
+    pub alerts: bool,
+    pub models: Vec<Row>,
+    pub total: usize,
+    pub fetched_at: i64,
+    pub next_fetch_at: i64,
+    pub throttled: bool,
+    pub error: Option<String>,
+    pub index: String,
+}
+
+pub fn view(cfg: &ModelsConfig, now: i64, outcome: Outcome) -> ModelsView {
+    let badge = |id: &str| cfg.badges.iter().find(|b| b.id == id && now - b.at < BADGE_MS).map(|b| b.kind);
+    ModelsView {
+        alerts: cfg.alerts,
+        models: cfg
+            .models
+            .iter()
+            .enumerate()
+            .map(|(i, m)| Row { model: m.clone(), rank: i + 1, badge: badge(&m.id) })
+            .collect(),
+        total: cfg.total,
+        fetched_at: cfg.fetched_at,
+        next_fetch_at: next_fetch_at(cfg),
+        throttled: outcome.throttled,
+        error: outcome.error.or_else(|| cfg.error.clone()),
+        index: cfg.index.clone(),
+    }
+}
+
+#[cfg(test)]
+#[path = "state_tests.rs"]
+mod tests;

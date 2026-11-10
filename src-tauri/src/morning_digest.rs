@@ -13,7 +13,7 @@ use crate::calendar::AgendaItem;
 use crate::error::Result;
 use crate::notification::DIGEST_PREFIX;
 use crate::vault::AppState;
-use crate::{cmd_extras, cmd_forges, mentions_state::MentionsUnread, routine, window};
+use crate::{cmd_extras, forge, mentions::state::MentionsUnread, routine, window};
 
 const FILE: &str = "resumo_manha.json";
 const TICK: Duration = Duration::from_secs(60);
@@ -220,7 +220,7 @@ fn gather(app: &AppHandle, state: &AppState, day: NaiveDate, now_ms: i64) -> Cou
         meetings,
         first_meeting,
         tasks: routine::open_count(state, &key).unwrap_or(0),
-        reviews: cmd_forges::review_requested_total(app),
+        reviews: forge::cmd::review_requested_total(app),
         mentions: app.state::<MentionsUnread>().count(),
     }
 }

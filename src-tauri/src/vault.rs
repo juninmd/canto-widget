@@ -35,14 +35,14 @@ pub struct AppState {
     pub alert: Mutex<Option<crate::calendar::AgendaItem>>,
     pub trash: crate::trash::Trash,
     /// GitHub/GitLab lists; dropped on lock like the rest of the plaintext.
-    pub forges: crate::forge_cache::ForgeCache,
+    pub forges: crate::forge::cache::ForgeCache,
     /// Guests' directory photos; dropped on lock like the rest of the plaintext.
     pub guest_photos: crate::guest_photos::GuestPhotos,
     /// Contact photos as `data:` URLs; dropped on lock like the rest of the plaintext.
-    pub contact_photos: crate::contact_photos::ContactPhotos,
+    pub contact_photos: crate::contacts::photos::ContactPhotos,
     /// Steam lists (wishlist deals, top sellers, catalog); dropped on lock with the rest.
     pub steam: crate::steam::SteamCache,
-    pub traffic: crate::traffic_cache::TrafficCache,
+    pub traffic: crate::traffic::cache::TrafficCache,
     /// Soonest upcoming event with a Meet link, refreshed by `tray_live::watch`; read by the tray and the join shortcut.
     pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
     /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.

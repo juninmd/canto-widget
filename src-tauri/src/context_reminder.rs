@@ -6,7 +6,7 @@ use std::time::Duration;
 use chrono::Local;
 use tauri::{AppHandle, Manager};
 
-use crate::activity_os;
+use crate::activity;
 use crate::calendar::AgendaItem;
 use crate::error::Result;
 use crate::model::{now_ms, Task};
@@ -93,7 +93,7 @@ pub fn watch(app: AppHandle) {
             if state.is_unlocked() {
                 // Local time from chrono: `time`'s local offset is refused in multithreaded processes.
                 let today = Local::now().format("%Y-%m-%d").to_string();
-                for t in tick(&state, &mut rung, &today, activity_os::foreground_app, wifi_os::current_ssid) {
+                for t in tick(&state, &mut rung, &today, activity::os::foreground_app, wifi_os::current_ssid) {
                     let _ = window::open_alert(&app, to_event(&t));
                 }
             }

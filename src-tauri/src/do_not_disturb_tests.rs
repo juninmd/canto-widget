@@ -78,6 +78,28 @@ fn source(file: &str) -> String {
     std::fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("src").join(file)).unwrap().replace("\r\n", "\n")
 }
 
+/// Every non-test source file under `src`, as (path relative to `src` with `/`, contents).
+fn sources() -> Vec<(String, String)> {
+    fn walk(dir: &Path, root: &Path, out: &mut Vec<(String, String)>) {
+        for entry in std::fs::read_dir(dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                walk(&path, root, out);
+                continue;
+            }
+            let name = path.strip_prefix(root).unwrap().to_string_lossy().replace('\\', "/");
+            if name.ends_with(".rs") && !name.ends_with("tests.rs") {
+                out.push((name, std::fs::read_to_string(&path).unwrap()));
+            }
+        }
+    }
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
+    let mut out = Vec::new();
+    walk(&root, &root, &mut out);
+    assert!(out.len() > 100, "the scan found only {} files: it stopped walking the folders", out.len());
+    out
+}
+
 fn body_of(src: &str, signature: &str) -> String {
     let start = src.find(signature).unwrap_or_else(|| panic!("{signature} not found"));
     let rest = &src[start..];
@@ -86,40 +108,27 @@ fn body_of(src: &str, signature: &str) -> String {
 
 #[test]
 fn every_os_notification_goes_through_the_gate() {
-    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
-    for entry in std::fs::read_dir(dir).unwrap() {
-        let path = entry.unwrap().path();
-        if !path.is_file() || path.extension().and_then(|extension| extension.to_str()) != Some("rs") {
-            continue;
+    for (name, src) in sources() {
+        if name != "notification.rs" {
+            assert!(!src.contains(".notification()"), "{name} notifies around notify_os and do not disturb");
         }
-        let name = path.file_name().unwrap().to_string_lossy().to_string();
-        if name == "notification.rs" || name.ends_with("_tests.rs") {
-            continue;
-        }
-        let src = std::fs::read_to_string(&path).unwrap();
-        assert!(!src.contains(".notification()"), "{name} notifies around notify_os and do not disturb");
     }
     let notify_os = body_of(&source("notification.rs"), "pub fn notify_os(");
     assert!(notify_os.contains("do_not_disturb::quiet(app)"));
     assert!(body_of(&source("notification.rs"), "pub fn send(").contains("notify_os("), "meetings and tasks");
-    assert!(source("status_alert.rs").contains("window::open_alert("), "status outages ring through the alert window");
-    assert!(body_of(&source("models_alert.rs"), "pub fn notify(").contains("open_alert("), "AI models top 10");
+    assert!(source("status/alert.rs").contains("window::open_alert("), "status outages ring through the alert window");
+    assert!(body_of(&source("models/alert.rs"), "pub fn notify(").contains("open_alert("), "AI models top 10");
 }
 
 #[test]
 fn every_alert_pop_up_goes_through_the_gate() {
-    let open_alert = body_of(&source("window.rs"), "pub fn open_alert(");
+    let open_alert = body_of(&source("window/mod.rs"), "pub fn open_alert(");
     let gate = open_alert.find("do_not_disturb::quiet(app)").expect("open_alert must check do not disturb");
     assert!(gate < open_alert.find("state.alert").unwrap(), "gate before the overlay payload is stored");
     // Meeting alerts, task reminders, snoozes and the UI's alert_open all ring through open_alert.
-    for entry in std::fs::read_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("src")).unwrap() {
-        let path = entry.unwrap().path();
-        if !path.is_file() || path.extension().and_then(|extension| extension.to_str()) != Some("rs") {
-            continue;
-        }
-        let name = path.file_name().unwrap().to_string_lossy().to_string();
-        if name != "window.rs" && !name.ends_with("_tests.rs") {
-            assert!(!std::fs::read_to_string(&path).unwrap().contains("ALERT_EVENT"), "{name} bypasses open_alert");
+    for (name, src) in sources() {
+        if name != "window/mod.rs" {
+            assert!(!src.contains("ALERT_EVENT"), "{name} bypasses open_alert");
         }
     }
 }
