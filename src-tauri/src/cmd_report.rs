@@ -3,9 +3,9 @@ use tauri::{Manager, State};
 
 use crate::blocking::run;
 use crate::calendar::{self, AgendaItem};
-use crate::cmd_forges::{rfc3339, Opened};
 use crate::error::{AppError, Result};
-use crate::forge_filter::Window;
+use crate::forge::cmd::{rfc3339, Opened};
+use crate::forge::filter::Window;
 use crate::model::now_ms;
 use crate::report::{self, VaultPeriod};
 use crate::vault::AppState;
@@ -31,7 +31,7 @@ pub fn check_period(from_ms: i64, to_ms: i64, now: i64) -> Result<()> {
 pub async fn forges_activity_between(app: tauri::AppHandle, from_ms: i64, to_ms: i64) -> Result<Opened> {
     check_period(from_ms, to_ms, now_ms())?;
     let w = Window { since: rfc3339(from_ms)?, until: Some(rfc3339(to_ms)?) };
-    run(move || crate::cmd_forges::activity(&app, &w)).await
+    run(move || crate::forge::cmd::activity(&app, &w)).await
 }
 
 #[tauri::command]

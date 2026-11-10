@@ -10,7 +10,7 @@ use tauri::{AppHandle, Manager, State};
 use crate::calendar::AgendaItem;
 use crate::model::now_ms;
 use crate::vault::AppState;
-use crate::{badge, cmd_forges};
+use crate::{badge, forge};
 
 pub const JOIN_ITEM_ID: &str = "join_meeting";
 /// Background poll cadence; the badge's forge half is cheap (5 min cache), the agenda half reads `meeting_cache`.
@@ -55,9 +55,9 @@ fn tick(app: &AppHandle) {
     update_menu(app, meeting.as_ref());
     *state.next_meeting.lock_safe() = meeting;
 
-    let reviews = cmd_forges::review_requested_total(app);
+    let reviews = forge::cmd::review_requested_total(app);
     let tasks = *state.badge_tasks.lock_safe() as u64;
-    let mentions = u64::from(app.state::<crate::mentions_state::MentionsUnread>().count());
+    let mentions = u64::from(app.state::<crate::mentions::state::MentionsUnread>().count());
     badge::apply(app, (reviews + tasks + mentions).min(u32::MAX as u64) as u32);
 }
 

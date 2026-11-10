@@ -1,7 +1,7 @@
 //! Per-task focus: the planned effort and the seconds the timer has added so far.
 use tauri::State;
 
-use crate::activity_watch::ActivityState;
+use crate::activity::watch::ActivityState;
 use crate::error::{AppError, Result};
 use crate::model::{next_version, now_ms};
 use crate::vault::AppState;

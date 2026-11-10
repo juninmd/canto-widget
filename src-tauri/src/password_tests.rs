@@ -1,6 +1,6 @@
 use super::*;
 use crate::clipboard::ClipHistory;
-use crate::cmd_drive::DriveConfig;
+use crate::drive::cmd::DriveConfig;
 
 fn state(name: &str) -> AppState {
     let dir = std::env::temp_dir().join(format!("canto-password-{name}-{}-{}", std::process::id(), now_ms()));
@@ -135,19 +135,19 @@ fn the_traffic_key_and_trips_stay_readable_after_a_password_change() {
 
 #[test]
 fn what_the_user_read_and_muted_stays_readable_after_a_password_change() {
-    use crate::mentions_state::{self, Saved};
+    use crate::mentions::state::{self, Saved};
     let st = state("mencoes");
-    mentions_state::update(&st, |s| {
+    state::update(&st, |s| {
         s.mark(&["gitlab:5".to_string()], true, 1);
         s.mute_thread("https://github.com/o/r/pull/1", "Corrige o parser", true);
         s.mute_author("Marina", true);
     })
     .unwrap();
-    let before: Saved = mentions_state::load(&st).unwrap();
+    let before: Saved = state::load(&st).unwrap();
     st.change_password("senha-velha", "senha-nova").unwrap();
     st.lock();
     st.unlock("senha-nova").unwrap();
-    assert_eq!(mentions_state::load(&st).unwrap(), before, "the mute list was lost to the password change");
+    assert_eq!(state::load(&st).unwrap(), before, "the mute list was lost to the password change");
     cleanup(&st);
 }
 

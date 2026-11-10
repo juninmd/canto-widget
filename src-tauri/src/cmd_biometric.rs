@@ -52,7 +52,7 @@ fn without_always_on_top<T>(_app: &tauri::AppHandle, f: impl FnOnce() -> T) -> T
 #[cfg(desktop)]
 fn without_always_on_top<T>(app: &tauri::AppHandle, f: impl FnOnce() -> T) -> T {
     let win = app.get_webview_window("main");
-    let always_on_top = app.state::<crate::window_state::WindowState>().cfg().always_on_top;
+    let always_on_top = app.state::<crate::window::state::WindowState>().cfg().always_on_top;
     if let Some(w) = &win {
         let _ = w.set_always_on_top(false);
     }

@@ -6,7 +6,7 @@ use time::format_description::well_known::Rfc3339;
 
 use crate::calendar::{AgendaItem, Attachment};
 use crate::forge::{ChecksStatus, ForgeItem};
-use crate::github_failures::FailedJob;
+use crate::github::failures::FailedJob;
 use crate::notification::PR_PREFIX;
 
 /// More stalled PRs than this at once become one summary instead of a stack of pop-ups.

@@ -30,3 +30,15 @@ test("features and the shell sit one folder deep", () => {
   const nested = code.filter((file) => /\/src\/(features\/[^/]+|shell)\/[^/]+\//.test(file));
   expect(nested).toEqual([]);
 });
+
+test("a Rust feature with a folder keeps none of its modules at the root", () => {
+  const root = new URL("../src-tauri/src/", import.meta.url).pathname;
+  const entries = readdirSync(root, { withFileTypes: true });
+  const folders = entries.filter((e) => e.isDirectory() && e.name !== "locales").map((e) => e.name);
+  expect(folders.length).toBeGreaterThan(15);
+  const strays = entries
+    .filter((e) => e.isFile())
+    .map((e) => e.name)
+    .filter((name) => folders.some((folder) => name === `${folder}.rs` || name.startsWith(`${folder}_`) || name.startsWith(`cmd_${folder}`)));
+  expect(strays).toEqual([]);
+});

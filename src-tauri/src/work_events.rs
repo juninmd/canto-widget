@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::calendar::{AgendaItem, Sender};
 use crate::forge::{ForgeItem, ForgeList};
-use crate::gitlab_todos::Mention;
+use crate::gitlab::todos::Mention;
 use crate::notification::PR_PREFIX;
 use crate::pr_state::{Said, MAX_EACH};
 

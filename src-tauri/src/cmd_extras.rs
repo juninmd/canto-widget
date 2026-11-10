@@ -6,7 +6,7 @@ use serde::Serialize;
 
 use crate::calendar::{self, AgendaItem};
 #[cfg(desktop)]
-use crate::clip_watch::ClipWatch;
+use crate::clipboard::watch::ClipWatch;
 use crate::clipboard::{ClipItem, ClipView, MAX_PINNED_CEILING};
 use crate::commands::new_id;
 use crate::error::{AppError, Result};
@@ -62,11 +62,11 @@ pub fn clip_copy_as(
     app: tauri::AppHandle,
     state: State<'_, AppState>,
     id: String,
-    mode: crate::clip_transform::Mode,
+    mode: crate::clipboard::transform::Mode,
 ) -> Result<()> {
     let hist = state.clip_load()?;
     let item = hist.items.iter().find(|i| i.id == id).ok_or(AppError::NotFound)?;
-    let text = crate::clip_transform::apply(&item.text, mode)?;
+    let text = crate::clipboard::transform::apply(&item.text, mode)?;
     app.clipboard().write_text(text).map_err(|e| AppError::Io(e.to_string()))
 }
 
@@ -109,7 +109,7 @@ pub fn clip_capture(app: tauri::AppHandle, state: State<'_, AppState>) -> Result
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
-    if let Some(text) = app.clipboard().read_text().ok().filter(|_| !crate::clip_os::concealed()) {
+    if let Some(text) = app.clipboard().read_text().ok().filter(|_| !crate::clipboard::os::concealed()) {
         state.clip_update(|hist| Ok(((), hist.push(&text, new_id()))))?;
     }
     Ok(())
@@ -133,9 +133,9 @@ pub fn watch_clipboard(app: tauri::AppHandle) {
                 seen = ClipWatch::default();
                 continue;
             }
-            let Some(text) =
-                seen.next(crate::clip_os::sequence(), crate::clip_os::concealed, || app.clipboard().read_text().ok())
-            else {
+            let Some(text) = seen.next(crate::clipboard::os::sequence(), crate::clipboard::os::concealed, || {
+                app.clipboard().read_text().ok()
+            }) else {
                 continue;
             };
             let _ = state.clip_update(|hist| Ok(((), hist.push(&text, new_id()))));
@@ -189,7 +189,7 @@ pub(crate) fn agenda(state: &AppState, time_min: &str, time_max: &str, max_resul
 
 /// Kept here for existing callers; the logic lives in `google_token`.
 pub(crate) fn google_token(state: &AppState) -> Result<String> {
-    crate::google_token::fresh(state)
+    crate::google::token::fresh(state)
 }
 
 #[tauri::command]

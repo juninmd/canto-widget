@@ -19,7 +19,7 @@ pub fn on_window_event(win: &tauri::Window, event: &tauri::WindowEvent) {
             let _ = win.hide();
         }
         tauri::WindowEvent::Moved(_) | tauri::WindowEvent::Resized(_) if win.label() == "main" => {
-            window_state::record(win);
+            window::state::record(win);
         }
         _ => {}
     }
@@ -48,7 +48,7 @@ pub fn build(app: &tauri::AppHandle) -> tauri::Result<()> {
                 let _ = window::toggle(app);
             }
             "mini" => {
-                let _ = window_mode::toggle_mini(app);
+                let _ = window::mode::toggle_mini(app);
             }
             tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
             do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),
@@ -57,7 +57,7 @@ pub fn build(app: &tauri::AppHandle) -> tauri::Result<()> {
             }
             "quit" => {
                 if let Ok(dir) = app.path().app_data_dir() {
-                    let _ = app.state::<window_state::WindowState>().save_if_dirty(&dir);
+                    let _ = app.state::<window::state::WindowState>().save_if_dirty(&dir);
                 }
                 app.exit(0)
             }

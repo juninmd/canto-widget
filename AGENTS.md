@@ -44,29 +44,30 @@ src/                      React UI (one component per file, tests next to it)
   features/<name>/        one folder per feature, components + logic + hooks + tests + CSS side by side: tasks, notes,
                           clipboard, agenda, alerts (AlertCard/FocusedAlert/NotificationsPanel), forge (GitHub/GitLab),
                           google, steam, weather, system, activity, settings, models, map, market, status, health, ...
-src-tauri/src/
+src-tauri/src/            core modules at the root, one folder per feature with three or more modules
   lib.rs                  plugin setup, tray, background watchers, invoke_handler list
   vault.rs, store.rs, crypto.rs   AppState/session, sealed envelopes, Argon2id + AES-256-GCM
   model.rs                synced vault model (Task, Note, merge / tombstones)
-  commands.rs, cmd_*.rs   Tauri commands, grouped by feature
+  commands.rs, cmd_*.rs   Tauri commands of the root features; a folder keeps its own in `<feature>/cmd.rs`
   focus.rs                per-task estimate and tracked seconds (commands only; the timer itself lives in the UI)
-  activity.rs, activity_os.rs, activity_watch.rs   opt-in focused-app log: pure spans, OS probes, sampler thread
   password.rs             master password change (re-seals every sealed file)
-  github.rs, github_auth.rs       GitHub search API and PAT / device-flow auth
   biometric.rs, hello.rs  Windows Hello unlock
   routine.rs, snooze.rs, notification.rs   reminders, recurring tasks, snoozing, OS notifications
-  clipboard.rs, clip_os.rs        clipboard history (size caps, previews), OS change counter and secret skip list
-  clip_secret.rs                  copies shaped like a token or private key never enter the history
-  window.rs, window_state.rs      corner anchoring, saved position, fullscreen
-  window_mode.rs                  mini mode: the window shrinks into a right-edge dock (geometry, tray toggle, `window_mini_*`)
   alert_log.rs                    in-memory log of what became of each alert today (never on disk)
   meeting_alert.rs, task_reminder.rs   meeting alerts and task reminders rung from Rust (hidden webviews sleep)
-  status_feed.rs, status_live.rs, status_alert.rs   Status API feeds, live Statuspage state, opt-in outage alerts
-  steam_lists.rs, cmd_steam.rs   the four Steam sub-tabs and their commands; steam_store.rs/steam_url.rs read the
-                                 store, steam_region.rs picks the storefront, steam_review.rs words the buckets
-  steam_alert.rs                  opt-in OS alert when a wishlist game gets cheaper (last prices sealed)
-  sysmon.rs, sysmon_probe.rs      Sistema tab (desktop only): one snapshot of CPU, GPU, memory, disks, network, battery and
-                                 apps (sysinfo + starship-battery); sysmon_hints.rs/sysmon_alert.rs ring opt-in system alerts
+  <feature>/mod.rs        the feature's own API; siblings drop the prefix (`steam/lists.rs` is `crate::steam::lists`)
+  activity/               opt-in focused-app log: pure spans (mod), OS probes (os), sampler thread (watch)
+  clipboard/              history with size caps and previews (mod), OS change counter and skip list (os), token and
+                          private-key filter (secret), transforms, watcher
+  github/, gitlab/, forge/        search APIs, PAT / device-flow auth (github/auth), CI checks, shared cache and filters
+  google/, gmail/, drive/, contacts/   Google token and API client, then one folder per Google product
+  window/                 corner anchoring and fullscreen (mod), saved position (state), mini dock (mode, `window_mini_*`)
+  status/, models/, mentions/, own_work/, health/, harness/, market/, traffic/, weather/
+                          feeds, sealed state and opt-in alerts of each tab
+  steam/                  the four sub-tabs (lists) and their commands (cmd, cmd_more); storefront and url read the
+                          store, region picks the storefront, review words the buckets, alert rings on a price drop
+  sysmon/                 Sistema tab (desktop only): one snapshot of CPU, GPU, memory, disks, network, battery and
+                          apps (sysinfo + starship-battery); hints and alert ring opt-in system alerts
 src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)
 ```
 
@@ -88,6 +89,9 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - **The first paint loads only what it shows.** Tabs off the default bar (`shell/lazyTabs.ts`), overlays
   (`shell/lazyOverlays.ts`) and the markdown parser (`lib/markdown.tsx`) load on demand and are fetched on idle.
 - One feature per module; commands are thin, logic is a pure function with a unit test.
+- **Rust modules group by feature.** A third module of one feature turns it into a folder (`<feature>/mod.rs`,
+  siblings without the prefix, commands in `cmd.rs`); `x_*.rs` never sits next to a folder `x/`
+  (`scripts/layout.test.ts`). Tests that scan the sources walk the folders (`do_not_disturb_tests.rs`, `tests/sealed_files.rs`).
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`); body explains why.
 - Rust: `Mutex` goes through `resilient::LockExt::lock_safe()` (never `lock().unwrap()`, which poisons after one
   panic) and long-lived background threads through `resilient::supervise`, which restarts them after a panic.

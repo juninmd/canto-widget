@@ -48,11 +48,11 @@ impl AppState {
             (store::models_path(&self.dir), MODELS_AAD, false),
             (store::steam_path(&self.dir), crate::store::STEAM_AAD, false),
             (store::traffic_path(&self.dir), crate::traffic::AAD, false),
-            (store::steam_deals_path(&self.dir), crate::steam_alert::AAD, true),
+            (store::steam_deals_path(&self.dir), crate::steam::alert::AAD, true),
             (store::clip_path(&self.dir), CLIP_AAD, true),
             (store::activity_path(&self.dir), ACTIVITY_AAD, true),
             (store::health_path(&self.dir), crate::health::AAD, false),
-            (store::mentions_path(&self.dir), crate::mentions_state::AAD, false),
+            (store::mentions_path(&self.dir), crate::mentions::state::AAD, false),
         ] {
             match reencrypt(&path, aad, &session.key, &key, &salt) {
                 Ok(Some(r)) => batch.push(r),

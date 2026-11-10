@@ -1,5 +1,5 @@
 //! Pop-up alerts about the user's own open GitHub PRs: CI that just turned red, and PRs nobody reviewed for
-//! too long. Holds the settings of every own-work alert (`own_work_alerts.rs` reads them). Polls the same cached lists the tab uses, only with GitHub connected and the vault open.
+//! too long. Holds the settings of every own-work alert (`own_work/alerts.rs` reads them). Polls the same cached lists the tab uses, only with GitHub connected and the vault open.
 use crate::resilient::LockExt;
 use std::collections::{HashMap, HashSet};
 use std::path::{Path, PathBuf};
@@ -10,13 +10,13 @@ use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
 use zeroize::Zeroizing;
 
-use crate::cmd_github::{valid_token, GithubState};
-use crate::cmd_github_lists::Github;
 use crate::error::Result;
+use crate::forge::filter::{ForgeFilter, Kind, Order, Section, Sort};
 use crate::forge::{self, ChecksStatus};
-use crate::forge_filter::{ForgeFilter, Kind, Order, Section, Sort};
-use crate::github_checks::{self, GithubChecks, PrRef};
-use crate::github_failures;
+use crate::github;
+use crate::github::checks::{self, GithubChecks, PrRef};
+use crate::github::cmd::{valid_token, GithubState};
+use crate::github::cmd_lists::Github;
 use crate::model::now_ms;
 use crate::my_pr_events::{advance_stalled, ci_event, newly_failing, remember, stalled, stalled_events};
 use crate::vault::AppState;
@@ -34,7 +34,7 @@ pub struct Config {
     pub stalled: bool,
     #[serde(default = "default_hours")]
     pub stalled_hours: u32,
-    /// Pop-up when someone @-mentions the user on GitHub or GitLab (`mention_alerts.rs` reads it).
+    /// Pop-up when someone @-mentions the user on GitHub or GitLab (`mentions/alerts.rs` reads it).
     #[serde(default = "on")]
     pub mentions: bool,
     /// Approved or changes requested on the user's PRs/MRs.
@@ -137,12 +137,12 @@ fn check_ci(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, mem: &m
     };
     let refs: Vec<PrRef> = list.items.iter().map(|i| PrRef { repo: i.repo.clone(), number: i.number }).collect();
     let Ok(api) = GithubChecks::new(cred.as_str()) else { return };
-    let found = github_checks::statuses(&state.forges.checks, &api, &github_checks::pick(refs), now_ms());
+    let found = checks::statuses(&state.forges.checks, &api, &checks::pick(refs), now_ms());
     let now: HashMap<String, ChecksStatus> =
         found.into_iter().map(|c| (format!("{}#{}", c.repo, c.number), c.status)).collect();
     let failing = newly_failing(mem.ci.as_ref(), &now);
     for item in list.items.iter().filter(|i| failing.contains(&i.reference)) {
-        let jobs = github_failures::fetch(cred, &item.repo, item.number).unwrap_or_default();
+        let jobs = github::failures::fetch(cred, &item.repo, item.number).unwrap_or_default();
         let _ = crate::window::open_alert(app, ci_event(item, &jobs, crate::lang::english()));
     }
     let listed: HashSet<&str> = list.items.iter().map(|i| i.reference.as_str()).collect();
