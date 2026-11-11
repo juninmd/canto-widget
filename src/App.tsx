@@ -21,6 +21,7 @@ import Lock from "./shell/Lock";
 import type { SectionId } from "./features/settings/settingsGroups";
 import { useHiddenTabs, visibleTabs } from "./shell/tabs";
 import { useTabLayout } from "./shell/tabLayout";
+import TabDock from "./shell/TabDock";
 import { useReminderLead } from "./features/alerts/reminderLead";
 import { usePrivacyMode } from "./lib/privacy";
 import TabBar, { panelId, type Tab } from "./shell/TabBar";
@@ -321,7 +322,7 @@ function Canto() {
         <Lock exists={status.exists} onOpen={openVault} />
       ) : (
         <div className={`flex min-h-0 min-w-0 flex-1 ${layout === "vertical" && !IS_MOBILE ? "flex-row" : "flex-col"}`}>
-          {IS_MOBILE ? null : layout === "vertical" ? (
+          {IS_MOBILE || layout === "dock" ? null : layout === "vertical" ? (
             <TabRail current={tab} onChange={changeTab} tabs={tabs} pinned={pinned} onPinned={setPinned} />
           ) : (
             <TabBar current={tab} onChange={changeTab} tabs={tabs} />
@@ -373,6 +374,7 @@ function Canto() {
             <FocusBar onDone={() => setTasksVersion((v) => v + 1)} onError={setError} />
           </div>
           {IS_MOBILE && <MobileNav current={tab} onChange={changeTab} tabs={tabs} />}
+          {!IS_MOBILE && layout === "dock" && <TabDock current={tab} onChange={changeTab} tabs={tabs} />}
         </div>
       )}
     </div>

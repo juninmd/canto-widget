@@ -246,5 +246,9 @@
   "uiTasksNotes.section.pinned": "pinned",
   "uiTasksNotes.section.recent": "recent",
   "uiTasksNotes.emptyHint": "try another tag or clear the search",
-  "uiTasksNotes.clearSearch": "clear search"
+  "uiTasksNotes.clearSearch": "clear search",
+  "theme.skin.aurora": "Aurora",
+  "settings.tabs.dock": "Dock",
+  "settings.tabs.dockHint": "Floating bar at the bottom with the main tabs; every other tab opens in a grid.",
+  "tabs.all": "all tabs"
 }

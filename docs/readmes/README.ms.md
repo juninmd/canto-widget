@@ -267,6 +267,10 @@ Dan **Ikuti sistem**, yang bertukar antara terang dan gelap bersama-sama dengan 
 |---|---|
 | ![The vertical tab bar opened over the window: My day, Code and Explore groups, Settings at the bottom](../prints/app/102-abas-verticais.png) | ![Tab layout in Settings: two previews, Horizontal and Vertical, and a checkbox to keep the side bar open](../prints/app/103-abas-layout-ajustes.png) |
 
+| Dock layout: a floating bar with the main tabs and a grid with every tab, shown in the new Aurora skin |
+|---|
+| ![The dock layout with the grid of all tabs open over the Tasks tab, in the Aurora skin](../prints/app/106-dock-aurora.png) |
+
 | Tasks: progress ring, priority chips, a menu for the rest | Notes: tag chips with counts, list or grid |
 |---|---|
 | ![Tasks with a progress ring, Todas/Alta/Média/Baixa chips, a more-actions menu and priority pills](../prints/app/104-tarefas-refresh.png) | ![Notes with a tag chip row, Pinned and Recent sections and a list/grid toggle](../prints/app/105-notas-tags.png) |

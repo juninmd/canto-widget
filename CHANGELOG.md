@@ -31,6 +31,8 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Layout "Dock" e tema Aurora**: em Ajustes > Aparência, o layout das abas ganhou uma terceira opção ao lado de Horizontal e Vertical: uma barra flutuante embaixo com as quatro abas principais (mais a aba aberta, se for outra) e um botão que abre uma grade com todas as abas, com ícones e contadores de pendências. O tema Aurora (violeta escuro com brilhos rosa, verde-água e lilás) entra ao lado dos demais e passa pelas mesmas checagens de contraste. As abas horizontais e verticais, o modo mini e a janela de avisos seguem como antes.
+
 - **Aba Sistema redesenhada**: uma faixa de saúde no topo diz se está tudo em ordem ou quais partes pedem
   atenção (cada uma abre a sua sub-aba); a Geral virou medidores em anel para CPU, memória, disco e GPU; as
   sub-abas ganharam ícones; o menu `···` pausa e retoma a leitura, lê na hora, copia um resumo da máquina e leva

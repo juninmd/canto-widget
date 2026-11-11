@@ -123,6 +123,36 @@
   --color-cat-other: #98989d;
 }
 
+:root[data-skin="aurora"] {
+  --color-ink: #0c0a1e;
+  --color-panel: #120f2a;
+  --color-edge: #2f2866;
+  --color-accent: #ff7ad9;
+  --color-accent-text: #ff9be4;
+  --color-on-accent: #1a0614;
+  --color-fg: #f1eefc;
+  --color-muted: #b0a9d6;
+  --color-faint: #9b94c4;
+  --color-line: #6b62a8;
+  --color-danger: #fb7185;
+  --color-ok: #5eead4;
+  --color-warn: #fcd34d;
+  --color-cat-games: #fb7185;
+  --color-cat-meet: #5eead4;
+  --color-cat-docs: #fcd34d;
+  --color-cat-chat: #ff7ad9;
+  --color-cat-web: #8b7bff;
+  --color-cat-other: #9b94c4;
+}
+
+/* Aurora: dark violet with soft color glows behind the panel */
+:root[data-skin="aurora"] .bg-panel\/95 {
+  background-image:
+    radial-gradient(60% 45% at 8% 0%, rgb(255 122 217 / 0.16), transparent 70%),
+    radial-gradient(55% 45% at 100% 40%, rgb(139 123 255 / 0.16), transparent 70%),
+    radial-gradient(60% 40% at 30% 100%, rgb(94 234 212 / 0.12), transparent 70%);
+}
+
 /* Glass: translucidez acentuada, reflexo da borda superior e superfícies vítreas */
 :root[data-skin="glass"] .bg-panel\/95 {
   background-color: color-mix(in srgb, var(--color-panel) 75%, transparent);

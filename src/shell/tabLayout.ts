@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import type { Tab } from "./TabBar";
 
-export type TabLayout = "horizontal" | "vertical";
+export type TabLayout = "horizontal" | "vertical" | "dock";
 
 const LAYOUT_KEY = "canto.tabLayout";
 const PINNED_KEY = "canto.railPinned";
@@ -15,9 +15,9 @@ export const TAB_GROUP: Partial<Record<Tab, TabGroup>> = {
   models: "explore", activity: "explore", gmail: "day", gdrive: "day", contacts: "day", weather: "explore", map: "explore", market: "explore", system: "explore", steam: "explore", reads: "explore",
 };
 
-/** Anything but a saved "vertical" is horizontal: the bar people already know. */
+/** Anything but a saved "vertical" or "dock" is horizontal: the bar people already know. */
 export function parseLayout(raw: string | null): TabLayout {
-  return raw === "vertical" ? "vertical" : "horizontal";
+  return raw === "vertical" || raw === "dock" ? raw : "horizontal";
 }
 
 function read(key: string): string | null {

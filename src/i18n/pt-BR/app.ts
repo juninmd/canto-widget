@@ -261,6 +261,7 @@ export const app = {
 
   "tabs.label": "seções do widget",
   "tabs.more": "mais",
+  "tabs.all": "todas as abas",
   "tabs.moreTitle": "mais abas ({n})",
   "tabs.attention": "pendências: {n}",
   "tabs.tasks": "Tarefas",
@@ -275,6 +276,7 @@ export const app = {
   "theme.skin.default": "Padrão",
   "theme.skin.dracula": "Drácula",
   "theme.skin.glass": "Glass",
+  "theme.skin.aurora": "Aurora",
   "theme.skin.light": "Claro",
   "theme.skin.system": "Seguir o sistema",
 
@@ -325,5 +327,7 @@ export const app = {
   "settings.tabs.horizontalHint": "Abas no topo; o que não cabe vai para “mais”.",
   "settings.tabs.vertical": "Vertical",
   "settings.tabs.verticalHint": "Barra lateral com todas as abas, em grupos.",
+  "settings.tabs.dock": "Dock",
+  "settings.tabs.dockHint": "Barra flutuante embaixo com as abas principais; as outras abrem numa grade.",
   "settings.tabs.pin": "manter a barra lateral aberta (senão ela abre ao passar o mouse)",
 } as const;
