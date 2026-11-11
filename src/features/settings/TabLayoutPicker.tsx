@@ -8,13 +8,13 @@ type Props = {
   onPinned: (pinned: boolean) => void;
 };
 
-const OPTIONS: TabLayout[] = ["horizontal", "vertical"];
+const OPTIONS: TabLayout[] = ["horizontal", "vertical", "dock"];
 
 /** Two small previews of the window, so the choice reads without trying it first. */
 export default function TabLayoutPicker({ layout, onLayout, pinned, onPinned }: Props) {
   return (
     <div className="flex flex-col gap-2">
-      <div role="radiogroup" aria-label={t("settings.tabs.layout")} className="grid grid-cols-2 gap-2">
+      <div role="radiogroup" aria-label={t("settings.tabs.layout")} className="grid grid-cols-3 gap-2">
         {OPTIONS.map((option) => (
           <button
             key={option}
@@ -28,9 +28,9 @@ export default function TabLayoutPicker({ layout, onLayout, pinned, onPinned }: 
           >
             <span
               aria-hidden="true"
-              className={`flex h-12 gap-1 rounded-md border border-edge bg-panel p-1 ${option === "horizontal" ? "flex-col" : ""}`}
+              className={`flex h-12 gap-1 rounded-md border border-edge bg-panel p-1 ${option === "vertical" ? "" : option === "dock" ? "flex-col-reverse" : "flex-col"}`}
             >
-              <span className={`rounded-sm bg-edge ${option === "horizontal" ? "h-2" : "w-2"}`} />
+              <span className={`rounded-sm bg-edge ${option === "vertical" ? "w-2" : option === "dock" ? "mx-auto h-2 w-8 rounded-full" : "h-2"}`} />
               <span className="flex-1 rounded-sm bg-edge/50" />
             </span>
             <span className="text-xs font-semibold text-fg">{t(`settings.tabs.${option}`)}</span>

@@ -5,9 +5,10 @@ import { parseLayout, TAB_GROUP, useTabLayout } from "./tabLayout";
 
 afterEach(() => localStorage.clear());
 
-test("anything but a saved vertical is the horizontal bar", () => {
+test("anything but a saved vertical or dock is the horizontal bar", () => {
   expect(parseLayout("vertical")).toBe("vertical");
   expect(parseLayout("horizontal")).toBe("horizontal");
+  expect(parseLayout("dock")).toBe("dock");
   expect(parseLayout("lateral")).toBe("horizontal");
   expect(parseLayout(null)).toBe("horizontal");
 });

@@ -266,6 +266,7 @@ export const app: Record<keyof typeof source, string> = {
 
   "tabs.label": "widget sections",
   "tabs.more": "more",
+  "tabs.all": "all tabs",
   "tabs.moreTitle": "more tabs ({n})",
   "tabs.attention": "pending: {n}",
   "tabs.tasks": "Tasks",
@@ -280,6 +281,7 @@ export const app: Record<keyof typeof source, string> = {
   "theme.skin.default": "Default",
   "theme.skin.dracula": "Dracula",
   "theme.skin.glass": "Glass",
+  "theme.skin.aurora": "Aurora",
   "theme.skin.light": "Light",
   "theme.skin.system": "Follow system",
 
@@ -330,5 +332,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.tabs.horizontalHint": "Tabs on top; what does not fit goes to “more”.",
   "settings.tabs.vertical": "Vertical",
   "settings.tabs.verticalHint": "Side bar with every tab, in groups.",
+  "settings.tabs.dock": "Dock",
+  "settings.tabs.dockHint": "Floating bar at the bottom with the main tabs; every other tab opens in a grid.",
   "settings.tabs.pin": "keep the side bar open (otherwise it opens on hover)",
 };

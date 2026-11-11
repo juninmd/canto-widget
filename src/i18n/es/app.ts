@@ -266,6 +266,7 @@ export const app: Record<keyof typeof source, string> = {
 
   "tabs.label": "secciones del widget",
   "tabs.more": "más",
+  "tabs.all": "todas las pestañas",
   "tabs.moreTitle": "más pestañas ({n})",
   "tabs.attention": "pendientes: {n}",
   "tabs.tasks": "Tareas",
@@ -280,6 +281,7 @@ export const app: Record<keyof typeof source, string> = {
   "theme.skin.default": "Predeterminado",
   "theme.skin.dracula": "Dracula",
   "theme.skin.glass": "Glass",
+  "theme.skin.aurora": "Aurora",
   "theme.skin.light": "Claro",
   "theme.skin.system": "Seguir al sistema",
 
@@ -330,5 +332,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.tabs.horizontalHint": "Pestañas arriba; lo que no cabe va a «más».",
   "settings.tabs.vertical": "Vertical",
   "settings.tabs.verticalHint": "Barra lateral con todas las pestañas, en grupos.",
+  "settings.tabs.dock": "Dock",
+  "settings.tabs.dockHint": "Barra flotante abajo con las pestañas principales; las demás se abren en una cuadrícula.",
   "settings.tabs.pin": "mantener la barra lateral abierta (si no, se abre al pasar el ratón)",
 };

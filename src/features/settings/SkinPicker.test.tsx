@@ -7,7 +7,7 @@ afterEach(cleanup);
 
 test("each skin shows by name, not just by color", () => {
   render(<SkinPicker />);
-  for (const name of ["Padrão", "Hueco Mundo", "Drácula", "Glass", "Claro", "Seguir o sistema"]) {
+  for (const name of ["Padrão", "Hueco Mundo", "Drácula", "Glass", "Aurora", "Claro", "Seguir o sistema"]) {
     expect(screen.getByRole("radio", { name })).toBeTruthy();
   }
 });
