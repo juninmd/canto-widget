@@ -144,6 +144,31 @@ jobs:
         shell: bash
         run: |
           if [ -n "$GOOGLE_OAUTH_JSON" ]; then printf '%s' "$GOOGLE_OAUTH_JSON" > src-tauri/google-oauth.json; fi
+      # Sem certificado Apple o bundle sai com assinatura ad-hoc ("-", em tauri.conf.json): sem ela o macOS
+      # (Apple Silicon) mostra "o app está danificado" ao abrir um .dmg baixado. Com os secrets abaixo o app é
+      # assinado com Developer ID, notarizado e grampeado (staple) automaticamente pelo Tauri.
+      - name: Apple signing and notarization (optional)
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ] && [ -n "$APPLE_SIGNING_IDENTITY" ]; then
+            for v in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY; do
+              printf '%s=%s\n' "$v" "${!v}" >> "$GITHUB_ENV"
+            done
+            if [ -n "$APPLE_ID" ] && [ -n "$APPLE_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+              for v in APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do printf '%s=%s\n' "$v" "${!v}" >> "$GITHUB_ENV"; done
+            fi
+            echo "Developer ID signing enabled"
+          else
+            echo "No Apple certificate: using ad-hoc signature"
+          fi
       - uses: tauri-apps/tauri-action@1deb371b0cd8bd54025b384f1cd735e725c4060f # action-v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
