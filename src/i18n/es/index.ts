@@ -16,8 +16,9 @@ import { google } from "./google";
 import { weather } from "./weather";
 import { system } from "./system";
 import { map } from "./map";
+import { dev } from "./dev";
 import { uiModelsActivity } from "./uiModelsActivity";
 import { uiFormats } from "./uiFormats";
 
-export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats };
+export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...map, ...dev, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats };
 export const messages = es;

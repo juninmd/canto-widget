@@ -669,6 +669,44 @@ gets worse. The tab starts hidden, one checkbox away in Settings, and is desktop
 
 <sub>All screenshots use fictitious data.</sub>
 
+## 🧑‍💻 Dev
+
+**Dev** answers what a developer asks of the machine, in one desktop-only tab on Windows, macOS and Linux. **Ports**
+lists every process holding a port (`netstat` on Windows, `ss`/`lsof` on Linux, `lsof` on macOS), with the command, the
+folder it runs from, its memory and a warning when it listens on the network; search by number, filter TCP/UDP or "dev
+only", copy `localhost:port` and stop the process or its whole tree (only ever a process that holds a port, never the
+system or Canto itself). **Docker** appears only while the engine is running: containers grouped by Compose project
+with CPU, memory, health, logs and start/stop/restart/remove, plus images, volumes and networks with a one-click
+cleanup of the unused. **Git** reads only the folders you add: branch, changes and ahead/behind per repository, and a
+review list of worktrees whose work already reached the remote (branch merged or deleted upstream, nothing uncommitted)
+that you can remove in one go; the safety check runs again in Rust before anything is removed. **Tools** runs in the
+window, sending nothing out: JSON, JWT (decode, encode and verify HMAC), Base64, URL, UUID and secrets, hashes with
+HMAC, timestamps, regex and diff. **Schedule** lists, creates, disables, runs and removes crontab tasks on Linux and
+macOS (a backup is kept before each rewrite) and lists the Task Scheduler tasks on Windows. The tab starts hidden, one
+checkbox away in Settings.
+
+| Ports | Docker | Git |
+|---|---|---|
+| <img src="docs/prints/app/132-dev-portas.png" alt="Ports: processes holding each port, with the command, memory and a network exposure warning"> | <img src="docs/prints/app/133-dev-docker.png" alt="Docker: containers grouped by Compose project with health, CPU and memory"> | <img src="docs/prints/app/134-dev-git.png" alt="Git: repositories with branch, changes and ahead/behind"> |
+
+| Worktrees | Schedule | Docker images |
+|---|---|---|
+| <img src="docs/prints/app/147-dev-git-worktrees.png" alt="Worktrees already synced to the remote, ready to remove"> | <img src="docs/prints/app/135-dev-agenda.png" alt="Schedule: crontab tasks with the next run and on/off switches"> | <img src="docs/prints/app/145-dev-docker-imagens.png" alt="Docker images with the unused ones marked for cleanup"> |
+
+| JSON | JWT | Base64 |
+|---|---|---|
+| <img src="docs/prints/app/136-dev-util-json.png" alt="JSON tool"> | <img src="docs/prints/app/137-dev-util-jwt.png" alt="JWT decoded with claims, expiry and signature check"> | <img src="docs/prints/app/138-dev-util-base64.png" alt="Base64 tool"> |
+
+| URL | UUID and secrets | Hash |
+|---|---|---|
+| <img src="docs/prints/app/139-dev-util-url.png" alt="URL parts and query"> | <img src="docs/prints/app/140-dev-util-uuid.png" alt="UUIDs and random secrets"> | <img src="docs/prints/app/141-dev-util-hash.png" alt="SHA digests and HMAC"> |
+
+| Time | Regex | Diff |
+|---|---|---|
+| <img src="docs/prints/app/142-dev-util-tempo.png" alt="Timestamp converter"> | <img src="docs/prints/app/143-dev-util-regex.png" alt="Regex tester with highlighted matches"> | <img src="docs/prints/app/144-dev-util-diff.png" alt="Line diff"> |
+
+<sub>All screenshots use fictitious data.</sub>
+
 ## ⚖️ Compared to what's out there
 
 None of the tools researched cover more than two of these fronts at once. Sources and details in

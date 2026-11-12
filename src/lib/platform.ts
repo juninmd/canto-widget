@@ -2,6 +2,8 @@ import { t } from "../i18n";
 /** WKWebView reports "MacIntel" even on Apple Silicon; userAgent covers webviews that blank `platform`. */
 export const IS_MAC = typeof navigator !== "undefined" && /Mac/i.test(navigator.platform || navigator.userAgent);
 
+export const IS_WINDOWS = typeof navigator !== "undefined" && /Win/i.test(navigator.platform || navigator.userAgent);
+
 /** The Android and iOS builds run this bundle in a phone's webview; `?mobile` forces it for browser previews and e2e. */
 export function detectMobile(ua: string, touchPoints: number, search: string): boolean {
   // iPadOS Safari and WKWebView report a Mac user agent; only a Mac with a touch screen is an iPad.

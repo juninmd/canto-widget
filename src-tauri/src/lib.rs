@@ -30,6 +30,8 @@ pub mod commands;
 pub mod contacts;
 pub mod context_reminder;
 pub mod crypto;
+#[cfg(desktop)]
+pub mod dev;
 pub mod do_not_disturb;
 pub mod drive;
 pub mod error;
@@ -288,6 +290,34 @@ pub fn run() {
             weather::cmd::weather_clear,
             weather::alert::weather_alerts_get,
             weather::alert::weather_alerts_set,
+            #[cfg(desktop)]
+            dev::cmd::dev_ports_list,
+            #[cfg(desktop)]
+            dev::cmd::dev_port_kill,
+            #[cfg(desktop)]
+            dev::cmd::dev_docker_get,
+            #[cfg(desktop)]
+            dev::cmd::dev_docker_action,
+            #[cfg(desktop)]
+            dev::cmd::dev_docker_logs,
+            #[cfg(desktop)]
+            dev::cmd::dev_docker_prune,
+            #[cfg(desktop)]
+            dev::cmd::dev_git_get,
+            #[cfg(desktop)]
+            dev::cmd::dev_pick_folder,
+            #[cfg(desktop)]
+            dev::cmd::dev_git_root,
+            #[cfg(desktop)]
+            dev::cmd::dev_git_fetch,
+            #[cfg(desktop)]
+            dev::cmd::dev_git_pull,
+            #[cfg(desktop)]
+            dev::cmd::dev_git_worktree_remove,
+            #[cfg(desktop)]
+            dev::cmd::dev_cron_list,
+            #[cfg(desktop)]
+            dev::cmd::dev_cron_change,
             #[cfg(desktop)]
             sysmon::system_get,
             #[cfg(desktop)]

@@ -15,8 +15,9 @@ import { uiTasksNotes } from "./uiTasksNotes";
 import { google } from "./google";
 import { weather } from "./weather";
 import { system } from "./system";
+import { dev } from "./dev";
 import { map } from "./map";
 import { uiModelsActivity } from "./uiModelsActivity";
 import { uiFormats } from "./uiFormats";
 
-export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats };
+export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats };

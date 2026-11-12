@@ -11,6 +11,7 @@ export const MapTab = lazy(() => import("../features/map/MapTab"));
 export const ReadsTab = lazy(() => import("../features/reads/ReadsTab"));
 export const MarketTab = lazy(() => import("../features/market/MarketTab"));
 export const SystemTab = lazy(() => import("../features/system/SystemTab"));
+export const DevTab = lazy(() => import("../features/dev/DevTab"));
 export const GmailTab = lazy(() => import("../features/google/GmailTab"));
 export const GDriveTab = lazy(() => import("../features/google/GDriveTab"));
 export const ContactsTab = lazy(() => import("../features/contacts/ContactsTab"));

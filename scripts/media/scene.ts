@@ -10,7 +10,7 @@ import { SYSTEM } from "./data-system";
 import { openScene, settle, type SceneOptions } from "./stage";
 import { seedVault } from "./vault";
 
-const TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents", "weather", "map", "market", "system", "reads", "activity", "gmail", "gdrive", "contacts", "settings"];
+const TABS = ["tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents", "weather", "map", "market", "system", "dev", "reads", "activity", "gmail", "gdrive", "contacts", "settings"];
 
 /** Every answer a tab asks Rust for, so any of them can be opened from the same scene. */
 export const FIXED = {
