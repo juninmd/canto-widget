@@ -49,7 +49,8 @@ fn scratch(name: &str) -> PathBuf {
     let dir = std::env::temp_dir().join(format!("canto-dev-{name}-{}", std::process::id()));
     let _ = fs::remove_dir_all(&dir);
     fs::create_dir_all(&dir).unwrap();
-    dir.canonicalize().unwrap()
+    // git rejects the `\\?\` verbatim form canonicalize gives on Windows.
+    PathBuf::from(dir.canonicalize().unwrap().to_string_lossy().trim_start_matches(r"\\?\").to_string())
 }
 
 #[test]
