@@ -705,6 +705,10 @@ Download the installer for your platform from **[Releases](https://github.com/ju
 
 > [!NOTE]
 > The installers aren't code-signed yet: SmartScreen (Windows) and Gatekeeper (macOS) warn on first launch.
+> On macOS the app carries an ad-hoc signature (no Apple Developer ID, not notarized). If macOS says Canto
+> "is damaged and can't be opened", it is the download quarantine flag, not a corrupt file. Drag Canto to
+> Applications and run `xattr -cr /Applications/Canto.app` once (or right-click → Open, or
+> **System Settings → Privacy & Security → Open Anyway**).
 > Automatic updates are verified against the project's own signature before running.
 
 Ready-made manifests for winget and Homebrew (plus a skeleton for Flatpak, currently blocked) live in
