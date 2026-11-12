@@ -216,11 +216,16 @@ fn fail(out: Option<Out>) -> AppError {
     AppError::Config(text.unwrap_or_else(|| tr("o git não respondeu", "git did not answer").into()))
 }
 
+/// git prints forward slashes on Windows; the webview may hand back either form.
+fn same_path(a: &str, b: &str) -> bool {
+    a.replace('\\', "/") == b.replace('\\', "/")
+}
+
 /// Removes one worktree, and its local branch when git agrees nothing is lost. The verdict is recomputed here: the
 /// webview's list may be minutes old. Returns whether the branch went too.
 pub fn remove_worktree(repo: &Path, path: &str, delete_branch: bool) -> Result<bool> {
     let current = worktrees(repo);
-    let Some(w) = current.iter().find(|w| w.path == path) else {
+    let Some(w) = current.iter().find(|w| same_path(&w.path, path)) else {
         return Err(AppError::Config(tr("worktree não encontrada", "worktree not found").into()));
     };
     if !w.safe {
