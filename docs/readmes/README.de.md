@@ -7,6 +7,7 @@
 [![Herunterladen](https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20Herunterladen-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4ade80?style=for-the-badge&labelColor=0f172a)](https://github.com/juninmd/canto-widget/releases)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/juninmd/canto-widget/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=0f172a)](https://github.com/juninmd/canto-widget/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/juninmd/canto-widget?style=for-the-badge&label=Release&labelColor=0f172a&color=4ade80)](https://github.com/juninmd/canto-widget/releases/latest)
 [![MIT-Lizenz](https://img.shields.io/badge/lizenz-MIT-4ade80?style=for-the-badge&labelColor=0f172a)](../../LICENSE)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-24c8db?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0f172a)](https://v2.tauri.app)
 [![Rust](https://img.shields.io/badge/Rust-verschl%C3%BCsselter%20Kern-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](../../src-tauri)
@@ -17,6 +18,13 @@
 <sub>[English](../../README.md) · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · **Deutsch** · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [हिन्दी](README.hi.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [فارسی](README.fa.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Українська](README.uk.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Magyar](README.hu.md) · [Svenska](README.sv.md) · [Dansk](README.da.md) · [Norsk bokmål](README.nb.md) · [Suomi](README.fi.md) · [Ελληνικά](README.el.md) · [Български](README.bg.md) · [Hrvatski](README.hr.md) · [Српски](README.sr.md) · [Slovenščina](README.sl.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [Eesti](README.et.md) · [Bahasa Indonesia](README.id.md) · [Bahasa Melayu](README.ms.md) · [Tiếng Việt](README.vi.md) · [ไทย](README.th.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Kiswahili](README.sw.md) · [Català](README.ca.md)</sub>
 
 </div>
+
+<div align="center">
+
+<img src="docs/prints/readme/hero.gif" alt="Canto in the dock layout with the Aurora skin: browsing the tabs and a meeting alert popping up" width="420">
+
+</div>
+
 
 <br>
 
@@ -136,7 +144,7 @@ und **zuletzt veröffentlichter Version** nebeneinander sowie einem Button zum A
 Außerdem gibt es 🎙️ **Besprechungen**: Geminis Notizen und Transkripte der letzten zwei Wochen sowie `.vtt`,
 `.srt`, `.txt` und `.md`-Transkripte aus einem lokalen Ordner, bereinigt und durchsuchbar.
 
-⌨️ **Alles per Tastatur:** `Alt+1`…`Alt+7` wechseln die Tabs, `N` erstellt, `/` sucht, `F11` Vollbild, `Alt+L`
+⌨️ **Alles per Tastatur:** `Alt+1`…`Alt+9` wechseln die Tabs, `N` erstellt, `/` sucht, `F11` Vollbild, `Alt+L`
 sperrt und `?` listet die Tastenkürzel auf.
 
 ## 🎨 Fünf Skins

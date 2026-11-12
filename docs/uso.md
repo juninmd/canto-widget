@@ -109,7 +109,7 @@ nunca mostra de novo.
 
 ## Aparência e atalho
 
-- Skins, escolhidas em **ajustes → Aparência**: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Glass** (vidro translúcido com desfoque de fundo), **Claro** e **Sistema**, que segue o tema
+- Skins, escolhidas em **ajustes → Aparência**: **padrão**, **Hueco Mundo** (Bleach), **Drácula**, **Glass** (vidro translúcido com desfoque de fundo), **Aurora** (violeta e rosa, pensada para o layout Dock), **Claro** e **Sistema**, que segue o tema
   claro/escuro do sistema operacional e troca sozinha quando ele muda. Todas passam AA em todo texto.
 - **Tamanho da interface**, em **Ajustes → Tamanho da interface**: **compacta**, **padrão** ou **confortável** —
   escala texto e espaçamento juntos, como um zoom do widget inteiro. A janela pode ser redimensionada pelas

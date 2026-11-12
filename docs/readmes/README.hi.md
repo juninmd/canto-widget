@@ -7,6 +7,7 @@
 [![डाउनलोड](https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20%E0%A4%A1%E0%A4%BE%E0%A4%89%E0%A4%A8%E0%A4%B2%E0%A5%8B%E0%A4%A1-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4ade80?style=for-the-badge&labelColor=0f172a)](https://github.com/juninmd/canto-widget/releases)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/juninmd/canto-widget/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=0f172a)](https://github.com/juninmd/canto-widget/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/juninmd/canto-widget?style=for-the-badge&label=Release&labelColor=0f172a&color=4ade80)](https://github.com/juninmd/canto-widget/releases/latest)
 [![MIT लाइसेंस](https://img.shields.io/badge/%E0%A4%B2%E0%A4%BE%E0%A4%87%E0%A4%B8%E0%A5%87%E0%A4%82%E0%A4%B8-MIT-4ade80?style=for-the-badge&labelColor=0f172a)](../../LICENSE)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-24c8db?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0f172a)](https://v2.tauri.app)
 [![Rust](https://img.shields.io/badge/Rust-%E0%A4%8F%E0%A4%A8%E0%A5%8D%E0%A4%95%E0%A5%8D%E0%A4%B0%E0%A4%BF%E0%A4%AA%E0%A5%8D%E0%A4%9F%E0%A5%87%E0%A4%A1%20%E0%A4%95%E0%A5%8B%E0%A4%B0-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](../../src-tauri)
@@ -17,6 +18,13 @@
 <sub>[English](../../README.md) · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · **हिन्दी** · [العربية](README.ar.md) · [עברית](README.he.md) · [فارسی](README.fa.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Українська](README.uk.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Magyar](README.hu.md) · [Svenska](README.sv.md) · [Dansk](README.da.md) · [Norsk bokmål](README.nb.md) · [Suomi](README.fi.md) · [Ελληνικά](README.el.md) · [Български](README.bg.md) · [Hrvatski](README.hr.md) · [Српски](README.sr.md) · [Slovenščina](README.sl.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [Eesti](README.et.md) · [Bahasa Indonesia](README.id.md) · [Bahasa Melayu](README.ms.md) · [Tiếng Việt](README.vi.md) · [ไทย](README.th.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · [Kiswahili](README.sw.md) · [Català](README.ca.md)</sub>
 
 </div>
+
+<div align="center">
+
+<img src="docs/prints/readme/hero.gif" alt="Canto in the dock layout with the Aurora skin: browsing the tabs and a meeting alert popping up" width="420">
+
+</div>
+
 
 <br>
 
@@ -131,7 +139,7 @@ Syncthing...), सिस्टम के साथ स्टार्ट और 
 इसमें 🎙️ **Meetings** भी है: पिछले दो हफ़्तों के Gemini नोट्स और ट्रांसक्रिप्ट, साथ ही लोकल फ़ोल्डर से
 `.vtt`, `.srt`, `.txt` और `.md` ट्रांसक्रिप्ट, साफ़ किए और सर्च योग्य।
 
-⌨️ **सब कुछ कीबोर्ड से:** `Alt+1`…`Alt+7` टैब बदलते हैं, `N` बनाता है, `/` सर्च करता है, `F11` फ़ुलस्क्रीन,
+⌨️ **सब कुछ कीबोर्ड से:** `Alt+1`…`Alt+9` टैब बदलते हैं, `N` बनाता है, `/` सर्च करता है, `F11` फ़ुलस्क्रीन,
 `Alt+L` लॉक करता है और `?` शॉर्टकट लिस्ट करता है।
 
 ## 🎨 पाँच स्किन

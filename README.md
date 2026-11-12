@@ -7,16 +7,24 @@
 [![Download](https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20Download-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4ade80?style=for-the-badge&labelColor=0f172a)](https://github.com/juninmd/canto-widget/releases)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/juninmd/canto-widget/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=0f172a)](https://github.com/juninmd/canto-widget/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/juninmd/canto-widget?style=for-the-badge&label=Release&labelColor=0f172a&color=4ade80)](https://github.com/juninmd/canto-widget/releases/latest)
 [![MIT License](https://img.shields.io/badge/license-MIT-4ade80?style=for-the-badge&labelColor=0f172a)](LICENSE)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-24c8db?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0f172a)](https://v2.tauri.app)
 [![Rust](https://img.shields.io/badge/Rust-encrypted%20core-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](src-tauri)
 [![React 19](https://img.shields.io/badge/React-19-61dafb?style=for-the-badge&logo=react&logoColor=white&labelColor=0f172a)](src)
 
-**[Features](#-features)** · **[Skins](#-six-skins)** · **[Install](#%EF%B8%8F-install)** · **[Security](#-security-at-a-glance)** · **[Documentation](#-documentation)**
+**[Features](#-features)** · **[Skins](#-seven-skins)** · **[Install](#%EF%B8%8F-install)** · **[Security](#-security-at-a-glance)** · **[Documentation](#-documentation)**
 
 <sub>**English** · [Português](docs/readmes/README.pt-BR.md) · [Español](docs/readmes/README.es.md) · [Français](docs/readmes/README.fr.md) · [Italiano](docs/readmes/README.it.md) · [日本語](docs/readmes/README.ja.md) · [中文](docs/readmes/README.zh.md) · [Deutsch](docs/readmes/README.de.md) · [Русский](docs/readmes/README.ru.md) · [Türkçe](docs/readmes/README.tr.md) · [हिन्दी](docs/readmes/README.hi.md) · [العربية](docs/readmes/README.ar.md) · [עברית](docs/readmes/README.he.md) · [فارسی](docs/readmes/README.fa.md) · [한국어](docs/readmes/README.ko.md) · [Nederlands](docs/readmes/README.nl.md) · [Polski](docs/readmes/README.pl.md) · [Українська](docs/readmes/README.uk.md) · [Čeština](docs/readmes/README.cs.md) · [Slovenčina](docs/readmes/README.sk.md) · [Română](docs/readmes/README.ro.md) · [Magyar](docs/readmes/README.hu.md) · [Svenska](docs/readmes/README.sv.md) · [Dansk](docs/readmes/README.da.md) · [Norsk bokmål](docs/readmes/README.nb.md) · [Suomi](docs/readmes/README.fi.md) · [Ελληνικά](docs/readmes/README.el.md) · [Български](docs/readmes/README.bg.md) · [Hrvatski](docs/readmes/README.hr.md) · [Српски](docs/readmes/README.sr.md) · [Slovenščina](docs/readmes/README.sl.md) · [Lietuvių](docs/readmes/README.lt.md) · [Latviešu](docs/readmes/README.lv.md) · [Eesti](docs/readmes/README.et.md) · [Bahasa Indonesia](docs/readmes/README.id.md) · [Bahasa Melayu](docs/readmes/README.ms.md) · [Tiếng Việt](docs/readmes/README.vi.md) · [ไทย](docs/readmes/README.th.md) · [বাংলা](docs/readmes/README.bn.md) · [தமிழ்](docs/readmes/README.ta.md) · [Kiswahili](docs/readmes/README.sw.md) · [Català](docs/readmes/README.ca.md)</sub>
 
 </div>
+
+<div align="center">
+
+<img src="docs/prints/readme/hero.gif" alt="Canto in the dock layout with the Aurora skin: browsing the tabs and a meeting alert popping up" width="420">
+
+</div>
+
 
 <br>
 
@@ -347,11 +355,11 @@ as mini cards, and with more than one waiting its **close** button grows a chevr
 once — the same split the snooze button uses. In that pop-up, what the alert says renders **markdown** (a mention or a
 service writes markdown), with its links opening in the browser.
 
-⌨️ **Everything by keyboard:** `Alt+1`…`Alt+7` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
+⌨️ **Everything by keyboard:** `Alt+1`…`Alt+9` switch tabs, `N` creates, `/` searches, `F11` fullscreen, `Alt+L`
 locks and `?` lists the shortcuts. `Ctrl+Shift+P` (`Cmd+Shift+P` on macOS) opens a **command palette** with every
 action by name: go to a tab, new task or note, join the next meeting, copy the day's summary, switch skin, lock.
 
-## 🎨 Six skins
+## 🎨 Seven skins
 
 <table>
 <tr>
@@ -359,11 +367,12 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
 <td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Glass</b></td>
+<td align="center"><img src="docs/prints/app/131-skin-aurora.png" alt="Aurora skin" width="200"><br><b>Aurora</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Light</b></td>
 </tr>
 </table>
 
-And **Follow system**, which switches between light and dark along with the OS. All pass AA contrast.
+**Aurora** is the newest (violet and pink, built for the dock layout). And **Follow system**, which switches between light and dark along with the OS. All pass AA contrast.
 
 <details>
 <summary>🖥️ More screens: onboarding, global search, command palette, GitLab, subtasks, note editor, security, sync, density and more</summary>
