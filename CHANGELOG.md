@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Aba Dev (Windows, macOS e Linux)**: Portas (quem segura cada porta, com encerrar processo/árvore e aviso de exposição na rede), Docker (só aparece com o engine rodando; containers por projeto, logs, imagens, volumes e redes com limpeza dos não usados), Git (você escolhe as pastas; limpeza em lote de worktrees já sincronizadas com o remoto), nove Utilitários locais (JSON, JWT com codificar/decodificar/verificar, Base64, URL, UUID e segredos, Hash/HMAC, Tempo, Regex, Diff) e Agenda (crontab no Linux/macOS com criar, pausar, executar e remover; Agendador de Tarefas no Windows, somente leitura). Parsers testados com saídas reais de `netstat`, `ss`, `lsof`, `docker` e `git` em cada S.O. A aba começa oculta e é só desktop. Closes #242.
+
 ### Documentação
 
 - **README com GIF principal e prints novas**: o GIF logo após o cabeçalho mostra o layout Dock com a skin Aurora, a navegação entre abas e um aviso de reunião aparecendo (`scripts/media/hero.media.ts`); prints das abas regeneradas com dados fictícios, skin Aurora na galeria, atalho `Alt+1…Alt+9` corrigido e selo da última versão.

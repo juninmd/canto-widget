@@ -3,7 +3,7 @@ import { calls, goTab, mockTauri } from "./mock";
 
 const ALL_TABS = [
   "tasks", "notes", "clipboard", "agenda", "github", "gitlab", "steam", "status", "models", "agents",
-  "weather", "map", "market", "system", "reads", "activity", "gmail", "gdrive", "contacts",
+  "weather", "map", "market", "system", "dev", "reads", "activity", "gmail", "gdrive", "contacts",
 ];
 const HIDDEN = ["gitlab", "status", "activity", "steam", "agents", "weather", "market", "reads", "gmail", "gdrive", "contacts"];
 const ORIGIN = { name: "Rua das Acácias, 120", detail: "Aurora", lat: -23.5, lon: -46.6 };

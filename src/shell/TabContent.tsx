@@ -24,6 +24,7 @@ import {
   StatusTab,
   SteamTab,
   SystemTab,
+  DevTab,
   WeatherTab,
 } from "./lazyTabs";
 
@@ -90,6 +91,7 @@ export default function TabContent(p: TabContentProps) {
       {tab === "map" && <MapTab />}
       {tab === "market" && <MarketTab />}
       {tab === "system" && <SystemTab />}
+      {tab === "dev" && <DevTab />}
       {tab === "gmail" && <GmailTab onNotice={onNotice} />}
       {tab === "gdrive" && <GDriveTab onNotice={onNotice} />}
       {tab === "contacts" && <ContactsTab onNotice={onNotice} />}

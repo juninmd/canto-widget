@@ -6,7 +6,7 @@ const KEY = "canto.hiddenTabs";
 const KNOWN_KEY = "canto.knownTabs";
 
 /** Need desktop probes (the focused app, the machine's sensors) that a phone has no counterpart for. */
-export const DESKTOP_ONLY_TABS: readonly Tab[] = ["activity", "system"];
+export const DESKTOP_ONLY_TABS: readonly Tab[] = ["activity", "system", "dev"];
 
 const offered = TABS.filter((t) => !IS_MOBILE || !DESKTOP_ONLY_TABS.includes(t.id));
 
@@ -14,7 +14,7 @@ const offered = TABS.filter((t) => !IS_MOBILE || !DESKTOP_ONLY_TABS.includes(t.i
 export const HIDEABLE = offered.filter((t) => t.id !== "settings");
 
 /** Eighteen tabs don't fit the default width; GitLab, Status API, Atividade, Steam, Agentes, Clima, Mapa, Mercado, Leituras, Gmail, Drive, Contatos and Sistema start hidden, one checkbox away in Ajustes. */
-const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts", "system"];
+const DEFAULT_HIDDEN: Tab[] = ["gitlab", "status", "activity", "steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts", "system", "dev"];
 
 /** Nothing saved yet means the default; unknown ids (a tab removed in an update) and corrupt data are ignored. */
 export function parseHidden(raw: string | null): Tab[] {
@@ -28,7 +28,7 @@ export function parseHidden(raw: string | null): Tab[] {
 }
 
 /** Shipped after people could save their hidden list; before `canto.knownTabs` existed, these were the unknown ones. */
-const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts", "system"];
+const ADDED_LATER: Tab[] = ["steam", "agents", "weather", "map", "market", "reads", "gmail", "gdrive", "contacts", "system", "dev"];
 
 /** A tab hidden by default stays hidden for someone who saved a choice before it existed, instead of crowding their bar. */
 export function hideNewTabs(hidden: Tab[], rawKnown: string | null): Tab[] {
