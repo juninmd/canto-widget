@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Documentação
+
+- **README com GIF principal e prints novas**: o GIF logo após o cabeçalho mostra o layout Dock com a skin Aurora, a navegação entre abas e um aviso de reunião aparecendo (`scripts/media/hero.media.ts`); prints das abas regeneradas com dados fictícios, skin Aurora na galeria, atalho `Alt+1…Alt+9` corrigido e selo da última versão.
+
 ### Corrigido
 
 - **Janela com erro não mostra o erro técnico**: uma falha de renderização exibia a mensagem crua do motor (ex.: "Cannot read properties of null") no painel em português. Agora mostra um texto simples e o erro vai para o console.

@@ -7,6 +7,7 @@
 [![Download](https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20Download-Windows%20%C2%B7%20macOS%20%C2%B7%20Linux-4ade80?style=for-the-badge&labelColor=0f172a)](https://github.com/juninmd/canto-widget/releases)
 
 [![CI](https://img.shields.io/github/actions/workflow/status/juninmd/canto-widget/ci.yml?branch=main&style=for-the-badge&label=CI&labelColor=0f172a)](https://github.com/juninmd/canto-widget/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/juninmd/canto-widget?style=for-the-badge&label=Release&labelColor=0f172a&color=4ade80)](https://github.com/juninmd/canto-widget/releases/latest)
 [![MIT License](https://img.shields.io/badge/license-MIT-4ade80?style=for-the-badge&labelColor=0f172a)](../../LICENSE)
 [![Tauri v2](https://img.shields.io/badge/Tauri-v2-24c8db?style=for-the-badge&logo=tauri&logoColor=white&labelColor=0f172a)](https://v2.tauri.app)
 [![Rust](https://img.shields.io/badge/Rust-encrypted%20core-f74c00?style=for-the-badge&logo=rust&logoColor=white&labelColor=0f172a)](../../src-tauri)
@@ -18,6 +19,13 @@
 <sub>[English](../../README.md) · [Português](README.pt-BR.md) · [Español](README.es.md) · [Français](README.fr.md) · [Italiano](README.it.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Deutsch](README.de.md) · [Русский](README.ru.md) · [Türkçe](README.tr.md) · [हिन्दी](README.hi.md) · [العربية](README.ar.md) · [עברית](README.he.md) · [فارسی](README.fa.md) · [한국어](README.ko.md) · [Nederlands](README.nl.md) · [Polski](README.pl.md) · [Українська](README.uk.md) · [Čeština](README.cs.md) · [Slovenčina](README.sk.md) · [Română](README.ro.md) · [Magyar](README.hu.md) · [Svenska](README.sv.md) · [Dansk](README.da.md) · [Norsk bokmål](README.nb.md) · [Suomi](README.fi.md) · [Ελληνικά](README.el.md) · [Български](README.bg.md) · [Hrvatski](README.hr.md) · [Српски](README.sr.md) · [Slovenščina](README.sl.md) · [Lietuvių](README.lt.md) · [Latviešu](README.lv.md) · [Eesti](README.et.md) · [Bahasa Indonesia](README.id.md) · [Bahasa Melayu](README.ms.md) · [Tiếng Việt](README.vi.md) · [ไทย](README.th.md) · [বাংলা](README.bn.md) · [தமிழ்](README.ta.md) · **Kiswahili** · [Català](README.ca.md)</sub>
 
 </div>
+
+<div align="center">
+
+<img src="docs/prints/readme/hero.gif" alt="Canto in the dock layout with the Aurora skin: browsing the tabs and a meeting alert popping up" width="420">
+
+</div>
+
 
 <br>
 
@@ -192,7 +200,7 @@ arifa juu ya dirisha zima katika hali yoyote: kadi moja kwa tahadhari na vitendo
 kutatuliwa leo chini yao - bila chochote kinachosubiri, ni jinsi unavyofikia logi ya leo. Kutoka kwenye kizimbani, bonyeza
 bado inafungua arifa hiyo moja juu ya dirisha la kawaida.
 
-⌨️ **Kila kitu kwa kibodi:** `Alt+1`…`Alt+7` badilisha vichupo, `N` huunda, `/` utafutaji, `F11` skrini nzima, `Alt+L`
+⌨️ **Kila kitu kwa kibodi:** `Alt+1`…`Alt+9` badilisha vichupo, `N` huunda, `/` utafutaji, `F11` skrini nzima, `Alt+L`
 kufuli na `?` kuorodhesha njia za mkato. `Ctrl+Shift+P` (`Cmd+Shift+P` kwenye macOS) hufungua **paleti ya amri** na kila
 kitendo kwa jina: nenda kwenye kichupo, kazi mpya au dokezo, jiunge na mkutano unaofuata, nakili muhtasari wa siku, badilisha ngozi, funga.
 
@@ -204,6 +212,7 @@ kitendo kwa jina: nenda kwenye kichupo, kazi mpya au dokezo, jiunge na mkutano u
 <td align="center"><img src="docs/prints/app/17-skin-hueco-mundo.png" alt="Hueco Mundo skin" width="200"><br><b>Hueco Mundo</b></td>
 <td align="center"><img src="docs/prints/app/14-skin-dracula.png" alt="Dracula skin" width="200"><br><b>Dracula</b></td>
 <td align="center"><img src="docs/prints/app/79-skin-glass.png" alt="Glass skin" width="200"><br><b>Kioo</b></td>
+<td align="center"><img src="docs/prints/app/131-skin-aurora.png" alt="Aurora skin" width="200"><br><b>Aurora</b></td>
 <td align="center"><img src="docs/prints/app/11-skin-clara.png" alt="Light skin" width="200"><br><b>Nuru</b></td>
 </tr>
 </table>
