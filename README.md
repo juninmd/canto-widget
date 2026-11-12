@@ -711,6 +711,13 @@ Download the installer for your platform from **[Releases](https://github.com/ju
 > **System Settings → Privacy & Security → Open Anyway**).
 > Automatic updates are verified against the project's own signature before running.
 
+**macOS, one line, no quarantine** (downloads with `curl` don't get the quarantine flag; the script also runs
+`xattr -cr` as a safety net):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/juninmd/canto-widget/main/scripts/install-macos.sh | bash
+```
+
 Ready-made manifests for winget and Homebrew (plus a skeleton for Flatpak, currently blocked) live in
 [`packaging/`](docs/readmes/packaging/README.md) — prepared and verified locally, but not yet published to those
 repositories: publishing is a manual decision and action by the maintainer.
