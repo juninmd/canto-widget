@@ -1,0 +1,5 @@
+title: Canto
+description: Encrypted local-first desktop widget for tasks, notes, agenda and more.
+theme: jekyll-theme-primer
+include: [privacy.md]
+exclude: [benchmark, readmes, prints, mobile.md, languages.md]
