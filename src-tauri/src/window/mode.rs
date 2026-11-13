@@ -35,9 +35,50 @@ fn work_area(win: &WebviewWindow) -> tauri::Result<Option<Area>> {
     Ok(Some((p.x, p.y, s.width, s.height)))
 }
 
+/// macOS native fullscreen moves the window to its own Space and, for a borderless window, brings the title bar
+/// back (and keeps it after leaving). The "simple" fullscreen only resizes the borderless window, so the layout
+/// never meets a native bar. Everywhere else the regular fullscreen is fine.
+pub const SIMPLE_FULLSCREEN: bool = cfg!(target_os = "macos");
+
+/// Maximized state of the main window; `is_fullscreen()` alone misses the macOS simple fullscreen.
+pub fn is_max(win: &WebviewWindow) -> bool {
+    win.try_state::<WindowState>().is_some_and(|s| s.is_max()) || win.is_fullscreen().unwrap_or(false)
+}
+
+pub fn is_max_window(win: &tauri::Window) -> bool {
+    win.try_state::<WindowState>().is_some_and(|s| s.is_max()) || win.is_fullscreen().unwrap_or(false)
+}
+
+/// The widget never has a native title bar: asserted again after every mode change because the OS may have given
+/// one back (idempotent, a no-op when the window already has none).
+pub fn strip_chrome(win: &WebviewWindow) -> tauri::Result<()> {
+    win.set_decorations(false)
+}
+
+pub fn set_max(win: &WebviewWindow, enabled: bool) -> tauri::Result<()> {
+    if SIMPLE_FULLSCREEN {
+        // A native fullscreen left over (older build, user shortcut) must end before the simple one starts.
+        if win.is_fullscreen()? {
+            win.set_fullscreen(false)?;
+        }
+        win.set_simple_fullscreen(enabled)?;
+    } else {
+        win.set_fullscreen(enabled)?;
+    }
+    if let Some(state) = win.try_state::<WindowState>() {
+        state.set_max(enabled);
+    }
+    strip_chrome(win)?;
+    if !enabled && win.try_state::<WindowState>().is_some_and(|s| s.cfg().sidebar) {
+        crate::window::state::place(win)?;
+    }
+    Ok(())
+}
+
 /// Idempotent: boot and every resize go through here, so the mini window never keeps the normal limits.
 pub fn place_mini(win: &WebviewWindow, size: (f64, f64)) -> tauri::Result<()> {
     let size = clamp_mini(size);
+    strip_chrome(win)?;
     win.set_resizable(false)?;
     win.set_min_size(None::<LogicalSize<f64>>)?;
     win.set_size(LogicalSize::new(size.0, size.1))?;
@@ -69,14 +110,16 @@ pub fn set_mini(app: &tauri::AppHandle, enabled: bool) -> tauri::Result<()> {
     // Flag first: the resize events below must not overwrite the normal geometry the user saved.
     state.change(|c| c.mini = enabled);
     if enabled {
-        if win.is_fullscreen()? {
-            win.set_fullscreen(false)?;
+        if is_max(&win) {
+            set_max(&win, false)?;
         }
         place_mini(&win, MINI_DEFAULT)?;
     } else {
         restore_limits(&win)?;
         crate::window::state::place(&win)?;
     }
+    // Leaving fullscreen or resizing may bring a native bar back on macOS.
+    strip_chrome(&win)?;
     app.emit(MODE_EVENT, enabled)
 }
 
@@ -91,6 +134,17 @@ pub fn toggle_mini(app: &tauri::AppHandle) -> tauri::Result<()> {
         }
     }
     Ok(())
+}
+
+#[tauri::command]
+pub fn window_max_set(app: tauri::AppHandle, enabled: bool) -> Result<()> {
+    let Some(win) = app.get_webview_window("main") else { return Ok(()) };
+    set_max(&win, enabled).map_err(|e| AppError::Io(e.to_string()))
+}
+
+#[tauri::command]
+pub fn window_max_get(app: tauri::AppHandle) -> bool {
+    app.get_webview_window("main").is_some_and(|w| is_max(&w))
 }
 
 #[tauri::command]

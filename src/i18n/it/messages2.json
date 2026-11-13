@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "torna all'angolo e alle dimensioni originali",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Scorciatoie da tastiera",
   "shortcuts.hint": "I tasti a lettera singola non funzionano durante la digitazione in un campo.",
   "shortcuts.close": "chiudere",

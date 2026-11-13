@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "вернуться в угол и исходный размер",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Сочетания клавиш",
   "shortcuts.hint": "Однобуквенные клавиши не работают, пока вы вводите поле.",
   "shortcuts.close": "закрыть",

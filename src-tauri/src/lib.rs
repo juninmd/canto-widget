@@ -235,6 +235,12 @@ pub fn run() {
             window::mode::window_mini_set,
             #[cfg(desktop)]
             window::mode::window_mini_resize,
+            #[cfg(desktop)]
+            window::mode::window_max_set,
+            #[cfg(desktop)]
+            window::mode::window_max_get,
+            #[cfg(desktop)]
+            window::sidebar::window_sidebar_set,
             github::cmd::github_status,
             github::cmd::github_save_token,
             github::cmd::github_device_start,

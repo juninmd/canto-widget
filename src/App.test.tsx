@@ -31,7 +31,12 @@ mock.module("@tauri-apps/api/core", () => ({
       case "agenda_today":
         return Promise.resolve(agendaItems);
       case "window_config":
-        return Promise.resolve({ position: null, size: null, always_on_top: true, mini: miniOn });
+        return Promise.resolve({ position: null, size: null, always_on_top: true, mini: miniOn, sidebar: false });
+      case "window_max_get":
+        return Promise.resolve(fullscreenOn);
+      case "window_max_set":
+        fullscreenOn = args?.enabled === true;
+        return Promise.resolve(null);
       case "window_mini_set":
         miniOn = args?.enabled === true;
         return Promise.resolve(null);

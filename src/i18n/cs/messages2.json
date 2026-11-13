@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "zpět do rohu a původní velikosti",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Klávesové zkratky",
   "shortcuts.hint": "Jednopísmenné klávesy při psaní do pole nefungují.",
   "shortcuts.close": "zavřít",

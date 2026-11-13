@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "tornar a la cantonada i la mida original",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Dreceres de teclat",
   "shortcuts.hint": "Les tecles d'una sola lletra no funcionen mentre escriviu en un camp.",
   "shortcuts.close": "tancar",

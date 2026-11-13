@@ -206,6 +206,9 @@ export const app: Record<keyof typeof source, string> = {
   "settings.window.alwaysOnTop": "siempre encima de otras ventanas",
   "settings.window.hint": "Arrastra por la barra superior y redimensiona desde los bordes: la posición y el tamaño se guardan.",
   "settings.window.reset": "volver a la esquina y al tamaño original",
+  "settings.window.sidebar": "barra lateral que se oculta sola",
+  "settings.window.sidebarHint":
+    "Fija la ventana al borde derecho de la pantalla, a toda la altura. Al sacar el ratón se oculta y deja una franja fina; toca el borde derecho para volver. El modo mini y la pantalla completa tienen prioridad.",
 
   "shortcuts.title": "Atajos de teclado",
   "shortcuts.hint": "Las teclas de una sola letra no funcionan mientras escribes en un campo.",

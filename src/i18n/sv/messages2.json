@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "tillbaka till hörnet och originalstorlek",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Kortkommandon",
   "shortcuts.hint": "Enbokstavsnycklar fungerar inte när du skriver i ett fält.",
   "shortcuts.close": "nära",

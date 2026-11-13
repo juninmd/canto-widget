@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "কোণে এবং আসল আকারে ফিরে যান",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "কীবোর্ড শর্টকাট",
   "shortcuts.hint": "আপনি একটি ক্ষেত্রে টাইপ করার সময় একক-অক্ষরের কীগুলি কাজ করে না।",
   "shortcuts.close": "বন্ধ",

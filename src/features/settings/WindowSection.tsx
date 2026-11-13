@@ -6,6 +6,7 @@ import { SettingsSection } from "./SettingsSection";
 
 export default function WindowSection({ onError }: { onError: (m: string) => void }) {
   const [onTop, setOnTop] = useState(true);
+  const [sidebar, setSidebar] = useState(false);
   const [moved, setMoved] = useState(false);
   const { error, fail, clear } = useSectionError(onError);
 
@@ -14,6 +15,7 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
       const cfg = await api.windowConfig();
       if (!cfg) return;
       setOnTop(cfg.always_on_top);
+      setSidebar(cfg.sidebar === true);
       setMoved(!!cfg.position || !!cfg.size);
     } catch (e) {
       fail(e);
@@ -47,6 +49,16 @@ export default function WindowSection({ onError }: { onError: (m: string) => voi
         />
         {t("settings.window.alwaysOnTop")}
       </label>
+      <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
+        <input
+          type="checkbox"
+          checked={sidebar}
+          onChange={(e) => void act(() => api.windowSidebarSet(e.target.checked))}
+          className="canto-box"
+        />
+        {t("settings.window.sidebar")}
+      </label>
+      <p className="text-[11px] text-faint">{t("settings.window.sidebarHint")}</p>
       <p className="text-[11px] text-faint">{t("settings.window.hint")}</p>
       {moved && (
         <button

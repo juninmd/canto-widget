@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "înapoi la colț și dimensiunea originală",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Comenzi rapide de la tastatură",
   "shortcuts.hint": "Tastele cu o singură literă nu funcționează în timp ce tastați într-un câmp.",
   "shortcuts.close": "aproape",
