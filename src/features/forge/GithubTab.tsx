@@ -6,6 +6,7 @@ import { useForgeLists } from "./useForgeLists";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
 import { patchForgeCache, readForgeCache } from "./forgeCache";
 import ErrorBanner from "../../components/ErrorBanner";
+import { clearReposCache } from "./useRepos";
 import ForgeBoard from "./ForgeBoard";
 import GithubConnect from "./GithubConnect";
 import Skeleton from "../../components/Skeleton";
@@ -70,6 +71,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
   async function disconnect() {
     try {
       await api.githubDisconnect();
+      clearReposCache("github");
       await refresh();
     } catch (e) {
       onError(errText(e));

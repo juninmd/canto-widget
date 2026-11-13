@@ -355,6 +355,11 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|
 | ![GitHub tab, mentions subtab: unread dot, author's photo, name and @login, a preview of the text that mentions me, the thread's link, and actions to mark read or mute the thread or the person; the subtab shows the unread count](../prints/app/81-aba-mencoes.png) |
 
+| Repositories subtab (GitHub and GitLab) |
+|---|
+| ![GitHub tab, repositories subtab: the repositories I can reach grouped under "pessoais" and each organization, as cards, with the "estatísticas" switch on showing the totals and the contribution squares of the last six months](../prints/app/148-aba-repositorios.png) |
+| ![Repositories subtab as a grid of compact tiles, grouped by organization](../prints/app/149-repositorios-grade.png) |
+
 | পাসওয়ার্ড পরিবর্তন, একটি ফাইল মুলতুবি | দিনের সারসংক্ষেপ |
 |---|---|
 | ![Toast asking to lock and unlock to finish updating one file](../prints/app/31-senha-pendente.png) | ![Day summary with tasks, meetings and their total time, opened, merged and reviewed PRs/MRs](../prints/app/32-resumo-do-dia.png) |
