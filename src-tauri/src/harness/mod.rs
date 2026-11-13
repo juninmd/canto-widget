@@ -20,7 +20,7 @@ pub struct Method {
 pub struct Harness {
     pub id: &'static str,
     pub name: &'static str,
-    /// `owner/name` on GitHub, the only source of the release feed.
+    /// `owner/name` on GitHub, the only source of the release feed; empty when the tool publishes no GitHub releases.
     pub repo: &'static str,
     /// Executable looked up in PATH to tell whether the CLI is installed on this machine.
     pub bin: &'static str,
@@ -77,6 +77,30 @@ pub const HARNESSES: &[Harness] = &[
         bin: "aider",
         site: "https://github.com/Aider-AI/aider",
         install: Method { tool: "pipx", command: "pipx install aider-chat" },
+    },
+    Harness {
+        id: "antigravity",
+        name: "Antigravity CLI",
+        repo: "",
+        bin: "agy",
+        site: "https://antigravity.google",
+        install: Method { tool: "choco", command: "choco install antigravity-cli" },
+    },
+    Harness {
+        id: "vscode",
+        name: "VS Code",
+        repo: "microsoft/vscode",
+        bin: "code",
+        site: "https://github.com/microsoft/vscode",
+        install: Method { tool: "winget", command: "winget install Microsoft.VisualStudioCode" },
+    },
+    Harness {
+        id: "grok",
+        name: "Grok Build",
+        repo: "xai-org/grok-build",
+        bin: "grok",
+        site: "https://github.com/xai-org/grok-build",
+        install: Method { tool: "npm", command: "npm install -g @xai-official/grok" },
     },
 ];
 

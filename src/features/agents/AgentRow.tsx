@@ -56,7 +56,7 @@ export default function AgentRow({ view, index = 0, onError }: { view: HarnessVi
               {t(view.installed ? "agents.installed" : "agents.notInstalled")}
             </span>
           </div>
-          <div className="truncate text-[10px] text-faint">{view.repo}</div>
+          <div className="truncate text-[10px] text-faint">{view.repo || new URL(view.site).host}</div>
           <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[10px]">
             {release ? (
               <>

@@ -55,3 +55,10 @@ mod live {
         }
     }
 }
+
+#[test]
+fn a_harness_without_a_repo_is_not_looked_up() {
+    let client = crate::net::client_builder().build().unwrap();
+    let h = HARNESSES.iter().find(|h| h.repo.is_empty()).expect("antigravity has no repo");
+    assert_eq!(fetch_one(&client, h), FeedEntry { release: None, error: None });
+}
