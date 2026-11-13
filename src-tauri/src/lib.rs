@@ -80,6 +80,7 @@ pub mod prefs;
 pub mod priority;
 pub mod reads;
 pub mod report;
+pub mod repos;
 pub mod resilient;
 pub mod review_alert;
 pub mod routine;
@@ -249,6 +250,10 @@ pub fn run() {
             github::cmd::github_disconnect,
             github::cmd_lists::github_lists,
             mentions::cmd::github_mentions,
+            repos::cmd::github_repos,
+            repos::cmd::github_contributions,
+            repos::cmd::gitlab_repos,
+            repos::cmd::gitlab_contributions,
             mentions::cmd::gitlab_mentions,
             mentions::state::mention_read,
             mentions::state::mention_mute_thread,

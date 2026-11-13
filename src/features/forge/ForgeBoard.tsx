@@ -6,6 +6,7 @@ import { useMentions } from "./useMentions";
 import type { CiMap, ConflictMap } from "./forgeChecks";
 import { effectiveFocus, focusList, focusSections, type SummaryFocus } from "./forgeFocus";
 import { useForgeCommenters } from "./useForgeCommenters";
+import { useRepos } from "./useRepos";
 import { clockLabel } from "../../lib/clockLabel";
 import { t } from "../../i18n";
 import ErrorBanner from "../../components/ErrorBanner";
@@ -15,12 +16,13 @@ import ForgeSection from "./ForgeSection";
 import ForgeSummary from "./ForgeSummary";
 import MentionsList from "./MentionsList";
 import PrCommentersCatalog from "./PrCommentersCatalog";
+import ReposList, { savedStats } from "./ReposList";
 import Skeleton from "../../components/Skeleton";
 import SubTabs from "../../components/SubTabs";
 
 type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; conflicts?: ConflictMap; onDisconnect: () => void };
 
-type Sub = "lists" | "mentions";
+type Sub = "lists" | "mentions" | "repos";
 
 const VIEW_TAB = "canto-hit flex-1 rounded-lg py-1 text-center text-[11px] font-medium transition-colors";
 
@@ -37,6 +39,9 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const mentions = useMentions(forge);
   const { load: loadMentions, loaded } = mentions;
   const onMentions = sub === "mentions";
+  const onRepos = sub === "repos";
+  const [stats, setStats] = useState(savedStats);
+  const repos = useRepos(forge, onRepos, stats);
 
   useEffect(() => {
     if (onMentions && !loaded) void loadMentions();
@@ -46,8 +51,8 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   }, []);
 
   const unread = mentions.reply?.unread ?? known;
-  const busy = onMentions ? mentions.loading : gh.loading;
-  const refresh = () => void (onMentions ? loadMentions(true) : gh.load(gh.filter, true, true));
+  const busy = onRepos ? repos.loading : onMentions ? mentions.loading : gh.loading;
+  const refresh = () => (onRepos ? repos.refresh() : void (onMentions ? loadMentions(true) : gh.load(gh.filter, true, true)));
   const commenters = useForgeCommenters(forge, lists, view === "commenters");
   const shown = lists ? focusSections(visibleSections(forge, gh.filter.kind), focus) : [];
 
@@ -56,8 +61,8 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
       <ForgeHeader
         login={login}
         host={host}
-        cached={!onMentions && !!gh.error && !!lists}
-        fetchedAt={onMentions ? null : (fresh?.fetchedAt ?? null)}
+        cached={!onMentions && !onRepos && !!gh.error && !!lists}
+        fetchedAt={onRepos ? (repos.list?.fetched_at ?? null) : onMentions ? null : (fresh?.fetchedAt ?? null)}
         busy={busy}
         onRefresh={refresh}
         onDisconnect={onDisconnect}
@@ -69,9 +74,12 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
         tabs={[
           { key: "lists", label: t("forge.sub.lists", { pr: forge === "gitlab" ? "MRs" : "PRs" }) },
           { key: "mentions", label: unread > 0 ? t("forge.sub.mentionsCount", { n: unread }) : t("forge.sub.mentions") },
+          { key: "repos", label: t("forge.sub.repos") },
         ]}
       />
-      {onMentions ? (
+      {onRepos ? (
+        <ReposList forge={forge} repos={repos} stats={stats} onStats={setStats} />
+      ) : onMentions ? (
         <MentionsList forge={forge} mentions={mentions} />
       ) : (
         <>

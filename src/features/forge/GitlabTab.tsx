@@ -5,6 +5,7 @@ import { useForgeLists } from "./useForgeLists";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
 import { patchForgeCache, readForgeCache } from "./forgeCache";
 import ErrorBanner from "../../components/ErrorBanner";
+import { clearReposCache } from "./useRepos";
 import ForgeBoard from "./ForgeBoard";
 import GitlabConnect from "./GitlabConnect";
 import Skeleton from "../../components/Skeleton";
@@ -41,6 +42,7 @@ export default function GitlabTab({ onError }: { onError: (m: string) => void })
   async function disconnect() {
     try {
       await api.gitlabDisconnect();
+      clearReposCache("gitlab");
       await refresh();
     } catch (e) {
       onError(errText(e));

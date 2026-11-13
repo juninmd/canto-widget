@@ -47,3 +47,27 @@ export type VaultPeriod = {
   focused_secs?: number;
 };
 export type GitlabStatus = { connected: boolean; username: string; base_url: string };
+/** A repository (GitHub) or project (GitLab) the user can reach; `group` is the organization or group path, empty for the user's own. */
+export type RepoInfo = {
+  name: string;
+  full_name: string;
+  group: string;
+  description: string;
+  url: string;
+  private: boolean;
+  fork: boolean;
+  archived: boolean;
+  stars: number;
+  forks: number;
+  language: string;
+  updated_at: string;
+};
+export type RepoList = {
+  repos: RepoInfo[];
+  /** More repositories exist than the pages Rust fetched. */
+  truncated: boolean;
+  fetched_at: number;
+  limited_until: number | null;
+};
+export type ContributionDay = { date: string; count: number };
+export type Contributions = { days: ContributionDay[]; total: number; fetched_at: number; limited_until: number | null };

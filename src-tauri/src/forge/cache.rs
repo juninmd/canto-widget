@@ -67,6 +67,8 @@ pub struct ForgeCache {
     inner: Mutex<Inner>,
     /// PR CI status, dropped together with the lists on disconnect or lock.
     pub checks: ChecksCache,
+    /// Repository lists and contribution calendars of the repositories subtab, dropped the same way.
+    pub repos: crate::repos::cache::RepoCache,
 }
 
 impl ForgeCache {
@@ -135,6 +137,7 @@ impl ForgeCache {
         g.quotas.remove(forge);
         g.generation += 1;
         self.checks.forget(forge);
+        self.repos.forget(forge);
     }
 
     pub fn clear(&self) {
@@ -143,6 +146,7 @@ impl ForgeCache {
         g.quotas.clear();
         g.generation += 1;
         self.checks.clear();
+        self.repos.clear();
     }
 }
 
