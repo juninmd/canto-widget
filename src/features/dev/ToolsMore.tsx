@@ -5,38 +5,44 @@ import { Area, Label, Line, Note, relative } from "./ToolBits";
 import { digests, lineDiff, parseInstant, randomSecret, randomUuids, testRegex } from "./tools";
 
 export function ToolUuid() {
-  const [ids, setIds] = useState(() => randomUuids(5));
-  const [secret, setSecret] = useState(() => randomSecret());
+  const [ids, setIds] = useState<string[]>([]);
+  const [secret, setSecret] = useState<{ hex: string; base64: string } | null>(null);
   return (
     <>
       <div className="flex shrink-0 items-center gap-1">
         <Label>{t("dev.uuid.title")}</Label>
         <span className="flex-1" />
-        <Chip on={false} onClick={() => setIds(randomUuids(5))}>{t("dev.uuid.again")}</Chip>
-        <Chip on={false} onClick={() => copyText(ids.join("\n"))}>{t("dev.uuid.copyAll")}</Chip>
+        <Chip on={false} onClick={() => setIds(randomUuids(5))}>{t(ids.length ? "dev.uuid.again" : "dev.uuid.make")}</Chip>
+        <Chip on={false} onClick={() => ids.length > 0 && copyText(ids.join("\n"))}>{t("dev.uuid.copyAll")}</Chip>
       </div>
+      {ids.length === 0 && <Note>{t("dev.uuid.empty")}</Note>}
       {ids.map((id) => <CopyLine key={id} text={id} />)}
       <div className="flex shrink-0 items-center gap-1">
         <Label>{t("dev.uuid.secret")}</Label>
         <span className="flex-1" />
-        <Chip on={false} onClick={() => setSecret(randomSecret())}>{t("dev.uuid.again")}</Chip>
+        <Chip on={false} onClick={() => setSecret(randomSecret())}>{t(secret ? "dev.uuid.again" : "dev.uuid.make")}</Chip>
       </div>
-      <Label>{t("dev.uuid.hex")}</Label>
-      <CopyLine text={secret.hex} />
-      <Label>{t("dev.uuid.b64")}</Label>
-      <CopyLine text={secret.base64} />
+      {secret && (
+        <>
+          <Label>{t("dev.uuid.hex")}</Label>
+          <CopyLine text={secret.hex} />
+          <Label>{t("dev.uuid.b64")}</Label>
+          <CopyLine text={secret.base64} />
+        </>
+      )}
       <p className="text-[11px] text-faint">{t("dev.uuid.note")}</p>
     </>
   );
 }
 
 export function ToolHash() {
-  const [text, setText] = useState("canto");
+  const [text, setText] = useState("");
   const [key, setKey] = useState("");
   const [rows, setRows] = useState<[string, string][]>([]);
   useEffect(() => {
     let live = true;
-    void digests(text, key).then((r) => live && setRows(r));
+    if (text) void digests(text, key).then((r) => live && setRows(r));
+    else setRows([]);
     return () => void (live = false);
   }, [text, key]);
   return (
@@ -54,7 +60,7 @@ export function ToolHash() {
 }
 
 export function ToolTime() {
-  const [text, setText] = useState(() => String(Math.floor(Date.now() / 1000)));
+  const [text, setText] = useState("");
   const ms = parseInstant(text);
   const shift = (by: number) => ms !== null && setText(String(Math.floor((ms + by) / 1000)));
   return (
@@ -66,7 +72,7 @@ export function ToolTime() {
         <Chip on={false} onClick={() => shift(86_400_000)}>{t("dev.time.plus1d")}</Chip>
         <Chip on={false} onClick={() => shift(-86_400_000)}>{t("dev.time.minus1d")}</Chip>
       </div>
-      {ms === null ? (
+      {!text.trim() ? null : ms === null ? (
         <Note tone="warn">{t("dev.time.invalid")}</Note>
       ) : (
         <>
@@ -89,9 +95,9 @@ export function ToolTime() {
 }
 
 export function ToolRegex() {
-  const [pattern, setPattern] = useState("(\\w+)@(\\w+)\\.com");
+  const [pattern, setPattern] = useState("");
   const [flags, setFlags] = useState("g");
-  const [text, setText] = useState("contato: ana@canto.com, bia@exemplo.com, x@outro.org");
+  const [text, setText] = useState("");
   const r = testRegex(pattern, flags, text);
   return (
     <>
@@ -100,7 +106,7 @@ export function ToolRegex() {
         <div className="w-16 shrink-0"><Line id="dev-re-flags" value={flags} onChange={setFlags} label={t("dev.re.flags")} /></div>
       </div>
       <Area id="dev-re-text" value={text} onChange={setText} label={t("dev.re.text")} rows={3} />
-      {"error" in r ? (
+      {!pattern ? null : "error" in r ? (
         <Note tone="danger">{t("dev.re.invalid", { msg: r.error })}</Note>
       ) : (
         <>
@@ -123,8 +129,8 @@ export function ToolRegex() {
 }
 
 export function ToolDiff() {
-  const [a, setA] = useState("porta=3000\nhost=localhost\nmodo=dev");
-  const [b, setB] = useState("porta=3001\nhost=localhost\nmodo=dev\ndebug=true");
+  const [a, setA] = useState("");
+  const [b, setB] = useState("");
   const d = lineDiff(a, b);
   const add = d?.filter((l) => l.op === "+").length ?? 0;
   const del = d?.filter((l) => l.op === "-").length ?? 0;
@@ -132,7 +138,7 @@ export function ToolDiff() {
     <>
       <Area id="dev-diff-a" value={a} onChange={setA} label={t("dev.diff.a")} rows={3} />
       <Area id="dev-diff-b" value={b} onChange={setB} label={t("dev.diff.b")} rows={3} />
-      {!d ? (
+      {!a && !b ? null : !d ? (
         <Note tone="warn">{t("dev.diff.tooBig")}</Note>
       ) : (
         <>

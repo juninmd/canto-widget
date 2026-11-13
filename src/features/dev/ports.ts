@@ -22,13 +22,14 @@ export function projectOf(e: PortEntry): string {
 
 export type PortSort = "port" | "name" | "pid" | "mem";
 export type Proto = "all" | "TCP" | "UDP";
-export type PortFilter = { query: string; proto: Proto; onlyDev: boolean };
+export type PortFilter = { query: string; proto: Proto; onlyDev: boolean; exposed?: boolean };
 
 export function filterPorts(list: PortEntry[], f: PortFilter): PortEntry[] {
   const q = f.query.trim().toLowerCase();
   return list.filter((e) => {
     if (f.proto !== "all" && e.proto !== f.proto) return false;
     if (f.onlyDev && !isDevProcess(e)) return false;
+    if (f.exposed && !e.exposed) return false;
     return !q || [e.port, e.pid, e.name, e.cmd, projectOf(e)].join(" ").toLowerCase().includes(q);
   });
 }

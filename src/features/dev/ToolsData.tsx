@@ -6,10 +6,10 @@ import { decodeText, encodeText, formatJson, jsonDepth, jsonPath, parseUrl, safe
 
 const MODES: JsonMode[] = ["format", "minify", "sort"];
 
-export function ToolJson({ seed }: { seed: string }) {
-  const [text, setText] = useState(seed);
+export function ToolJson() {
+  const [text, setText] = useState("");
   const [mode, setMode] = useState<JsonMode>("format");
-  const [path, setPath] = useState("abas[0].id");
+  const [path, setPath] = useState("");
   const r = formatJson(text, mode);
   const found = r.ok && path ? jsonPath(r.value.value, path) : undefined;
   return (
@@ -22,7 +22,7 @@ export function ToolJson({ seed }: { seed: string }) {
           </Chip>
         ))}
       </div>
-      {!r.ok ? (
+      {!text.trim() ? null : !r.ok ? (
         <Note tone="danger">{t("dev.json.invalid", { msg: r.error })}</Note>
       ) : (
         <>
@@ -44,7 +44,7 @@ export function ToolJson({ seed }: { seed: string }) {
 }
 
 export function ToolBase64() {
-  const [text, setText] = useState("Canto Widget");
+  const [text, setText] = useState("");
   const [urlSafe, setUrlSafe] = useState(false);
   return (
     <>
@@ -53,21 +53,25 @@ export function ToolBase64() {
         <input type="checkbox" checked={urlSafe} onChange={(e) => setUrlSafe(e.target.checked)} className="size-4 accent-[var(--color-accent)]" />
         {t("dev.b64.urlSafe")}
       </label>
-      <Label>{t("dev.b64.encoded")}</Label>
-      <CopyLine text={encodeText(text, urlSafe)} />
-      <Label>{t("dev.b64.decoded")}</Label>
-      <CopyLine text={decodeText(text) ?? t("dev.b64.invalid")} />
+      {text && (
+        <>
+          <Label>{t("dev.b64.encoded")}</Label>
+          <CopyLine text={encodeText(text, urlSafe)} />
+          <Label>{t("dev.b64.decoded")}</Label>
+          <CopyLine text={decodeText(text) ?? t("dev.b64.invalid")} />
+        </>
+      )}
     </>
   );
 }
 
 export function ToolUrl() {
-  const [text, setText] = useState("https://api.canto.dev/v1/tarefas?status=aberta&tag=dev&tag=urgente&q=a%C3%A7%C3%A3o#topo");
+  const [text, setText] = useState("");
   const p = parseUrl(text);
   return (
     <>
       <Area id="dev-url" value={text} onChange={setText} label={t("dev.url.input")} rows={3} />
-      {p ? (
+      {!text.trim() ? null : p ? (
         <div className="flex shrink-0 flex-col gap-1.5 rounded-xl bg-ink/50 p-2.5">
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-[11.5px]">
             {[[t("dev.url.protocol"), p.url.protocol], [t("dev.url.host"), p.url.host], [t("dev.url.path"), p.url.pathname], [t("dev.url.hash"), p.url.hash || "—"]].map(([k, v]) => (
@@ -90,10 +94,14 @@ export function ToolUrl() {
       ) : (
         <Note tone="warn">{t("dev.url.invalid")}</Note>
       )}
+      {text && (
+        <>
       <Label>{t("dev.url.encoded")}</Label>
       <CopyLine text={encodeURIComponent(text)} />
       <Label>{t("dev.url.decoded")}</Label>
       <CopyLine text={safeDecodeUri(text) ?? t("dev.url.badSeq")} />
+        </>
+      )}
     </>
   );
 }

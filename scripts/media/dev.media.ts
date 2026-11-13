@@ -8,16 +8,17 @@ const SHOTS: [string, string, string[]][] = [
   ["Git", "134-dev-git", []],
   ["Agenda", "135-dev-agenda", []],
 ];
-const TOOLS: [string, string][] = [
-  ["JSON", "136-dev-util-json"],
-  ["JWT", "137-dev-util-jwt"],
-  ["Base64", "138-dev-util-base64"],
-  ["URL", "139-dev-util-url"],
-  ["UUID e segredos", "140-dev-util-uuid"],
-  ["Hash", "141-dev-util-hash"],
-  ["Tempo", "142-dev-util-tempo"],
-  ["Regex", "143-dev-util-regex"],
-  ["Diff", "144-dev-util-diff"],
+// Utilities start empty: each print types its own fictitious input first.
+const TOOLS: [string, string, [string, string][]][] = [
+  ["JSON", "136-dev-util-json", [["#dev-json", '{"nome":"Canto","abas":[{"id":"portas","ativa":true},{"id":"docker","ativa":false}],"versao":2}'], ["#dev-json-path", "abas[0].id"]]],
+  ["JWT", "137-dev-util-jwt", [["#dev-jwt", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBbmEiLCJleHAiOjQxMDI0NDQ4MDB9.c2lnbmF0dXJl"], ["#dev-jwt-secret", "segredo-de-teste"]]],
+  ["Base64", "138-dev-util-base64", [["#dev-b64", "Canto Widget"]]],
+  ["URL", "139-dev-util-url", [["#dev-url", "https://api.exemplo.dev/v1/tarefas?status=aberta&tag=dev&tag=urgente#topo"]]],
+  ["UUID e segredos", "140-dev-util-uuid", []],
+  ["Hash", "141-dev-util-hash", [["#dev-hash", "canto"]]],
+  ["Tempo", "142-dev-util-tempo", [["#dev-time", "1762000000"]]],
+  ["Regex", "143-dev-util-regex", [["#dev-re", "(\\w+)@(\\w+)\\.com"], ["#dev-re-text", "contato: ana@exemplo.com, bia@exemplo.com"]]],
+  ["Diff", "144-dev-util-diff", [["#dev-diff-a", "porta=3000\nhost=localhost"], ["#dev-diff-b", "porta=3001\nhost=localhost\ndebug=true"]]],
 ];
 
 async function shot(page: import("@playwright/test").Page, file: string) {
@@ -43,8 +44,11 @@ test("a aba Dev e suas sub-abas", async ({ browser }) => {
   await page.getByRole("button", { name: /worktrees sincronizadas/ }).click();
   await shot(page, "147-dev-git-worktrees");
   await page.getByRole("tab", { name: "Utilitários", exact: true }).last().click();
-  for (const [name, file] of TOOLS) {
-    await page.getByRole("button", { name, exact: true }).click();
+  for (const [name, file, inputs] of TOOLS) {
+    await page.getByRole("tab", { name, exact: true }).last().click();
+    for (const [sel, value] of inputs) await page.locator(sel).fill(value);
+    if (name.startsWith("UUID")) for (let i = 0; i < 2; i++) await page.getByRole("button", { name: "Gerar", exact: true }).first().click();
+    await page.evaluate(() => document.getElementById("dev-tool-panel")?.parentElement?.scrollTo(0, 0));
     await shot(page, file);
   }
 });

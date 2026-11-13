@@ -24,6 +24,7 @@ test("ports filter by text, protocol and dev, sort and group", () => {
   expect(filterPorts(all, { query: "", proto: "all", onlyDev: true }).map((e) => e.port)).toEqual([3000, 5173]);
   expect(filterPorts(all, { query: "widget", proto: "all", onlyDev: false }).map((e) => e.port)).toEqual([5173]);
   expect(filterPorts(all, { query: "", proto: "UDP", onlyDev: false }).map((e) => e.port)).toEqual([5353]);
+  expect(filterPorts(all, { query: "", proto: "all", onlyDev: false, exposed: true }).every((e) => e.exposed)).toBe(true);
   expect(sortPorts(all, "mem").map((e) => e.port)).toEqual([3000, 5173, 5353]);
   expect(sortPorts(all, "pid")[0].pid).toBe(2);
   expect(groupByProject(all).map(([k]) => k)).toEqual(["canto-site", "svchost", "widget"]);

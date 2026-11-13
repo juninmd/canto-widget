@@ -22,18 +22,11 @@ const parse = (s: string): object | null => {
 export default function ToolJwt() {
   const [mode, setMode] = useState<"decode" | "encode">("decode");
   const [token, setToken] = useState("");
-  const [secret, setSecret] = useState("segredo-de-teste");
+  const [secret, setSecret] = useState("");
   const [header, setHeader] = useState(pretty(SEED));
-  const [payload, setPayload] = useState(pretty({ sub: "42", name: "Antonio", roles: ["admin"] }));
+  const [payload, setPayload] = useState("{}");
   const [made, setMade] = useState("");
   const [valid, setValid] = useState<boolean | null | undefined>(undefined);
-
-  const sample = async (expired: boolean) => {
-    const now = Math.floor(Date.now() / 1000);
-    setToken(await signJwt(SEED, { sub: "42", name: "Antonio", roles: ["admin"], iat: now - 86400, exp: now + (expired ? -3600 : 3 * 86400) }, secret));
-  };
-
-  useEffect(() => void sample(false), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let live = true;
@@ -73,7 +66,7 @@ export default function ToolJwt() {
       {mode === "decode" ? (
         <>
           <Area id="dev-jwt" value={token} onChange={setToken} label={t("dev.jwt.token")} rows={4} />
-          {!jwt ? (
+          {!token.trim() ? null : !jwt ? (
             <Note tone="warn">{t("dev.jwt.invalid")}</Note>
           ) : (
             <>
@@ -82,9 +75,6 @@ export default function ToolJwt() {
                 {jwt.header.alg === "none" && <Note tone="danger">{t("dev.jwt.algNone")}</Note>}
                 {exp?.kind === "none" ? <Note tone="warn">{t("dev.jwt.expNone")}</Note> : exp && <Note tone={exp.kind === "expired" ? "danger" : "ok"}>{t(exp.kind === "expired" ? "dev.jwt.expExpired" : "dev.jwt.expValid", { span: relative(exp.ms) })}</Note>}
                 {valid !== undefined && <Note tone={valid === null ? "muted" : valid ? "ok" : "danger"}>{valid === null ? t("dev.jwt.unverifiable") : valid ? t("dev.jwt.verified") : t("dev.jwt.mismatch")}</Note>}
-                <span className="flex-1" />
-                <Chip on={false} onClick={() => void sample(false)}>{t("dev.jwt.sample")}</Chip>
-                <Chip on={false} onClick={() => void sample(true)}>{t("dev.jwt.sampleOld")}</Chip>
               </p>
               <div className="grid shrink-0 gap-2 sm:grid-cols-2">
                 <div className="flex min-w-0 flex-col gap-1"><Label>{t("dev.jwt.header")}</Label><Pre max="max-h-40">{pretty(jwt.header)}</Pre></div>
@@ -108,8 +98,8 @@ export default function ToolJwt() {
       ) : (
         <>
           <div className="grid shrink-0 gap-2 sm:grid-cols-2">
-            <div className="flex flex-col gap-1"><Area id="dev-jwt-header" value={header} onChange={setHeader} label={t("dev.jwt.header")} rows={5} />{!h && <Note tone="danger">{t("dev.jwt.badJson")}</Note>}</div>
-            <div className="flex flex-col gap-1"><Area id="dev-jwt-payload" value={payload} onChange={setPayload} label={t("dev.jwt.payload")} rows={5} />{!p && <Note tone="danger">{t("dev.jwt.badJson")}</Note>}</div>
+            <div className="flex flex-col gap-1"><Area id="dev-jwt-header" value={header} onChange={setHeader} label={t("dev.jwt.header")} rows={5} />{!h && header.trim() && <Note tone="danger">{t("dev.jwt.badJson")}</Note>}</div>
+            <div className="flex flex-col gap-1"><Area id="dev-jwt-payload" value={payload} onChange={setPayload} label={t("dev.jwt.payload")} rows={5} />{!p && payload.trim() && <Note tone="danger">{t("dev.jwt.badJson")}</Note>}</div>
           </div>
           <div className="flex shrink-0 flex-wrap items-center gap-1">
             <span className="mr-1 text-[11px] text-faint">{t("dev.jwt.expire")}</span>

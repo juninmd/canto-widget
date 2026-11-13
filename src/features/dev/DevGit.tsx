@@ -5,6 +5,7 @@ import { useWindowVisible } from "../../lib/useWindowVisible";
 import { t } from "../../i18n";
 import ConfirmButton from "../../components/ConfirmButton";
 import ErrorBanner from "../../components/ErrorBanner";
+import Spinner from "../../components/Spinner";
 import { ChevronIcon, CrossIcon } from "../../components/Icons";
 import type { GitView } from "./devTypes";
 import { Chip, CopyGlyph, IconButton, Panel, Row, SearchField, StatLine, Sub, Switch, copyText } from "./DevBits";
@@ -58,11 +59,32 @@ export default function DevGit() {
     }
   }
 
+  async function fetchRemote() {
+    setBusy(true);
+    try {
+      apply(await api.devGitFetch());
+      notify({ message: t("dev.git.wt.fetched") });
+    } catch (e) {
+      notify({ message: errText(e), type: "erro" });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function terminal(name: string, repo: string) {
+    try {
+      await api.devGitTerminal(repo);
+    } catch (e) {
+      notify({ message: t("dev.git.terminalFail", { name, msg: errText(e) }), type: "erro" });
+    }
+  }
+
   async function browse() {
     const chosen = await api.devPickFolder().catch(() => null);
     if (chosen) await change({ add: chosen }, t("dev.git.added"));
   }
 
+  const loading = (view === null && !error) || busy;
   const repos = view?.repos ?? [];
   const roots = view?.roots ?? [];
   const safe = safeWorktrees(view?.worktrees ?? []);
@@ -110,7 +132,7 @@ export default function DevGit() {
             <span className={`transition-transform ${review ? "rotate-90" : ""}`}><ChevronIcon dir="right" /></span>
             <span className="truncate">{safe.length > 0 ? t("dev.git.wt.title", { n: safe.length }) : t("dev.git.wt.none")}</span>
           </button>
-          <button type="button" disabled={busy || roots.length === 0} onClick={() => void api.devGitFetch().then((v) => (apply(v), notify({ message: t("dev.git.wt.fetched") })), (e) => notify({ message: errText(e), type: "erro" }))} className="canto-hit min-h-[26px] rounded-md bg-hover px-2 text-[11.5px] font-medium text-muted hover:text-fg disabled:opacity-40">
+          <button type="button" disabled={busy || roots.length === 0} onClick={() => void fetchRemote()} className="canto-hit min-h-[26px] rounded-md bg-hover px-2 text-[11.5px] font-medium text-muted hover:text-fg disabled:opacity-40">
             {t("dev.git.wt.fetch")}
           </button>
         </div>
@@ -193,6 +215,13 @@ export default function DevGit() {
         )}
       </Panel>
 
+      {loading && (
+        <p role="status" className="flex shrink-0 items-center gap-2 px-1 text-[12px] text-muted">
+          <Spinner />
+          {t(roots.length > 0 ? "dev.git.loading" : "dev.git.loadingFirst")}
+        </p>
+      )}
+
       {roots.length > 0 && (
         <>
           <SearchField value={query} onChange={setQuery} placeholder={t("dev.git.search")} />
@@ -217,6 +246,9 @@ export default function DevGit() {
                         {r.behind > 0 && <span className="text-danger"> · ↓{r.behind}</span>}
                       </Sub>
                     </div>
+                    <IconButton label={t("dev.git.terminal", { name: r.name })} onClick={() => void terminal(r.name, r.path)}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m5 8 5 4-5 4M13 17h6" /></svg>
+                    </IconButton>
                     <IconButton label={t("dev.git.copyPath", { name: r.name })} onClick={() => copyText(r.path)}><CopyGlyph /></IconButton>
                     <IconButton label={t("dev.git.pull", { name: r.name })} onClick={() => void pull(r.name, r.path, r.dirty)}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M12 4v12M7 11l5 5 5-5M5 20h14" /></svg>
@@ -226,7 +258,7 @@ export default function DevGit() {
               </ul>
             </section>
           ))}
-          {view && repos.length === 0 && <p className="px-2 py-6 text-center text-[12px] text-faint">{t("dev.git.empty")}</p>}
+          {view && !loading && repos.length === 0 && <p className="px-2 py-6 text-center text-[12px] text-faint">{t("dev.git.empty")}</p>}
           {repos.length > 0 && groups.length === 0 && <p className="px-2 py-6 text-center text-[12px] text-faint">{t("dev.git.noMatch")}</p>}
         </>
       )}

@@ -58,7 +58,7 @@ export default function DevTab() {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto px-3 pb-3 pt-1.5">
+    <div className="flex h-full min-h-0 flex-col gap-2.5 overflow-y-auto pr-0.5 [&>*]:shrink-0">
       <SubTabs label={t("dev.subs")} value={current} onChange={pick} tabs={shown.map((s) => ({ key: s, label: t(`dev.sub.${s}`) }))} />
       {current === "ports" && <DevPorts />}
       {current === "docker" && docker && hasDocker && <DevDocker state={docker} reload={loadDocker} />}
