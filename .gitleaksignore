@@ -5,4 +5,7 @@
 66335d7a1d5afbd7381768aeed8519a8ba116920:src-tauri/src/cmd_gitlab_tests.rs:generic-api-key:15
 1481adf4a7961bbb772ca8a682314c2687671449:src-tauri/src/cmd_gitlab_tests.rs:generic-api-key:12
 1481adf4a7961bbb772ca8a682314c2687671449:src-tauri/src/gitlab_query_tests.rs:gitlab-pat:73
-1481adf4a7961bbb772ca8a682314c2687671449:src-tauri/src/gitlab_query_tests.rs:gitlab-pat:73
+
+# JWT ficticio dos prints da aba Dev (payload sub=42, exp=4102444800, assinatura "signature").
+# O literal saiu do HEAD em 8857b4f, mas o scan da PR varre o range inteiro do branch.
+a9f516be08f6dc111fbf19474f66773c6a97e9e7:scripts/media/dev.media.ts:jwt:14
