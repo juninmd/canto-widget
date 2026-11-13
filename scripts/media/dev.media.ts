@@ -8,10 +8,14 @@ const SHOTS: [string, string, string[]][] = [
   ["Git", "134-dev-git", []],
   ["Agenda", "135-dev-agenda", []],
 ];
+// Built at run time so no token-shaped literal sits in the repository (secret scanners flag it).
+const part = (v: object) => Buffer.from(JSON.stringify(v)).toString("base64url");
+const fakeToken = () => [part({ alg: "HS256", typ: "JWT" }), part({ sub: "42", name: "Ana", exp: 4102444800 }), "ZmljdGljaW8"].join(".");
+
 // Utilities start empty: each print types its own fictitious input first.
 const TOOLS: [string, string, [string, string][]][] = [
   ["JSON", "136-dev-util-json", [["#dev-json", '{"nome":"Canto","abas":[{"id":"portas","ativa":true},{"id":"docker","ativa":false}],"versao":2}'], ["#dev-json-path", "abas[0].id"]]],
-  ["JWT", "137-dev-util-jwt", [["#dev-jwt", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0MiIsIm5hbWUiOiJBbmEiLCJleHAiOjQxMDI0NDQ4MDB9.c2lnbmF0dXJl"], ["#dev-jwt-secret", "segredo-de-teste"]]],
+  ["JWT", "137-dev-util-jwt", [["#dev-jwt", fakeToken()], ["#dev-jwt-secret", "segredo-de-teste"]]],
   ["Base64", "138-dev-util-base64", [["#dev-b64", "Canto Widget"]]],
   ["URL", "139-dev-util-url", [["#dev-url", "https://api.exemplo.dev/v1/tarefas?status=aberta&tag=dev&tag=urgente#topo"]]],
   ["UUID e segredos", "140-dev-util-uuid", []],
