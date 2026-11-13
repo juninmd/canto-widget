@@ -60,6 +60,10 @@ pub fn parse(bytes: &[u8]) -> Option<Release> {
 }
 
 fn fetch_one(client: &reqwest::blocking::Client, harness: &Harness) -> FeedEntry {
+    // No GitHub repository (Antigravity): nothing to look up, the card links to the site.
+    if harness.repo.is_empty() {
+        return FeedEntry { release: None, error: None };
+    }
     let url = format!("https://api.github.com/repos/{}/releases/latest", harness.repo);
     let res = match client.get(url).send() {
         Ok(res) => res,

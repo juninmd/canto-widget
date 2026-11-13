@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Agentes: Antigravity CLI, VS Code e Grok Build**: a aba Agentes agora detecta no PATH (`agy`, `code`, `grok`), mostra a última release do GitHub (VS Code e Grok) e o comando de instalação para copiar. O Antigravity não publica releases no GitHub: o cartão mostra só a detecção e o link do site.
 - **Barra lateral com auto-hide (Windows, macOS e Linux)**: em Ajustes → Janela, a janela gruda no canto direito da tela em altura total, some deixando só uma faixa fina quando o mouse sai dela e volta ao encostar o mouse na borda direita. O modo mini e a tela cheia têm prioridade.
 
 ### Corrigido

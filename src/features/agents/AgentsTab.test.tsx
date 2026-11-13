@@ -148,3 +148,10 @@ test("each agent gets its provider mark, an unknown one falls back to its initia
   expect(bar.getAttribute("aria-valuenow")).toBe("1");
   expect(bar.getAttribute("aria-valuemax")).toBe("3");
 });
+
+test("an agent without a GitHub repo shows the site host and no release", async () => {
+  views = [row("antigravity", "Antigravity CLI", { repo: "", site: "https://antigravity.google" })];
+  await show();
+  expect(agents()).toEqual(["antigravity"]);
+  expect(screen.getByText("antigravity.google")).toBeTruthy();
+});

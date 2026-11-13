@@ -29,6 +29,31 @@ const MARKS: Record<string, Mark> = {
   gemini: { color: "#8e75b2", draw: (gradient) => <path d={GEMINI} fill={`url(#${gradient})`} /> },
   opencode: { color: "var(--color-fg)", draw: () => <path d={OPENCODE} fill="currentColor" fillRule="evenodd" /> },
   copilot: { color: "#a371f7", draw: () => <path d={COPILOT} fill="currentColor" /> },
+  antigravity: {
+    color: "#4285f4",
+    draw: () => (
+      <g {...line}>
+        <path d="M12 3.5 4 20.5M12 3.5l8 17M7.6 14.5c2.8-1.6 6-1.6 8.8 0" />
+      </g>
+    ),
+  },
+  vscode: {
+    color: "#23a9f2",
+    draw: () => (
+      <g {...line}>
+        <path d="M17 3.5 7.5 12 17 20.5zM7.5 12 3.8 8.8v6.4zM17 3.5l3.2 1.6v13.8L17 20.5" />
+      </g>
+    ),
+  },
+  grok: {
+    color: "var(--color-fg)",
+    draw: () => (
+      <g {...line}>
+        <circle cx="11" cy="13" r="6.5" />
+        <path d="M20.5 3.5 8 20" />
+      </g>
+    ),
+  },
   aider: {
     color: "#22c55e",
     draw: () => (

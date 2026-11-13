@@ -26,9 +26,13 @@ fn the_catalog_has_unique_ids_and_well_formed_links() {
     ids.dedup();
     assert_eq!(ids.len(), total);
     for h in HARNESSES {
-        let (owner, name) = h.repo.split_once('/').expect("o repo é owner/name");
-        assert!(!owner.is_empty() && !name.contains('/'), "{}: {}", h.id, h.repo);
-        assert_eq!(h.site, format!("https://github.com/{}", h.repo), "{}", h.id);
+        if h.repo.is_empty() {
+            assert!(h.site.starts_with("https://"), "{}", h.id);
+        } else {
+            let (owner, name) = h.repo.split_once('/').expect("o repo é owner/name");
+            assert!(!owner.is_empty() && !name.contains('/'), "{}: {}", h.id, h.repo);
+            assert_eq!(h.site, format!("https://github.com/{}", h.repo), "{}", h.id);
+        }
         assert!(!h.bin.is_empty() && !h.bin.contains('/'), "{}", h.id);
         assert!(h.install.command.contains(h.install.tool), "{}: {}", h.id, h.install.command);
     }
@@ -90,4 +94,11 @@ fn views_report_which_clis_are_installed_and_merge_fills_the_feed() {
     assert_eq!(merged[0].release, Some(release()));
     assert_eq!(merged[1].error.as_deref(), Some("sem resposta do GitHub"));
     assert!(merged[2..].iter().all(|v| v.release.is_none() && v.error.is_none()));
+}
+
+#[test]
+fn antigravity_vscode_and_grok_are_in_the_catalog() {
+    for (id, bin) in [("antigravity", "agy"), ("vscode", "code"), ("grok", "grok")] {
+        assert_eq!(HARNESSES.iter().find(|h| h.id == id).map(|h| h.bin), Some(bin), "{id}");
+    }
 }
