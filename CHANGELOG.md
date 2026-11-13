@@ -8,6 +8,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 ### Adicionado
 
 - **Sub-aba Repositórios (GitHub e GitLab)**: ao lado de Menções, lista os repositórios (GitHub) ou projetos (GitLab) a que a conta tem acesso, organizados por organização/grupo e, na raiz, os pessoais, em lista, cards ou grade (a escolha fica lembrada), com filtro por nome, descrição ou linguagem e grupos que recolhem. O botão "estatísticas" (desligado por padrão) mostra os totais e o mosaico de contribuições dos últimos 6 meses; só então o calendário é buscado (GraphQL no GitHub; no GitLab, os eventos do último ano contados por dia). As listas ficam em RAM por 10 min no Rust, com carregando, vazio, erro e limite de requisições tratados como nas outras sub-abas.
+- **Agentes: Antigravity CLI, VS Code e Grok Build**: a aba Agentes agora detecta no PATH (`agy`, `code`, `grok`), mostra a última release do GitHub (VS Code e Grok) e o comando de instalação para copiar. O Antigravity não publica releases no GitHub: o cartão mostra só a detecção e o link do site.
 - **Barra lateral com auto-hide (Windows, macOS e Linux)**: em Ajustes → Janela, a janela gruda no canto direito da tela em altura total, some deixando só uma faixa fina quando o mouse sai dela e volta ao encostar o mouse na borda direita. O modo mini e a tela cheia têm prioridade.
 
 ### Corrigido

@@ -177,7 +177,7 @@ update of your games ring an OS notification once each. The public lists only ne
 ### 🤖 The agent CLIs, installed or not
 
 The coding-agent harnesses in one list: **Claude Code**, **Codex CLI**, **Gemini CLI**, **OpenCode**,
-**GitHub Copilot CLI** and **Aider**, each with its **provider logo** and brand color. A header strip shows how many
+**GitHub Copilot CLI**, **Aider**, **Antigravity CLI**, **VS Code** and **Grok Build**, each with its **provider logo** and brand color. A header strip shows how many
 are installed as a row of logos and a progress bar. Each card says whether the CLI is installed **on this machine** (and where),
 shows the **latest GitHub release** with its date and a summary of what changed, and — when the CLI is missing —
 brings the **install command ready to copy**. Canto only copies: **nothing is installed or executed** by the
