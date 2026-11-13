@@ -201,6 +201,9 @@ export const app = {
   "settings.window.alwaysOnTop": "sempre na frente das outras janelas",
   "settings.window.hint": "Arraste pela barra do topo e redimensione pelas bordas: posição e tamanho ficam salvos.",
   "settings.window.reset": "voltar ao canto e ao tamanho original",
+  "settings.window.sidebar": "barra lateral que se esconde sozinha",
+  "settings.window.sidebarHint":
+    "Gruda a janela no canto direito da tela, em altura total. Ao tirar o mouse dela, some e deixa só uma faixa fina; encoste o mouse na borda direita para voltar. O modo mini e a tela cheia têm prioridade.",
 
   "shortcuts.title": "Atalhos de teclado",
   "shortcuts.hint": "Letras soltas não valem enquanto você digita num campo.",

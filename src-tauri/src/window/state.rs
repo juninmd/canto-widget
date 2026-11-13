@@ -25,6 +25,9 @@ pub struct WindowConfig {
     /// Mini mode survives a restart; the saved position and size stay those of the normal window.
     #[serde(default)]
     pub mini: bool,
+    /// Sidebar mode: docked to the right edge of the work area, hidden while the mouse is away (`sidebar.rs`).
+    #[serde(default)]
+    pub sidebar: bool,
 }
 
 fn yes() -> bool {
@@ -33,7 +36,7 @@ fn yes() -> bool {
 
 impl Default for WindowConfig {
     fn default() -> Self {
-        Self { position: None, size: None, always_on_top: true, mini: false }
+        Self { position: None, size: None, always_on_top: true, mini: false, sidebar: false }
     }
 }
 
@@ -57,6 +60,13 @@ pub fn close_to(a: (f64, f64), b: (f64, f64)) -> bool {
 pub struct WindowState {
     cfg: Mutex<WindowConfig>,
     dirty: AtomicBool,
+    /// Maximized (fullscreen) by `mode::set_max`. Not persisted, and kept here because the macOS "simple" fullscreen
+    /// is invisible to `is_fullscreen()`.
+    max: AtomicBool,
+    /// The sidebar is tucked against the edge, with only a thin strip showing. Never persisted.
+    peeking: AtomicBool,
+    /// Work area (physical pixels) of the monitor the sidebar lives on: a tucked window reports the next monitor.
+    dock_area: Mutex<Option<Area>>,
 }
 
 fn path(dir: &Path) -> PathBuf {
@@ -67,11 +77,35 @@ impl WindowState {
     pub fn load(dir: &Path) -> Self {
         // A corrupted file doesn't stop the widget from opening: it falls back to the corner.
         let cfg = store::read_json(&path(dir)).ok().flatten().unwrap_or_default();
-        Self { cfg: Mutex::new(cfg), dirty: AtomicBool::new(false) }
+        Self { cfg: Mutex::new(cfg), ..Self::default() }
     }
 
     pub fn cfg(&self) -> WindowConfig {
         self.cfg.lock_safe().clone()
+    }
+
+    pub fn is_max(&self) -> bool {
+        self.max.load(Ordering::Relaxed)
+    }
+
+    pub fn set_max(&self, on: bool) {
+        self.max.store(on, Ordering::Relaxed);
+    }
+
+    pub fn is_peeking(&self) -> bool {
+        self.peeking.load(Ordering::Relaxed)
+    }
+
+    pub fn set_peeking(&self, on: bool) {
+        self.peeking.store(on, Ordering::Relaxed);
+    }
+
+    pub fn dock_area(&self) -> Option<Area> {
+        *self.dock_area.lock_safe()
+    }
+
+    pub fn set_dock_area(&self, area: Option<Area>) {
+        *self.dock_area.lock_safe() = area;
     }
 
     pub fn change(&self, f: impl FnOnce(&mut WindowConfig)) {
@@ -113,7 +147,7 @@ pub fn usable_size(size: Option<(f64, f64)>) -> (f64, f64) {
 
 pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
     // In fullscreen the OS owns the rectangle; touching it would kick the window out of that mode.
-    if win.is_fullscreen()? {
+    if crate::window::mode::is_max(win) {
         return Ok(());
     }
     let Some(window_state) = win.try_state::<WindowState>() else {
@@ -123,6 +157,10 @@ pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
     if cfg.mini {
         return crate::window::mode::place_mini(win, crate::window::mode::MINI_DEFAULT);
     }
+    if cfg.sidebar {
+        return crate::window::sidebar::place(win, &window_state, cfg.size);
+    }
+    crate::window::mode::strip_chrome(win)?;
     crate::window::mode::restore_limits(win)?;
     let size = usable_size(cfg.size);
     win.set_size(LogicalSize::new(size.0, size.1))?;
@@ -137,7 +175,9 @@ pub fn record(win: &tauri::Window) {
         return;
     };
     // Fullscreen size isn't a user preference: saving it would make the widget reopen giant.
-    if window_state.cfg().mini || win.is_fullscreen().unwrap_or(false) {
+    let cfg = window_state.cfg();
+    // The sidebar's geometry is the edge's, not a preference either.
+    if cfg.mini || cfg.sidebar || crate::window::mode::is_max_window(win) {
         return;
     }
     // A minimized window reports the shell's iconic rect (160x28 at -32000), never the size the user chose.
@@ -224,6 +264,14 @@ mod tests {
         let cfg = WindowConfig { mini: true, ..WindowConfig::default() };
         let back: WindowConfig = serde_json::from_str(&serde_json::to_string(&cfg).unwrap()).unwrap();
         assert!(back.mini);
+    }
+
+    #[test]
+    fn sidebar_is_off_in_old_files_and_survives_a_round_trip() {
+        assert!(!serde_json::from_str::<WindowConfig>(r#"{"mini":true}"#).unwrap().sidebar);
+        let cfg = WindowConfig { sidebar: true, ..WindowConfig::default() };
+        let back: WindowConfig = serde_json::from_str(&serde_json::to_string(&cfg).unwrap()).unwrap();
+        assert!(back.sidebar);
     }
 
     #[test]

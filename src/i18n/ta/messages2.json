@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "மீண்டும் மூலை மற்றும் அசல் அளவு",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "விசைப்பலகை குறுக்குவழிகள்",
   "shortcuts.hint": "நீங்கள் ஒரு புலத்தில் தட்டச்சு செய்யும் போது ஒற்றை எழுத்து விசைகள் வேலை செய்யாது.",
   "shortcuts.close": "நெருக்கமான",

@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "kembali ke sudut dan ukuran aslinya",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "Pintasan keyboard",
   "shortcuts.hint": "Tombol satu huruf tidak berfungsi saat Anda mengetik di suatu bidang.",
   "shortcuts.close": "tutup",

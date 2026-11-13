@@ -206,6 +206,9 @@ export const app: Record<keyof typeof source, string> = {
   "settings.window.alwaysOnTop": "always on top of other windows",
   "settings.window.hint": "Drag by the top bar and resize from the edges: position and size are saved.",
   "settings.window.reset": "back to the corner and original size",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint":
+    "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
 
   "shortcuts.title": "Keyboard shortcuts",
   "shortcuts.hint": "Single-letter keys don't work while you're typing in a field.",

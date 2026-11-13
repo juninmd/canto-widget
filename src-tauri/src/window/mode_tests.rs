@@ -37,7 +37,7 @@ fn normal_limits_match_the_declared_window() {
 fn mini_geometry_never_overwrites_the_saved_normal_one() {
     let src = include_str!("state.rs");
     let body = &src[src.find("pub fn record(").unwrap()..src.find("#[tauri::command]").unwrap()];
-    assert!(body.contains("cfg().mini"), "a dock-sized window would be saved as the widget size");
+    assert!(body.contains("cfg.mini"), "a dock-sized window would be saved as the widget size");
 }
 
 #[test]
@@ -54,4 +54,29 @@ fn choosing_the_dock_from_the_tray_restores_a_minimized_window() {
     let src = include_str!("mode.rs");
     let body = &src[src.find("pub fn toggle_mini(").unwrap()..src.find("#[tauri::command]").unwrap()];
     assert!(body.contains("should_show("), "a minimized window counts as visible and would leave the dock off screen");
+}
+
+#[test]
+fn macos_maximizes_without_the_native_fullscreen_that_brings_the_title_bar_back() {
+    let src = include_str!("mode.rs");
+    let body = &src[src.find("pub fn set_max(").unwrap()..src.find("/// Idempotent: boot").unwrap()];
+    assert!(body.contains("set_simple_fullscreen"), "native fullscreen gives the borderless window a title bar");
+    assert!(body.contains("strip_chrome"), "the bar must be taken off again after the transition");
+    assert!(SIMPLE_FULLSCREEN == cfg!(target_os = "macos"));
+}
+
+#[test]
+fn every_mode_change_asserts_the_window_has_no_native_bar() {
+    let src = include_str!("mode.rs");
+    let mini = &src[src.find("pub fn place_mini(").unwrap()..src.find("pub fn restore_limits(").unwrap()];
+    assert!(mini.contains("strip_chrome"), "the dock would show the native bar on macOS");
+    let set = &src[src.find("pub fn set_mini(").unwrap()..src.find("/// From the tray").unwrap()];
+    assert!(set.contains("strip_chrome"));
+}
+
+#[test]
+fn the_main_window_is_declared_without_decorations() {
+    let conf: serde_json::Value = serde_json::from_str(include_str!("../../tauri.conf.json")).unwrap();
+    let main = conf["app"]["windows"].as_array().unwrap().iter().find(|w| w["label"] == "main").unwrap();
+    assert_eq!(main["decorations"].as_bool(), Some(false));
 }

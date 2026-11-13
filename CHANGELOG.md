@@ -7,6 +7,12 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Barra lateral com auto-hide (Windows, macOS e Linux)**: em Ajustes → Janela, a janela gruda no canto direito da tela em altura total, some deixando só uma faixa fina quando o mouse sai dela e volta ao encostar o mouse na borda direita. O modo mini e a tela cheia têm prioridade.
+
+### Corrigido
+
+- **macOS: mini e maximizar sem a barra nativa**: a tela cheia usa o modo "simples" do macOS (sem Space novo) e a janela reafirma que não tem decoração a cada troca de modo, então a barra superior nativa não aparece mais por cima do layout.
+
 - **Aba Dev (Windows, macOS e Linux)**: Portas (quem segura cada porta, com encerrar processo/árvore e aviso de exposição na rede), Docker (só aparece com o engine rodando; containers por projeto, logs, imagens, volumes e redes com limpeza dos não usados), Git (você escolhe as pastas; limpeza em lote de worktrees já sincronizadas com o remoto), nove Utilitários locais (JSON, JWT com codificar/decodificar/verificar, Base64, URL, UUID e segredos, Hash/HMAC, Tempo, Regex, Diff) e Agenda (crontab no Linux/macOS com criar, pausar, executar e remover; Agendador de Tarefas no Windows, somente leitura). Parsers testados com saídas reais de `netstat`, `ss`, `lsof`, `docker` e `git` em cada S.O. A aba começa oculta e é só desktop. Closes #242.
 
 ### Corrigido

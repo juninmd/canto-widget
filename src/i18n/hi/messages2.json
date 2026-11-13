@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "कोने और मूल आकार पर वापस जाएँ",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "कीबोर्ड शॉर्टकट",
   "shortcuts.hint": "जब आप किसी फ़ील्ड में टाइप कर रहे हों तो एकल-अक्षर कुंजियाँ काम नहीं करतीं।",
   "shortcuts.close": "बंद करें",

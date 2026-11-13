@@ -70,6 +70,8 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     weather::alert::watch(app.handle().clone());
     do_not_disturb::watch(app.handle().clone());
     fullscreen_guard::watch(app.handle().clone());
+    #[cfg(desktop)]
+    window::sidebar::watch(app.handle().clone());
     review_alert::watch(app.handle().clone());
     my_pr_alerts::watch(app.handle().clone());
     mentions::alerts::watch(app.handle().clone());

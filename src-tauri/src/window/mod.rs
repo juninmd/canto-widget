@@ -1,6 +1,8 @@
 #[cfg(desktop)]
 pub mod mode;
 #[cfg(desktop)]
+pub mod sidebar;
+#[cfg(desktop)]
 pub mod state;
 
 use crate::resilient::LockExt;

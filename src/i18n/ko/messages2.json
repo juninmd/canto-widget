@@ -1,5 +1,7 @@
 {
   "settings.window.reset": "모퉁이로 돌아가서 원래 크기",
+  "settings.window.sidebar": "auto-hiding sidebar",
+  "settings.window.sidebarHint": "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
   "shortcuts.title": "키보드 단축키",
   "shortcuts.hint": "필드에 입력하는 동안에는 단일 문자 키가 작동하지 않습니다.",
   "shortcuts.close": "닫기",
