@@ -174,6 +174,11 @@ pub fn dev_git_pull(state: State<'_, AppState>, repo: String) -> Result<String> 
 }
 
 #[tauri::command(async)]
+pub fn dev_git_terminal(state: State<'_, AppState>, repo: String) -> Result<()> {
+    crate::dev::terminal::open(&chosen(&state, &repo)?)
+}
+
+#[tauri::command(async)]
 pub fn dev_git_worktree_remove(
     state: State<'_, AppState>,
     repo: String,

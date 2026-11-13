@@ -313,6 +313,8 @@ pub fn run() {
             #[cfg(desktop)]
             dev::cmd::dev_git_pull,
             #[cfg(desktop)]
+            dev::cmd::dev_git_terminal,
+            #[cfg(desktop)]
             dev::cmd::dev_git_worktree_remove,
             #[cfg(desktop)]
             dev::cmd::dev_cron_list,

@@ -6,3 +6,4 @@ pub mod docker;
 pub mod exec;
 pub mod git;
 pub mod ports;
+pub mod terminal;

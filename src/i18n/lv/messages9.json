@@ -759,8 +759,6 @@
   "dev.jwt.alg": "Algorithm",
   "dev.jwt.generated": "Generated token",
   "dev.jwt.open": "Open in the decoder",
-  "dev.jwt.sample": "Sample",
-  "dev.jwt.sampleOld": "Expired",
   "dev.jwt.badJson": "Invalid JSON",
   "dev.jwt.fix": "Fix the JSON to generate the token.",
   "dev.jwt.claim.sub": "Subject",
@@ -868,5 +866,12 @@
   "dev.cron.onDay": "on day {n}",
   "dev.cron.inMonth": "in month {n}",
   "dev.cron.weekdays": "Monday to Friday",
-  "dev.cron.onWeekday": "on weekdays {n}"
+  "dev.cron.onWeekday": "on weekdays {n}",
+  "dev.ports.stats": "Ports summary",
+  "dev.git.terminal": "Open terminal in {name}",
+  "dev.git.terminalFail": "Could not open a terminal in {name}: {msg}",
+  "dev.git.loading": "Reading repositories…",
+  "dev.git.loadingFirst": "Reading repositories…",
+  "dev.uuid.make": "Generate",
+  "dev.uuid.empty": "Nothing generated yet."
 }

@@ -9,7 +9,7 @@ import ConfirmButton from "../../components/ConfirmButton";
 import ErrorBanner from "../../components/ErrorBanner";
 import { CrossIcon, MoreIcon, PlusIcon } from "../../components/Icons";
 import type { PortEntry } from "./devTypes";
-import { Chip, CopyLine, IconButton, Panel, Row, SearchField, StatLine, Sub, Switch } from "./DevBits";
+import { Chip, CopyLine, IconButton, Panel, Row, SearchField, Sub } from "./DevBits";
 import { filterPorts, freed, groupByProject, portCommands, portQuery, projectOf, siblings, sortPorts, type PortSort, type Proto } from "./ports";
 
 const POLL_MS = 3000;
@@ -34,6 +34,7 @@ export default function DevPorts() {
   const [query, setQuery] = useState("");
   const [proto, setProto] = useState<Proto>("all");
   const [onlyDev, setOnlyDev] = useState(true);
+  const [exposed, setExposed] = useState(false);
   const [group, setGroup] = useState(false);
   const [sort, setSort] = useState<PortSort>("port");
   const [more, setMore] = useState(false);
@@ -95,7 +96,7 @@ export default function DevPorts() {
   }
 
   const all = list ?? [];
-  const shown = useMemo(() => sortPorts(filterPorts(all, { query, proto, onlyDev }), sort), [all, query, proto, onlyDev, sort]);
+  const shown = useMemo(() => sortPorts(filterPorts(all, { query, proto, onlyDev, exposed }), sort), [all, query, proto, onlyDev, exposed, sort]);
   const asked = portQuery(query);
   const holder = asked === null ? undefined : all.find((e) => e.port === asked);
   const busy = (p: number) => all.some((e) => e.port === p && e.proto === "TCP");
@@ -166,7 +167,11 @@ export default function DevPorts() {
   return (
     <>
       {error && <ErrorBanner message={error} onRetry={() => void load()} />}
-      <StatLine items={[{ text: t("dev.ports.stat.inUse", { n: all.length }) }, { text: t("dev.ports.stat.tcp", { n: all.filter((e) => e.proto === "TCP").length }) }, { text: t("dev.ports.stat.exposed", { n: all.filter((e) => e.exposed).length }), tone: "warn" }]} />
+      <div role="group" aria-label={t("dev.ports.stats")} className="flex shrink-0 flex-wrap gap-1 text-[11.5px] tabular-nums">
+        <Chip on={proto === "all" && !exposed && !onlyDev} onClick={() => (setProto("all"), setExposed(false), setOnlyDev(false))}>{t("dev.ports.stat.inUse", { n: all.length })}</Chip>
+        <Chip on={proto === "TCP" && !exposed && !onlyDev} onClick={() => (setProto("TCP"), setExposed(false), setOnlyDev(false))}>{t("dev.ports.stat.tcp", { n: all.filter((e) => e.proto === "TCP").length })}</Chip>
+        <Chip on={exposed} onClick={() => (setProto("all"), setExposed(!exposed), setOnlyDev(false))}>{t("dev.ports.stat.exposed", { n: all.filter((e) => e.exposed).length })}</Chip>
+      </div>
       <div role="group" aria-label={t("dev.ports.favorites")} className="flex shrink-0 gap-1 overflow-x-auto pb-0.5">
         {favs.map((p) => (
           <span key={p} className="inline-flex shrink-0 items-center rounded-md bg-ink/70 text-[11.5px]">
@@ -206,10 +211,7 @@ export default function DevPorts() {
           </Chip>
         ))}
         <span className="flex-1" />
-        <label className="flex items-center gap-1.5 text-[11.5px] text-muted">
-          {t("dev.ports.onlyDev")}
-          <Switch on={onlyDev} onChange={setOnlyDev} label={t("dev.ports.onlyDev")} />
-        </label>
+        <Chip on={onlyDev} onClick={() => setOnlyDev(!onlyDev)}>{t("dev.ports.onlyDev")}</Chip>
         <IconButton label={t("dev.ports.options")} on={more} onClick={() => setMore(!more)}>
           <MoreIcon />
         </IconButton>

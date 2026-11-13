@@ -817,6 +817,7 @@ export const api = {
   devGitRoot: (change: { add?: string; remove?: string; depth?: number }) => invoke<GitView>("dev_git_root", { add: change.add ?? null, remove: change.remove ?? null, depth: change.depth ?? null }),
   devPickFolder: () => invoke<string | null>("dev_pick_folder"),
   devGitFetch: () => invoke<GitView>("dev_git_fetch"),
+  devGitTerminal: (repo: string) => invoke<void>("dev_git_terminal", { repo }),
   devGitPull: (repo: string) => invoke<string>("dev_git_pull", { repo }),
   /** Rust checks again that the worktree is safe; resolves to whether its local branch was deleted too. */
   devGitWorktreeRemove: (repo: string, path: string, deleteBranch: boolean) => invoke<boolean>("dev_git_worktree_remove", { repo, path, deleteBranch }),

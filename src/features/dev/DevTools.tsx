@@ -7,7 +7,6 @@ import { ToolDiff, ToolHash, ToolRegex, ToolTime, ToolUuid } from "./ToolsMore";
 export type Tool = "json" | "jwt" | "base64" | "url" | "uuid" | "hash" | "time" | "regex" | "diff";
 export const TOOLS: Tool[] = ["json", "jwt", "base64", "url", "uuid", "hash", "time", "regex", "diff"];
 const KEY = "canto.devTool";
-const SEED = '{"nome":"Canto","abas":[{"id":"portas","ativa":true},{"id":"docker","ativa":false}],"versao":2}';
 
 function saved(): Tool {
   try {
@@ -29,25 +28,45 @@ export default function DevTools({ initial }: { initial?: Tool }) {
       // Private mode: the tool lasts until the window closes.
     }
   };
+  const move = (e: React.KeyboardEvent, i: number) => {
+    const to = { ArrowRight: (i + 1) % TOOLS.length, ArrowLeft: (i - 1 + TOOLS.length) % TOOLS.length, Home: 0, End: TOOLS.length - 1 }[e.key];
+    if (to === undefined) return;
+    e.preventDefault();
+    pick(TOOLS[to]);
+    document.getElementById(`dev-tool-tab-${TOOLS[to]}`)?.focus();
+  };
   return (
     <>
-      <div role="group" aria-label={t("dev.tools.pick")} className="flex shrink-0 flex-wrap gap-x-3.5 gap-y-0.5">
-        {TOOLS.map((k) => (
-          <button key={k} type="button" aria-pressed={tool === k} onClick={() => pick(k)} className={`canto-hit border-b-2 px-0.5 py-1 text-[12px] ${tool === k ? "border-accent font-semibold text-fg" : "border-transparent text-muted hover:text-fg"}`}>
+      <div role="tablist" aria-label={t("dev.tools.pick")} className="-mb-2.5 flex shrink-0 gap-0.5 overflow-x-auto border-b border-edge px-1 pt-1">
+        {TOOLS.map((k, i) => (
+          <button
+            key={k}
+            id={`dev-tool-tab-${k}`}
+            type="button"
+            role="tab"
+            aria-selected={tool === k}
+            aria-controls="dev-tool-panel"
+            tabIndex={tool === k ? 0 : -1}
+            onClick={() => pick(k)}
+            onKeyDown={(e) => move(e, i)}
+            className={`canto-hit relative -mb-px shrink-0 whitespace-nowrap rounded-t-lg border border-b-0 px-3 py-1.5 text-[12px] transition-colors ${tool === k ? "border-edge bg-raised font-semibold text-accent-text before:absolute before:inset-x-2 before:top-0 before:h-0.5 before:rounded-full before:bg-accent" : "border-transparent text-muted hover:bg-hover hover:text-fg"}`}
+          >
             {t(`dev.tool.${k}`)}
           </button>
         ))}
       </div>
-      <p className="shrink-0 text-[11px] text-faint">{t("dev.tool.note")}</p>
-      {tool === "json" && <ToolJson seed={SEED} />}
-      {tool === "jwt" && <ToolJwt />}
-      {tool === "base64" && <ToolBase64 />}
-      {tool === "url" && <ToolUrl />}
-      {tool === "uuid" && <ToolUuid />}
-      {tool === "hash" && <ToolHash />}
-      {tool === "time" && <ToolTime />}
-      {tool === "regex" && <ToolRegex />}
-      {tool === "diff" && <ToolDiff />}
+      <div id="dev-tool-panel" role="tabpanel" aria-labelledby={`dev-tool-tab-${tool}`} className="flex shrink-0 flex-col gap-2 rounded-b-xl rounded-tr-xl border border-t-0 border-edge bg-raised/40 p-2.5">
+        <p className="text-[11px] text-faint">{t("dev.tool.note")}</p>
+        {tool === "json" && <ToolJson />}
+        {tool === "jwt" && <ToolJwt />}
+        {tool === "base64" && <ToolBase64 />}
+        {tool === "url" && <ToolUrl />}
+        {tool === "uuid" && <ToolUuid />}
+        {tool === "hash" && <ToolHash />}
+        {tool === "time" && <ToolTime />}
+        {tool === "regex" && <ToolRegex />}
+        {tool === "diff" && <ToolDiff />}
+      </div>
     </>
   );
 }
