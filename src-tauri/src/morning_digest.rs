@@ -5,7 +5,7 @@ use crate::resilient::LockExt;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use chrono::{Datelike, Local, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Weekday};
+use chrono::{Datelike, Local, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
 

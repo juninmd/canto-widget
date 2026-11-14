@@ -43,6 +43,10 @@ fn finite(v: f32) -> f32 {
     }
 }
 
+fn finite_opt(v: Option<f32>) -> Option<f32> {
+    v.filter(|x| x.is_finite())
+}
+
 impl Probe {
     /// One refresh up front: CPU usage is a difference between two readings, so the tab's first one already means something.
     pub fn new() -> Self {
@@ -104,7 +108,7 @@ impl Probe {
                 .iter()
                 .map(|g| Gpu {
                     name: g.model().or(g.vendor()).unwrap_or("GPU").trim().to_string(),
-                    usage: finite(g.usage()),
+                    usage: finite_opt(g.usage()),
                     mem_used: g.used_memory(),
                     mem_total: g.total_memory(),
                 })
@@ -274,5 +278,9 @@ mod tests {
         assert_eq!(finite(f32::INFINITY), 0.0);
         assert_eq!(finite(f32::NEG_INFINITY), 0.0);
         assert_eq!(finite(42.5), 42.5);
+        assert_eq!(finite_opt(None), None);
+        assert_eq!(finite_opt(Some(f32::NAN)), None);
+        assert_eq!(finite_opt(Some(f32::INFINITY)), None);
+        assert_eq!(finite_opt(Some(42.5)), Some(42.5));
     }
 }

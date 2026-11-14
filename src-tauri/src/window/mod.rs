@@ -33,7 +33,7 @@ pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
         );
         let (x, y) = anchored_physical(rect, scale, (size.width, size.height));
         win.set_position(tauri::PhysicalPosition::new(x, y))?;
-        return Ok(());
+        Ok(())
     }
     #[cfg(target_os = "macos")]
     {
