@@ -204,7 +204,7 @@ mod tests {
         state.forecast(false, 10_000, |_| Ok(forecast(20.0))).unwrap();
         assert_eq!(state.forecast(false, 5_000, |_| Ok(forecast(25.0))).unwrap().now.temp, 25.0);
         let r = state
-            .forecast(false, 50_000, |_| {
+            .forecast(false, 5_000 + TTL_MS, |_| {
                 state.set_place(Some(Place { city: "Recife".into(), ..place() })).unwrap();
                 Ok(forecast(18.0))
             })

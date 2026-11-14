@@ -26,11 +26,11 @@ pub fn wayland_session(xdg: Option<&str>, wayland: Option<&str>, gdk: Option<&st
 fn is_wayland() -> bool {
     #[cfg(all(unix, not(target_os = "macos")))]
     {
-        return wayland_session(
+        wayland_session(
             std::env::var("XDG_SESSION_TYPE").ok().as_deref(),
             std::env::var("WAYLAND_DISPLAY").ok().as_deref(),
             std::env::var("GDK_BACKEND").ok().as_deref(),
-        );
+        )
     }
     #[cfg(not(all(unix, not(target_os = "macos"))))]
     false

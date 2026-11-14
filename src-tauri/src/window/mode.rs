@@ -99,7 +99,7 @@ pub fn place_mini(win: &WebviewWindow, size: (f64, f64)) -> tauri::Result<()> {
             win.set_position(tauri::PhysicalPosition::new(x.round() as i32, y.round() as i32))?;
             return Ok(());
         }
-        return win.set_size(LogicalSize::new(size.0, size.1));
+        win.set_size(LogicalSize::new(size.0, size.1))
     }
     #[cfg(target_os = "macos")]
     {
