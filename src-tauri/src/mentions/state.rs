@@ -48,7 +48,7 @@ impl Saved {
                 self.read.remove(id);
             }
         }
-        self.read.retain(|_, at| now - *at < KEEP_MS);
+        self.read.retain(|_, at| now.saturating_sub(*at) < KEEP_MS);
         while self.read.len() > MAX_READ {
             let Some(oldest) = self.read.iter().min_by_key(|(_, at)| **at).map(|(k, _)| k.clone()) else { break };
             self.read.remove(&oldest);
@@ -151,6 +151,25 @@ pub fn mention_read(
     Ok(unread.recount(&saved))
 }
 
+fn validate_thread_input(url: &str, title: &str) -> Result<(String, String)> {
+    let clean_url = url.trim();
+    if clean_url.is_empty()
+        || clean_url.len() > 512
+        || !(clean_url.starts_with("https://") || clean_url.starts_with("http://"))
+    {
+        return Err(crate::error::AppError::Config("URL inválida".into()));
+    }
+    Ok((clean_url.to_string(), title.trim().chars().take(200).collect()))
+}
+
+fn validate_author_input(login: &str) -> Result<String> {
+    let clean: String = login.trim().chars().take(128).collect();
+    if clean.is_empty() {
+        return Err(crate::error::AppError::Config("usuário inválido".into()));
+    }
+    Ok(clean)
+}
+
 #[tauri::command(async)]
 pub fn mention_mute_thread(
     state: State<'_, AppState>,
@@ -159,6 +178,7 @@ pub fn mention_mute_thread(
     title: String,
     muted: bool,
 ) -> Result<u32> {
+    let (url, title) = validate_thread_input(&url, &title)?;
     state.touch();
     let (_, saved) = update(&state, |s| s.mute_thread(&url, &title, muted))?;
     Ok(unread.recount(&saved))
@@ -171,13 +191,17 @@ pub fn mention_mute_author(
     login: String,
     muted: bool,
 ) -> Result<u32> {
+    let login = validate_author_input(&login)?;
     state.touch();
     let (_, saved) = update(&state, |s| s.mute_author(&login, muted))?;
     Ok(unread.recount(&saved))
 }
 
 #[tauri::command]
-pub fn mentions_unread(unread: State<'_, MentionsUnread>) -> u32 {
+pub fn mentions_unread(state: State<'_, AppState>, unread: State<'_, MentionsUnread>) -> u32 {
+    if !state.is_unlocked() {
+        return 0;
+    }
     unread.count()
 }
 

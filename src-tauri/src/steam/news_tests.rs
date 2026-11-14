@@ -43,4 +43,17 @@ fn fresh_means_after_the_last_read_and_the_list_is_merged_across_games() {
     assert_eq!((news.items[0].fresh, news.items[1].fresh, news.unread), (true, false, 1));
     let never_read = combine(items, 0, now, 1);
     assert_eq!((never_read.items.len(), never_read.unread), (1, 1), "before any read, the last three days count");
+
+    let extreme = NewsItem {
+        gid: "9".into(),
+        appid: 1,
+        game: "X".into(),
+        title: "Patch".into(),
+        url: String::new(),
+        date: i64::MAX,
+        lines: vec![],
+        fresh: false,
+    };
+    let out = combine(vec![extreme], 1_000, now, 10);
+    assert!(out.items[0].fresh);
 }

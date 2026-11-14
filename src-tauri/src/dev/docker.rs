@@ -159,7 +159,13 @@ pub fn parse_images(images: &str, in_use: &HashSet<String>) -> Vec<Image> {
         .map(|r| {
             let name =
                 if r.repository == "<none>" { "<none>".to_string() } else { format!("{}:{}", r.repository, r.tag) };
-            let used = in_use.contains(&name) || in_use.contains(&r.id) || in_use.iter().any(|u| u.starts_with(&r.id));
+            let bare_id = r.id.trim_start_matches("sha256:");
+            let used = in_use.contains(&name)
+                || (r.tag == "latest" && in_use.contains(&r.repository))
+                || (!bare_id.is_empty()
+                    && (in_use.contains(&r.id)
+                        || in_use.contains(bare_id)
+                        || in_use.iter().any(|u| u.trim_start_matches("sha256:").starts_with(bare_id))));
             Image { id: r.id, name, size: parse_size(&r.size), age: r.created_since, used }
         })
         .collect()

@@ -51,6 +51,8 @@ fn a_fresh_entry_is_answered_from_memory_and_force_skips_it() {
     cache.clear();
     cache.get_or("trending", false, T0, count(&calls)).unwrap();
     assert_eq!(calls.get(), 4, "cleared on lock");
+    cache.get_or("trending", false, T0 - 1, count(&calls)).unwrap();
+    assert_eq!(calls.get(), 5, "clock jump backward refetches");
 }
 
 #[test]

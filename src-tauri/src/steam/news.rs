@@ -149,12 +149,12 @@ fn strip(line: &str) -> String {
 /// Marks what came after `read_at` (ms) as fresh; before the first "mark as read", the last three
 /// days are. Newest first across games, capped at `max`.
 pub fn combine(mut items: Vec<NewsItem>, read_at_ms: i64, now_ms: i64, max: usize) -> SteamNews {
-    let since = if read_at_ms > 0 { read_at_ms } else { now_ms - 3 * 24 * 3_600_000 };
+    let since = if read_at_ms > 0 { read_at_ms } else { now_ms.saturating_sub(3 * 24 * 3_600_000) };
     items.sort_by(|a, b| b.date.cmp(&a.date).then_with(|| a.gid.cmp(&b.gid)));
     items.dedup_by(|a, b| a.gid == b.gid);
     items.truncate(max);
     for item in &mut items {
-        item.fresh = item.date * 1000 > since;
+        item.fresh = item.date.saturating_mul(1000) > since;
     }
     let unread = items.iter().filter(|i| i.fresh).count() as u32;
     SteamNews { items, unread }

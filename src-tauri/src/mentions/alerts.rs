@@ -149,7 +149,7 @@ fn check_github(app: &AppHandle, state: &AppState, mem: &mut Memory, team_mentio
         }
     }
     let saved = state::load(state).unwrap_or_default();
-    let known = mentions::feed::github_known(&list.items, names.len());
+    let known = mentions::feed::github_known(&list.items, &names);
     app.state::<MentionsUnread>().set(GITHUB, mentions::feed::github_lights(&list.items, &known), &saved);
     let seen = mem.github.as_ref().filter(|(l, _)| *l == login).map(|(_, s)| s);
     let (fresh, next) = review_alert::advance(seen, &list);

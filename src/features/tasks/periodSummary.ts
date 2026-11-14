@@ -31,7 +31,7 @@ export function meetingGroups(agenda: AgendaItem[]): MeetingGroup[] {
   for (const e of attended(agenda)) byTitle.set(e.title, [...(byTitle.get(e.title) ?? []), e]);
   return [...byTitle.entries()]
     .map(([title, list]) => ({ title, count: list.length, minutes: meetingMinutes(list) }))
-    .sort((a, b) => b.minutes - a.minutes || b.count - a.count || a.title.localeCompare(b.title));
+    .sort((a, b) => b.minutes - a.minutes || b.count - a.count || a.title.localeCompare(b.title, LOCALE));
 }
 
 function shortDay(day: string, weekday = false): string {

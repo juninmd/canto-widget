@@ -135,7 +135,8 @@ pub async fn github_device_start(app: tauri::AppHandle) -> Result<DeviceCode> {
     }
     run(move || {
         let d = auth::start(client_id)?;
-        let expires_at = now_ms() + d.expires_in as i64 * 1000;
+        let secs = i64::try_from(d.expires_in).unwrap_or(900).max(0);
+        let expires_at = now_ms().saturating_add(secs.saturating_mul(1000));
         *app.state::<GithubState>().flow.lock_safe() =
             Some(Flow { device_code: d.device_code, interval: d.interval, expires_at, client_id });
         Ok(DeviceCode { user_code: d.user_code, url: d.verification_uri, expires_in_s: d.expires_in })
@@ -172,6 +173,9 @@ fn finish(state: &AppState, gh: &GithubState) -> Result<String> {
             Ok(PollResult::SlowDown(n)) => interval = n,
             Ok(PollResult::Ready(tokens)) => {
                 let saved = github::user(&tokens.access_token).and_then(|login| {
+                    if current(gh).map(|f| f.0) != Some(code.clone()) {
+                        return Err(AppError::Github("login cancelado".into()));
+                    }
                     let cfg = GithubConfig {
                         tokens,
                         login: login.clone(),
@@ -194,8 +198,11 @@ pub fn github_device_cancel(gh: State<'_, GithubState>) {
 
 /// Only forgets the token on this computer; revoking is done on GitHub (Settings → Applications/Tokens).
 #[tauri::command(async)]
-pub fn github_disconnect(state: State<'_, AppState>, gh: State<'_, GithubState>) -> Result<()> {
-    disconnect(&state, &gh)
+pub fn github_disconnect(app: tauri::AppHandle, state: State<'_, AppState>, gh: State<'_, GithubState>) -> Result<()> {
+    disconnect(&state, &gh)?;
+    app.state::<crate::mentions::state::MentionsUnread>()
+        .clear(crate::mentions::state::GITHUB, &crate::mentions::state::Saved::default());
+    Ok(())
 }
 
 fn disconnect(state: &AppState, gh: &GithubState) -> Result<()> {

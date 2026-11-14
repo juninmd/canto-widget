@@ -95,10 +95,15 @@ pub fn health(ep: &Endpoint, history: &VecDeque<Sample>) -> Health {
     history.back().map_or(Health::Unknown, |s| classify(ep, s))
 }
 
+fn clean_host(raw: &str) -> String {
+    let trimmed = raw.trim();
+    trimmed.strip_prefix('[').and_then(|s| s.strip_suffix(']')).unwrap_or(trimmed).to_string()
+}
+
 fn valid_host(host: &str) -> bool {
     !host.is_empty()
         && host.len() <= 253
-        && host.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | ':' | '[' | ']'))
+        && host.chars().all(|c| c.is_ascii_alphanumeric() || matches!(c, '.' | '-' | '_' | ':'))
 }
 
 /// Checks everything that came from the webview and returns the cleaned endpoint (trimmed, id left to the caller).
@@ -123,7 +128,7 @@ pub fn validate(mut ep: Endpoint) -> Result<Endpoint> {
             }
         }
         Target::Tcp { host, port } | Target::Dns { host, port } => {
-            *host = host.trim().to_string();
+            *host = clean_host(host);
             if !valid_host(host) {
                 return bad("host inválido: só letras, números, ponto e hífen");
             }

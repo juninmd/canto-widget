@@ -23,7 +23,7 @@ test("next runs follow minute steps, ranges and weekdays", () => {
 });
 
 test("a day of month and a weekday together fire on either", () => {
-  const r = nextRuns("0 0 13 * 5", at("2026-11-01T00:00:00"), 3).map((d) => d.getDate());
+  const r = nextRuns("  0 0 13 * 5  ", at("2026-11-01T00:00:00"), 3).map((d) => d.getDate());
   expect(r).toEqual([6, 13, 20]);
 });
 

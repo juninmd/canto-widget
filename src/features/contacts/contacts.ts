@@ -41,7 +41,7 @@ export function groupByLetter(items: Contact[]): { letter: string; items: Contac
     groups.set(letter, [...(groups.get(letter) ?? []), contact]);
   }
   return [...groups.entries()]
-    .sort(([a], [b]) => (a === "#" ? 1 : b === "#" ? -1 : a.localeCompare(b)))
+    .sort(([a], [b]) => (a === "#" ? 1 : b === "#" ? -1 : a.localeCompare(b, LOCALE)))
     .map(([letter, list]) => ({ letter, items: list }));
 }
 

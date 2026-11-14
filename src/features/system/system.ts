@@ -51,7 +51,7 @@ export type AppSort = "cpu" | "memory";
 
 export function sortApps(apps: SystemApp[], by: AppSort, limit = 8): SystemApp[] {
   const key = (a: SystemApp) => (by === "cpu" ? a.cpu : a.memory);
-  return [...apps].sort((a, b) => key(b) - key(a) || a.name.localeCompare(b.name)).slice(0, limit);
+  return [...apps].sort((a, b) => key(b) - key(a) || a.name.localeCompare(b.name, LOCALE)).slice(0, limit);
 }
 
 /** "1 h 05 min", "42 min". */

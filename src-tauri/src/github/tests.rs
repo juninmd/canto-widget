@@ -83,3 +83,35 @@ fn raw_comment_parses_user_and_url() {
     assert_eq!(c.user.as_ref().unwrap().login, "joao");
     assert_eq!(c.user.as_ref().unwrap().user_type.as_deref(), Some("User"));
 }
+
+#[test]
+fn pr_comments_drop_untrusted_avatars_and_non_github_links() {
+    let raw: Vec<RawComment> = serde_json::from_value(serde_json::json!([
+        {
+            "id": 1,
+            "html_url": "https://github.com/octo/canto/pull/7#issuecomment-1",
+            "body": "ok",
+            "created_at": "2026-09-15T10:00:00Z",
+            "user": { "login": "ok", "avatar_url": "https://avatars.githubusercontent.com/u/1" }
+        },
+        {
+            "id": 2,
+            "html_url": "https://github.com/octo/canto/pull/7#issuecomment-2",
+            "body": "evil avatar",
+            "created_at": "2026-09-15T10:01:00Z",
+            "user": { "login": "bad", "avatar_url": "https://evil.example/a.png" }
+        },
+        {
+            "id": 3,
+            "html_url": "https://evil.example/comment",
+            "body": "evil url",
+            "created_at": "2026-09-15T10:02:00Z",
+            "user": { "login": "bad2" }
+        }
+    ]))
+    .unwrap();
+    let parsed = parse_comments(raw, |u| format!("data:image/png;base64,{}", u.len()));
+    assert_eq!(parsed.len(), 2);
+    assert!(parsed[0].avatar_url.starts_with("data:image/png;base64,"));
+    assert_eq!(parsed[1].avatar_url, "");
+}

@@ -6,7 +6,6 @@ import { readGoal, readOverrides, saveGoal, saveOverrides } from "./activityPref
 import { activityText } from "./activitySummary";
 import { mergeApps, mergeFocus, weekSeries, type Day } from "./activityView";
 import { MOD_KEY } from "../../lib/platform";
-import { dayStart } from "../tasks/summary";
 import { useToast } from "../../lib/toast";
 import { clockLabel } from "../../lib/clockLabel";
 import { useWindowVisible } from "../../lib/useWindowVisible";
@@ -21,8 +20,15 @@ import ActivityWeek from "./ActivityWeek";
 import { ActivityEmpty, ActivityFooter, ActivityLoading, ActivityOff, ActivityUnsupported } from "./ActivityStates";
 import { COLUMN, LAYOUT } from "./activityLayout";
 
-const DAY_MS = 86_400_000;
 const REFRESH_MS = 60_000;
+
+function localDayBounds(today: string, daysBack: number): [number, number] {
+  const [y, m, d] = today.split("-").map(Number);
+  return [
+    new Date(y, m - 1, d - daysBack).getTime(),
+    new Date(y, m - 1, d - daysBack + 1).getTime(),
+  ];
+}
 const ROOT = "@container relative flex h-full min-h-0 flex-col overflow-y-auto pr-1";
 const sum = (apps: { secs: number }[]) => apps.reduce((s, a) => s + a.secs, 0);
 const codeOf = (d: Day) => sum(d.apps.filter((a) => categoryOf(a.app) === "code"));
@@ -42,7 +48,6 @@ export default function ActivityTab({ today, onError }: { today: string; onError
   const [loadError, setLoadError] = useState("");
   const [busy, setBusy] = useState(false);
   const visible = useWindowVisible();
-  const start = dayStart(today);
   setCategoryOverrides(cats);
 
   const { bump, isLatest } = useLatestRequest();
@@ -56,10 +61,10 @@ export default function ActivityTab({ today, onError }: { today: string; onError
       if (!isLatest(id)) return;
       setStatus(st);
       if (!st.enabled) return;
-      const days = [0, 1, 2, 3, 4, 5, 6].map((i) => start - i * DAY_MS);
-      const sums = await Promise.all(days.map((d) => api.activitySummary(d, d + DAY_MS)));
+      const ranges = [0, 1, 2, 3, 4, 5, 6].map((i) => localDayBounds(today, i));
+      const sums = await Promise.all(ranges.map(([from, to]) => api.activitySummary(from, to)));
       if (!isLatest(id)) return;
-      setWeek(sums.map((s, i) => ({ day: days[i], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs, focus: s.focus })));
+      setWeek(sums.map((s, i) => ({ day: ranges[i][0], apps: s.apps, spans: s.spans, idle: s.idle, idleSecs: s.idle_secs, focus: s.focus })));
       setFetchedAt(Date.now());
       setLoadError("");
     } catch (e) {
@@ -69,7 +74,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
       if (isLatest(id)) setBusy(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [start]);
+  }, [today]);
 
   // A hidden widget has nobody to show it to: the poll sleeps and catches up when the window returns.
   useEffect(() => {

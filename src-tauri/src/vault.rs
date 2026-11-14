@@ -80,7 +80,7 @@ impl AppState {
     }
 
     pub fn idle_ms(&self) -> i64 {
-        now_ms() - *self.last_active.lock_safe()
+        now_ms().saturating_sub(*self.last_active.lock_safe()).max(0)
     }
 
     /// Returns `true` only on the lock transition, so the watchdog notifies the UI once per lock.

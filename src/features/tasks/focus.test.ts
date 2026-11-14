@@ -100,3 +100,28 @@ test("msToNext aims at the run's own second and minute boundaries", async () => 
   expect(store.msToNext(60_000, 1000)).toBe(9_700);
   await store.stop();
 });
+
+test("stop or discard during an in-flight switch cancels the queued start", async () => {
+  let now = 1_000_000;
+  let release!: () => void;
+  let holds = false;
+  const added: [string, number][] = [];
+  const store = createFocusStore({
+    now: () => now,
+    every: 60_000,
+    add: (id, secs) => {
+      added.push([id, secs]);
+      return holds ? new Promise<void>((r) => (release = r)) : Promise.resolve();
+    },
+  });
+  await store.start({ id: "a", title: "A" });
+  now += 10_000;
+  holds = true;
+  const switching = store.start({ id: "b", title: "B" });
+  await Promise.resolve();
+  const stopping = store.stop();
+  release();
+  await Promise.all([switching, stopping]);
+  expect(added).toEqual([["a", 10]]);
+  expect(store.get()).toBeNull();
+});

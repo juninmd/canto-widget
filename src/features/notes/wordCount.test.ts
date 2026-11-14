@@ -7,7 +7,7 @@ test("counts plain words and ignores Markdown markup", () => {
 });
 
 test("ordered-list numbers and task checkboxes are markup, not words", () => {
-  expect(countWords("1. migrar\n2) testar\n- [x] feito\n- [X] ok\n  * [ ] aninhado")).toBe(5);
+  expect(countWords("1. migrar\r\n2) testar\r\n- [x] feito\r\n- [X] ok\r\n  * [ ] aninhado")).toBe(5);
   expect(countWords("são 24 h")).toBe(3);
 });
 

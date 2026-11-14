@@ -67,3 +67,15 @@ fn a_file_written_before_a_field_existed_still_opens() {
     let s: Saved = serde_json::from_str(r#"{"read":{"gitlab:5":10}}"#).unwrap();
     assert!(!s.is_unread("gitlab:5") && s.threads.is_empty() && s.authors.is_empty());
 }
+
+#[test]
+fn mute_inputs_are_trimmed_bounded_and_checked_for_http_urls() {
+    assert!(validate_thread_input("javascript:alert(1)", "x").is_err());
+    assert!(validate_thread_input("   ", "x").is_err());
+    assert!(validate_thread_input(&format!("https://github.com/{}", "a".repeat(512)), "x").is_err());
+    let (u, t) = validate_thread_input("  https://github.com/o/r/issues/1  ", &"t".repeat(250)).unwrap();
+    assert_eq!(u, "https://github.com/o/r/issues/1");
+    assert_eq!(t.chars().count(), 200);
+    assert!(validate_author_input("  ").is_err());
+    assert_eq!(validate_author_input("  octocat ").unwrap(), "octocat");
+}

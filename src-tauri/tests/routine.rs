@@ -254,3 +254,22 @@ fn a_new_instance_keeps_the_estimate_but_starts_with_no_tracked_time() {
     let new_task = on_day(&d, "2026-09-15")[0];
     assert_eq!((new_task.estimate_min, new_task.tracked_secs), (Some(25), 0));
 }
+
+#[test]
+fn invalid_calendar_dates_and_non_leap_feb_29_are_rejected() {
+    for bad in ["2026-02-29", "1900-02-29", "2026-04-31", "2026-00-10", "2026-01-00"] {
+        assert_eq!(weekday_of(bad), None, "accepted invalid calendar date {bad:?}");
+    }
+    assert_eq!(weekday_of("2000-02-29"), Some(2));
+}
+
+#[test]
+fn a_new_instance_resets_completed_subtasks() {
+    use canto_widget_lib::model::Subtask;
+    let mut d = with_series("2026-09-14", Repeat::Daily);
+    d.tasks[0].subtasks = vec![Subtask { id: "sub1".into(), title: "step 1".into(), done: true }];
+    assert_eq!(materialize(&mut d, "2026-09-15", 10), 1);
+    let new_task = on_day(&d, "2026-09-15")[0];
+    assert_eq!(new_task.subtasks.len(), 1);
+    assert!(!new_task.subtasks[0].done, "cloned subtask inherited done=true from previous day");
+}

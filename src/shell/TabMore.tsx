@@ -103,7 +103,7 @@ export default function TabMore({ hidden, attention, onPick }: Props) {
                 {tab.label}
                 <TabBadge n={attention[tab.id] ?? 0} />
               </span>
-              <span className="text-[10px] text-faint">Alt+{i + 1}</span>
+              {i < 9 && <span className="text-[10px] text-faint">Alt+{i + 1}</span>}
             </button>
           ))}
         </div>

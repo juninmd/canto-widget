@@ -18,6 +18,7 @@ test("the updater card reads the release notes as plain sentences: no symbols, n
 
 test("text that only looks like Markdown survives and an empty body stays empty", () => {
   expect(plainNotes("Veja [isto] (não é link) e a\\*b")).toBe("Veja [isto] (não é link) e a*b");
+  expect(plainNotes("[fix] veja [PR](https://github.com/o/r/pull/1)")).toBe("[fix] veja PR");
   expect(plainNotes("")).toBe("");
 });
 

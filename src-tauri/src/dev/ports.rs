@@ -42,7 +42,8 @@ pub fn split_addr(text: &str) -> Option<(String, u16)> {
 }
 
 pub fn is_loopback(addr: &str) -> bool {
-    addr.starts_with("127.") || addr == "::1" || addr == "localhost"
+    let bare = addr.split('%').next().unwrap_or(addr);
+    bare.starts_with("127.") || bare == "::1" || bare.eq_ignore_ascii_case("localhost")
 }
 
 /// Windows words the state ("LISTENING") in the user's language, so a listener is told by its empty foreign address.
@@ -50,9 +51,12 @@ pub fn parse_netstat(text: &str) -> Vec<Raw> {
     text.lines()
         .filter_map(|line| {
             let cols: Vec<&str> = line.split_whitespace().collect();
+            let last = *cols.last()?;
             let (proto, local, pid) = match (cols.first().map(|c| c.to_ascii_uppercase()).as_deref(), cols.len()) {
-                (Some("TCP"), 5) if matches!(cols[2], "0.0.0.0:0" | "[::]:0" | "*:0") => ("TCP", cols[1], cols[4]),
-                (Some("UDP"), 4) => ("UDP", cols[1], cols[3]),
+                (Some("TCP"), n) if n >= 5 && matches!(cols[2], "0.0.0.0:0" | "[::]:0" | "*:0") => {
+                    ("TCP", cols[1], last)
+                }
+                (Some("UDP"), n) if n >= 4 => ("UDP", cols[1], last),
                 _ => return None,
             };
             let (addr, port) = split_addr(local)?;
@@ -67,7 +71,10 @@ pub fn parse_lsof(text: &str) -> Vec<Raw> {
     for line in text.lines() {
         let (tag, rest) = line.split_at(line.chars().next().map_or(0, char::len_utf8));
         match tag {
-            "p" => pid = rest.parse().unwrap_or(0),
+            "p" => {
+                pid = rest.parse().unwrap_or(0);
+                proto = "TCP";
+            }
             "P" => proto = if rest.eq_ignore_ascii_case("UDP") { "UDP" } else { "TCP" },
             "n" if pid > 0 && !rest.contains("->") => {
                 if let Some((addr, port)) = split_addr(rest.split(' ').next().unwrap_or(rest)) {

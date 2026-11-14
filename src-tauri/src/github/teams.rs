@@ -25,25 +25,53 @@ struct Org {
     login: String,
 }
 
-type Cached = Option<(Instant, Vec<String>)>;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
-static CACHE: LazyLock<Mutex<Cached>> = LazyLock::new(Mutex::default);
+#[derive(Default)]
+struct Cache {
+    generation: u64,
+    entry: Option<(u64, Instant, Vec<String>)>,
+}
+
+static CACHE: LazyLock<Mutex<Cache>> = LazyLock::new(Mutex::default);
+
+fn token_key(token: &str) -> u64 {
+    let mut h = DefaultHasher::new();
+    token.hash(&mut h);
+    h.finish()
+}
+
+pub fn clear() {
+    let mut cache = CACHE.lock_safe();
+    cache.generation = cache.generation.wrapping_add(1);
+    cache.entry = None;
+}
 
 fn handles(teams: Vec<Team>) -> Vec<String> {
     teams.into_iter().filter_map(|t| Some(format!("{}/{}", t.organization?.login, t.slug))).take(MAX_TEAMS).collect()
 }
 
 pub fn lookup(token: &str) -> Vec<String> {
-    let mut cache = CACHE.lock_safe();
-    if let Some((_, teams)) = cache.as_ref().filter(|(at, _)| at.elapsed() < TTL) {
-        return teams.clone();
-    }
+    let key = token_key(token);
+    let generation = {
+        let cache = CACHE.lock_safe();
+        if let Some((k, at, teams)) = &cache.entry {
+            if *k == key && at.elapsed() < TTL {
+                return teams.clone();
+            }
+        }
+        cache.generation
+    };
     let fetched = client()
         .and_then(|c| c.get(format!("{API}/user/teams?per_page=30")).bearer_auth(token).send().map_err(network))
         .and_then(response::<Vec<Team>>)
         .map(handles)
         .unwrap_or_default();
-    *cache = Some((Instant::now(), fetched.clone()));
+    let mut cache = CACHE.lock_safe();
+    if cache.generation == generation {
+        cache.entry = Some((key, Instant::now(), fetched.clone()));
+    }
     fetched
 }
 
@@ -61,5 +89,14 @@ mod tests {
         let many: Vec<Team> =
             (0..20).map(|i| Team { slug: format!("t{i}"), organization: Some(Org { login: "o".into() }) }).collect();
         assert_eq!(handles(many).len(), MAX_TEAMS);
+    }
+
+    #[test]
+    fn token_keys_differ_by_account_and_clear_bumps_generation() {
+        assert_ne!(token_key("ghp_one"), token_key("ghp_two"));
+        clear();
+        let before = CACHE.lock_safe().generation;
+        clear();
+        assert_ne!(CACHE.lock_safe().generation, before);
     }
 }

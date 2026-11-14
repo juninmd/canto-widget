@@ -10,7 +10,7 @@ import ErrorBanner from "../../components/ErrorBanner";
 import { CrossIcon, MoreIcon, PlusIcon } from "../../components/Icons";
 import type { PortEntry } from "./devTypes";
 import { Chip, CopyLine, IconButton, Panel, Row, SearchField, Sub } from "./DevBits";
-import { filterPorts, freed, groupByProject, portCommands, portQuery, projectOf, siblings, sortPorts, type PortSort, type Proto } from "./ports";
+import { filterPorts, freedWatches, groupByProject, portCommands, portQuery, projectOf, siblings, sortPorts, type PortSort, type PortWatch, type Proto } from "./ports";
 
 const POLL_MS = 3000;
 const FAV_KEY = "canto.devFavPorts";
@@ -26,6 +26,7 @@ function savedFavs(): number[] {
 }
 
 const key = (e: PortEntry) => `${e.proto}:${e.port}:${e.pid}`;
+const sameWatch = (a: PortWatch, b: PortWatch) => a.port === b.port && a.proto === b.proto;
 
 /** Who holds which port: the live list, a search that doubles as "is 3000 free?", favorites and a kill that asks first. */
 export default function DevPorts() {
@@ -40,11 +41,11 @@ export default function DevPorts() {
   const [more, setMore] = useState(false);
   const [open, setOpen] = useState("");
   const [favs, setFavs] = useState<number[]>(savedFavs);
-  const [watched, setWatched] = useState<number[]>([]);
+  const [watched, setWatched] = useState<PortWatch[]>([]);
   const notify = useToast();
   const visible = useWindowVisible();
   const live = useRef(true);
-  const watching = useRef<number[]>([]);
+  const watching = useRef<PortWatch[]>([]);
   watching.current = watched;
 
   const load = useCallback(
@@ -54,10 +55,10 @@ export default function DevPorts() {
           if (!live.current) return;
           setList(l);
           setError("");
-          const done = freed(watching.current, l);
+          const done = freedWatches(watching.current, l);
           if (done.length) {
-            done.forEach((port) => notify({ message: t("dev.ports.freedToast", { port }) }));
-            setWatched((w) => w.filter((p) => !done.includes(p)));
+            done.forEach((w) => notify({ message: t("dev.ports.freedToast", { port: w.port }) }));
+            setWatched((w) => w.filter((x) => !done.some((d) => sameWatch(x, d))));
           }
         },
         (e) => live.current && setError(errText(e) || t("dev.error")),
@@ -99,12 +100,13 @@ export default function DevPorts() {
   const shown = useMemo(() => sortPorts(filterPorts(all, { query, proto, onlyDev, exposed }), sort), [all, query, proto, onlyDev, exposed, sort]);
   const asked = portQuery(query);
   const holder = asked === null ? undefined : all.find((e) => e.port === asked);
-  const busy = (p: number) => all.some((e) => e.port === p && e.proto === "TCP");
+  const busy = (p: number) => all.some((e) => e.port === p);
 
   const row = (e: PortEntry) => {
     const id = key(e);
     const expanded = open === id;
     const also = siblings(all, e);
+    const isWatched = watched.some((w) => w.port === e.port && w.proto === e.proto);
     return (
       <Fragment key={id}>
         <Row>
@@ -117,7 +119,7 @@ export default function DevPorts() {
                   {t("dev.ports.exposed")}
                 </span>
               )}
-              {watched.includes(e.port) && <span className="text-[10.5px] font-semibold text-accent-text">{t("dev.ports.watching")}</span>}
+              {isWatched && <span className="text-[10.5px] font-semibold text-accent-text">{t("dev.ports.watching")}</span>}
             </p>
             <Sub>
               {e.proto} · PID {e.pid} · {projectOf(e)}
@@ -150,8 +152,8 @@ export default function DevPorts() {
               <button type="button" onClick={() => void kill(e, true)} className="canto-hit min-h-[26px] rounded-md bg-danger/12 px-2 text-[11.5px] font-medium text-danger hover:bg-danger/20">
                 {t("dev.ports.killTree")}
               </button>
-              <button type="button" onClick={() => setWatched((w) => (w.includes(e.port) ? w.filter((p) => p !== e.port) : [...w, e.port]))} className="canto-hit min-h-[26px] rounded-md bg-hover px-2 text-[11.5px] font-medium text-muted hover:text-fg">
-                {watched.includes(e.port) ? t("dev.ports.unwatch") : t("dev.ports.watch")}
+              <button type="button" onClick={() => setWatched((w) => (isWatched ? w.filter((x) => !(x.port === e.port && x.proto === e.proto)) : [...w, { port: e.port, proto: e.proto }]))} className="canto-hit min-h-[26px] rounded-md bg-hover px-2 text-[11.5px] font-medium text-muted hover:text-fg">
+                {isWatched ? t("dev.ports.unwatch") : t("dev.ports.watch")}
               </button>
             </div>
             {portCommands(e, IS_WINDOWS).map((c) => (

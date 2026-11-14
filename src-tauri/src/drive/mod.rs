@@ -92,13 +92,13 @@ pub fn exchange_code(
     Ok(DriveTokens {
         refresh_token,
         access_token: res.access_token,
-        expires_at: crate::model::now_ms() + res.expires_in * 1000,
+        expires_at: crate::model::now_ms().saturating_add(res.expires_in.max(0).saturating_mul(1000)),
     })
 }
 
 /// Renews the access token when less than 60s of validity remain.
 pub fn fresh_access_token(tokens: &mut DriveTokens, client_id: &str, client_secret: &str) -> Result<String> {
-    if !tokens.access_token.is_empty() && tokens.expires_at - crate::model::now_ms() > 60_000 {
+    if !tokens.access_token.is_empty() && tokens.expires_at.saturating_sub(crate::model::now_ms()) > 60_000 {
         return Ok(tokens.access_token.clone());
     }
     let mut form = vec![
@@ -111,7 +111,7 @@ pub fn fresh_access_token(tokens: &mut DriveTokens, client_id: &str, client_secr
     }
     let res = post_token(&form)?;
     tokens.access_token = res.access_token.clone();
-    tokens.expires_at = crate::model::now_ms() + res.expires_in * 1000;
+    tokens.expires_at = crate::model::now_ms().saturating_add(res.expires_in.max(0).saturating_mul(1000));
     Ok(res.access_token)
 }
 

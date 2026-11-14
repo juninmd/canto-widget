@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, type ForgeLists, type PrComment } from "../../lib/api";
 import type { Forge } from "./forge";
 import { fetchInBatches, groupCommenters, prsWithComments, type EnrichedComment } from "./prCommenters";
@@ -6,12 +6,17 @@ import { fetchInBatches, groupCommenters, prsWithComments, type EnrichedComment 
 /** Comments of my PRs are fetched only while the commenters view is open, four PRs at a time, once each. */
 export function useForgeCommenters(forge: Forge, lists: ForgeLists | null, active: boolean) {
   const [cache, setCache] = useState<Record<string, PrComment[]>>({});
+  const cacheRef = useRef(cache);
+  cacheRef.current = cache;
   const [loading, setLoading] = useState(false);
-  const prs = lists ? prsWithComments(lists.my_prs.items) : [];
+  const prs = useMemo(() => (lists ? prsWithComments(lists.my_prs.items) : []), [lists]);
 
   useEffect(() => {
-    if (!active || !lists?.my_prs?.items) return;
-    const targets = prs.filter((p) => !cache[`${p.repo}#${p.number}`]);
+    if (!active || prs.length === 0) {
+      setLoading(false);
+      return;
+    }
+    const targets = prs.filter((p) => !cacheRef.current[`${p.repo}#${p.number}`]);
     if (targets.length === 0) return;
 
     let live = true;
@@ -39,7 +44,7 @@ export function useForgeCommenters(forge: Forge, lists: ForgeLists | null, activ
     return () => {
       live = false;
     };
-  }, [active, lists?.my_prs?.items, forge, prs, cache]);
+  }, [active, prs, forge]);
 
   const commenters = useMemo(() => {
     const enriched: EnrichedComment[] = [];

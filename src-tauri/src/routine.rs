@@ -12,7 +12,15 @@ fn civil(day: &str) -> Option<(i64, u32, u32)> {
     }
     let num = |r: std::ops::Range<usize>| day.get(r)?.parse::<u32>().ok();
     let (y, m, d) = (num(0..4)?, num(5..7)?, num(8..10)?);
-    ((1..=12).contains(&m) && (1..=31).contains(&d)).then_some((y as i64, m, d))
+    let leap = y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
+    let max_day = match m {
+        1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
+        4 | 6 | 9 | 11 => 30,
+        2 if leap => 29,
+        2 => 28,
+        _ => return None,
+    };
+    (1..=max_day).contains(&d).then_some((y as i64, m, d))
 }
 
 /// 0 = Sunday ... 6 = Saturday (Howard Hinnant's days_from_civil algorithm).
@@ -73,14 +81,20 @@ pub fn materialize(d: &mut VaultData, day: &str, now: i64) -> usize {
         .filter(|(_, t)| {
             t.repeat.is_some_and(|r| r.applies_on(day)) || t.extended_repeat.as_ref().is_some_and(|r| r.applies_on(day))
         })
-        .map(|(series, t)| Task {
-            id: instance_id(series, day),
-            day: day.to_string(),
-            done: false,
-            created_at: now,
-            updated_at: now,
-            tracked_secs: 0,
-            ..t.clone()
+        .map(|(series, t)| {
+            let mut next = Task {
+                id: instance_id(series, day),
+                day: day.to_string(),
+                done: false,
+                created_at: now,
+                updated_at: now,
+                tracked_secs: 0,
+                ..t.clone()
+            };
+            for sub in &mut next.subtasks {
+                sub.done = false;
+            }
+            next
         })
         .filter(|t| !d.deleted.contains_key(&t.id))
         .collect();

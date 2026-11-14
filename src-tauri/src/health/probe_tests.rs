@@ -54,6 +54,12 @@ fn a_name_that_does_not_resolve_is_down_with_a_reason() {
 }
 
 #[test]
+fn bracketed_ipv6_host_resolves_to_loopback_addr() {
+    let (addrs, _) = resolve("[::1]", 443).unwrap();
+    assert!(addrs.iter().any(|a| a.ip().is_loopback()));
+}
+
+#[test]
 #[ignore = "needs network"]
 fn the_certificate_of_a_real_host_has_days_left() {
     let s = probe(&ep(Target::Dns { host: "github.com".into(), port: 443 }), chrono::Utc::now().timestamp_millis());

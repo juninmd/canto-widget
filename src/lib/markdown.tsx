@@ -26,7 +26,7 @@ const subscribe = (notify: () => void) => {
 /** One paragraph per line: what a text shows for the few milliseconds before the parser arrives. */
 export function plainTokens(text: string): Token[] {
   return text
-    .split("\n")
+    .split(/\r?\n/)
     .filter((line) => line.trim() !== "")
     .map((line) => ({ type: "paragraph", raw: line, text: line, tokens: [{ type: "text", raw: line, text: line }] }) as Tokens.Paragraph);
 }

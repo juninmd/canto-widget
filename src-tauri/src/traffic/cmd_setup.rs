@@ -3,7 +3,6 @@ use tauri::AppHandle;
 
 use crate::blocking::run;
 use crate::error::{AppError, Result};
-use crate::model::now_ms;
 use crate::traffic::cmd::{config, save, tr};
 use crate::traffic::feed;
 use crate::traffic::{self, Spot, TrafficStatus, Trip};
@@ -69,7 +68,7 @@ pub async fn traffic_add_trip(app: AppHandle, name: String, icon: String, to: Sp
         if cfg.trips.len() >= traffic::MAX_TRIPS {
             return Err(tr("limite de trajetos atingido", "trip limit reached"));
         }
-        cfg.trips.push(Trip { id: format!("t{}", now_ms()), name, icon: traffic::clean_icon(&icon), to });
+        cfg.trips.push(Trip { id: crate::commands::new_id(), name, icon: traffic::clean_icon(&icon), to });
         save(&app, &cfg)
     })
     .await

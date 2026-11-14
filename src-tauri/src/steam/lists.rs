@@ -121,7 +121,7 @@ pub fn library_page(games: &[OwnedGame], page: usize) -> SteamLibrary {
     SteamLibrary {
         items,
         total: games.len() as u32,
-        minutes: games.iter().map(|game| game.total_min).sum(),
+        minutes: games.iter().fold(0u32, |acc, g| acc.saturating_add(g.total_min)),
         has_key: true,
     }
 }

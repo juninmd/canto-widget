@@ -126,20 +126,27 @@ pub fn github_lights(items: &[ForgeItem], known: &HashMap<String, Mentioned>) ->
         .collect()
 }
 
-/// What an earlier lookup already found for these threads; never asks GitHub (for the badge, which runs often).
-pub fn github_known(items: &[ForgeItem], names_len: usize) -> HashMap<String, Mentioned> {
-    let cache = FOUND.lock_safe();
-    items.iter().filter_map(|i| Some((i.reference.clone(), cache.get(&found_key(i, names_len))?.clone()))).collect()
+pub fn clear() {
+    FOUND.lock_safe().clear();
+    AVATARS.lock_safe().clear();
 }
 
-fn found_key(i: &ForgeItem, names_len: usize) -> String {
-    format!("{}|{}|{names_len}", i.reference, i.updated_at)
+/// What an earlier lookup already found for these threads; never asks GitHub (for the badge, which runs often).
+pub fn github_known(items: &[ForgeItem], names: &[String]) -> HashMap<String, Mentioned> {
+    let cache = FOUND.lock_safe();
+    items.iter().filter_map(|i| Some((i.reference.clone(), cache.get(&found_key(i, names))?.clone()))).collect()
+}
+
+fn found_key(i: &ForgeItem, names: &[String]) -> String {
+    let mut sorted: Vec<&str> = names.iter().map(String::as_str).collect();
+    sorted.sort_unstable();
+    format!("{}|{}|{}", i.reference, i.updated_at, sorted.join(","))
 }
 
 /// The comment behind each thread, looked up in parallel; a thread unchanged since the last lookup costs nothing.
 pub fn github_found(token: &str, names: &[String], items: &[ForgeItem]) -> HashMap<String, Mentioned> {
-    // The names are part of the key: switching team mentions on must not reuse a lookup made without them.
-    let key = |i: &ForgeItem| found_key(i, names.len());
+    // The names are part of the key: switching team mentions or accounts must not reuse a lookup for other handles.
+    let key = |i: &ForgeItem| found_key(i, names);
     let todo: Vec<&ForgeItem> = {
         let cache = FOUND.lock_safe();
         items.iter().filter(|i| !cache.contains_key(&key(i))).collect()

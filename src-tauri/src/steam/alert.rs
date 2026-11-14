@@ -78,7 +78,7 @@ impl SteamAlerts {
     /// The first tick after an unlock, then one scan every `CHECK_MS`.
     fn due(&self, now: i64) -> bool {
         let inner = self.0.lock_safe();
-        inner.checked_at == 0 || now - inner.checked_at >= CHECK_MS
+        inner.checked_at == 0 || now < inner.checked_at || now - inner.checked_at >= CHECK_MS
     }
 
     fn checked(&self, now: i64) {

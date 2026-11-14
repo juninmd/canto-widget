@@ -1,5 +1,5 @@
 //! Mini mode: the window shrinks into a dock on the screen's right edge that lists only pending alerts.
-use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, State, WebviewWindow};
+use tauri::{Emitter, LogicalSize, Manager, State, WebviewWindow};
 
 use crate::error::{AppError, Result};
 use crate::window::state::{Area, WindowState};
@@ -25,6 +25,7 @@ pub fn dock_position(area: Area, size: (f64, f64)) -> (f64, f64) {
     (x + w - size.0, y + (h - size.1) / 2.0)
 }
 
+#[cfg(target_os = "macos")]
 fn work_area(win: &WebviewWindow) -> tauri::Result<Option<Area>> {
     let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
         return Ok(None);
@@ -81,12 +82,34 @@ pub fn place_mini(win: &WebviewWindow, size: (f64, f64)) -> tauri::Result<()> {
     strip_chrome(win)?;
     win.set_resizable(false)?;
     win.set_min_size(None::<LogicalSize<f64>>)?;
-    win.set_size(LogicalSize::new(size.0, size.1))?;
-    if let Some(area) = work_area(win)? {
-        let (x, y) = dock_position(area, size);
-        win.set_position(LogicalPosition::new(x, y))?;
+    #[cfg(not(target_os = "macos"))]
+    {
+        if let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) {
+            let scale = monitor.scale_factor();
+            let area = monitor.work_area();
+            let phys = (
+                f64::from(area.position.x),
+                f64::from(area.position.y),
+                f64::from(area.size.width),
+                f64::from(area.size.height),
+            );
+            let phys_size = ((size.0 * scale).round(), (size.1 * scale).round());
+            let (x, y) = dock_position(phys, phys_size);
+            win.set_size(tauri::PhysicalSize::new(phys_size.0 as u32, phys_size.1 as u32))?;
+            win.set_position(tauri::PhysicalPosition::new(x.round() as i32, y.round() as i32))?;
+            return Ok(());
+        }
+        return win.set_size(LogicalSize::new(size.0, size.1));
     }
-    Ok(())
+    #[cfg(target_os = "macos")]
+    {
+        win.set_size(LogicalSize::new(size.0, size.1))?;
+        if let Some(area) = work_area(win)? {
+            let (x, y) = dock_position(area, size);
+            win.set_position(tauri::LogicalPosition::new(x, y))?;
+        }
+        Ok(())
+    }
 }
 
 pub fn restore_limits(win: &WebviewWindow) -> tauri::Result<()> {

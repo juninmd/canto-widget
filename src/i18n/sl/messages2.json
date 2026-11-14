@@ -103,7 +103,7 @@
   "capture.placeholder": "what do you want to remember?",
   "capture.task": "task for today",
   "capture.note": "note",
-  "capture.hint": "Enter: task · Ctrl+Enter: note · Esc: close",
+  "capture.hint": "Enter: task · {mod}+Enter: note · Esc: close",
   "capture.close": "blizu",
   "shortcuts.capture": "quick capture of a task or note, from any app",
   "tasks.addPlaceholder": "nova naloga (npr.: Daily at 9:30 !high)",

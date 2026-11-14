@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { t } from "../../i18n";
+import { LOCALE, t } from "../../i18n";
 import { Chip, CopyLine, copyText } from "./DevBits";
 import { Area, Label, Line, Note, relative } from "./ToolBits";
 import { digests, lineDiff, parseInstant, randomSecret, randomUuids, testRegex } from "./tools";
@@ -83,7 +83,7 @@ export function ToolTime() {
           <Label>{t("dev.time.iso")}</Label>
           <CopyLine text={new Date(ms).toISOString()} />
           <Label>{t("dev.time.local")}</Label>
-          <CopyLine text={new Date(ms).toLocaleString(undefined, { dateStyle: "full", timeStyle: "medium" })} />
+          <CopyLine text={new Date(ms).toLocaleString(LOCALE, { dateStyle: "full", timeStyle: "medium" })} />
           <Label>{t("dev.time.unixS")}</Label>
           <CopyLine text={String(Math.floor(ms / 1000))} />
           <Label>{t("dev.time.unixMs")}</Label>

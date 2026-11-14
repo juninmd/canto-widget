@@ -1,3 +1,4 @@
+import { LOCALE } from "../../i18n";
 import type { Note } from "../../lib/api";
 
 export type TagCount = { tag: string; count: number };
@@ -8,7 +9,7 @@ export type TagCensus = { tags: TagCount[]; total: number; complete: boolean };
 export function tagCounts(notes: Note[]): TagCount[] {
   const counts = new Map<string, number>();
   for (const note of notes) for (const tag of new Set(note.tags)) counts.set(tag, (counts.get(tag) ?? 0) + 1);
-  return [...counts].map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+  return [...counts].map(([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag, LOCALE));
 }
 
 export function censusOf(notes: Note[], total: number): TagCensus {

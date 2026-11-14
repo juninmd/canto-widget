@@ -49,3 +49,11 @@ fn single_line_blocks_newlines_that_would_add_a_second_entry() {
     assert!(single_line("echo oi"));
     assert!(!single_line("echo oi\n* * * * * rm -rf x") && !single_line("   "));
 }
+
+#[test]
+fn only_standard_cron_macros_and_single_line_expressions_are_accepted() {
+    assert_eq!(split_line("@daily /bin/sync"), Some(("@daily".into(), "/bin/sync".into())));
+    assert_eq!(split_line("@bogus /bin/sync"), None);
+    assert!(valid_expr("0 * * * *").is_some());
+    assert!(valid_expr("0 * * * *\n* * * * *").is_none());
+}
