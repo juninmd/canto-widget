@@ -15,6 +15,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **PATH completo ao abrir pelo Finder, Dock ou menu de aplicativos (macOS e Linux)**: apps abertos pela interface recebem um `PATH` mínimo, então `git`, `docker` e as CLIs de agentes (Homebrew, `~/.local/bin`, cargo, bun, npm) apareciam como não instalados. O Canto agora acrescenta esses diretórios ao fim do `PATH`. A pasta no terminal também tenta tilix, foot e wezterm no Linux.
 - **Revisão multiplataforma (Windows, macOS e Linux)**: corrigida a detecção e o posicionamento da janela em telas com fatores de escala distintos e monitores secundários (incluindo barra lateral em macOS/Linux/Windows); corrigida a leitura de SSID/Wi-Fi em macOS, Linux e Windows; supervisão e recuperação de travamentos em threads de fundo e mutexes (`lock_safe`); parsers de `ss`/`netstat`/`lsof`, `docker`, `git` e `crontab` endurecidos para caminhos Windows, caracteres CRLF, caminhos com espaços/aspas e entradas inválidas; proteção contra saltos de relógio em caches e limitação do idle do cofre; cálculo correto de limites de dia em DST/eventos que atravessam a meia-noite, cronômetros concorrentes em tarefas, watches UDP em Portas e atalhos reais no navegador/menu de abas.
 
 - **macOS: mini e maximizar sem a barra nativa**: a tela cheia usa o modo "simples" do macOS (sem Space novo) e a janela reafirma que não tem decoração a cada troca de modo, então a barra superior nativa não aparece mais por cima do layout.

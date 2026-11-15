@@ -28,6 +28,9 @@ pub fn candidates(os: &str, dir: &str) -> Vec<Launch> {
             with("xfce4-terminal", &["--working-directory"]),
             with("kitty", &["--directory"]),
             with("alacritty", &["--working-directory"]),
+            with("tilix", &["--working-directory"]),
+            with("foot", &["--working-directory"]),
+            with("wezterm", &["start", "--cwd"]),
             bare("xterm", &[]),
         ],
     }
