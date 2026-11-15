@@ -21,6 +21,11 @@ impl Upcoming {
         }
     }
 
+    /// The whole cached list, for the mini-dashboard's "next event".
+    pub fn items(&self) -> Vec<AgendaItem> {
+        self.0.lock_safe().clone()
+    }
+
     pub fn next_with_meet(&self, now_ms: i64) -> Option<AgendaItem> {
         next_meeting::next_with_meet(&self.0.lock_safe(), now_ms).cloned()
     }

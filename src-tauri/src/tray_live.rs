@@ -56,6 +56,8 @@ fn tick(app: &AppHandle) {
     *state.next_meeting.lock_safe() = meeting;
 
     let reviews = forge::cmd::review_requested_total(app);
+    #[cfg(desktop)]
+    crate::strip::feed_reviews(app, reviews);
     let tasks = *state.badge_tasks.lock_safe() as u64;
     let mentions = u64::from(app.state::<crate::mentions::state::MentionsUnread>().count());
     badge::apply(app, (reviews + tasks + mentions).min(u32::MAX as u64) as u32);

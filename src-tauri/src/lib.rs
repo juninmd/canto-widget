@@ -89,6 +89,8 @@ pub mod startup;
 pub mod status;
 pub mod steam;
 pub mod store;
+#[cfg(desktop)]
+pub mod strip;
 pub mod subtask;
 pub mod sync;
 #[cfg(desktop)]
@@ -335,6 +337,16 @@ pub fn run() {
             dev::cmd::dev_cron_list,
             #[cfg(desktop)]
             dev::cmd::dev_cron_change,
+            #[cfg(desktop)]
+            strip::cmd::strip_config_get,
+            #[cfg(desktop)]
+            strip::cmd::strip_config_set,
+            #[cfg(desktop)]
+            strip::cmd::strip_snapshot,
+            #[cfg(desktop)]
+            strip::cmd::strip_resize,
+            #[cfg(desktop)]
+            strip::cmd::strip_join,
             #[cfg(desktop)]
             sysmon::system_get,
             #[cfg(desktop)]
