@@ -14,6 +14,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Barra lateral com auto-hide (Windows, macOS e Linux)**: em Ajustes → Janela, a janela gruda no canto direito da tela em altura total, some deixando só uma faixa fina quando o mouse sai dela e volta ao encostar o mouse na borda direita. O modo mini e a tela cheia têm prioridade.
 - **Menos conexões e handshakes TLS**: status, agentes, modelos, saúde dos endpoints, leituras (RSS) e agenda do Google agora reutilizam um único cliente HTTP (conexões keep-alive) em vez de criar um novo a cada atualização, reduzindo CPU, memória e latência nos refreshes periódicos.
 
+### Desempenho
+
+- **Listas mais leves**: avatares, miniaturas, capas e ícones de listas (Agenda, Contatos, Repositórios, Leituras, Steam, Notas) decodificam fora da thread principal e as miniaturas carregam só perto da tela; a lista da Área de transferência não refaz o filtro por tipo a cada ciclo de atualização.
+
 ### Corrigido
 
 - **PATH completo ao abrir pelo Finder, Dock ou menu de aplicativos (macOS e Linux)**: apps abertos pela interface recebem um `PATH` mínimo, então `git`, `docker` e as CLIs de agentes (Homebrew, `~/.local/bin`, cargo, bun, npm) apareciam como não instalados. O Canto agora acrescenta esses diretórios ao fim do `PATH`. A pasta no terminal também tenta tilix, foot e wezterm no Linux.

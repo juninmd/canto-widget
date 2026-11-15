@@ -9,7 +9,7 @@ type Props = { contact: Contact; photos: Record<string, string>; className: stri
 export default function ContactAvatar({ contact, photos, className }: Props) {
   const photo = contact.photo ? photos[contact.photo] : undefined;
   if (isPhoto(photo)) {
-    return <img src={photo} alt="" aria-hidden="true" data-contact-photo className={`shrink-0 rounded-full object-cover ${className}`} />;
+    return <img loading="lazy" decoding="async" src={photo} alt="" aria-hidden="true" data-contact-photo className={`shrink-0 rounded-full object-cover ${className}`} />;
   }
   return (
     <span aria-hidden="true" className={`grid shrink-0 place-items-center rounded-full text-[11px] font-bold text-fg ${className} ${avatarTone(contact.emails[0] ?? contact.name)}`}>

@@ -54,7 +54,7 @@ export default function SteamArt({ art, name, className = "" }: { art: string; n
   return (
     <span ref={box} aria-hidden="true" className={`steam-art relative block overflow-hidden bg-raised ${className}`}>
       {src ? (
-        <img src={src} alt="" className="canto-cover h-full w-full object-cover" />
+        <img decoding="async" src={src} alt="" className="canto-cover h-full w-full object-cover" />
       ) : (
         <span className="grid h-full w-full place-items-center bg-gradient-to-br from-edge to-ink text-sm font-extrabold tracking-wide text-faint">
           {initials || "?"}

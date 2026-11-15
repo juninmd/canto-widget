@@ -26,7 +26,7 @@ export default function NoteImage({ id, alt, thumb = false }: { id: string; alt:
         </span>
       );
     }
-    return <img src={state.src} alt={alt || t("notes.imageLabel")} className={`${box} object-cover`} />;
+    return <img decoding="async" src={state.src} alt={alt || t("notes.imageLabel")} className={`${box} object-cover`} />;
   }
   if (state?.id !== id) return <span className="text-xs text-faint">{t("notes.imageLoading")}</span>;
   if (!state.src) {
@@ -36,5 +36,5 @@ export default function NoteImage({ id, alt, thumb = false }: { id: string; alt:
       </span>
     );
   }
-  return <img src={state.src} alt={alt || t("notes.imageLabel")} className="my-1 block max-h-64 max-w-full rounded border border-edge" />;
+  return <img decoding="async" src={state.src} alt={alt || t("notes.imageLabel")} className="my-1 block max-h-64 max-w-full rounded border border-edge" />;
 }

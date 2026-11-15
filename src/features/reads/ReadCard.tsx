@@ -43,7 +43,7 @@ export default function ReadCard({
         article.unread ? "" : "opacity-60"
       }`}
     >
-      {thumb && <img src={thumb} alt="" className="canto-img-in h-14 w-20 shrink-0 rounded object-cover" />}
+      {thumb && <img loading="lazy" decoding="async" src={thumb} alt="" className="canto-img-in h-14 w-20 shrink-0 rounded object-cover" />}
       <div className="min-w-0 flex-1">
         <button
           type="button"
@@ -55,7 +55,7 @@ export default function ReadCard({
         </button>
         <div className="mt-0.5 flex items-center gap-1 text-[10px] text-faint">
           {icon ? (
-            <img src={icon} alt="" className="size-3 shrink-0 rounded-sm" />
+            <img loading="lazy" decoding="async" src={icon} alt="" className="size-3 shrink-0 rounded-sm" />
           ) : (
             <span className="grid size-3 shrink-0 place-items-center rounded-sm bg-edge text-[7px] uppercase text-muted">
               {article.source.slice(0, 1)}

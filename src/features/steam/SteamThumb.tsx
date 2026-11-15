@@ -51,7 +51,7 @@ export default function SteamThumb({ art, name }: { art: string; name: string })
       className="canto-thumb flex h-9 w-24 shrink-0 items-center justify-center overflow-hidden rounded-md border border-edge bg-raised"
     >
       {src ? (
-        <img src={src} alt="" className="canto-cover h-full w-full object-cover" />
+        <img loading="lazy" decoding="async" src={src} alt="" className="canto-cover h-full w-full object-cover" />
       ) : (
         <span className="text-xs font-semibold text-faint">{(name.trim()[0] ?? "?").toUpperCase()}</span>
       )}

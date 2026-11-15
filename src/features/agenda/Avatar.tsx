@@ -7,7 +7,7 @@ type Props = { name: string; email?: string; size?: "sm" | "md" | "lg"; photo?: 
 export default function Avatar({ name, email = "", size = "sm", photo }: Props) {
   const box = size === "lg" ? "h-9 w-9 text-xs" : size === "md" ? "h-7 w-7 text-[11px]" : "h-5 w-5 text-[9px]";
   if (isPhoto(photo)) {
-    return <img src={photo} alt="" aria-hidden="true" className={`shrink-0 rounded-full object-cover ${box}`} />;
+    return <img loading="lazy" decoding="async" src={photo} alt="" aria-hidden="true" className={`shrink-0 rounded-full object-cover ${box}`} />;
   }
   return (
     <span

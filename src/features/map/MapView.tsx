@@ -73,8 +73,8 @@ export default function MapView({ origin, live, route, incidents, focused, onFoc
         <div className="absolute left-1/2 top-1/2" style={{ transform: `translate(${pan[0]}px, ${pan[1]}px)` }}>
           {tiles?.tiles.map((tile) => (
             <div key={`${tile.x}/${tile.y}`} className="absolute" style={{ left: tile.x * TILE - ox, top: tile.y * TILE - oy, width: TILE, height: TILE }}>
-              {tile.base && <img src={tile.base} alt="" draggable={false} className={`absolute inset-0 h-full w-full ${osm ? "map-osm" : ""}`} />}
-              {tile.flow && layers.flow && <img src={tile.flow} alt="" draggable={false} className="absolute inset-0 h-full w-full" />}
+              {tile.base && <img decoding="async" src={tile.base} alt="" draggable={false} className={`absolute inset-0 h-full w-full ${osm ? "map-osm" : ""}`} />}
+              {tile.flow && layers.flow && <img decoding="async" src={tile.flow} alt="" draggable={false} className="absolute inset-0 h-full w-full" />}
             </div>
           ))}
           <svg className="absolute overflow-visible" width="1" height="1" aria-hidden={!live}>
