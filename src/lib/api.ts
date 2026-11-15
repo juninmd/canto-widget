@@ -1,5 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
-import type { Contributions, RepoList, ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "../features/forge/forgeTypes";
+import type { Contributions, Readme, RepoPage, ForgeFilter, ForgeList, ForgeLists, ForgeOpened, ForgeSection, GitlabStatus, VaultPeriod } from "../features/forge/forgeTypes";
 import type { HealthEndpoint, HealthView } from "../features/health/healthTypes";
 import type { SystemSnapshot } from "../features/system/systemTypes";
 import type { CronListing, DockerState, GitView, PortEntry } from "../features/dev/devTypes";
@@ -663,7 +663,8 @@ export const api = {
     invoke<ForgeList>("github_section", { section, page, filter }),
   /** Fallback click for a PR the batch left out; shares the batch's cache. */
   /** Repositories the account reaches, kept in Rust for 10 min unless `force`. */
-  githubRepos: (force = false) => invoke<RepoList>("github_repos", { force }),
+  githubReposPage: (page: number, force = false) => invoke<RepoPage>("github_repos_page", { page, force }),
+  githubReadme: (fullName: string, force = false) => invoke<Readme>("github_readme", { fullName, force }),
   /** The year's contribution calendar; only asked for when the statistics are on. */
   githubContributions: (force = false) => invoke<Contributions>("github_contributions", { force }),
   githubMentions: (force = false) => invoke<MentionsReply>("github_mentions", { force }),
@@ -700,7 +701,12 @@ export const api = {
   mentionMuteThread: (url: string, title: string, muted: boolean) => invoke<number>("mention_mute_thread", { url, title, muted }),
   mentionMuteAuthor: (login: string, muted: boolean) => invoke<number>("mention_mute_author", { login, muted }),
   mentionsUnread: () => invoke<number>("mentions_unread"),
-  gitlabRepos: (force = false) => invoke<RepoList>("gitlab_repos", { force }),
+  gitlabReposPage: (page: number, force = false) => invoke<RepoPage>("gitlab_repos_page", { page, force }),
+  gitlabReadme: (id: string, branch: string, force = false) => invoke<Readme>("gitlab_readme", { id, branch, force }),
+  /** Pages already held in RAM or in the sealed disk copy (page 1 on): painted before any request. */
+  reposCached: (forge: "github" | "gitlab") => invoke<RepoPage[]>("repos_cached", { forge }),
+  /** Icons as `data:` URLs by source URL (the CSP blocks remote images); a failed one is left out. */
+  repoAvatars: (forge: "github" | "gitlab", urls: string[]) => invoke<Record<string, string>>("repo_avatars", { forge, urls }),
   /** GitLab has no calendar for tokens: the user's events of the last year, counted per day. */
   gitlabContributions: (force = false) => invoke<Contributions>("gitlab_contributions", { force }),
   gitlabMrChecks: (project: string, iid: number) => invoke<ChecksStatus>("gitlab_mr_checks", { project, iid }),

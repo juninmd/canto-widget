@@ -358,8 +358,8 @@ OneDrive, Syncthing...) เริ่มต้นด้วยระบบแล�
 
 | Repositories subtab (GitHub and GitLab) |
 |---|
-| ![GitHub tab, repositories subtab: the repositories I can reach grouped under "pessoais" and each organization, as cards, with the "estatísticas" switch on showing the totals and the contribution squares of the last six months](../prints/app/148-aba-repositorios.png) |
-| ![Repositories subtab as a grid of compact tiles, grouped by organization](../prints/app/149-repositorios-grade.png) |
+| ![GitHub tab, repositories subtab: a tree of "pessoais" and each organization, a repository selected with its about, topics and README below, and a local search above](../prints/app/148-aba-repositorios.png) |
+| ![Repositories subtab as a flat list, searched locally by name, about or topic](../prints/app/149-repositorios-grade.png) |
 
 | เปลี่ยนรหัสผ่านแล้ว มีหนึ่งไฟล์ที่รอดำเนินการ | สรุปวัน |
 |---|---|

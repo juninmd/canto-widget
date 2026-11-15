@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import type { Forge } from "./forge";
-import { filterRepos, groupRepos, stars, type RepoView } from "./repos";
+import { buildRows, filterRepos, flatRows, groupCount, indexRepos, stars, type RepoSort, type RepoView } from "./repos";
 import type { ReposState } from "./useRepos";
 import { clockLabel } from "../../lib/clockLabel";
 import { t } from "../../i18n";
 import ErrorBanner from "../../components/ErrorBanner";
 import RepoHeatmap from "./RepoHeatmap";
-import RepoItem from "./RepoItem";
+import RepoDetail from "./RepoDetail";
+import RepoTree from "./RepoTree";
+import { useRepoAvatars } from "./useRepoAvatars";
 import RepoViewSwitch from "./RepoViewSwitch";
 import Skeleton from "../../components/Skeleton";
 
@@ -29,115 +31,145 @@ function keep(key: string, value: string) {
   }
 }
 
-export const savedView = (): RepoView => saved(VIEW_KEY, (v) => (v === "list" || v === "grid" ? v : "cards"));
+/** The old layouts (list, cards, grid) are gone: whatever was saved opens the tree. */
+export const savedView = (): RepoView => saved(VIEW_KEY, (v) => (v === "flat" ? "flat" : "tree"));
+const SORT_KEY = "canto.forge.repos.sort";
+export const savedSort = (): RepoSort => saved(SORT_KEY, (v) => (v === "name" || v === "stars" ? v : "recent"));
 /** The statistics (and their API call) stay off until the user asks for them in this subtab. */
 export const savedStats = (): boolean => saved(STATS_KEY, (v) => v === "1");
 
-const LAYOUT: Record<RepoView, string> = {
-  list: "space-y-1",
-  cards: "grid gap-2 sm:grid-cols-2",
-  grid: "grid grid-cols-[repeat(auto-fill,minmax(110px,1fr))] gap-2",
-};
+const SORTS: RepoSort[] = ["recent", "name", "stars"];
 
 type Props = { forge: Forge; repos: ReposState; stats: boolean; onStats: (on: boolean) => void };
 
-/** The repositories the user reaches, by organization or group and the root; list, cards or grid. */
+/**
+ * The repositories the user reaches as a windowed tree of groups, subgroups and repositories (or a flat list), found
+ * with a local search over everything loaded so far; selecting one opens its details and, on demand, its README.
+ */
 export default function ReposList({ forge, repos, stats, onStats }: Props) {
-  const { list, calendar, error, listLoading, calendarLoading, calendarError } = repos;
+  const { repos: all, calendar, error, syncing, partial, limitedUntil, calendarLoading, calendarError } = repos;
   const [view, setView] = useState<RepoView>(savedView);
+  const [sort, setSort] = useState<RepoSort>(savedSort);
   const [text, setText] = useState("");
-  const [closed, setClosed] = useState<string[]>([]);
-  const shown = list ? filterRepos(list.repos, text) : [];
-  const groups = groupRepos(shown);
+  const [open, setOpen] = useState<Set<string>>(() => new Set([""]));
+  const [shut, setShut] = useState<Set<string>>(() => new Set());
+  const [selected, setSelected] = useState<string | null>(null);
+  const query = useDeferredValue(text);
+  const searching = query.trim() !== "";
+
+  const index = useMemo(() => indexRepos(all), [all]);
+  const shown = useMemo(() => filterRepos(index, query), [index, query]);
+  const rows = useMemo(
+    () => (view === "flat" ? flatRows(shown, sort) : buildRows(shown, sort, (key) => (searching ? !shut.has(key) : open.has(key)))),
+    [view, shown, sort, searching, shut, open],
+  );
+  const picked = selected === null ? undefined : all.find((r) => (r.id || r.full_name) === selected);
+  const icons = useRepoAvatars(forge, picked?.avatar_url ? [picked.avatar_url] : []);
 
   const chooseView = (v: RepoView) => {
     setView(v);
     keep(VIEW_KEY, v);
   };
-  const toggle = (key: string) => setClosed((c) => (c.includes(key) ? c.filter((k) => k !== key) : [...c, key]));
+  const chooseSort = (s: RepoSort) => {
+    setSort(s);
+    keep(SORT_KEY, s);
+  };
+  // While searching every group is open and a click closes it; otherwise the user's own open set rules.
+  const toggle = (key: string) => {
+    const flip = (s: Set<string>) => {
+      const next = new Set(s);
+      if (!next.delete(key)) next.add(key);
+      return next;
+    };
+    if (searching) setShut(flip);
+    else setOpen(flip);
+  };
   function chooseStats() {
     keep(STATS_KEY, stats ? "0" : "1");
     onStats(!stats);
   }
 
+  const summary = searching
+    ? t("forge.repos.summaryFiltered", { shown: shown.length, repos: all.length })
+    : t("forge.repos.summary", { repos: all.length, groups: groupCount(all) });
+
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-2">
-      <div className="flex flex-wrap items-center gap-1.5">
+      <div className="space-y-1.5">
         <input
           type="search"
           value={text}
           aria-label={t("forge.repos.filter")}
           placeholder={t("forge.repos.filterPlaceholder")}
-          onChange={(e) => setText(e.target.value)}
-          className="canto-field min-w-0 flex-1 px-2 py-1 text-xs"
+          onChange={(e) => {
+            setText(e.target.value);
+            setShut(new Set());
+          }}
+          className="canto-field w-full px-2 py-1 text-xs"
         />
-        <button
-          type="button"
-          aria-pressed={stats}
-          onClick={chooseStats}
-          title={t("forge.repos.statsTitle")}
-          className={`canto-hit min-h-[24px] rounded-full border px-2 text-[11px] transition-colors ${stats ? "border-accent-text text-accent-text" : "border-edge text-muted hover:bg-hover hover:text-fg"}`}
-        >
-          {t("forge.repos.stats")}
-        </button>
-        <RepoViewSwitch value={view} onChange={chooseView} />
+        <div className="flex items-center gap-1.5">
+          <select
+            value={sort}
+            aria-label={t("forge.repos.sort")}
+            onChange={(e) => chooseSort(e.target.value as RepoSort)}
+            className="canto-field min-w-0 flex-1 px-1.5 py-1 text-[11px]"
+          >
+            {SORTS.map((s) => (
+              <option key={s} value={s}>
+                {t(`forge.repos.sort.${s}`)}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            aria-pressed={stats}
+            onClick={chooseStats}
+            title={t("forge.repos.statsTitle")}
+            className={`canto-hit min-h-[24px] rounded-full border px-2 text-[11px] transition-colors ${stats ? "border-accent-text text-accent-text" : "border-edge text-muted hover:bg-hover hover:text-fg"}`}
+          >
+            {t("forge.repos.stats")}
+          </button>
+          <RepoViewSwitch value={view} onChange={chooseView} />
+        </div>
       </div>
-      {list?.limited_until && (
-        <p role="status" className="text-[11px] text-muted">
-          {t("forge.rateLimited", { time: clockLabel(list.limited_until) })}
+      {all.length > 0 && (
+        <p role="status" className="m-0 flex flex-wrap items-center gap-x-2 text-[11px] text-muted">
+          <span>{summary}</span>
+          {syncing && <span className="text-faint">{t("forge.repos.syncing", { n: all.length })}</span>}
+          {partial && !limitedUntil && <span className="text-faint">{t("forge.repos.partial", { n: all.length })}</span>}
+          {limitedUntil && <span>{t("forge.rateLimited", { time: clockLabel(limitedUntil) })}</span>}
         </p>
       )}
-      {error && <ErrorBanner message={error} onRetry={() => void repos.load(true)} busy={listLoading} />}
-      <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-        {stats && (
-          <section aria-label={t("forge.repos.statsLabel")} className="space-y-2 rounded-xl border border-edge bg-ink/60 p-2.5">
-            {list && (
-              <p className="text-[11px] text-muted">
-                {t("forge.repos.totals", { repos: list.repos.length, groups: groupRepos(list.repos).filter((g) => g.key !== "").length, stars: stars(list.repos) })}
-              </p>
-            )}
-            {calendarError && <ErrorBanner message={calendarError} onRetry={() => void repos.loadCalendar(true)} busy={calendarLoading} />}
-            {!calendar && calendarLoading && <Skeleton label={t("forge.repos.heatmapLoading")} rows={2} />}
-            {calendar && (calendar.days.length > 0 ? <RepoHeatmap calendar={calendar} /> : <p className="text-[11px] text-faint">{t("forge.repos.heatmapEmpty")}</p>)}
-          </section>
-        )}
-        {!list && listLoading && <Skeleton label={t("forge.repos.loading")} rows={4} />}
-        {list && groups.length === 0 && (
-          <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">
-            {list.repos.length > 0 ? t("forge.repos.emptyFiltered") : t(forge === "gitlab" ? "forge.repos.emptyGitlab" : "forge.repos.empty")}
-          </p>
-        )}
-        {groups.map((g) => {
-          const open = !closed.includes(g.key);
-          const name = g.key || t("forge.repos.root");
-          return (
-            <section key={g.key} aria-label={name}>
-              <h3 className="m-0 mb-1">
-                <button
-                  type="button"
-                  aria-expanded={open}
-                  onClick={() => toggle(g.key)}
-                  className="canto-hit flex w-full items-center gap-1.5 rounded-md px-1 text-left text-[11px] font-semibold uppercase tracking-wide text-muted hover:text-fg"
-                >
-                  <span aria-hidden="true" className={`inline-block transition-transform ${open ? "rotate-90" : ""}`}>
-                    ▸
-                  </span>
-                  <span className="min-w-0 truncate">{name}</span>
-                  <span className="rounded-full bg-edge px-1.5 text-[10px] font-normal normal-case text-faint">{g.repos.length}</span>
-                </button>
-              </h3>
-              {open && (
-                <ul className={LAYOUT[view]} aria-label={name}>
-                  {g.repos.map((r) => (
-                    <RepoItem key={r.full_name} repo={r} view={view} />
-                  ))}
-                </ul>
-              )}
-            </section>
-          );
-        })}
-        {list?.truncated && <p className="text-center text-[11px] text-faint">{t("forge.repos.truncated")}</p>}
-      </div>
+      {error && <ErrorBanner message={error} onRetry={() => void repos.load(true)} busy={syncing} />}
+      {stats && (
+        <section aria-label={t("forge.repos.statsLabel")} className="max-h-[40%] shrink-0 space-y-2 overflow-y-auto rounded-xl border border-edge bg-ink/60 p-2.5">
+          {all.length > 0 && <p className="m-0 text-[11px] text-muted">{t("forge.repos.totals", { repos: all.length, groups: groupCount(all), stars: stars(all) })}</p>}
+          {calendarError && <ErrorBanner message={calendarError} onRetry={() => void repos.loadCalendar(true)} busy={calendarLoading} />}
+          {!calendar && calendarLoading && <Skeleton label={t("forge.repos.heatmapLoading")} rows={2} />}
+          {calendar && (calendar.days.length > 0 ? <RepoHeatmap calendar={calendar} /> : <p className="text-[11px] text-faint">{t("forge.repos.heatmapEmpty")}</p>)}
+        </section>
+      )}
+      {all.length === 0 && syncing && <Skeleton label={t("forge.repos.loading")} rows={4} />}
+      {all.length === 0 && repos.loaded && !syncing && !error && (
+        <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">
+          {t(forge === "gitlab" ? "forge.repos.emptyGitlab" : "forge.repos.empty")}
+        </p>
+      )}
+      {all.length > 0 && shown.length === 0 && (
+        <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{t("forge.repos.emptyFiltered")}</p>
+      )}
+      {shown.length > 0 && (
+        <RepoTree
+          forge={forge}
+          rows={rows}
+          flat={view === "flat"}
+          selected={selected}
+          label={t("forge.repos.tree")}
+          onToggle={toggle}
+          onSelect={(r) => setSelected(r.id || r.full_name)}
+        />
+      )}
+      {picked && <RepoDetail forge={forge} repo={picked} icon={icons(picked.avatar_url)} onClose={() => setSelected(null)} />}
     </div>
   );
 }
