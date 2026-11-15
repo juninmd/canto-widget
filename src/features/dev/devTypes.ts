@@ -29,7 +29,7 @@ export type DockerNamed = { name: string; detail: string; used: boolean };
 export type DockerState = { running: boolean; version: string; containers: DockerContainer[]; images: DockerImage[]; volumes: DockerNamed[]; networks: DockerNamed[] };
 
 export type GitRepo = { path: string; name: string; root: string; branch: string; dirty: number; ahead: number; behind: number; last: string };
-export type WorktreeReason = "merged" | "gone" | "dirty" | "open" | "detached";
+export type WorktreeReason = "merged" | "gone" | "dirty" | "open" | "detached" | "unknown";
 export type GitWorktree = { repo: string; repo_path: string; path: string; branch: string; safe: boolean; reason: WorktreeReason; count: number };
 export type GitView = { roots: string[]; depth: number; repos: GitRepo[]; worktrees: GitWorktree[] };
 

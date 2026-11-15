@@ -208,3 +208,19 @@ test("hiding tabs in Ajustes keeps the bar on screen instead of crashing the who
   rerender(<TabBar current="settings" onChange={() => {}} tabs={fewer} />);
   expect(screen.getAllByRole("tab").map((t) => t.textContent)).toEqual(["Tarefas", "Ajustes"]);
 });
+
+test("tabs past the ninth do not advertise nonexistent Alt+10+ shortcuts", () => {
+  render(<TabBar current="tasks" onChange={() => {}} tabs={TABS} />);
+  const tabs = screen.getAllByRole("tab");
+  expect(tabs[8].getAttribute("title")).toBe("Alt+9");
+  expect(tabs[9].getAttribute("title")).toBeNull();
+  expect(tabs[9].getAttribute("aria-keyshortcuts")).toBeNull();
+
+  withLayout(() => {
+    cleanup();
+    render(<Harness />);
+    fireEvent.click(screen.getByRole("button", { name: /mais/ }));
+    const menuItems = screen.getAllByRole("menuitem").map((m) => m.textContent ?? "");
+    expect(menuItems.some((txt) => txt.includes("Alt+10"))).toBe(false);
+  });
+});

@@ -1,3 +1,4 @@
+import { LOCALE } from "../../i18n";
 import type { PrComment } from "../../lib/api";
 import type { ForgeItem } from "./forgeTypes";
 
@@ -103,7 +104,7 @@ export function groupCommenters(comments: EnrichedComment[]): CommenterGroup[] {
   // Humans first, then sorted by most comments desc
   return result.sort((a, b) => {
     if (a.isBot !== b.isBot) return a.isBot ? 1 : -1;
-    return b.totalComments - a.totalComments || a.login.localeCompare(b.login);
+    return b.totalComments - a.totalComments || a.login.localeCompare(b.login, LOCALE);
   });
 }
 

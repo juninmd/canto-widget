@@ -33,8 +33,19 @@ fn drain<R: Read + Send + 'static>(pipe: Option<R>) -> std::thread::JoinHandle<S
 
 /// `None` when the program is missing or ran past `timeout` (it is killed).
 pub fn run(program: &str, args: &[&str], stdin: Option<&str>, timeout: Duration) -> Option<Out> {
+    run_env(program, args, &[], stdin, timeout)
+}
+
+/// Runs `program` with extra environment variables and a hard timeout.
+pub fn run_env(
+    program: &str,
+    args: &[&str],
+    env: &[(&str, &str)],
+    stdin: Option<&str>,
+    timeout: Duration,
+) -> Option<Out> {
     let mut cmd = Command::new(program);
-    cmd.args(args).stdin(if stdin.is_some() { Stdio::piped() } else { Stdio::null() });
+    cmd.args(args).envs(env.iter().copied()).stdin(if stdin.is_some() { Stdio::piped() } else { Stdio::null() });
     cmd.stdout(Stdio::piped()).stderr(Stdio::piped());
     #[cfg(windows)]
     {

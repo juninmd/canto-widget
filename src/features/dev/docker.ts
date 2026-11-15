@@ -1,3 +1,4 @@
+import { LOCALE } from "../../i18n";
 import type { DockerContainer, DockerImage, DockerNamed } from "./devTypes";
 
 export type LogLevel = "error" | "warn" | "info" | "debug";
@@ -14,7 +15,7 @@ export function logLevel(line: string): LogLevel {
 export function groupContainers(list: DockerContainer[]): [string, DockerContainer[]][] {
   const groups = new Map<string, DockerContainer[]>();
   for (const c of list) groups.set(c.project, [...(groups.get(c.project) ?? []), c]);
-  return [...groups].sort(([a], [b]) => (a === "" ? 1 : b === "" ? -1 : a.localeCompare(b)));
+  return [...groups].sort(([a], [b]) => (a === "" ? 1 : b === "" ? -1 : a.localeCompare(b, LOCALE)));
 }
 
 export const isUp = (c: DockerContainer) => c.state === "running";

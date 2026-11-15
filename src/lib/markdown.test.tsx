@@ -8,8 +8,9 @@ function Text({ text }: { text: string }) {
 }
 
 test("before the parser loads a text shows one plain line per line", () => {
-  const tokens = plainTokens("**reunião**\n\n- item");
+  const tokens = plainTokens("**reunião**\r\n\r\n- item");
   expect(tokens.map((tok) => tok.type)).toEqual(["paragraph", "paragraph"]);
+  expect(tokens.map((tok) => (tok as { text: string }).text)).toEqual(["**reunião**", "- item"]);
   const { container } = render(<div>{tokens.map((tok, i) => block(tok, { text: (plain) => plain }, `p${i}`))}</div>);
   expect(container.textContent).toBe("**reunião**- item");
 });

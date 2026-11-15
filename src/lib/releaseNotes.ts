@@ -15,13 +15,14 @@ function withoutLinks(text: string): string {
   let out = "";
   let i = 0;
   while (i < text.length) {
-    const close = text[i] === "[" ? text.indexOf("](", i) : -1;
-    const end = close === -1 ? -1 : text.indexOf(")", close);
-    if (end === -1) {
+    const close = text[i] === "[" ? text.indexOf("]", i + 1) : -1;
+    const end = close !== -1 && text[close + 1] === "(" ? text.indexOf(")", close + 2) : -1;
+    const inner = close !== -1 ? text.slice(i + 1, close) : "";
+    if (end === -1 || inner.includes("[")) {
       out += text[i];
       i += 1;
     } else {
-      out += text.slice(i + 1, close);
+      out += inner;
       i = end + 1;
     }
   }

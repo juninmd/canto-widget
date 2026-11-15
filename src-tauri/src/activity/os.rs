@@ -36,7 +36,12 @@ pub fn parse_active_window_id(out: &str) -> Option<String> {
 /// `WM_CLASS(STRING) = "code", "Code"`: the second value is the class users recognise.
 pub fn parse_wm_class(out: &str) -> Option<String> {
     let values: Vec<&str> = out.split_once('=')?.1.split(',').map(|v| v.trim().trim_matches('"')).collect();
-    values.get(1).or(values.first()).filter(|v| !v.is_empty()).map(|v| v.to_string())
+    values
+        .get(1)
+        .copied()
+        .filter(|v| !v.is_empty())
+        .or_else(|| values.first().copied().filter(|v| !v.is_empty()))
+        .map(str::to_string)
 }
 
 pub fn foreground_app() -> Option<String> {
@@ -195,6 +200,7 @@ mod tests {
         assert_eq!(parse_active_window_id("_NET_ACTIVE_WINDOW(WINDOW): window id # 0x0\n"), None);
         assert_eq!(parse_active_window_id("_NET_ACTIVE_WINDOW: not found.\n"), None);
         assert_eq!(parse_wm_class("WM_CLASS(STRING) = \"code\", \"Code\"\n").as_deref(), Some("Code"));
+        assert_eq!(parse_wm_class("WM_CLASS(STRING) = \"firefox\", \"\"\n").as_deref(), Some("firefox"));
         assert_eq!(parse_wm_class("WM_CLASS(STRING) = \"solo\"\n").as_deref(), Some("solo"));
         assert_eq!(parse_wm_class("WM_CLASS:  not found.\n"), None);
     }

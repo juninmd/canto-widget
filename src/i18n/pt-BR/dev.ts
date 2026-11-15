@@ -130,6 +130,7 @@ export const dev = {
   "dev.git.wt.reason.dirty": "Bloqueada: {n} arquivos alterados",
   "dev.git.wt.reason.open": "Bloqueada: branch ainda não mergeada",
   "dev.git.wt.reason.detached": "Bloqueada: sem branch (HEAD solto)",
+  "dev.git.wt.reason.unknown": "Bloqueada: estado do Git indisponível",
   "dev.git.wt.deleteBranch": "Apagar também a branch local",
   "dev.git.wt.select": "Selecionar {path}",
   "dev.git.wt.script": "Comandos que serão executados",

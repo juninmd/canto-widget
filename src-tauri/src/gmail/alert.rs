@@ -62,18 +62,23 @@ pub fn gmail_alerts_set(alerts: State<'_, GmailAlerts>, on: bool) -> Result<bool
 
 pub fn watch(app: AppHandle) {
     crate::resilient::supervise("gmail-alert", move || {
-        let mut seen: Option<HashSet<String>> = None;
+        let mut seen: Option<(String, HashSet<String>)> = None;
         loop {
             if !app.state::<GmailAlerts>().on() {
                 seen = None;
-            } else if let Ok(token) = crate::google::token::fresh(&app.state::<AppState>()) {
-                // A failed reading (locked vault, offline) keeps what was seen: no repeat when it comes back.
-                if let Ok(summary) = crate::gmail::summary(&token) {
-                    for mail in fresh(seen.as_ref(), &summary.important) {
-                        let title = crate::lang::tr("E-mail importante", "Important email");
-                        crate::notification::notify_os(&app, title, &format!("{}: {}", mail.from, mail.subject));
+            } else {
+                let state = app.state::<AppState>();
+                if let Ok(token) = crate::google::token::fresh(&state) {
+                    let account = state.drive_config().ok().map(|c| c.email).unwrap_or_default();
+                    // A failed reading (locked vault, offline) keeps what was seen: no repeat when it comes back.
+                    if let Ok(summary) = crate::gmail::summary(&token) {
+                        let prev = seen.as_ref().filter(|(e, _)| *e == account).map(|(_, s)| s);
+                        for mail in fresh(prev, &summary.important) {
+                            let title = crate::lang::tr("E-mail importante", "Important email");
+                            crate::notification::notify_os(&app, title, &format!("{}: {}", mail.from, mail.subject));
+                        }
+                        seen = Some((account, summary.important.into_iter().map(|m| m.id).collect()));
                     }
-                    seen = Some(summary.important.into_iter().map(|m| m.id).collect());
                 }
             }
             std::thread::sleep(TICK);

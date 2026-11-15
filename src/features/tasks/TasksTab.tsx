@@ -147,11 +147,13 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
       onDragHover={() => reorder.hover(task.id)}
       onMove={(delta) => reorder.step(task.id, delta)}
       onToggleDone={() => {
-        if (!task.done && focusStore.get()?.id === task.id) void focusStore.stop();
         setChecking(task.id);
         // The row folds into the collapsed "Concluídas" group, so focus would otherwise fall to <body>.
         const neighbor = !task.done && !doneOpen ? (shown[shown.indexOf(task) + 1] ?? shown[shown.indexOf(task) - 1]) : undefined;
-        void run(() => api.taskToggle(task.id)).then(() => {
+        void run(async () => {
+          if (!task.done && focusStore.get()?.id === task.id) await focusStore.stop();
+          return api.taskToggle(task.id);
+        }).then(() => {
           if (!task.done && !doneOpen) setTimeout(() => refocusAfterDelete(listRef.current, neighbor?.id), 0);
         });
       }}

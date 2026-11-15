@@ -87,12 +87,14 @@ pub async fn gitlab_connect(app: tauri::AppHandle, base_url: String, token: Stri
 }
 
 /// Only forgets the token on this computer; revoking is done on GitLab (Preferences → Access tokens).
-#[tauri::command]
-pub fn gitlab_disconnect(state: State<'_, AppState>) -> Result<()> {
+#[tauri::command(async)]
+pub fn gitlab_disconnect(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
     if !state.is_unlocked() {
         return Err(AppError::Locked);
     }
     state.forges.forget(FORGE);
+    app.state::<crate::mentions::state::MentionsUnread>()
+        .clear(crate::mentions::state::GITLAB, &crate::mentions::state::Saved::default());
     match std::fs::remove_file(store::gitlab_path(&state.dir)) {
         Err(e) if e.kind() != std::io::ErrorKind::NotFound => Err(e.into()),
         _ => Ok(()),

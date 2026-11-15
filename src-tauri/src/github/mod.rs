@@ -104,24 +104,41 @@ pub fn pr_comments(token: &str, repo: &str, number: u64) -> Result<Vec<PrComment
     let url = format!("{API}/repos/{repo}/issues/{number}/comments?per_page=100");
     let res = client()?.get(url).bearer_auth(token).send().map_err(network)?;
     let raw: Vec<RawComment> = response(res)?;
-    Ok(raw
-        .into_iter()
+    let mut cache: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    Ok(parse_comments(raw, |u| {
+        if let Some(hit) = cache.get(u) {
+            return hit.clone();
+        }
+        let data = crate::account::download_image(u).unwrap_or_default();
+        cache.insert(u.to_string(), data.clone());
+        data
+    }))
+}
+
+fn parse_comments(raw: Vec<RawComment>, mut resolve_avatar: impl FnMut(&str) -> String) -> Vec<PrComment> {
+    raw.into_iter()
         .filter_map(|c| {
             if !c.html_url.starts_with("https://github.com/") {
                 return None;
             }
             let user = c.user;
+            let raw_avatar = user.as_ref().and_then(|u| u.avatar_url.as_deref()).unwrap_or("");
+            let avatar_url = if crate::mentions::sender::trusted_github_avatar(raw_avatar) {
+                resolve_avatar(raw_avatar)
+            } else {
+                String::new()
+            };
             Some(PrComment {
                 id: c.id,
                 author: user.as_ref().map(|u| u.login.clone()).unwrap_or_default(),
                 author_type: user.as_ref().and_then(|u| u.user_type.clone()).unwrap_or_default(),
-                avatar_url: user.as_ref().and_then(|u| u.avatar_url.clone()).unwrap_or_default(),
+                avatar_url,
                 body: c.body,
                 created_at: c.created_at,
                 url: c.html_url,
             })
         })
-        .collect())
+        .collect()
 }
 
 /// First page of the PRs of one kind inside `w`, newest first; `total` still counts the ones past it.

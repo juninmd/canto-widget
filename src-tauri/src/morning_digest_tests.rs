@@ -106,3 +106,45 @@ fn the_settings_and_the_day_it_rang_survive_a_restart_and_the_hour_is_clamped() 
     assert_eq!(MorningDigest::load(&dir).get(), Config { enabled: true, ..Config::default() });
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[derive(Clone, Copy)]
+struct SpringForwardTz;
+
+impl chrono::TimeZone for SpringForwardTz {
+    type Offset = chrono::FixedOffset;
+
+    fn from_offset(_offset: &Self::Offset) -> Self {
+        Self
+    }
+
+    fn offset_from_local_date(&self, local: &NaiveDate) -> chrono::LocalResult<Self::Offset> {
+        let hours = if *local >= NaiveDate::from_ymd_opt(2026, 10, 12).unwrap() { -2 } else { -3 };
+        chrono::LocalResult::Single(chrono::FixedOffset::east_opt(hours * 3600).unwrap())
+    }
+
+    fn offset_from_local_datetime(&self, local: &NaiveDateTime) -> chrono::LocalResult<Self::Offset> {
+        let spring = NaiveDate::from_ymd_opt(2026, 10, 12).unwrap();
+        if local.date() == spring && local.time() < NaiveTime::from_hms_opt(1, 0, 0).unwrap() {
+            chrono::LocalResult::None
+        } else {
+            self.offset_from_local_date(&local.date())
+        }
+    }
+
+    fn offset_from_utc_date(&self, utc: &NaiveDate) -> Self::Offset {
+        let hours = if *utc >= NaiveDate::from_ymd_opt(2026, 10, 12).unwrap() { -2 } else { -3 };
+        chrono::FixedOffset::east_opt(hours * 3600).unwrap()
+    }
+
+    fn offset_from_utc_datetime(&self, utc: &NaiveDateTime) -> Self::Offset {
+        self.offset_from_utc_date(&utc.date())
+    }
+}
+
+#[test]
+fn day_bounds_survives_a_spring_forward_skipped_midnight() {
+    let day = NaiveDate::from_ymd_opt(2026, 10, 12).unwrap();
+    let (from, to) = day_bounds_in(&SpringForwardTz, day).expect("skipped midnight must step forward");
+    assert_eq!(from, "2026-10-12T03:00:00+00:00");
+    assert_eq!(to, "2026-10-13T02:00:00+00:00");
+}

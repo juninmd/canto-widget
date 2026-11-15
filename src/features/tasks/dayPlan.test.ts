@@ -81,3 +81,13 @@ test("back-to-back blocks do not share a lane cluster", () => {
   const blocks = dayBlocks([event("a", at(9), at(10)), event("b", at(10), at(11))], []);
   expect(blocks.map((b) => [b.lane, b.lanes])).toEqual([[0, 1], [0, 1]]);
 });
+
+test("overnight and multi-month events clip to the reference day boundaries", () => {
+  const overnight = event("oncall", new Date(2026, 8, 29, 22, 0).toISOString(), new Date(2026, 8, 30, 2, 0).toISOString());
+  const crossMonth = event("sprint", new Date(2026, 8, 30, 22, 0).toISOString(), new Date(2026, 9, 30, 9, 0).toISOString());
+  const blocks = dayBlocks([overnight, crossMonth], [], new Date(2026, 8, 30, 12, 0));
+  expect(blocks.map((b) => [b.id, b.start, b.end])).toEqual([
+    ["oncall", 0, 120],
+    ["sprint", 22 * 60, 24 * 60],
+  ]);
+});

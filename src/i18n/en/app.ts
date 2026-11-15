@@ -321,7 +321,7 @@ export const app: Record<keyof typeof source, string> = {
   "capture.placeholder": "what do you want to remember?",
   "capture.task": "task for today",
   "capture.note": "note",
-  "capture.hint": "Enter: task · Ctrl+Enter: note · Esc: close",
+  "capture.hint": "Enter: task · {mod}+Enter: note · Esc: close",
   "capture.close": "close",
   "shortcuts.capture": "quick capture of a task or note, from any app",
 

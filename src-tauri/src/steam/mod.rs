@@ -193,7 +193,8 @@ impl SteamCache {
         fetch: impl FnOnce() -> Result<T>,
     ) -> Result<T> {
         if !force {
-            let hit = self.0.lock_safe().get(key).filter(|e| now - e.at < TTL_MS).map(|e| e.json.clone());
+            let hit =
+                self.0.lock_safe().get(key).filter(|e| now >= e.at && now - e.at < TTL_MS).map(|e| e.json.clone());
             if let Some(json) = hit {
                 return Ok(serde_json::from_str(&json)?);
             }

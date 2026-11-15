@@ -1,6 +1,6 @@
 import type { AgendaItem, Task } from "../../lib/api";
 import { conflicts, horizon, MIN_FREE_MINUTES } from "./agendaFree";
-import { DEFAULT_TASK_MIN, dayBlocks, firstFreeSlot, hourRange, taskStart, type PlanBlock } from "../tasks/dayPlan";
+import { DEFAULT_TASK_MIN, dayBlocks, eventSpanOnDay, firstFreeSlot, hourRange, sameDay, taskStart, type PlanBlock } from "../tasks/dayPlan";
 
 export const minuteOf = (d: Date) => d.getHours() * 60 + d.getMinutes();
 
@@ -11,14 +11,12 @@ export type RailEntry =
   | ({ kind: "task"; id: string; task: Task } & Span)
   | ({ kind: "gap"; id: string } & Span);
 
-/** Timed events as minutes of the day; declined ones stay (the card says so) but take no time. */
-function eventEntries(items: AgendaItem[]): RailEntry[] {
+/** Timed events as minutes of the reference day; declined ones stay (the card says so) but take no time. */
+function eventEntries(items: AgendaItem[], day?: Date): RailEntry[] {
   return items.flatMap((item) => {
     if (item.all_day) return [];
-    const [s, f] = [new Date(item.start), new Date(item.end)];
-    if (Number.isNaN(s.getTime()) || Number.isNaN(f.getTime()) || f <= s) return [];
-    const end = f.getDate() === s.getDate() ? minuteOf(f) : 24 * 60;
-    return [{ kind: "event" as const, id: item.id, item, start: minuteOf(s), end }];
+    const span = eventSpanOnDay(new Date(item.start), new Date(item.end), day);
+    return span ? [{ kind: "event" as const, id: item.id, item, start: span[0], end: span[1] }] : [];
   });
 }
 
@@ -32,7 +30,7 @@ function taskEntries(tasks: Task[]): RailEntry[] {
 
 export const horizonMin = (now: Date) => {
   const h = horizon(now);
-  return h.getDate() === now.getDate() ? h.getHours() * 60 : 24 * 60;
+  return sameDay(h, now) ? h.getHours() * 60 : 24 * 60;
 };
 
 /** Gaps of at least `min` minutes between `from` and `to`, around everything that takes time. */
@@ -52,8 +50,8 @@ export function freeGaps(blocks: PlanBlock[], from: number, to: number, min = MI
 /** What is over, and what is left of the day with its free gaps as entries of their own. */
 export function railEntries(items: AgendaItem[], tasks: Task[], now: Date): { past: RailEntry[]; upcoming: RailEntry[] } {
   const at = minuteOf(now);
-  const all = [...eventEntries(items), ...taskEntries(tasks)];
-  const gaps: RailEntry[] = freeGaps(dayBlocks(items, tasks), at, horizonMin(now)).map((g) => ({ kind: "gap", id: `gap-${g.start}`, ...g }));
+  const all = [...eventEntries(items, now), ...taskEntries(tasks)];
+  const gaps: RailEntry[] = freeGaps(dayBlocks(items, tasks, now), at, horizonMin(now)).map((g) => ({ kind: "gap", id: `gap-${g.start}`, ...g }));
   const order = (a: RailEntry, b: RailEntry) => a.start - b.start || a.end - b.end;
   return {
     past: all.filter((e) => e.end <= at).sort(order),
@@ -67,7 +65,7 @@ export const JOIN_SOON_MIN = 15;
 /** The Meet to join right now: the one in progress, else one starting within `soonMin`. Never a meeting hours away. */
 export function meetToJoin(items: AgendaItem[], now: Date, soonMin = JOIN_SOON_MIN): AgendaItem | null {
   const at = minuteOf(now);
-  const events = eventEntries(items.filter((i) => i.response !== "declined" && i.meet)).sort((a, b) => a.start - b.start);
+  const events = eventEntries(items.filter((i) => i.response !== "declined" && i.meet), now).sort((a, b) => a.start - b.start);
   const live = events.find((e) => e.start <= at && at < e.end);
   const soon = events.find((e) => e.start > at && e.start - at <= soonMin);
   const pick = live ?? soon;
@@ -82,7 +80,7 @@ export type Hero =
 /** The meeting in progress, else the next one; once the day is over, a summary. Null when nothing takes time. */
 export function heroOf(items: AgendaItem[], now: Date): Hero | null {
   const at = minuteOf(now);
-  const events = eventEntries(items.filter((i) => i.response !== "declined")).filter((e) => e.kind === "event");
+  const events = eventEntries(items.filter((i) => i.response !== "declined"), now).filter((e) => e.kind === "event");
   if (events.length === 0) return null;
   const sorted = events.sort((a, b) => a.start - b.start);
   const cur = sorted.find((e) => e.start <= at && at < e.end);
@@ -106,7 +104,7 @@ function meetingMinutes(spans: Span[]): number {
 export type DayStats = { meetings: number; events: number; free: number; nextFree: number | null; clashes: number };
 
 export function dayStats(items: AgendaItem[], tasks: Task[], now: Date): DayStats {
-  const blocks = dayBlocks(items, tasks);
+  const blocks = dayBlocks(items, tasks, now);
   const events = blocks.filter((b) => b.kind === "event");
   const gaps = freeGaps(blocks, minuteOf(now), horizonMin(now));
   const pairs = [...conflicts(items).values()].reduce((n, titles) => n + titles.length, 0) / 2;
@@ -123,7 +121,7 @@ export type RibbonSegment = { id: string; kind: "event" | "task" | "gap"; tone: 
 
 /** The day on one line: hours covered, what fills them and the gaps still ahead. */
 export function ribbon(items: AgendaItem[], tasks: Task[], now: Date) {
-  const blocks = dayBlocks(items, tasks);
+  const blocks = dayBlocks(items, tasks, now);
   const [first, last] = hourRange(blocks);
   const byId = new Map(items.map((i) => [i.id, i]));
   const gaps = freeGaps(blocks, Math.max(minuteOf(now), first * 60), Math.min(horizonMin(now), last * 60), 30);

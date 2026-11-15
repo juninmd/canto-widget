@@ -5,12 +5,13 @@ use std::process::{Command, Stdio};
 
 use serde::{Deserialize, Serialize};
 
-use crate::dev::exec::{run, QUICK};
+use crate::dev::exec::{run, run_env, QUICK};
 use crate::error::{AppError, Result};
 use crate::lang::tr;
 
 const OFF: &str = "#canto-off# ";
 const NAME: &str = "# canto: ";
+const MACROS: [&str; 8] = ["reboot", "yearly", "annually", "monthly", "weekly", "daily", "midnight", "hourly"];
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct Task {
@@ -45,6 +46,9 @@ pub fn split_line(line: &str) -> Option<(String, String)> {
     let line = line.trim();
     if let Some(rest) = line.strip_prefix('@') {
         let (macro_, cmd) = rest.split_once(char::is_whitespace)?;
+        if !MACROS.contains(&macro_) {
+            return None;
+        }
         return Some((format!("@{macro_}"), cmd.trim().to_string())).filter(|(_, c)| !c.is_empty());
     }
     let mut parts = line.splitn(6, char::is_whitespace);
@@ -91,7 +95,7 @@ pub fn parse_crontab(text: &str) -> Vec<Task> {
 }
 
 fn read_crontab() -> Option<String> {
-    let out = run("crontab", &["-l"], None, QUICK)?;
+    let out = run_env("crontab", &["-l"], &[("LC_ALL", "C")], None, QUICK)?;
     // "no crontab for user" is an empty one, not a failure.
     if out.ok || out.stderr.contains("no crontab") {
         Some(out.stdout)
@@ -129,20 +133,27 @@ fn single_line(s: &str) -> bool {
     !s.trim().is_empty() && s.len() <= 500 && !s.contains(['\n', '\r', '\0'])
 }
 
+fn valid_expr(expr: &str) -> Option<String> {
+    if !single_line(expr) {
+        return None;
+    }
+    let clean = expr.split_whitespace().collect::<Vec<_>>().join(" ");
+    split_line(&format!("{clean} x")).filter(|(e, _)| *e == clean).map(|(e, _)| e)
+}
+
 pub fn cron_change(action: &str, id: &str, raw: &str, new: Option<(&str, &str, &str)>, backup: &Path) -> Result<()> {
     let before = read_crontab()
         .ok_or_else(|| AppError::Config(tr("o crontab não está disponível", "crontab is not available").into()))?;
     let mut lines: Vec<String> = before.lines().map(str::to_string).collect();
     match (action, new) {
         ("add", Some((name, expr, command))) => {
-            if split_line(&format!("{expr} x"))
-                .is_none_or(|(e, _)| e != expr.split_whitespace().collect::<Vec<_>>().join(" "))
-                || !single_line(command)
-                || !single_line(name)
-            {
+            let Some(clean_expr) = valid_expr(expr) else {
+                return Err(AppError::Config(tr("tarefa inválida", "invalid task").into()));
+            };
+            if !single_line(command) || !single_line(name) {
                 return Err(AppError::Config(tr("tarefa inválida", "invalid task").into()));
             }
-            lines.extend([format!("{NAME}{}", name.trim()), format!("{} {}", expr.trim(), command.trim())]);
+            lines.extend([format!("{NAME}{}", name.trim()), format!("{clean_expr} {}", command.trim())]);
         }
         ("toggle", _) => {
             let i = locate(&lines, id, raw)?;
@@ -229,7 +240,8 @@ pub fn parse_windows(json: &str) -> Vec<Task> {
 const LIST_PS: &str = "$ErrorActionPreference='SilentlyContinue'; $o=@(Get-ScheduledTask | Where-Object { $_.TaskPath -notlike '\\Microsoft\\*' } | ForEach-Object { $i=$_ | Get-ScheduledTaskInfo; $a=$_.Actions | Select-Object -First 1; [pscustomobject]@{Name=$_.TaskName;Path=$_.TaskPath;State=[int]$_.State;Command=(($a.Execute+' '+$a.Arguments).Trim());Next=$(if($i.NextRunTime){$i.NextRunTime.ToString('o')});Last=$(if($i.LastRunTime){$i.LastRunTime.ToString('o')});Result=[int64]$i.LastTaskResult} }); ConvertTo-Json -InputObject $o -Compress";
 
 fn powershell(script: &str) -> Option<crate::dev::exec::Out> {
-    run("powershell", &["-NoProfile", "-NonInteractive", "-Command", script], None, crate::dev::exec::SLOW)
+    let utf8 = format!("[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;{script}");
+    run("powershell", &["-NoProfile", "-NonInteractive", "-Command", &utf8], None, crate::dev::exec::SLOW)
 }
 
 pub fn list() -> Listing {

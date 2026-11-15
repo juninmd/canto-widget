@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { filterPorts, freed, groupByProject, isDevProcess, portCommands, portQuery, projectOf, siblings, sortPorts } from "./ports";
+import { filterPorts, freed, freedWatches, groupByProject, isDevProcess, portCommands, portQuery, projectOf, siblings, sortPorts } from "./ports";
 import { filterContainers, groupContainers, logLevel, reclaimable } from "./docker";
 import { byRoot, cleanScript, filterRepos } from "./gitView";
 import type { DockerContainer, GitRepo, GitWorktree, PortEntry } from "./devTypes";
@@ -39,9 +39,19 @@ test("the OS picks the commands, and a bare number is a port question", () => {
 });
 
 test("sibling ports and freed watches read the live list", () => {
-  const all = [port({ port: 3000, pid: 5 }), port({ port: 9229, pid: 5 })];
+  const all = [port({ port: 3000, pid: 5 }), port({ port: 9229, pid: 5 }), port({ port: 5353, proto: "UDP", pid: 7 })];
   expect(siblings(all, all[0])).toEqual([9229]);
   expect(freed([3000, 4000], all)).toEqual([4000]);
+  expect(
+    freedWatches(
+      [
+        { port: 3000, proto: "TCP" },
+        { port: 5353, proto: "UDP" },
+        { port: 8125, proto: "UDP" },
+      ],
+      all,
+    ),
+  ).toEqual([{ port: 8125, proto: "UDP" }]);
 });
 
 const box = (o: Partial<DockerContainer>): DockerContainer => ({ id: "a", name: "api", image: "x", state: "running", status: "Up", health: "", ports: [], project: "backend", cpu: 0, mem: 0, ...o });

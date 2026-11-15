@@ -74,3 +74,12 @@ fn killing_a_system_pid_or_the_app_is_refused() {
     assert!(kill(4, true).is_err());
     assert!(kill(std::process::id(), false).is_err());
 }
+
+#[test]
+fn ipv6_zone_loopback_multiword_netstat_and_lsof_pid_reset_behave_cleanly() {
+    assert!(is_loopback("::1%lo") && is_loopback("::1%1"));
+    let multi = "  TCP    127.0.0.1:8080         0.0.0.0:0              EM ESCUTA       9012\n";
+    assert_eq!(parse_netstat(multi), vec![Raw { proto: "TCP", addr: "127.0.0.1".into(), port: 8080, pid: 9012 }]);
+    let lsof = "p100\nPUDP\nn*:5353\np200\nn*:3000\n";
+    assert_eq!(parse_lsof(lsof)[1].proto, "TCP");
+}

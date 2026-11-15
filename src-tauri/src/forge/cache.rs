@@ -33,15 +33,15 @@ impl Quota {
     ) -> Option<Quota> {
         let num = |name: &str| h.get(name)?.to_str().ok()?.trim().parse::<i64>().ok();
         if let Some(secs) = num("retry-after").filter(|_| matches!(status, 403 | 429)) {
-            return Some(Quota { remaining: 0, reset_at: now + secs.max(0) * 1000 });
+            return Some(Quota { remaining: 0, reset_at: now.saturating_add(secs.max(0).saturating_mul(1000)) });
         }
         let remaining = num(remaining)?.clamp(0, u32::MAX as i64) as u32;
-        Some(Quota { remaining, reset_at: num(reset)? * 1000 })
+        Some(Quota { remaining, reset_at: num(reset)?.saturating_mul(1000) })
     }
 }
 
 pub fn rate_limited(forge: &str, reset_at: i64, now: i64) -> AppError {
-    let minutes = ((reset_at - now) as f64 / 60_000.0).ceil().max(1.0) as i64;
+    let minutes = ((reset_at.saturating_sub(now)) as f64 / 60_000.0).ceil().max(1.0) as i64;
     AppError::RateLimited {
         message: format!("{forge}: limite de requisições atingido; tente de novo em {minutes} min"),
         reset_at,
@@ -86,7 +86,7 @@ impl ForgeCache {
             let mut g = self.inner.lock_safe();
             if let Some(e) = g.entries.get_mut(&full) {
                 e.used = now;
-                if !force && now - e.at < TTL_MS {
+                if !force && now >= e.at && now - e.at < TTL_MS {
                     return Ok(stamped(e, None));
                 }
             }
@@ -136,8 +136,13 @@ impl ForgeCache {
         g.entries.retain(|k, _| !k.starts_with(&prefix));
         g.quotas.remove(forge);
         g.generation += 1;
+        drop(g);
         self.checks.forget(forge);
         self.repos.forget(forge);
+        if forge == "github" {
+            crate::github::teams::clear();
+        }
+        crate::mentions::feed::clear();
     }
 
     pub fn clear(&self) {
@@ -145,8 +150,11 @@ impl ForgeCache {
         g.entries.clear();
         g.quotas.clear();
         g.generation += 1;
+        drop(g);
         self.checks.clear();
         self.repos.clear();
+        crate::github::teams::clear();
+        crate::mentions::feed::clear();
     }
 }
 

@@ -1,3 +1,4 @@
+import { LOCALE } from "../../i18n";
 import type { ContributionDay, RepoInfo } from "../../lib/api";
 
 export type RepoView = "list" | "cards" | "grid";
@@ -16,7 +17,7 @@ export function groupRepos(repos: RepoInfo[]): RepoGroup[] {
   for (const r of repos) by.set(r.group, [...(by.get(r.group) ?? []), r]);
   return [...by.entries()]
     .map(([key, list]) => ({ key, repos: list }))
-    .sort((a, b) => (a.key === "" ? -1 : b.key === "" ? 1 : a.key.localeCompare(b.key)));
+    .sort((a, b) => (a.key === "" ? -1 : b.key === "" ? 1 : a.key.localeCompare(b.key, LOCALE)));
 }
 
 export const stars = (repos: RepoInfo[]) => repos.reduce((n, r) => n + r.stars, 0);

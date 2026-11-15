@@ -71,3 +71,14 @@ fn the_log_survives_a_flush_and_a_reload_and_clear_empties_the_file() {
     assert_eq!(act.with_log(&state, |log| log.spans.len()).unwrap(), 0);
     let _ = std::fs::remove_dir_all(&dir);
 }
+
+#[test]
+fn locked_vault_cannot_read_or_seed_the_activity_log() {
+    let dir = std::env::temp_dir().join(format!("canto-activity-locked-{}-{}", std::process::id(), now_ms()));
+    let _ = std::fs::remove_dir_all(&dir);
+    let state = AppState::new(dir.clone());
+    let act = ActivityState::load(&dir);
+    assert!(matches!(act.with_log(&state, |_| ()), Err(AppError::Locked)));
+    assert!(act.log.lock_safe().is_none());
+    let _ = std::fs::remove_dir_all(&dir);
+}

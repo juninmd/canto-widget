@@ -75,3 +75,20 @@ test("J joins the meeting in progress, else one starting within 15 minutes, neve
   expect(meetToJoin(items, now(12, 0))).toBeNull();
   expect(meetToJoin(items, now(14, 45))?.id).toBe("later");
 });
+
+test("overnight events starting the previous day clip from midnight on the current rail", () => {
+  const overnight: AgendaItem = {
+    id: "night",
+    title: "Deploy",
+    start: new Date(2026, 8, 29, 22, 0).toISOString(),
+    end: new Date(2026, 8, 30, 2, 0).toISOString(),
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "",
+  };
+  const { past, upcoming } = railEntries([overnight], [], now(1, 0));
+  expect(past).toEqual([]);
+  expect(upcoming[0]).toMatchObject({ kind: "event", id: "night", start: 0, end: 120 });
+  expect(heroOf([overnight], now(1, 0))).toMatchObject({ kind: "now", left: 60, pct: 0.5 });
+});

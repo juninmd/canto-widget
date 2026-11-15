@@ -124,4 +124,10 @@ fn github_rows_start_unread_and_the_badge_learns_authors_only_from_earlier_looku
     let known = HashMap::from([(items[0].reference.clone(), Mentioned { sender: ana(), excerpt: "x".into() })]);
     let l = github_lights(&items, &known);
     assert_eq!((l[0].id.as_str(), l[0].login.as_str(), l[1].login.as_str()), ("github:o/r#7", "ana", ""));
+    let item = thread(7, true);
+    assert_ne!(
+        found_key(&item, &["alice".into(), "acme/core".into()]),
+        found_key(&item, &["bob".into(), "acme/ops".into()]),
+        "same name count for another account or team must not reuse cached comment"
+    );
 }

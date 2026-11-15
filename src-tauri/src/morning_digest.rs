@@ -5,7 +5,7 @@ use crate::resilient::LockExt;
 use std::sync::Mutex;
 use std::time::Duration;
 
-use chrono::{Datelike, Local, NaiveDate, NaiveDateTime, NaiveTime, TimeZone, Weekday};
+use chrono::{Datelike, Local, NaiveDate, NaiveDateTime, NaiveTime, Weekday};
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager, State};
 
@@ -206,8 +206,16 @@ fn end_ms(e: &AgendaItem) -> i64 {
 }
 
 fn day_bounds(day: NaiveDate) -> Option<(String, String)> {
-    let local = |d: NaiveDate| Local.from_local_datetime(&d.and_hms_opt(0, 0, 0)?).earliest();
-    let (a, b) = (local(day)?, local(day.succ_opt()?)?);
+    day_bounds_in(&Local, day)
+}
+
+pub(crate) fn day_bounds_in<Tz: chrono::TimeZone>(tz: &Tz, day: NaiveDate) -> Option<(String, String)> {
+    let midnight = |d: NaiveDate| {
+        let naive = d.and_hms_opt(0, 0, 0)?;
+        // Spring-forward transitions skip 00:00 in zones like America/Sao_Paulo (historically); step forward to the first valid local instant.
+        (0..180).find_map(|m| tz.from_local_datetime(&(naive + chrono::Duration::minutes(m))).earliest())
+    };
+    let (a, b) = (midnight(day)?, midnight(day.succ_opt()?)?);
     Some((a.to_utc().to_rfc3339(), b.to_utc().to_rfc3339()))
 }
 

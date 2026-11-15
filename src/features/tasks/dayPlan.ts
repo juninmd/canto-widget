@@ -20,16 +20,32 @@ export type PlanBlock = {
 
 const minuteOf = (d: Date) => d.getHours() * 60 + d.getMinutes();
 
+export const sameDay = (a: Date, b: Date) =>
+  a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+
+/** Minutes on `refDay` for `[s, f)`, clipping multi-day spans cleanly; without overlap or `refDay`, uses `s`'s local day. */
+export function eventSpanOnDay(s: Date, f: Date, refDay?: Date): [number, number] | null {
+  if (Number.isNaN(s.getTime()) || Number.isNaN(f.getTime()) || f <= s) return null;
+  if (refDay) {
+    const dayStart = new Date(refDay.getFullYear(), refDay.getMonth(), refDay.getDate()).getTime();
+    const dayEnd = new Date(refDay.getFullYear(), refDay.getMonth(), refDay.getDate() + 1).getTime();
+    if (f.getTime() > dayStart && s.getTime() < dayEnd) {
+      const start = s.getTime() <= dayStart ? 0 : minuteOf(s);
+      const end = f.getTime() >= dayEnd ? DAY_END : minuteOf(f);
+      return end > start ? [start, end] : null;
+    }
+  }
+  const end = sameDay(s, f) ? minuteOf(f) : DAY_END;
+  return end > minuteOf(s) ? [minuteOf(s), end] : null;
+}
+
 /** Events that take my time today: timed, not declined, clipped to the day. */
-function eventBlocks(agenda: AgendaItem[]): PlanBlock[] {
+function eventBlocks(agenda: AgendaItem[], day?: Date): PlanBlock[] {
   return agenda
     .filter((e) => !e.all_day && e.response !== "declined")
     .flatMap((e) => {
-      const [s, f] = [new Date(e.start), new Date(e.end)];
-      if (Number.isNaN(s.getTime()) || Number.isNaN(f.getTime()) || f <= s) return [];
-      const start = minuteOf(s);
-      const end = f.getDate() === s.getDate() ? minuteOf(f) : DAY_END;
-      return end > start ? [{ id: e.id, title: e.title, start, end, kind: "event" as const, clash: false, lane: 0, lanes: 1 }] : [];
+      const span = eventSpanOnDay(new Date(e.start), new Date(e.end), day);
+      return span ? [{ id: e.id, title: e.title, start: span[0], end: span[1], kind: "event" as const, clash: false, lane: 0, lanes: 1 }] : [];
     });
 }
 
@@ -73,8 +89,8 @@ function withLanes(sorted: PlanBlock[]): PlanBlock[] {
 }
 
 /** A task clashes with anything else on the day; two events overlapping is the agenda's own conflict badge. */
-export function dayBlocks(agenda: AgendaItem[], tasks: Task[]): PlanBlock[] {
-  const all = [...eventBlocks(agenda), ...taskBlocks(tasks)].sort((a, b) => a.start - b.start || a.end - b.end);
+export function dayBlocks(agenda: AgendaItem[], tasks: Task[], day?: Date): PlanBlock[] {
+  const all = [...eventBlocks(agenda, day), ...taskBlocks(tasks)].sort((a, b) => a.start - b.start || a.end - b.end);
   return withLanes(
     all.map((b) => ({
       ...b,

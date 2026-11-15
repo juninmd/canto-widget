@@ -19,7 +19,7 @@ impl HarnessCache {
     pub fn get(&self, force: bool, now: i64, fetch: impl FnOnce() -> Vec<FeedEntry>) -> Vec<FeedEntry> {
         if !force {
             if let Some(e) = self.0.lock_safe().as_ref() {
-                if now - e.at < TTL_MS {
+                if now >= e.at && now - e.at < TTL_MS {
                     return e.feeds.clone();
                 }
             }
@@ -76,6 +76,14 @@ mod tests {
         let cache = HarnessCache::default();
         cache.get(false, 1_000, || feed("first"));
         let second = cache.get(true, 1_001, || feed("second"));
+        assert_eq!(second[0].release.as_ref().unwrap().tag, "second");
+    }
+
+    #[test]
+    fn clock_jump_backward_triggers_refetch() {
+        let cache = HarnessCache::default();
+        cache.get(false, 10_000, || feed("first"));
+        let second = cache.get(false, 5_000, || feed("second"));
         assert_eq!(second[0].release.as_ref().unwrap().tag, "second");
     }
 }

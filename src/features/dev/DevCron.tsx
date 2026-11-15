@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText } from "../../lib/api";
 import { useToast } from "../../lib/toast";
 import { useWindowVisible } from "../../lib/useWindowVisible";
-import { t } from "../../i18n";
+import { LOCALE, t } from "../../i18n";
 import ConfirmButton from "../../components/ConfirmButton";
 import ErrorBanner from "../../components/ErrorBanner";
 import { CrossIcon, PlayIcon } from "../../components/Icons";
@@ -91,7 +91,7 @@ export default function DevCron() {
           <input value={expr} onChange={(e) => setExpr(e.target.value)} aria-label={t("dev.cron.expr")} spellCheck={false} className="canto-field h-8 px-2.5 font-mono text-[11.5px]" />
           <input value={command} onChange={(e) => setCommand(e.target.value)} placeholder={t("dev.cron.command")} aria-label={t("dev.cron.command")} spellCheck={false} className="canto-field h-8 px-2.5 font-mono text-[11.5px]" />
           <p className={`text-[12px] font-medium ${words ? "text-accent-text" : "text-danger"}`}>{words ?? t("dev.cron.invalid")}</p>
-          {runs.length > 0 && <p className="text-[11px] text-faint tabular-nums">{t("dev.cron.nextRuns", { list: runs.map((r) => r.toLocaleString(undefined, { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })).join(" · ") })}</p>}
+          {runs.length > 0 && <p className="text-[11px] text-faint tabular-nums">{t("dev.cron.nextRuns", { list: runs.map((r) => r.toLocaleString(LOCALE, { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })).join(" · ") })}</p>}
           <button
             type="button"
             disabled={!words}

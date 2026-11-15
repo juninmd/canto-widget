@@ -14,7 +14,7 @@ export function isBirthday(contact: Contact, today: Date): boolean {
 
 /** Who turns a year older today, by name. */
 export const birthdaysToday = (items: Contact[], today: Date): Contact[] =>
-  items.filter((c) => isBirthday(c, today)).sort((a, b) => a.name.localeCompare(b.name));
+  items.filter((c) => isBirthday(c, today)).sort((a, b) => a.name.localeCompare(b.name, LOCALE));
 
 /** The age being turned today; null when Google has no year or it makes no sense. */
 export function ageToday(contact: Contact, today: Date): number | null {

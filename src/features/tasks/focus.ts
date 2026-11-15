@@ -83,6 +83,21 @@ export function createFocusStore(deps: Deps) {
     if (announce) onSaved();
   }
 
+  let op = 0;
+  let halting = 0;
+
+  async function halt() {
+    halting++;
+    clearInterval(timer);
+    timer = undefined;
+    try {
+      await flush(true);
+      emit(null);
+    } finally {
+      halting = Math.max(0, halting - 1);
+    }
+  }
+
   return {
     subscribe(l: () => void) {
       listeners.add(l);
@@ -97,8 +112,10 @@ export function createFocusStore(deps: Deps) {
       onSaved = h.onSaved ?? onSaved;
     },
     async start(task: { id: string; title: string; estimateMin?: number | null; trackedSecs?: number }) {
-      if (running?.id === task.id) return;
-      await this.stop();
+      if (running?.id === task.id && halting === 0) return;
+      const myOp = ++op;
+      await halt();
+      if (myOp !== op) return;
       emit({
         id: task.id,
         title: task.title,
@@ -117,13 +134,15 @@ export function createFocusStore(deps: Deps) {
       if (running) emit({ ...running, nudged: true });
     },
     async stop() {
-      clearInterval(timer);
-      await flush(true);
-      emit(null);
+      ++op;
+      await halt();
     },
     /** For a vault that just locked: nothing can be saved, and the last minute is the price. */
     discard() {
+      ++op;
+      halting = 0;
       clearInterval(timer);
+      timer = undefined;
       emit(null);
     },
   };

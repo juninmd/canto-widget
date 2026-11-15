@@ -32,6 +32,8 @@ fn a_new_endpoint_is_due_at_once_then_only_after_its_interval() {
     s.record(&ep("a", 60), reading(1_000, Some(10)));
     assert!(s.due(60_999).is_empty());
     assert_eq!(s.due(61_000).len(), 1);
+    s.record(&ep("a", 60), reading(61_000, Some(10)));
+    assert_eq!(s.due(5_000).len(), 1, "clock jump backward must not stall probes");
 }
 
 #[test]

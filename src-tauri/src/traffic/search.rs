@@ -6,13 +6,26 @@ use crate::traffic::{self, Spot};
 
 const MATCHES: &str = "6";
 
+fn encode_path_segment(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for b in s.bytes() {
+        if b.is_ascii_alphanumeric() || matches!(b, b'-' | b'.' | b'_' | b'~') {
+            out.push(b as char);
+        } else {
+            use std::fmt::Write;
+            let _ = write!(out, "%{b:02X}");
+        }
+    }
+    out
+}
+
 pub fn search(
     client: &reqwest::blocking::Client,
     key: &str,
     query: &str,
     near: Option<&Spot>,
 ) -> Result<Vec<Spot>, String> {
-    let encoded: String = url::form_urlencoded::byte_serialize(query.as_bytes()).collect();
+    let encoded = encode_path_segment(query);
     let mut params = vec![("limit", MATCHES.to_string()), ("language", language().into()), ("key", key.into())];
     if let Some(near) = near {
         params.push(("lat", near.lat.to_string()));
@@ -59,5 +72,10 @@ mod tests {
         assert_eq!(list[0].name, "Academia Exemplo");
         assert_eq!(list[0].detail, "Rua Fictícia, 10, Aurora");
         assert_eq!((list[1].name.as_str(), list[1].detail.as_str()), ("Avenida Aurora, 200", "Aurora"));
+    }
+
+    #[test]
+    fn path_segment_encoding_uses_percent_20_and_escapes_delimiters() {
+        assert_eq!(encode_path_segment("São Paulo/Centro?a=1"), "S%C3%A3o%20Paulo%2FCentro%3Fa%3D1");
     }
 }

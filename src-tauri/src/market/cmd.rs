@@ -34,7 +34,7 @@ impl MarketState {
     pub fn view(&self, force: bool, now: i64, fetch: impl FnOnce() -> Result<Vec<Quote>, String>) -> MarketView {
         let cached = self.cached.lock_safe().clone();
         if let Some((at, quotes)) = &cached {
-            if !force && now - at < TTL_MS {
+            if !force && now >= *at && now - *at < TTL_MS {
                 return MarketView { quotes: quotes.clone(), fetched_at: *at, error: None };
             }
         }
@@ -59,7 +59,7 @@ impl MarketState {
     ) -> Result<History, String> {
         let cached = self.history.lock_safe().get(&key).cloned();
         if let Some((at, history)) = &cached {
-            if now - at < TTL_MS {
+            if now >= *at && now - *at < TTL_MS {
                 return Ok(history.clone());
             }
         }
@@ -106,6 +106,7 @@ mod tests {
         assert_eq!(cached.fetched_at, 1_000);
         assert_eq!(state.view(true, 2_000, || Ok(vec![quote(2.0)])).quotes[0].price, 2.0);
         assert_eq!(state.view(false, 2_000 + TTL_MS, || Ok(vec![quote(3.0)])).quotes[0].price, 3.0);
+        assert_eq!(state.view(false, 1_000, || Ok(vec![quote(4.0)])).quotes[0].price, 4.0);
     }
 
     #[test]
@@ -128,6 +129,7 @@ mod tests {
         assert_eq!(state.history(key(), 1_000, || Ok(curve(1.0))).unwrap().points, vec![1.0]);
         assert_eq!(state.history(key(), 2_000, || panic!("não devia buscar")).unwrap().points, vec![1.0]);
         assert_eq!(state.history(key(), 1_000 + TTL_MS, || Err("sem resposta".into())).unwrap().points, vec![1.0]);
+        assert_eq!(state.history(key(), 500, || Ok(curve(2.0))).unwrap().points, vec![2.0]);
         let other = state.history(("IBOV".into(), "1y".into()), 1_000, || Err("sem resposta".into()));
         assert_eq!(other, Err("sem resposta".to_string()));
     }

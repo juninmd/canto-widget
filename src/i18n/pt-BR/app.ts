@@ -316,7 +316,7 @@ export const app = {
   "capture.placeholder": "o que você quer lembrar?",
   "capture.task": "tarefa de hoje",
   "capture.note": "nota",
-  "capture.hint": "Enter: tarefa · Ctrl+Enter: nota · Esc: fechar",
+  "capture.hint": "Enter: tarefa · {mod}+Enter: nota · Esc: fechar",
   "capture.close": "fechar",
   "shortcuts.capture": "captura rápida de tarefa ou nota, de qualquer app",
 

@@ -42,3 +42,12 @@ fn a_locked_vault_answers_no_and_drops_what_was_in_ram() {
     assert!(alerts.watching(&st), "the file was there all along");
     let _ = std::fs::remove_dir_all(&st.dir);
 }
+
+#[test]
+fn clock_jump_backward_keeps_alerts_due() {
+    let alerts = SteamAlerts::default();
+    assert!(alerts.due(10_000));
+    alerts.checked(10_000);
+    assert!(!alerts.due(10_000 + CHECK_MS - 1));
+    assert!(alerts.due(5_000), "clock moving backward must not stall scans");
+}

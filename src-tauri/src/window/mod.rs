@@ -6,7 +6,7 @@ pub mod sidebar;
 pub mod state;
 
 use crate::resilient::LockExt;
-use tauri::{Emitter, LogicalPosition, LogicalSize, Manager, WebviewWindow};
+use tauri::{Emitter, LogicalSize, Manager, WebviewWindow};
 
 use crate::calendar::AgendaItem;
 
@@ -16,10 +16,39 @@ mod alert_queue;
 const MARGIN: f64 = 16.0;
 
 pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
-    if let Some((x, y)) = anchored_position(win)? {
-        win.set_position(LogicalPosition::new(x, y))?;
+    #[cfg(not(target_os = "macos"))]
+    {
+        let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
+            return Ok(());
+        };
+        let scale = monitor.scale_factor();
+        let win_scale = win.scale_factor().unwrap_or(scale);
+        let size = win.outer_size()?.to_logical::<f64>(win_scale);
+        let area = monitor.work_area();
+        let rect = (
+            f64::from(area.position.x),
+            f64::from(area.position.y),
+            f64::from(area.size.width),
+            f64::from(area.size.height),
+        );
+        let (x, y) = anchored_physical(rect, scale, (size.width, size.height));
+        win.set_position(tauri::PhysicalPosition::new(x, y))?;
+        Ok(())
     }
-    Ok(())
+    #[cfg(target_os = "macos")]
+    {
+        if let Some((x, y)) = anchored_position(win)? {
+            win.set_position(tauri::LogicalPosition::new(x, y))?;
+        }
+        Ok(())
+    }
+}
+
+/// Physical top-left corner anchored to a monitor's bottom-right work area.
+pub fn anchored_physical(area: (f64, f64, f64, f64), scale: f64, logical_size: (f64, f64)) -> (i32, i32) {
+    let x = area.0 + area.2 - (logical_size.0 + MARGIN) * scale;
+    let y = area.1 + area.3 - (logical_size.1 + MARGIN) * scale;
+    (x.round() as i32, y.round() as i32)
 }
 
 /// Where the window sits when anchored to the current monitor's corner, in logical pixels.
@@ -28,7 +57,8 @@ pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)
         return Ok(None);
     };
     let scale = monitor.scale_factor();
-    let size = win.outer_size()?.to_logical::<f64>(scale);
+    let win_scale = win.scale_factor().unwrap_or(scale);
+    let size = win.outer_size()?.to_logical::<f64>(win_scale);
     let area = monitor.work_area();
     let origin = area.position.to_logical::<f64>(scale);
     let bounds = area.size.to_logical::<f64>(scale);
@@ -318,5 +348,13 @@ mod tests {
         assert!(hidden.contains("SHOWN_EVENT"), "a hidden pop-up must be told to stop its animation");
         let shown = &src[src.find("fn present_alert(").unwrap()..src.find("#[cfg(test)]").unwrap()];
         assert!(shown.contains("SHOWN_EVENT, true"), "a shown pop-up must resume its animation");
+    }
+
+    #[test]
+    fn physical_corner_anchor_scales_margin_and_logical_size() {
+        // 4K monitor at 2.0x scale: 420x580 logical + 16px margin -> (872, 1192) physical inset.
+        assert_eq!(super::anchored_physical((0.0, 0.0, 3840.0, 2080.0), 2.0, (420.0, 580.0)), (2968, 888));
+        // Secondary monitor offset to the right at 1.5x scale.
+        assert_eq!(super::anchored_physical((3840.0, 0.0, 2560.0, 1400.0), 1.5, (420.0, 580.0)), (5746, 506));
     }
 }

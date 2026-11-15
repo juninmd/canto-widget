@@ -38,7 +38,7 @@ export default function AgendaRail({ items, tasks, now, live = true, clashes, op
   // Nothing left to look at: the finished meetings are the whole answer, so they start open.
   const pastOpen = showPast ?? !upcoming.some((e) => e.kind !== "gap");
   const at = minuteOf(now);
-  const blocks = dayBlocks(items, tasks);
+  const blocks = dayBlocks(items, tasks, now);
   const pending = unscheduled(tasks);
   const lineAt = !live || upcoming.some((e) => e.kind !== "gap" && e.start <= at) ? -1 : upcoming.findIndex((e) => e.start > at);
 

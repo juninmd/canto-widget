@@ -127,7 +127,7 @@ pub fn parse_page(html: &str) -> std::result::Result<Vec<Model>, FetchError> {
     let data = payload(html);
     let list = data
         .match_indices("odels\":[")
-        .filter(|(i, _)| *i > 1 && matches!(&data[i - 1..*i], "m" | "M"))
+        .filter(|(i, _)| *i >= 1 && matches!(data.as_bytes().get(i - 1), Some(b'm' | b'M')))
         .filter_map(|(i, m)| {
             let mut items = serde_json::Deserializer::from_str(&data[i + m.len() - 1..]).into_iter::<Vec<Value>>();
             items.next()?.ok().filter(|l| l.first().is_some_and(|first| first.get("intelligenceIndex").is_some()))

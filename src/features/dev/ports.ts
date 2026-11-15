@@ -1,3 +1,4 @@
+import { LOCALE } from "../../i18n";
 import type { PortEntry } from "./devTypes";
 
 const DEV_NAMES = new Set([
@@ -23,6 +24,7 @@ export function projectOf(e: PortEntry): string {
 export type PortSort = "port" | "name" | "pid" | "mem";
 export type Proto = "all" | "TCP" | "UDP";
 export type PortFilter = { query: string; proto: Proto; onlyDev: boolean; exposed?: boolean };
+export type PortWatch = { port: number; proto: PortEntry["proto"] };
 
 export function filterPorts(list: PortEntry[], f: PortFilter): PortEntry[] {
   const q = f.query.trim().toLowerCase();
@@ -37,7 +39,7 @@ export function filterPorts(list: PortEntry[], f: PortFilter): PortEntry[] {
 export function sortPorts(list: PortEntry[], by: PortSort): PortEntry[] {
   const cmp: Record<PortSort, (a: PortEntry, b: PortEntry) => number> = {
     port: (a, b) => a.port - b.port,
-    name: (a, b) => a.name.localeCompare(b.name),
+    name: (a, b) => a.name.localeCompare(b.name, LOCALE),
     pid: (a, b) => a.pid - b.pid,
     mem: (a, b) => b.mem - a.mem,
   };
@@ -47,7 +49,7 @@ export function sortPorts(list: PortEntry[], by: PortSort): PortEntry[] {
 export function groupByProject(list: PortEntry[]): [string, PortEntry[]][] {
   const groups = new Map<string, PortEntry[]>();
   for (const e of list) groups.set(projectOf(e), [...(groups.get(projectOf(e)) ?? []), e]);
-  return [...groups].sort(([a], [b]) => a.localeCompare(b));
+  return [...groups].sort(([a], [b]) => a.localeCompare(b, LOCALE));
 }
 
 /** The other ports the same process holds (a Node server and its debugger). */
@@ -67,3 +69,6 @@ export function portQuery(q: string): number | null {
 
 /** Ports that were held and no longer are: what a "tell me when it frees" watch waits for. */
 export const freed = (watched: readonly number[], now: PortEntry[]) => watched.filter((p) => !now.some((e) => e.port === p && e.proto === "TCP"));
+
+export const freedWatches = (watched: readonly PortWatch[], now: PortEntry[]) =>
+  watched.filter((w) => !now.some((e) => e.port === w.port && e.proto === w.proto));

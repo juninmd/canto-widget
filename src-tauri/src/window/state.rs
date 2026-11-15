@@ -18,6 +18,9 @@ pub struct WindowConfig {
     /// Top-left corner in logical pixels; `None` = anchored to the monitor's corner.
     #[serde(default, alias = "posicao")]
     pub position: Option<(f64, f64)>,
+    /// Physical top-left corner used on Windows/X11 so mixed-DPI monitors place without scaling against the wrong display.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub physical_position: Option<(i32, i32)>,
     #[serde(default, alias = "tamanho")]
     pub size: Option<(f64, f64)>,
     #[serde(default = "yes", alias = "sempre_no_topo")]
@@ -36,7 +39,7 @@ fn yes() -> bool {
 
 impl Default for WindowConfig {
     fn default() -> Self {
-        Self { position: None, size: None, always_on_top: true, mini: false, sidebar: false }
+        Self { position: None, physical_position: None, size: None, always_on_top: true, mini: false, sidebar: false }
     }
 }
 
@@ -49,6 +52,17 @@ pub fn fits(pos: (f64, f64), size: (f64, f64), areas: &[Area]) -> bool {
             && pos.1 >= y - SLACK_PX
             && pos.0 + size.0 <= x + w + SLACK_PX
             && pos.1 + size.1 <= y + h + SLACK_PX
+    })
+}
+
+/// Checks a physical corner against each monitor's physical work area using that monitor's own scale factor.
+#[cfg(any(not(target_os = "macos"), test))]
+pub fn fits_physical(pos: (f64, f64), logical_size: (f64, f64), areas: &[(Area, f64)]) -> bool {
+    areas.iter().any(|&((x, y, w, h), scale)| {
+        let slack = SLACK_PX * scale;
+        let sw = logical_size.0 * scale;
+        let sh = logical_size.1 * scale;
+        pos.0 >= x - slack && pos.1 >= y - slack && pos.0 + sw <= x + w + slack && pos.1 + sh <= y + h + slack
     })
 }
 
@@ -65,8 +79,8 @@ pub struct WindowState {
     max: AtomicBool,
     /// The sidebar is tucked against the edge, with only a thin strip showing. Never persisted.
     peeking: AtomicBool,
-    /// Work area (physical pixels) of the monitor the sidebar lives on: a tucked window reports the next monitor.
-    dock_area: Mutex<Option<Area>>,
+    /// Work area + scale factor of the monitor the sidebar lives on: a tucked window reports the next monitor.
+    dock_area: Mutex<Option<(Area, f64)>>,
 }
 
 fn path(dir: &Path) -> PathBuf {
@@ -100,11 +114,11 @@ impl WindowState {
         self.peeking.store(on, Ordering::Relaxed);
     }
 
-    pub fn dock_area(&self) -> Option<Area> {
+    pub fn dock_area(&self) -> Option<(Area, f64)> {
         *self.dock_area.lock_safe()
     }
 
-    pub fn set_dock_area(&self, area: Option<Area>) {
+    pub fn set_dock_area(&self, area: Option<(Area, f64)>) {
         *self.dock_area.lock_safe() = area;
     }
 
@@ -138,6 +152,19 @@ fn areas(win: &WebviewWindow) -> Vec<Area> {
         .collect()
 }
 
+#[cfg(not(target_os = "macos"))]
+fn physical_areas(win: &WebviewWindow) -> Vec<(Area, f64)> {
+    win.available_monitors()
+        .unwrap_or_default()
+        .iter()
+        .map(|m| {
+            let work = m.work_area();
+            let (p, t) = (work.position, work.size);
+            ((f64::from(p.x), f64::from(p.y), f64::from(t.width), f64::from(t.height)), m.scale_factor())
+        })
+        .collect()
+}
+
 /// A saved size the window cannot possibly have — the iconic 160x28 rect a minimize used to record, a corrupted
 /// file — would reopen the widget as a sliver, so it falls back to the default.
 pub fn usable_size(size: Option<(f64, f64)>) -> (f64, f64) {
@@ -163,6 +190,15 @@ pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
     crate::window::mode::strip_chrome(win)?;
     crate::window::mode::restore_limits(win)?;
     let size = usable_size(cfg.size);
+    #[cfg(not(target_os = "macos"))]
+    if let Some((px, py)) = cfg.physical_position.filter(|&(px, py)| {
+        let areas = physical_areas(win);
+        fits_physical((f64::from(px), f64::from(py)), size, &areas)
+    }) {
+        // Move before sizing so the target monitor's scale factor applies to LogicalSize.
+        win.set_position(tauri::PhysicalPosition::new(px, py))?;
+        return win.set_size(LogicalSize::new(size.0, size.1));
+    }
     win.set_size(LogicalSize::new(size.0, size.1))?;
     match cfg.position.filter(|&p| fits(p, size, &areas(win))) {
         Some((x, y)) => win.set_position(LogicalPosition::new(x, y)),
@@ -184,10 +220,10 @@ pub fn record(win: &tauri::Window) {
     if win.is_minimized().unwrap_or(false) {
         return;
     }
-    let (Ok(pos), Ok(size)) = (win.outer_position(), win.inner_size()) else {
+    let (Ok(phys_pos), Ok(size)) = (win.outer_position(), win.inner_size()) else {
         return;
     };
-    let pos = pos.to_logical::<f64>(scale);
+    let pos = phys_pos.to_logical::<f64>(scale);
     let size = size.to_logical::<f64>(scale);
     let anchored = win
         .app_handle()
@@ -196,6 +232,7 @@ pub fn record(win: &tauri::Window) {
         .is_some_and(|a| close_to(a, (pos.x, pos.y)));
     window_state.change(|c| {
         c.position = (!anchored).then_some((pos.x, pos.y));
+        c.physical_position = (!anchored).then_some((phys_pos.x, phys_pos.y));
         let default_size = close_to((size.width, size.height), (DEFAULT_WIDTH, DEFAULT_HEIGHT));
         c.size = (!default_size).then_some((size.width, size.height));
     });
@@ -223,6 +260,7 @@ pub fn window_set_always_on_top(
 pub fn window_reset(app: tauri::AppHandle, window_state: State<'_, WindowState>) -> Result<()> {
     window_state.change(|c| {
         c.position = None;
+        c.physical_position = None;
         c.size = None;
     });
     if let Some(win) = app.get_webview_window("main") {
@@ -249,6 +287,14 @@ mod tests {
         assert!(!fits((2000.0, 300.0), (420.0, 580.0), &[SCREEN]), "window would land off-screen");
         assert!(!fits((1700.0, 100.0), (420.0, 580.0), &[SCREEN]), "half the window is off-screen");
         assert!(!fits((100.0, 100.0), (420.0, 580.0), &[]), "no monitor at all");
+    }
+
+    #[test]
+    fn mixed_dpi_physical_position_uses_each_monitors_scale() {
+        let primary = ((0.0, 0.0, 3840.0, 2100.0), 2.0);
+        let secondary = ((3840.0, 0.0, 1920.0, 1040.0), 1.0);
+        assert!(fits_physical((3900.0, 100.0), (420.0, 580.0), &[primary, secondary]));
+        assert!(!fits_physical((5500.0, 100.0), (420.0, 580.0), &[primary, secondary]));
     }
 
     #[test]
