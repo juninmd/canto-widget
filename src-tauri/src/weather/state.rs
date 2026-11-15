@@ -43,6 +43,7 @@ impl WeatherState {
         Ok(())
     }
 
+    #[cfg(desktop)]
     /// The reading already in RAM, never a fetch: the mini-dashboard shows it only once the Clima tab or alert loaded it.
     pub fn cached_now(&self) -> Option<crate::strip::snapshot::Weather> {
         self.cached
