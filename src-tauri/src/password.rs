@@ -53,6 +53,7 @@ impl AppState {
             (store::activity_path(&self.dir), ACTIVITY_AAD, true),
             (store::health_path(&self.dir), crate::health::AAD, false),
             (store::mentions_path(&self.dir), crate::mentions::state::AAD, false),
+            (store::repos_path(&self.dir), crate::repos::persist::AAD, true),
         ] {
             match reencrypt(&path, aad, &session.key, &key, &salt) {
                 Ok(Some(r)) => batch.push(r),
@@ -112,6 +113,7 @@ pub(crate) fn finish_interrupted(dir: &Path, vault_salt: &[u8]) -> Result<()> {
         store::activity_path(dir),
         store::health_path(dir),
         store::mentions_path(dir),
+        store::repos_path(dir),
     ];
     for path in peripherals.into_iter().chain(backup_files(dir)).chain(note_images::files(dir)) {
         let next = staged(&path);

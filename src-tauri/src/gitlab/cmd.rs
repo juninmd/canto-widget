@@ -81,6 +81,7 @@ pub async fn gitlab_connect(app: tauri::AppHandle, base_url: String, token: Stri
         let state = app.state::<AppState>();
         state.save_gitlab(&GitlabConfig { base_url: base, token: token.to_string(), username: username.clone() })?;
         state.forges.forget(FORGE);
+        crate::repos::persist::forget(&state, FORGE);
         Ok(username)
     })
     .await
@@ -93,6 +94,7 @@ pub fn gitlab_disconnect(app: tauri::AppHandle, state: State<'_, AppState>) -> R
         return Err(AppError::Locked);
     }
     state.forges.forget(FORGE);
+    crate::repos::persist::forget(&state, FORGE);
     app.state::<crate::mentions::state::MentionsUnread>()
         .clear(crate::mentions::state::GITLAB, &crate::mentions::state::Saved::default());
     match std::fs::remove_file(store::gitlab_path(&state.dir)) {

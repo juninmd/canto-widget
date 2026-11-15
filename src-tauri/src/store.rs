@@ -96,6 +96,10 @@ pub fn mentions_path(dir: &Path) -> PathBuf {
     dir.join("mencoes.json")
 }
 
+pub fn repos_path(dir: &Path) -> PathBuf {
+    dir.join("repositorios.json")
+}
+
 pub fn health_path(dir: &Path) -> PathBuf {
     dir.join("saude.json")
 }

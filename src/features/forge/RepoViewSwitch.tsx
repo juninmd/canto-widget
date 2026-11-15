@@ -2,28 +2,15 @@ import { t } from "../../i18n";
 import type { RepoView } from "./repos";
 
 const ICONS: Record<RepoView, React.ReactNode> = {
-  list: <path d="M9 6h12M9 12h12M9 18h12M3 6h2M3 12h2M3 18h2" />,
-  cards: (
-    <>
-      <rect x="3" y="4" width="18" height="7" rx="2" />
-      <rect x="3" y="14" width="18" height="7" rx="2" />
-    </>
-  ),
-  grid: (
-    <>
-      <rect x="3" y="3" width="8" height="8" rx="1" />
-      <rect x="13" y="3" width="8" height="8" rx="1" />
-      <rect x="3" y="13" width="8" height="8" rx="1" />
-      <rect x="13" y="13" width="8" height="8" rx="1" />
-    </>
-  ),
+  tree: <path d="M4 5h6M8 12h6M8 19h6M6 5v14M6 12h2M6 19h2" />,
+  flat: <path d="M9 6h12M9 12h12M9 18h12M3 6h2M3 12h2M3 18h2" />,
 };
 
-/** List, cards or grid: the three ways the repositories are laid out. */
+/** Tree (groups, subgroups) or a flat list: the two ways the repositories are laid out. */
 export default function RepoViewSwitch({ value, onChange }: { value: RepoView; onChange: (v: RepoView) => void }) {
   return (
     <div role="group" aria-label={t("forge.repos.view")} className="flex gap-0.5 rounded-lg border border-edge bg-ink p-0.5">
-      {(["list", "cards", "grid"] as const).map((v) => (
+      {(["tree", "flat"] as const).map((v) => (
         <button
           key={v}
           type="button"

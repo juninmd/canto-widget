@@ -49,6 +49,8 @@ export type VaultPeriod = {
 export type GitlabStatus = { connected: boolean; username: string; base_url: string };
 /** A repository (GitHub) or project (GitLab) the user can reach; `group` is the organization or group path, empty for the user's own. */
 export type RepoInfo = {
+  /** GitLab's numeric project id as text; empty on GitHub, where `full_name` is the key. */
+  id: string;
   name: string;
   full_name: string;
   group: string;
@@ -59,15 +61,25 @@ export type RepoInfo = {
   archived: boolean;
   stars: number;
   forks: number;
+  open_issues: number;
   language: string;
   updated_at: string;
+  topics: string[];
+  /** The repository's own icon (or its owner's); remote, so it is only shown after Rust embeds it as a `data:` URL. */
+  avatar_url: string;
+  group_avatar_url: string;
+  default_branch: string;
 };
-export type RepoList = {
+/** One page (100) of the list; `fetched_at` is older than now when it came from the cache. */
+export type RepoPage = {
+  page: number;
   repos: RepoInfo[];
-  /** More repositories exist than the pages Rust fetched. */
-  truncated: boolean;
+  has_next: boolean;
   fetched_at: number;
   limited_until: number | null;
+  /** The forge confirmed (304) that the cached copy is current. */
+  revalidated: boolean;
 };
+export type Readme = { text: string; truncated: boolean; fetched_at: number; limited_until: number | null };
 export type ContributionDay = { date: string; count: number };
 export type Contributions = { days: ContributionDay[]; total: number; fetched_at: number; limited_until: number | null };

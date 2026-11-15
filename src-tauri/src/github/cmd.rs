@@ -79,6 +79,7 @@ fn store_login(state: &AppState, gh: &GithubState, cfg: &GithubConfig) -> Result
     let _one_at_a_time = gh.refreshing.lock_safe();
     state.save_github(cfg)?;
     state.forges.forget(FORGE);
+    crate::repos::persist::forget(state, FORGE);
     Ok(())
 }
 
@@ -212,7 +213,10 @@ fn disconnect(state: &AppState, gh: &GithubState) -> Result<()> {
     let _one_at_a_time = gh.refreshing.lock_safe();
     match std::fs::remove_file(store::github_path(&state.dir)) {
         Err(e) if e.kind() != std::io::ErrorKind::NotFound => return Err(e.into()),
-        _ => state.forges.forget(FORGE),
+        _ => {
+            state.forges.forget(FORGE);
+            crate::repos::persist::forget(state, FORGE);
+        }
     }
     Ok(())
 }

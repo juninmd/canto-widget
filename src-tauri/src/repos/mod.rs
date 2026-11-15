@@ -1,15 +1,20 @@
-//! The repositories subtab of the GitHub and GitLab tabs: what the user can reach, grouped by owner, and the
-//! contribution calendar behind the optional statistics.
+//! The repositories subtab of the GitHub and GitLab tabs: what the user can reach (paged, ETag-validated, kept sealed
+//! on disk), group and repository icons, READMEs on demand and the contribution calendar behind the statistics.
+pub mod avatars;
 pub mod cache;
 pub mod cmd;
 pub mod github;
 pub mod gitlab;
+pub mod persist;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 /// One repository or project. `group` is the organization / group path, empty for the user's own (the "root").
-#[derive(Debug, Clone, Serialize, PartialEq, Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub struct Repo {
+    /// GitLab's numeric project id (the README and other calls need it); empty on GitHub, where `full_name` is the key.
+    #[serde(default)]
+    pub id: String,
     pub name: String,
     pub full_name: String,
     pub group: String,
@@ -20,18 +25,43 @@ pub struct Repo {
     pub archived: bool,
     pub stars: u64,
     pub forks: u64,
+    #[serde(default)]
+    pub open_issues: u64,
     pub language: String,
     pub updated_at: String,
+    #[serde(default)]
+    pub topics: Vec<String>,
+    /// The repository's own icon (GitLab project avatar) or, lacking one, its owner's.
+    #[serde(default)]
+    pub avatar_url: String,
+    /// The organization / group icon: what the tree shows beside the group.
+    #[serde(default)]
+    pub group_avatar_url: String,
+    #[serde(default)]
+    pub default_branch: String,
 }
 
+/// One page of the list: the UI asks for page 1, 2, 3... and shows what it has while the rest arrives.
 #[derive(Debug, Clone, Serialize, PartialEq, Default)]
-pub struct RepoList {
+pub struct RepoPage {
+    pub page: u32,
     pub repos: Vec<Repo>,
-    /// More repositories exist than the pages fetched.
-    pub truncated: bool,
-    /// When the list left the forge (ms); older than now when it came from the cache.
+    /// More pages exist after this one.
+    pub has_next: bool,
+    /// When the page left the forge (ms); older than now when it came from the cache.
     pub fetched_at: i64,
     /// Set when the rate limit forced a cached copy: fresh data only after this instant (ms).
+    pub limited_until: Option<i64>,
+    /// The forge confirmed (304) that the cached copy is still current.
+    pub revalidated: bool,
+}
+
+/// A repository's README, read on demand. `text` is empty when the repository has none.
+#[derive(Debug, Clone, Serialize, PartialEq, Default)]
+pub struct Readme {
+    pub text: String,
+    pub truncated: bool,
+    pub fetched_at: i64,
     pub limited_until: Option<i64>,
 }
 
@@ -50,18 +80,46 @@ pub struct Contributions {
     pub limited_until: Option<i64>,
 }
 
-/// Repositories per request and requests per list: 500 repositories are far more than a widget can browse.
+/// Repositories per request and the most pages one list reaches (10,000 repositories): the UI loads them one page
+/// at a time, so a long list never blocks the first screen.
 pub const PER_PAGE: u32 = 100;
-pub const MAX_PAGES: u32 = 5;
+pub const MAX_PAGES: u32 = 100;
+/// A README is read in full up to this many bytes; the rest is cut (the UI says so).
+pub const README_MAX_BYTES: u64 = 96 * 1024;
+
+/// `rel="next"` in a GitHub `Link` header.
+pub fn has_next_link(link: &str) -> bool {
+    link.split(',').any(|part| part.contains("rel=\"next\""))
+}
+
+/// `owner/name` as GitHub spells it: nothing that could change the path of the request.
+pub fn valid_full_name(full_name: &str) -> bool {
+    let ok = |s: &str| {
+        !s.is_empty()
+            && s.len() <= 100
+            && s != "."
+            && s != ".."
+            && s.bytes().all(|c| c.is_ascii_alphanumeric() || matches!(c, b'-' | b'_' | b'.'))
+    };
+    full_name.split_once('/').is_some_and(|(o, n)| ok(o) && ok(n))
+}
+
+/// Text cut at a character boundary below `max` bytes; the bool says something was cut.
+pub fn cap_text(bytes: &[u8], max: usize) -> (String, bool) {
+    let cut = bytes.len() > max;
+    let mut text = String::from_utf8_lossy(&bytes[..bytes.len().min(max)]).into_owned();
+    if cut {
+        // A character split by the cut shows as U+FFFD at the very end.
+        while text.ends_with('\u{FFFD}') {
+            text.pop();
+        }
+    }
+    (text, cut)
+}
 
 /// Only http(s) links reach the webview, which opens them in the browser.
 pub fn safe_url(url: &str, prefix: &str) -> bool {
     url.starts_with(prefix)
-}
-
-/// Groups first by name, the root (empty group) leading is left to the UI; inside a group, latest activity first.
-pub fn sort_repos(repos: &mut [Repo]) {
-    repos.sort_by(|a, b| b.updated_at.cmp(&a.updated_at).then_with(|| a.full_name.cmp(&b.full_name)));
 }
 
 /// Per-day counts from timestamps (`2026-11-02T10:00:00Z`), oldest day first; unparseable stamps are dropped.

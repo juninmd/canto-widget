@@ -1,9 +1,12 @@
-//! GitHub side: `/user/repos` and the GraphQL contribution calendar.
+//! GitHub side: `/user/repos` page by page, READMEs and the GraphQL contribution calendar.
 use serde::Deserialize;
 
 use crate::error::{AppError, Result};
 use crate::github::{client, network, response, API};
-use crate::repos::{safe_url, sort_repos, Contributions, Day, Repo, MAX_PAGES, PER_PAGE};
+use crate::repos::cache::Fetched;
+use crate::repos::{
+    cap_text, has_next_link, safe_url, Contributions, Day, Readme, Repo, MAX_PAGES, PER_PAGE, README_MAX_BYTES,
+};
 
 #[derive(Deserialize)]
 struct RawRepo {
@@ -28,51 +31,60 @@ struct RawRepo {
     #[serde(default)]
     forks_count: u64,
     #[serde(default)]
+    open_issues_count: u64,
+    #[serde(default)]
     language: Option<String>,
     #[serde(default)]
     pushed_at: Option<String>,
     #[serde(default)]
     updated_at: String,
+    #[serde(default)]
+    topics: Vec<String>,
+    #[serde(default)]
+    default_branch: String,
 }
 
 #[derive(Deserialize)]
 struct Owner {
     login: String,
+    #[serde(default)]
+    avatar_url: String,
 }
 
-/// Every repository the token reaches (own, collaborator, organization member), most recent push first.
-pub fn repos(token: &str, login: &str) -> Result<(Vec<Repo>, bool)> {
-    let mut raw = Vec::new();
-    let mut truncated = false;
-    for page in 1..=MAX_PAGES {
-        let url = url::Url::parse_with_params(
-            &format!("{API}/user/repos"),
-            [
-                ("affiliation", "owner,collaborator,organization_member"),
-                ("sort", "pushed"),
-                ("per_page", &PER_PAGE.to_string()),
-                ("page", &page.to_string()),
-            ],
-        )
-        .map_err(|e| AppError::Github(e.to_string()))?;
-        let res = client()?.get(url).bearer_auth(token).send().map_err(network)?;
-        let got: Vec<RawRepo> = response(res)?;
-        let full = got.len() as u32 >= PER_PAGE;
-        raw.extend(got);
-        if !full {
-            break;
-        }
-        truncated = page == MAX_PAGES;
+/// One page of the repositories the token reaches (own, collaborator, organization member). Sorted by name, not by
+/// push: a list that reorders itself between two page requests would repeat some repositories and skip others.
+/// `etag` is what the last look at this page returned; the forge answers 304 (free of rate limit) when nothing changed.
+pub fn page(token: &str, login: &str, page: u32, etag: Option<&str>) -> Result<Fetched> {
+    let url = url::Url::parse_with_params(
+        &format!("{API}/user/repos"),
+        [
+            ("affiliation", "owner,collaborator,organization_member"),
+            ("sort", "full_name"),
+            ("direction", "asc"),
+            ("per_page", &PER_PAGE.to_string()),
+            ("page", &page.to_string()),
+        ],
+    )
+    .map_err(|e| AppError::Github(e.to_string()))?;
+    let mut req = client()?.get(url).bearer_auth(token);
+    if let Some(e) = etag {
+        req = req.header(reqwest::header::IF_NONE_MATCH, e);
     }
-    Ok((convert(raw, login), truncated))
+    let res = req.send().map_err(network)?;
+    if res.status().as_u16() == 304 {
+        return Ok(Fetched::NotModified);
+    }
+    let header = |n: &str| res.headers().get(n).and_then(|v| v.to_str().ok()).unwrap_or_default().to_string();
+    let (etag, has_next) = (header("etag"), has_next_link(&header("link")));
+    let got: Vec<RawRepo> = response(res)?;
+    Ok(Fetched::Page { repos: convert(got, login), has_next: has_next && page < MAX_PAGES, etag })
 }
 
 fn convert(raw: Vec<RawRepo>, login: &str) -> Vec<Repo> {
-    let mut out: Vec<Repo> = raw
-        .into_iter()
+    raw.into_iter()
         .filter(|r| safe_url(&r.html_url, "https://github.com/"))
         .map(|r| {
-            let owner = r.owner.map(|o| o.login).unwrap_or_default();
+            let (owner, avatar) = r.owner.map(|o| (o.login, o.avatar_url)).unwrap_or_default();
             // The user's own repositories sit at the root; every other owner (organization or person) is a group.
             let group = if owner.eq_ignore_ascii_case(login) { String::new() } else { owner };
             Repo {
@@ -86,13 +98,41 @@ fn convert(raw: Vec<RawRepo>, login: &str) -> Vec<Repo> {
                 archived: r.archived,
                 stars: r.stargazers_count,
                 forks: r.forks_count,
+                open_issues: r.open_issues_count,
                 language: r.language.unwrap_or_default(),
                 updated_at: r.pushed_at.unwrap_or(r.updated_at),
+                topics: r.topics,
+                avatar_url: avatar.clone(),
+                group_avatar_url: avatar,
+                default_branch: r.default_branch,
+                ..Default::default()
             }
         })
-        .collect();
-    sort_repos(&mut out);
-    out
+        .collect()
+}
+
+/// The README as plain text (`application/vnd.github.raw+json`), or none when the repository has no README.
+pub fn readme(token: &str, full_name: &str) -> Result<Readme> {
+    let url = format!("{API}/repos/{full_name}/readme");
+    let res = client()?
+        .get(url)
+        .bearer_auth(token)
+        .header(reqwest::header::ACCEPT, "application/vnd.github.raw+json")
+        .send()
+        .map_err(network)?;
+    let status = res.status().as_u16();
+    match status {
+        404 => Ok(Readme::default()),
+        200..=299 => {
+            let mut bytes = Vec::new();
+            std::io::Read::read_to_end(&mut std::io::Read::take(res, README_MAX_BYTES + 1), &mut bytes)
+                .map_err(|e| AppError::Github(format!("resposta inesperada: {e}")))?;
+            let (text, truncated) = cap_text(&bytes, README_MAX_BYTES as usize);
+            Ok(Readme { text, truncated, ..Default::default() })
+        }
+        // Rate limit, expired token and the rest keep their usual messages.
+        _ => response::<serde_json::Value>(res).map(|_| Readme::default()),
+    }
 }
 
 const CALENDAR: &str = "query { viewer { contributionsCollection { contributionCalendar { totalContributions weeks { contributionDays { date contributionCount } } } } } }";
@@ -179,10 +219,14 @@ mod tests {
     use super::*;
 
     fn raw(owner: &str, name: &str, url: &str) -> RawRepo {
+        let acme = owner == "acme";
+        let topics: Vec<&str> = if acme { vec!["mapas"] } else { vec![] };
+        let avatar = if acme { "https://avatars.githubusercontent.com/u/9" } else { "" };
         serde_json::from_value(serde_json::json!({
-            "name": name, "full_name": format!("{owner}/{name}"), "owner": {"login": owner},
+            "name": name, "full_name": format!("{owner}/{name}"),
             "html_url": url, "pushed_at": "2026-11-01T10:00:00Z", "updated_at": "2026-10-01T10:00:00Z",
-            "stargazers_count": 3, "language": "Rust", "description": null
+            "stargazers_count": 3, "language": "Rust", "description": null,
+            "topics": topics, "owner": {"login": owner, "avatar_url": avatar}
         }))
         .unwrap()
     }
@@ -198,6 +242,11 @@ mod tests {
         );
         let group = |n: &str| out.iter().find(|r| r.name == n).unwrap().group.clone();
         assert_eq!((group("dotfiles").as_str(), group("atlas").as_str()), ("", "acme"));
+        let atlas = out.iter().find(|r| r.name == "atlas").unwrap();
+        assert_eq!(
+            (atlas.group_avatar_url.as_str(), atlas.topics.clone()),
+            ("https://avatars.githubusercontent.com/u/9", vec!["mapas".to_string()])
+        );
         assert_eq!(out[0].updated_at, "2026-11-01T10:00:00Z");
         assert_eq!((out[0].description.as_str(), out[0].language.as_str(), out[0].stars), ("", "Rust", 3));
     }

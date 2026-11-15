@@ -62,7 +62,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
         login={login}
         host={host}
         cached={!onMentions && !onRepos && !!gh.error && !!lists}
-        fetchedAt={onRepos ? (repos.list?.fetched_at ?? null) : onMentions ? null : (fresh?.fetchedAt ?? null)}
+        fetchedAt={onRepos ? repos.fetchedAt : onMentions ? null : (fresh?.fetchedAt ?? null)}
         busy={busy}
         onRefresh={refresh}
         onDisconnect={onDisconnect}
