@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Modelos IA: o Intelligence Index voltou a atualizar**: a Artificial Analysis tirou o campo `slug` dos itens da lista e o leitor descartava todos os modelos. Agora usa o `id` quando não há `slug`, e uma lista com notas que não pôde ser lida vira erro de formato em vez de ranking vazio.
+
 ### Adicionado
 
 - **Mini-dashboard na borda da tela (Windows, macOS e Linux)**: em Ajustes → Mini-dashboard (desligado por padrão), uma pílula sempre visível no topo ou na base da tela, numa janela própria sem foco e fora da barra de tarefas, com CPU, memória, clima, próximo evento (contagem regressiva), revisões pedidas e avisos pendentes, um interruptor para cada. A cor só aparece quando algo pede atenção (CPU acima de 65 %, reunião em menos de 15 min, revisão esperando). Passe o mouse para ver os detalhes e clique para fixar; cada cartão abre a aba correspondente e **Entrar** faz o mesmo que o item do tray. Lê só caches em RAM que o app já mantém (a CPU é a única leitura ao vivo, a cada 2 s e só com a pílula na tela), não usa a rede e some enquanto um app está em tela cheia. A escolha fica em `minipainel.json`, sem dados sensíveis.
