@@ -35,7 +35,7 @@ test("password stays hidden until the user asks to see it", () => {
 
 test("creating a vault shows the password requirement outside the placeholder", () => {
   render(<Lock exists={false} onOpen={() => {}} />);
-  expect(screen.getByText("mínimo de 4 caracteres")).toBeTruthy();
+  expect(screen.getByText("de 4 a 20 caracteres")).toBeTruthy();
 });
 
 test("mismatched passwords explain how to fix it", () => {

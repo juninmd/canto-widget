@@ -10,6 +10,20 @@ use crate::store::{self, SealedBlob, VAULT_AAD};
 
 /// Kept short deliberately: the envelope leaves the machine in backups and is attackable offline with no attempt limit, so only Argon2id cost protects it.
 pub const MIN_PASSWORD_LEN: usize = 4;
+/// Upper bound for a *new* master password; unlocking never checks it, so vaults made earlier keep opening.
+pub const MAX_PASSWORD_LEN: usize = 20;
+
+/// Length rule for choosing a master password (create and change), counted in characters.
+pub fn check_new_password(password: &str) -> Result<()> {
+    let len = password.chars().count();
+    if len < MIN_PASSWORD_LEN {
+        return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
+    }
+    if len > MAX_PASSWORD_LEN {
+        return Err(AppError::Config(format!("a senha mestra pode ter no máximo {MAX_PASSWORD_LEN} caracteres")));
+    }
+    Ok(())
+}
 
 pub struct Session {
     pub(crate) key: VaultKey,
@@ -107,9 +121,7 @@ impl AppState {
         if self.vault_exists() {
             return Err(AppError::AlreadyExists);
         }
-        if password.chars().count() < MIN_PASSWORD_LEN {
-            return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
-        }
+        check_new_password(password)?;
         let salt = store::new_salt();
         let key = VaultKey::derive(password, &salt)?;
         let session = Session { key, password: Zeroizing::new(password.to_string()), salt, data: VaultData::default() };

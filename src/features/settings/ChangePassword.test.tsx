@@ -69,10 +69,16 @@ test("a file still waiting after the change tells the user how to finish it", as
   expect(screen.getByText(/senha mestra trocada; tranque e destranque/)).toBeTruthy();
 });
 
+test("a new password longer than 20 characters is refused before the round trip", async () => {
+  await fill("velha", "a".repeat(21), "a".repeat(21));
+  expect(calls).toEqual([]);
+  expect(screen.getByText("a senha mestra pode ter no máximo 20 caracteres", { selector: "[role=alert]" })).toBeTruthy();
+});
+
 test("a new password shorter than the vault's floor is refused before the round trip", async () => {
   await fill("velha", "abc", "abc");
   expect(calls).toEqual([]);
-  expect(screen.getByText("mínimo de 4 caracteres", { selector: "[role=alert]" })).toBeTruthy();
+  expect(screen.getByText("a senha mestra precisa de ao menos 4 caracteres", { selector: "[role=alert]" })).toBeTruthy();
   expect(screen.getByLabelText("nova senha").getAttribute("aria-invalid")).toBe("true");
   expect(document.activeElement === screen.getByLabelText("nova senha")).toBe(true);
 });

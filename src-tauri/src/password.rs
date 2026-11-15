@@ -13,7 +13,7 @@ use crate::error::{AppError, Result};
 use crate::model::now_ms;
 use crate::note_images::{self, NOTE_IMAGE_AAD};
 use crate::store::{self, SealedBlob, DRIVE_AAD, GITHUB_AAD, GITLAB_AAD, MODELS_AAD, VAULT_AAD};
-use crate::vault::{AppState, MIN_PASSWORD_LEN};
+use crate::vault::{check_new_password, AppState};
 
 /// Envelope read with the old key and already sealed with the new one, ready to write.
 struct Reencrypted {
@@ -24,9 +24,7 @@ struct Reencrypted {
 impl AppState {
     /// Nothing hits disk before every envelope opens with the old key, so a wrong password leaves the vault unchanged; once the vault is sealed with the new key the change stands.
     pub fn change_password(&self, current_password: &str, new_password: &str) -> Result<PasswordChanged> {
-        if new_password.chars().count() < MIN_PASSWORD_LEN {
-            return Err(AppError::Config(format!("a senha mestra precisa de ao menos {MIN_PASSWORD_LEN} caracteres")));
-        }
+        check_new_password(new_password)?;
         if new_password == current_password {
             return Err(AppError::Config("a nova senha é igual à atual".into()));
         }
