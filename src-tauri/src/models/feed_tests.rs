@@ -55,6 +55,18 @@ fn a_missing_name_falls_back_to_the_id_and_long_text_is_cut() {
 }
 
 #[test]
+fn items_without_slug_use_their_id() {
+    let body = page(r#"{"initialModels":[{"id":"uuid-1","name":"Sem slug","intelligenceIndex":50}]}"#);
+    assert_eq!(parse_page(&body).unwrap()[0].id, "uuid-1");
+}
+
+#[test]
+fn a_scored_list_with_no_readable_item_is_a_format_error() {
+    let body = page(r#"{"models":[{"name":"Sem id","intelligenceIndex":50}]}"#);
+    assert_eq!(parse_page(&body).unwrap_err(), FetchError::Format);
+}
+
+#[test]
 fn errors_read_as_pt_br_for_the_ui() {
     assert!(FetchError::RateLimited.message().contains("limite"));
     assert!(FetchError::Network("dns".into()).message().contains("sem resposta"));

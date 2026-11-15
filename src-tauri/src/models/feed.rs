@@ -85,7 +85,8 @@ fn model(v: &Value) -> Option<Model> {
         return None;
     }
     let score = v["intelligenceIndex"].as_f64().filter(|n| n.is_finite())?;
-    let id = text(&v["slug"])?;
+    // The leaderboard dropped `slug` from its items: the stable `id` (UUID) identifies the model then.
+    let id = text(&v["slug"]).or_else(|| text(&v["id"]))?;
     let name = text(&v["name"]).unwrap_or_else(|| id.clone());
     Some(Model {
         creator: text(&v["modelCreatorName"]).unwrap_or_default(),
@@ -134,7 +135,18 @@ pub fn parse_page(html: &str) -> std::result::Result<Vec<Model>, FetchError> {
         })
         .max_by_key(|l| l.len());
     match list {
-        Some(list) => Ok(list.iter().filter_map(model).collect()),
+        Some(list) => {
+            let models: Vec<Model> = list.iter().filter_map(model).collect();
+            // A scored list nobody could read means the item format changed, not that there are no models.
+            let scored = list
+                .iter()
+                .any(|v| v["intelligenceIndex"].as_f64().is_some() && v["deprecated"].as_bool() != Some(true));
+            if models.is_empty() && scored {
+                Err(FetchError::Format)
+            } else {
+                Ok(models)
+            }
+        }
         None => Err(FetchError::Format),
     }
 }
