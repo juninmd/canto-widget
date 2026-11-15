@@ -87,9 +87,7 @@ pub fn watch(app: AppHandle) {
             let ids = app.state::<StatusAlerts>().snapshot();
             last.retain(|id, _| ids.contains(id));
             if !ids.is_empty() {
-                if let Ok(client) =
-                    crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(10)).build()
-                {
+                if let Ok(client) = crate::status::feed::client() {
                     for source in SOURCES.iter().filter(|s| ids.iter().any(|id| id == s.id)) {
                         // A failed call keeps the last reading: no alert storm when the network drops.
                         let Some(live) = crate::status::feed::current(&client, source) else { continue };

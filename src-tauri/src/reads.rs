@@ -206,12 +206,15 @@ pub fn fetch(url: &str) -> Result<Vec<u8>, String> {
     if !valid_feed_url(url) {
         return Err("endereço inválido: use http(s)".into());
     }
-    let client = crate::net::client_builder()
-        .user_agent("canto-widget")
-        .timeout(Duration::from_secs(TIMEOUT_S))
-        .redirect(reqwest::redirect::Policy::limited(3))
-        .build()
-        .map_err(|e| e.to_string())?;
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    let client = crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            .user_agent("canto-widget")
+            .timeout(Duration::from_secs(TIMEOUT_S))
+            .redirect(reqwest::redirect::Policy::limited(3))
+            .build()
+    })
+    .map_err(|e| e.to_string())?;
     let res = client.get(url).send().map_err(|_| "sem resposta do feed".to_string())?;
     match res.status().as_u16() {
         404 => return Err("o feed respondeu 404".into()),

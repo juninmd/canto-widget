@@ -30,8 +30,11 @@ pub fn probe(ep: &Endpoint, now_ms: i64) -> Sample {
 }
 
 fn http(url: &str) -> Result<u32, String> {
-    let client =
-        crate::net::client_builder().user_agent("canto-widget").timeout(TIMEOUT).build().map_err(|e| e.to_string())?;
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    let client = crate::net::shared(&CLIENT, || {
+        crate::net::client_builder().user_agent("canto-widget").timeout(TIMEOUT).build()
+    })
+    .map_err(|e| e.to_string())?;
     let start = Instant::now();
     let resp = client.get(url).send().map_err(|e| short(&e.without_url().to_string()))?;
     let ms = elapsed_ms(start);

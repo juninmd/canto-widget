@@ -155,11 +155,14 @@ pub fn index_version(html: &str) -> Option<String> {
 }
 
 pub fn fetch() -> std::result::Result<Page, FetchError> {
-    let client = crate::net::client_builder()
-        .user_agent("Mozilla/5.0 (compatible; canto-widget)")
-        .timeout(Duration::from_secs(TIMEOUT_S))
-        .build()
-        .map_err(|e| FetchError::Network(e.to_string()))?;
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    let client = crate::net::shared(&CLIENT, || {
+        crate::net::client_builder()
+            .user_agent("Mozilla/5.0 (compatible; canto-widget)")
+            .timeout(Duration::from_secs(TIMEOUT_S))
+            .build()
+    })
+    .map_err(|e| FetchError::Network(e.to_string()))?;
     let res = client.get(URL).send().map_err(|e| FetchError::Network(e.to_string()))?;
     let html = match res.status().as_u16() {
         429 => return Err(FetchError::RateLimited),
