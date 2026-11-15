@@ -4,8 +4,9 @@ import { useToast } from "../../lib/toast";
 import { t } from "../../i18n";
 
 const FIELD = "canto-field px-3 py-2 text-sm aria-invalid:border-danger";
-/** Same floor as `vault::MIN_PASSWORD_LEN`: checked here only to answer before the round trip. */
+/** Same limits as `vault::MIN_PASSWORD_LEN`/`MAX_PASSWORD_LEN`: checked here only to answer before the round trip. */
 const MIN_LENGTH = 4;
+const MAX_LENGTH = 20;
 
 /** Collapsed by default: it's a rare action and shouldn't compete for attention with the rest of settings. */
 export default function ChangePassword({ onChanged }: { onChanged: () => void }) {
@@ -51,7 +52,8 @@ export default function ChangePassword({ onChanged }: { onChanged: () => void })
     e.preventDefault();
     setError("");
     setInvalid("");
-    if ([...next].length < MIN_LENGTH) return reject("next", t("lock.minLength"));
+    if ([...next].length < MIN_LENGTH) return reject("next", t("lock.tooShort"));
+    if ([...next].length > MAX_LENGTH) return reject("next", t("lock.tooLong"));
     if (next === current) return reject("next", t("settings.password.same"));
     if (next !== confirm) return reject("confirm", t("settings.password.mismatch"));
     setBusy(true);
@@ -111,7 +113,7 @@ export default function ChangePassword({ onChanged }: { onChanged: () => void })
       <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
         <input type="checkbox" checked={show} onChange={(e) => setShow(e.target.checked)} className="canto-box" />
         {t("settings.password.show")}
-        <span className="ml-auto text-faint">{t("lock.minLength")}</span>
+        <span className="ml-auto text-faint">{t("lock.lengthRange")}</span>
       </label>
       {caps && (
         <p role="status" className="text-xs text-warn">

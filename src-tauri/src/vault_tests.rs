@@ -16,6 +16,22 @@ fn short_password_does_not_create_vault() {
 }
 
 #[test]
+fn password_above_ceiling_does_not_create_vault() {
+    let st = state("longa");
+    assert!(st.create(&"a".repeat(MAX_PASSWORD_LEN + 1)).is_err(), "accepted a password above the ceiling");
+    assert!(!st.vault_exists());
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
+#[test]
+fn password_at_exact_ceiling_is_accepted() {
+    let st = state("teto");
+    st.create(&"a".repeat(MAX_PASSWORD_LEN)).unwrap();
+    assert!(st.is_unlocked());
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
+#[test]
 fn password_at_exact_floor_is_accepted() {
     let st = state("piso");
     let password: String = "a".repeat(MIN_PASSWORD_LEN);

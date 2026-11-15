@@ -50,6 +50,11 @@ export default function Lock({ exists, onOpen }: Props) {
     e.preventDefault();
     setError("");
     setInvalid(null);
+    if (!exists) {
+      const len = [...password].length;
+      if (len < 4) return retry(passwordField.current, t("lock.tooShort"), "password");
+      if (len > 20) return retry(passwordField.current, t("lock.tooLong"), "password");
+    }
     if (!exists && password !== confirm) {
       retry(confirmField.current, t("lock.mismatch"), "confirm");
       return;
@@ -115,7 +120,7 @@ export default function Lock({ exists, onOpen }: Props) {
           className="canto-box"
         />
         {t("lock.showPassword")}
-        {!exists && <span className="ml-auto text-faint">{t("lock.minLength")}</span>}
+        {!exists && <span className="ml-auto text-faint">{t("lock.lengthRange")}</span>}
       </label>
       {error && (
         <p id="lock-error" role="alert" className="text-xs text-danger">
