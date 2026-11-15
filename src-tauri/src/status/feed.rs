@@ -6,6 +6,14 @@ use std::time::Duration;
 use serde::Serialize;
 
 const TIMEOUT_S: u64 = 10;
+
+/// One client for the page reads and the alert watcher: the keep-alive connections survive between refreshes.
+pub fn client() -> reqwest::Result<reqwest::blocking::Client> {
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    crate::net::shared(&CLIENT, || {
+        crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(TIMEOUT_S)).build()
+    })
+}
 /// Bounds the payload sent to the webview; a feed's older history stays on its own status page.
 const MAX_ITEMS: usize = 6;
 
@@ -120,9 +128,7 @@ fn fetch_one(client: &reqwest::blocking::Client, source: &Source) -> StatusResul
 
 /// One thread per feed: a slow or dead status page must not delay the others.
 pub fn fetch_all() -> Vec<StatusResult> {
-    let client =
-        crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(TIMEOUT_S)).build();
-    let client = match client {
+    let client = match client() {
         Ok(c) => Arc::new(c),
         Err(e) => {
             return SOURCES

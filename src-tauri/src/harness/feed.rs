@@ -83,8 +83,10 @@ fn fetch_one(client: &reqwest::blocking::Client, harness: &Harness) -> FeedEntry
 
 /// One thread per harness: a slow repository must not delay the others.
 pub fn fetch_all() -> Vec<FeedEntry> {
-    let client =
-        crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(TIMEOUT_S)).build();
+    static CLIENT: std::sync::OnceLock<reqwest::blocking::Client> = std::sync::OnceLock::new();
+    let client = crate::net::shared(&CLIENT, || {
+        crate::net::client_builder().user_agent("canto-widget").timeout(Duration::from_secs(TIMEOUT_S)).build()
+    });
     let Ok(client) = client else {
         let error = Some("sem resposta do GitHub".to_string());
         return HARNESSES.iter().map(|_| FeedEntry { release: None, error: error.clone() }).collect();

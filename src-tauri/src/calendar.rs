@@ -114,10 +114,7 @@ fn page(
     if let Some(t) = page_token {
         query.push(("pageToken", t.to_string()));
     }
-    let res = crate::net::client_builder()
-        .timeout(std::time::Duration::from_secs(30))
-        .build()
-        .map_err(|e| AppError::Drive(crate::error::net_text(e)))?
+    let res = crate::google::api::client()?
         .get(API)
         .bearer_auth(token)
         .query(&query)
