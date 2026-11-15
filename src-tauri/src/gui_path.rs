@@ -78,7 +78,8 @@ mod tests {
 
     #[test]
     fn merged_keeps_order_and_skips_duplicates() {
-        let out = merged(OsStr::new("/usr/bin:/a"), &[PathBuf::from("/a"), PathBuf::from("/b")]);
-        assert_eq!(out, OsString::from("/usr/bin:/a:/b"));
+        let join = |dirs: &[&str]| std::env::join_paths(dirs).unwrap();
+        let out = merged(&join(&["/usr/bin", "/a"]), &[PathBuf::from("/a"), PathBuf::from("/b")]);
+        assert_eq!(out, join(&["/usr/bin", "/a", "/b"]));
     }
 }
