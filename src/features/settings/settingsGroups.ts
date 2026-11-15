@@ -7,12 +7,12 @@ export type SectionId =
   | "reminders" | "digest" | "dnd" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
   | "activity" | "focus" | "security"
   | "google" | "clipboard" | "backup" | "sync"
-  | "window" | "autostart" | "shortcuts" | "update";
+  | "window" | "strip" | "autostart" | "shortcuts" | "update";
 
 type Group = { id: GroupId; sections: SectionId[]; sensitive: SectionId[] };
 
 /** Window, tray, global shortcut, focused-app and updater settings; the phone has no such thing (the store updates the app). */
-export const DESKTOP_ONLY_SECTIONS: readonly SectionId[] = ["fullscreen", "activity", "window", "autostart", "shortcuts", "update", "sync"];
+export const DESKTOP_ONLY_SECTIONS: readonly SectionId[] = ["fullscreen", "activity", "window", "strip", "autostart", "shortcuts", "update", "sync"];
 
 /** What a phone keeps of each group; a group left with nothing goes away. */
 export function forPlatform(groups: Group[], mobile: boolean): Group[] {
@@ -27,7 +27,7 @@ const DESKTOP_GROUPS: Group[] = [
   { id: "notifications", sections: ["reminders", "digest", "dnd", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
   { id: "privacy", sections: ["activity", "focus"], sensitive: ["security"] },
   { id: "data", sections: ["google", "clipboard"], sensitive: ["backup", "sync"] },
-  { id: "app", sections: ["window", "autostart", "shortcuts", "update"], sensitive: [] },
+  { id: "app", sections: ["window", "strip", "autostart", "shortcuts", "update"], sensitive: [] },
 ];
 
 export const GROUPS = forPlatform(DESKTOP_GROUPS, IS_MOBILE);
@@ -52,6 +52,7 @@ const KEYWORDS: Record<SectionId, string> = {
   backup: "backup exportar importar cópia export import",
   sync: "sincronizar sincronização pasta nuvem sync folder cloud",
   window: "janela sempre no topo posição window top position",
+  strip: "mini-dashboard mini painel pílula barra borda cpu clima evento próximo topo base mini dashboard pill edge weather event top bottom",
   autostart: "iniciar início automático ligar computador bandeja startup autostart tray",
   shortcuts: "atalhos teclado tecla shortcuts keyboard keys",
   update: "atualização atualizar versão update version",

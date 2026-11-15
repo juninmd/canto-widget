@@ -5,6 +5,7 @@ import { loadWindowRoot, windowKind } from "./windowRoot";
 test("the query string picks the window", () => {
   expect(windowKind("?alert")).toBe("alert");
   expect(windowKind("?capture")).toBe("capture");
+  expect(windowKind("?strip")).toBe("strip");
   expect(windowKind("")).toBe("main");
   expect(windowKind("?other=1")).toBe("main");
   // Same precedence as before: an alert flag wins over capture.
@@ -14,6 +15,7 @@ test("the query string picks the window", () => {
 test("each kind loads its own component", async () => {
   expect(await loadWindowRoot("alert")).toBe((await import("../AlertWindow")).default);
   expect(await loadWindowRoot("capture")).toBe((await import("../CaptureWindow")).default);
+  expect(await loadWindowRoot("strip")).toBe((await import("../StripWindow")).default);
   expect(await loadWindowRoot("main")).toBe((await import("../App")).default);
 });
 

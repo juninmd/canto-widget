@@ -5,6 +5,7 @@ import SyncSection from "./SyncSection";
 import ClipSection from "../clipboard/ClipSection";
 import GoogleSection from "../google/GoogleSection";
 import WindowSection from "./WindowSection";
+import StripSection from "./StripSection";
 import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
 import DensityPicker from "./DensityPicker";
@@ -67,6 +68,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     sync: <SyncSection onError={onError} />,
     clipboard: <ClipSection onError={onError} />,
     window: <WindowSection onError={onError} />,
+    strip: <StripSection onError={onError} />,
     autostart: <AutostartSection onError={onError} />,
     shortcuts: <ShortcutsSection onOpen={onShowShortcuts} />,
     update: <UpdateSection />,

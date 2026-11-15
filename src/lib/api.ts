@@ -101,6 +101,18 @@ export type DndState = { active: boolean; untilMs: number | null };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
+export type StripItem = "cpu" | "memory" | "weather" | "event" | "reviews" | "notices";
+export const STRIP_ITEMS: readonly StripItem[] = ["cpu", "memory", "weather", "event", "reviews", "notices"];
+export type StripConfig = { enabled: boolean; edge: "top" | "bottom"; items: StripItem[] };
+export type StripSnapshot = {
+  cpu: number;
+  memory: number;
+  weather: { temp: number; condition: WeatherCondition } | null;
+  event: { title: string; in_min: number; meet: boolean } | null;
+  reviews: number;
+  notices: number;
+};
+
 export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean; mini: boolean; sidebar: boolean };
 
 /// User's local day as YYYY-MM-DD. Lives in the frontend because the Rust
@@ -588,6 +600,12 @@ export const api = {
   windowMaxSet: (enabled: boolean) => invoke<void>("window_max_set", { enabled }),
   windowMaxGet: () => invoke<boolean>("window_max_get"),
   windowMiniResize: (width: number, height: number) => invoke<void>("window_mini_resize", { width, height }),
+
+  stripConfigGet: () => invoke<StripConfig>("strip_config_get"),
+  stripConfigSet: (config: StripConfig) => invoke<StripConfig>("strip_config_set", { config }),
+  stripSnapshot: () => invoke<StripSnapshot>("strip_snapshot"),
+  stripResize: (width: number, height: number) => invoke<void>("strip_resize", { width, height }),
+  stripJoin: () => invoke<void>("strip_join"),
 
   autostartStatus: () => invoke<boolean>("autostart_status"),
   autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),

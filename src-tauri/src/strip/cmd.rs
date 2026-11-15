@@ -1,0 +1,41 @@
+use tauri::{AppHandle, Manager, State};
+
+use crate::error::{AppError, Result};
+use crate::strip::snapshot::{self, Snapshot};
+use crate::strip::{place, StripConfig, StripState, WINDOW};
+
+#[tauri::command]
+pub fn strip_config_get(state: State<'_, StripState>) -> StripConfig {
+    state.cfg()
+}
+
+#[tauri::command]
+pub fn strip_config_set(app: AppHandle, state: State<'_, StripState>, config: StripConfig) -> Result<StripConfig> {
+    let saved = state.set(config)?;
+    place::sync(&app);
+    // An edge change on a window already up must move it now, not at the next show.
+    if let Some(win) = app.get_webview_window(WINDOW).filter(|w| w.is_visible().unwrap_or(false)) {
+        let size = win.inner_size().ok().zip(win.scale_factor().ok());
+        let size = size.map_or(place::DEFAULT, |(s, f)| (f64::from(s.width) / f, f64::from(s.height) / f));
+        place::place(&win, size, saved.edge).map_err(|e| AppError::Io(e.to_string()))?;
+    }
+    Ok(saved)
+}
+
+#[tauri::command(async)]
+pub fn strip_snapshot(app: AppHandle, state: State<'_, StripState>) -> Snapshot {
+    snapshot::build(&app, &state.cfg())
+}
+
+/// The pill's measured size: the window takes it, so no empty, click-eating space stays on the screen edge.
+#[tauri::command]
+pub fn strip_resize(app: AppHandle, state: State<'_, StripState>, width: f64, height: f64) -> Result<()> {
+    let Some(win) = app.get_webview_window(WINDOW) else { return Ok(()) };
+    place::place(&win, (width, height), state.cfg().edge).map_err(|e| AppError::Io(e.to_string()))
+}
+
+/// Same action as the tray's "entrar" item and its shortcut.
+#[tauri::command]
+pub fn strip_join(app: AppHandle) {
+    crate::tray_live::join_next_meeting(&app);
+}
