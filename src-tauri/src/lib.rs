@@ -47,6 +47,7 @@ pub mod gmail;
 pub mod google;
 pub mod gtasks;
 pub mod guest_photos;
+pub mod gui_path;
 pub mod harness;
 pub mod health;
 #[cfg(windows)]
@@ -118,6 +119,7 @@ pub use global_shortcuts::TOGGLE_SHORTCUT_LABEL;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    gui_path::init();
     let builder = tauri::Builder::default();
     // Must be first: with autostart, reopening the app would create another tray and clipboard.json watcher.
     #[cfg(desktop)]
