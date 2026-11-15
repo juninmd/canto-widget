@@ -79,7 +79,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
   // Under a search the list is partial, so only an unfiltered list says how much a clear removes.
   const clearable = loadedFor === "" && !query ? items.length - pinnedCount : -1;
   const counts = useMemo(() => kindCounts(items.map((i) => i.preview)), [items]);
-  const visible = items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter);
+  const visible = useMemo(() => items.filter((i) => kindFilter === "all" || clipKind(i.preview) === kindFilter), [items, kindFilter]);
   const list = useRef<HTMLDivElement>(null);
   useFlip(list, visible.map((i) => `${i.id}:${i.pinned}`).join());
 
