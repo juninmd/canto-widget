@@ -14,6 +14,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 - **Barra lateral com auto-hide (Windows, macOS e Linux)**: em Ajustes → Janela, a janela gruda no canto direito da tela em altura total, some deixando só uma faixa fina quando o mouse sai dela e volta ao encostar o mouse na borda direita. O modo mini e a tela cheia têm prioridade.
 - **Menos conexões e handshakes TLS**: status, agentes, modelos, saúde dos endpoints, leituras (RSS) e agenda do Google agora reutilizam um único cliente HTTP (conexões keep-alive) em vez de criar um novo a cada atualização, reduzindo CPU, memória e latência nos refreshes periódicos.
 
+### Desempenho
+
+- **Listas mais leves**: avatares, miniaturas, capas e ícones de listas (Agenda, Contatos, Repositórios, Leituras, Steam, Notas) decodificam fora da thread principal e as miniaturas carregam só perto da tela; a lista da Área de transferência não refaz o filtro por tipo a cada ciclo de atualização.
+
 ### Corrigido
 
 - **PATH completo ao abrir pelo Finder, Dock ou menu de aplicativos (macOS e Linux)**: apps abertos pela interface recebem um `PATH` mínimo, então `git`, `docker` e as CLIs de agentes (Homebrew, `~/.local/bin`, cargo, bun, npm) apareciam como não instalados. O Canto agora acrescenta esses diretórios ao fim do `PATH`. A pasta no terminal também tenta tilix, foot e wezterm no Linux.
@@ -136,7 +140,6 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
   os testes delas. **Mercado** continua como protótipo; o mecanismo de protótipo fica para a próxima ideia.
 ### Alterado
 
-- **Listas mais leves**: avatares, miniaturas, capas e ícones de listas (Agenda, Contatos, Repositórios, Leituras, Steam, Notas) decodificam fora da thread principal e as miniaturas carregam só perto da tela; a lista da Área de transferência não refaz o filtro por tipo a cada ciclo de atualização.
 - **Código Rust agrupado por funcionalidade**: `src-tauri/src` tinha 271 arquivos numa pasta só; 166 deles foram para 21 pastas (`steam/`, `github/`, `clipboard/`, `window/`, ...), sem o prefixo repetido (`steam_lists.rs` virou `steam/lists.rs`, os comandos ficam em `<funcionalidade>/cmd.rs`). Nomes de comandos IPC, arquivos em disco e AADs não mudam. Os testes que varrem o código-fonte (não perturbe, arquivos selados) passaram a percorrer as pastas.
 
 - **Código da interface organizado por funcionalidade**: os 360 arquivos de `src/components` e os 242 de `src/lib` foram para `src/features/<nome>/` (componentes, lógica e testes lado a lado), `src/shell/` (o que emoldura as abas) e um núcleo compartilhado pequeno. Nada muda para quem usa; um teste impede que o código compartilhado volte a depender de uma funcionalidade e que dois arquivos da mesma pasta difiram só por maiúsculas (o que quebra no Windows e no macOS).
