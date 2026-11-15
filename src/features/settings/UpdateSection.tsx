@@ -1,11 +1,19 @@
 import { useEffect, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { api, errText, UPDATE_PROGRESS_EVENT, type UpdateInfo, type UpdateProgress } from "../../lib/api";
-import { t } from "../../i18n";
+import { LOCALE, t } from "../../i18n";
 import { plainNotes } from "../../lib/releaseNotes";
 import { SettingsSection } from "./SettingsSection";
 
-const brDate = (iso: string) => iso.split("-").reverse().join("/");
+function formatDate(iso: string): string {
+  const m = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return iso;
+  return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(LOCALE, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
 
 function percent(p: UpdateProgress | null): string {
   if (!p) return "";
@@ -63,7 +71,7 @@ export default function UpdateSection() {
         <dt className="text-muted">{t("update.latest")}</dt>
         <dd className="font-mono text-fg">
           {info ? info.latest : checking ? t("update.checking") : "—"}
-          {info?.date && <span className="font-sans text-faint"> · {brDate(info.date)}</span>}
+          {info?.date && <span className="font-sans text-faint"> · {formatDate(info.date)}</span>}
         </dd>
       </dl>
       {error && (

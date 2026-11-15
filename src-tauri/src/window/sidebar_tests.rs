@@ -76,4 +76,15 @@ fn the_watcher_stands_down_for_mini_and_fullscreen() {
     let src = include_str!("sidebar.rs").replace('\r', "");
     let body = &src[src.find("fn tick(").unwrap()..src.find("pub fn watch(").unwrap()];
     assert!(body.contains("cfg.mini") && body.contains("is_max"), "the sidebar would fight the dock");
+    assert!(body.contains("is_wayland()"), "Wayland cannot read cursor position and would strand the sidebar");
+}
+
+#[test]
+fn wayland_detection_respects_x11_override_and_display_vars() {
+    assert!(wayland_session(Some("wayland"), None, None));
+    assert!(wayland_session(Some("Wayland"), None, None));
+    assert!(wayland_session(None, Some("wayland-0"), None));
+    assert!(!wayland_session(Some("wayland"), Some("wayland-0"), Some("x11")));
+    assert!(!wayland_session(Some("x11"), None, None));
+    assert!(!wayland_session(None, Some(""), None));
 }

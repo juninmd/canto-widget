@@ -28,7 +28,7 @@ fn track_text_tells_ahead_and_gone() {
 #[test]
 fn only_merged_or_gone_and_clean_is_safe() {
     let f = |dirty, merged, gone, branch: Option<&str>| {
-        verdict(&Facts { branch: branch.map(Into::into), dirty, merged, gone })
+        verdict(&Facts { branch: branch.map(Into::into), status_ok: true, dirty, merged, gone })
     };
     assert_eq!(f(0, true, false, Some("a")).reason, "merged");
     assert_eq!(f(0, false, true, Some("a")).reason, "gone");
@@ -36,6 +36,11 @@ fn only_merged_or_gone_and_clean_is_safe() {
     assert_eq!((f(3, true, true, Some("a")).reason, f(3, true, true, Some("a")).count), ("dirty", 3));
     assert!(!f(0, false, false, Some("a")).safe, "a branch still open stays");
     assert_eq!(f(0, true, false, None).reason, "detached");
+    let failed_status =
+        verdict(&Facts { branch: Some("a".into()), status_ok: false, dirty: 0, merged: true, gone: true });
+    assert!(!failed_status.safe && failed_status.reason == "unknown");
+    let weird_ab = parse_status("# branch.ab é1 -");
+    assert_eq!((weird_ab.ahead, weird_ab.behind), (0, 0));
 }
 
 fn sh(dir: &Path, args: &[&str]) {

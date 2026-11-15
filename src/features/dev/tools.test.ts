@@ -88,6 +88,9 @@ test("the line diff marks what left and what came", () => {
   expect(lineDiff("a\nb\nc", "a\nc\nd")).toEqual([
     { op: " ", text: "a" }, { op: "-", text: "b" }, { op: " ", text: "c" }, { op: "+", text: "d" },
   ]);
+  expect(lineDiff("a\r\nb\r\n", "a\nb\n")).toEqual([
+    { op: " ", text: "a" }, { op: " ", text: "b" }, { op: " ", text: "" },
+  ]);
   expect(lineDiff("x".repeat(1), "x")?.every((l) => l.op === " ")).toBe(true);
   expect(lineDiff("\n".repeat(3000), "\n".repeat(3000))).toBeNull();
 });

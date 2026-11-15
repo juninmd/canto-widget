@@ -7,13 +7,14 @@ import type { Agenda } from "./useAgenda";
 const opened: string[] = [];
 const windows: string[] = [];
 let dayItems: unknown[] = [];
+const dayResponses: Array<Promise<unknown[]>> = [];
 const photoCalls: string[][] = [];
 let photos: unknown = null;
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, a?: { url?: string; emails?: string[]; timeMin?: string }) => {
     if (cmd === "agenda_today") {
       windows.push(a?.timeMin ?? "");
-      return Promise.resolve(dayItems);
+      return dayResponses.shift() ?? Promise.resolve(dayItems);
     }
     if (cmd === "open_link" && a?.url) opened.push(a.url);
     if (cmd === "guest_photos") {
@@ -59,6 +60,7 @@ beforeEach(() => {
   opened.length = 0;
   windows.length = 0;
   dayItems = [];
+  dayResponses.length = 0;
   photoCalls.length = 0;
   photos = null;
 });
@@ -194,4 +196,25 @@ test("any date can be picked and 'hoje' returns to the live agenda", async () =>
     fireEvent.click(screen.getByRole("button", { name: "hoje" }));
   });
   expect(screen.getByRole("button", { name: /Planejamento da sprint/ })).toBeTruthy();
+});
+
+test("switching days rapidly ignores a slower response from an earlier day", async () => {
+  let resolveFirst!: (v: unknown[]) => void;
+  let resolveSecond!: (v: unknown[]) => void;
+  dayResponses.push(
+    new Promise((r) => (resolveFirst = r)),
+    new Promise((r) => (resolveSecond = r)),
+  );
+  render(<AgendaTab agenda={agenda({})} today="2026-09-18" onError={() => {}} />);
+  fireEvent.change(screen.getByLabelText("Escolher o dia da agenda"), { target: { value: "2026-10-05" } });
+  fireEvent.change(screen.getByLabelText("Escolher o dia da agenda"), { target: { value: "2026-10-06" } });
+  await act(async () => {
+    resolveSecond([{ ...planning, id: "fresh", title: "Fresh Oct 6 meeting" }]);
+  });
+  expect(screen.getByRole("button", { name: /Fresh Oct 6 meeting/ })).toBeTruthy();
+  await act(async () => {
+    resolveFirst([{ ...planning, id: "stale", title: "Stale Oct 5 meeting" }]);
+  });
+  expect(screen.queryByRole("button", { name: /Stale Oct 5 meeting/ })).toBeNull();
+  expect(screen.getByRole("button", { name: /Fresh Oct 6 meeting/ })).toBeTruthy();
 });

@@ -38,6 +38,7 @@ pub fn available() -> bool {
 /// Stores the password, then reopens right away: proves the prompt really unlocks it before the
 /// caller marks biometric as enabled, matching `biometric::enable_verified`'s Windows Hello contract.
 pub fn enable_verified(password: &str) -> Result<()> {
+    delete();
     let mut opts = options();
     opts.set_access_control_options(AccessControlOptions::BIOMETRY_CURRENT_SET);
     passwords::set_generic_password_options(password.as_bytes(), opts).map_err(failure)?;

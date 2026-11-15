@@ -117,6 +117,7 @@ pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Re
         }
         // Vault recreated with another password: the stored copy is now useless.
         Err(AppError::WrongPassword) => {
+            delete();
             let _ = biometric::disable(&state.dir);
             Err(AppError::Config(format!("a senha mestra mudou; ative o {NAME} de novo em Ajustes")))
         }

@@ -1,5 +1,6 @@
 //! The meeting watcher's last Calendar read, shared with the tray: one request every 3 minutes feeds both,
 //! where the tray used to send its own every 90 s for the same events.
+use crate::resilient::LockExt;
 use std::sync::Mutex;
 
 use crate::calendar::AgendaItem;
@@ -12,7 +13,7 @@ impl Upcoming {
     /// Called once per watcher step. The fetched list is kept whole, so a meeting already under way still offers
     /// "Entrar" until it ends; a lock empties it, since the tray shows nothing then and full events stay off memory.
     pub fn publish(&self, fresh: Option<&[AgendaItem]>, locked: bool) {
-        let mut items = self.0.lock().unwrap();
+        let mut items = self.0.lock_safe();
         if locked {
             items.clear();
         } else if let Some(fresh) = fresh {
@@ -21,7 +22,7 @@ impl Upcoming {
     }
 
     pub fn next_with_meet(&self, now_ms: i64) -> Option<AgendaItem> {
-        next_meeting::next_with_meet(&self.0.lock().unwrap(), now_ms).cloned()
+        next_meeting::next_with_meet(&self.0.lock_safe(), now_ms).cloned()
     }
 }
 

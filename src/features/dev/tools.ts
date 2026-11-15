@@ -193,7 +193,7 @@ export type DiffLine = { op: " " | "+" | "-"; text: string };
 
 /** Line diff by longest common subsequence; null when the inputs are too big to diff in the webview. */
 export function lineDiff(a: string, b: string): DiffLine[] | null {
-  const [x, y] = [a.split("\n"), b.split("\n")];
+  const [x, y] = [a.split(/\r?\n/), b.split(/\r?\n/)];
   if (x.length * y.length > 4_000_000) return null;
   const d = Array.from({ length: x.length + 1 }, () => new Array<number>(y.length + 1).fill(0));
   for (let i = x.length - 1; i >= 0; i--) for (let j = y.length - 1; j >= 0; j--) d[i][j] = x[i] === y[j] ? d[i + 1][j + 1] + 1 : Math.max(d[i + 1][j], d[i][j + 1]);

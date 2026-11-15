@@ -2,11 +2,12 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { emit, listen } from "@tauri-apps/api/event";
 import { t } from "./i18n";
 import { api, errText, todayLocal } from "./lib/api";
+import { MOD_KEY } from "./lib/platform";
 import { CAPTURE_EVENT, TASKS_CHANGED_EVENT } from "./features/alerts/alertEvents";
 import { parseQuickTask } from "./features/tasks/quickAdd";
 import Spinner from "./components/Spinner";
 
-/** The shortcut's own window: Enter saves a task for today, Ctrl+Enter a note, Esc leaves without saving. */
+/** The shortcut's own window: Enter saves a task for today, Ctrl+Enter (Cmd+Enter on macOS) a note, Esc leaves without saving. */
 export default function CaptureWindow() {
   const [text, setText] = useState("");
   const [error, setError] = useState("");
@@ -85,7 +86,7 @@ export default function CaptureWindow() {
         className="min-h-9 rounded-lg border border-edge bg-ink px-3 text-sm text-fg placeholder:text-faint focus:border-accent focus:outline-none"
       />
       <div className="flex items-center justify-between gap-2">
-        <p className="min-w-0 truncate text-[11px] text-faint">{t("capture.hint")}</p>
+        <p className="min-w-0 truncate text-[11px] text-faint">{t("capture.hint", { mod: MOD_KEY })}</p>
         <div className="flex shrink-0 gap-1.5">
           <button
             type="button"

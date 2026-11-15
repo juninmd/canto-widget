@@ -1,3 +1,4 @@
+import { LOCALE } from "../../i18n";
 import type { ContributionDay, RepoInfo, RepoPage } from "../../lib/api";
 
 export type RepoView = "tree" | "flat";
@@ -35,7 +36,7 @@ export function mergePages(pages: Map<number, RepoPage>): RepoInfo[] {
   return out;
 }
 
-const byName = (a: RepoInfo, b: RepoInfo) => a.full_name.localeCompare(b.full_name);
+const byName = (a: RepoInfo, b: RepoInfo) => a.full_name.localeCompare(b.full_name, LOCALE);
 
 export function sortRepos(repos: RepoInfo[], sort: RepoSort): RepoInfo[] {
   const by: Record<RepoSort, (a: RepoInfo, b: RepoInfo) => number> = {
@@ -86,11 +87,11 @@ export function buildRows(repos: RepoInfo[], sort: RepoSort, isOpen: (key: strin
     const open = isOpen(n.key);
     rows.push({ kind: "group", key: n.key, name: n.name, depth: n.depth, count: n.count, open, avatar: n.avatar });
     if (!open) return;
-    for (const kid of [...n.kids.values()].sort((a, b) => a.name.localeCompare(b.name))) visit(kid);
+    for (const kid of [...n.kids.values()].sort((a, b) => a.name.localeCompare(b.name, LOCALE))) visit(kid);
     for (const repo of sortRepos(n.repos, sort)) rows.push({ kind: "repo", key: repo.id || repo.full_name, repo, depth: n.depth + 1 });
   };
   if (root.repos.length > 0) visit(root);
-  for (const n of [...top.values()].sort((a, b) => a.name.localeCompare(b.name))) visit(n);
+  for (const n of [...top.values()].sort((a, b) => a.name.localeCompare(b.name, LOCALE))) visit(n);
   return rows;
 }
 

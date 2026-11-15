@@ -163,7 +163,7 @@ export default function AgendaTab({
           )}
           {!hasDay && loading && !error && <Skeleton label={t("agenda.loading")} />}
           {!hasDay && !loading && (!error || disconnected) && <AgendaEmpty notConnected={disconnected} isToday={isToday} onOpenSettings={onOpenSettings} />}
-          <AgendaTray tasks={unscheduled(tasks)} blocks={dayBlocks(items, tasks)} nowMin={minuteOf(at)} onSchedule={schedule} />
+          <AgendaTray tasks={unscheduled(tasks)} blocks={dayBlocks(items, tasks, at)} nowMin={minuteOf(at)} onSchedule={schedule} />
         </div>
       )}
     </div>

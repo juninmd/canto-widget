@@ -134,7 +134,7 @@ export default function TabBar({ current, onChange, tabs = TABS, attention = {} 
               aria-controls={current === tab.id ? panelId(tab.id) : undefined}
               tabIndex={current === tab.id ? 0 : -1}
               onClick={() => onChange(tab.id)}
-              title={`Alt+${i + 1}`}
+              title={i < 9 ? `Alt+${i + 1}` : undefined}
               aria-keyshortcuts={i < 9 ? `Alt+${i + 1}` : undefined}
               className={`${TAB} ${
                 current === tab.id

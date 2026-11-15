@@ -100,6 +100,14 @@ fn the_scored_initial_models_win_over_a_plain_name_list() {
     assert_eq!(models.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(), ["carbon"]);
 }
 
+#[test]
+fn multibyte_utf8_before_models_key_does_not_panic() {
+    let body = r#"{"notas":"caféodels":[1],"models":[{"slug":"a","name":"A","intelligenceIndex":10}]}"#;
+    let models = parse_page(&page(body)).unwrap();
+    assert_eq!(models.len(), 1);
+    assert_eq!(models[0].id, "a");
+}
+
 /// Smoke test against the live page: `cargo test --lib live_leaderboard -- --ignored --nocapture`.
 #[test]
 #[ignore = "network"]

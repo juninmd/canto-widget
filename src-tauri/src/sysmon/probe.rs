@@ -35,6 +35,18 @@ impl Default for Probe {
     }
 }
 
+fn finite(v: f32) -> f32 {
+    if v.is_finite() {
+        v
+    } else {
+        0.0
+    }
+}
+
+fn finite_opt(v: Option<f32>) -> Option<f32> {
+    v.filter(|x| x.is_finite())
+}
+
 impl Probe {
     /// One refresh up front: CPU usage is a difference between two readings, so the tab's first one already means something.
     pub fn new() -> Self {
@@ -66,7 +78,7 @@ impl Probe {
             sys.refresh_processes_specifics(ProcessesToUpdate::All, true, procs_kind());
             let cores = sys.cpus().len().max(1);
             snap.cpu = Cpu {
-                usage: sys.global_cpu_usage(),
+                usage: finite(sys.global_cpu_usage()),
                 brand: sys.cpus().first().map(|c| c.brand().trim().to_string()).unwrap_or_default(),
                 cores,
                 freq_mhz: sys.cpus().iter().map(|c| c.frequency()).max().unwrap_or(0),
@@ -81,7 +93,7 @@ impl Probe {
             let samples =
                 sys.processes().values().filter(|p| p.thread_kind() != Some(ThreadKind::Userland)).map(|p| Sample {
                     name: p.name().to_string_lossy().into_owned(),
-                    cpu: p.cpu_usage() / cores as f32,
+                    cpu: finite(p.cpu_usage() / cores as f32),
                     memory: p.memory(),
                 });
             snap.apps = group(samples);
@@ -96,7 +108,7 @@ impl Probe {
                 .iter()
                 .map(|g| Gpu {
                     name: g.model().or(g.vendor()).unwrap_or("GPU").trim().to_string(),
-                    usage: g.usage(),
+                    usage: finite_opt(g.usage()),
                     mem_used: g.used_memory(),
                     mem_total: g.total_memory(),
                 })
@@ -214,15 +226,15 @@ fn battery() -> Option<Battery> {
         _ => None,
     };
     Some(Battery {
-        percent: b.state_of_charge().get::<percent>(),
+        percent: finite(b.state_of_charge().get::<percent>()),
         state: state.to_string(),
-        rate_w: b.energy_rate().get::<watt>().abs(),
-        temp_c: b.temperature().map(|t| t.get::<degree_celsius>()),
-        health: b.state_of_health().get::<percent>(),
+        rate_w: finite(b.energy_rate().get::<watt>().abs()),
+        temp_c: b.temperature().map(|t| t.get::<degree_celsius>()).filter(|t| t.is_finite()),
+        health: finite(b.state_of_health().get::<percent>()),
         cycles: b.cycle_count(),
-        voltage_v: b.voltage().get::<volt>(),
-        full_wh: b.energy_full().get::<watt_hour>(),
-        design_wh: b.energy_full_design().get::<watt_hour>(),
+        voltage_v: finite(b.voltage().get::<volt>()),
+        full_wh: finite(b.energy_full().get::<watt_hour>()),
+        design_wh: finite(b.energy_full_design().get::<watt_hour>()),
         minutes: minutes.map(|m| m.get::<minute>().round() as u32).filter(|m| *m > 0),
     })
 }
@@ -258,5 +270,17 @@ mod tests {
     fn loopback_interfaces_are_not_traffic() {
         assert!(loopback("lo") && loopback("lo0") && loopback("Loopback Pseudo-Interface 1"));
         assert!(!loopback("wlan0") && !loopback("Wi-Fi") && !loopback("eth0"));
+    }
+
+    #[test]
+    fn non_finite_sensor_values_become_zero_so_json_never_breaks() {
+        assert_eq!(finite(f32::NAN), 0.0);
+        assert_eq!(finite(f32::INFINITY), 0.0);
+        assert_eq!(finite(f32::NEG_INFINITY), 0.0);
+        assert_eq!(finite(42.5), 42.5);
+        assert_eq!(finite_opt(None), None);
+        assert_eq!(finite_opt(Some(f32::NAN)), None);
+        assert_eq!(finite_opt(Some(f32::INFINITY)), None);
+        assert_eq!(finite_opt(Some(42.5)), Some(42.5));
     }
 }

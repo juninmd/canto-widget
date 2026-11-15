@@ -122,7 +122,7 @@ pub fn page(games: &[PlayGame], filter: &str, term: &str, page: usize, has_key: 
     SteamPlay {
         items: matching.iter().skip(page * PAGE).take(PAGE).map(|g| (*g).clone()).collect(),
         total: total as u32,
-        minutes: matching.iter().map(|g| g.total_min).sum(),
+        minutes: matching.iter().fold(0u32, |acc, g| acc.saturating_add(g.total_min)),
         pages: total.div_ceil(PAGE).max(1) as u32,
         counts: counts(games),
         hero: games.iter().find(|g| g.last_played > 0 || g.recent_min > 0).or(games.first()).cloned(),

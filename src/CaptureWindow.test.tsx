@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { todayLocal } from "./lib/api";
+import { MOD_KEY } from "./lib/platform";
 
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 const emitted: string[] = [];
@@ -117,4 +118,8 @@ test("a second Enter while the first save runs does not add the task twice", asy
   await settle();
   expect(cmds().filter((c) => c === "task_add")).toHaveLength(1);
   expect(task.disabled).toBe(false);
+});
+
+test("hint displays the platform modifier key next to note shortcut", () => {
+  expect(screen.getByText(`Enter: tarefa · ${MOD_KEY}+Enter: nota · Esc: fechar`)).toBeDefined();
 });

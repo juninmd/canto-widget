@@ -21,7 +21,7 @@ struct Saved {
 pub struct WeatherState {
     path: PathBuf,
     place: Mutex<Option<Place>>,
-    cached: Mutex<Option<(i64, Forecast)>>,
+    cached: Mutex<Option<(i64, Place, Forecast)>>,
 }
 
 impl WeatherState {
@@ -44,7 +44,7 @@ impl WeatherState {
     }
 
     pub fn fetched_at(&self) -> i64 {
-        self.cached.lock_safe().as_ref().map_or(0, |(at, _)| *at)
+        self.cached.lock_safe().as_ref().map_or(0, |(at, _, _)| *at)
     }
 
     /// A fresh reading comes from RAM; `force` (or the floor) goes to the network. The lock is released while
@@ -55,16 +55,18 @@ impl WeatherState {
         now: i64,
         fetch: impl FnOnce(&Place) -> std::result::Result<Forecast, String>,
     ) -> std::result::Result<Forecast, String> {
+        let place = self.place().ok_or_else(|| "escolha uma cidade".to_string())?;
         if !force {
-            if let Some((at, forecast)) = self.cached.lock_safe().clone() {
-                if now - at < TTL_MS {
+            if let Some((at, cached_place, forecast)) = self.cached.lock_safe().clone() {
+                if cached_place == place && now >= at && now - at < TTL_MS {
                     return Ok(forecast);
                 }
             }
         }
-        let place = self.place().ok_or_else(|| "escolha uma cidade".to_string())?;
         let forecast = fetch(&place)?;
-        *self.cached.lock_safe() = Some((now, forecast.clone()));
+        if self.place().as_ref() == Some(&place) {
+            *self.cached.lock_safe() = Some((now, place, forecast.clone()));
+        }
         Ok(forecast)
     }
 }
@@ -193,5 +195,21 @@ mod tests {
         assert!(state.forecast(false, 0, |_| Err("sem resposta".into())).is_err());
         assert_eq!(state.fetched_at(), 0);
         assert!(state.forecast(false, 1, |_| Ok(forecast(20.0))).is_ok());
+    }
+
+    #[test]
+    fn clock_jump_backward_refetches_and_city_change_during_fetch_does_not_poison_cache() {
+        let state = WeatherState::load(&dir("clock-and-race"));
+        state.set_place(Some(place())).unwrap();
+        state.forecast(false, 10_000, |_| Ok(forecast(20.0))).unwrap();
+        assert_eq!(state.forecast(false, 5_000, |_| Ok(forecast(25.0))).unwrap().now.temp, 25.0);
+        let r = state
+            .forecast(false, 5_000 + TTL_MS, |_| {
+                state.set_place(Some(Place { city: "Recife".into(), ..place() })).unwrap();
+                Ok(forecast(18.0))
+            })
+            .unwrap();
+        assert_eq!(r.now.temp, 18.0);
+        assert_eq!(state.fetched_at(), 0);
     }
 }

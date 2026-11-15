@@ -1,4 +1,4 @@
-import { t, type MessageKey } from "../../i18n";
+import { LOCALE, t, type MessageKey } from "../../i18n";
 import type { CronTask } from "./devTypes";
 
 const RANGES: [number, number][] = [[0, 59], [0, 23], [1, 31], [1, 12], [0, 6]];
@@ -28,6 +28,7 @@ export function parseCron(expr: string): Set<number>[] | null {
 
 /** The next `n` minutes the expression fires at, after `from`; "@reboot" and the like have none. */
 export function nextRuns(expr: string, from: Date, n = 3): Date[] {
+  const parts = expr.trim().split(/\s+/);
   const f = parseCron(expr);
   if (!f) return [];
   const d = new Date(from);
@@ -36,7 +37,7 @@ export function nextRuns(expr: string, from: Date, n = 3): Date[] {
   for (let i = 0; i < 60 * 24 * 366 && out.length < n; i++) {
     d.setMinutes(d.getMinutes() + 1);
     // Cron fires on day-of-month OR weekday when both are restricted.
-    const dayOk = (expr.split(/\s+/)[2] !== "*" && expr.split(/\s+/)[4] !== "*") ? f[2].has(d.getDate()) || f[4].has(d.getDay()) : f[2].has(d.getDate()) && f[4].has(d.getDay());
+    const dayOk = (parts[2] !== "*" && parts[4] !== "*") ? f[2].has(d.getDate()) || f[4].has(d.getDay()) : f[2].has(d.getDate()) && f[4].has(d.getDay());
     if (f[0].has(d.getMinutes()) && f[1].has(d.getHours()) && f[3].has(d.getMonth() + 1) && dayOk) out.push(new Date(d));
   }
   return out;
@@ -62,5 +63,5 @@ export function describeCron(expr: string): string | null {
 /** A task's schedule for a list row: its own expression, or the time Windows gave. */
 export function nextLabel(task: CronTask, from: Date): string {
   const when = task.expr ? nextRuns(task.expr, from, 1)[0] : task.next ? new Date(task.next) : undefined;
-  return when && !Number.isNaN(when.getTime()) ? when.toLocaleString(undefined, { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
+  return when && !Number.isNaN(when.getTime()) ? when.toLocaleString(LOCALE, { weekday: "short", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) : "";
 }

@@ -57,6 +57,9 @@ fn the_library_puts_the_most_played_first_and_counts_everything_it_matched() {
     assert_eq!(filtered.len(), 1, "the search is case-insensitive");
     assert_eq!(filtered[0].appid, 2);
     assert_eq!(library_page(&filtered, 0).minutes, 900, "the total follows the search");
+
+    let huge = vec![owned(1, "A", u32::MAX - 10), owned(2, "B", 100)];
+    assert_eq!(library_page(&huge, 0).minutes, u32::MAX);
 }
 
 #[test]

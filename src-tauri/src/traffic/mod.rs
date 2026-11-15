@@ -146,7 +146,7 @@ pub fn km_between(a: (f64, f64), b: (f64, f64)) -> f64 {
     let dla = la2 - la1;
     let dlo = (b.1 - a.1).to_radians();
     let h = (dla / 2.0).sin().powi(2) + la1.cos() * la2.cos() * (dlo / 2.0).sin().powi(2);
-    6371.0 * 2.0 * h.sqrt().asin()
+    6371.0 * 2.0 * h.clamp(0.0, 1.0).sqrt().asin()
 }
 
 /// `(min_lon, min_lat, max_lon, max_lat)` of a square `km` around the point.

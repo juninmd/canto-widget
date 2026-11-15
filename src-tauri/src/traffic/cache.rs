@@ -31,7 +31,12 @@ impl TrafficCache {
         now: i64,
         fetch: impl FnOnce() -> Result<T>,
     ) -> Result<(T, i64)> {
-        let hit = self.entries.lock_safe().get(key).filter(|e| now - e.at < ttl).map(|e| (e.json.clone(), e.at));
+        let hit = self
+            .entries
+            .lock_safe()
+            .get(key)
+            .filter(|e| now >= e.at && now - e.at < ttl)
+            .map(|e| (e.json.clone(), e.at));
         if let Some((json, at)) = hit {
             return Ok((serde_json::from_str(&json)?, at));
         }
@@ -57,7 +62,7 @@ impl TrafficCache {
         if history.last().is_none_or(|(last, _)| *last != at) {
             history.push((at, slowdown));
         }
-        history.retain(|(t, _)| at - t < 24 * 3_600_000);
+        history.retain(|(t, _)| at.saturating_sub(*t) < 24 * 3_600_000);
         history.clone()
     }
 

@@ -46,6 +46,12 @@ test("shows the installed and the newest published version side by side", async 
   expect(screen.getByText("Correções no clipboard")).toBeDefined();
 });
 
+test("formats full ISO timestamps cleanly when present in release metadata", async () => {
+  check = () => Promise.resolve({ ...newer, date: "2026-09-18T14:30:00Z" });
+  await show();
+  expect(screen.getByText("última publicada").nextElementSibling?.textContent).toBe("0.2.0 · 18/09/2026");
+});
+
 test("the release notes show as plain sentences: the card has no Markdown to render", async () => {
   check = () =>
     Promise.resolve({

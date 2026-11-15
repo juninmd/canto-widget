@@ -18,7 +18,7 @@ const isBareNumber = (segment: string) => {
 
 /** Words in a note's Markdown body, ignoring image refs, link targets and markup; CJK counts per segment. */
 export function countWords(markdown: string): number {
-  const text = markdown.replace(IMAGE_REF, " ").replace(LINK, "$1").replace(URL_RE, " ").replace(LIST_MARK, "$1");
+  const text = markdown.replace(/\r\n/g, "\n").replace(IMAGE_REF, " ").replace(LINK, "$1").replace(URL_RE, " ").replace(LIST_MARK, "$1");
   if (!segmenter) return text.split(/[^\p{L}\p{N}]+/u).filter(Boolean).length;
   let n = 0;
   for (const s of segmenter.segment(text)) if (s.isWordLike || isBareNumber(s.segment)) n++;

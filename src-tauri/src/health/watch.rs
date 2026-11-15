@@ -114,7 +114,7 @@ impl HealthState {
                     .history
                     .get(&e.id)
                     .and_then(|h| h.back())
-                    .is_none_or(|s| now_ms - s.at >= e.every_secs as i64 * 1000)
+                    .is_none_or(|s| now_ms < s.at || now_ms - s.at >= e.every_secs as i64 * 1000)
             })
             .cloned()
             .collect();

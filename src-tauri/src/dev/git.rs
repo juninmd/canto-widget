@@ -30,7 +30,7 @@ pub fn parse_status(text: &str) -> Status {
         if let Some(h) = line.strip_prefix("# branch.head ") {
             s.branch = Some(h.to_string()).filter(|h| h != "(detached)");
         } else if let Some(ab) = line.strip_prefix("# branch.ab ") {
-            let mut n = ab.split_whitespace().map(|x| x[1..].parse::<u32>().unwrap_or(0));
+            let mut n = ab.split_whitespace().map(|x| x.get(1..).and_then(|s| s.parse::<u32>().ok()).unwrap_or(0));
             (s.ahead, s.behind) = (n.next().unwrap_or(0), n.next().unwrap_or(0));
         } else if !line.starts_with('#') && !line.is_empty() {
             s.dirty += 1;
@@ -64,6 +64,7 @@ pub fn parse_track(text: &str) -> (u32, bool) {
 #[derive(Debug, Clone, Default)]
 pub struct Facts {
     pub branch: Option<String>,
+    pub status_ok: bool,
     pub dirty: u32,
     pub merged: bool,
     pub gone: bool,
@@ -72,7 +73,7 @@ pub struct Facts {
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub struct Verdict {
     pub safe: bool,
-    /// "merged" and "gone" are safe; "detached", "dirty" and "open" are why one is not.
+    /// "merged" and "gone" are safe; "detached", "unknown", "dirty" and "open" are why one is not.
     pub reason: &'static str,
     pub count: u32,
 }
@@ -83,6 +84,7 @@ pub fn verdict(f: &Facts) -> Verdict {
     let v = |safe, reason, count| Verdict { safe, reason, count };
     match () {
         _ if f.branch.is_none() => v(false, "detached", 0),
+        _ if !f.status_ok => v(false, "unknown", 0),
         _ if f.dirty > 0 => v(false, "dirty", f.dirty),
         _ if f.merged => v(true, "merged", 0),
         _ if f.gone => v(true, "gone", 0),
@@ -178,14 +180,15 @@ fn default_branch(repo: &Path) -> Option<String> {
 }
 
 fn facts(repo: &Path, w: &Wt, default: Option<&str>) -> Facts {
-    let dirty =
-        git(Path::new(&w.path), &["status", "--porcelain"], QUICK).map_or(0, |o| o.stdout.lines().count() as u32);
-    let Some(branch) = w.branch.clone() else { return Facts { dirty, ..Default::default() } };
+    let status = git(Path::new(&w.path), &["status", "--porcelain"], QUICK);
+    let status_ok = status.as_ref().is_some_and(|o| o.ok);
+    let dirty = status.map_or(0, |o| o.stdout.lines().count() as u32);
+    let Some(branch) = w.branch.clone() else { return Facts { status_ok, dirty, ..Default::default() } };
     let refname = format!("refs/heads/{branch}");
     let track = text(repo, &["for-each-ref", "--format=%(upstream:track)", &refname]).unwrap_or_default();
     let merged =
         default.is_some_and(|d| git(repo, &["merge-base", "--is-ancestor", &refname, d], QUICK).is_some_and(|o| o.ok));
-    Facts { branch: Some(branch), dirty, merged, gone: parse_track(&track).1 }
+    Facts { branch: Some(branch), status_ok, dirty, merged, gone: parse_track(&track).1 }
 }
 
 /// The linked worktrees (never the main checkout) of one repository, each with its verdict.

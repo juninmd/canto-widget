@@ -86,7 +86,7 @@ pub fn to_event(t: &Task) -> AgendaItem {
 }
 
 pub fn watch(app: AppHandle) {
-    std::thread::spawn(move || {
+    crate::resilient::supervise("context-reminder", move || {
         let mut rung = Rung::default();
         loop {
             let state = app.state::<AppState>();

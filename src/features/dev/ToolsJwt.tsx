@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { t, type MessageKey } from "../../i18n";
+import { LOCALE, t, type MessageKey } from "../../i18n";
 import { Chip, CopyLine, copyText } from "./DevBits";
 import { Area, Label, Line, Note, Pre, relative } from "./ToolBits";
 import { JWT_ALGS, decodeJwt, expiry, signJwt, verifyJwt } from "./tools";
@@ -52,7 +52,7 @@ export default function ToolJwt() {
     const now = Math.floor(Date.now() / 1000);
     setPayload(pretty(seconds ? { ...rest, iat: now, exp: now + seconds } : rest));
   };
-  const claim = (k: string, v: unknown) => (["iat", "exp", "nbf"].includes(k) && typeof v === "number" ? new Date(v * 1000).toLocaleString() : typeof v === "object" ? JSON.stringify(v) : String(v));
+  const claim = (k: string, v: unknown) => (["iat", "exp", "nbf"].includes(k) && typeof v === "number" ? new Date(v * 1000).toLocaleString(LOCALE) : typeof v === "object" ? JSON.stringify(v) : String(v));
 
   return (
     <>

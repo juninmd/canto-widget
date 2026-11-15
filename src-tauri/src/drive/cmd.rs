@@ -64,6 +64,7 @@ pub fn drive_status(state: State<'_, AppState>) -> Result<DriveStatus> {
 
 #[tauri::command(async)]
 pub fn drive_configure(state: State<'_, AppState>, client_id: String, client_secret: String) -> Result<()> {
+    let _serial = state.drive_lock.lock_safe();
     let mut cfg = state.drive_config()?;
     cfg.client_id = client_id.trim().to_string();
     cfg.client_secret = client_secret.trim().to_string();
@@ -98,7 +99,10 @@ pub async fn drive_connect(app: tauri::AppHandle) -> Result<String> {
 }
 
 fn connect(state: &AppState) -> Result<String> {
-    let mut cfg = state.drive_config()?;
+    let mut cfg = {
+        let _serial = state.drive_lock.lock_safe();
+        state.drive_config()?
+    };
     if !use_client(&mut cfg, crate::oauth::embedded_client()) {
         return Err(AppError::Config("informe o Client ID do Google antes de conectar".into()));
     }
@@ -109,12 +113,16 @@ fn connect(state: &AppState) -> Result<String> {
     let code = server.wait_for_code(&pkce.state)?;
     let tokens = drive::exchange_code(&cfg.client_id, &cfg.client_secret, &server.redirect_uri, &code, &pkce.verifier)?;
     let profile = crate::account::fetch_profile(&tokens.access_token).unwrap_or_default();
-    cfg.avatar = crate::account::download_avatar(&profile.photo).unwrap_or_default();
-    cfg.email = profile.email;
-    cfg.name = profile.name;
-    cfg.tokens = Some(tokens);
-    let who = cfg.email.clone();
-    state.save_drive_config(&cfg)?;
+    let avatar = crate::account::download_avatar(&profile.photo).unwrap_or_default();
+    let _serial = state.drive_lock.lock_safe();
+    let mut latest = state.drive_config()?;
+    use_client(&mut latest, crate::oauth::embedded_client());
+    latest.avatar = avatar;
+    latest.email = profile.email;
+    latest.name = profile.name;
+    latest.tokens = Some(tokens);
+    let who = latest.email.clone();
+    state.save_drive_config(&latest)?;
     Ok(who)
 }
 

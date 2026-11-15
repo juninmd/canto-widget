@@ -52,6 +52,9 @@ impl ActivityState {
 
     /// Runs `f` on the log, reading it from disk the first time after an unlock.
     fn with_log<T>(&self, state: &AppState, f: impl FnOnce(&mut Log) -> T) -> Result<T> {
+        if !state.is_unlocked() {
+            return Err(AppError::Locked);
+        }
         let mut guard = self.log.lock_safe();
         if guard.is_none() {
             let path = store::activity_path(&state.dir);
@@ -122,7 +125,7 @@ pub fn watch(app: AppHandle) {
                 Sample::Idle => log.record_idle(now),
                 Sample::Unknown => {}
             });
-            if recorded.is_ok() && now - last_flush >= FLUSH_SECS {
+            if recorded.is_ok() && (now < last_flush || now - last_flush >= FLUSH_SECS) {
                 last_flush = now;
                 if let Err(e) = act.flush(&state) {
                     eprintln!("atividade nao gravou: {e}");
@@ -176,6 +179,9 @@ pub fn activity_summary(
     from_ms: i64,
     to_ms: i64,
 ) -> Result<Summary> {
+    if !state.is_unlocked() {
+        return Err(AppError::Locked);
+    }
     valid_window(from_ms, to_ms)?;
     state.touch();
     // Reads what the sampler has, or the file when it has not run yet since the unlock.

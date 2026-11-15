@@ -115,6 +115,9 @@ fn validation_cleans_and_rejects_what_the_webview_sends() {
     }
     let tcp = |host: &str, port| ep(Target::Tcp { host: host.into(), port });
     assert!(validate(tcp("db.interno", 5432)).is_ok());
+    assert_eq!(validate(tcp(" [::1] ", 5432)).unwrap().target, Target::Tcp { host: "::1".into(), port: 5432 });
+    assert!(validate(tcp("[::1", 5432)).is_err());
+    assert!(validate(tcp("::1]", 5432)).is_err());
     assert!(validate(tcp("db interno", 5432)).is_err());
     assert!(validate(tcp("db.interno", 0)).is_err());
     assert!(validate(Endpoint { every_secs: 7, ..http() }).is_err());

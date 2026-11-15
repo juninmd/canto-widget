@@ -42,10 +42,15 @@ fn http(url: &str) -> Result<u32, String> {
     Ok(ms)
 }
 
+fn bare_host(host: &str) -> &str {
+    let trimmed = host.trim();
+    trimmed.strip_prefix('[').and_then(|s| s.strip_suffix(']')).unwrap_or(trimmed)
+}
+
 fn resolve(host: &str, port: u16) -> Result<(Vec<SocketAddr>, u32), String> {
     let start = Instant::now();
     let addrs: Vec<SocketAddr> =
-        (host, port).to_socket_addrs().map_err(|_| "o nome não resolve".to_string())?.collect();
+        (bare_host(host), port).to_socket_addrs().map_err(|_| "o nome não resolve".to_string())?.collect();
     if addrs.is_empty() {
         return Err("o nome não resolve".into());
     }
@@ -127,7 +132,7 @@ fn leaf_expiry(host: &str, addr: &SocketAddr) -> Result<i64, String> {
         .dangerous()
         .with_custom_certificate_verifier(Arc::new(AnyCert(provider)))
         .with_no_client_auth();
-    let name = ServerName::try_from(host.to_string()).map_err(|e| e.to_string())?;
+    let name = ServerName::try_from(bare_host(host).to_string()).map_err(|e| e.to_string())?;
     let mut conn = ClientConnection::new(Arc::new(config), name).map_err(|e| e.to_string())?;
     let mut sock = TcpStream::connect_timeout(addr, TIMEOUT).map_err(|e| e.to_string())?;
     sock.set_read_timeout(Some(TIMEOUT)).ok();

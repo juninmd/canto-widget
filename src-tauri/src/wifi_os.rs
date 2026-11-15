@@ -3,7 +3,7 @@
 
 /// `netsh wlan show interfaces` lists `SSID : name` (and `BSSID : mac`, which is not it) per adapter.
 pub fn parse_netsh_ssid(out: &str) -> Option<String> {
-    out.lines().filter_map(|l| l.split_once(':')).find(|(k, _)| k.trim() == "SSID").and_then(|(_, v)| name(v))
+    out.lines().filter_map(|l| l.split_once(':')).find_map(|(k, v)| (k.trim() == "SSID").then(|| name(v)).flatten())
 }
 
 /// `nmcli -t -f active,ssid dev wifi` prints `yes:name`, escaping a colon in the name as `\:`.
@@ -62,7 +62,7 @@ mod imp {
     use std::process::Command;
 
     fn run(program: &str, args: &[&str]) -> Option<String> {
-        let out = Command::new(program).args(args).output().ok().filter(|o| o.status.success())?;
+        let out = Command::new(program).args(args).env("LC_ALL", "C").output().ok().filter(|o| o.status.success())?;
         String::from_utf8(out.stdout).ok()
     }
 
@@ -82,6 +82,12 @@ mod tests {
         let out = "    Name                   : Wi-Fi\n    State                  : connected\n    SSID                   : Casa 5G\n    BSSID                  : aa:bb:cc:dd:ee:ff\n";
         assert_eq!(parse_netsh_ssid(out).as_deref(), Some("Casa 5G"));
         assert_eq!(parse_netsh_ssid("    Name : Wi-Fi\n    State : disconnected\n"), None);
+    }
+
+    #[test]
+    fn netsh_skips_disconnected_adapter_before_connected_one() {
+        let out = "    Name : Virtual\n    SSID :\n    Name : Wi-Fi\n    SSID : Escritorio\n";
+        assert_eq!(parse_netsh_ssid(out).as_deref(), Some("Escritorio"));
     }
 
     #[test]

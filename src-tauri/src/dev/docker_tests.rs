@@ -45,10 +45,14 @@ fn images_are_used_by_name_or_id_and_dangling_ones_are_not() {
     let text = r#"{"ID":"sha1","Repository":"postgres","Tag":"16","Size":"431MB","CreatedSince":"2 weeks ago"}
 {"ID":"sha2","Repository":"<none>","Tag":"<none>","Size":"640MB","CreatedSince":"4 months ago"}
 {"ID":"sha3","Repository":"node","Tag":"18-alpine","Size":"178MB","CreatedSince":"6 months ago"}
+{"ID":"sha4","Repository":"redis","Tag":"latest","Size":"110MB","CreatedSince":"1 week ago"}
+{"ID":"abc123","Repository":"busybox","Tag":"musl","Size":"5MB","CreatedSince":"1 day ago"}
+{"ID":"","Repository":"empty-id","Tag":"v1","Size":"5MB","CreatedSince":"1 day ago"}
 "#;
-    let used: HashSet<String> = ["postgres:16".to_string()].into();
+    let used: HashSet<String> =
+        ["postgres:16".to_string(), "redis".to_string(), "sha256:abc123def456".to_string()].into();
     let all = parse_images(text, &used);
-    assert_eq!(all.iter().map(|i| i.used).collect::<Vec<_>>(), vec![true, false, false]);
+    assert_eq!(all.iter().map(|i| i.used).collect::<Vec<_>>(), vec![true, false, false, true, true, false]);
     assert_eq!(all[1].name, "<none>");
     assert_eq!(all[0].size, 431_000_000);
 }

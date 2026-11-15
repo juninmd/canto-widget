@@ -148,7 +148,8 @@ pub fn interpret(v: &serde_json::Value, now: i64) -> Result<PollResult> {
     if access_token.is_empty() {
         return Err(AppError::Github("o GitHub não devolveu token".into()));
     }
-    let expires_at = v.get("expires_in").and_then(|x| x.as_i64()).map_or(0, |s| now + s * 1000);
+    let expires_at =
+        v.get("expires_in").and_then(|x| x.as_i64()).map_or(0, |s| now.saturating_add(s.max(0).saturating_mul(1000)));
     Ok(PollResult::Ready(Tokens { access_token, refresh_token: text("refresh_token"), expires_at }))
 }
 

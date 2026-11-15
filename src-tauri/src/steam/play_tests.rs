@@ -45,4 +45,7 @@ fn a_page_filters_searches_and_counts_everything() {
     assert_eq!(page(&games, "all", "PORT", 0, true).total, 1, "the search ignores case");
     let empty = page(&[], "all", "", 0, false);
     assert_eq!((empty.total, empty.pages, empty.hero), (0, 1, None));
+
+    let huge = merge(vec![owned(1, "A", u32::MAX - 5, 1), owned(2, "B", 20, 1)], &[], &[]);
+    assert_eq!(page(&huge, "all", "", 0, true).minutes, u32::MAX);
 }
