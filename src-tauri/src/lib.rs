@@ -226,6 +226,7 @@ pub fn run() {
             cmd_sync::sync_set_folder,
             cmd_sync::sync_clear,
             cmd_sync::sync_now,
+            cmd_sync::sync_status,
             trash::trash_undo,
             cmd_biometric::biometric_status,
             cmd_biometric::biometric_enable,
