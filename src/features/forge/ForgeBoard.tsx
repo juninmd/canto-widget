@@ -15,6 +15,7 @@ import ForgeHeader from "./ForgeHeader";
 import ForgeSection from "./ForgeSection";
 import ForgeSummary from "./ForgeSummary";
 import MentionsList from "./MentionsList";
+import { savedHideDrafts, saveHideDrafts } from "./forgeDrafts";
 import PrCommentersCatalog from "./PrCommentersCatalog";
 import ReposList, { savedStats } from "./ReposList";
 import Skeleton from "../../components/Skeleton";
@@ -34,6 +35,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const [view, setView] = useState<"items" | "commenters">("items");
   const [pressed, setPressed] = useState<SummaryFocus | null>(null);
   const [known, setKnown] = useState(0);
+  const [hideDrafts, setHideDrafts] = useState(savedHideDrafts);
   const focus = effectiveFocus(pressed, ci);
 
   const mentions = useMentions(forge);
@@ -97,6 +99,17 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
           {view === "items" ? (
             <>
               <ForgeFilterBar forge={forge} filter={gh.filter} onApply={(f) => void gh.load(f, false)} />
+              <button
+                type="button"
+                aria-pressed={hideDrafts}
+                onClick={() => {
+                  saveHideDrafts(!hideDrafts);
+                  setHideDrafts(!hideDrafts);
+                }}
+                className={`canto-hit min-h-[24px] self-start rounded-full px-2.5 text-[11px] ${hideDrafts ? "bg-accent font-semibold text-on-accent" : "bg-edge text-muted hover:bg-active hover:text-fg"}`}
+              >
+                {t("forge.hideDrafts")}
+              </button>
               {fresh?.limitedUntil && (
                 <p role="status" className="text-[11px] text-muted">
                   {t("forge.rateLimited", { time: clockLabel(fresh.limitedUntil) })}
@@ -120,6 +133,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                       onMore={() => void gh.more(key)}
                       ci={ci}
                       conflicts={conflicts}
+                      hideDrafts={hideDrafts}
                     />
                   ))}
               </div>

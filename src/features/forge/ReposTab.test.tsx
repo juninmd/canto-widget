@@ -260,3 +260,20 @@ test("GitLab lists its projects through gitlab_repos_page, subgroups nested and 
   expect(calls.find((c) => c.cmd === "gitlab_readme")?.args).toEqual({ id: "7", branch: "trunk", force: false });
   expect(screen.getByText("este repositório não tem README")).toBeTruthy();
 });
+
+test("a pinned repository stays one click away: the pinned filter keeps only the pins, and the pin survives a reload", async () => {
+  localStorage.clear();
+  responses.github_repos_page = () => Promise.resolve(page([repo("octocat/dotfiles", ""), repo("octocat/canto", "")]));
+  await openRepos();
+  expect(screen.getByRole("button", { name: "fixados · 0" })).toBeTruthy();
+  fireEvent.click(screen.getByRole("treeitem", { name: "octocat/dotfiles" }));
+  const detail = screen.getByRole("region", { name: "detalhes do repositório" });
+  fireEvent.click(within(detail).getByRole("button", { name: "fixar octocat/dotfiles" }));
+  expect(within(detail).getByRole("button", { name: "desafixar octocat/dotfiles" }).getAttribute("aria-pressed")).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "fixados · 1" }));
+  expect(rowNames()).toContain("octocat/dotfiles");
+  expect(rowNames()).not.toContain("octocat/canto");
+  expect(JSON.parse(localStorage.getItem("canto.forge.repos.pins") ?? "[]")).toEqual(["octocat/dotfiles"]);
+  fireEvent.click(screen.getByRole("button", { name: "fixados · 1" }));
+  expect(rowNames()).toContain("octocat/canto");
+});

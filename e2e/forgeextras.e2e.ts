@@ -1,0 +1,87 @@
+import { expect, test } from "@playwright/test";
+import { goTab, mockTauri } from "./mock";
+
+/** Fictitious data only (public repository). */
+const now = Date.now();
+const ago = (h: number) => new Date(now - h * 3_600_000).toISOString();
+const pr = (n: number, title: string, extra: Record<string, unknown> = {}) => ({
+  repo: "acme/atlas",
+  number: n,
+  reference: `acme/atlas#${n}`,
+  title,
+  url: `https://github.com/acme/atlas/pull/${n}`,
+  created_at: ago(30),
+  updated_at: ago(2),
+  comments: 0,
+  is_pr: true,
+  draft: false,
+  author: "ana",
+  ...extra,
+});
+const empty = { total: 0, items: [], fetched_at: now };
+const lists = {
+  review_requested: { total: 1, items: [pr(41, "Corrige o cálculo de rotas com paradas", { comments: 5 })], fetched_at: now },
+  assigned: empty,
+  my_prs: {
+    total: 3,
+    items: [pr(52, "Cache de relatórios por período", { author: "voce", comments: 2 }), pr(57, "Rascunho: painel da frota", { author: "voce", draft: true }), pr(60, "Atualiza dependências do mapa", { author: "voce" })],
+    fetched_at: now,
+  },
+  my_issues: empty,
+};
+const fixed = {
+  github_status: { connected: true, login: "voce", source: "pat", device_flow: true },
+  github_lists: lists,
+  github_prs_checks: [],
+  mentions_unread: 0,
+};
+
+test("a PR with new comments shows a badge, and ocultar rascunhos hides the drafts for good", async ({ page }) => {
+  // The user looked at the review request when it had 2 comments, and at "Cache de relatórios" when it had 2.
+  await page.addInitScript((seen) => localStorage.setItem("canto.forge.seen", JSON.stringify(seen)), {
+    "https://github.com/acme/atlas/pull/41": 2,
+    "https://github.com/acme/atlas/pull/52": 2,
+  });
+  await mockTauri(page, { fixed });
+  await page.goto("/");
+  await goTab(page, "GitHub");
+  await expect(page.getByText("+3 comentários")).toBeVisible();
+  await expect(page.getByText("Rascunho: painel da frota")).toBeVisible();
+  await page.getByRole("button", { name: "ocultar rascunhos" }).click();
+  await expect(page.getByText("Rascunho: painel da frota")).toHaveCount(0);
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+  await page.reload();
+  await goTab(page, "GitHub");
+  await expect(page.getByRole("button", { name: "ocultar rascunhos" })).toHaveAttribute("aria-pressed", "true");
+  await expect(page.getByText("Rascunho: painel da frota")).toHaveCount(0);
+});
+
+test("pinning a repository keeps it one click away through the pinned filter", async ({ page }) => {
+  const repo = (full_name: string, group: string, description: string) => ({
+    id: "", name: full_name.split("/").pop(), full_name, group, description, url: `https://github.com/${full_name}`,
+    private: false, fork: false, archived: false, stars: 7, forks: 1, open_issues: 0, language: "TypeScript",
+    updated_at: ago(3), topics: [], avatar_url: "", group_avatar_url: "", default_branch: "main",
+  });
+  await mockTauri(page, {
+    fixed: {
+      ...fixed,
+      github_lists: { assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
+      github_repos_page: {
+        page: 1, has_next: false, revalidated: false, fetched_at: now, limited_until: null,
+        repos: [repo("voce/dotfiles", "", "Configurações de shell"), repo("acme/atlas", "acme", "Mapas e rotas para a frota"), repo("acme/relatorios", "acme", "Relatórios por período")],
+      },
+      repos_cached: [],
+      repo_avatars: {},
+    },
+  });
+  await page.goto("/");
+  await goTab(page, "GitHub");
+  await page.getByRole("tab", { name: "repositórios" }).click();
+  await page.getByRole("treeitem", { name: "voce/dotfiles" }).click();
+  await page.getByRole("button", { name: "fixar voce/dotfiles" }).click();
+  await page.getByRole("button", { name: "fixados · 1" }).click();
+  await expect(page.getByRole("treeitem", { name: "voce/dotfiles" })).toBeVisible();
+  await expect(page.getByRole("treeitem", { name: /acme/ })).toHaveCount(0);
+  await page.getByLabel("Filtrar repositórios").blur();
+  if (process.env.SHOT2) await page.screenshot({ path: process.env.SHOT2 });
+});

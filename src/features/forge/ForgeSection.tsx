@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ForgeList, ForgeSection as ForgeSectionKey } from "../../lib/api";
 import type { Forge } from "./forge";
 import { checkKey, type CiMap, type ConflictMap } from "./forgeChecks";
 import { loadSnoozes, oldestFirst, snoozeUntil } from "./reviewRadar";
 import { t } from "../../i18n";
+import { loadSeen, markSeen, newComments, rememberItems } from "./forgeSeen";
 import ForgeRow from "./ForgeRow";
 
 type Props = {
@@ -19,16 +20,21 @@ type Props = {
   ci?: CiMap;
   /** Merge conflicts the GitHub CI batch found; GitLab items already carry `conflict`. */
   conflicts?: ConflictMap;
+  hideDrafts?: boolean;
 };
 
-export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, hideDrafts }: Props) {
   const rest = list.total - list.items.length;
   const radar = section === "review_requested";
   const [snoozed, setSnoozed] = useState(loadSnoozes);
   const [showSnoozed, setShowSnoozed] = useState(false);
+  const [seen, setSeen] = useState(loadSeen);
+  useEffect(() => setSeen(rememberItems(list.items)), [list.items]);
   const ordered = radar ? oldestFirst(list.items) : list.items;
   const hidden = radar ? ordered.filter((i) => snoozed[i.url] > Date.now()) : [];
   const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
+  const rows = hideDrafts ? shown.filter((it) => !it.draft) : shown;
+  const onlyDrafts = rows.length === 0 && shown.length > 0;
   return (
     <section aria-label={title}>
       <h3 className="sticky top-0 z-10 -mx-0.5 mb-1.5 flex items-center gap-1.5 bg-panel px-0.5 py-1 text-xs font-semibold text-fg">
@@ -44,11 +50,11 @@ export default function ForgeSection({ title, section, forge, list, login, filte
           {showSnoozed ? t("forge.snoozedHide") : t("forge.snoozedShow", { n: hidden.length })}
         </button>
       )}
-      {list.items.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{filtered ? t("forge.emptyFiltered") : t("forge.empty")}</p>
+      {list.items.length === 0 || onlyDrafts ? (
+        <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{filtered || onlyDrafts ? t("forge.emptyFiltered") : t("forge.empty")}</p>
       ) : (
         <ul className="space-y-1.5">
-          {shown.map((it) => (
+          {rows.map((it) => (
             <ForgeRow
               key={it.url}
               item={it}
@@ -57,6 +63,8 @@ export default function ForgeSection({ title, section, forge, list, login, filte
               waiting={radar}
               ci={ci?.[checkKey(it.repo, it.number)]}
               conflict={it.is_pr && (it.conflict === true || conflicts?.[checkKey(it.repo, it.number)] === true)}
+              news={newComments(seen, it)}
+              onOpen={() => setSeen(markSeen(it))}
               onSnooze={radar ? () => setSnoozed(snoozeUntil(it.url)) : undefined}
             />
           ))}

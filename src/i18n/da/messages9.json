@@ -1073,5 +1073,11 @@
   "settings.strip.refresh": "update every",
   "settings.strip.refreshHint": "Longer saves a little CPU.",
   "settings.strip.seconds": "{n} s",
-  "settings.strip.columns": "columns in the details"
+  "settings.strip.columns": "columns in the details",
+  "forge.hideDrafts": "hide drafts",
+  "forge.item.news": "+{n} comments",
+  "forge.item.newsTitle": "{n} new comments since you last opened it",
+  "forge.repos.pinnedFilter": "pinned · {n}",
+  "forge.repos.pin": "pin {name}",
+  "forge.repos.unpin": "unpin {name}"
 }

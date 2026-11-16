@@ -522,6 +522,11 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 |---|
 | ![GitHub tab, repositories subtab: a tree of "pessoais" and each organization, a repository selected with its about, topics and README below, and a local search above](docs/prints/app/148-aba-repositorios.png) |
 | ![Repositories subtab as a flat list, searched locally by name, about or topic](docs/prints/app/149-repositorios-grade.png) |
+| ![Repositories subtab with one repository pinned (star in its details) and the "pinned" filter on, showing only the pins](docs/prints/app/154-repositorios-fixados.png) |
+
+| PRs and issues (GitHub and GitLab): news and drafts |
+|---|
+| ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](docs/prints/app/153-forge-novidades-rascunhos.png) |
 
 | Password changed, one file pending | Day summary |
 |---|---|
