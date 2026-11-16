@@ -51,9 +51,43 @@ pub fn anchored_physical(area: (f64, f64, f64, f64), scale: f64, logical_size: (
     (x.round() as i32, y.round() as i32)
 }
 
-/// Where the window sits when anchored to the current monitor's corner, in logical pixels.
+/// Extra bottom room, in logical pixels, when the work area reserves nothing but the menu bar: that is a macOS Dock
+/// set to auto-hide, which pops over the corner the moment the pointer reaches the screen edge.
+const DOCK_AUTOHIDE_GAP: f64 = 80.0;
+
+/// Bottom gap under the pop-up: the margin, plus Dock room when the work area equals the screen below and beside it.
+pub fn bottom_gap(work: (f64, f64, f64, f64), full: (f64, f64, f64, f64), macos: bool) -> f64 {
+    let untouched = (work.0 - full.0).abs() < 1.0
+        && (work.2 - full.2).abs() < 1.0
+        && ((work.1 + work.3) - (full.1 + full.3)).abs() < 1.0;
+    if macos && untouched {
+        MARGIN + DOCK_AUTOHIDE_GAP
+    } else {
+        MARGIN
+    }
+}
+
+/// A hidden window still reports the monitor it last sat on, which may be unplugged or the wrong one; the pop-up
+/// goes where the user is looking: the monitor under the pointer, else the widget's, else the primary.
+fn alert_monitor(win: &WebviewWindow) -> tauri::Result<Option<tauri::Monitor>> {
+    if win.is_visible().unwrap_or(false) {
+        if let Some(m) = win.current_monitor()? {
+            return Ok(Some(m));
+        }
+    }
+    let app = win.app_handle();
+    if let Ok(cursor) = app.cursor_position() {
+        if let Ok(Some(m)) = app.monitor_from_point(cursor.x, cursor.y) {
+            return Ok(Some(m));
+        }
+    }
+    let main = app.get_webview_window("main").and_then(|m| m.current_monitor().ok().flatten());
+    Ok(main.or(win.current_monitor()?).or(win.primary_monitor()?))
+}
+
+/// Where the window sits when anchored to the chosen monitor's corner, in logical pixels.
 pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
-    let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
+    let Some(monitor) = alert_monitor(win)? else {
         return Ok(None);
     };
     let scale = monitor.scale_factor();
@@ -62,9 +96,15 @@ pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)
     let area = monitor.work_area();
     let origin = area.position.to_logical::<f64>(scale);
     let bounds = area.size.to_logical::<f64>(scale);
+    let (fp, fs) = (monitor.position().to_logical::<f64>(scale), monitor.size().to_logical::<f64>(scale));
+    let gap = bottom_gap(
+        (origin.x, origin.y, bounds.width, bounds.height),
+        (fp.x, fp.y, fs.width, fs.height),
+        cfg!(target_os = "macos"),
+    );
 
     let x = origin.x + bounds.width - size.width - MARGIN;
-    let y = origin.y + bounds.height - size.height - MARGIN;
+    let y = (origin.y + bounds.height - size.height - gap).max(origin.y);
     Ok(Some((x, y)))
 }
 
@@ -251,6 +291,18 @@ fn present_alert(app: &tauri::AppHandle) -> tauri::Result<()> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn autohidden_dock_gets_extra_room_only_on_macos() {
+        let full = (0.0, 0.0, 1440.0, 900.0);
+        let menu_bar_only = (0.0, 25.0, 1440.0, 875.0);
+        assert!(super::bottom_gap(menu_bar_only, full, true) > super::MARGIN);
+        assert_eq!(super::bottom_gap(menu_bar_only, full, false), super::MARGIN);
+        let dock_bottom = (0.0, 25.0, 1440.0, 800.0);
+        assert_eq!(super::bottom_gap(dock_bottom, full, true), super::MARGIN);
+        let dock_right = (0.0, 25.0, 1380.0, 875.0);
+        assert_eq!(super::bottom_gap(dock_right, full, true), super::MARGIN);
+    }
+
     #[test]
     fn a_minimized_widget_comes_back_instead_of_hiding() {
         // Win+D minimizes the widget, and the OS still reports it as visible.
