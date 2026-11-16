@@ -101,15 +101,42 @@ export type DndState = { active: boolean; untilMs: number | null };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
-export type StripItem = "cpu" | "memory" | "weather" | "event" | "reviews" | "notices";
-export const STRIP_ITEMS: readonly StripItem[] = ["cpu", "memory", "weather", "event", "reviews", "notices"];
-export type StripConfig = { enabled: boolean; edge: "top" | "bottom"; items: StripItem[] };
+export type StripItem =
+  | "clock" | "cpu" | "memory" | "gpu" | "temp" | "disk" | "network" | "battery" | "tasks" | "weather" | "event"
+  | "reviews" | "notices" | "health" | "market";
+export const STRIP_ITEMS: readonly StripItem[] = [
+  "clock", "cpu", "memory", "gpu", "temp", "disk", "network", "battery", "tasks", "weather", "event", "reviews", "notices", "health", "market",
+];
+export type StripConfig = {
+  enabled: boolean;
+  edge: "top" | "bottom";
+  /** In the user's order. */
+  items: StripItem[];
+  monitor?: string | null;
+  density: "compact" | "comfortable";
+  labels: boolean;
+  icons: boolean;
+  /** 40 to 100. */
+  opacity: number;
+  charts: boolean;
+  launcher: boolean;
+};
 export type StripSnapshot = {
   cpu: number;
   memory: number;
+  disk: number | null;
+  /** Bytes per second, down and up. */
+  network: [number, number];
+  gpu: number | null;
+  temp: number | null;
+  market: { symbol: string; price: number; change: number; currency: string | null } | null;
+  health: { down: number; total: number };
+  history: { cpu: number[]; memory: number[]; net_down: number[] } | null;
   weather: { temp: number; condition: WeatherCondition } | null;
   event: { title: string; in_min: number; meet: boolean } | null;
   reviews: number;
+  battery: [number, boolean] | null;
+  tasks: number;
   notices: number;
 };
 
@@ -606,6 +633,8 @@ export const api = {
   stripSnapshot: () => invoke<StripSnapshot>("strip_snapshot"),
   stripResize: (width: number, height: number) => invoke<void>("strip_resize", { width, height }),
   stripJoin: () => invoke<void>("strip_join"),
+  stripFocus: (on: boolean) => invoke<void>("strip_focus", { on }),
+  stripMonitors: () => invoke<string[]>("strip_monitors"),
 
   autostartStatus: () => invoke<boolean>("autostart_status"),
   autostartSet: (enabled: boolean) => invoke<void>("autostart_set", { enabled }),

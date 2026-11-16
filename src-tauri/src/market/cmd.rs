@@ -30,6 +30,11 @@ pub struct MarketView {
 }
 
 impl MarketState {
+    /// Whatever was read last, however old: the mini-dashboard shows it and never fetches.
+    pub fn last_quotes(&self) -> Vec<Quote> {
+        self.cached.lock_safe().as_ref().map(|(_, q)| q.clone()).unwrap_or_default()
+    }
+
     /// Fresh quotes come from RAM; `force` (or the floor) goes to the network. A failure keeps the old quotes.
     pub fn view(&self, force: bool, now: i64, fetch: impl FnOnce() -> Result<Vec<Quote>, String>) -> MarketView {
         let cached = self.cached.lock_safe().clone();

@@ -357,6 +357,10 @@ pub fn run() {
             #[cfg(desktop)]
             strip::cmd::strip_join,
             #[cfg(desktop)]
+            strip::cmd::strip_monitors,
+            #[cfg(desktop)]
+            strip::cmd::strip_focus,
+            #[cfg(desktop)]
             sysmon::system_get,
             #[cfg(desktop)]
             sysmon::alert::system_alerts_get,

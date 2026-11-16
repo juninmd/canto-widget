@@ -31,9 +31,10 @@ pub fn build(app: &tauri::AppHandle) -> tauri::Result<()> {
     let dnd_label = do_not_disturb::tray_label(do_not_disturb::current(app));
     let dnd = MenuItem::with_id(app, do_not_disturb::TRAY_ITEM_ID, dnd_label, true, None::<&str>)?;
     let mini = MenuItem::with_id(app, "mini", lang::tr("Modo mini", "Mini mode"), true, None::<&str>)?;
+    let strip = MenuItem::with_id(app, "strip", lang::tr("Mini-dashboard", "Mini dashboard"), true, None::<&str>)?;
     let lock = MenuItem::with_id(app, "lock", lang::tr("Trancar cofre", "Lock vault"), true, None::<&str>)?;
     let quit = MenuItem::with_id(app, "quit", lang::tr("Sair", "Quit"), true, None::<&str>)?;
-    let menu = Menu::with_items(app, &[&toggle, &mini, &join, &dnd, &lock, &quit])?;
+    let menu = Menu::with_items(app, &[&toggle, &mini, &strip, &join, &dnd, &lock, &quit])?;
     app.manage(tray_live::JoinMenuItem(join));
     app.manage(do_not_disturb::DndMenuItem(dnd));
     app.manage(lang::TrayLabels { toggle, mini, lock, quit });
@@ -50,6 +51,7 @@ pub fn build(app: &tauri::AppHandle) -> tauri::Result<()> {
             "mini" => {
                 let _ = window::mode::toggle_mini(app);
             }
+            "strip" => crate::strip::toggle(app),
             tray_live::JOIN_ITEM_ID => tray_live::join_next_meeting(app),
             do_not_disturb::TRAY_ITEM_ID => do_not_disturb::tray_toggle(app),
             "lock" => {

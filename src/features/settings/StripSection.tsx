@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react";
-import { api, STRIP_ITEMS, type StripConfig, type StripItem } from "../../lib/api";
+import { api, type StripConfig } from "../../lib/api";
+import StripItemsEditor from "./StripItemsEditor";
+import StripLook from "./StripLook";
 import { useSectionError } from "./useSectionError";
 import { t } from "../../i18n";
 import { SettingsSection } from "./SettingsSection";
 
+/** An older build answers without the look keys. */
+const LOOK = { density: "comfortable", icons: true, labels: false, opacity: 100, charts: true, launcher: true } as const;
+
 export default function StripSection({ onError }: { onError: (m: string) => void }) {
   const [cfg, setCfg] = useState<StripConfig | null>(null);
+  const [monitors, setMonitors] = useState<string[]>([]);
   const { error, fail, clear } = useSectionError(onError);
 
   useEffect(() => {
-    api.stripConfigGet().then(setCfg, fail);
+    api.stripConfigGet().then((c) => setCfg({ ...LOOK, ...c }), fail);
+    api.stripMonitors().then((m) => setMonitors(m ?? []), () => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -23,8 +30,6 @@ export default function StripSection({ onError }: { onError: (m: string) => void
   }
 
   if (!cfg) return <SettingsSection title={t("settings.strip.title")} error={error}>{null}</SettingsSection>;
-  const toggle = (item: StripItem, on: boolean) =>
-    void save({ ...cfg, items: on ? [...cfg.items, item] : cfg.items.filter((i) => i !== item) });
 
   return (
     <SettingsSection title={t("settings.strip.title")} error={error}>
@@ -43,12 +48,25 @@ export default function StripSection({ onError }: { onError: (m: string) => void
               </label>
             ))}
           </div>
-          {STRIP_ITEMS.map((item) => (
-            <label key={item} className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
-              <input type="checkbox" checked={cfg.items.includes(item)} onChange={(e) => toggle(item, e.target.checked)} className="canto-box" />
-              {t(`strip.item.${item}`)}
+          {monitors.length > 1 && (
+            <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
+              {t("settings.strip.monitor")}
+              <select
+                value={cfg.monitor ?? ""}
+                onChange={(e) => void save({ ...cfg, monitor: e.target.value || null })}
+                className="canto-field rounded-md px-1.5 py-0.5 text-xs"
+              >
+                <option value="">{t("settings.strip.monitorAuto")}</option>
+                {monitors.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
             </label>
-          ))}
+          )}
+          <StripItemsEditor items={cfg.items} onChange={(items) => void save({ ...cfg, items })} />
+          <StripLook cfg={cfg} onChange={(next) => void save(next)} />
         </>
       )}
     </SettingsSection>
