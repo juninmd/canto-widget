@@ -2,6 +2,7 @@
 //! Off by default, loopback only, bearer token, one switch per resource, read-only until the user says otherwise.
 //! The config sits next to the vault; the token itself is sealed with the vault key (only its hash is plain, so
 //! the server can check requests while the vault is locked, and it refuses the data until the user unlocks).
+pub mod agents;
 pub mod http;
 pub mod more;
 pub mod rpc;
@@ -25,6 +26,8 @@ use crate::vault::AppState;
 const FILE: &str = "mcp.json";
 const TOKEN_FILE: &str = "mcp_token.json";
 const TOKEN_AAD: &[u8] = b"canto-mcp-token-v1";
+const AGENTS_FILE: &str = "mcp_agents.json";
+const AGENTS_AAD: &[u8] = b"canto-mcp-agents-v1";
 pub const DEFAULT_PORT: u16 = 47615;
 
 /// One switch per resource. Reads are on except the private ones (notes, clipboard, e-mail, contacts); writes are off.
@@ -110,17 +113,28 @@ impl Perms {
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
-struct Config {
+pub(crate) struct Config {
     enabled: bool,
     port: u16,
     perms: Perms,
     /// SHA-256 of the token, hex. Empty until one is generated.
     token_hash: String,
+    /// The shared token above reads but never writes, whatever the write switches say.
+    default_read_only: bool,
+    /// Agents with a token of their own, each optionally read-only.
+    agents: Vec<agents::AgentCfg>,
 }
 
 impl Default for Config {
     fn default() -> Self {
-        Self { enabled: false, port: DEFAULT_PORT, perms: Perms::default(), token_hash: String::new() }
+        Self {
+            enabled: false,
+            port: DEFAULT_PORT,
+            perms: Perms::default(),
+            token_hash: String::new(),
+            default_read_only: false,
+            agents: Vec::new(),
+        }
     }
 }
 
@@ -142,6 +156,8 @@ pub struct McpState {
     error: Mutex<Option<String>>,
     /// Serializes config changes (start/stop, token) so two clicks can't interleave.
     change: Mutex<()>,
+    /// What agents called, newest last; memory only, cleared with the app.
+    calls: Mutex<std::collections::VecDeque<agents::CallEntry>>,
 }
 
 impl McpState {
@@ -153,12 +169,26 @@ impl McpState {
             running: Mutex::new(None),
             error: Mutex::new(None),
             change: Mutex::new(()),
+            calls: Mutex::new(Default::default()),
         }
     }
 
-    pub fn snapshot(&self) -> (u16, String, Perms) {
+    /// Port, every token that opens the endpoint (the shared one first) and the permission switches.
+    pub fn snapshot(&self) -> (u16, Vec<agents::Cred>, Perms) {
         let c = self.cfg.lock_safe();
-        (c.port, c.token_hash.clone(), c.perms.clone())
+        let mut creds = vec![agents::Cred {
+            id: agents::DEFAULT_ID.into(),
+            name: agents::DEFAULT_ID.into(),
+            token_hash: c.token_hash.clone(),
+            read_only: c.default_read_only,
+        }];
+        creds.extend(c.agents.iter().map(|a| agents::Cred {
+            id: a.id.clone(),
+            name: a.name.clone(),
+            token_hash: a.token_hash.clone(),
+            read_only: a.read_only,
+        }));
+        (c.port, creds, c.perms.clone())
     }
 
     fn save(&self, cfg: &Config) -> Result<()> {
@@ -231,9 +261,11 @@ pub struct View {
     endpoint: String,
     perms: Perms,
     error: Option<String>,
+    default_read_only: bool,
+    agents: Vec<agents::AgentView>,
 }
 
-fn view(state: &McpState) -> View {
+pub(crate) fn view(state: &McpState) -> View {
     let c = state.cfg.lock_safe();
     View {
         enabled: c.enabled,
@@ -242,6 +274,12 @@ fn view(state: &McpState) -> View {
         endpoint: format!("http://127.0.0.1:{}{}", c.port, http::PATH),
         perms: c.perms.clone(),
         error: state.error.lock_safe().clone(),
+        default_read_only: c.default_read_only,
+        agents: c
+            .agents
+            .iter()
+            .map(|a| agents::AgentView { id: a.id.clone(), name: a.name.clone(), read_only: a.read_only })
+            .collect(),
     }
 }
 

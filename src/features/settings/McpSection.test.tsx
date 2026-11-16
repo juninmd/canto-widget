@@ -15,6 +15,7 @@ mock.module("@tauri-apps/api/core", () => ({
     const view = () => ({ enabled, running: enabled, port: 47615, endpoint: "http://127.0.0.1:47615/mcp", perms, error: null });
     if (cmd === "mcp_set_enabled") enabled = args.enabled ?? false;
     if (cmd === "mcp_token_get") return Promise.resolve("canto_tok");
+    if (cmd === "mcp_calls") return Promise.resolve([{ at: 1, agent: "Codex", tool: "create_task", outcome: "blocked", write: true }]);
     return Promise.resolve(view());
   },
 }));
@@ -62,4 +63,32 @@ test("the token stays hidden until asked and the snippets never print it in clea
     fireEvent.click(screen.getByText("mostrar"));
   });
   expect(container.textContent?.includes("canto_tok")).toBe(true);
+});
+
+test("an agent with its own token is added read-only by default and the shared token can be made read-only", async () => {
+  enabled = true;
+  render(<McpSection onError={() => {}} />);
+  await act(async () => {});
+  fireEvent.change(screen.getByLabelText("nome do agente"), { target: { value: "Codex" } });
+  await act(async () => {
+    fireEvent.click(screen.getByText("adicionar"));
+  });
+  expect(calls.find((c) => c.cmd === "mcp_agent_add")?.args).toEqual({ name: "Codex", readOnly: true });
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("o token compartilhado só lê (nunca escreve)"));
+  });
+  expect(calls.find((c) => c.cmd === "mcp_agent_set_read_only")?.args).toEqual({ id: "default", readOnly: true });
+});
+
+test("the call log shows the agent, the tool and the outcome by text", async () => {
+  enabled = true;
+  render(<McpSection onError={() => {}} />);
+  await act(async () => {});
+  await act(async () => {
+    fireEvent.click(screen.getByText("chamadas recentes dos agentes"));
+  });
+  const row = (await screen.findByText("create_task", { exact: false })).closest("li")!;
+  expect(row.textContent).toContain("Codex");
+  expect(row.textContent).toContain("escrita");
+  expect(row.textContent).toContain("bloqueada");
 });

@@ -745,6 +745,12 @@ export const api = {
   mcpSetPort: (port: number) => invoke<McpView>("mcp_set_port", { port }),
   mcpToken: () => invoke<string>("mcp_token_get"),
   mcpTokenRegenerate: () => invoke<string>("mcp_token_regenerate"),
+  mcpAgentAdd: (name: string, readOnly: boolean) => invoke<McpView>("mcp_agent_add", { name, readOnly }),
+  mcpAgentSetReadOnly: (id: string, readOnly: boolean) => invoke<McpView>("mcp_agent_set_read_only", { id, readOnly }),
+  mcpAgentRemove: (id: string) => invoke<McpView>("mcp_agent_remove", { id }),
+  mcpAgentToken: (id: string) => invoke<string>("mcp_agent_token", { id }),
+  mcpCalls: () => invoke<McpCall[]>("mcp_calls"),
+  mcpCallsClear: () => invoke<void>("mcp_calls_clear"),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
@@ -943,4 +949,9 @@ export type McpPerms = {
   health: boolean; clipboard: boolean; gmail: boolean; contacts: boolean;
   tasks_write: boolean; notes_write: boolean;
 };
-export type McpView = { enabled: boolean; running: boolean; port: number; endpoint: string; perms: McpPerms; error: string | null };
+export type McpAgent = { id: string; name: string; read_only: boolean };
+export type McpCall = { at: number; agent: string; tool: string; outcome: "ok" | "blocked" | "error"; write: boolean };
+export type McpView = {
+  enabled: boolean; running: boolean; port: number; endpoint: string; perms: McpPerms; error: string | null;
+  default_read_only?: boolean; agents?: McpAgent[];
+};

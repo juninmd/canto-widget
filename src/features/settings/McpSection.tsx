@@ -5,6 +5,7 @@ import { t } from "../../i18n";
 import { SettingsSection } from "./SettingsSection";
 import ConfirmButton from "../../components/ConfirmButton";
 import { snippets } from "./mcpSnippets";
+import McpAgents from "./McpAgents";
 
 const READS: (keyof McpPerms)[] = [
   "notifications", "tasks", "agenda", "prs", "mentions", "repos", "system", "weather", "agents", "models", "status", "market", "steam", "health",
@@ -142,6 +143,7 @@ export default function McpSection({ onError }: { onError: (m: string) => void }
           {READS.map(perm)}
           {WRITES.map(perm)}
           <p className="text-[11px] text-faint">{t("settings.mcp.permsHint")}</p>
+          <McpAgents view={view} busy={busy} run={(job) => void run(job)} />
 
           {token && (
             <>
