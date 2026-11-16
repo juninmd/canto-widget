@@ -6,7 +6,10 @@ import { SettingsSection } from "./SettingsSection";
 import ConfirmButton from "../../components/ConfirmButton";
 import { snippets } from "./mcpSnippets";
 
-const READS: (keyof McpPerms)[] = ["notifications", "tasks", "notes", "agenda", "prs", "system", "weather"];
+const READS: (keyof McpPerms)[] = [
+  "notifications", "tasks", "agenda", "prs", "mentions", "repos", "system", "weather", "agents", "models", "status", "market", "steam", "health",
+  "notes", "clipboard", "gmail", "contacts",
+];
 const WRITES: (keyof McpPerms)[] = ["tasks_write", "notes_write"];
 const BTN = "canto-hit min-h-[24px] rounded-md border border-line px-2 text-xs text-muted hover:text-fg";
 
