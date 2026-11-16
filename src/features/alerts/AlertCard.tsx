@@ -4,6 +4,7 @@ import { kindOf, toneOf } from "./alerts";
 import { t } from "../../i18n";
 import AlertActions from "./AlertActions";
 import SenderLine from "../google/SenderLine";
+import Avatar from "../agenda/Avatar";
 import { summary, TONE } from "./AlertStrip";
 import ErrorBanner from "../../components/ErrorBanner";
 
@@ -47,7 +48,16 @@ export default function AlertCard({ event, onGone, onCompleted, onOpenModels, on
       <div className="min-w-0">
         <p className={`text-[11px] uppercase tracking-widest ${tone.text}`}>{kind}</p>
         <h2 className="line-clamp-2 text-sm font-semibold leading-snug text-fg">{event.title}</h2>
-        {event.sender ? <SenderLine sender={event.sender} /> : note !== kind && <p className="text-[11px] text-muted">{note}</p>}
+        {event.sender ? (
+          <SenderLine sender={event.sender} />
+        ) : kindOf(event) === "meeting" && event.organizer ? (
+          <div className="flex min-w-0 items-center gap-2 text-[11px] text-muted">
+            <Avatar name={event.organizer} />
+            <span className="truncate">{event.organizer}</span>
+          </div>
+        ) : (
+          note !== kind && <p className="text-[11px] text-muted">{note}</p>
+        )}
       </div>
       <AlertActions
         event={event}

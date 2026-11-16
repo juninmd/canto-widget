@@ -4,6 +4,8 @@ import { outcomeLabel, resolvedToday, toneOf } from "./alerts";
 import { LOCALE, t } from "../../i18n";
 import AlertCard from "./AlertCard";
 import { TONE } from "./AlertStrip";
+import Avatar from "../agenda/Avatar";
+import { senderName } from "./alerts";
 import ErrorBanner from "../../components/ErrorBanner";
 import { BellIcon, CheckIcon, ChevronIcon } from "../../components/Icons";
 
@@ -161,12 +163,16 @@ export default function NotificationsPanel({
           <ul className="divide-y divide-edge rounded-lg border border-edge bg-ink/40">
             {(all ? done : done.slice(0, SHOWN)).map((r, i) => (
               <li key={`${r.item.id}-${r.at}-${i}`} className="flex items-center gap-2.5 px-2.5 py-1.5 text-xs">
-                <span
-                  aria-hidden="true"
-                  className={`grid size-5 shrink-0 place-items-center rounded-full bg-edge/70 ${r.outcome === "done" ? TONE[toneOf(r.item)].text : "text-faint"}`}
-                >
-                  <CheckIcon />
-                </span>
+                {r.item.sender ? (
+                  <Avatar name={senderName(r.item)} email={r.item.sender.login} photo={r.item.sender.avatar} />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className={`grid size-5 shrink-0 place-items-center rounded-full bg-edge/70 ${r.outcome === "done" ? TONE[toneOf(r.item)].text : "text-faint"}`}
+                  >
+                    <CheckIcon />
+                  </span>
+                )}
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-muted">{r.item.title}</span>
                   <span className="block text-[11px] text-faint">{outcomeLabel(r.item, r.outcome)}</span>
