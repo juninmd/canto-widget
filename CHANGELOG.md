@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Mini-dashboard: “Ocultar” atualiza os Ajustes na hora, e o hover não depende mais do foco**: ocultar pela pílula (ou pelo menu da bandeja) agora avisa a tela de Ajustes, que desliga o interruptor “mostrar o mini-dashboard” sem precisar reabrir. No macOS a posição do cursor, lida pelo app, é repetida a cada meio segundo, então uma página que ainda não escutava ou estava dormindo alcança o estado certo em vez de ficar sem hover até a janela receber o foco.
 - **Mini-dashboard no macOS: abre ao passar o mouse e fecha ao sair**: uma janela inativa do macOS não avisa a página de que o mouse entrou ou saiu, então os detalhes não abriam no hover e, depois de um clique, ficavam abertos para sempre. Agora o app lê a posição do cursor (a cada 80 ms, só com a pílula na tela) e informa a janela; clicar fora de uma pílula fixada também a solta. O item **Próximo evento** mostra o nome do evento (cortado se for longo) junto da contagem, ou “agora” enquanto ele acontece. Os atalhos de abas saíram dos detalhes e a opção correspondente dos Ajustes.
 - **Modelos IA: o Intelligence Index voltou a atualizar**: a Artificial Analysis tirou o campo `slug` dos itens da lista e o leitor descartava todos os modelos. Agora usa o `id` quando não há `slug`, e uma lista com notas que não pôde ser lida vira erro de formato em vez de ranking vazio.
 

@@ -3,6 +3,16 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 const saved: unknown[] = [];
+let pushed: ((e: { payload: unknown }) => void) | undefined;
+
+mock.module("@tauri-apps/api/event", () => ({
+  // Mocks are process-wide: other windows import `emit` from the same module.
+  emit: () => Promise.resolve(),
+  listen: (event: string, cb: (e: { payload: unknown }) => void) => {
+    if (event === "strip-config") pushed = cb;
+    return Promise.resolve(() => {});
+  },
+}));
 let stored: Record<string, unknown> = { enabled: false, edge: "top", items: ["cpu", "event"] };
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -105,4 +115,13 @@ test("a preset swaps the items and the look but keeps where the pill sits", asyn
   await act(async () => {});
   await act(async () => fireEvent.click(screen.getByRole("button", { name: "Minimalista" })));
   expect(saved.at(-1)).toMatchObject({ edge: "bottom", align: "end", items: ["clock", "event"], surface: "glass" });
+});
+
+test("the switch follows a config saved elsewhere, like Ocultar on the pill", async () => {
+  stored = { enabled: true, edge: "top", items: ["cpu"] };
+  render(<StripSection onError={() => {}} />);
+  const box = (await screen.findByLabelText("mostrar o mini-dashboard na borda da tela")) as HTMLInputElement;
+  expect(box.checked).toBe(true);
+  await act(async () => pushed?.({ payload: { enabled: false, edge: "top", items: ["cpu"] } }));
+  expect(box.checked).toBe(false);
 });

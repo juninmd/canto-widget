@@ -13,7 +13,7 @@ use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Mutex;
 use std::time::Duration;
 
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Emitter, Manager};
 
 use crate::error::Result;
 use crate::resilient::LockExt;
@@ -23,8 +23,12 @@ pub const WINDOW: &str = "strip";
 const FILE: &str = "minipainel.json";
 const TICK: Duration = Duration::from_secs(2);
 const HOVER_TICK: Duration = Duration::from_millis(80);
+/// Every sixth reading (about half a second) repeats the answer.
+const HOVER_REPEAT: u32 = 6;
 /// The window tells its page whether the cursor is over it.
 pub const HOVER_EVENT: &str = "strip-hover";
+/// Every window hears a saved config, so Ajustes follows "Ocultar" and the tray switch.
+pub const CONFIG_EVENT: &str = "strip-config";
 pub struct StripState {
     path: PathBuf,
     cfg: Mutex<StripConfig>,
@@ -71,8 +75,9 @@ pub fn toggle(app: &AppHandle) {
     let Some(state) = app.try_state::<StripState>() else { return };
     let mut cfg = state.cfg();
     cfg.enabled = !cfg.enabled;
-    if state.set(cfg).is_ok() {
+    if let Ok(saved) = state.set(cfg) {
         place::sync(app);
+        let _ = app.emit(CONFIG_EVENT, saved);
     }
 }
 
@@ -87,10 +92,12 @@ pub fn watch(app: AppHandle) {
     // An inactive window on macOS gets no mouse enter/leave from the webview, so the cursor is read from here.
     if cfg!(target_os = "macos") {
         crate::resilient::supervise("strip-hover", move || {
-            let mut last = false;
+            let (mut last, mut ticks) = (false, 0u32);
             loop {
                 let now = place::cursor_inside(&app);
-                if now != last {
+                ticks = ticks.wrapping_add(1);
+                // Said again now and then: a page that was not listening yet, or was asleep, catches up.
+                if now != last || ticks % HOVER_REPEAT == 0 {
                     last = now;
                     place::emit_hover(&app, now);
                 }

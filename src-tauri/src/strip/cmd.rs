@@ -1,4 +1,4 @@
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 use crate::error::{AppError, Result};
 use crate::strip::snapshot::{self, Snapshot};
@@ -13,6 +13,7 @@ pub fn strip_config_get(state: State<'_, StripState>) -> StripConfig {
 pub fn strip_config_set(app: AppHandle, state: State<'_, StripState>, config: StripConfig) -> Result<StripConfig> {
     let saved = state.set(config)?;
     place::sync(&app);
+    let _ = app.emit(crate::strip::CONFIG_EVENT, &saved);
     // An edge change on a window already up must move it now, not at the next show.
     if let Some(win) = app.get_webview_window(WINDOW).filter(|w| w.is_visible().unwrap_or(false)) {
         let size = win.inner_size().ok().zip(win.scale_factor().ok());
