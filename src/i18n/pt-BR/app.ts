@@ -400,6 +400,7 @@ export const app = {
   "capture.note": "nota",
   "capture.hint": "Enter: tarefa · {mod}+Enter: nota · Esc: fechar",
   "capture.close": "fechar",
+  "capture.partial": "tarefa criada, mas faltou salvar horário/prioridade ({error}). Enter tenta de novo.",
   "shortcuts.capture": "captura rápida de tarefa ou nota, de qualquer app",
 
   "tabs.group.day": "Meu dia",

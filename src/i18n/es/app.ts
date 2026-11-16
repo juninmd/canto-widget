@@ -405,6 +405,7 @@ export const app: Record<keyof typeof source, string> = {
   "capture.note": "nota",
   "capture.hint": "Enter: tarea · {mod}+Enter: nota · Esc: cerrar",
   "capture.close": "cerrar",
+  "capture.partial": "tarea creada, pero faltó guardar hora/prioridad ({error}). Enter lo reintenta.",
   "shortcuts.capture": "captura rápida de una tarea o nota, desde cualquier app",
 
   "tabs.group.day": "Mi día",
