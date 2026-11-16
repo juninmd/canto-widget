@@ -127,3 +127,49 @@ fn clearing_the_folder_stops_future_exports() {
     let count = std::fs::read_dir(&pasta).unwrap().count();
     assert_eq!(count, 1);
 }
+
+#[test]
+fn fifteen_remote_merges_in_a_row_keep_the_earlier_daily_copies() {
+    let pasta = folder_dir("quinze");
+    let a = machine("quinze-a", "1234");
+    let b = machine("quinze-b", "1234");
+    for d in 1..=3 {
+        backup::daily(&b.dir, &format!("2026-10-{d:02}")).unwrap();
+    }
+    set_folder(&a, pasta.clone()).unwrap();
+    set_folder(&b, pasta.clone()).unwrap();
+    for i in 0..15 {
+        with_task(&a, &format!("remota-{i}"));
+        poll_and_merge(&b).unwrap();
+    }
+    let dailies = backup::list(&b.dir).iter().filter(|c| c.kind == "daily").count();
+    assert!(dailies >= 3, "the daily copies were pushed out by sync imports: {dailies}");
+}
+
+#[test]
+fn an_oversized_synced_file_is_refused_without_being_read_whole() {
+    let pasta = folder_dir("grande");
+    let st = machine("grande", "1234");
+    set_folder(&st, pasta.clone()).unwrap();
+    let file = std::fs::File::create(pasta.join("canto.canto")).unwrap();
+    file.set_len(backup::MAX_BYTES + 1024 * 1024).unwrap();
+    // A sparse file: reading it whole would allocate 33 MiB, so the cap (checked on the handle) must answer first.
+    assert_eq!(poll_and_merge(&st).unwrap(), None);
+}
+
+#[test]
+fn the_exported_hash_is_of_the_bytes_written_even_if_the_file_is_swapped_after() {
+    let pasta = folder_dir("troca");
+    let a = machine("troca-a", "1234");
+    let b = machine("troca-b", "1234");
+    set_folder(&a, pasta.clone()).unwrap();
+    with_task(&a, "minha");
+    let mine = std::fs::read(pasta.join("canto.canto")).unwrap();
+    assert_eq!(load(&a.dir).ultimo_hash.as_deref(), Some(hash(&mine).as_str()));
+    // The other machine's version lands right after our export: it must read as a change, not as "our own export".
+    set_folder(&b, pasta.clone()).unwrap();
+    with_task(&b, "dela");
+    assert_ne!(load(&a.dir).ultimo_hash, load(&b.dir).ultimo_hash);
+    let merged = poll_and_merge(&a).unwrap();
+    assert_eq!(merged.map(|s| s.tasks), Some(2));
+}

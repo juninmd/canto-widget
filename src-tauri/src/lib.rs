@@ -225,6 +225,8 @@ pub fn run() {
             autolock::autolock_set,
             cmd_backup::backup_export,
             cmd_backup::backup_import,
+            cmd_backup::backup_list,
+            cmd_backup::backup_restore,
             cmd_sync::sync_get,
             cmd_sync::sync_set_folder,
             cmd_sync::sync_clear,

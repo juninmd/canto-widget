@@ -93,7 +93,7 @@ export const app = {
   "settings.backup.never": "Nenhum backup exportado ainda: a cópia diária fica na pasta do app, então exporte uma para fora dela.",
   "settings.backup.last": "Último backup exportado há {days} dia(s).",
   "settings.backup.stale": "Último backup exportado há {days} dias: exporte um novo para fora da pasta do app.",
-  "settings.backup.auto": "Cópia automática diária na pasta do app (últimas 10).",
+  "settings.backup.auto": "Cópia automática diária na pasta do app (últimas 10 diárias e 10 de antes de importar).",
   "settings.backup.saved": "backup salvo em {path}",
   "settings.backup.merged": "backup mesclado: o cofre tem {tasks} tarefas e {notes} notas",
 
@@ -446,4 +446,10 @@ export const app = {
   "settings.strip.columns": "colunas nos detalhes",
   "settings.security.methodFailed": "{method} — tentativa recusada",
   "lock.failedAttempts": "{n} tentativas falhas desde o último acesso",
+  "settings.backup.copies": "cópias automáticas",
+  "settings.backup.copyDaily": "diária de {day}",
+  "settings.backup.copyImport": "antes de importar, {when}",
+  "settings.backup.restore": "restaurar",
+  "settings.backup.restored": "cofre restaurado: {tasks} tarefas e {notes} notas. O estado anterior ficou na lista.",
+  "settings.backup.restoreHint": "Restaurar volta o cofre àquela cópia, sem mesclar. O estado que ele substitui é guardado como nova cópia.",
 } as const;

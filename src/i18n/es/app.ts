@@ -97,7 +97,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.backup.never": "Aún no se ha exportado ninguna copia: la copia diaria está en la carpeta de la app, así que exporta una fuera de ella.",
   "settings.backup.last": "Última copia exportada hace {days} día(s).",
   "settings.backup.stale": "Última copia exportada hace {days} días: exporta una nueva fuera de la carpeta de la app.",
-  "settings.backup.auto": "Copia diaria automática en la carpeta de la app (últimas 10).",
+  "settings.backup.auto": "Copia diaria automática en la carpeta de la app (últimas 10 diarias y 10 de antes de importar).",
   "settings.backup.saved": "copia guardada en {path}",
   "settings.backup.merged": "copia combinada: la bóveda tiene {tasks} tareas y {notes} notas",
 
@@ -451,4 +451,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.strip.columns": "columnas en los detalles",
   "settings.security.methodFailed": "{method} — intento rechazado",
   "lock.failedAttempts": "{n} intentos fallidos desde el último acceso",
+  "settings.backup.copies": "copias automáticas",
+  "settings.backup.copyDaily": "diaria del {day}",
+  "settings.backup.copyImport": "antes de importar, {when}",
+  "settings.backup.restore": "restaurar",
+  "settings.backup.restored": "cofre restaurado: {tasks} tareas y {notes} notas. El estado anterior quedó en la lista.",
+  "settings.backup.restoreHint": "Restaurar devuelve el cofre a esa copia, sin fusionar. El estado que reemplaza se guarda como copia nueva.",
 };

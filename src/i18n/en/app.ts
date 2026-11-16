@@ -97,7 +97,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.backup.never": "No backup exported yet: the daily copy lives in the app folder, so export one outside it.",
   "settings.backup.last": "Last backup exported {days} day(s) ago.",
   "settings.backup.stale": "Last backup exported {days} days ago: export a fresh one outside the app folder.",
-  "settings.backup.auto": "Automatic daily copy in the app folder (last 10).",
+  "settings.backup.auto": "Automatic daily copy in the app folder (last 10 daily and 10 from before imports).",
   "settings.backup.saved": "backup saved to {path}",
   "settings.backup.merged": "backup merged: the vault has {tasks} tasks and {notes} notes",
 
@@ -451,4 +451,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.strip.columns": "columns in the details",
   "settings.security.methodFailed": "{method} — attempt refused",
   "lock.failedAttempts": "{n} failed attempts since the last access",
+  "settings.backup.copies": "automatic copies",
+  "settings.backup.copyDaily": "daily of {day}",
+  "settings.backup.copyImport": "before an import, {when}",
+  "settings.backup.restore": "restore",
+  "settings.backup.restored": "vault restored: {tasks} tasks and {notes} notes. The previous state is in the list.",
+  "settings.backup.restoreHint": "Restoring puts the vault back to that copy, without merging. The state it replaces is kept as a new copy.",
 };

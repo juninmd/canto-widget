@@ -173,6 +173,7 @@ export type DriveStatus = {
   avatar?: string;
 };
 export type ImportSummary = { tasks: number; notes: number };
+export type BackupCopy = { name: string; kind: "daily" | "import"; day: string; at: number | null };
 export type KeepImport = { imported: number; duplicates: number; skipped: number };
 
 export type GithubStatus = { connected: boolean; login: string; source: string; device_flow: boolean };
@@ -662,6 +663,8 @@ export const api = {
   /** `null` when the user cancels the dialog. */
   backupExport: () => invoke<string | null>("backup_export"),
   backupImport: () => invoke<ImportSummary | null>("backup_import"),
+  backupList: () => invoke<BackupCopy[]>("backup_list"),
+  backupRestore: (name: string) => invoke<ImportSummary>("backup_restore", { name }),
 
   syncGet: () => invoke<string | null>("sync_get"),
   /** `null` when the user cancels the folder dialog. */

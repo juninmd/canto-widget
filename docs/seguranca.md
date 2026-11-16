@@ -85,7 +85,7 @@ Merge (coberto por `tests/merge.rs` e `tests/backup.rs`):
 `app_data_dir` da plataforma (ex.: `%APPDATA%\com.junin.canto` no Windows):
 
 - `vault.json` — envelope cifrado com tarefas e notas;
-- `backups/*.canto` — cópias diárias e de antes de importar, cifradas (últimas 10);
+- `backups/*.canto` — cópias diárias e de antes de importar, cifradas (últimas 10 diárias e últimas 10 de antes de importar, cada tipo com a sua contagem; nomes fora desses dois padrões nunca são apagados). Uma importação automática da sincronização não gera cópia quando não muda nada, e várias em até 10 minutos dividem uma só. A pasta sincronizada é lida uma vez, com o mesmo teto de 32 MiB do import manual, e o hash registrado ao exportar é o dos bytes gravados (não de uma releitura);
 - `drive.json` — credenciais OAuth da agenda, cifradas com a mesma chave;
 - `github.json` — token do GitHub, cifrado com a mesma chave (fora do backup);
 - `gitlab.json` — endereço da instância e token do GitLab, cifrados com a mesma chave (fora do backup);
