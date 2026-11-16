@@ -3,6 +3,7 @@
 //! The config sits next to the vault; the token itself is sealed with the vault key (only its hash is plain, so
 //! the server can check requests while the vault is locked, and it refuses the data until the user unlocks).
 pub mod http;
+pub mod more;
 pub mod rpc;
 pub mod tools;
 
@@ -26,7 +27,7 @@ const TOKEN_FILE: &str = "mcp_token.json";
 const TOKEN_AAD: &[u8] = b"canto-mcp-token-v1";
 pub const DEFAULT_PORT: u16 = 47615;
 
-/// One switch per resource. Reads are on except notes (the most private); writes are off.
+/// One switch per resource. Reads are on except the private ones (notes, clipboard, e-mail, contacts); writes are off.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Perms {
@@ -37,6 +38,17 @@ pub struct Perms {
     pub prs: bool,
     pub system: bool,
     pub weather: bool,
+    pub agents: bool,
+    pub models: bool,
+    pub status: bool,
+    pub market: bool,
+    pub mentions: bool,
+    pub repos: bool,
+    pub steam: bool,
+    pub health: bool,
+    pub clipboard: bool,
+    pub gmail: bool,
+    pub contacts: bool,
     pub tasks_write: bool,
     pub notes_write: bool,
 }
@@ -51,6 +63,17 @@ impl Default for Perms {
             prs: true,
             system: true,
             weather: true,
+            agents: true,
+            models: true,
+            status: true,
+            market: true,
+            mentions: true,
+            repos: true,
+            steam: true,
+            health: true,
+            clipboard: false,
+            gmail: false,
+            contacts: false,
             tasks_write: false,
             notes_write: false,
         }
@@ -67,6 +90,17 @@ impl Perms {
             "prs" => self.prs,
             "system" => self.system,
             "weather" => self.weather,
+            "agents" => self.agents,
+            "models" => self.models,
+            "status" => self.status,
+            "market" => self.market,
+            "mentions" => self.mentions,
+            "repos" => self.repos,
+            "steam" => self.steam,
+            "health" => self.health,
+            "clipboard" => self.clipboard,
+            "gmail" => self.gmail,
+            "contacts" => self.contacts,
             "tasks_write" => self.tasks_write,
             "notes_write" => self.notes_write,
             _ => false,
@@ -291,6 +325,7 @@ mod tests {
         let c = Config::default();
         assert!(!c.enabled && c.token_hash.is_empty());
         assert!(!c.perms.tasks_write && !c.perms.notes_write && !c.perms.notes);
+        assert!(!c.perms.clipboard && !c.perms.gmail && !c.perms.contacts);
         assert!(c.perms.tasks && c.perms.notifications);
         assert!(!c.perms.allows("unknown"));
     }

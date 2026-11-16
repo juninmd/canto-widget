@@ -891,6 +891,8 @@ export function errText(e: unknown): string {
 
 export type McpPerms = {
   notifications: boolean; tasks: boolean; notes: boolean; agenda: boolean; prs: boolean; system: boolean; weather: boolean;
+  agents: boolean; models: boolean; status: boolean; market: boolean; mentions: boolean; repos: boolean; steam: boolean;
+  health: boolean; clipboard: boolean; gmail: boolean; contacts: boolean;
   tasks_write: boolean; notes_write: boolean;
 };
 export type McpView = { enabled: boolean; running: boolean; port: number; endpoint: string; perms: McpPerms; error: string | null };

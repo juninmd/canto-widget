@@ -3,7 +3,10 @@ import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 const calls: { cmd: string; args: unknown }[] = [];
-const perms = { notifications: true, tasks: true, notes: false, agenda: true, prs: true, system: true, weather: true, tasks_write: false, notes_write: false };
+const perms = {
+  notifications: true, tasks: true, notes: false, agenda: true, prs: true, system: true, weather: true, agents: true, models: true, status: true,
+  market: true, mentions: true, repos: true, steam: true, health: true, clipboard: false, gmail: false, contacts: false, tasks_write: false, notes_write: false,
+};
 let enabled = false;
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -34,7 +37,7 @@ test("off by default: nothing but the switch shows, and turning it on reveals th
   expect(calls.find((c) => c.cmd === "mcp_set_enabled")?.args).toEqual({ enabled: true });
   expect(screen.getByText("Token de acesso")).toBeTruthy();
   expect(screen.getByText("Claude Code")).toBeTruthy();
-  expect((screen.getByLabelText("criar tarefas") as HTMLInputElement).checked).toBe(false);
+  expect((screen.getByLabelText("criar e concluir tarefas") as HTMLInputElement).checked).toBe(false);
   expect((screen.getByLabelText("ler tarefas") as HTMLInputElement).checked).toBe(true);
 });
 
@@ -43,7 +46,7 @@ test("a permission switch saves the whole set", async () => {
   render(<McpSection onError={() => {}} />);
   await act(async () => {});
   await act(async () => {
-    fireEvent.click(screen.getByLabelText("criar notas"));
+    fireEvent.click(screen.getByLabelText("criar notas e acrescentar texto"));
   });
   const sent = calls.find((c) => c.cmd === "mcp_set_perms")?.args as { perms: typeof perms };
   expect(sent.perms.notes_write).toBe(true);
