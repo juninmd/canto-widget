@@ -323,6 +323,13 @@ last exported a `.canto` file and warns (never exported, or 30+ days) to save on
 
 <img src="docs/prints/app/130-backup-lembrete.png" alt="Backup section in Settings warning that the last exported backup is 45 days old, between the export and import buttons and the automatic daily copy note" width="420">
 
+**MCP server for your coding agents:** Settings → MCP server (off by default) opens a loopback-only endpoint protected by a
+generated token, so Claude Code, Codex, OpenCode, Gemini CLI, Cursor, VS Code/Copilot or Windsurf can read today's
+notifications, tasks, agenda, PRs, system status and weather (notes and creating tasks/notes are opt-in). Each agent gets
+a ready-to-copy command or config snippet.
+
+<img src="docs/prints/mcp/mcp-ligado.png" alt="MCP server section in Settings: switch on, endpoint, token with show and copy buttons and one permission switch per resource" width="320">
+
 </td>
 <td><img src="docs/prints/app/18-atualizacoes.png" alt="Settings showing installed version, latest published version and the update button"></td>
 </tr>
