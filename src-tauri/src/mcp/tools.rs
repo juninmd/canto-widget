@@ -130,6 +130,28 @@ pub fn create_note_in(d: &mut VaultData, title: &str, body: &str, tags: Vec<Stri
     Ok(note)
 }
 
+pub fn complete_task_in(d: &mut VaultData, id: &str) -> Result<Value, String> {
+    let task = d.tasks.iter_mut().find(|t| t.id == id).ok_or("task not found")?;
+    if !task.done {
+        task.done = true;
+        task.updated_at = crate::model::next_version(task.updated_at, now_ms());
+    }
+    Ok(json!({ "id": task.id, "title": task.title, "done": true }))
+}
+
+pub fn append_to_note_in(d: &mut VaultData, id: &str, extra: &str) -> Result<Value, String> {
+    if extra.trim().is_empty() {
+        return Err("text is empty".into());
+    }
+    let note = d.notes.iter_mut().find(|n| n.id == id).ok_or("note not found")?;
+    let body = if note.body.is_empty() { extra.to_string() } else { format!("{}\n{extra}", note.body) };
+    check_size(&note.title, &body, (note.title.chars().count(), note.body.chars().count()))
+        .map_err(|e| e.to_string())?;
+    note.body = body;
+    note.updated_at = crate::model::next_version(note.updated_at, now_ms());
+    Ok(json!({ "id": note.id, "title": note.title }))
+}
+
 impl AppBackend {
     fn state(&self) -> tauri::State<'_, AppState> {
         self.0.state::<AppState>()
@@ -249,7 +271,15 @@ impl Backend for AppBackend {
                 write(&state, |d| create_note_in(d, &title, &body, tags))?
                     .map(|n| json!({ "id": n.id, "title": n.title }))
             }
-            _ => Err(format!("unknown tool: {name}")),
+            "complete_task" => {
+                let id = text(args, "id").to_string();
+                write(&state, |d| complete_task_in(d, &id))?
+            }
+            "append_to_note" => {
+                let (id, extra) = (text(args, "id").to_string(), text(args, "text").to_string());
+                write(&state, |d| append_to_note_in(d, &id, &extra))?
+            }
+            _ => super::more::call(&self.0, name, args).unwrap_or_else(|| Err(format!("unknown tool: {name}"))),
         }
     }
 }
@@ -284,6 +314,20 @@ mod tests {
         assert!(found[0].get("body").is_none());
         assert_eq!(list_notes(&d, &json!({ "query": "#work" })).as_array().unwrap().len(), 1);
         assert_eq!(list_notes(&d, &json!({ "query": "zzz" })).as_array().unwrap().len(), 0);
+    }
+
+    #[test]
+    fn completing_and_appending_change_only_what_they_say() {
+        let mut d = vault();
+        let id = d.tasks[0].id.clone();
+        let before = d.tasks[0].updated_at;
+        complete_task_in(&mut d, &id).unwrap();
+        assert!(d.tasks[0].done && d.tasks[0].updated_at > before);
+        assert!(complete_task_in(&mut d, "nope").is_err());
+        let note = d.notes[0].id.clone();
+        append_to_note_in(&mut d, &note, "mais uma linha").unwrap();
+        assert!(d.notes[0].body.starts_with("pauta longa") && d.notes[0].body.ends_with("\nmais uma linha"));
+        assert!(append_to_note_in(&mut d, &note, "  ").is_err() && append_to_note_in(&mut d, "x", "a").is_err());
     }
 
     #[test]

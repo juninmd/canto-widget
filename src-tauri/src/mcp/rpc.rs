@@ -82,6 +82,104 @@ pub const TOOLS: &[Tool] = &[
         schema: NONE,
     },
     Tool {
+        name: "list_agents",
+        description: "Coding-agent CLIs Canto tracks (Claude Code, Codex, OpenCode...): installed on this machine or not, latest release.",
+        perm: "agents",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "get_ai_models",
+        description: "AI model ranking (Intelligence Index) as shown in the Models tab, best first.",
+        perm: "models",
+        write: false,
+        schema: r#"{"type":"object","properties":{"limit":{"type":"integer","minimum":1,"maximum":100}}}"#,
+    },
+    Tool {
+        name: "get_api_status",
+        description: "Status of the public APIs/services followed in the Status tab: operational, degraded, outage.",
+        perm: "status",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "get_market",
+        description: "Quotes of the Market tab (stocks, crypto, currencies) with the day's change.",
+        perm: "market",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "list_mentions",
+        description: "GitHub notifications where someone mentioned you.",
+        perm: "mentions",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "list_repositories",
+        description: "Repositories of the connected GitHub account (first page of 100).",
+        perm: "repos",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "list_steam_deals",
+        description: "Steam wishlist deals as shown in the Steam tab.",
+        perm: "steam",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "list_steam_trending",
+        description: "Steam top sellers right now.",
+        perm: "steam",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "list_health",
+        description: "Your monitored endpoints (HTTP/TCP/DNS) with the latest checks.",
+        perm: "health",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "list_clipboard",
+        description: "Clipboard history, newest first. Private: anything you copied can be in it.",
+        perm: "clipboard",
+        write: false,
+        schema: r#"{"type":"object","properties":{"query":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":100}}}"#,
+    },
+    Tool {
+        name: "list_emails",
+        description: "Unread count and important e-mails from Gmail (needs Google connected).",
+        perm: "gmail",
+        write: false,
+        schema: r#"{"type":"object","properties":{"view":{"type":"string","enum":["inbox","important","starred"]},"search":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":50}}}"#,
+    },
+    Tool {
+        name: "list_contacts",
+        description: "Google contacts, optionally filtered by text.",
+        perm: "contacts",
+        write: false,
+        schema: r#"{"type":"object","properties":{"query":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":100}}}"#,
+    },
+    Tool {
+        name: "complete_task",
+        description: "Marks a task as done (never deletes or reopens).",
+        perm: "tasks_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"}},"required":["id"]}"#,
+    },
+    Tool {
+        name: "append_to_note",
+        description: "Adds text at the end of an existing note (never replaces or deletes).",
+        perm: "notes_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"},"text":{"type":"string"}},"required":["id","text"]}"#,
+    },
+    Tool {
         name: "create_task",
         description: "Adds a task to the Canto vault.",
         perm: "tasks_write",
@@ -121,6 +219,17 @@ fn ok(id: &Value, result: Value) -> Value {
     json!({ "jsonrpc": "2.0", "id": id, "result": result })
 }
 
+/// A feed that grew past this is cut on a character boundary, with a note: an agent's context is not free.
+const MAX_OUTPUT: usize = 60_000;
+
+fn cap(text: String) -> String {
+    if text.len() <= MAX_OUTPUT {
+        return text;
+    }
+    let cut = (0..=MAX_OUTPUT).rev().find(|i| text.is_char_boundary(*i)).unwrap_or(0);
+    format!("{}\n… (output cut at {MAX_OUTPUT} bytes; narrow it with `limit` or a query)", &text[..cut])
+}
+
 fn tool_result(text: String, is_error: bool) -> Value {
     json!({ "content": [{ "type": "text", "text": text }], "isError": is_error })
 }
@@ -134,7 +243,7 @@ fn call(params: &Value, perms: &Perms, backend: &dyn Backend) -> Result<Value, (
     }
     let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
     Ok(match backend.call(name, &args) {
-        Ok(value) => tool_result(serde_json::to_string_pretty(&value).unwrap_or_default(), false),
+        Ok(value) => tool_result(cap(serde_json::to_string_pretty(&value).unwrap_or_default()), false),
         Err(message) => tool_result(message, true),
     })
 }
@@ -243,6 +352,34 @@ mod tests {
         assert_eq!(r["error"]["code"], -32602);
         let r = send(&Perms::default(), json!({"jsonrpc":"2.0","id":6,"method":"nope"})).unwrap();
         assert_eq!(r["error"]["code"], -32601);
+    }
+
+    #[test]
+    fn long_output_is_cut_on_a_char_boundary() {
+        let big = "é".repeat(MAX_OUTPUT);
+        let out = cap(big);
+        assert!(out.len() < MAX_OUTPUT + 100 && out.contains("output cut"));
+        assert_eq!(cap("short".into()), "short");
+    }
+
+    #[test]
+    fn tool_names_are_unique_and_every_gate_is_a_known_permission() {
+        let mut names: Vec<&str> = TOOLS.iter().map(|t| t.name).collect();
+        names.sort();
+        names.dedup();
+        assert_eq!(names.len(), TOOLS.len());
+        let all = Perms {
+            clipboard: true,
+            gmail: true,
+            contacts: true,
+            notes: true,
+            tasks_write: true,
+            notes_write: true,
+            ..Perms::default()
+        };
+        for t in TOOLS {
+            assert!(all.allows(t.perm), "{} gates on an unknown permission {}", t.name, t.perm);
+        }
     }
 
     #[test]
