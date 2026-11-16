@@ -138,3 +138,18 @@ test("espiar shows the PR details, and approving asks for a confirmation first",
   await panel.getByRole("button", { name: "confirmar aprovação" }).click();
   await expect(panel.getByRole("status")).toHaveText("aprovação enviada");
 });
+
+test("a running CI can be watched and a review request can be snoozed for longer", async ({ page }) => {
+  await mockTauri(page, { fixed: { ...fixed, github_prs_checks: [{ repo: "acme/atlas", number: 41, status: "running" }] } });
+  await page.goto("/");
+  await goTab(page, "GitHub");
+  const row = page.getByRole("listitem").filter({ hasText: "Corrige o cálculo de rotas com paradas" });
+  await row.hover();
+  await row.getByRole("button", { name: /avisar quando o CI de/ }).click();
+  await expect(row.getByRole("button", { name: /parar de avisar/ })).toHaveAttribute("aria-pressed", "true");
+  await expect(row.getByRole("button", { name: /até amanhã$/ })).toBeVisible();
+  await page.waitForTimeout(400);
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+  await row.getByRole("button", { name: /até amanhã$/ }).click();
+  await expect(page.getByText("Corrige o cálculo de rotas com paradas")).toHaveCount(0);
+});

@@ -4,6 +4,7 @@ import { t } from "../../i18n";
 /** A review request older than this is overdue: the Radar paints it red. */
 export const SLA_HOURS = 48;
 export const SNOOZE_MS = 4 * 3_600_000;
+export type SnoozeKind = "h1" | "h4" | "tomorrow" | "week";
 const KEY = "canto.reviewSnooze";
 
 export function waitHours(item: ForgeItem, now = new Date()): number {
@@ -23,6 +24,17 @@ export function waitLabel(hours: number): string {
 /** Longest wait first; GitHub returns review requests by last update, which hides the oldest. */
 export function oldestFirst(items: ForgeItem[]): ForgeItem[] {
   return [...items].sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+}
+
+/** "Tomorrow" is the next 8:00 local time, so a snooze at night does not come back before the workday. */
+export function snoozeDelay(kind: SnoozeKind, now = Date.now()): number {
+  if (kind === "h1") return 3_600_000;
+  if (kind === "week") return 7 * 24 * 3_600_000;
+  if (kind === "h4") return SNOOZE_MS;
+  const at = new Date(now);
+  at.setDate(at.getDate() + 1);
+  at.setHours(8, 0, 0, 0);
+  return at.getTime() - now;
 }
 
 export type Snoozed = Record<string, number>;
@@ -47,8 +59,8 @@ export function loadSnoozes(now = Date.now()): Snoozed {
 }
 
 /** Merges into what is stored now, not the caller's copy, so a second mounted list cannot drop this one's snoozes. */
-export function snoozeUntil(url: string, now = Date.now()): Snoozed {
-  const next = { ...loadSnoozes(now), [url]: now + SNOOZE_MS };
+export function snoozeUntil(url: string, now = Date.now(), kind: SnoozeKind = "h4"): Snoozed {
+  const next = { ...loadSnoozes(now), [url]: now + snoozeDelay(kind, now) };
   try {
     localStorage.setItem(KEY, JSON.stringify(next));
   } catch {

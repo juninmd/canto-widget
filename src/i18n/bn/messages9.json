@@ -1154,5 +1154,14 @@
   "settings.mcp.callOk": "ok",
   "settings.mcp.callBlocked": "blocked",
   "settings.mcp.callError": "error",
-  "settings.mcp.callWrite": "write"
+  "settings.mcp.callWrite": "write",
+  "forge.snooze.h1": "1 h",
+  "forge.snooze.tomorrow": "tomorrow",
+  "forge.snooze.week": "1 wk",
+  "forge.watch.on": "notify on CI",
+  "forge.watch.off": "notifying ✓",
+  "forge.watch.onOf": "notify me when the CI of {title} ends",
+  "forge.watch.offOf": "stop notifying about the CI of {title}",
+  "forge.watch.passed": "CI passed: {title}",
+  "forge.watch.failed": "CI failed: {title}"
 }

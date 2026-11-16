@@ -73,7 +73,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
               news={newComments(seen, it)}
               onOpen={() => setSeen(markSeen(it))}
               onPeek={onPeek && it.is_pr ? () => onPeek(it) : undefined}
-              onSnooze={radar ? () => setSnoozed(snoozeUntil(it.url)) : undefined}
+              onSnooze={radar ? (kind) => setSnoozed(snoozeUntil(it.url, Date.now(), kind)) : undefined}
             />
           ))}
         </ul>

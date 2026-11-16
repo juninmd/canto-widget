@@ -355,6 +355,20 @@ test("snoozing a review request hides it for 4 h, keeps a counter and can bring 
   expect(Object.keys(JSON.parse(localStorage.getItem("canto.reviewSnooze") ?? "{}"))).toEqual([reviewItems[1].url]);
 });
 
+test("a review request can also be snoozed for 1 h, until tomorrow or a week", async () => {
+  localStorage.clear();
+  responses.github_status = connected;
+  responses.github_lists = () => Promise.resolve(lists({ review_requested: { total: 2, items: reviewItems } }));
+  await mount();
+  const before = Date.now();
+  fireEvent.click(screen.getByRole("button", { name: "adiar Antigo por 1 semana" }));
+  const until = JSON.parse(localStorage.getItem("canto.reviewSnooze") ?? "{}")[reviewItems[1].url] as number;
+  expect(until - before).toBeGreaterThanOrEqual(7 * 24 * 3_600_000);
+  expect(screen.queryByText("Antigo")).toBeNull();
+  expect(screen.getByRole("button", { name: "adiar Recente por 1 hora" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "adiar Recente até amanhã" })).toBeTruthy();
+});
+
 test("the summary strip counts reviews owed and my PRs whose CI failed", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "app", device_flow: true });
   responses.github_lists = () =>
