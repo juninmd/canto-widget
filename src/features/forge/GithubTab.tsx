@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText, type GithubStatus } from "../../lib/api";
-import { applyChecks, applyConflicts, prsToCheck, type CiMap, type ConflictMap } from "./forgeChecks";
+import { applyChecks, applyConflicts, applyReviews, prsToCheck, type CiMap, type ConflictMap, type ReviewMap } from "./forgeChecks";
 import { t } from "../../i18n";
 import { useForgeLists } from "./useForgeLists";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
@@ -20,6 +20,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
   const { load, clear, seedFilter, setError } = gh;
   const [ci, setCi] = useState<CiMap>({});
   const [conflicts, setConflicts] = useState<ConflictMap>({});
+  const [reviews, setReviews] = useState<ReviewMap>({});
   const known = useRef(ci);
   known.current = ci;
 
@@ -34,6 +35,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
         clear();
         setCi({});
         setConflicts({});
+        setReviews({});
       }
     } catch (e) {
       // With a cached board on screen the failure joins the board's banner instead of replacing it.
@@ -61,6 +63,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
         if (!live || !Array.isArray(got)) return;
         setCi((m) => applyChecks(m, got));
         setConflicts((m) => applyConflicts(m, got));
+        setReviews((m) => applyReviews(m, got));
       })
       .catch(() => {});
     return () => {
@@ -82,5 +85,5 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
     return statusError ? <ErrorBanner message={statusError} onRetry={() => void refresh()} /> : <Skeleton label={t("github.loading")} />;
   }
   if (!status.connected) return <GithubConnect device={status.device_flow} onConnected={() => void refresh()} />;
-  return <ForgeBoard forge="github" login={status.login} lists={gh} ci={ci} conflicts={conflicts} onDisconnect={() => void disconnect()} />;
+  return <ForgeBoard forge="github" login={status.login} lists={gh} ci={ci} conflicts={conflicts} reviews={reviews} onDisconnect={() => void disconnect()} />;
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { ForgeList, ForgeSection as ForgeSectionKey } from "../../lib/api";
+import type { ForgeItem, ForgeList, ForgeSection as ForgeSectionKey } from "../../lib/api";
 import type { Forge } from "./forge";
-import { checkKey, type CiMap, type ConflictMap } from "./forgeChecks";
+import { checkKey, type CiMap, type ConflictMap, type ReviewMap } from "./forgeChecks";
 import { loadSnoozes, oldestFirst, snoozeUntil } from "./reviewRadar";
 import { t } from "../../i18n";
 import { loadSeen, markSeen, newComments, rememberItems } from "./forgeSeen";
@@ -20,10 +20,13 @@ type Props = {
   ci?: CiMap;
   /** Merge conflicts the GitHub CI batch found; GitLab items already carry `conflict`. */
   conflicts?: ConflictMap;
+  reviews?: ReviewMap;
   hideDrafts?: boolean;
+  /** Narrows the list to the items that ask for my attention. */
+  needs?: (item: ForgeItem) => boolean;
 };
 
-export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, hideDrafts }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, reviews, hideDrafts, needs }: Props) {
   const rest = list.total - list.items.length;
   const radar = section === "review_requested";
   const [snoozed, setSnoozed] = useState(loadSnoozes);
@@ -33,7 +36,8 @@ export default function ForgeSection({ title, section, forge, list, login, filte
   const ordered = radar ? oldestFirst(list.items) : list.items;
   const hidden = radar ? ordered.filter((i) => snoozed[i.url] > Date.now()) : [];
   const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
-  const rows = hideDrafts ? shown.filter((it) => !it.draft) : shown;
+  const kept = needs ? shown.filter(needs) : shown;
+  const rows = hideDrafts ? kept.filter((it) => !it.draft) : kept;
   const onlyDrafts = rows.length === 0 && shown.length > 0;
   return (
     <section aria-label={title}>
@@ -63,6 +67,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
               waiting={radar}
               ci={ci?.[checkKey(it.repo, it.number)]}
               conflict={it.is_pr && (it.conflict === true || conflicts?.[checkKey(it.repo, it.number)] === true)}
+              review={reviews?.[checkKey(it.repo, it.number)]}
               news={newComments(seen, it)}
               onOpen={() => setSeen(markSeen(it))}
               onSnooze={radar ? () => setSnoozed(snoozeUntil(it.url)) : undefined}

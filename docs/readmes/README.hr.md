@@ -365,6 +365,7 @@ I **Follow system**, koji se prebacuje između svjetla i tame zajedno s OS-om. S
 | PRs and issues (GitHub and GitLab): news and drafts |
 |---|
 | ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](../prints/app/153-forge-novidades-rascunhos.png) |
+| ![GitHub tab: each PR shows its approvals, "mudanças pedidas" and the size of its diff next to the CI badge, and the "precisa de mim" button keeps only overdue reviews and my stalled PRs](../prints/app/155-forge-aprovacoes-precisa-de-mim.png) |
 
 | Lozinka promijenjena, jedna datoteka na čekanju | Dnevni sažetak |
 |---|---|

@@ -19,11 +19,18 @@ pub fn ttl(status: ChecksStatus) -> i64 {
     }
 }
 
-/// What `pulls/{n}` says about a PR's head: the sha its CI runs on and whether it conflicts with the base.
-#[derive(Debug, Clone, PartialEq)]
+/// What `pulls/{n}` says about a PR's head: the sha its CI runs on and whether it conflicts with the base, plus the
+/// size of the diff and where the reviews stand (cached together: they cost the same call or one more).
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct Head {
     pub sha: String,
     pub conflict: bool,
+    pub additions: u64,
+    pub deletions: u64,
+    /// People whose latest decisive review is an approval.
+    pub approvals: u32,
+    /// Someone's latest decisive review still asks for changes.
+    pub changes_requested: bool,
 }
 
 #[derive(Default)]

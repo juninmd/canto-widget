@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { ForgeItem, ForgeList, ForgeLists } from "../../lib/api";
-import { applyChecks, applyConflicts, checkKey, MAX_CHECKED, prsToCheck } from "./forgeChecks";
+import { applyChecks, applyConflicts, applyReviews, checkKey, MAX_CHECKED, prsToCheck } from "./forgeChecks";
 
 const pr = (number: number, extra: Partial<ForgeItem> = {}): ForgeItem => ({
   repo: "acme/atlas",
@@ -58,4 +58,12 @@ test("conflicts follow the batch too, and a PR it left out keeps its last state"
   const next = applyConflicts(prev, [{ repo: "acme/atlas", number: 1, status: "success", conflict: false }]);
   expect(next).toEqual({ "acme/atlas#1": false, "acme/atlas#2": true });
   expect(applyConflicts(prev, [])).toBe(prev);
+});
+
+test("applyReviews keeps the diff size and review state, and ignores answers from older builds", () => {
+  const got = [{ repo: "a/b", number: 1, status: "success" as const, additions: 12, deletions: 3, approvals: 2, changes_requested: false }];
+  const next = applyReviews({}, got);
+  expect(next["a/b#1"]).toEqual({ additions: 12, deletions: 3, approvals: 2, changes: false });
+  expect(applyReviews(next, [{ repo: "a/b", number: 2, status: "none" as const }])).toBe(next);
+  expect(applyReviews(next, [])).toBe(next);
 });

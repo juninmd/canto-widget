@@ -75,7 +75,11 @@ impl Fake {
 impl ChecksApi for Fake {
     fn head(&self, _: &str, _: u64) -> Result<Head> {
         self.heads.fetch_add(1, Ordering::SeqCst);
-        Ok(Head { sha: self.sha.lock().unwrap().clone(), conflict: self.conflict.load(Ordering::SeqCst) })
+        Ok(Head {
+            sha: self.sha.lock().unwrap().clone(),
+            conflict: self.conflict.load(Ordering::SeqCst),
+            ..Head::default()
+        })
     }
     fn signals(&self, _: &str, _: &str) -> Result<Signals> {
         self.calls.fetch_add(1, Ordering::SeqCst);
@@ -94,8 +98,8 @@ fn busy() -> Result<Signals> {
 #[test]
 fn a_refresh_within_the_ttl_spends_no_calls() {
     let (cache, api) = (ChecksCache::default(), Fake::new(green));
-    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), 0).unwrap(), (ChecksStatus::Success, false));
-    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap(), (ChecksStatus::Success, false));
+    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), 0).unwrap().0, ChecksStatus::Success);
+    assert_eq!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap().0, ChecksStatus::Success);
     assert_eq!((api.heads.load(Ordering::SeqCst), api.calls.load(Ordering::SeqCst)), (1, 1));
 }
 
@@ -147,8 +151,11 @@ fn a_conflict_rides_along_with_the_ci_badge_and_clears_on_the_next_head_check() 
     let got = statuses(&cache, &api, &[pr("o/r", 1)], 0);
     assert_eq!((got[0].status, got[0].conflict), (ChecksStatus::Success, true));
     api.conflict.store(false, Ordering::SeqCst);
-    assert!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap().1, "cached with the head");
-    assert!(!status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS + 1).unwrap().1, "resolved after a fresh look");
+    assert!(status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS - 1).unwrap().1.conflict, "cached with the head");
+    assert!(
+        !status_for(&cache, &api, &pr("o/r", 1), HEAD_TTL_MS + 1).unwrap().1.conflict,
+        "resolved after a fresh look"
+    );
     assert_eq!(api.calls.load(Ordering::SeqCst), 1, "the CI of the same sha is still cached");
 }
 
@@ -158,4 +165,30 @@ fn only_a_dirty_merge_state_is_a_conflict() {
     for state in ["clean", "unknown", "blocked", "behind", "unstable", "draft", ""] {
         assert!(!conflicted(state), "{state}");
     }
+}
+
+fn review(login: &str, state: &str) -> Review {
+    Review { user: Some(ReviewUser { login: login.into() }), state: state.into() }
+}
+
+#[test]
+fn the_latest_decisive_review_of_each_person_counts() {
+    let reviews = [
+        review("ana", "CHANGES_REQUESTED"),
+        review("bia", "APPROVED"),
+        review("ana", "COMMENTED"),
+        review("ana", "APPROVED"),
+        review("caio", "PENDING"),
+    ];
+    assert_eq!(review_summary(&reviews), (2, false));
+}
+
+#[test]
+fn changes_requested_stays_until_that_person_approves_or_is_dismissed() {
+    let asked = [review("ana", "APPROVED"), review("bia", "CHANGES_REQUESTED")];
+    assert_eq!(review_summary(&asked), (1, true));
+    let dismissed = [review("bia", "CHANGES_REQUESTED"), review("bia", "DISMISSED")];
+    assert_eq!(review_summary(&dismissed), (0, false));
+    assert_eq!(review_summary(&[]), (0, false));
+    assert_eq!(review_summary(&[Review { user: None, state: "APPROVED".into() }]), (0, false));
 }
