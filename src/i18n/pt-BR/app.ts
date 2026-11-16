@@ -196,6 +196,9 @@ export const app = {
   "settings.sync.stopYes": "sim, parar",
   "settings.sync.merged": "mesclado: o cofre tem {tasks} tarefas e {notes} notas",
   "settings.sync.nothingNew": "nada novo para mesclar",
+  "settings.sync.last": "Última sincronização: {when}",
+  "settings.sync.failing": "Sincronização com erro ({n} falhas seguidas): {error}",
+  "settings.sync.noneYet": "Ainda sem sincronização nesta sessão",
 
   "settings.tabs.title": "Abas visíveis",
   "settings.tabs.hint": "Ajustes fica sempre visível. Alt+1, Alt+2… seguem a ordem das abas visíveis.",
@@ -400,6 +403,7 @@ export const app = {
   "capture.note": "nota",
   "capture.hint": "Enter: tarefa · {mod}+Enter: nota · Esc: fechar",
   "capture.close": "fechar",
+  "capture.partial": "tarefa criada, mas faltou salvar horário/prioridade ({error}). Enter tenta de novo.",
   "shortcuts.capture": "captura rápida de tarefa ou nota, de qualquer app",
 
   "tabs.group.day": "Meu dia",

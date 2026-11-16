@@ -47,5 +47,12 @@ pub fn sync_clear(state: State<'_, AppState>) -> Result<()> {
 /// Manual nudge for immediate feedback; the same merge already runs on unlock and every few minutes.
 #[tauri::command(async)]
 pub fn sync_now(state: State<'_, AppState>) -> Result<Option<ImportSummary>> {
+    state.sync.reset_backoff();
     sync::poll_and_merge(&state)
+}
+
+/// Read-only: what the last export and merge did. Never touches the vault.
+#[tauri::command(async)]
+pub fn sync_status(state: State<'_, AppState>) -> sync::SyncStatus {
+    state.sync.status()
 }

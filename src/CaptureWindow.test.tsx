@@ -123,3 +123,24 @@ test("a second Enter while the first save runs does not add the task twice", asy
 test("hint displays the platform modifier key next to note shortcut", () => {
   expect(screen.getByText(`Enter: tarefa · ${MOD_KEY}+Enter: nota · Esc: fechar`)).toBeDefined();
 });
+
+test("a day token saves the task for that day", async () => {
+  fireEvent.change(input(), { target: { value: "Pagar boleto amanhã às 9h" } });
+  await press({ key: "Enter" });
+  const t = new Date();
+  t.setDate(t.getDate() + 1);
+  expect(calls[0]).toEqual({ cmd: "task_add", args: { title: "Pagar boleto", day: todayLocal(t) } });
+});
+
+test("a failed priority keeps the text and Enter finishes the same task instead of duplicating it", async () => {
+  fireEvent.change(input(), { target: { value: "Daily !alta" } });
+  failNext = "task_set_priority";
+  await press({ key: "Enter" });
+  expect(input().value).toBe("Daily !alta");
+  expect(cmds()).not.toContain("capture_close");
+  expect(screen.getByRole("alert").textContent).toContain("cofre trancado");
+  await press({ key: "Enter" });
+  expect(cmds().filter((c) => c === "task_add")).toHaveLength(1);
+  expect(cmds().filter((c) => c === "task_set_priority")).toHaveLength(2);
+  expect(cmds()).toContain("capture_close");
+});
