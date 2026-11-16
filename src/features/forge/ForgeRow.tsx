@@ -11,10 +11,10 @@ import { IssueIcon, PullIcon } from "../../components/Icons";
 const STALE_DAYS = 7;
 const ACTION = "canto-hit rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active";
 
-type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onSnooze?: () => void };
+type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; onSnooze?: () => void };
 
 /** One PR/MR/issue. The secondary actions appear on hover or focus-within; they stay in the tab order while hidden. */
-export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onSnooze }: Props) {
+export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onPeek, onSnooze }: Props) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? waitHours(item) : null;
@@ -96,8 +96,13 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
           ↗
         </span>
       </button>
-      {(onSnooze || canCheck) && (
+      {(onSnooze || canCheck || onPeek) && (
         <div className="absolute right-7 top-1.5 flex items-center gap-0.5 rounded-lg border border-edge bg-panel p-0.5 opacity-0 shadow-raised transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none">
+          {onPeek && (
+            <button type="button" onClick={onPeek} aria-label={t("forge.peek.openOf", { title: item.title })} className={ACTION}>
+              {t("forge.peek.open")}
+            </button>
+          )}
           {onSnooze && (
             <button type="button" onClick={onSnooze} aria-label={t("forge.snoozeOf", { title: item.title })} className={ACTION}>
               {t("forge.snooze")}

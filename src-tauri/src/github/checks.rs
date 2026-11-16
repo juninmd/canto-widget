@@ -52,7 +52,7 @@ pub struct Signals {
     pub status_count: u64,
 }
 
-fn run_status(r: &CheckRun) -> ChecksStatus {
+pub(crate) fn run_status(r: &CheckRun) -> ChecksStatus {
     if r.status != "completed" {
         return ChecksStatus::Running;
     }
@@ -82,19 +82,19 @@ pub fn combine(s: &Signals) -> ChecksStatus {
 #[derive(Debug, Deserialize)]
 pub struct Review {
     #[serde(default)]
-    user: Option<ReviewUser>,
+    pub(crate) user: Option<ReviewUser>,
     #[serde(default)]
-    state: String,
+    pub(crate) state: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct ReviewUser {
-    login: String,
+pub(crate) struct ReviewUser {
+    pub(crate) login: String,
 }
 
-/// Approvals and whether changes are still requested, from each person's latest decisive review: a comment or a
-/// pending draft says nothing, and a dismissal takes the person's earlier verdict back.
-pub fn review_summary(reviews: &[Review]) -> (u32, bool) {
+/// Each person's latest decisive verdict (`APPROVED` or `CHANGES_REQUESTED`): a comment or a pending draft says
+/// nothing, and a dismissal takes the person's earlier verdict back.
+pub(crate) fn verdicts(reviews: &[Review]) -> Vec<(&str, &str)> {
     let mut latest: Vec<(&str, &str)> = Vec::new();
     for r in reviews {
         let Some(user) = &r.user else { continue };
@@ -107,6 +107,12 @@ pub fn review_summary(reviews: &[Review]) -> (u32, bool) {
             latest.push((&user.login, state));
         }
     }
+    latest
+}
+
+/// Approvals and whether changes are still requested.
+pub fn review_summary(reviews: &[Review]) -> (u32, bool) {
+    let latest = verdicts(reviews);
     let approvals = latest.iter().filter(|(_, s)| *s == "APPROVED").count() as u32;
     (approvals, latest.iter().any(|(_, s)| *s == "CHANGES_REQUESTED"))
 }

@@ -528,6 +528,7 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 |---|
 | ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](docs/prints/app/153-forge-novidades-rascunhos.png) |
 | ![GitHub tab: each PR shows its approvals, "mudanças pedidas" and the size of its diff next to the CI badge, and the "precisa de mim" button keeps only overdue reviews and my stalled PRs](docs/prints/app/155-forge-aprovacoes-precisa-de-mim.png) |
+| ![GitHub tab: "espiar" opens the PR description, its CI jobs and reviewers under the lists, with a comment box and an "aprovar" button that asks for confirmation before writing](docs/prints/app/156-forge-espiar-pr.png) |
 
 | Password changed, one file pending | Day summary |
 |---|---|

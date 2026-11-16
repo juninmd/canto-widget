@@ -90,6 +90,8 @@ Duas formas de conectar:
   <https://github.com/settings/personal-access-tokens/new> com **Issues** e **Pull requests** em *Read-only*
   nos repositórios que quiser ver, e cole na aba. Para o selo de CI, some **Checks** e **Commit statuses** em
   *Read-only*.
+  Para **aprovar e comentar** pelo botão “espiar”, esse token precisa de **Pull requests** (e **Issues**, para comentar)
+  em *Read and write*; é opcional e só é usado quando você clica em “aprovar” ou “comentar”.
 - **Entrar com o GitHub** (device flow): aparece quando a build traz o Client ID de um GitHub App.
   Crie um GitHub App com permissões *Issues*, *Pull requests*, *Checks* e *Commit statuses* em *Read-only*, marque **Enable Device Flow**
   e exporte `CANTO_GITHUB_CLIENT_ID=<client id>` antes do `bun run tauri build` (na CI, variável de repositório

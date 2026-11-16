@@ -274,6 +274,8 @@ pub fn run() {
             github::cmd_lists::github_pr_checks,
             github::cmd_lists::github_prs_checks,
             github::cmd_lists::github_pr_comments,
+            github::cmd_pr::github_pr_detail,
+            github::cmd_pr::github_pr_review,
             review_alert::review_alerts_get,
             review_alert::review_alerts_set,
             my_pr_alerts::my_pr_alerts_get,
