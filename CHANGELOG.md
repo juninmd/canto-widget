@@ -13,6 +13,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Busca global também acha repositórios**: o atalho de busca agora inclui os repositórios do GitHub e do GitLab que a aba Repositórios já guardou (por nome ou descrição), sem fazer nenhuma requisição.
 - **GitHub: aprovações, tamanho do diff e “precisa de mim” nas listas**: cada PR mostra, junto do selo de CI, quantas pessoas aprovaram (“✓ 2 aprov.”), se alguém pediu mudanças e as linhas adicionadas e removidas (`+182 −41`). O Canto lê isso no mesmo lote do CI (o `pulls/{n}` já traz o diff; o estado dos reviews custa uma chamada a mais por PR, guardada junto da cabeça do PR). O novo botão **precisa de mim · N** reduz as listas ao que está parado: pedidos de revisão com mais de 48 h e PRs seus com CI falhando, conflito ou mudanças pedidas (rascunhos não contam). Aparece só quando há algo parado; no GitLab vale para revisões atrasadas e conflitos.
 
 - **GitHub e GitLab: comentários novos na linha, ocultar rascunhos e repositórios fixados**: um PR, MR ou issue que ganhou comentários desde a última vez que você o abriu mostra o selo “+3 comentários” (a primeira vez que um item aparece serve só de base, então nada acende sem motivo; some ao abrir o item). O botão **ocultar rascunhos** esconde PRs e MRs em rascunho das listas, sem nova chamada à API, e a escolha fica lembrada. Em Repositórios, a estrela nos detalhes **fixa** o repositório e o filtro **fixados** mostra só eles. Tudo fica no armazenamento local do app, sem novas chamadas ao GitHub ou ao GitLab.

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { api, errText, type AgendaItem, type ClipItem, type Note, type Task, type TranscriptMeta } from "../lib/api";
+import { api, errText, type AgendaItem, type ClipItem, type Note, type RepoInfo, type Task, type TranscriptMeta } from "../lib/api";
 import { useLatestRequest } from "../lib/useLatestRequest";
 import { fold, foldIncludes } from "../lib/fold";
 import { t } from "../i18n";
@@ -7,6 +7,21 @@ import type { Tab } from "./TabBar";
 import { Group, Row } from "./GlobalSearchGroup";
 
 const CAP = 5;
+
+type RepoHit = { repo: RepoInfo; forge: "github" | "gitlab" };
+
+/** Repositories already held by the Repos tab (RAM or sealed disk copy): no request goes out for a search. */
+async function cachedRepos(low: string): Promise<RepoHit[]> {
+  const hits: RepoHit[] = [];
+  for (const forge of ["github", "gitlab"] as const) {
+    // A forge that is not connected rejects: it simply has no repository to offer.
+    const pages = await api.reposCached(forge).catch(() => []);
+    for (const page of pages)
+      for (const repo of page.repos)
+        if (foldIncludes(repo.full_name, low) || foldIncludes(repo.description, low)) hits.push({ repo, forge });
+  }
+  return hits;
+}
 
 /** Meeting transcripts live inside the Agenda tab; the jump tells App which of its two views to open. */
 export type SearchTarget = Tab | "transcripts";
@@ -34,6 +49,7 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
   const input = useRef<HTMLInputElement>(null);
   const previous = useRef<Element | null>(null);
   const [transcripts, setTranscripts] = useState<TranscriptMeta[]>([]);
+  const [repos, setRepos] = useState<RepoHit[]>([]);
   const dialog = useRef<HTMLDivElement>(null);
   const { bump, isLatest } = useLatestRequest();
   const mask = privacy ? "blur-sm select-none" : "";
@@ -54,6 +70,7 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
       setClips([]);
       setSettled("");
       setTranscripts([]);
+      setRepos([]);
       return;
     }
     const timer = setTimeout(() => {
@@ -92,6 +109,9 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
         .transcriptsList(q)
         .then((list) => isLatest(id) && setTranscripts(list))
         .catch(() => isLatest(id) && setTranscripts([]));
+      void cachedRepos(low)
+        .then((hits) => isLatest(id) && setRepos(hits))
+        .catch(() => isLatest(id) && setRepos([]));
     }, 150);
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,7 +158,7 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
       <div className="-mx-1 min-h-0 flex-1 overflow-y-auto px-1">
         {!query.trim() ? (
           <p className="px-1 text-xs text-muted">{t("search.hint")}</p>
-        ) : !(tasks.length || notes.length || clips.length || transcripts.length || events.length) ? (
+        ) : !(tasks.length || notes.length || clips.length || transcripts.length || events.length || repos.length) ? (
           settled === query.trim() && <p className="px-1 text-xs text-muted">{t("search.empty")}</p>
         ) : (
           <>
@@ -171,6 +191,13 @@ export default function GlobalSearch({ today, privacy, agenda = [], onNavigate, 
               >
                 {transcripts.slice(0, CAP).map((x) => (
                   <Row key={x.name} text={x.name} mask={mask} onOpen={() => go("transcripts")} />
+                ))}
+              </Group>
+            )}
+            {repos.length > 0 && (
+              <Group title={t("search.groupRepos")} more={Math.max(repos.length - CAP, 0)} onOpen={() => go(repos[0].forge)}>
+                {repos.slice(0, CAP).map((r) => (
+                  <Row key={`${r.forge}:${r.repo.full_name}`} text={r.repo.full_name} mask={mask} onOpen={() => go(r.forge)} />
                 ))}
               </Group>
             )}
