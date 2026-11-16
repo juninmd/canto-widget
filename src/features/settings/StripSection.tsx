@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
 import { api, type StripConfig } from "../../lib/api";
 import StripItemsEditor from "./StripItemsEditor";
 import StripPreview from "./StripPreview";
@@ -26,6 +27,21 @@ export default function StripSection({ onError }: { onError: (m: string) => void
   useEffect(() => {
     api.stripConfigGet().then((c) => setCfg({ ...DEFAULTS, ...c }), fail);
     api.stripMonitors().then((m) => setMonitors(m ?? []), () => {});
+    // "Ocultar" on the pill and the tray switch save the config elsewhere; the switch here follows.
+    let off: (() => void) | undefined;
+    let gone = false;
+    try {
+      listen<StripConfig>("strip-config", (e) => e.payload && setCfg({ ...DEFAULTS, ...e.payload })).then(
+        (fn) => (gone ? fn() : (off = fn)),
+        () => {},
+      );
+    } catch {
+      /* no Tauri here (a browser preview): the section just keeps what it loaded */
+    }
+    return () => {
+      gone = true;
+      off?.();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
