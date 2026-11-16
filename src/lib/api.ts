@@ -120,6 +120,22 @@ export type StripConfig = {
   opacity: number;
   charts: boolean;
   launcher: boolean;
+  /** Where along the edge the pill sits. */
+  align: "start" | "center" | "end";
+  /** Pixels between the pill and the edge, 0 to 64. */
+  gap: number;
+  /** Zoom in %, 80 to 140. */
+  scale: number;
+  surface: "solid" | "glass" | "outline";
+  dividers: boolean;
+  /** Seconds between readings, 1 to 30. */
+  refresh: number;
+  /** Details open on hover; off means a click only. */
+  hover: boolean;
+  /** Off keeps the pill over full-screen apps. */
+  hide_fullscreen: boolean;
+  /** Columns of cards in the details. */
+  columns: 1 | 2;
 };
 export type StripSnapshot = {
   cpu: number;

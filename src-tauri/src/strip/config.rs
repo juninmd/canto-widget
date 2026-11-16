@@ -23,12 +23,36 @@ pub enum Density {
     Comfortable,
 }
 
+/// Where along the edge the pill sits.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Align {
+    Start,
+    #[default]
+    Center,
+    End,
+}
+
+/// How the pill is painted: the theme's panel, frosted glass, or only an outline.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Surface {
+    #[default]
+    Solid,
+    Glass,
+    Outline,
+}
+
 const fn yes() -> bool {
     true
 }
 
 const fn full() -> u8 {
     100
+}
+
+const fn two() -> u8 {
+    2
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -58,6 +82,32 @@ pub struct StripConfig {
     /// The "Abrir aba" row under the cards.
     #[serde(default = "yes")]
     pub launcher: bool,
+    /// Left, middle or right along the edge.
+    #[serde(default)]
+    pub align: Align,
+    /// Space between the pill and the screen edge (and the corner, when not centered), in px: 0 to 64.
+    #[serde(default)]
+    pub gap: u8,
+    /// Pill and cards zoom in %, from 80 to 140.
+    #[serde(default = "full")]
+    pub scale: u8,
+    #[serde(default)]
+    pub surface: Surface,
+    /// The thin lines between the numbers.
+    #[serde(default = "yes")]
+    pub dividers: bool,
+    /// Seconds between readings: 1 to 30.
+    #[serde(default = "two")]
+    pub refresh: u8,
+    /// Details open on hover; off means only a click opens them.
+    #[serde(default = "yes")]
+    pub hover: bool,
+    /// Off keeps the pill on screen over a full-screen app too.
+    #[serde(default = "yes")]
+    pub hide_fullscreen: bool,
+    /// Columns of cards in the details: 1 or 2.
+    #[serde(default = "two")]
+    pub columns: u8,
 }
 
 fn default_items() -> Vec<String> {
@@ -77,6 +127,15 @@ impl Default for StripConfig {
             opacity: 100,
             charts: true,
             launcher: true,
+            align: Align::Center,
+            gap: 0,
+            scale: 100,
+            surface: Surface::Solid,
+            dividers: true,
+            refresh: 2,
+            hover: true,
+            hide_fullscreen: true,
+            columns: 2,
         }
     }
 }
@@ -97,6 +156,10 @@ impl StripConfig {
     pub fn sanitized(mut self) -> Self {
         self.items = known(&self.items);
         self.opacity = self.opacity.clamp(40, 100);
+        self.gap = self.gap.min(64);
+        self.scale = self.scale.clamp(80, 140);
+        self.refresh = self.refresh.clamp(1, 30);
+        self.columns = self.columns.clamp(1, 2);
         self.monitor = self.monitor.filter(|m| !m.trim().is_empty()).map(|m| m.chars().take(120).collect());
         self
     }

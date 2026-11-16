@@ -6,7 +6,7 @@ pub mod place;
 pub mod readings;
 pub mod snapshot;
 
-pub use config::{known, Density, Edge, StripConfig, ITEMS};
+pub use config::{known, Align, Density, Edge, StripConfig, Surface, ITEMS};
 
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};

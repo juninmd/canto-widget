@@ -2,13 +2,13 @@
 //! app (a game, a video) is in front or the option is off.
 use tauri::{Emitter, LogicalSize, Manager, WebviewWindow};
 
-use crate::strip::{Edge, StripState, WINDOW};
+use crate::strip::{Align, Edge, StripConfig, StripState, WINDOW};
 use crate::window::state::Area;
 
 /// Pill only; the UI asks for more room while the details are open.
 pub const DEFAULT: (f64, f64) = (240.0, 32.0);
 const MIN: (f64, f64) = (48.0, 20.0);
-const MAX: (f64, f64) = (420.0, 800.0);
+const MAX: (f64, f64) = (560.0, 1100.0);
 
 /// The webview picks the size (it measures its content); a bad value must not make a giant or invisible window.
 pub fn clamp(size: (f64, f64)) -> (f64, f64) {
@@ -18,12 +18,22 @@ pub fn clamp(size: (f64, f64)) -> (f64, f64) {
 
 /// Centered on the edge, flush with it, so growing for the details keeps the pill where it was.
 pub fn origin(area: Area, size: (f64, f64), edge: Edge) -> (f64, f64) {
+    origin_at(area, size, edge, Align::Center, 0.0)
+}
+
+/// Same, with the side along the edge and a gap (in the area's own unit) from the edge and the corner.
+pub fn origin_at(area: Area, size: (f64, f64), edge: Edge, align: Align, gap: f64) -> (f64, f64) {
     let (x, y, w, h) = area;
     let top = match edge {
-        Edge::Top => y,
-        Edge::Bottom => y + h - size.1,
+        Edge::Top => y + gap,
+        Edge::Bottom => y + h - size.1 - gap,
     };
-    (x + (w - size.0) / 2.0, top)
+    let left = match align {
+        Align::Start => x + gap,
+        Align::Center => x + (w - size.0) / 2.0,
+        Align::End => x + w - size.0 - gap,
+    };
+    (left, top)
 }
 
 /// Off wins over everything; a full-screen app keeps the screen to itself.
@@ -78,13 +88,13 @@ fn target_monitor(win: &WebviewWindow) -> tauri::Result<Option<tauri::Monitor>> 
     Ok(from_main.or(win.primary_monitor()?))
 }
 
-pub fn place(win: &WebviewWindow, size: (f64, f64), edge: Edge) -> tauri::Result<()> {
+pub fn place(win: &WebviewWindow, size: (f64, f64), cfg: &StripConfig) -> tauri::Result<()> {
     let size = clamp(size);
     let Some((area, scale)) = area_of(win, true)? else {
         return win.set_size(LogicalSize::new(size.0, size.1));
     };
     let scaled = ((size.0 * scale).round(), (size.1 * scale).round());
-    let (x, y) = origin(area, scaled, edge);
+    let (x, y) = origin_at(area, scaled, cfg.edge, cfg.align, (f64::from(cfg.gap) * scale).round());
     #[cfg(target_os = "macos")]
     {
         win.set_size(LogicalSize::new(size.0, size.1))?;
@@ -101,10 +111,10 @@ pub fn place(win: &WebviewWindow, size: (f64, f64), edge: Edge) -> tauri::Result
 pub fn sync(app: &tauri::AppHandle) {
     let (Some(win), Some(state)) = (app.get_webview_window(WINDOW), app.try_state::<StripState>()) else { return };
     let cfg = state.cfg();
-    let show = wanted(cfg.enabled, crate::fullscreen_guard::holding(app));
+    let show = wanted(cfg.enabled, cfg.hide_fullscreen && crate::fullscreen_guard::holding(app));
     let visible = win.is_visible().unwrap_or(false);
     if show && !visible {
-        let _ = place(&win, DEFAULT, cfg.edge);
+        let _ = place(&win, DEFAULT, &cfg);
         if win.show().is_ok() {
             let _ = win.emit_to(win.label(), crate::window::SHOWN_EVENT, true);
         }

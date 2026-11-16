@@ -16,7 +16,7 @@ export function SettingsSection({ id, title, error, className = "", children }: 
   const Heading = useContext(LevelContext) === 3 ? "h3" : "h4";
   return (
     <div role="group" aria-labelledby={headingId} className={`flex flex-col gap-2 ${className}`}>
-      <Heading id={headingId} className="text-xs font-semibold text-fg">
+      <Heading id={headingId} className="text-[11px] font-semibold uppercase tracking-wider text-accent-text">
         {title}
       </Heading>
       {children}

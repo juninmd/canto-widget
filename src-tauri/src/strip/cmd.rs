@@ -17,7 +17,7 @@ pub fn strip_config_set(app: AppHandle, state: State<'_, StripState>, config: St
     if let Some(win) = app.get_webview_window(WINDOW).filter(|w| w.is_visible().unwrap_or(false)) {
         let size = win.inner_size().ok().zip(win.scale_factor().ok());
         let size = size.map_or(place::DEFAULT, |(s, f)| (f64::from(s.width) / f, f64::from(s.height) / f));
-        place::place(&win, size, saved.edge).map_err(|e| AppError::Io(e.to_string()))?;
+        place::place(&win, size, &saved).map_err(|e| AppError::Io(e.to_string()))?;
     }
     Ok(saved)
 }
@@ -31,7 +31,7 @@ pub fn strip_snapshot(app: AppHandle, state: State<'_, StripState>) -> Snapshot 
 #[tauri::command]
 pub fn strip_resize(app: AppHandle, state: State<'_, StripState>, width: f64, height: f64) -> Result<()> {
     let Some(win) = app.get_webview_window(WINDOW) else { return Ok(()) };
-    place::place(&win, (width, height), state.cfg().edge).map_err(|e| AppError::Io(e.to_string()))
+    place::place(&win, (width, height), &state.cfg()).map_err(|e| AppError::Io(e.to_string()))
 }
 
 /// Same action as the tray's "entrar" item and its shortcut.
