@@ -9,7 +9,6 @@ import { ITEM_TAB } from "./features/strip/stripModel";
 import { nextFocus } from "./features/strip/stripKeys";
 import type { Tab } from "./shell/TabBar";
 
-const POLL_MS = 2000;
 const LOOK = { density: "comfortable", icons: true, labels: false } as const;
 /** Leaving the pill for the card is not leaving: a short grace keeps it from flickering shut on the way. */
 const CLOSE_MS = 250;
@@ -23,7 +22,8 @@ export default function StripWindow() {
   const shown = useWindowVisible();
   const content = useRef<HTMLDivElement>(null);
   const closing = useRef<ReturnType<typeof setTimeout>>(undefined);
-  const open = hover || pinned;
+  const open = (hover && cfg?.hover !== false) || pinned;
+  const pollMs = Math.max(1, Math.min(30, cfg?.refresh ?? 2)) * 1000;
 
   // Hidden (option off, full-screen app in front) means no polling: nobody is looking.
   useEffect(() => {
@@ -39,12 +39,12 @@ export default function StripWindow() {
         () => {},
       );
     load();
-    const timer = setInterval(load, POLL_MS);
+    const timer = setInterval(load, pollMs);
     return () => {
       alive = false;
       clearInterval(timer);
     };
-  }, [shown]);
+  }, [shown, pollMs]);
 
   // The window is exactly as big as its content, so the transparent rest never eats clicks on the screen edge.
   useEffect(() => {
@@ -123,7 +123,7 @@ export default function StripWindow() {
         ref={content}
         onMouseEnter={enter}
         onMouseLeave={leave}
-        style={{ opacity }}
+        style={{ opacity, zoom: (cfg?.scale ?? 100) / 100 }}
         className={`flex w-max flex-col items-center gap-1.5 p-0.5 transition-opacity duration-200 ${bottom ? "flex-col-reverse" : ""}`}
       >
         <StripPill items={items} snap={snap} look={cfg ?? LOOK} open={open} onToggle={() => setPinned((p) => !p)} />

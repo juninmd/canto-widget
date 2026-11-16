@@ -17,18 +17,19 @@ type Props = {
 
 /** Two columns of cards in the user's order; a click opens that item's tab in the widget. */
 export default function StripDetails({ cfg, snap, onOpen, onLaunch, onHide, now }: Props) {
+  const one = cfg.columns === 1;
   const view = cfg.charts ? snap : { ...snap, history: null };
   return (
-    <div className="flex w-[340px] flex-col gap-2 rounded-2xl border border-edge bg-panel p-2 shadow-2xl">
+    <div className={`flex ${one ? "w-[220px]" : "w-[340px]"} flex-col gap-2 rounded-2xl border border-edge bg-panel p-2 shadow-2xl`}>
       {cfg.items.length > 0 ? (
-        <div className="grid grid-flow-row-dense grid-cols-2 gap-1.5">
+        <div className={`grid grid-flow-row-dense gap-1.5 ${one ? "grid-cols-1" : "grid-cols-2"}`}>
           {cfg.items.map((item) => (
             <StripCard
               key={item}
               item={item}
               lines={lines(item, view, now)}
               level={levelOf(item, snap)}
-              wide={WIDE.has(item)}
+              wide={!one && WIDE.has(item)}
               onOpen={() => onOpen(item)}
               action={
                 item === "event" && snap.event?.meet ? (

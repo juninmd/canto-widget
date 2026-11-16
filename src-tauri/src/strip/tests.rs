@@ -64,7 +64,7 @@ fn the_pill_is_centered_and_flush_with_the_chosen_edge() {
 #[test]
 fn a_size_the_webview_cannot_have_is_clamped() {
     assert_eq!(place::clamp((f64::NAN, -5.0)), (place::DEFAULT.0, 20.0));
-    assert_eq!(place::clamp((9999.0, 9999.0)), (420.0, 800.0));
+    assert_eq!(place::clamp((9999.0, 9999.0)), (560.0, 1100.0));
     assert_eq!(place::clamp((300.0, 40.0)), (300.0, 40.0));
 }
 
@@ -147,4 +147,23 @@ fn an_old_file_gets_the_default_look_and_a_bad_opacity_is_clamped() {
 fn every_item_of_the_vocabulary_survives_and_keeps_its_place() {
     let all: Vec<String> = ITEMS.iter().rev().map(|s| s.to_string()).collect();
     assert_eq!(known(&all), all);
+}
+
+#[test]
+fn the_pill_can_sit_at_either_corner_with_a_gap() {
+    let area = (0.0, 40.0, 1920.0, 1000.0);
+    let size = (240.0, 32.0);
+    assert_eq!(place::origin_at(area, size, Edge::Top, Align::Start, 8.0), (8.0, 48.0));
+    assert_eq!(place::origin_at(area, size, Edge::Bottom, Align::End, 8.0), (1672.0, 1000.0));
+    assert_eq!(place::origin_at(area, size, Edge::Top, Align::Center, 0.0), place::origin(area, size, Edge::Top));
+}
+
+#[test]
+fn new_look_keys_fall_back_and_are_clamped() {
+    let cfg: StripConfig = serde_json::from_str(r#"{"enabled":true}"#).unwrap();
+    assert_eq!((cfg.align, cfg.gap, cfg.scale, cfg.surface), (Align::Center, 0, 100, Surface::Solid));
+    assert!(cfg.dividers && cfg.hover && cfg.hide_fullscreen);
+    assert_eq!((cfg.refresh, cfg.columns), (2, 2));
+    let wild = StripConfig { gap: 200, scale: 10, refresh: 0, columns: 9, ..StripConfig::default() }.sanitized();
+    assert_eq!((wild.gap, wild.scale, wild.refresh, wild.columns), (64, 80, 1, 2));
 }
