@@ -4,6 +4,7 @@ import BackupSection from "./BackupSection";
 import SyncSection from "./SyncSection";
 import ClipSection from "../clipboard/ClipSection";
 import GoogleSection from "../google/GoogleSection";
+import McpSection from "./McpSection";
 import WindowSection from "./WindowSection";
 import StripSection from "./StripSection";
 import SecuritySection from "./SecuritySection";
@@ -67,6 +68,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     backup: <BackupSection onError={onError} />,
     sync: <SyncSection onError={onError} />,
     clipboard: <ClipSection onError={onError} />,
+    mcp: <McpSection onError={onError} />,
     window: <WindowSection onError={onError} />,
     strip: <StripSection onError={onError} />,
     autostart: <AutostartSection onError={onError} />,

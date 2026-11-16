@@ -1,4 +1,5 @@
 import { app } from "./app";
+import { mcp } from "./mcp";
 import { agents } from "./agents";
 import { content } from "./content";
 import { focus } from "./focus";
@@ -21,4 +22,4 @@ import { uiModelsActivity } from "./uiModelsActivity";
 import { uiFormats } from "./uiFormats";
 
 /** One file per area so features can be translated (and reviewed) independently. */
-export const ptBR = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats } as const;
+export const ptBR = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats, ...mcp } as const;

@@ -1,4 +1,5 @@
 import { app } from "./app";
+import { mcp } from "./mcp";
 import { agents } from "./agents";
 import { content } from "./content";
 import { focus } from "./focus";
@@ -20,5 +21,5 @@ import { dev } from "./dev";
 import { uiModelsActivity } from "./uiModelsActivity";
 import { uiFormats } from "./uiFormats";
 
-export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...map, ...dev, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats };
+export const es = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...map, ...dev, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats, ...mcp };
 export const messages = es;
