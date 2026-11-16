@@ -28,7 +28,7 @@ fn an_empty_choice_stays_empty_and_unknown_names_go_away() {
     let cfg: StripConfig = serde_json::from_str(r#"{"enabled":true,"items":[]}"#).unwrap();
     assert!(cfg.items.is_empty(), "switching every item off is a choice, not a missing key");
     let raw = ["event".into(), "nope".into(), "cpu".into(), "cpu".into()];
-    assert_eq!(known(&raw), ["cpu", "event"], "the pill's own order, no duplicates");
+    assert_eq!(known(&raw), ["event", "cpu"], "the user's own order, no duplicates");
 }
 
 #[test]
@@ -42,6 +42,7 @@ fn the_choice_survives_a_restart() {
         edge: Edge::Bottom,
         items: vec!["memory".into(), "x".into()],
         monitor: Some("DP-2".into()),
+        ..Default::default()
     };
     assert_eq!(state.set(cfg).unwrap().items, ["memory"]);
     let back = StripState::load(&dir).cfg();
@@ -125,7 +126,25 @@ fn a_chosen_monitor_is_found_by_name_and_an_unplugged_one_falls_back() {
 
 #[test]
 fn the_new_items_are_known_and_old_files_have_no_monitor() {
-    assert_eq!(known(&["battery".into(), "tasks".into(), "cpu".into()]), ["cpu", "battery", "tasks"]);
+    assert_eq!(known(&["battery".into(), "tasks".into(), "cpu".into()]), ["battery", "tasks", "cpu"]);
     let cfg: StripConfig = serde_json::from_str(r#"{"enabled":true}"#).unwrap();
     assert_eq!(cfg.monitor, None);
+}
+
+#[test]
+fn an_old_file_gets_the_default_look_and_a_bad_opacity_is_clamped() {
+    let cfg: StripConfig = serde_json::from_str(r#"{"enabled":true,"items":["cpu"]}"#).unwrap();
+    assert_eq!(cfg.density, Density::Comfortable);
+    assert!(cfg.icons && cfg.charts && cfg.launcher && !cfg.labels);
+    assert_eq!(cfg.opacity, 100);
+    let raw = StripConfig { opacity: 5, monitor: Some("  ".into()), ..cfg.clone() }.sanitized();
+    assert_eq!(raw.opacity, 40, "an invisible pill would look like a bug");
+    assert_eq!(raw.monitor, None);
+    assert_eq!(StripConfig { opacity: 250, ..cfg }.sanitized().opacity, 100);
+}
+
+#[test]
+fn every_item_of_the_vocabulary_survives_and_keeps_its_place() {
+    let all: Vec<String> = ITEMS.iter().rev().map(|s| s.to_string()).collect();
+    assert_eq!(known(&all), all);
 }

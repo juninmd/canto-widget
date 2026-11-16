@@ -53,7 +53,7 @@ const KEYWORDS: Record<SectionId, string> = {
   sync: "sincronizar sincronização pasta nuvem sync folder cloud",
   mcp: "mcp servidor agente agentes claude code codex opencode cursor gemini copilot windsurf token ia ai integração integration server",
   window: "janela sempre no topo posição window top position",
-  strip: "mini-dashboard mini painel pílula barra borda cpu clima evento próximo topo base mini dashboard pill edge weather event top bottom",
+  strip: "mini-dashboard mini painel pílula barra borda cpu clima evento próximo topo base mini dashboard pill edge weather event top bottom gpu disco rede bateria tarefas mercado relógio endpoints opacidade ordem disk network battery tasks market clock opacity order",
   autostart: "iniciar início automático ligar computador bandeja startup autostart tray",
   shortcuts: "atalhos teclado tecla shortcuts keyboard keys",
   update: "atualização atualizar versão update version",
