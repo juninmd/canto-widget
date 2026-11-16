@@ -57,6 +57,7 @@ pub mod hello_mac;
 pub mod keep_import;
 pub mod lang;
 pub mod market;
+pub mod mcp;
 pub mod meet;
 pub mod meeting_alert;
 pub mod meeting_cache;
@@ -304,6 +305,12 @@ pub fn run() {
             gmail::alert::gmail_alerts_get,
             gmail::alert::gmail_alerts_set,
             weather::cmd::weather_get,
+            mcp::mcp_get,
+            mcp::mcp_set_enabled,
+            mcp::mcp_set_perms,
+            mcp::mcp_set_port,
+            mcp::mcp_token_get,
+            mcp::mcp_token_regenerate,
             weather::cmd::weather_search,
             weather::cmd::weather_set_place,
             weather::cmd::weather_clear,

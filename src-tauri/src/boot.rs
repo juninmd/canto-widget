@@ -16,6 +16,7 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     std::fs::create_dir_all(&dir)?;
     app.manage(AppState::new(dir.clone()));
     app.manage(prefs::PrefsLock::default());
+    app.manage(mcp::McpState::load(&dir));
     app.manage(github::cmd::GithubState::default());
     app.manage(status::cache::StatusCache::default());
     app.manage(status::alert::StatusAlerts::load(&dir));
@@ -60,6 +61,7 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     tray_live::watch(app.handle().clone());
     #[cfg(desktop)]
     sysmon::alert::watch(app.handle().clone());
+    mcp::start_if_enabled(app.handle());
     meeting_alert::watch(app.handle().clone());
     task_reminder::watch(app.handle().clone());
     context_reminder::watch(app.handle().clone());

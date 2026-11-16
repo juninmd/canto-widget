@@ -691,6 +691,12 @@ export const api = {
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
   /** Fetch comments on a PR to display in the commenters catalog. */
   githubPrComments: (repo: string, number: number) => invoke<PrComment[]>("github_pr_comments", { repo, number }),
+  mcpGet: () => invoke<McpView>("mcp_get"),
+  mcpSetEnabled: (enabled: boolean) => invoke<McpView>("mcp_set_enabled", { enabled }),
+  mcpSetPerms: (perms: McpPerms) => invoke<McpView>("mcp_set_perms", { perms }),
+  mcpSetPort: (port: number) => invoke<McpView>("mcp_set_port", { port }),
+  mcpToken: () => invoke<string>("mcp_token_get"),
+  mcpTokenRegenerate: () => invoke<string>("mcp_token_regenerate"),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
   reviewAlertsGet: () => invoke<boolean>("review_alerts_get"),
@@ -882,3 +888,9 @@ export const api = {
 export function errText(e: unknown): string {
   return typeof e === "string" ? e : e instanceof Error ? e.message : t("app.unexpectedError");
 }
+
+export type McpPerms = {
+  notifications: boolean; tasks: boolean; notes: boolean; agenda: boolean; prs: boolean; system: boolean; weather: boolean;
+  tasks_write: boolean; notes_write: boolean;
+};
+export type McpView = { enabled: boolean; running: boolean; port: number; endpoint: string; perms: McpPerms; error: string | null };

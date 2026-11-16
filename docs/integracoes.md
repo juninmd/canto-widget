@@ -116,3 +116,23 @@ na instância antes de salvar.
 - Instância com certificado de CA própria (interna) ainda não é suportada.
 
 **desconectar** apaga endereço e token deste computador. Para revogar: GitLab → Preferences → Access tokens.
+
+## Servidor MCP (opcional)
+
+Em **Ajustes → Servidor MCP** (desligado por padrão) o Canto abre um endpoint MCP em
+`http://127.0.0.1:47615/mcp` (HTTP, uma requisição por conexão) para agentes de código lerem o app.
+
+- **Só este computador**: escuta apenas `127.0.0.1`; recusa `Host` de outro nome e qualquer requisição com `Origin`
+  (uma página web não consegue chamar).
+- **Token**: gerado no app (`canto_…`, 256 bits), exigido como `Authorization: Bearer`. O arquivo de configuração
+  guarda só o hash; o token em si fica cifrado com a chave do cofre. **Gerar novo token** invalida o antigo.
+- **Cofre bloqueado = sem dados**: as ferramentas respondem que o Canto está bloqueado, e ler não adia o
+  bloqueio automático.
+- **Permissões por recurso**: ler notificações do dia, tarefas, agenda, PRs do GitHub, status do sistema e clima
+  (ligados); ler notas, criar tarefas e criar notas (desligados). Ferramenta desligada nem aparece na lista.
+
+Ferramentas: `list_notifications`, `list_tasks`, `list_notes`, `get_note`, `list_agenda`, `list_pull_requests`,
+`get_system_status`, `get_weather`, `create_task`, `create_note`. A tela traz o comando ou o trecho de configuração
+com o token para Claude Code, Codex, OpenCode, Gemini CLI, Cursor, VS Code/Copilot, Windsurf e, via `mcp-remote`,
+Claude Desktop e outros. O conteúdo devolvido (títulos de PR, notas) vem de terceiros: o agente deve tratá-lo
+como dado, não como instrução.

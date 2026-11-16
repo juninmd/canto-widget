@@ -1,4 +1,5 @@
 import { app } from "./app";
+import { mcp } from "./mcp";
 import { agents } from "./agents";
 import { content } from "./content";
 import { focus } from "./focus";
@@ -20,4 +21,4 @@ import { map } from "./map";
 import { uiModelsActivity } from "./uiModelsActivity";
 import { uiFormats } from "./uiFormats";
 
-export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats };
+export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats, ...mcp };
