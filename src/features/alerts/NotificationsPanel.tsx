@@ -4,8 +4,10 @@ import { outcomeLabel, resolvedToday, toneOf } from "./alerts";
 import { LOCALE, t } from "../../i18n";
 import AlertCard from "./AlertCard";
 import { TONE } from "./AlertStrip";
+import Avatar from "../agenda/Avatar";
+import { senderName } from "./alerts";
 import ErrorBanner from "../../components/ErrorBanner";
-import { BellIcon, CheckIcon } from "../../components/Icons";
+import { BellIcon, CheckIcon, ChevronIcon } from "../../components/Icons";
 
 const SHOWN = 8;
 const heading = "flex items-center gap-2 text-[10px] uppercase tracking-widest text-faint";
@@ -108,8 +110,9 @@ export default function NotificationsPanel({
               type="button"
               onClick={() => void dismissAll()}
               disabled={busy}
-              className="canto-hit min-h-[24px] whitespace-nowrap rounded-md px-2 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active disabled:opacity-50"
+              className="canto-hit inline-flex min-h-[24px] items-center gap-1 whitespace-nowrap rounded-md px-2 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active disabled:opacity-50"
             >
+              <CheckIcon />
               {t("notif.dismissAll")}
             </button>
           )}
@@ -118,8 +121,9 @@ export default function NotificationsPanel({
             type="button"
             onClick={onClose}
             title="Esc"
-            className="canto-hit min-h-[24px] rounded-lg bg-edge px-3 text-xs text-fg hover:bg-hover active:bg-active"
+            className="canto-hit inline-flex min-h-[24px] items-center gap-1 rounded-lg bg-edge px-3 text-xs text-fg hover:bg-hover active:bg-active"
           >
+            <ChevronIcon dir="left" />
             {t("transcripts.back")}
           </button>
         </div>
@@ -159,12 +163,16 @@ export default function NotificationsPanel({
           <ul className="divide-y divide-edge rounded-lg border border-edge bg-ink/40">
             {(all ? done : done.slice(0, SHOWN)).map((r, i) => (
               <li key={`${r.item.id}-${r.at}-${i}`} className="flex items-center gap-2.5 px-2.5 py-1.5 text-xs">
-                <span
-                  aria-hidden="true"
-                  className={`grid size-5 shrink-0 place-items-center rounded-full bg-edge/70 ${r.outcome === "done" ? TONE[toneOf(r.item)].text : "text-faint"}`}
-                >
-                  <CheckIcon />
-                </span>
+                {r.item.sender ? (
+                  <Avatar name={senderName(r.item)} email={r.item.sender.login} photo={r.item.sender.avatar} />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className={`grid size-5 shrink-0 place-items-center rounded-full bg-edge/70 ${r.outcome === "done" ? TONE[toneOf(r.item)].text : "text-faint"}`}
+                  >
+                    <CheckIcon />
+                  </span>
+                )}
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-muted">{r.item.title}</span>
                   <span className="block text-[11px] text-faint">{outcomeLabel(r.item, r.outcome)}</span>

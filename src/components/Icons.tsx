@@ -242,3 +242,10 @@ export const CalendarIcon = () => (
     <path d="M3.5 10h17M8 3v4M16 3v4" />
   </svg>
 );
+
+export const VideoIcon = () => (
+  <svg {...base}>
+    <rect x="2.5" y="6" width="13" height="12" rx="2" />
+    <path d="m15.5 10.5 6-3.5v10l-6-3.5" />
+  </svg>
+);
