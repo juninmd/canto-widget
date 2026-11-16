@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api, type ChecksStatus, type ForgeItem } from "../../lib/api";
 import type { Forge } from "./forge";
+import type { ReviewInfo } from "./forgeChecks";
 import { daysSince, timeAgo } from "../../lib/time";
 import { overdue, waitHours, waitLabel } from "./reviewRadar";
 import { t } from "../../i18n";
@@ -10,10 +11,10 @@ import { IssueIcon, PullIcon } from "../../components/Icons";
 const STALE_DAYS = 7;
 const ACTION = "canto-hit rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active";
 
-type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; news?: number; onOpen?: () => void; onSnooze?: () => void };
+type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onSnooze?: () => void };
 
 /** One PR/MR/issue. The secondary actions appear on hover or focus-within; they stay in the tab order while hidden. */
-export default function ForgeRow({ item, login, forge, waiting, ci, conflict, news = 0, onOpen, onSnooze }: Props) {
+export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onSnooze }: Props) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? waitHours(item) : null;
@@ -59,8 +60,23 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, ne
               </Pill>
             )}
             {item.is_pr && badge && <CiPill status={badge} />}
+            {item.is_pr && review?.changes && (
+              <Pill tone="bad" title={t("forge.item.changesTitle")}>
+                {t("forge.item.changes")}
+              </Pill>
+            )}
+            {item.is_pr && review && !review.changes && review.approvals > 0 && (
+              <Pill tone="ok" title={t("forge.item.approvedTitle", { n: review.approvals })}>
+                {t("forge.item.approved", { n: review.approvals })}
+              </Pill>
+            )}
             {item.is_pr && checks === "loading" && <span className="text-faint">{t("forge.checks.loading")}</span>}
             <span className="truncate">{item.reference}</span>
+            {item.is_pr && review && (
+              <span title={t("forge.item.diffTitle")} className="shrink-0 font-mono text-[10.5px] tabular-nums">
+                <span className="text-ok">+{review.additions}</span> <span className="text-danger">−{review.deletions}</span>
+              </span>
+            )}
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
             {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
             {wait !== null && (

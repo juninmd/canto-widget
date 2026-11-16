@@ -1079,5 +1079,12 @@
   "forge.item.newsTitle": "{n} new comments since you last opened it",
   "forge.repos.pinnedFilter": "pinned · {n}",
   "forge.repos.pin": "pin {name}",
-  "forge.repos.unpin": "unpin {name}"
+  "forge.repos.unpin": "unpin {name}",
+  "forge.attention": "needs me · {n}",
+  "forge.attentionTitle": "overdue reviews and my stalled PRs: CI failed, conflict or changes requested",
+  "forge.item.approved": "✓ {n} appr.",
+  "forge.item.approvedTitle": "{n} approvals and no change requests",
+  "forge.item.changes": "changes requested",
+  "forge.item.changesTitle": "a reviewer asked for changes",
+  "forge.item.diffTitle": "lines added and removed"
 }

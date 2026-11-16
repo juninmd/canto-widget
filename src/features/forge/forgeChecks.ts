@@ -1,6 +1,6 @@
 import type { ChecksStatus, ForgeLists, ForgeSection, PrChecks, PrRef } from "../../lib/api";
 
-/** Same bound as `MAX_PRS` in `github_checks.rs`: each uncached PR costs three GitHub calls. */
+/** Same bound as `MAX_PRS` in `github_checks.rs`: each uncached PR costs four GitHub calls. */
 export const MAX_CHECKED = 20;
 const ORDER: ForgeSection[] = ["review_requested", "assigned", "my_prs"];
 
@@ -40,5 +40,20 @@ export function applyConflicts(prev: ConflictMap, results: PrChecks[]): Conflict
   if (results.length === 0) return prev;
   const next = { ...prev };
   for (const r of results) next[checkKey(r.repo, r.number)] = r.conflict === true;
+  return next;
+}
+
+/** What the CI batch also says about a PR: how big the diff is and where its reviews stand. */
+export type ReviewInfo = { additions: number; deletions: number; approvals: number; changes: boolean };
+export type ReviewMap = Record<string, ReviewInfo>;
+
+/** Same rule as `applyChecks`: a PR the batch left out keeps what was last known; older Rust builds send none of it. */
+export function applyReviews(prev: ReviewMap, results: PrChecks[]): ReviewMap {
+  const got = results.filter((r) => typeof r.additions === "number");
+  if (got.length === 0) return prev;
+  const next = { ...prev };
+  for (const r of got) {
+    next[checkKey(r.repo, r.number)] = { additions: r.additions ?? 0, deletions: r.deletions ?? 0, approvals: r.approvals ?? 0, changes: r.changes_requested === true };
+  }
   return next;
 }

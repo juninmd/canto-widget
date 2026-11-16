@@ -3,7 +3,8 @@ import { api } from "../../lib/api";
 import { freshness, isFiltered, visibleSections, type Forge } from "./forge";
 import type { ForgeListsState } from "./useForgeLists";
 import { useMentions } from "./useMentions";
-import type { CiMap, ConflictMap } from "./forgeChecks";
+import type { CiMap, ConflictMap, ReviewMap } from "./forgeChecks";
+import { ATTENTION_SECTIONS, attentionCount, needsAttention } from "./forgeAttention";
 import { effectiveFocus, focusList, focusSections, type SummaryFocus } from "./forgeFocus";
 import { useForgeCommenters } from "./useForgeCommenters";
 import { useRepos } from "./useRepos";
@@ -21,14 +22,14 @@ import ReposList, { savedStats } from "./ReposList";
 import Skeleton from "../../components/Skeleton";
 import SubTabs from "../../components/SubTabs";
 
-type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; conflicts?: ConflictMap; onDisconnect: () => void };
+type Props = { forge: Forge; login: string; host?: string; lists: ForgeListsState; ci?: CiMap; conflicts?: ConflictMap; reviews?: ReviewMap; onDisconnect: () => void };
 
 type Sub = "lists" | "mentions" | "repos";
 
 const VIEW_TAB = "canto-hit flex-1 rounded-lg py-1 text-center text-[11px] font-medium transition-colors";
 
 /** Connected forge: header, subtabs (lists vs mentions), PR/issue lists or commenters catalog. */
-export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflicts, onDisconnect }: Props) {
+export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflicts, reviews, onDisconnect }: Props) {
   const { lists } = gh;
   const fresh = lists ? freshness(lists) : null;
   const [sub, setSub] = useState<Sub>("lists");
@@ -36,6 +37,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const [pressed, setPressed] = useState<SummaryFocus | null>(null);
   const [known, setKnown] = useState(0);
   const [hideDrafts, setHideDrafts] = useState(savedHideDrafts);
+  const [attention, setAttention] = useState(false);
   const focus = effectiveFocus(pressed, ci);
 
   const mentions = useMentions(forge);
@@ -56,7 +58,11 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const busy = onRepos ? repos.loading : onMentions ? mentions.loading : gh.loading;
   const refresh = () => (onRepos ? repos.refresh() : void (onMentions ? loadMentions(true) : gh.load(gh.filter, true, true)));
   const commenters = useForgeCommenters(forge, lists, view === "commenters");
-  const shown = lists ? focusSections(visibleSections(forge, gh.filter.kind), focus) : [];
+  const signals = { ci, conflicts, reviews };
+  const stuck = lists ? attentionCount(lists, new Date(), signals) : 0;
+  const attending = attention && stuck > 0;
+  const base = lists ? focusSections(visibleSections(forge, gh.filter.kind), focus) : [];
+  const shown = attending ? base.filter((s) => ATTENTION_SECTIONS.includes(s.key)) : base;
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -99,17 +105,30 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
           {view === "items" ? (
             <>
               <ForgeFilterBar forge={forge} filter={gh.filter} onApply={(f) => void gh.load(f, false)} />
-              <button
-                type="button"
-                aria-pressed={hideDrafts}
-                onClick={() => {
-                  saveHideDrafts(!hideDrafts);
-                  setHideDrafts(!hideDrafts);
-                }}
-                className={`canto-hit min-h-[24px] self-start rounded-full px-2.5 text-[11px] ${hideDrafts ? "bg-accent font-semibold text-on-accent" : "bg-edge text-muted hover:bg-active hover:text-fg"}`}
-              >
-                {t("forge.hideDrafts")}
-              </button>
+              <div className="flex flex-wrap gap-1.5">
+                {stuck > 0 && (
+                  <button
+                    type="button"
+                    aria-pressed={attention}
+                    title={t("forge.attentionTitle")}
+                    onClick={() => setAttention(!attention)}
+                    className={`canto-hit min-h-[24px] rounded-full px-2.5 text-[11px] ${attention ? "bg-accent font-semibold text-on-accent" : "bg-edge text-muted hover:bg-active hover:text-fg"}`}
+                  >
+                    {t("forge.attention", { n: stuck })}
+                  </button>
+                )}
+                <button
+                  type="button"
+                  aria-pressed={hideDrafts}
+                  onClick={() => {
+                    saveHideDrafts(!hideDrafts);
+                    setHideDrafts(!hideDrafts);
+                  }}
+                  className={`canto-hit min-h-[24px] rounded-full px-2.5 text-[11px] ${hideDrafts ? "bg-accent font-semibold text-on-accent" : "bg-edge text-muted hover:bg-active hover:text-fg"}`}
+                >
+                  {t("forge.hideDrafts")}
+                </button>
+              </div>
               {fresh?.limitedUntil && (
                 <p role="status" className="text-[11px] text-muted">
                   {t("forge.rateLimited", { time: clockLabel(fresh.limitedUntil) })}
@@ -133,7 +152,9 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                       onMore={() => void gh.more(key)}
                       ci={ci}
                       conflicts={conflicts}
+                      reviews={reviews}
                       hideDrafts={hideDrafts}
+                      needs={attending ? (it) => needsAttention(key, it, new Date(), signals) : undefined}
                     />
                   ))}
               </div>

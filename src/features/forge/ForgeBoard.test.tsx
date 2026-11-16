@@ -239,3 +239,44 @@ test("a PR that got new comments since the last look shows a badge that clears o
   });
   expect(screen.queryByText("+3 comentários")).toBeNull();
 });
+
+test("the CI batch also brings approvals, changes requested and the diff size onto the row", async () => {
+  const batch = [
+    { repo: "acme/atlas", number: 3, status: "success", conflict: false, additions: 120, deletions: 34, approvals: 2, changes_requested: false },
+    { repo: "acme/atlas", number: 4, status: "success", conflict: false, additions: 5, deletions: 1, approvals: 1, changes_requested: true },
+  ];
+  await mountGithub({ ...board, review_requested: empty, assigned: empty, my_issues: empty }, batch);
+  const green = screen.getByRole("button", { name: /Meu PR verde/ });
+  expect(within(green).getByText("✓ 2 aprov.")).toBeTruthy();
+  expect(green.textContent).toContain("+120");
+  expect(green.textContent).toContain("−34");
+  const red = screen.getByRole("button", { name: /Meu PR vermelho/ });
+  expect(within(red).getByText("mudanças pedidas")).toBeTruthy();
+  expect(within(red).queryByText(/aprov\./)).toBeNull();
+});
+
+test("precisa de mim narrows the board to overdue reviews and my stalled PRs, and only shows up when something is stuck", async () => {
+  const lists = {
+    ...board,
+    review_requested: { total: 2, items: [pr(1, "Pedido novo"), pr(6, "Pedido antigo", { created_at: hoursAgo(80) })] },
+    my_issues: empty,
+    assigned: { total: 1, items: [issue(2, "Atribuída a mim")] },
+  };
+  await mountGithub(lists, checks);
+  const chip = screen.getByRole("button", { name: "precisa de mim · 2" });
+  expect(chip.getAttribute("aria-pressed")).toBe("false");
+  fireEvent.click(chip);
+  expect(chip.getAttribute("aria-pressed")).toBe("true");
+  expect(screen.getByText("Pedido antigo")).toBeTruthy();
+  expect(screen.getByText("Meu PR vermelho")).toBeTruthy();
+  expect(screen.queryByText("Pedido novo")).toBeNull();
+  expect(screen.queryByText("Meu PR verde")).toBeNull();
+  expect(screen.queryByText("Atribuída a mim")).toBeNull();
+  fireEvent.click(chip);
+  expect(screen.getByText("Pedido novo")).toBeTruthy();
+});
+
+test("without anything stuck there is no precisa de mim button", async () => {
+  await mountGithub({ ...board, my_prs: { total: 1, items: [pr(3, "Meu PR verde")] } }, [{ repo: "acme/atlas", number: 3, status: "success" }]);
+  expect(screen.queryByRole("button", { name: /precisa de mim/ })).toBeNull();
+});

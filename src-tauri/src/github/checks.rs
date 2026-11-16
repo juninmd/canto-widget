@@ -11,7 +11,7 @@ use crate::forge::{checks_from_github, valid_repo_path, ChecksStatus};
 use crate::github::cmd::FORGE;
 use crate::github::{client, network, response, API};
 
-/// PRs checked per request: an uncached one costs three REST calls.
+/// PRs checked per request: an uncached one costs four REST calls (pull, reviews, check runs, status).
 pub const MAX_PRS: usize = 20;
 const PARALLEL: usize = 4;
 
@@ -28,6 +28,10 @@ pub struct PrChecks {
     pub status: ChecksStatus,
     /// The PR can't merge until someone resolves conflicts with its base.
     pub conflict: bool,
+    pub additions: u64,
+    pub deletions: u64,
+    pub approvals: u32,
+    pub changes_requested: bool,
 }
 
 /// `status` is queued/in_progress/completed/...; `conclusion` only arrives once completed.
@@ -75,6 +79,38 @@ pub fn combine(s: &Signals) -> ChecksStatus {
     }
 }
 
+#[derive(Debug, Deserialize)]
+pub struct Review {
+    #[serde(default)]
+    user: Option<ReviewUser>,
+    #[serde(default)]
+    state: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct ReviewUser {
+    login: String,
+}
+
+/// Approvals and whether changes are still requested, from each person's latest decisive review: a comment or a
+/// pending draft says nothing, and a dismissal takes the person's earlier verdict back.
+pub fn review_summary(reviews: &[Review]) -> (u32, bool) {
+    let mut latest: Vec<(&str, &str)> = Vec::new();
+    for r in reviews {
+        let Some(user) = &r.user else { continue };
+        let state = match r.state.as_str() {
+            s @ ("APPROVED" | "CHANGES_REQUESTED" | "DISMISSED") => s,
+            _ => continue,
+        };
+        latest.retain(|(login, _)| *login != user.login);
+        if state != "DISMISSED" {
+            latest.push((&user.login, state));
+        }
+    }
+    let approvals = latest.iter().filter(|(_, s)| *s == "APPROVED").count() as u32;
+    (approvals, latest.iter().any(|(_, s)| *s == "CHANGES_REQUESTED"))
+}
+
 /// GitHub says "dirty" once it found a conflict with the base; "unknown" while it is still computing.
 pub fn conflicted(mergeable_state: &str) -> bool {
     mergeable_state == "dirty"
@@ -103,7 +139,7 @@ pub trait ChecksApi: Sync {
 }
 
 /// Served from the cache when the head and its status are still fresh; zero calls in the common refresh.
-pub fn status_for(cache: &ChecksCache, api: &impl ChecksApi, pr: &PrRef, now: i64) -> Result<(ChecksStatus, bool)> {
+pub fn status_for(cache: &ChecksCache, api: &impl ChecksApi, pr: &PrRef, now: i64) -> Result<(ChecksStatus, Head)> {
     let generation = cache.generation();
     let head_key = format!("{FORGE}|{}#{}", pr.repo, pr.number);
     let head = match cache.head(&head_key, now) {
@@ -119,11 +155,11 @@ pub fn status_for(cache: &ChecksCache, api: &impl ChecksApi, pr: &PrRef, now: i6
     };
     let key = format!("{FORGE}|{}@{}", pr.repo, head.sha);
     if let Some(status) = cache.status(&key, now) {
-        return Ok((status, head.conflict));
+        return Ok((status, head));
     }
     let status = combine(&api.signals(&pr.repo, &head.sha)?);
     cache.put_status(generation, key, status, now);
-    Ok((status, head.conflict))
+    Ok((status, head))
 }
 
 /// A few PRs at a time; a PR that fails is left out (the row keeps its "ver CI" link), and the rate limit stops the rest.
@@ -150,7 +186,16 @@ pub fn statuses(cache: &ChecksCache, api: &impl ChecksApi, prs: &[PrRef], now: i
     found.sort_by_key(|(i, _)| *i);
     found
         .into_iter()
-        .map(|(i, (status, conflict))| PrChecks { repo: prs[i].repo.clone(), number: prs[i].number, status, conflict })
+        .map(|(i, (status, head))| PrChecks {
+            repo: prs[i].repo.clone(),
+            number: prs[i].number,
+            status,
+            conflict: head.conflict,
+            additions: head.additions,
+            deletions: head.deletions,
+            approvals: head.approvals,
+            changes_requested: head.changes_requested,
+        })
         .collect()
 }
 
@@ -159,6 +204,10 @@ struct PullDetail {
     head: PullHead,
     #[serde(default)]
     mergeable_state: String,
+    #[serde(default)]
+    additions: u64,
+    #[serde(default)]
+    deletions: u64,
 }
 
 #[derive(Deserialize)]
@@ -198,7 +247,16 @@ impl<'a> GithubChecks<'a> {
 impl ChecksApi for GithubChecks<'_> {
     fn head(&self, repo: &str, number: u64) -> Result<Head> {
         let pull: PullDetail = self.get(&format!("{API}/repos/{repo}/pulls/{number}"))?;
-        Ok(Head { sha: pull.head.sha, conflict: conflicted(&pull.mergeable_state) })
+        let reviews: Vec<Review> = self.get(&format!("{API}/repos/{repo}/pulls/{number}/reviews?per_page=100"))?;
+        let (approvals, changes_requested) = review_summary(&reviews);
+        Ok(Head {
+            sha: pull.head.sha,
+            conflict: conflicted(&pull.mergeable_state),
+            additions: pull.additions,
+            deletions: pull.deletions,
+            approvals,
+            changes_requested,
+        })
     }
 
     fn signals(&self, repo: &str, sha: &str) -> Result<Signals> {

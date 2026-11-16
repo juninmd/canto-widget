@@ -85,3 +85,27 @@ test("pinning a repository keeps it one click away through the pinned filter", a
   await page.getByLabel("Filtrar repositórios").blur();
   if (process.env.SHOT2) await page.screenshot({ path: process.env.SHOT2 });
 });
+
+test("each PR shows its approvals, change requests and diff size, and precisa de mim keeps only what is stuck", async ({ page }) => {
+  const checks = [
+    { repo: "acme/atlas", number: 41, status: "failure", conflict: false, additions: 182, deletions: 41, approvals: 0, changes_requested: false },
+    { repo: "acme/atlas", number: 52, status: "success", conflict: false, additions: 540, deletions: 96, approvals: 2, changes_requested: false },
+    { repo: "acme/atlas", number: 60, status: "success", conflict: false, additions: 64, deletions: 12, approvals: 1, changes_requested: true },
+  ];
+  const stuck = { ...lists, review_requested: { total: 2, items: [pr(41, "Corrige o cálculo de rotas com paradas", { created_at: ago(80) }), pr(43, "Ajusta o texto do onboarding", { created_at: ago(5) })], fetched_at: now } };
+  await mockTauri(page, { fixed: { ...fixed, github_lists: stuck, github_prs_checks: checks } });
+  await page.goto("/");
+  await goTab(page, "GitHub");
+  await expect(page.getByText("✓ 2 aprov.")).toBeVisible();
+  await expect(page.getByText("mudanças pedidas")).toBeVisible();
+  await expect(page.getByText("+540")).toBeVisible();
+  await page.getByRole("button", { name: "precisa de mim · 2" }).click();
+  await expect(page.getByText("Ajusta o texto do onboarding")).toHaveCount(0);
+  await expect(page.getByText("Cache de relatórios por período")).toHaveCount(0);
+  await expect(page.getByText("Atualiza dependências do mapa")).toBeVisible();
+  if (process.env.SHOT3) {
+    await page.setViewportSize({ width: 420, height: 760 });
+    await page.getByRole("button", { name: "precisa de mim · 2" }).click();
+  }
+  if (process.env.SHOT3) await page.screenshot({ path: process.env.SHOT3 });
+});
