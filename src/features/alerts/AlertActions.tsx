@@ -6,7 +6,7 @@ import { TASK_PREFIX } from "./reminders";
 import { t } from "../../i18n";
 import SnoozeButton from "./SnoozeButton";
 import { OPEN_TAB_EVENT } from "./alertEvents";
-import { BellOffIcon, CrossIcon, ForecastIcon, PulseIcon } from "../../components/Icons";
+import { BellOffIcon, CalendarIcon, CheckIcon, CrossIcon, ForecastIcon, LinkIcon, PullIcon, PulseIcon, VideoIcon } from "../../components/Icons";
 
 type Props = {
   event: AgendaItem;
@@ -67,6 +67,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           }
           className={PRIMARY}
         >
+          <CheckIcon />
           {t("alert.completeTask")}
         </button>
       )}
@@ -80,6 +81,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           }}
           className={PRIMARY}
         >
+          {kind === "pr" ? <PullIcon /> : <LinkIcon />}
           {t(kind === "pr" ? "alert.openPr" : "alert.openMention")}
         </button>
       )}
@@ -93,11 +95,13 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           }}
           className={PRIMARY}
         >
+          <VideoIcon />
           {t("alert.joinMeet")}
         </button>
       )}
       {kind === "status" && event.link && (
         <button ref={primary} type="button" onClick={open(event.link)} className={PRIMARY}>
+          <LinkIcon />
           {t("alert.openStatus")}
         </button>
       )}
@@ -141,6 +145,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           }}
           className={PRIMARY}
         >
+          <LinkIcon />
           {t("alert.openModels")}
         </button>
       )}
@@ -151,6 +156,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           onClick={open(event.link)}
           className={event.meet ? SECONDARY : PRIMARY}
         >
+          <CalendarIcon />
           {t("alert.openCalendar")}
         </button>
       )}
@@ -183,8 +189,9 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           type="button"
           onClick={() => onDismiss()}
           title="Esc"
-          className={`${onCloseAll ? "" : "ml-auto "}h-8 rounded-lg px-3 text-[13px] text-muted hover:bg-edge hover:text-fg`}
+          className={`${onCloseAll ? "" : "ml-auto "}inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] text-muted hover:bg-edge hover:text-fg`}
         >
+          <CrossIcon />
           {t("alert.close")}
         </button>
       )}

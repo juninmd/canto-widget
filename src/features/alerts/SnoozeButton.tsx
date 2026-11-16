@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { loadSnooze, saveSnooze, SNOOZE_OPTIONS } from "./snooze";
 import { t } from "../../i18n";
+import { ClockIcon } from "../../components/Icons";
 
 /** "adiar N min" with a chevron on its right to pick 1, 5 or 10; picking snoozes at once and becomes the main value.
  *  The menu opens on the current choice, arrows rove, and Esc hands focus back to the chevron. */
@@ -53,8 +54,9 @@ export default function SnoozeButton({ onSnooze }: { onSnooze: (minutes: number)
         type="button"
         onClick={() => onSnooze(minutes)}
         aria-label={t("alert.snooze", { minutes })}
-        className="h-8 whitespace-nowrap rounded-l-lg bg-edge px-2.5 text-[13px] text-fg hover:brightness-125"
+        className="inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-l-lg bg-edge px-2.5 text-[13px] text-fg hover:brightness-125"
       >
+        <ClockIcon />
         {t("alert.snoozeShort", { minutes })}
       </button>
       <button
