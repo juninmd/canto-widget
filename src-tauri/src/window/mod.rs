@@ -60,7 +60,11 @@ pub fn bottom_gap(work: (f64, f64, f64, f64), full: (f64, f64, f64, f64), macos:
     let untouched = (work.0 - full.0).abs() < 1.0
         && (work.2 - full.2).abs() < 1.0
         && ((work.1 + work.3) - (full.1 + full.3)).abs() < 1.0;
-    if macos && untouched { MARGIN + DOCK_AUTOHIDE_GAP } else { MARGIN }
+    if macos && untouched {
+        MARGIN + DOCK_AUTOHIDE_GAP
+    } else {
+        MARGIN
+    }
 }
 
 /// A hidden window still reports the monitor it last sat on, which may be unplugged or the wrong one; the pop-up
