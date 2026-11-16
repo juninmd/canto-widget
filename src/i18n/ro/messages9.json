@@ -1086,5 +1086,7 @@
   "forge.item.approvedTitle": "{n} approvals and no change requests",
   "forge.item.changes": "changes requested",
   "forge.item.changesTitle": "a reviewer asked for changes",
-  "forge.item.diffTitle": "lines added and removed"
+  "forge.item.diffTitle": "lines added and removed",
+  "settings.security.methodFailed": "{method} — attempt refused",
+  "lock.failedAttempts": "{n} failed attempts since the last access"
 }

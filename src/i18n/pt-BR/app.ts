@@ -444,4 +444,6 @@ export const app = {
   "settings.strip.refreshHint": "Mais tempo poupa um pouco de CPU.",
   "settings.strip.seconds": "{n} s",
   "settings.strip.columns": "colunas nos detalhes",
+  "settings.security.methodFailed": "{method} — tentativa recusada",
+  "lock.failedAttempts": "{n} tentativas falhas desde o último acesso",
 } as const;

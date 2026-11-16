@@ -112,8 +112,8 @@ fn body_of(k: &KeepNote) -> String {
     let links: Vec<String> = k
         .annotations
         .iter()
-        .filter(|a| a.url.starts_with("http"))
-        .map(|a| if a.title.trim().is_empty() { a.url.clone() } else { format!("[{}]({})", a.title.trim(), a.url) })
+        .filter_map(|a| crate::web_url::web_url_or_none(&a.url).map(|url| (a, url)))
+        .map(|(a, url)| if a.title.trim().is_empty() { url } else { format!("[{}]({})", a.title.trim(), url) })
         .collect();
     if !links.is_empty() {
         push_block(&mut out, &links.join("\n"));

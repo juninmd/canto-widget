@@ -249,3 +249,12 @@ fn note_images_open_with_the_new_password() {
     assert!(st.note_image_data_url(&id).unwrap().starts_with("data:image/gif;base64,"), "image stuck on the old key");
     cleanup(&st);
 }
+
+#[test]
+fn a_password_change_keeps_the_vaults_kdf_params() {
+    let st = state("kdf");
+    st.change_password("senha-velha", "senha-nova").unwrap();
+    let blob: SealedBlob = store::read_json(&store::vault_path(&st.dir)).unwrap().unwrap();
+    assert_eq!((blob.kdf.m_kib, blob.kdf.t, blob.kdf.p), (19 * 1024, 2, 1));
+    cleanup(&st);
+}

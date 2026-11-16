@@ -107,10 +107,12 @@ pub mod trash;
 pub mod tray;
 pub mod tray_live;
 pub mod unlock_log;
+pub mod unlock_throttle;
 #[cfg(desktop)]
 pub mod updater;
 pub mod vault;
 pub mod weather;
+pub mod web_url;
 pub mod wifi_os;
 pub mod window;
 pub mod work_events;
@@ -146,6 +148,7 @@ pub fn run() {
             commands::vault_unlock,
             commands::vault_lock,
             commands::unlock_history,
+            commands::unlock_failed_count,
             commands::vault_touch,
             password::vault_change_password,
             commands::tasks_for_day,

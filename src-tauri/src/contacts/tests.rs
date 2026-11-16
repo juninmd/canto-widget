@@ -55,7 +55,7 @@ fn a_contact_brings_its_birthday_addresses_links_relations_and_note() {
     assert_eq!(c.birthday, Some(Birthday { day: 23, month: 10, year: None }));
     assert_eq!((c.nickname.as_str(), c.department.as_str()), ("Bibi", "Vendas"));
     assert_eq!(c.addresses, ["Rua A, 10 São Paulo"]);
-    assert_eq!(c.urls, ["https://bia.dev"]);
+    assert_eq!(c.urls, ["https://bia.dev/"]);
     assert_eq!(c.relations, ["Rui (Cônjuge)", "Lia"]);
     assert_eq!(c.note, "Prefere WhatsApp.");
     let c = person(r#"{"resourceName": "people/c8", "names": [{"displayName": "Rui"}], "birthdays": [{"date": {"year": 1990, "month": 2, "day": 30}}, {"date": {"year": 1990, "month": 13, "day": 1}}]}"#).unwrap();

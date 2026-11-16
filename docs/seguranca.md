@@ -7,6 +7,10 @@
 | Item | Decisão |
 |---|---|
 | Derivação de chave | Argon2id (19 MiB, t=2, p=1), salt aleatório de 16 bytes por cofre |
+| Parâmetros do KDF | lidos do envelope e validados antes de derivar (`alg = argon2id`, 8–256 MiB, t 1–10, p 1–4); fora disso o arquivo é recusado sem alocar memória. A troca de senha mantém o custo do cofre |
+| Tentativas de desbloqueio | recusas ficam em `desbloqueios.json` (sem selo, até 20 sucessos e 20 falhas) e, depois de 3 seguidas, o app impõe pausa crescente de 1 a 30 s em memória. É só contra uso interativo: **não** substitui a proteção offline acima |
+| Links externos | `web_url::parse_web_url` é a única porta antes de abrir ou gravar um link: http(s) com host, sem usuário/senha, sem controle/espaço, até 2048 bytes (fronteira webview/Rust) |
+| Permissões Unix | arquivos do cofre são criados 0600; no Windows vale a ACL herdada do perfil. Pastas escolhidas pelo usuário (backup, sincronização) não têm a permissão alterada |
 | Senha mestra | mínimo de 4 caracteres (`MIN_SENHA`). O envelope fica em disco e sai da máquina em todo backup exportado, então a senha é atacável **offline**: nenhum limite de tentativas protege, e o Argon2id encarece cada palpite, não o total deles. Senha curta é uma escolha consciente de conveniência sobre resistência |
 | Cifra | AES-256-GCM, nonce novo a cada gravação, AAD fixando o domínio (`canto.vault.v1`) |
 | Chave | só existe em RAM enquanto o cofre está destrancado; zeroizada ao trancar/sair |

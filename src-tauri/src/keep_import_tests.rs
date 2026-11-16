@@ -35,7 +35,7 @@ fn links_follow_the_text_and_archived_notes_get_a_tag() {
         r#"{"title":"Ler","textContent":"depois","isArchived":true,"createdTimestampUsec":1000,
         "annotations":[{"url":"https://exemplo.com","title":"Exemplo"},{"url":"javascript:alert(1)"}]}"#,
     );
-    assert_eq!(n.body, "depois\n\n[Exemplo](https://exemplo.com)");
+    assert_eq!(n.body, "depois\n\n[Exemplo](https://exemplo.com/)");
     assert!(n.tags.contains(&"arquivada".to_string()));
 }
 
@@ -61,4 +61,12 @@ fn the_same_note_imported_twice_is_recognized() {
     let existing = vec![Note { id: "1".into(), ..n.clone() }];
     assert!(already_there(&existing, &n));
     assert!(!already_there(&existing, &Note { body: "c".into(), ..n }));
+}
+
+#[test]
+fn a_look_alike_scheme_does_not_become_a_link() {
+    let n = note(
+        r#"{"title":"x","textContent":"t","createdTimestampUsec":1000,"annotations":[{"url":"httpfoo://x"},{"url":"http-x://y"}]}"#,
+    );
+    assert_eq!(n.body, "t");
 }

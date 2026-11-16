@@ -32,12 +32,14 @@ impl AppState {
         let mut guard = self.session.lock_safe();
         let session = guard.as_mut().ok_or(AppError::Locked)?;
         let vault: SealedBlob = store::read_json(&store::vault_path(&self.dir))?.ok_or(AppError::NotFound)?;
-        VaultKey::derive(current_password, &session.salt)
+        vault
+            .derive_key(current_password)
             .and_then(|k| vault.open(&k, VAULT_AAD))
             .map_err(|_| AppError::Config("a senha atual não confere".into()))?;
 
         let salt = store::new_salt();
-        let key = VaultKey::derive(new_password, &salt)?;
+        // Same cost as before: a vault upgraded to a dearer profile keeps it across password changes.
+        let key = VaultKey::derive_with(new_password, &salt, session.key.kdf())?;
         let (mut batch, mut discard) = (Vec::new(), Vec::new());
         for (path, aad, disposable) in [
             (store::drive_path(&self.dir), DRIVE_AAD, false),

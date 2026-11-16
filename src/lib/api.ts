@@ -100,7 +100,7 @@ export type VaultStatus = { exists: boolean; unlocked: boolean };
 export type DndState = { active: boolean; untilMs: number | null };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
-export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
+export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id"; ok: boolean };
 export type StripItem =
   | "clock" | "cpu" | "memory" | "gpu" | "temp" | "disk" | "network" | "battery" | "tasks" | "weather" | "event"
   | "reviews" | "notices" | "health" | "market";
@@ -657,6 +657,7 @@ export const api = {
   autolockGet: () => invoke<number>("autolock_get"),
   autolockSet: (minutes: number) => invoke<void>("autolock_set", { minutes }),
   unlockHistory: () => invoke<UnlockEntry[]>("unlock_history"),
+  unlockFailedCount: () => invoke<number>("unlock_failed_count"),
 
   /** `null` when the user cancels the dialog. */
   backupExport: () => invoke<string | null>("backup_export"),

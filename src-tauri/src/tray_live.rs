@@ -30,8 +30,8 @@ pub fn join_next_meeting(app: &AppHandle) {
     let Some(meet) = app.state::<AppState>().next_meeting.lock_safe().as_ref().map(|m| m.meet.clone()) else {
         return;
     };
-    if meet.starts_with("https://") || meet.starts_with("http://") {
-        let _ = tauri_plugin_opener::open_url(meet, None::<&str>);
+    if let Ok(url) = crate::web_url::parse_web_url(&meet) {
+        let _ = tauri_plugin_opener::open_url(url.as_str(), None::<&str>);
     }
 }
 

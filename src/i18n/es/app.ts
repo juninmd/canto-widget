@@ -449,4 +449,6 @@ export const app: Record<keyof typeof source, string> = {
   "settings.strip.refreshHint": "Más tiempo ahorra algo de CPU.",
   "settings.strip.seconds": "{n} s",
   "settings.strip.columns": "columnas en los detalles",
+  "settings.security.methodFailed": "{method} — intento rechazado",
+  "lock.failedAttempts": "{n} intentos fallidos desde el último acceso",
 };
