@@ -114,7 +114,11 @@ function Description({ text }: { text: string }) {
   const lexer = useLexer("inline");
   const render: Render = {
     text: (plain) => plain,
-    link: (href, children, key) => (
+    // Only web links are buttons; anything else (javascript:, file:) stays plain text.
+    link: (href, children, key) =>
+      !/^https?:\/\//i.test(href) ? (
+        <span key={key}>{children}</span>
+      ) : (
       <button
         key={key}
         type="button"
@@ -123,7 +127,7 @@ function Description({ text }: { text: string }) {
       >
         {children}
       </button>
-    ),
+      ),
   };
   return (
     <div className="space-y-1 break-words text-xs text-fg">
