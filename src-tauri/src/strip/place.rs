@@ -8,7 +8,7 @@ use crate::window::state::Area;
 /// Pill only; the UI asks for more room while the details are open.
 pub const DEFAULT: (f64, f64) = (240.0, 32.0);
 const MIN: (f64, f64) = (48.0, 20.0);
-const MAX: (f64, f64) = (420.0, 560.0);
+const MAX: (f64, f64) = (420.0, 800.0);
 
 /// The webview picks the size (it measures its content); a bad value must not make a giant or invisible window.
 pub fn clamp(size: (f64, f64)) -> (f64, f64) {
@@ -49,8 +49,31 @@ fn area_of(win: &WebviewWindow, _logical: bool) -> tauri::Result<Option<(Area, f
     Ok(Some((area, monitor.scale_factor())))
 }
 
-/// The monitor the widget lives on, else the primary one.
+/// Monitors are told apart by name; an unnamed one gets its position in the list.
+pub fn monitor_label(index: usize, name: Option<&str>) -> String {
+    name.filter(|n| !n.is_empty()).map_or_else(|| format!("Monitor {}", index + 1), str::to_string)
+}
+
+/// Index of the wanted monitor, or `None` (not asked, or unplugged since) so the caller falls back.
+pub fn pick(labels: &[String], wanted: Option<&str>) -> Option<usize> {
+    let wanted = wanted.filter(|w| !w.is_empty())?;
+    labels.iter().position(|l| l == wanted)
+}
+
+pub fn monitor_names(app: &tauri::AppHandle) -> Vec<String> {
+    let list = app.available_monitors().unwrap_or_default();
+    list.iter().enumerate().map(|(i, m)| monitor_label(i, m.name().map(String::as_str))).collect()
+}
+
+/// The chosen monitor, else the one the widget lives on, else the primary one.
 fn target_monitor(win: &WebviewWindow) -> tauri::Result<Option<tauri::Monitor>> {
+    let wanted = win.app_handle().try_state::<StripState>().and_then(|s| s.cfg().monitor);
+    let list = win.available_monitors()?;
+    let labels: Vec<String> =
+        list.iter().enumerate().map(|(i, m)| monitor_label(i, m.name().map(String::as_str))).collect();
+    if let Some(m) = pick(&labels, wanted.as_deref()).and_then(|i| list.into_iter().nth(i)) {
+        return Ok(Some(m));
+    }
     let from_main = win.app_handle().get_webview_window("main").and_then(|m| m.current_monitor().ok().flatten());
     Ok(from_main.or(win.primary_monitor()?))
 }

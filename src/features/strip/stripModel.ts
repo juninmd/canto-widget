@@ -8,6 +8,7 @@ export type Level = "" | "warn" | "danger";
 export function levelOf(item: StripItem, s: StripSnapshot): Level {
   if (item === "cpu") return s.cpu >= 85 ? "danger" : s.cpu >= 65 ? "warn" : "";
   if (item === "memory") return s.memory >= 90 ? "danger" : s.memory >= 80 ? "warn" : "";
+  if (item === "battery" && s.battery) return s.battery[1] ? "" : s.battery[0] <= 10 ? "danger" : s.battery[0] <= 20 ? "warn" : "";
   if (item === "event" && s.event) return s.event.in_min <= 5 ? "danger" : s.event.in_min <= 15 ? "warn" : "";
   if (item === "reviews") return s.reviews > 0 ? "warn" : "";
   return "";
@@ -26,6 +27,10 @@ export function pillText(item: StripItem, s: StripSnapshot): string | null {
       return `${Math.round(s.cpu)}%`;
     case "memory":
       return `${Math.round(s.memory)}%`;
+    case "battery":
+      return s.battery ? `${Math.round(s.battery[0])}%` : null;
+    case "tasks":
+      return String(s.tasks);
     case "weather":
       return s.weather ? `${degrees(s.weather.temp)}°` : null;
     case "event":
@@ -41,6 +46,8 @@ export function pillText(item: StripItem, s: StripSnapshot): string | null {
 export const ITEM_TAB: Record<StripItem, string> = {
   cpu: "system",
   memory: "system",
+  battery: "system",
+  tasks: "tasks",
   weather: "weather",
   event: "agenda",
   reviews: "github",

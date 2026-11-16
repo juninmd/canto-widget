@@ -6,6 +6,8 @@ import { OPEN_TAB_EVENT } from "./features/alerts/alertEvents";
 import StripPill from "./features/strip/StripPill";
 import StripDetails from "./features/strip/StripDetails";
 import { ITEM_TAB } from "./features/strip/stripModel";
+import { nextFocus } from "./features/strip/stripKeys";
+import type { Tab } from "./shell/TabBar";
 
 const POLL_MS = 2000;
 /** Leaving the pill for the card is not leaving: a short grace keeps it from flickering shut on the way. */
@@ -71,11 +73,24 @@ export default function StripWindow() {
   }, []);
   useEffect(() => () => clearTimeout(closing.current), []);
 
+  // Only a pinned pill takes focus: hovering must never steal the keyboard from the app in front.
+  useEffect(() => {
+    void api.stripFocus(pinned).catch(() => {});
+  }, [pinned]);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Escape") return;
-      setPinned(false);
-      setHover(false);
+      if (e.key === "Escape") {
+        setPinned(false);
+        setHover(false);
+        return;
+      }
+      const navs = Array.from(content.current?.querySelectorAll<HTMLElement>("[data-nav]") ?? []);
+      const at = navs.indexOf(document.activeElement as HTMLElement);
+      const to = nextFocus(e.key, at, navs.length);
+      if (to === null) return;
+      e.preventDefault();
+      navs[to]?.focus();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -83,6 +98,11 @@ export default function StripWindow() {
 
   const openItem = (item: StripItem) => {
     void emit(OPEN_TAB_EVENT, ITEM_TAB[item]);
+    void api.mainShow();
+  };
+
+  const launch = (tab: Tab) => {
+    void emit(OPEN_TAB_EVENT, tab);
     void api.mainShow();
   };
 
@@ -97,7 +117,7 @@ export default function StripWindow() {
         className={`flex w-max flex-col items-center gap-1.5 p-0.5 ${bottom ? "flex-col-reverse" : ""}`}
       >
         <StripPill items={items} snap={snap} open={open} onToggle={() => setPinned((p) => !p)} />
-        {open && snap && <StripDetails items={items} snap={snap} onOpen={openItem} />}
+        {open && snap && <StripDetails items={items} snap={snap} onOpen={openItem} onLaunch={launch} />}
       </div>
     </div>
   );

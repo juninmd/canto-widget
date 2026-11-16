@@ -39,3 +39,19 @@ pub fn strip_resize(app: AppHandle, state: State<'_, StripState>, width: f64, he
 pub fn strip_join(app: AppHandle) {
     crate::tray_live::join_next_meeting(&app);
 }
+
+/// Names for the Ajustes picker; the pill moves to the chosen one at the next placement.
+#[tauri::command]
+pub fn strip_monitors(app: AppHandle) -> Vec<String> {
+    place::monitor_names(&app)
+}
+
+/// The window never takes focus on its own; a click that pins it asks for it, so the arrow keys have somewhere to land.
+#[tauri::command]
+pub fn strip_focus(app: AppHandle, on: bool) {
+    let Some(win) = app.get_webview_window(WINDOW) else { return };
+    let _ = win.set_focusable(on);
+    if on {
+        let _ = win.set_focus();
+    }
+}

@@ -37,11 +37,17 @@ fn the_choice_survives_a_restart() {
     let _ = std::fs::remove_dir_all(&dir);
     std::fs::create_dir_all(&dir).unwrap();
     let state = StripState::load(&dir);
-    let cfg = StripConfig { enabled: true, edge: Edge::Bottom, items: vec!["memory".into(), "x".into()] };
+    let cfg = StripConfig {
+        enabled: true,
+        edge: Edge::Bottom,
+        items: vec!["memory".into(), "x".into()],
+        monitor: Some("DP-2".into()),
+    };
     assert_eq!(state.set(cfg).unwrap().items, ["memory"]);
     let back = StripState::load(&dir).cfg();
     assert!(back.enabled && back.edge == Edge::Bottom);
     assert_eq!(back.items, ["memory"]);
+    assert_eq!(back.monitor.as_deref(), Some("DP-2"));
     let _ = std::fs::remove_dir_all(&dir);
 }
 
@@ -57,7 +63,7 @@ fn the_pill_is_centered_and_flush_with_the_chosen_edge() {
 #[test]
 fn a_size_the_webview_cannot_have_is_clamped() {
     assert_eq!(place::clamp((f64::NAN, -5.0)), (place::DEFAULT.0, 20.0));
-    assert_eq!(place::clamp((9999.0, 9999.0)), (420.0, 560.0));
+    assert_eq!(place::clamp((9999.0, 9999.0)), (420.0, 800.0));
     assert_eq!(place::clamp((300.0, 40.0)), (300.0, 40.0));
 }
 
@@ -105,4 +111,21 @@ fn the_pill_never_asks_the_network_or_the_disk_for_its_numbers() {
     for banned in ["review_requested_total", "forecast(", "read_json", "reqwest"] {
         assert!(!body.contains(banned), "{banned} would make a 2 s poll hit the network or the disk");
     }
+}
+
+#[test]
+fn a_chosen_monitor_is_found_by_name_and_an_unplugged_one_falls_back() {
+    let labels = ["DP-1".to_string(), place::monitor_label(1, None), place::monitor_label(2, Some(""))];
+    assert_eq!(labels[1], "Monitor 2");
+    assert_eq!(place::pick(&labels, Some("Monitor 2")), Some(1));
+    assert_eq!(place::pick(&labels, Some("HDMI-9")), None, "unplugged: the widget's own monitor");
+    assert_eq!(place::pick(&labels, None), None);
+    assert_eq!(place::pick(&labels, Some("")), None);
+}
+
+#[test]
+fn the_new_items_are_known_and_old_files_have_no_monitor() {
+    assert_eq!(known(&["battery".into(), "tasks".into(), "cpu".into()]), ["cpu", "battery", "tasks"]);
+    let cfg: StripConfig = serde_json::from_str(r#"{"enabled":true}"#).unwrap();
+    assert_eq!(cfg.monitor, None);
 }

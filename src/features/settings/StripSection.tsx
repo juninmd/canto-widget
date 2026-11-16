@@ -6,10 +6,12 @@ import { SettingsSection } from "./SettingsSection";
 
 export default function StripSection({ onError }: { onError: (m: string) => void }) {
   const [cfg, setCfg] = useState<StripConfig | null>(null);
+  const [monitors, setMonitors] = useState<string[]>([]);
   const { error, fail, clear } = useSectionError(onError);
 
   useEffect(() => {
     api.stripConfigGet().then(setCfg, fail);
+    api.stripMonitors().then((m) => setMonitors(m ?? []), () => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -43,6 +45,23 @@ export default function StripSection({ onError }: { onError: (m: string) => void
               </label>
             ))}
           </div>
+          {monitors.length > 1 && (
+            <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
+              {t("settings.strip.monitor")}
+              <select
+                value={cfg.monitor ?? ""}
+                onChange={(e) => void save({ ...cfg, monitor: e.target.value || null })}
+                className="canto-field rounded-md px-1.5 py-0.5 text-xs"
+              >
+                <option value="">{t("settings.strip.monitorAuto")}</option>
+                {monitors.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
           {STRIP_ITEMS.map((item) => (
             <label key={item} className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
               <input type="checkbox" checked={cfg.items.includes(item)} onChange={(e) => toggle(item, e.target.checked)} className="canto-box" />

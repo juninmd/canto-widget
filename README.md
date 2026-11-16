@@ -659,14 +659,14 @@ endpoint, keyless and fetched by Rust, kept in memory for 15 min (↻ forces a n
 ## 📌 Mini dashboard
 
 An optional **pill on the top or bottom edge of the screen**, always visible, in a window of its own (no focus, no
-taskbar entry): CPU, memory, the weather, the next event and its countdown, review requests and pending notices, one
+taskbar entry): CPU, memory, battery, open tasks, the weather, the next event and its countdown, review requests and pending notices, one
 switch each in Settings → Mini dashboard. Colour only appears when something is wrong (CPU over 65%, a meeting in under
 15 minutes, a review waiting). Hover for the details and click to pin them; a card opens its tab in the widget, and
-**Join** does what the tray's "entrar" does. It reads RAM caches the app already keeps (the CPU probe is the only live
+**Join** does what the tray's "entrar" does, and an **Open tab** row puts every tab you keep on your bar one click away. Pinned, it takes the keyboard (arrows, Enter, Esc). With several monitors, pick the one it sits on. It reads RAM caches the app already keeps (the CPU probe is the only live
 read, every 2 s, only while the pill is on screen), never touches the network, and hides while a full-screen app is in
 front. Off by default, desktop-only.
 
-<img src="docs/prints/app/150-mini-dashboard.png" alt="Mini dashboard: a pill with CPU 23%, 24° weather, the next meeting in 14 minutes, 3 review requests and 2 notices, and its details open with a Join button" width="340">
+<img src="docs/prints/app/150-mini-dashboard.png" alt="Mini dashboard: a pill with CPU, battery, open tasks, weather, the next meeting, review requests and notices, and its details open with a Join button and an Open tab row" width="340">
 
 ## 🖥️ System
 

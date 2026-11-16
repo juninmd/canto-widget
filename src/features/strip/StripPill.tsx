@@ -20,9 +20,25 @@ const SunIcon = () => (
   </svg>
 );
 
+const BatteryIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden>
+    <rect x="2" y="8" width="17" height="8" rx="2" />
+    <path d="M22 11v2" />
+  </svg>
+);
+
+const TaskIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <rect x="4" y="4" width="16" height="16" rx="3" />
+    <path d="m8.5 12 2.5 2.5 4.5-5" />
+  </svg>
+);
+
 export const ICONS: Record<StripItem, ReactNode> = {
   cpu: <PulseIcon size={14} />,
   memory: <RamIcon />,
+  battery: <BatteryIcon />,
+  tasks: <TaskIcon />,
   weather: <SunIcon />,
   event: <CalendarIcon />,
   reviews: <PullIcon />,

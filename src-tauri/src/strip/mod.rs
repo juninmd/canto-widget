@@ -20,7 +20,7 @@ pub const WINDOW: &str = "strip";
 const FILE: &str = "minipainel.json";
 const TICK: Duration = Duration::from_secs(2);
 /// Order of the pill; the config keeps whichever the user switched on, in this order.
-pub const ITEMS: [&str; 6] = ["cpu", "memory", "weather", "event", "reviews", "notices"];
+pub const ITEMS: [&str; 8] = ["cpu", "memory", "battery", "tasks", "weather", "event", "reviews", "notices"];
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -38,6 +38,9 @@ pub struct StripConfig {
     pub edge: Edge,
     #[serde(default = "default_items")]
     pub items: Vec<String>,
+    /// Name from `place::monitor_names`; empty or gone means the monitor the widget is on.
+    #[serde(default)]
+    pub monitor: Option<String>,
 }
 
 fn default_items() -> Vec<String> {
@@ -46,7 +49,7 @@ fn default_items() -> Vec<String> {
 
 impl Default for StripConfig {
     fn default() -> Self {
-        Self { enabled: false, edge: Edge::Top, items: default_items() }
+        Self { enabled: false, edge: Edge::Top, items: default_items(), monitor: None }
     }
 }
 

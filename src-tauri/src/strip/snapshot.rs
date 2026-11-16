@@ -4,6 +4,7 @@ use tauri::{AppHandle, Manager};
 use time::format_description::well_known::Rfc3339;
 
 use crate::calendar::AgendaItem;
+use crate::resilient::LockExt;
 use crate::strip::{StripConfig, StripState};
 
 #[derive(Debug, Clone, PartialEq, Serialize)]
@@ -27,6 +28,10 @@ pub struct Snapshot {
     pub weather: Option<Weather>,
     pub event: Option<NextEvent>,
     pub reviews: u32,
+    /// Battery percent and whether it is on the charger; `None` on a desktop without one.
+    pub battery: Option<(f32, bool)>,
+    /// Tasks still open, as the Tarefas tab last counted them.
+    pub tasks: u32,
     /// Alerts waiting plus unread mentions.
     pub notices: u32,
 }
@@ -51,10 +56,14 @@ pub fn next_event(items: &[AgendaItem], now_ms: i64) -> Option<NextEvent> {
 pub fn build(app: &AppHandle, cfg: &StripConfig) -> Snapshot {
     let on = |k: &str| cfg.items.iter().any(|i| i == k);
     let mut snap = Snapshot::default();
-    if on("cpu") || on("memory") {
+    if on("cpu") || on("memory") || on("battery") {
         let s = app.state::<crate::sysmon::SystemMonitor>().read();
         snap.cpu = s.cpu.usage;
         snap.memory = crate::sysmon::percent(s.memory.used, s.memory.total);
+        snap.battery = s.battery.as_ref().map(|b| (b.percent, matches!(b.state.as_str(), "charging" | "full")));
+    }
+    if on("tasks") {
+        snap.tasks = *app.state::<crate::vault::AppState>().badge_tasks.lock_safe();
     }
     if on("weather") {
         snap.weather = app.state::<crate::weather::state::WeatherState>().cached_now();
