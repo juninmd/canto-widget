@@ -122,10 +122,39 @@ export function block(tok: Token, render: Render, key: string): ReactNode {
     }
     case "code":
       return (
-        <pre key={key} className="overflow-hidden rounded bg-edge px-1 font-mono text-[11px]">
+        <pre key={key} className="overflow-x-auto rounded bg-edge px-1 font-mono text-[11px]">
           {render.text((tok as Tokens.Code).text)}
         </pre>
       );
+    case "table": {
+      const table = tok as Tokens.Table;
+      return (
+        <div key={key} className="overflow-x-auto">
+          <table className="border-collapse text-[11px]">
+            <thead>
+              <tr>
+                {table.header.map((c, i) => (
+                  <th key={i} className="border border-line px-1.5 py-0.5 font-semibold text-fg" style={{ textAlign: table.align[i] ?? undefined }}>
+                    {inline(c.tokens, render, `${key}-h${i}`)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {table.rows.map((row, r) => (
+                <tr key={r}>
+                  {row.map((c, i) => (
+                    <td key={i} className="border border-line px-1.5 py-0.5" style={{ textAlign: table.align[i] ?? undefined }}>
+                      {inline(c.tokens, render, `${key}-${r}-${i}`)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
     case "blockquote":
       return (
         <div key={key} className="border-l-2 border-line pl-1.5 italic">

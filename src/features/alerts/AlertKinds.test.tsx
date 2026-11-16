@@ -380,3 +380,11 @@ test("the strip is a carousel: arrows and ← → step through every alert and w
   expect(picked()).toBe(0);
   expect(document.activeElement === cards()[0], "the keyboard moves focus along with the pick").toBe(true);
 });
+
+test("the details render markdown: tables become tables and non-web links stay text", async () => {
+  await show([{ ...approved, description: "**forte**\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n[x](javascript:alert(1)) [ok](https://ex.com/a)" }]);
+  expect(document.querySelector("table td")?.textContent).toBe("1");
+  expect(screen.getByText("forte").closest("strong")).toBeTruthy();
+  expect(screen.queryByRole("button", { name: "x" })).toBeNull();
+  expect(screen.getByRole("button", { name: "ok" })).toBeTruthy();
+});
