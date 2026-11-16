@@ -10,10 +10,10 @@ import { IssueIcon, PullIcon } from "../../components/Icons";
 const STALE_DAYS = 7;
 const ACTION = "canto-hit rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active";
 
-type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; onSnooze?: () => void };
+type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; news?: number; onOpen?: () => void; onSnooze?: () => void };
 
 /** One PR/MR/issue. The secondary actions appear on hover or focus-within; they stay in the tab order while hidden. */
-export default function ForgeRow({ item, login, forge, waiting, ci, conflict, onSnooze }: Props) {
+export default function ForgeRow({ item, login, forge, waiting, ci, conflict, news = 0, onOpen, onSnooze }: Props) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? waitHours(item) : null;
@@ -35,7 +35,10 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, on
     <li className="group relative">
       <button
         type="button"
-        onClick={() => void api.openLink(item.url)}
+        onClick={() => {
+          onOpen?.();
+          void api.openLink(item.url);
+        }}
         title={item.url}
         className={`flex w-full gap-2.5 rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
       >
@@ -48,6 +51,11 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, on
             {conflict && (
               <Pill tone="bad" title={t("forge.item.conflictTitle")}>
                 ⚠ {t("forge.item.conflict")}
+              </Pill>
+            )}
+            {news > 0 && (
+              <Pill tone="info" title={t("forge.item.newsTitle", { n: news })}>
+                {t("forge.item.news", { n: news })}
               </Pill>
             )}
             {item.is_pr && badge && <CiPill status={badge} />}

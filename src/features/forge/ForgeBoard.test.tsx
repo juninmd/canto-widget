@@ -209,3 +209,33 @@ test("GitLab keeps three toggle tiles (no CI) and narrows the same way", async (
   expect(screen.getByRole("button", { name: "ordenar por: atualização" })).toBeTruthy();
   expect(screen.getByRole("button", { name: "mais ações" })).toBeTruthy();
 });
+
+test("ocultar rascunhos hides draft PRs in place, remembers the choice and keeps the counts", async () => {
+  const lists = { ...board, review_requested: empty, assigned: empty, my_issues: empty, my_prs: { total: 2, items: [pr(3, "Pronto"), pr(4, "Ainda rascunho", { draft: true })] } };
+  await mountGithub(lists, []);
+  expect(screen.getByText("Ainda rascunho")).toBeTruthy();
+  const toggle = screen.getByRole("button", { name: "ocultar rascunhos" });
+  fireEvent.click(toggle);
+  expect(toggle.getAttribute("aria-pressed")).toBe("true");
+  expect(screen.queryByText("Ainda rascunho")).toBeNull();
+  expect(screen.getByText("Pronto")).toBeTruthy();
+  expect(localStorage.getItem("canto.forge.hideDrafts")).toBe("1");
+  cleanup();
+  await mountGithub(lists, []);
+  expect(screen.getByRole("button", { name: "ocultar rascunhos" }).getAttribute("aria-pressed")).toBe("true");
+  expect(screen.queryByText("Ainda rascunho")).toBeNull();
+});
+
+test("a PR that got new comments since the last look shows a badge that clears once it is opened", async () => {
+  const lists = (comments: number) => ({ ...board, review_requested: empty, assigned: empty, my_issues: empty, my_prs: { total: 1, items: [pr(3, "Com conversa", { comments })] } });
+  await mountGithub(lists(2), []);
+  expect(screen.queryByText(/^\+\d+ comentários$/)).toBeNull();
+  cleanup();
+  clearForgeCache();
+  await mountGithub(lists(5), []);
+  expect(screen.getByText("+3 comentários")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: /Com conversa/ }));
+  });
+  expect(screen.queryByText("+3 comentários")).toBeNull();
+});

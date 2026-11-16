@@ -33,7 +33,9 @@ function ReadmeBody({ readme }: { readme: Readme }) {
 }
 
 /** What a repository's row has no room for: about, topics, numbers and, when asked, its README (cached by Rust). */
-export default function RepoDetail({ forge, repo, icon, onClose }: { forge: Forge; repo: RepoInfo; icon?: string; onClose: () => void }) {
+type Props = { forge: Forge; repo: RepoInfo; icon?: string; pinned: boolean; onPin: () => void; onClose: () => void };
+
+export default function RepoDetail({ forge, repo, icon, pinned, onPin, onClose }: Props) {
   const [readme, setReadme] = useState<Readme | null>(() => READMES.get(key(forge, repo)) ?? null);
   const [shown, setShown] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -81,6 +83,16 @@ export default function RepoDetail({ forge, repo, icon, onClose }: { forge: Forg
           className="canto-hit min-h-[24px] shrink-0 rounded-md border border-edge px-2 text-[11px] text-muted hover:bg-hover hover:text-fg"
         >
           {t("forge.repos.detail.open")}
+        </button>
+        <button
+          type="button"
+          aria-pressed={pinned}
+          onClick={onPin}
+          aria-label={t(pinned ? "forge.repos.unpin" : "forge.repos.pin", { name: repo.full_name })}
+          title={t(pinned ? "forge.repos.unpin" : "forge.repos.pin", { name: repo.full_name })}
+          className={`canto-hit grid size-6 shrink-0 place-items-center rounded-md hover:text-fg ${pinned ? "text-warn" : "text-faint"}`}
+        >
+          {pinned ? "★" : "☆"}
         </button>
         <button type="button" onClick={onClose} aria-label={t("forge.repos.detail.close")} title={t("forge.repos.detail.close")} className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:text-fg">
           ✕

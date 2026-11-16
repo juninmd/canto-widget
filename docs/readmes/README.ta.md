@@ -360,6 +360,11 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 |---|
 | ![GitHub tab, repositories subtab: a tree of "pessoais" and each organization, a repository selected with its about, topics and README below, and a local search above](../prints/app/148-aba-repositorios.png) |
 | ![Repositories subtab as a flat list, searched locally by name, about or topic](../prints/app/149-repositorios-grade.png) |
+| ![Repositories subtab with one repository pinned (star in its details) and the "pinned" filter on, showing only the pins](../prints/app/154-repositorios-fixados.png) |
+
+| PRs and issues (GitHub and GitLab): news and drafts |
+|---|
+| ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](../prints/app/153-forge-novidades-rascunhos.png) |
 
 | கடவுச்சொல் மாற்றப்பட்டது, ஒரு கோப்பு நிலுவையில் உள்ளது | நாள் சுருக்கம் |
 |---|---|

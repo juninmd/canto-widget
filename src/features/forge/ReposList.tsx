@@ -10,6 +10,7 @@ import RepoDetail from "./RepoDetail";
 import RepoTree from "./RepoTree";
 import { useRepoAvatars } from "./useRepoAvatars";
 import RepoViewSwitch from "./RepoViewSwitch";
+import { loadPins, repoKey, togglePin } from "./repoPins";
 import Skeleton from "../../components/Skeleton";
 
 const VIEW_KEY = "canto.forge.repos.view";
@@ -54,11 +55,14 @@ export default function ReposList({ forge, repos, stats, onStats }: Props) {
   const [open, setOpen] = useState<Set<string>>(() => new Set([""]));
   const [shut, setShut] = useState<Set<string>>(() => new Set());
   const [selected, setSelected] = useState<string | null>(null);
+  const [pins, setPins] = useState(loadPins);
+  const [onlyPinned, setOnlyPinned] = useState(false);
   const query = useDeferredValue(text);
   const searching = query.trim() !== "";
 
   const index = useMemo(() => indexRepos(all), [all]);
-  const shown = useMemo(() => filterRepos(index, query), [index, query]);
+  const found = useMemo(() => filterRepos(index, query), [index, query]);
+  const shown = useMemo(() => (onlyPinned ? found.filter((r) => pins.has(repoKey(r))) : found), [found, onlyPinned, pins]);
   const rows = useMemo(
     () => (view === "flat" ? flatRows(shown, sort) : buildRows(shown, sort, (key) => (searching ? !shut.has(key) : open.has(key)))),
     [view, shown, sort, searching, shut, open],
@@ -89,7 +93,7 @@ export default function ReposList({ forge, repos, stats, onStats }: Props) {
     onStats(!stats);
   }
 
-  const summary = searching
+  const summary = searching || onlyPinned
     ? t("forge.repos.summaryFiltered", { shown: shown.length, repos: all.length })
     : t("forge.repos.summary", { repos: all.length, groups: groupCount(all) });
 
@@ -128,6 +132,14 @@ export default function ReposList({ forge, repos, stats, onStats }: Props) {
             className={`canto-hit min-h-[24px] rounded-full border px-2 text-[11px] transition-colors ${stats ? "border-accent-text text-accent-text" : "border-edge text-muted hover:bg-hover hover:text-fg"}`}
           >
             {t("forge.repos.stats")}
+          </button>
+          <button
+            type="button"
+            aria-pressed={onlyPinned}
+            onClick={() => setOnlyPinned(!onlyPinned)}
+            className={`canto-hit min-h-[24px] rounded-full border px-2 text-[11px] transition-colors ${onlyPinned ? "border-accent-text text-accent-text" : "border-edge text-muted hover:bg-hover hover:text-fg"}`}
+          >
+            {t("forge.repos.pinnedFilter", { n: pins.size })}
           </button>
           <RepoViewSwitch value={view} onChange={chooseView} />
         </div>
@@ -169,7 +181,7 @@ export default function ReposList({ forge, repos, stats, onStats }: Props) {
           onSelect={(r) => setSelected(r.id || r.full_name)}
         />
       )}
-      {picked && <RepoDetail forge={forge} repo={picked} icon={icons(picked.avatar_url)} onClose={() => setSelected(null)} />}
+      {picked && <RepoDetail forge={forge} repo={picked} icon={icons(picked.avatar_url)} pinned={pins.has(repoKey(picked))} onPin={() => setPins(togglePin(pins, repoKey(picked)))} onClose={() => setSelected(null)} />}
     </div>
   );
 }
