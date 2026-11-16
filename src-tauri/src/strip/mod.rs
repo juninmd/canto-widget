@@ -22,6 +22,9 @@ use crate::resilient::LockExt;
 pub const WINDOW: &str = "strip";
 const FILE: &str = "minipainel.json";
 const TICK: Duration = Duration::from_secs(2);
+const HOVER_TICK: Duration = Duration::from_millis(80);
+/// The window tells its page whether the cursor is over it.
+pub const HOVER_EVENT: &str = "strip-hover";
 pub struct StripState {
     path: PathBuf,
     cfg: Mutex<StripConfig>,
@@ -74,10 +77,27 @@ pub fn toggle(app: &AppHandle) {
 }
 
 pub fn watch(app: AppHandle) {
-    crate::resilient::supervise("strip", move || loop {
-        place::sync(&app);
-        std::thread::sleep(TICK);
+    crate::resilient::supervise("strip", {
+        let app = app.clone();
+        move || loop {
+            place::sync(&app);
+            std::thread::sleep(TICK);
+        }
     });
+    // An inactive window on macOS gets no mouse enter/leave from the webview, so the cursor is read from here.
+    if cfg!(target_os = "macos") {
+        crate::resilient::supervise("strip-hover", move || {
+            let mut last = false;
+            loop {
+                let now = place::cursor_inside(&app);
+                if now != last {
+                    last = now;
+                    place::emit_hover(&app, now);
+                }
+                std::thread::sleep(HOVER_TICK);
+            }
+        });
+    }
 }
 
 #[cfg(test)]

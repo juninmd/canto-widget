@@ -11,7 +11,7 @@ import { SettingsSection } from "./SettingsSection";
 
 /** An older build answers without the newer keys. */
 const DEFAULTS: Omit<StripConfig, "enabled" | "edge" | "items"> = {
-  density: "comfortable", icons: true, labels: false, opacity: 100, charts: true, launcher: true,
+  density: "comfortable", icons: true, labels: false, opacity: 100, charts: true,
   align: "center", gap: 0, scale: 100, surface: "solid", dividers: true, refresh: 2, hover: true, hide_fullscreen: true, columns: 2,
 };
 
@@ -191,7 +191,6 @@ export default function StripSection({ onError }: { onError: (m: string) => void
                   />
                 </Row>
                 <SwitchRow checked={cfg.charts} onChange={(charts) => set({ charts })} label={t("settings.strip.charts")} />
-                <SwitchRow checked={cfg.launcher} onChange={(launcher) => set({ launcher })} label={t("settings.strip.launcher")} />
               </RowGroup>
             </div>
           )}

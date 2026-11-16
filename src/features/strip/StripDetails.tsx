@@ -1,8 +1,6 @@
 import { api, type StripConfig, type StripItem, type StripSnapshot } from "../../lib/api";
 import { t } from "../../i18n";
-import type { Tab } from "../../shell/TabBar";
 import StripCard from "./StripCard";
-import StripLauncher from "./StripLauncher";
 import { lines } from "./stripLines";
 import { levelOf, WIDE } from "./stripModel";
 
@@ -10,13 +8,13 @@ type Props = {
   cfg: StripConfig;
   snap: StripSnapshot;
   onOpen: (item: StripItem) => void;
-  onLaunch: (tab: Tab) => void;
+  onCustomize: () => void;
   onHide: () => void;
   now?: Date;
 };
 
 /** Two columns of cards in the user's order; a click opens that item's tab in the widget. */
-export default function StripDetails({ cfg, snap, onOpen, onLaunch, onHide, now }: Props) {
+export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, now }: Props) {
   const one = cfg.columns === 1;
   const view = cfg.charts ? snap : { ...snap, history: null };
   return (
@@ -49,10 +47,9 @@ export default function StripDetails({ cfg, snap, onOpen, onLaunch, onHide, now 
       ) : (
         <p className="px-2 py-1 text-xs text-muted">{t("strip.noItems")}</p>
       )}
-      {cfg.launcher && <StripLauncher onOpen={onLaunch} />}
       <div className="flex items-center gap-1 px-1 text-[10px] text-faint">
         <span className="min-w-0 flex-1 truncate">{t("strip.keys")}</span>
-        <button type="button" data-nav onClick={() => onLaunch("settings")} className="canto-hit rounded-md px-1.5 py-0.5 text-muted hover:text-fg">
+        <button type="button" data-nav onClick={onCustomize} className="canto-hit rounded-md px-1.5 py-0.5 text-muted hover:text-fg">
           {t("strip.customize")}
         </button>
         <button type="button" data-nav onClick={onHide} className="canto-hit rounded-md px-1.5 py-0.5 text-muted hover:text-fg">

@@ -119,7 +119,6 @@ export type StripConfig = {
   /** 40 to 100. */
   opacity: number;
   charts: boolean;
-  launcher: boolean;
   /** Where along the edge the pill sits. */
   align: "start" | "center" | "end";
   /** Pixels between the pill and the edge, 0 to 64. */

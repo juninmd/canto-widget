@@ -135,7 +135,7 @@ fn the_new_items_are_known_and_old_files_have_no_monitor() {
 fn an_old_file_gets_the_default_look_and_a_bad_opacity_is_clamped() {
     let cfg: StripConfig = serde_json::from_str(r#"{"enabled":true,"items":["cpu"]}"#).unwrap();
     assert_eq!(cfg.density, Density::Comfortable);
-    assert!(cfg.icons && cfg.charts && cfg.launcher && !cfg.labels);
+    assert!(cfg.icons && cfg.charts && !cfg.labels);
     assert_eq!(cfg.opacity, 100);
     let raw = StripConfig { opacity: 5, monitor: Some("  ".into()), ..cfg.clone() }.sanitized();
     assert_eq!(raw.opacity, 40, "an invisible pill would look like a bug");
@@ -166,4 +166,11 @@ fn new_look_keys_fall_back_and_are_clamped() {
     assert_eq!((cfg.refresh, cfg.columns), (2, 2));
     let wild = StripConfig { gap: 200, scale: 10, refresh: 0, columns: 9, ..StripConfig::default() }.sanitized();
     assert_eq!((wild.gap, wild.scale, wild.refresh, wild.columns), (64, 80, 1, 2));
+}
+
+#[test]
+fn the_cursor_is_over_the_window_only_inside_its_rectangle() {
+    assert!(place::inside((10.0, 5.0), (0.0, 0.0), (240.0, 32.0)));
+    assert!(!place::inside((240.0, 5.0), (0.0, 0.0), (240.0, 32.0)), "the far edge belongs to the next pixel");
+    assert!(!place::inside((10.0, -1.0), (0.0, 0.0), (240.0, 32.0)));
 }

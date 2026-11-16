@@ -667,8 +667,8 @@ front. Off by default, desktop-only.
 
 <img src="docs/prints/app/151-mini-ajustes-position.png" alt="Mini dashboard settings, Position page: screen edge, side, distance from the edge and monitor, with a preview of the pill" width="300">
 <img src="docs/prints/app/151-mini-ajustes-look.png" alt="Mini dashboard settings, Look page: size, background (solid, glass, outline), zoom, opacity, icons, names and dividers" width="300">
-<img src="docs/prints/app/151-mini-dashboard-ajustes.png" alt="Mini dashboard settings: each item with a switch and up/down arrows, a live preview of the pill, size, icons, names, charts, shortcuts and resting opacity" width="300">
-<img src="docs/prints/app/150-mini-dashboard.png" alt="Mini dashboard: a pill with CPU, battery, open tasks, weather, the next meeting, review requests and notices, and its details open with a Join button and an Open tab row" width="340">
+<img src="docs/prints/app/151-mini-dashboard-ajustes.png" alt="Mini dashboard settings: each item with a switch and up/down arrows, a live preview of the pill, size, icons, names, charts and resting opacity" width="300">
+<img src="docs/prints/app/150-mini-dashboard.png" alt="Mini dashboard: a pill with CPU, battery, open tasks, weather, the next meeting, review requests and notices, and its details open with a Join button" width="340">
 
 ## 🖥️ System
 
