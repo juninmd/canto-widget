@@ -147,6 +147,7 @@ export const content = {
   "search.groupTasks": "tarefas de hoje",
   "search.groupAgenda": "agenda de hoje",
   "search.groupTranscripts": "transcrições",
+  "search.groupRepos": "repositórios",
   "search.groupNotes": "notas",
   "search.groupClipboard": "clipboard",
   "search.untitled": "(sem título)",

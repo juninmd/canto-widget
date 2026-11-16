@@ -435,6 +435,7 @@
   "tasks.context.chipWifi": "sul Wi-Fi {name}",
   "search.groupAgenda": "agenda di oggi",
   "search.groupTranscripts": "trascrizioni",
+  "search.groupRepos": "repositories",
   "common.cancel": "cancel",
   "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
   "google.signOutYes": "yes, sign out",
