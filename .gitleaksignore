@@ -9,3 +9,6 @@
 # JWT ficticio dos prints da aba Dev (payload sub=42, exp=4102444800, assinatura "signature").
 # O literal saiu do HEAD em 8857b4f, mas o scan da PR varre o range inteiro do branch.
 a9f516be08f6dc111fbf19474f66773c6a97e9e7:scripts/media/dev.media.ts:jwt:14
+
+# Token fictício do print do servidor MCP (scripts/media/mcp.media.ts), já trocado por um valor montado em tempo de execução.
+de6969e2d7e72ae5e11cf8bb33cca5dea26df853:scripts/media/mcp.media.ts:juninmd-env-secret-assignment:7
