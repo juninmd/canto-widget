@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { emit } from "@tauri-apps/api/event";
+import { emit, listen } from "@tauri-apps/api/event";
 import { api, type StripConfig, type StripItem, type StripSnapshot } from "./lib/api";
 import { useWindowVisible } from "./lib/useWindowVisible";
 import { OPEN_TAB_EVENT } from "./features/alerts/alertEvents";
@@ -7,7 +7,6 @@ import StripPill from "./features/strip/StripPill";
 import StripDetails from "./features/strip/StripDetails";
 import { ITEM_TAB } from "./features/strip/stripModel";
 import { nextFocus } from "./features/strip/stripKeys";
-import type { Tab } from "./shell/TabBar";
 
 const LOOK = { density: "comfortable", icons: true, labels: false } as const;
 /** Leaving the pill for the card is not leaving: a short grace keeps it from flickering shut on the way. */
@@ -74,6 +73,25 @@ export default function StripWindow() {
   }, []);
   useEffect(() => () => clearTimeout(closing.current), []);
 
+  // On macOS the app answers where the cursor is (an inactive window never gets mouseenter/leave, and a stale
+  // "enter" kept the details open for good); once it speaks, the page's own events stop counting.
+  const native = useRef(false);
+  useEffect(() => {
+    const off = listen<boolean>("strip-hover", (e) => {
+      native.current = true;
+      if (e.payload) enter();
+      else leave();
+    });
+    return () => void off.then((fn) => fn(), () => {});
+  }, [enter, leave]);
+
+  // Clicking away from a pinned pill lets it go.
+  useEffect(() => {
+    const unpin = () => setPinned(false);
+    window.addEventListener("blur", unpin);
+    return () => window.removeEventListener("blur", unpin);
+  }, []);
+
   // Only a pinned pill takes focus: hovering must never steal the keyboard from the app in front.
   useEffect(() => {
     void api.stripFocus(pinned).catch(() => {});
@@ -102,8 +120,8 @@ export default function StripWindow() {
     void api.mainShow();
   };
 
-  const launch = (tab: Tab) => {
-    void emit(OPEN_TAB_EVENT, tab);
+  const customize = () => {
+    void emit(OPEN_TAB_EVENT, "settings");
     void api.mainShow();
   };
 
@@ -121,13 +139,13 @@ export default function StripWindow() {
     <div className={`flex h-screen justify-center ${bottom ? "items-end" : "items-start"}`}>
       <div
         ref={content}
-        onMouseEnter={enter}
-        onMouseLeave={leave}
+        onMouseEnter={() => native.current || enter()}
+        onMouseLeave={() => native.current || leave()}
         style={{ opacity, zoom: (cfg?.scale ?? 100) / 100 }}
         className={`flex w-max flex-col items-center gap-1.5 p-0.5 transition-opacity duration-200 ${bottom ? "flex-col-reverse" : ""}`}
       >
         <StripPill items={items} snap={snap} look={cfg ?? LOOK} open={open} onToggle={() => setPinned((p) => !p)} />
-        {open && snap && cfg && <StripDetails cfg={cfg} snap={snap} onOpen={openItem} onLaunch={launch} onHide={hide} />}
+        {open && snap && cfg && <StripDetails cfg={cfg} snap={snap} onOpen={openItem} onCustomize={customize} onHide={hide} />}
       </div>
     </div>
   );

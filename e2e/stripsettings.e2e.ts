@@ -3,7 +3,7 @@ import { goTab, mockTauri } from "./mock";
 
 const CFG = {
   enabled: true, edge: "top", items: ["clock", "cpu", "memory", "tasks", "event", "weather"],
-  density: "comfortable", icons: true, labels: false, opacity: 100, charts: true, launcher: true,
+  density: "comfortable", icons: true, labels: false, opacity: 100, charts: true,
   align: "end", gap: 12, scale: 100, surface: "glass", dividers: true, refresh: 2, hover: true, hide_fullscreen: true, columns: 2,
 };
 

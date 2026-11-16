@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { inLabel, levelOf, pillText } from "./stripModel";
+import { inLabel, levelOf, pillText, shortTitle } from "./stripModel";
 import type { StripSnapshot } from "../../lib/api";
 
 const base: StripSnapshot = {
@@ -79,4 +79,12 @@ test("an endpoint down is red, and the market shows the day's move", () => {
 
 test("the clock follows the given time", () => {
   expect(pillText("clock", base, new Date(2026, 10, 15, 9, 5))).toBe("09:05");
+});
+
+test("the event on the pill carries its name, cut when long, and says now while it runs", () => {
+  const snap = { ...base, event: { title: "Daily do time", in_min: 14, meet: true } };
+  expect(pillText("event", snap)).toBe("Daily do time · em 14 min");
+  expect(pillText("event", { ...snap, event: { ...snap.event, in_min: 0 } })).toBe("Daily do time · agora");
+  expect(shortTitle("Planejamento trimestral de engenharia")).toBe("Planejamento trimestr…");
+  expect(shortTitle("  Daily  ")).toBe("Daily");
 });

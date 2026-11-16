@@ -24,7 +24,7 @@ const SNAPSHOT = {
   notices: 2,
 };
 
-const LOOK = { density: "comfortable", icons: true, labels: false, opacity: 100, charts: true, launcher: true };
+const LOOK = { density: "comfortable", icons: true, labels: false, opacity: 100, charts: true };
 
 test.use({ viewport: { width: 440, height: 860 } });
 
@@ -51,15 +51,15 @@ test("the pill shows the numbers and a click pins the details with Entrar", asyn
   await expect.poll(async () => (await calls(page)).some((c) => c.cmd === "strip_resize")).toBe(true);
 
   await pill.click();
-  await expect(page.getByText("Daily do time")).toBeVisible();
+  await expect(page.getByText("Daily do time", { exact: true })).toBeVisible();
   await page.mouse.move(300, 400);
-  await expect(page.getByText("Daily do time")).toBeVisible();
+  await expect(page.getByText("Daily do time", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Entrar" }).click();
   await expect.poll(async () => (await calls(page)).some((c) => c.cmd === "strip_join")).toBe(true);
   await page.screenshot({ path: "docs/prints/app/150-mini-dashboard.png" });
 
   await page.keyboard.press("Escape");
-  await expect(page.getByText("Daily do time")).toBeHidden();
+  await expect(page.getByText("Daily do time", { exact: true })).toBeHidden();
 });
 
 test("Ocultar switches the pill off from the details", async ({ page }) => {
@@ -93,7 +93,7 @@ test("compact with names: the pill reads without icons", async ({ page }) => {
   await expect(pill.locator("svg")).toHaveCount(0);
 });
 
-test("arrow keys walk the pinned details and a tab button opens that tab", async ({ page }) => {
+test("arrow keys walk the pinned details and Personalizar opens the settings", async ({ page }) => {
   await mockTauri(page, {
     fixed: {
       "plugin:window|is_visible": true,
@@ -107,8 +107,8 @@ test("arrow keys walk the pinned details and a tab button opens that tab", async
   await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("button", { name: /Tarefas abertas/ })).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("button", { name: "Notas" })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Personalizar" })).toBeFocused();
+  await expect(page.getByRole("button", { name: "Notas" })).toHaveCount(0);
   await page.keyboard.press("Enter");
   await expect.poll(async () => (await calls(page)).some((c) => c.cmd === "main_show")).toBe(true);
 });

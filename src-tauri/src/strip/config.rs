@@ -79,9 +79,6 @@ pub struct StripConfig {
     /// Mini charts of the last minute on the CPU, memory and network cards.
     #[serde(default = "yes")]
     pub charts: bool,
-    /// The "Abrir aba" row under the cards.
-    #[serde(default = "yes")]
-    pub launcher: bool,
     /// Left, middle or right along the edge.
     #[serde(default)]
     pub align: Align,
@@ -126,7 +123,6 @@ impl Default for StripConfig {
             icons: true,
             opacity: 100,
             charts: true,
-            launcher: true,
             align: Align::Center,
             gap: 0,
             scale: 100,

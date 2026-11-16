@@ -107,6 +107,25 @@ pub fn place(win: &WebviewWindow, size: (f64, f64), cfg: &StripConfig) -> tauri:
     }
 }
 
+/// Whether the cursor is over the visible pill window; the webview cannot tell while another app is active.
+pub fn cursor_inside(app: &tauri::AppHandle) -> bool {
+    let Some(win) = app.get_webview_window(WINDOW).filter(|w| w.is_visible().unwrap_or(false)) else { return false };
+    let (Ok(cursor), Ok(pos), Ok(size)) = (app.cursor_position(), win.outer_position(), win.outer_size()) else {
+        return false;
+    };
+    inside((cursor.x, cursor.y), (f64::from(pos.x), f64::from(pos.y)), (f64::from(size.width), f64::from(size.height)))
+}
+
+pub fn inside(cursor: (f64, f64), origin: (f64, f64), size: (f64, f64)) -> bool {
+    cursor.0 >= origin.0 && cursor.0 < origin.0 + size.0 && cursor.1 >= origin.1 && cursor.1 < origin.1 + size.1
+}
+
+pub fn emit_hover(app: &tauri::AppHandle, on: bool) {
+    if let Some(win) = app.get_webview_window(WINDOW) {
+        let _ = win.emit_to(win.label(), crate::strip::HOVER_EVENT, on);
+    }
+}
+
 /// Idempotent: the config command and the watcher both call it, so the window follows the option and the screen.
 pub fn sync(app: &tauri::AppHandle) {
     let (Some(win), Some(state)) = (app.get_webview_window(WINDOW), app.try_state::<StripState>()) else { return };

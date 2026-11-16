@@ -64,7 +64,7 @@ test("with two monitors the user can pick one, and going back to the widget's ow
 });
 
 test("the arrows reorder, and the look options are saved with a live preview", async () => {
-  stored = { enabled: true, edge: "top", items: ["cpu", "event"], density: "comfortable", icons: true, labels: false, opacity: 100, charts: true, launcher: true };
+  stored = { enabled: true, edge: "top", items: ["cpu", "event"], density: "comfortable", icons: true, labels: false, opacity: 100, charts: true };
   render(<StripSection onError={() => {}} />);
   await act(async () => {});
   await act(async () => fireEvent.click(screen.getByRole("button", { name: "subir Próximo evento" })));

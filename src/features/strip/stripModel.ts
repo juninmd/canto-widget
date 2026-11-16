@@ -40,6 +40,12 @@ export function inLabel(min: number): string {
   return min < 120 ? t("strip.in", { min: String(min) }) : t("strip.inHours", { h: String(Math.round(min / 60)) });
 }
 
+/** The name keeps the pill from growing without bound: past this many characters it is cut with an ellipsis. */
+export function shortTitle(title: string, max = 22): string {
+  const text = title.trim();
+  return text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text;
+}
+
 export function clock(now: Date): string {
   return now.toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
 }
@@ -70,7 +76,7 @@ export function pillText(item: StripItem, s: StripSnapshot, now = new Date()): s
     case "weather":
       return s.weather ? `${degrees(s.weather.temp)}°` : null;
     case "event":
-      return s.event ? inLabel(s.event.in_min) : null;
+      return s.event ? `${shortTitle(s.event.title)} · ${inLabel(s.event.in_min)}` : null;
     case "reviews":
       return String(s.reviews);
     case "notices":
