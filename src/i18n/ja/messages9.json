@@ -435,6 +435,7 @@
   "tasks.context.chipWifi": "Wi-Fi {name} 接続時",
   "search.groupAgenda": "今日の予定",
   "search.groupTranscripts": "文字起こし",
+  "search.groupRepos": "repositories",
   "common.cancel": "cancel",
   "google.signOutAsk": "sign out of this account? Google Calendar leaves Canto until you sign in again",
   "google.signOutYes": "yes, sign out",
@@ -1094,5 +1095,9 @@
   "forge.item.approvedTitle": "{n} approvals and no change requests",
   "forge.item.changes": "changes requested",
   "forge.item.changesTitle": "a reviewer asked for changes",
-  "forge.item.diffTitle": "lines added and removed"
+  "forge.item.diffTitle": "lines added and removed",
+  "capture.partial": "task created, but the time/priority was not saved ({error}). Press Enter to retry.",
+  "settings.sync.last": "Last sync: {when}",
+  "settings.sync.failing": "Sync error ({n} failures in a row): {error}",
+  "settings.sync.noneYet": "No sync yet in this session"
 }

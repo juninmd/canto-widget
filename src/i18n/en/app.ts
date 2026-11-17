@@ -209,6 +209,9 @@ export const app: Record<keyof typeof source, string> = {
   "settings.sync.stopYes": "yes, stop",
   "settings.sync.merged": "merged: the vault has {tasks} tasks and {notes} notes",
   "settings.sync.nothingNew": "nothing new to merge",
+  "settings.sync.last": "Last sync: {when}",
+  "settings.sync.failing": "Sync error ({n} failures in a row): {error}",
+  "settings.sync.noneYet": "No sync yet in this session",
 
   "settings.tabs.title": "Visible tabs",
   "settings.tabs.hint": "Settings is always visible. Alt+1, Alt+2… follow the order of the visible tabs.",
@@ -413,6 +416,7 @@ export const app: Record<keyof typeof source, string> = {
   "capture.note": "note",
   "capture.hint": "Enter: task · {mod}+Enter: note · Esc: close",
   "capture.close": "close",
+  "capture.partial": "task created, but the time/priority was not saved ({error}). Press Enter to retry.",
   "shortcuts.capture": "quick capture of a task or note, from any app",
 
   "tabs.group.day": "My day",
