@@ -201,6 +201,9 @@ export const app: Record<keyof typeof source, string> = {
   "settings.sync.stopYes": "sí, detener",
   "settings.sync.merged": "combinado: la bóveda tiene {tasks} tareas y {notes} notas",
   "settings.sync.nothingNew": "nada nuevo que combinar",
+  "settings.sync.last": "Última sincronización: {when}",
+  "settings.sync.failing": "Error de sincronización ({n} fallos seguidos): {error}",
+  "settings.sync.noneYet": "Aún sin sincronización en esta sesión",
 
   "settings.tabs.title": "Pestañas visibles",
   "settings.tabs.hint": "Ajustes siempre está visible. Alt+1, Alt+2… siguen el orden de las pestañas visibles.",
@@ -405,6 +408,7 @@ export const app: Record<keyof typeof source, string> = {
   "capture.note": "nota",
   "capture.hint": "Enter: tarea · {mod}+Enter: nota · Esc: cerrar",
   "capture.close": "cerrar",
+  "capture.partial": "tarea creada, pero faltó guardar hora/prioridad ({error}). Enter lo reintenta.",
   "shortcuts.capture": "captura rápida de una tarea o nota, desde cualquier app",
 
   "tabs.group.day": "Mi día",

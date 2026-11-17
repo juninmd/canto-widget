@@ -14,12 +14,15 @@ export default function CaptureWindow() {
   const [saving, setSaving] = useState<"task" | "note" | null>(null);
   // A ref, not the state: two Enters in the same frame both see the old state and would save twice.
   const busy = useRef(false);
+  // A task whose time or priority failed to save: kept so pressing Enter again completes it, not duplicates it.
+  const partial = useRef<{ raw: string; id: string; scheduled: boolean; prioritized: boolean } | null>(null);
   const input = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const open = () => {
       setText("");
       setError("");
+      partial.current = null;
       input.current?.focus();
     };
     open();
@@ -45,13 +48,30 @@ export default function CaptureWindow() {
       if (asNote) {
         await api.noteSave({ title: raw, body: "", tags: [] });
       } else {
-        // Same quick-add syntax as the task list: "Daily às 9h30 !alta" sets the time and priority too.
-        const created = await api.taskAdd(quick.title, todayLocal());
-        // Cleared before the rest: a failed time or priority must not leave the text to be saved twice.
-        setText("");
+        // Same quick-add syntax as the task list: "Daily amanhã às 9h30 !alta" sets day, time and priority too.
+        // A retry of the same text reuses the task a failed earlier try already created, so it never duplicates.
+        let created = partial.current?.raw === raw ? partial.current : null;
+        if (!created) {
+          const task = await api.taskAdd(quick.title, quick.day ?? todayLocal());
+          created = partial.current = { raw, id: task.id, scheduled: false, prioritized: false };
+        }
+        try {
+          if (quick.time && !created.scheduled) {
+            await api.taskSetSchedule(created.id, quick.time, null);
+            created.scheduled = true;
+          }
+          if (quick.priority && !created.prioritized) {
+            await api.taskSetPriority(created.id, quick.priority);
+            created.prioritized = true;
+          }
+        } catch (e) {
+          // The text stays: Enter finishes the same task instead of creating a second one.
+          setError(t("capture.partial", { error: errText(e) }));
+          await emit(TASKS_CHANGED_EVENT);
+          return;
+        }
+        partial.current = null;
         await emit(TASKS_CHANGED_EVENT);
-        if (quick.time) await api.taskSetSchedule(created.id, quick.time, null);
-        if (quick.priority) await api.taskSetPriority(created.id, quick.priority);
       }
       setText("");
       await api.captureClose();

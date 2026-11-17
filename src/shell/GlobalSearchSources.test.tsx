@@ -4,13 +4,18 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { AgendaItem } from "../lib/api";
 
 let transcripts: unknown = [];
+let repoPages: Record<string, unknown> = {};
 
 mock.module("@tauri-apps/api/core", () => ({
-  invoke: (cmd: string) => {
+  invoke: function (cmd: string) {
     if (cmd === "notes_search") return Promise.resolve({ total: 0, items: [] });
     if (cmd === "clip_list") return Promise.resolve({ items: [], max_pinned: 0 });
     if (cmd === "tasks_for_day") return Promise.resolve([]);
     if (cmd === "transcripts_list") return transcripts instanceof Error ? Promise.reject(transcripts) : Promise.resolve(transcripts);
+    if (cmd === "repos_cached") {
+      const forge = (arguments[1] as { forge: string }).forge;
+      return repoPages[forge] instanceof Error ? Promise.reject(repoPages[forge]) : Promise.resolve(repoPages[forge] ?? []);
+    }
     return Promise.resolve(null);
   },
 }));
@@ -20,6 +25,7 @@ const { default: GlobalSearch } = await import("./GlobalSearch");
 afterEach(() => {
   cleanup();
   transcripts = [];
+  repoPages = {};
 });
 
 const meeting = (id: string, title: string): AgendaItem => ({ id, title, start: "", end: "", all_day: false, location: "", meet: "", link: "" });
@@ -85,4 +91,18 @@ test("privacy mode blurs transcript and event rows", async () => {
   transcripts = [{ name: "ata-secreta.md", modified_at: 1, size: 1, preview: "" }];
   await search("ata", { privacy: true });
   expect(screen.getByRole("button", { name: "ata-secreta.md" }).className).toContain("blur-sm");
+});
+
+const repo = (full_name: string, description = "") => ({ full_name, description });
+
+test("cached repositories match by name or description and a click opens their forge", async () => {
+  repoPages = {
+    github: [{ repos: [repo("juninmd/canto-widget"), repo("juninmd/outro", "painel de tarefas")] }],
+    gitlab: new Error("conecte sua conta do GitLab"),
+  };
+  const { jumps, errors } = await search("canto");
+  expect(screen.getByText("repositórios →")).toBeTruthy();
+  fireEvent.click(screen.getByText("juninmd/canto-widget"));
+  expect(jumps).toEqual([["github", "canto"]]);
+  expect(errors).toEqual([]);
 });

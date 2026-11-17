@@ -44,6 +44,9 @@ impl Session {
 
 pub struct AppState {
     pub dir: PathBuf,
+    pub sync: crate::sync::SyncTracker,
+    #[cfg(test)]
+    pub derives: std::sync::atomic::AtomicUsize,
     pub session: Mutex<Option<Session>>,
     /// Last event that triggered the pop-up, read by the alert window.
     pub alert: Mutex<Option<crate::calendar::AgendaItem>>,
@@ -73,6 +76,9 @@ impl AppState {
     pub fn new(dir: PathBuf) -> Self {
         Self {
             dir,
+            sync: Default::default(),
+            #[cfg(test)]
+            derives: Default::default(),
             session: Mutex::new(None),
             alert: Mutex::new(None),
             trash: Default::default(),
@@ -144,7 +150,7 @@ impl AppState {
         // Best-effort: images of notes deleted before the last lock are no longer undoable.
         let _ = self.note_images_gc(crate::note_images::ORPHAN_GRACE);
         // Best-effort: whatever showed up in a synced folder merges in right away.
-        let _ = crate::sync::poll_and_merge(self);
+        let _ = crate::sync::poll_and_merge(self); // the outcome lands in `self.sync` (status)
         Ok(())
     }
 
@@ -184,7 +190,7 @@ impl AppState {
     fn sync_after_persist(&self) {
         #[cfg(test)]
         test_hooks::delay_before_sync();
-        let _ = crate::sync::export_now(&self.dir);
+        let _ = crate::sync::export_tracked(self);
     }
 
     /// Single seam for the lock -> mutate -> persist-if-changed -> unlock -> sync-if-changed
@@ -268,6 +274,8 @@ impl AppState {
         let password = self.session_password()?;
         #[cfg(test)]
         test_hooks::delay_before_derive();
+        #[cfg(test)]
+        self.derives.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
         let key = VaultKey::derive(&password, &blob.salt_bytes()?)?;
         let plain = blob.open(&key, VAULT_AAD).map_err(|e| match e {
             AppError::WrongPassword => AppError::Config("o backup foi criado com outra senha mestra".into()),

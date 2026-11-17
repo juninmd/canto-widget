@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../../lib/api";
+import { api, type SyncStatus } from "../../lib/api";
+import { timeAgo } from "../../lib/time";
 import { useSectionError } from "./useSectionError";
 import { t } from "../../i18n";
 import ConfirmButton from "../../components/ConfirmButton";
@@ -9,11 +10,13 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
   const [folder, setFolder] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState("");
+  const [status, setStatus] = useState<SyncStatus | null>(null);
   const { error, fail, clear } = useSectionError(onError);
 
   async function reload() {
     try {
       setFolder(await api.syncGet());
+      setStatus(await api.syncStatus());
     } catch (e) {
       fail(e);
     }
@@ -64,6 +67,7 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
     } catch (e) {
       fail(e);
     } finally {
+      setStatus(await api.syncStatus().catch(() => null));
       setBusy(false);
     }
   }
@@ -111,7 +115,23 @@ export default function SyncSection({ onError }: { onError: (m: string) => void 
           </>
         )}
       </div>
+      {folder && status && <SyncState status={status} />}
       {info && <p className="text-[11px] text-accent-text">{info}</p>}
     </SettingsSection>
+  );
+}
+
+/** Text, not just color: the last good sync, or the current error (and how many tries failed in a row). */
+function SyncState({ status }: { status: SyncStatus }) {
+  const error = status.lastExportError ?? status.lastMergeError;
+  const last = Math.max(status.lastExportOkAt ?? 0, status.lastMergeOkAt ?? 0);
+  return (
+    <p role="status" className={`text-[11px] ${error ? "text-danger" : "text-faint"}`}>
+      {error
+        ? t("settings.sync.failing", { error, n: status.consecutiveFailures })
+        : last
+          ? t("settings.sync.last", { when: timeAgo(last) })
+          : t("settings.sync.noneYet")}
+    </p>
   );
 }

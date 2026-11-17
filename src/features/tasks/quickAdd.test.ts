@@ -52,3 +52,26 @@ describe("parseQuickTask", () => {
     expect(parseQuickTask("!alta")).toEqual({ title: "", time: null, priority: "high" });
   });
 });
+
+describe("parseQuickTask day tokens", () => {
+  const now = new Date(2026, 10, 16, 10, 0); // Monday 16/11/2026
+  test("amanhã with a time targets tomorrow", () => {
+    expect(parseQuickTask("Pagar boleto amanhã às 9h", now)).toEqual({ title: "Pagar boleto", time: "09:00", day: "2026-11-17" });
+  });
+  test("weekday names mean the next occurrence", () => {
+    expect(parseQuickTask("Reunião qua", now).day).toBe("2026-11-18");
+    expect(parseQuickTask("Reunião seg", now).day).toBe("2026-11-23");
+  });
+  test("dd/mm rolls to next year when already past and rejects invalid dates", () => {
+    expect(parseQuickTask("Festa 25/12", now).day).toBe("2026-12-25");
+    expect(parseQuickTask("Aniversário 03/02", now).day).toBe("2027-02-03");
+    expect(parseQuickTask("Algo 31/02", now)).toEqual({ title: "Algo 31/02", time: null });
+  });
+  test("unknown tokens stay in the title and combine with priority", () => {
+    expect(parseQuickTask("Comprar pão depois", now)).toEqual({ title: "Comprar pão depois", time: null });
+    expect(parseQuickTask("Ligar amanhã !alta", now)).toEqual({ title: "Ligar", time: null, priority: "high", day: "2026-11-17" });
+  });
+  test("a day word alone is kept as the title", () => {
+    expect(parseQuickTask("amanhã", now)).toEqual({ title: "amanhã", time: null });
+  });
+});
