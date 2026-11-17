@@ -107,6 +107,8 @@ test("arrow keys walk the pinned details and Personalizar opens the settings", a
   await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("button", { name: /Tarefas abertas/ })).toBeFocused();
   await page.keyboard.press("ArrowDown");
+  await expect(page.getByRole("button", { name: "Pausar alertas 1 h" })).toBeFocused();
+  await page.keyboard.press("ArrowDown");
   await expect(page.getByRole("button", { name: "Personalizar" })).toBeFocused();
   await expect(page.getByRole("button", { name: "Notas" })).toHaveCount(0);
   await page.keyboard.press("Enter");

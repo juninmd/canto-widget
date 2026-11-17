@@ -41,8 +41,8 @@ export default function StripPreview({ cfg }: { cfg: StripConfig }) {
           "radial-gradient(120% 140% at 15% 0%, color-mix(in srgb, var(--color-accent) 28%, transparent), transparent 60%), radial-gradient(100% 120% at 100% 100%, color-mix(in srgb, var(--color-cat-meet) 22%, transparent), transparent 55%), var(--color-ink)",
       }}
     >
-      <div className={`flex min-h-0 flex-1 ${bottom ? "items-end" : "items-start"} ${EDGE_SIDE[cfg.align]}`} style={{ padding: Math.round(cfg.gap / 4) }}>
-        <div className="pointer-events-none max-w-full origin-top overflow-hidden" style={{ opacity: cfg.opacity / 100, zoom: (Math.min(cfg.scale, 100) * 0.8) / 100 }}>
+      <div className={`flex min-h-0 flex-1 ${bottom ? "items-end" : "items-start"} ${cfg.pos == null ? EDGE_SIDE[cfg.align] : ""}`} style={{ padding: Math.round(cfg.gap / 4) }}>
+        <div className="pointer-events-none max-w-full origin-top overflow-hidden" style={{ ...(cfg.pos == null ? {} : { marginLeft: `${cfg.pos * 100}%`, transform: `translateX(-${cfg.pos * 100}%)` }), opacity: cfg.opacity / 100, zoom: (Math.min(cfg.scale, 100) * 0.8) / 100 }}>
           <StripPill items={cfg.items} snap={SAMPLE} look={cfg} now={SAMPLE_TIME} />
         </div>
       </div>

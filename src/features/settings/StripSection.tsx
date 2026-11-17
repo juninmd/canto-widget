@@ -110,12 +110,12 @@ export default function StripSection({ onError }: { onError: (m: string) => void
                   ]}
                 />
               </Row>
-              <Row label={t("settings.strip.align")}>
+              <Row label={t("settings.strip.align")} hint={t("settings.strip.dragHint")}>
                 <Segmented
                   name="strip-align"
                   label={t("settings.strip.align")}
                   value={cfg.align}
-                  onChange={(align) => set({ align })}
+                  onChange={(align) => set({ align, pos: null })}
                   options={[
                     { value: "start", label: t("settings.strip.alignStart") },
                     { value: "center", label: t("settings.strip.alignCenter") },

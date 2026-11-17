@@ -82,6 +82,9 @@ pub struct StripConfig {
     /// Left, middle or right along the edge.
     #[serde(default)]
     pub align: Align,
+    /// Where the user dragged the pill: its center as a fraction (0 to 1) of the work area's width. Wins over `align`.
+    #[serde(default)]
+    pub pos: Option<f64>,
     /// Space between the pill and the screen edge (and the corner, when not centered), in px: 0 to 64.
     #[serde(default)]
     pub gap: u8,
@@ -124,6 +127,7 @@ impl Default for StripConfig {
             opacity: 100,
             charts: true,
             align: Align::Center,
+            pos: None,
             gap: 0,
             scale: 100,
             surface: Surface::Solid,
@@ -153,6 +157,7 @@ impl StripConfig {
         self.items = known(&self.items);
         self.opacity = self.opacity.clamp(40, 100);
         self.gap = self.gap.min(64);
+        self.pos = self.pos.filter(|p| p.is_finite()).map(|p| p.clamp(0.0, 1.0));
         self.scale = self.scale.clamp(80, 140);
         self.refresh = self.refresh.clamp(1, 30);
         self.columns = self.columns.clamp(1, 2);

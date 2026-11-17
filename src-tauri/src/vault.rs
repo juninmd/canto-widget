@@ -64,6 +64,8 @@ pub struct AppState {
     pub next_meeting: Mutex<Option<crate::calendar::AgendaItem>>,
     /// Tasks still open "today" as the UI computes it (Rust can't: AGENTS.md timezone trap); folded into the badge count.
     pub badge_tasks: Mutex<u32>,
+    /// First open task of "today" as the Tarefas tab last listed it, for the mini-dashboard's "Concluir".
+    pub badge_next_task: Mutex<Option<crate::tray_live::NextTask>>,
     /// Serializes clipboard history load-modify-save so a watcher write can't undo a clear.
     pub clip_lock: Mutex<()>,
     /// Serializes Google config writes so a token refresh can't resurrect a disconnected account.
@@ -91,6 +93,7 @@ impl AppState {
             traffic: Default::default(),
             next_meeting: Mutex::new(None),
             badge_tasks: Mutex::new(0),
+            badge_next_task: Mutex::new(None),
             clip_lock: Mutex::new(()),
             drive_lock: Mutex::new(()),
             last_active: Mutex::new(now_ms()),
@@ -196,6 +199,7 @@ impl AppState {
         self.traffic.clear();
         *self.next_meeting.lock_safe() = None;
         *self.badge_tasks.lock_safe() = 0;
+        *self.badge_next_task.lock_safe() = None;
     }
 
     pub fn is_unlocked(&self) -> bool {
