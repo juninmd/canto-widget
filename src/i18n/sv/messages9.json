@@ -1102,5 +1102,6 @@
   "settings.sync.noneYet": "No sync yet in this session",
   "strip.pauseAlerts": "Pause alerts 1 h",
   "strip.resumeAlerts": "Resume alerts",
-  "strip.completeTask": "Complete"
+  "strip.completeTask": "Complete",
+  "settings.strip.dragHint": "Drag the pill along the edge to place it; picking a side here undoes the drag."
 }

@@ -448,6 +448,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.strip.alignStart": "izquierda",
   "settings.strip.alignCenter": "centro",
   "settings.strip.alignEnd": "derecha",
+  "settings.strip.dragHint": "Arrastra la píldora por el borde para colocarla; elegir un lado aquí deshace el arrastre.",
   "settings.strip.gap": "distancia del borde",
   "settings.strip.gapHint": "Espacio entre la píldora y el borde de la pantalla.",
   "settings.strip.surface": "fondo",

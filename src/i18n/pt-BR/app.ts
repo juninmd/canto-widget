@@ -443,6 +443,7 @@ export const app = {
   "settings.strip.alignStart": "esquerda",
   "settings.strip.alignCenter": "centro",
   "settings.strip.alignEnd": "direita",
+  "settings.strip.dragHint": "Arraste a pílula pela borda para posicioná-la; escolher um lado aqui desfaz o arraste.",
   "settings.strip.gap": "distância da borda",
   "settings.strip.gapHint": "Espaço entre a pílula e a borda da tela.",
   "settings.strip.surface": "fundo",

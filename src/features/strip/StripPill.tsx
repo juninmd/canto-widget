@@ -21,11 +21,13 @@ type Props = {
   look: PillLook;
   open?: boolean;
   onToggle?: () => void;
+  /** Pointer handlers for dragging the pill along the edge. */
+  drag?: Pick<React.ButtonHTMLAttributes<HTMLButtonElement>, "onPointerDown" | "onPointerMove" | "onPointerUp" | "onPointerCancel">;
   now?: Date;
 };
 
 /** One line of a few numbers; the whole pill is the button, so the target is as big as the pill. */
-export default function StripPill({ items, snap, look, open = false, onToggle, now }: Props) {
+export default function StripPill({ items, snap, look, open = false, onToggle, drag, now }: Props) {
   const compact = look.density === "compact";
   const shown = snap ? items.flatMap((item) => {
     const text = pillText(item, snap, now);
@@ -35,6 +37,7 @@ export default function StripPill({ items, snap, look, open = false, onToggle, n
     <button
       type="button"
       onClick={onToggle}
+      {...drag}
       aria-expanded={open}
       aria-label={t("strip.aria")}
       className={`canto-hit flex items-center whitespace-nowrap rounded-full border font-medium ${SURFACE[look.surface ?? "solid"]} ${

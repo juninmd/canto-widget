@@ -36,6 +36,24 @@ pub fn origin_at(area: Area, size: (f64, f64), edge: Edge, align: Align, gap: f6
     (left, top)
 }
 
+/// Same, but with the pill's center where the user dragged it (a fraction of the area's width). The window never
+/// leaves the area, nor the gap from its sides, so a drag cannot lose the pill off-screen or on an unplugged monitor.
+pub fn origin_dragged(area: Area, size: (f64, f64), edge: Edge, pos: f64, gap: f64) -> (f64, f64) {
+    let (x, w) = (area.0, area.2);
+    let (_, top) = origin_at(area, size, edge, Align::Center, gap);
+    let (lo, hi) = (x + gap, (x + w - size.0 - gap).max(x + gap));
+    let left = (x + pos.clamp(0.0, 1.0) * w - size.0 / 2.0).clamp(lo, hi);
+    (left, top)
+}
+
+/// The fraction of the area's width under a window center at `center` (same unit as the area).
+pub fn pos_of(area: Area, center: f64) -> f64 {
+    if area.2 <= 0.0 {
+        return 0.5;
+    }
+    ((center - area.0) / area.2).clamp(0.0, 1.0)
+}
+
 /// Off wins over everything; a full-screen app keeps the screen to itself.
 pub fn wanted(enabled: bool, fullscreen_app: bool) -> bool {
     enabled && !fullscreen_app
@@ -94,7 +112,11 @@ pub fn place(win: &WebviewWindow, size: (f64, f64), cfg: &StripConfig) -> tauri:
         return win.set_size(LogicalSize::new(size.0, size.1));
     };
     let scaled = ((size.0 * scale).round(), (size.1 * scale).round());
-    let (x, y) = origin_at(area, scaled, cfg.edge, cfg.align, (f64::from(cfg.gap) * scale).round());
+    let gap = (f64::from(cfg.gap) * scale).round();
+    let (x, y) = match cfg.pos {
+        Some(pos) => origin_dragged(area, scaled, cfg.edge, pos, gap),
+        None => origin_at(area, scaled, cfg.edge, cfg.align, gap),
+    };
     #[cfg(target_os = "macos")]
     {
         win.set_size(LogicalSize::new(size.0, size.1))?;
@@ -142,4 +164,25 @@ pub fn sync(app: &tauri::AppHandle) {
         // WebView2 keeps animating a hidden page; the UI listens for this to stop polling.
         let _ = win.emit_to(win.label(), crate::window::SHOWN_EVENT, false);
     }
+}
+
+/// Follows the cursor along the edge while the pill is dragged. `grab` is where the pill was held, in logical px from
+/// its center; the new position is kept in memory and only written to disk when `commit` is set (the drop).
+pub fn drag(app: &tauri::AppHandle, grab: f64, commit: bool) -> crate::error::Result<()> {
+    use crate::error::AppError;
+    let (Some(win), Some(state)) = (app.get_webview_window(WINDOW), app.try_state::<StripState>()) else {
+        return Ok(());
+    };
+    let io = |e: tauri::Error| AppError::Io(e.to_string());
+    let Some((area, scale)) = area_of(&win, true).map_err(io)? else { return Ok(()) };
+    let cursor = app.cursor_position().map_err(io)?;
+    // The area is logical on macOS and physical elsewhere; the cursor is always physical.
+    let monitor_scale = win.scale_factor().map_err(io)?;
+    let cursor_x = if cfg!(target_os = "macos") { cursor.x / monitor_scale } else { cursor.x };
+    let center = cursor_x - grab * if cfg!(target_os = "macos") { 1.0 } else { scale };
+    let mut cfg = state.cfg();
+    cfg.pos = Some(pos_of(area, center));
+    let cfg = state.set_live(cfg, commit)?;
+    let size = win.inner_size().map_err(io)?;
+    place(&win, (f64::from(size.width) / monitor_scale, f64::from(size.height) / monitor_scale), &cfg).map_err(io)
 }
