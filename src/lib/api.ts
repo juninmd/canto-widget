@@ -136,6 +136,7 @@ export type StripConfig = {
   /** Columns of cards in the details. */
   columns: 1 | 2;
 };
+export type NextTask = { id: string; title: string };
 export type StripSnapshot = {
   cpu: number;
   memory: number;
@@ -152,6 +153,8 @@ export type StripSnapshot = {
   reviews: number;
   battery: [number, boolean] | null;
   tasks: number;
+  /** First open task, offered as "Concluir" on the Tarefas card; absent in older backends and mocks. */
+  next_task?: NextTask | null;
   notices: number;
 };
 
@@ -795,7 +798,7 @@ export const api = {
   reportVault: (fromDay: string, toDay: string, fromMs: number, toMs: number) =>
     invoke<VaultPeriod>("report_vault", { fromDay, toDay, fromMs, toMs }),
   /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
-  badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
+  badgeSetTasks: (count: number, next: NextTask | null = null) => invoke<void>("badge_set_tasks", { count, next }),
 
   /** RSS/Atom incident history from services the team depends on; served from a 5 min cache unless `force`. */
   apiStatus: (force = false) => invoke<StatusResult[]>("api_status", { force }),

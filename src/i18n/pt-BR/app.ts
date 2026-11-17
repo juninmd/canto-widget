@@ -268,6 +268,7 @@ export const app = {
   "strip.noMarket": "Abra o Mercado para carregar as cotações",
   "strip.customize": "Personalizar",
   "strip.hide": "Ocultar",
+  "strip.completeTask": "Concluir",
   "settings.strip.items": "Itens",
   "settings.strip.itemsHint": "Ligue o que quer ver e use as setas para mudar a ordem.",
   "settings.strip.up": "subir {item}",

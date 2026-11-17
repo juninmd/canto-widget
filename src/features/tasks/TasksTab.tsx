@@ -73,7 +73,9 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   // Only this tab knows "today" correctly; the tray badge just reflects whatever it last pushed.
   useEffect(() => {
     if (loadedFor !== today) return;
-    void api.badgeSetTasks(tasks.filter((task) => !task.done).length).catch(() => {});
+    const open = tasks.filter((task) => !task.done);
+    const first = open[0];
+    void api.badgeSetTasks(open.length, first ? { id: first.id, title: first.title } : null).catch(() => {});
   }, [tasks, loadedFor, today]);
 
   const undoable = useUndo(onError, reload);

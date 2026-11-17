@@ -273,6 +273,7 @@ export const app: Record<keyof typeof source, string> = {
   "strip.noMarket": "Open Market to load the quotes",
   "strip.customize": "Customize",
   "strip.hide": "Hide",
+  "strip.completeTask": "Complete",
   "settings.strip.items": "Items",
   "settings.strip.itemsHint": "Switch on what you want and use the arrows to reorder.",
   "settings.strip.up": "move {item} up",

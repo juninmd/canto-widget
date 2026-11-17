@@ -273,6 +273,7 @@ export const app: Record<keyof typeof source, string> = {
   "strip.noMarket": "Abre Mercado para cargar las cotizaciones",
   "strip.customize": "Personalizar",
   "strip.hide": "Ocultar",
+  "strip.completeTask": "Completar",
   "settings.strip.items": "Elementos",
   "settings.strip.itemsHint": "Activa lo que quieres ver y usa las flechas para reordenar.",
   "settings.strip.up": "subir {item}",

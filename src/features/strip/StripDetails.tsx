@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { emit } from "@tauri-apps/api/event";
 import { api, type StripConfig, type StripItem, type StripSnapshot } from "../../lib/api";
 import { t } from "../../i18n";
 import StripCard from "./StripCard";
@@ -14,7 +16,26 @@ type Props = {
 };
 
 /** Two columns of cards in the user's order; a click opens that item's tab in the widget. */
+/** Tells the widget's Tarefas tab that a task changed behind its back, so it rereads. */
+export const TASKS_CHANGED = "canto://tasks-changed";
+
 export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, now }: Props) {
+  const [completing, setCompleting] = useState(false);
+  const next = snap.next_task;
+  async function complete() {
+    if (!next || completing) return;
+    setCompleting(true);
+    try {
+      await api.taskComplete(next.id);
+      // The card must not offer the same task again before the Tarefas tab pushes the new first one.
+      await api.badgeSetTasks(Math.max(snap.tasks - 1, 0), null);
+      await emit(TASKS_CHANGED);
+    } catch {
+      /* a task that is already gone or a locked vault: the next snapshot shows the truth */
+    } finally {
+      setCompleting(false);
+    }
+  }
   const one = cfg.columns === 1;
   const view = cfg.charts ? snap : { ...snap, history: null };
   return (
@@ -30,7 +51,18 @@ export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, n
               wide={!one && WIDE.has(item)}
               onOpen={() => onOpen(item)}
               action={
-                item === "event" && snap.event?.meet ? (
+                item === "tasks" && next ? (
+                  <button
+                    type="button"
+                    data-nav
+                    disabled={completing}
+                    title={next.title}
+                    onClick={() => void complete()}
+                    className="canto-hit shrink-0 self-center rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent disabled:opacity-40"
+                  >
+                    {t("strip.completeTask")}
+                  </button>
+                ) : item === "event" && snap.event?.meet ? (
                   <button
                     type="button"
                     data-nav
