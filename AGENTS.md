@@ -36,7 +36,7 @@ and publishes a release after the checks pass.
 
 ```text
 src/                      React UI (one component per file, tests next to it)
-  lib/api.ts              the only place that calls invoke(); IPC types live here
+  lib/api.ts              composes `api` from lib/ipc/<domain>.ts (the only place that calls invoke(); IPC types live there too)
   lib/, components/       shared only: pure helpers and hooks (theme, time, motion, markdown, toast) and UI primitives
                           (Icons, Skeleton, Spinner, EmptyState, ErrorBanner, SubTabs); they never import a feature
   shell/                  what frames every tab: TabBar (overflow into a "mais" menu via fitTabs), TabRail, MiniRail (dock),
