@@ -174,3 +174,28 @@ fn the_cursor_is_over_the_window_only_inside_its_rectangle() {
     assert!(!place::inside((240.0, 5.0), (0.0, 0.0), (240.0, 32.0)), "the far edge belongs to the next pixel");
     assert!(!place::inside((10.0, -1.0), (0.0, 0.0), (240.0, 32.0)));
 }
+
+#[test]
+fn a_dragged_pill_follows_the_cursor_but_never_leaves_the_area() {
+    let area = (100.0, 40.0, 1000.0, 600.0);
+    let size = (200.0, 32.0);
+    assert_eq!(place::origin_dragged(area, size, Edge::Top, 0.5, 0.0), (500.0, 40.0));
+    assert_eq!(place::origin_dragged(area, size, Edge::Top, 0.0, 8.0).0, 108.0, "held at the left gap");
+    assert_eq!(place::origin_dragged(area, size, Edge::Bottom, 1.0, 8.0), (892.0, 600.0), "held at the right gap");
+    assert_eq!(place::origin_dragged(area, size, Edge::Top, 9.0, 0.0).0, 900.0, "a wild value is clamped");
+    let second = (1920.0, 0.0, 1000.0, 600.0);
+    assert_eq!(place::origin_dragged(second, size, Edge::Top, 0.5, 0.0).0, 2320.0, "the second monitor's own area");
+}
+
+#[test]
+fn the_drag_position_is_a_fraction_of_the_width_and_survives_a_bad_file() {
+    let area = (100.0, 40.0, 1000.0, 600.0);
+    assert_eq!(place::pos_of(area, 600.0), 0.5);
+    assert_eq!(place::pos_of(area, -50.0), 0.0);
+    assert_eq!(place::pos_of(area, 5000.0), 1.0);
+    let cfg: StripConfig = serde_json::from_str(r#"{"pos":0.25}"#).unwrap();
+    assert_eq!(cfg.sanitized().pos, Some(0.25));
+    assert_eq!(StripConfig { pos: Some(7.0), ..StripConfig::default() }.sanitized().pos, Some(1.0));
+    assert_eq!(StripConfig { pos: Some(f64::NAN), ..StripConfig::default() }.sanitized().pos, None);
+    assert_eq!(StripConfig::default().pos, None, "an old file keeps its side");
+}

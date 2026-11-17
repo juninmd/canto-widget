@@ -21,6 +21,8 @@ export type StripConfig = {
   charts: boolean;
   /** Where along the edge the pill sits. */
   align: "start" | "center" | "end";
+  /** Where the user dragged the pill: its center as 0 to 1 of the screen width; wins over `align`. */
+  pos?: number | null;
   /** Pixels between the pill and the edge, 0 to 64. */
   gap: number;
   /** Zoom in %, 80 to 140. */
@@ -73,6 +75,8 @@ export const windowApi = {
   stripSnapshot: () => invoke<StripSnapshot>("strip_snapshot"),
   stripResize: (width: number, height: number) => invoke<void>("strip_resize", { width, height }),
   stripJoin: () => invoke<void>("strip_join"),
+  /** `grab`: where the pill was held, in px from its center. The drop (`commit`) saves the place. */
+  stripDrag: (grab: number, commit: boolean) => invoke<void>("strip_drag", { grab, commit }),
   stripFocus: (on: boolean) => invoke<void>("strip_focus", { on }),
   stripMonitors: () => invoke<string[]>("strip_monitors"),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),

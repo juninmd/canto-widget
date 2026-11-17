@@ -448,6 +448,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.strip.alignStart": "left",
   "settings.strip.alignCenter": "center",
   "settings.strip.alignEnd": "right",
+  "settings.strip.dragHint": "Drag the pill along the edge to place it; picking a side here undoes the drag.",
   "settings.strip.gap": "distance from the edge",
   "settings.strip.gapHint": "Space between the pill and the screen edge.",
   "settings.strip.surface": "background",
