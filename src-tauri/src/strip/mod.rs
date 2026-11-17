@@ -54,6 +54,16 @@ impl StripState {
         Ok(cfg)
     }
 
+    /// A drag in flight: the new position is used at once, and written to disk only on the drop.
+    pub fn set_live(&self, cfg: StripConfig, persist: bool) -> Result<StripConfig> {
+        if persist {
+            return self.set(cfg);
+        }
+        let cfg = cfg.sanitized();
+        *self.cfg.lock_safe() = cfg.clone();
+        Ok(cfg)
+    }
+
     pub fn reviews(&self) -> u32 {
         self.reviews.load(Ordering::Relaxed)
     }

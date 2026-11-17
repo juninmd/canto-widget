@@ -17,6 +17,7 @@ import RemindersSection from "../alerts/RemindersSection";
 import FocusSection from "../tasks/FocusSection";
 import ActivitySection from "../activity/ActivitySection";
 import DoNotDisturbSection from "../alerts/DoNotDisturbSection";
+import FocusRulesSection from "../alerts/FocusRulesSection";
 import DigestSection from "./DigestSection";
 import MyPrAlertsSection from "../forge/MyPrAlertsSection";
 import ReviewAlertsSection from "../forge/ReviewAlertsSection";
@@ -58,6 +59,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     reminders: <RemindersSection lead={reminderLead} onChange={onReminderLead} />,
     digest: <DigestSection onError={onError} />,
     dnd: <DoNotDisturbSection onError={onError} />,
+    focusRules: <FocusRulesSection onError={onError} />,
     fullscreen: <FullscreenHoldSection onError={onError} />,
     reviewAlerts: <ReviewAlertsSection onError={onError} />,
     myPrAlerts: <MyPrAlertsSection onError={onError} />,

@@ -7,6 +7,7 @@ import StripPill from "./features/strip/StripPill";
 import StripDetails from "./features/strip/StripDetails";
 import { ITEM_TAB } from "./features/strip/stripModel";
 import { nextFocus } from "./features/strip/stripKeys";
+import { createPillDrag } from "./features/strip/stripDrag";
 
 const LOOK = { density: "comfortable", icons: true, labels: false } as const;
 /** Leaving the pill for the card is not leaving: a short grace keeps it from flickering shut on the way. */
@@ -62,6 +63,26 @@ export default function StripWindow() {
     fit();
     return () => watcher.disconnect();
   }, []);
+
+  // Dragging the pill along the edge keeps it off whatever it covers; the app moves the window with the real cursor.
+  const dragger = useRef(createPillDrag((grab, commit) => api.stripDrag(grab, commit)));
+  const dragProps = {
+    onPointerDown: (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (e.button !== 0) return;
+      const box = content.current?.getBoundingClientRect();
+      dragger.current.down(e.clientX, box ? box.left + box.width / 2 : e.clientX);
+    },
+    onPointerMove: (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (dragger.current.move(e.clientX) && !e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }
+    },
+    onPointerUp: () => dragger.current.up(),
+    onPointerCancel: () => dragger.current.up(),
+  };
+  const toggle = () => {
+    if (!dragger.current.moved()) setPinned((p) => !p);
+  };
 
   const enter = useCallback(() => {
     clearTimeout(closing.current);
@@ -144,7 +165,7 @@ export default function StripWindow() {
         style={{ opacity, zoom: (cfg?.scale ?? 100) / 100 }}
         className={`flex w-max flex-col items-center gap-1.5 p-0.5 transition-opacity duration-200 ${bottom ? "flex-col-reverse" : ""}`}
       >
-        <StripPill items={items} snap={snap} look={cfg ?? LOOK} open={open} onToggle={() => setPinned((p) => !p)} />
+        <StripPill items={items} snap={snap} look={cfg ?? LOOK} open={open} onToggle={toggle} drag={dragProps} />
         {open && snap && cfg && <StripDetails cfg={cfg} snap={snap} onOpen={openItem} onCustomize={customize} onHide={hide} />}
       </div>
     </div>
