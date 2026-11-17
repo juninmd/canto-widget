@@ -1099,5 +1099,7 @@
   "capture.partial": "task created, but the time/priority was not saved ({error}). Press Enter to retry.",
   "settings.sync.last": "Last sync: {when}",
   "settings.sync.failing": "Sync error ({n} failures in a row): {error}",
-  "settings.sync.noneYet": "No sync yet in this session"
+  "settings.sync.noneYet": "No sync yet in this session",
+  "strip.pauseAlerts": "Pause alerts 1 h",
+  "strip.resumeAlerts": "Resume alerts"
 }

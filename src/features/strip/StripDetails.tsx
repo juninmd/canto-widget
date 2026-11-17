@@ -1,5 +1,6 @@
 import { api, type StripConfig, type StripItem, type StripSnapshot } from "../../lib/api";
 import { t } from "../../i18n";
+import { useDoNotDisturb } from "../alerts/doNotDisturb";
 import StripCard from "./StripCard";
 import { lines } from "./stripLines";
 import { levelOf, WIDE } from "./stripModel";
@@ -16,6 +17,7 @@ type Props = {
 /** Two columns of cards in the user's order; a click opens that item's tab in the widget. */
 export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, now }: Props) {
   const one = cfg.columns === 1;
+  const dnd = useDoNotDisturb();
   const view = cfg.charts ? snap : { ...snap, history: null };
   return (
     <div className={`flex ${one ? "w-[220px]" : "w-[340px]"} flex-col gap-2 rounded-2xl border border-edge bg-panel p-2 shadow-2xl`}>
@@ -49,6 +51,15 @@ export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, n
       )}
       <div className="flex items-center gap-1 px-1 text-[10px] text-faint">
         <span className="min-w-0 flex-1 truncate">{t("strip.keys")}</span>
+        <button
+          type="button"
+          data-nav
+          aria-pressed={dnd.state.active}
+          onClick={() => void (dnd.state.active ? dnd.stop() : dnd.start("1h"))}
+          className="canto-hit rounded-md px-1.5 py-0.5 text-muted hover:text-fg aria-pressed:text-accent-text"
+        >
+          {dnd.state.active ? t("strip.resumeAlerts") : t("strip.pauseAlerts")}
+        </button>
         <button type="button" data-nav onClick={onCustomize} className="canto-hit rounded-md px-1.5 py-0.5 text-muted hover:text-fg">
           {t("strip.customize")}
         </button>
