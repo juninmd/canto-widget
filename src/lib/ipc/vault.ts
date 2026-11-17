@@ -3,7 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 export type VaultStatus = { exists: boolean; unlocked: boolean };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
-export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
+export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id"; ok: boolean };
 export type SyncStatus = {
   lastExportOkAt: number | null;
   lastExportError: string | null;
@@ -21,6 +21,7 @@ export type DriveStatus = {
   avatar?: string;
 };
 export type ImportSummary = { tasks: number; notes: number };
+export type BackupCopy = { name: string; kind: "daily" | "import"; day: string; at: number | null };
 
 export const vaultApi = {
   status: () => invoke<VaultStatus>("vault_status"),
@@ -40,9 +41,12 @@ export const vaultApi = {
   autolockGet: () => invoke<number>("autolock_get"),
   autolockSet: (minutes: number) => invoke<void>("autolock_set", { minutes }),
   unlockHistory: () => invoke<UnlockEntry[]>("unlock_history"),
+  unlockFailedCount: () => invoke<number>("unlock_failed_count"),
   /** `null` when the user cancels the dialog. */
   backupExport: () => invoke<string | null>("backup_export"),
   backupImport: () => invoke<ImportSummary | null>("backup_import"),
+  backupList: () => invoke<BackupCopy[]>("backup_list"),
+  backupRestore: (name: string) => invoke<ImportSummary>("backup_restore", { name }),
   syncGet: () => invoke<string | null>("sync_get"),
   /** `null` when the user cancels the folder dialog. */
   syncSetFolder: () => invoke<string | null>("sync_set_folder"),

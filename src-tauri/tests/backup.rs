@@ -1,4 +1,4 @@
-use canto_widget_lib::backup::{self, ImportSummary, KEEP};
+use canto_widget_lib::backup::{self, ImportSummary, KEEP_DAILY};
 use canto_widget_lib::error::AppError;
 use canto_widget_lib::model::{now_ms, Note, Task};
 use canto_widget_lib::vault::AppState;
@@ -160,10 +160,10 @@ fn daily_backup_without_a_vault_does_nothing() {
 #[test]
 fn pruning_drops_the_oldest_copies() {
     let st = machine("poda", "1234");
-    for day in 1..=KEEP + 2 {
+    for day in 1..=KEEP_DAILY + 2 {
         backup::daily(&st.dir, &format!("2026-08-{day:02}")).unwrap();
     }
     let copies = files(&backup::backups_dir(&st.dir));
-    assert_eq!(copies.len(), KEEP);
+    assert_eq!(copies.len(), KEEP_DAILY);
     assert_eq!(copies[0], "2026-08-03.canto", "apagou a copia errada");
 }

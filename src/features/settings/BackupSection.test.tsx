@@ -63,3 +63,31 @@ test("a never exported vault and a stale export both warn", () => {
   expect(screen.getByRole("status").textContent).toMatch(/há 45 dias/);
   localStorage.clear();
 });
+
+test("a saved copy restores in one click and says the previous state was kept", async () => {
+  const calls: unknown[] = [];
+  responses.backup_list = () =>
+    Promise.resolve([
+      { name: "2026-11-03.canto", kind: "daily", day: "2026-11-03", at: null },
+      { name: "2026-11-02T5000-import.canto", kind: "import", day: "2026-11-02", at: 5000 },
+    ]);
+  responses.backup_restore = () => {
+    calls.push("restore");
+    return Promise.resolve({ tasks: 4, notes: 1 });
+  };
+  render(<BackupSection onError={() => {}} />);
+  await act(async () => {});
+  fireEvent.click(screen.getByText("cópias automáticas"));
+  expect(screen.getByText("diária de 2026-11-03")).toBeTruthy();
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("restaurar — diária de 2026-11-03"));
+  });
+  expect(calls).toEqual(["restore"]);
+  expect(screen.getByText(/4 tarefas e 1 notas/)).toBeTruthy();
+});
+
+test("with no saved copies the list does not appear", async () => {
+  render(<BackupSection onError={() => {}} />);
+  await act(async () => {});
+  expect(screen.queryByText("cópias automáticas")).toBeNull();
+});

@@ -112,7 +112,10 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
               .slice(0, 10)
               .map((e, i) => (
                 <li key={`${e.at}-${i}`} title={new Date(e.at).toLocaleString(LOCALE)}>
-                  {METHOD_LABEL[e.method] ?? e.method} — {timeAgo(e.at)}
+                  {e.ok === false
+                    ? t("settings.security.methodFailed", { method: METHOD_LABEL[e.method] ?? e.method })
+                    : (METHOD_LABEL[e.method] ?? e.method)}{" "}
+                  — {timeAgo(e.at)}
                 </li>
               ))}
           </ul>

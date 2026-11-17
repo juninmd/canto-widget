@@ -211,3 +211,40 @@ fn manual_lock_reports_the_transition_once() {
     assert!(!st.lock_now(), "a second lock must not notify the UI again");
     let _ = std::fs::remove_dir_all(&st.dir);
 }
+
+#[test]
+fn the_fourth_wrong_password_in_a_row_pauses_attempts_without_deriving() {
+    let st = state("espera");
+    st.create("certa").unwrap();
+    st.lock();
+    for i in 0..3 {
+        assert!(matches!(st.unlock_attempt("errada", "password", 1_000 + i), Err(AppError::WrongPassword)));
+    }
+    assert!(matches!(st.unlock_attempt("errada", "password", 1_100), Err(AppError::WrongPassword)));
+    // Even the right password is refused during the pause, which proves nothing was derived or opened.
+    match st.unlock_attempt("certa", "password", 1_200) {
+        Err(AppError::Config(m)) => assert_eq!(m, "aguarde 1 s para tentar de novo"),
+        other => panic!("{other:?}"),
+    }
+    assert!(!st.is_unlocked());
+    st.unlock_attempt("certa", "password", 5_000).unwrap();
+    assert!(st.is_unlocked());
+    let _ = std::fs::remove_dir_all(&st.dir);
+}
+
+#[test]
+fn a_successful_unlock_resets_the_count_and_failures_are_logged() {
+    let st = state("zera");
+    st.create("certa").unwrap();
+    st.lock();
+    for i in 0..3 {
+        let _ = st.unlock_attempt("errada", "password", i);
+    }
+    assert_eq!(crate::unlock_log::failed_since_last_success(&st.dir), 3);
+    st.unlock_attempt("certa", "password", 10).unwrap();
+    assert_eq!(crate::unlock_log::failed_since_last_success(&st.dir), 0);
+    st.lock();
+    let _ = st.unlock_attempt("errada", "password", 20);
+    assert_eq!(st.throttle.lock_safe().remaining_secs(20), 0, "the count restarted after the success");
+    let _ = std::fs::remove_dir_all(&st.dir);
+}

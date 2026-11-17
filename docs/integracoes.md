@@ -140,5 +140,10 @@ Ferramentas: `list_notifications`, `list_tasks`, `list_notes`, `get_note`, `list
 `list_emails`, `list_contacts`, e as de escrita `create_task`, `complete_task`, `create_note`, `append_to_note`
 (nenhuma apaga nada). Respostas longas são cortadas em 60 KB. A tela traz o comando ou o trecho de configuração
 com o token para Claude Code, Codex, OpenCode, Gemini CLI, Cursor, VS Code/Copilot, Windsurf e, via `mcp-remote`,
-Claude Desktop e outros. O conteúdo devolvido (títulos de PR, notas) vem de terceiros: o agente deve tratá-lo
+Claude Desktop e outros. **Agentes com token próprio**: além do token compartilhado, cada agente pode ter o seu
+(até 10); um agente (ou o token compartilhado) marcado como **somente leitura** nunca escreve, mesmo com os
+interruptores de escrita ligados — as ferramentas de escrita nem aparecem na lista dele. Remover um agente revoga só
+o token dele. Em **chamadas recentes dos agentes** ficam, só na memória (somem ao fechar o Canto), o agente, a
+ferramenta e o resultado (ok, bloqueada, erro) de cada chamada, nunca os argumentos nem o conteúdo devolvido.
+O conteúdo devolvido (títulos de PR, notas) vem de terceiros: o agente deve tratá-lo
 como dado, não como instrução.
