@@ -29,7 +29,8 @@ jobs:
       # The advisory endpoint occasionally answers 503; retry a few times before failing the gate.
       - run: |
           for attempt in 1 2 3; do
-            if bun audit; then
+            # picomatch has no patched release yet (4.0.7 is latest and still affected); drop this once one ships.
+            if bun audit --ignore GHSA-fc5q-39xc-vjpf; then
               exit 0
             fi
             if [ "$attempt" -lt 3 ]; then
