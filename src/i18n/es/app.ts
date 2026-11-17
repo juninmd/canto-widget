@@ -282,6 +282,8 @@ export const app: Record<keyof typeof source, string> = {
   "strip.customize": "Personalizar",
   "strip.hide": "Ocultar",
   "strip.completeTask": "Completar",
+  "strip.pauseAlerts": "Pausar alertas 1 h",
+  "strip.resumeAlerts": "Reanudar alertas",
   "settings.strip.items": "Elementos",
   "settings.strip.itemsHint": "Activa lo que quieres ver y usa las flechas para reordenar.",
   "settings.strip.up": "subir {item}",

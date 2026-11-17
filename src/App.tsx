@@ -1,4 +1,3 @@
-import { listen } from "@tauri-apps/api/event";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useClearOnLock } from "./shell/useClearOnLock";
 import { IS_MOBILE, MOD_KEY } from "./lib/platform";
@@ -124,14 +123,6 @@ function Canto() {
   }, [mode]);
   // Completing from the toast changes the task outside the tab: the list needs to reread.
   const [tasksVersion, setTasksVersion] = useState(0);
-
-  // The mini-dashboard completes a task from its own window: the Tarefas tab rereads when it says so.
-  useEffect(() => {
-    const stop = listen("canto://tasks-changed", () => setTasksVersion((v) => v + 1));
-    return () => {
-      void stop.then((f) => f());
-    };
-  }, []);
 
   // The bar and the rows show the run; saving happens in the store, and a reload picks up the saved time.
   useEffect(() => {
