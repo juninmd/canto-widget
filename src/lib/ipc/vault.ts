@@ -4,6 +4,13 @@ export type VaultStatus = { exists: boolean; unlocked: boolean };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
+export type SyncStatus = {
+  lastExportOkAt: number | null;
+  lastExportError: string | null;
+  lastMergeOkAt: number | null;
+  lastMergeError: string | null;
+  consecutiveFailures: number;
+};
 export type DriveStatus = {
   configured: boolean;
   embedded?: boolean;
@@ -41,6 +48,7 @@ export const vaultApi = {
   syncSetFolder: () => invoke<string | null>("sync_set_folder"),
   syncClear: () => invoke<void>("sync_clear"),
   /** `null` when there was nothing new to merge. */
+  syncStatus: () => invoke<SyncStatus>("sync_status"),
   syncNow: () => invoke<ImportSummary | null>("sync_now"),
   driveStatus: () => invoke<DriveStatus>("drive_status"),
   driveConfigure: (clientId: string, clientSecret: string) =>
