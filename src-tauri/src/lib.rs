@@ -36,6 +36,7 @@ pub mod do_not_disturb;
 pub mod drive;
 pub mod error;
 pub mod focus;
+pub mod focus_mode;
 pub mod forge;
 pub mod fullscreen_guard;
 pub mod gemini_docs;
@@ -364,6 +365,8 @@ pub fn run() {
             #[cfg(desktop)]
             strip::cmd::strip_focus,
             #[cfg(desktop)]
+            strip::cmd::strip_drag,
+            #[cfg(desktop)]
             sysmon::system_get,
             #[cfg(desktop)]
             sysmon::alert::system_alerts_get,
@@ -409,6 +412,10 @@ pub fn run() {
             do_not_disturb::dnd_get,
             do_not_disturb::dnd_set,
             do_not_disturb::dnd_clear,
+            focus_mode::focus_get,
+            focus_mode::focus_set,
+            focus_mode::focus_offset,
+            focus_mode::focus_summary,
             guest_photos::guest_photos,
             contacts::photos::contact_photos,
             tray_live::badge_set_tasks,

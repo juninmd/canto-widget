@@ -128,7 +128,7 @@ export async function goTab(page: Page, name: string) {
   await page.getByRole("tablist").first().waitFor();
   const tab = page.getByRole("tab", { name, exact: true });
   if ((await tab.count()) > 0) return tab.click();
-  await page.getByRole("button", { name: /^mais/ }).click();
+  await page.getByRole("button", { name: "mais", exact: true }).click();
   await page.getByRole("menuitem", { name: new RegExp(`^${name}`) }).click();
 }
 

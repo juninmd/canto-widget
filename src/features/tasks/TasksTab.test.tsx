@@ -509,7 +509,7 @@ test("the open task pushes its count to the tray badge", async () => {
   await act(async () => {
     await Promise.resolve();
   });
-  expect(calls.filter((c) => c.cmd === "badge_set_tasks").at(-1)?.args).toEqual({ count: 1 });
+  expect(calls.filter((c) => c.cmd === "badge_set_tasks").at(-1)?.args).toEqual({ count: 1, next: { id: "t1", title: "comprar leite" } });
 });
 
 test("at midnight a slow reply for yesterday never replaces today's list", async () => {

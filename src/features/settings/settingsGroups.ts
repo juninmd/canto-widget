@@ -4,7 +4,7 @@ export type GroupId = "appearance" | "notifications" | "privacy" | "data" | "app
 
 export type SectionId =
   | "skin" | "density" | "language" | "tabs"
-  | "reminders" | "digest" | "dnd" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
+  | "reminders" | "digest" | "dnd" | "focusRules" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
   | "activity" | "focus" | "security"
   | "google" | "clipboard" | "backup" | "sync"
   | "mcp" | "window" | "strip" | "autostart" | "shortcuts" | "update";
@@ -24,7 +24,7 @@ export function forPlatform(groups: Group[], mobile: boolean): Group[] {
 /** Password, backup and sync sit apart in each group, under "Zona sensível". */
 const DESKTOP_GROUPS: Group[] = [
   { id: "appearance", sections: ["skin", "density", "language", "tabs"], sensitive: [] },
-  { id: "notifications", sections: ["reminders", "digest", "dnd", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
+  { id: "notifications", sections: ["reminders", "digest", "dnd", "focusRules", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
   { id: "privacy", sections: ["activity", "focus"], sensitive: ["security"] },
   { id: "data", sections: ["google", "clipboard"], sensitive: ["backup", "sync"] },
   { id: "app", sections: ["mcp", "window", "strip", "autostart", "shortcuts", "update"], sensitive: [] },
@@ -41,6 +41,7 @@ const KEYWORDS: Record<SectionId, string> = {
   reminders: "lembrete lembretes antecedência reminders lead",
   digest: "resumo do dia manhã bom dia reuniões tarefas revisões menções digest summary morning",
   dnd: "não perturbe silêncio silenciar foco do not disturb silence mute",
+  focusRules: "modo foco horário agenda reunião silenciar automático resumo focus mode schedule meeting silence automatic summary",
   fullscreen: "tela cheia jogo jogos segurar avisos fullscreen game hold",
   reviewAlerts: "revisão review pull request pr github avisos alertas alerts",
   myPrAlerts: "meus prs pr mr ci falha parado menção github gitlab avisos alertas alerts mentions stalled aprovado aprovação merge conflito comentário atribuído resposta time times approved conflict assigned replies team",

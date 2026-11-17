@@ -56,3 +56,16 @@ pub fn strip_focus(app: AppHandle, on: bool) {
         let _ = win.set_focus();
     }
 }
+
+/// The pill is being dragged along the edge: it follows the cursor, and the drop (`commit`) saves the place.
+#[tauri::command]
+pub fn strip_drag(app: AppHandle, grab: f64, commit: bool) -> Result<()> {
+    let grab = if grab.is_finite() { grab.clamp(-2000.0, 2000.0) } else { 0.0 };
+    place::drag(&app, grab, commit)?;
+    if commit {
+        if let Some(state) = app.try_state::<StripState>() {
+            let _ = app.emit(crate::strip::CONFIG_EVENT, state.cfg());
+        }
+    }
+    Ok(())
+}

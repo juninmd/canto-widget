@@ -50,6 +50,8 @@ pub struct Snapshot {
     pub battery: Option<(f32, bool)>,
     /// Tasks still open, as the Tarefas tab last counted them.
     pub tasks: u32,
+    /// First open task, offered as "Concluir" on the Tarefas card.
+    pub next_task: Option<crate::tray_live::NextTask>,
     /// Alerts waiting plus unread mentions.
     pub notices: u32,
 }
@@ -99,7 +101,9 @@ pub fn build(app: &AppHandle, cfg: &StripConfig) -> Snapshot {
         snap.health = readings::endpoints(views.into_iter().map(|v| v.health));
     }
     if on("tasks") {
-        snap.tasks = *app.state::<crate::vault::AppState>().badge_tasks.lock_safe();
+        let state = app.state::<crate::vault::AppState>();
+        snap.tasks = *state.badge_tasks.lock_safe();
+        snap.next_task = state.badge_next_task.lock_safe().clone();
     }
     if on("weather") {
         snap.weather = app.state::<crate::weather::state::WeatherState>().cached_now();

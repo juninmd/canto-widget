@@ -38,6 +38,7 @@ import MiniRail from "./shell/MiniRail";
 import FocusedAlert from "./features/alerts/FocusedAlert";
 import { CommandPalette, GlobalSearch, NotificationsPanel, Onboarding, ShortcutsHelp, preloadOverlays } from "./shell/lazyOverlays";
 import { ToastProvider, useToast } from "./lib/toast";
+import { useFocusSummary } from "./features/alerts/focusMode";
 import { LANGUAGE, t } from "./i18n";
 import { saveView } from "./features/agenda/agendaView";
 
@@ -108,6 +109,7 @@ function Canto() {
   useEffect(() => {
     if (!status?.unlocked) setAlertsOpen(false);
   }, [status?.unlocked]);
+  useFocusSummary(status?.unlocked === true, (message) => notify({ message }));
   useEffect(() => {
     if (status?.unlocked) return preloadOverlays();
   }, [status?.unlocked]);

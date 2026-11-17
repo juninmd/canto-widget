@@ -5,8 +5,16 @@ import { openScene, settle } from "./stage";
 
 /** Brings a settings section to the top of the tab by its heading (h2/h3) or legend. */
 async function toSection(page: Page, title: RegExp) {
-  const heading = page.locator("h2, h3, legend").filter({ hasText: title }).first();
-  await expect(heading).toHaveCount(1);
+  // Groups are accordions: open every collapsed one so the section is in the DOM and visible.
+  await page.getByRole("searchbox", { name: "buscar ajuste" }).waitFor();
+  await settle(page, 800);
+  for (const id of ["appearance", "notifications", "privacy", "data", "app"]) {
+    const btn = page.locator(`#settings-group-${id}`);
+    if ((await btn.getAttribute("aria-expanded")) === "false") await btn.click();
+  }
+  await settle(page, 1500);
+  const heading = page.locator("h2, h3, h4, legend").filter({ hasText: title }).first();
+  await expect(heading).toHaveCount(1, { timeout: 20_000 });
   await heading.evaluate((el) => (el.closest("section, fieldset") ?? el).scrollIntoView({ block: "start" }));
   await settle(page, 500);
 }
