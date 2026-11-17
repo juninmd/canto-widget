@@ -74,10 +74,12 @@ fn watch_backup(dir: PathBuf) {
 /// Merges in whatever showed up in a synced folder; a no-op without one configured or while locked.
 fn watch_sync(app: AppHandle) {
     crate::resilient::supervise("folder-sync", move || loop {
-        std::thread::sleep(SYNC_POLL);
         let Some(state) = app.try_state::<AppState>() else {
+            std::thread::sleep(SYNC_POLL);
             continue;
         };
+        // Backs off after repeated failures (5 -> 15 -> 30 -> 60 min) so a bad folder or password isn't retried every cycle.
+        std::thread::sleep(sync::poll_interval(state.sync.status().consecutive_failures));
         if let Err(e) = sync::poll_and_merge(&state) {
             eprintln!("sincronizacao automatica falhou: {e}");
         }
