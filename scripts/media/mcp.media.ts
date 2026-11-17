@@ -42,8 +42,6 @@ test("mcp: on, token and permissions", async ({ browser }) => {
 
 test("mcp: agent snippets", async ({ browser }) => {
   const page = await scene(browser, on);
-  await page.getByText("Claude Code", { exact: true }).click();
-  await page.getByText("Codex", { exact: true }).click();
-  await page.getByText("OpenCode", { exact: true }).click();
+  await page.getByRole("tab", { name: "Codex" }).click();
   await section(page, "mcp-agentes");
 });

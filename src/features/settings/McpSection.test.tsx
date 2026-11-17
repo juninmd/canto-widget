@@ -92,3 +92,21 @@ test("the call log shows the agent, the tool and the outcome by text", async () 
   expect(row.textContent).toContain("escrita");
   expect(row.textContent).toContain("bloqueada");
 });
+
+test("connect an agent: one tab per agent, the config hides the token and the copy button copies it whole", async () => {
+  enabled = true;
+  let copied = "";
+  Object.defineProperty(navigator, "clipboard", { value: { writeText: async (v: string) => void (copied = v) }, configurable: true });
+  const { container } = render(<McpSection onError={() => {}} />);
+  await act(async () => {});
+  await act(async () => {
+    fireEvent.click(screen.getByRole("tab", { name: "Codex" }));
+  });
+  expect(container.textContent).toContain("~/.codex/config.toml");
+  expect(container.textContent?.includes("canto_tok")).toBe(false);
+  await act(async () => {
+    fireEvent.click(screen.getByLabelText("copiar configuração Codex"));
+  });
+  expect(copied).toContain("[mcp_servers.canto]");
+  expect(copied).toContain("Bearer canto_tok");
+});
