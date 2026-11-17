@@ -39,13 +39,13 @@ test("gif: every pending alert in one overlay", async ({ browser }) => {
   await settle(page, 900);
   await reel.frame(page, 1700);
   const cards = page.getByRole("group", { name: "avisos pendentes" }).getByRole("button");
-  await cards.nth(1).click();
+  await cards.nth(1).dispatchEvent("click");
   await settle(page, 700);
   await reel.frame(page, 2200);
-  await cards.nth(2).click();
+  await cards.nth(2).dispatchEvent("click");
   await settle(page, 700);
   await reel.frame(page, 1700);
-  await cards.nth(3).click();
+  await cards.nth(3).dispatchEvent("click");
   await settle(page, 700);
   await reel.frame(page, 1700);
   reel.save("alerts");
