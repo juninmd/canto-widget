@@ -24,9 +24,11 @@ type Props = {
   hideDrafts?: boolean;
   /** Narrows the list to the items that ask for my attention. */
   needs?: (item: ForgeItem) => boolean;
+  /** Opens the PR in the peek panel (GitHub only: GitLab's read-only token has nothing to write with). */
+  onPeek?: (item: ForgeItem) => void;
 };
 
-export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, reviews, hideDrafts, needs }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, reviews, hideDrafts, needs, onPeek }: Props) {
   const rest = list.total - list.items.length;
   const radar = section === "review_requested";
   const [snoozed, setSnoozed] = useState(loadSnoozes);
@@ -70,6 +72,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
               review={reviews?.[checkKey(it.repo, it.number)]}
               news={newComments(seen, it)}
               onOpen={() => setSeen(markSeen(it))}
+              onPeek={onPeek && it.is_pr ? () => onPeek(it) : undefined}
               onSnooze={radar ? () => setSnoozed(snoozeUntil(it.url)) : undefined}
             />
           ))}

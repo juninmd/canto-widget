@@ -109,3 +109,32 @@ test("each PR shows its approvals, change requests and diff size, and precisa de
   }
   if (process.env.SHOT3) await page.screenshot({ path: process.env.SHOT3 });
 });
+
+test("espiar shows the PR details, and approving asks for a confirmation first", async ({ page }) => {
+  const detail = {
+    body: "Recalcula as rotas quando uma parada é removida e evita ciclos.",
+    head_branch: "fix/rotas",
+    base_branch: "main",
+    changed_files: 4,
+    jobs: [
+      { name: "build", state: "success", url: "" },
+      { name: "test-windows", state: "failure", url: "" },
+    ],
+    reviewers: [
+      { login: "bia", state: "approved" },
+      { login: "caio", state: "pending" },
+    ],
+  };
+  await mockTauri(page, { fixed: { ...fixed, github_pr_detail: detail, github_pr_review: null } });
+  await page.goto("/");
+  await goTab(page, "GitHub");
+  await page.getByRole("button", { name: "espiar Corrige o cálculo de rotas com paradas" }).click();
+  const panel = page.getByRole("region", { name: "detalhes do PR" });
+  await expect(panel.getByText("fix/rotas → main")).toBeVisible();
+  await expect(panel.getByText("@bia · aprovou")).toBeVisible();
+  await panel.getByRole("button", { name: "aprovar" }).click();
+  await expect(panel.getByRole("button", { name: "confirmar aprovação" })).toBeVisible();
+  if (process.env.SHOT) await panel.scrollIntoViewIfNeeded(), await page.screenshot({ path: process.env.SHOT });
+  await panel.getByRole("button", { name: "confirmar aprovação" }).click();
+  await expect(panel.getByRole("status")).toHaveText("aprovação enviada");
+});

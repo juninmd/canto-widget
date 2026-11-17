@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../../lib/api";
+import { api, type ForgeItem } from "../../lib/api";
 import { freshness, isFiltered, visibleSections, type Forge } from "./forge";
 import type { ForgeListsState } from "./useForgeLists";
 import { useMentions } from "./useMentions";
@@ -17,6 +17,7 @@ import ForgeSection from "./ForgeSection";
 import ForgeSummary from "./ForgeSummary";
 import MentionsList from "./MentionsList";
 import { savedHideDrafts, saveHideDrafts } from "./forgeDrafts";
+import PrPeek from "./PrPeek";
 import PrCommentersCatalog from "./PrCommentersCatalog";
 import ReposList, { savedStats } from "./ReposList";
 import Skeleton from "../../components/Skeleton";
@@ -38,6 +39,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const [known, setKnown] = useState(0);
   const [hideDrafts, setHideDrafts] = useState(savedHideDrafts);
   const [attention, setAttention] = useState(false);
+  const [peeked, setPeeked] = useState<ForgeItem | null>(null);
   const focus = effectiveFocus(pressed, ci);
 
   const mentions = useMentions(forge);
@@ -154,10 +156,12 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                       conflicts={conflicts}
                       reviews={reviews}
                       hideDrafts={hideDrafts}
+                      onPeek={forge === "github" ? setPeeked : undefined}
                       needs={attending ? (it) => needsAttention(key, it, new Date(), signals) : undefined}
                     />
                   ))}
               </div>
+              {peeked && forge === "github" && <PrPeek item={peeked} login={login} onClose={() => setPeeked(null)} />}
             </>
           ) : (
             <div className="flex-1 overflow-y-auto pr-1">

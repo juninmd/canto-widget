@@ -235,7 +235,7 @@ test("a PR that got new comments since the last look shows a badge that clears o
   await mountGithub(lists(5), []);
   expect(screen.getByText("+3 comentários")).toBeTruthy();
   await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: /Com conversa/ }));
+    fireEvent.click(screen.getByText("Com conversa").closest("button") as HTMLElement);
   });
   expect(screen.queryByText("+3 comentários")).toBeNull();
 });
@@ -246,11 +246,11 @@ test("the CI batch also brings approvals, changes requested and the diff size on
     { repo: "acme/atlas", number: 4, status: "success", conflict: false, additions: 5, deletions: 1, approvals: 1, changes_requested: true },
   ];
   await mountGithub({ ...board, review_requested: empty, assigned: empty, my_issues: empty }, batch);
-  const green = screen.getByRole("button", { name: /Meu PR verde/ });
+  const green = screen.getByText("Meu PR verde").closest("button") as HTMLElement;
   expect(within(green).getByText("✓ 2 aprov.")).toBeTruthy();
   expect(green.textContent).toContain("+120");
   expect(green.textContent).toContain("−34");
-  const red = screen.getByRole("button", { name: /Meu PR vermelho/ });
+  const red = screen.getByText("Meu PR vermelho").closest("button") as HTMLElement;
   expect(within(red).getByText("mudanças pedidas")).toBeTruthy();
   expect(within(red).queryByText(/aprov\./)).toBeNull();
 });
@@ -279,4 +279,26 @@ test("precisa de mim narrows the board to overdue reviews and my stalled PRs, an
 test("without anything stuck there is no precisa de mim button", async () => {
   await mountGithub({ ...board, my_prs: { total: 1, items: [pr(3, "Meu PR verde")] } }, [{ repo: "acme/atlas", number: 3, status: "success" }]);
   expect(screen.queryByRole("button", { name: /precisa de mim/ })).toBeNull();
+});
+
+test("espiar opens the PR details under the lists on GitHub, and closes again", async () => {
+  responses.github_pr_detail = () => Promise.resolve({ body: "Detalhes do cofre", head_branch: "fix/cofre", base_branch: "main", changed_files: 2, jobs: [], reviewers: [] });
+  await mountGithub();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "espiar Revisar o cofre" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  const panel = screen.getByRole("region", { name: "detalhes do PR" });
+  expect(within(panel).getByText("Detalhes do cofre")).toBeTruthy();
+  expect(calls.find((c) => c.cmd === "github_pr_detail")?.args).toEqual({ repo: "acme/atlas", number: 1 });
+  fireEvent.click(within(panel).getByRole("button", { name: "fechar detalhes" }));
+  expect(screen.queryByRole("region", { name: "detalhes do PR" })).toBeNull();
+});
+
+test("GitLab rows have no espiar: its read-only token has nothing to write with", async () => {
+  responses.gitlab_status = () => Promise.resolve({ connected: true, username: "voce", base_url: "https://gitlab.com" });
+  responses.gitlab_lists = () => Promise.resolve(board);
+  render(<GitlabTab onError={() => {}} />);
+  for (let i = 0; i < 6; i++) await act(async () => {});
+  expect(screen.queryByRole("button", { name: /^espiar/ })).toBeNull();
 });
