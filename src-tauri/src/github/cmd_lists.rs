@@ -136,7 +136,7 @@ pub(crate) fn review_requested(app: &tauri::AppHandle) -> Option<Result<u64>> {
     Some(fetch())
 }
 
-fn token(app: &tauri::AppHandle) -> Result<Zeroizing<String>> {
+pub(crate) fn token(app: &tauri::AppHandle) -> Result<Zeroizing<String>> {
     let state = app.state::<AppState>();
     state.touch();
     valid_token(&state, &app.state::<GithubState>(), now_ms())

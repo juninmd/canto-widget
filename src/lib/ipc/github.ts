@@ -48,6 +48,10 @@ export type MentionsReply = {
 /** Combined CI/pipeline status of a PR/MR's head commit. */
 export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type PrRef = { repo: string; number: number };
+export type PrJob = { name: string; state: ChecksStatus; url: string };
+export type PrReviewer = { login: string; state: "approved" | "changes" | "pending" };
+/** One PR for the peek panel; `body` is already cut short by Rust. */
+export type PrDetail = { body: string; head_branch: string; base_branch: string; changed_files: number; jobs: PrJob[]; reviewers: PrReviewer[] };
 export type PrChecks = PrRef & { status: ChecksStatus; conflict?: boolean; additions?: number; deletions?: number; approvals?: number; changes_requested?: boolean };
 export type PrComment = {
   id: number;
@@ -81,6 +85,8 @@ export const githubApi = {
   githubMentions: (force = false) => invoke<MentionsReply>("github_mentions", { force }),
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
+  githubPrDetail: (repo: string, number: number) => invoke<PrDetail>("github_pr_detail", { repo, number }),
+  githubPrReview: (repo: string, number: number, action: "approve" | "comment", body?: string) => invoke<void>("github_pr_review", { repo, number, action, body: body ?? null }),
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
   /** Fetch comments on a PR to display in the commenters catalog. */
   githubPrComments: (repo: string, number: number) => invoke<PrComment[]>("github_pr_comments", { repo, number }),

@@ -3,6 +3,8 @@ pub mod auth;
 pub mod checks;
 pub mod cmd;
 pub mod cmd_lists;
+pub mod cmd_pr;
+pub mod detail;
 pub mod failures;
 pub mod query;
 pub mod teams;

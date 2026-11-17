@@ -366,6 +366,7 @@ művelet név szerint: ugrás egy lapra, új feladatra vagy jegyzetre, csatlakoz
 |---|
 | ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](../prints/app/153-forge-novidades-rascunhos.png) |
 | ![GitHub tab: each PR shows its approvals, "mudanças pedidas" and the size of its diff next to the CI badge, and the "precisa de mim" button keeps only overdue reviews and my stalled PRs](../prints/app/155-forge-aprovacoes-precisa-de-mim.png) |
+| ![GitHub: espiar PR](../prints/app/156-forge-espiar-pr.png) |
 
 | Jelszó megváltozott, egy fájl függőben van | Napi összefoglaló |
 |---|---|
