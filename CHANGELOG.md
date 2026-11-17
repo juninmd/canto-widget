@@ -15,6 +15,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Mini-dashboard: “Concluir” a próxima tarefa**: o cartão de Tarefas dos detalhes ganhou um botão que conclui a primeira tarefa aberta do dia sem abrir o widget; a aba Tarefas atualiza sozinha. O título só fica na memória e some ao trancar.
 - **Mini-dashboard: “Pausar alertas 1 h” nos detalhes**: um botão no rodapé do mini-dashboard liga o Não perturbe por uma hora e, com ele ligado, vira “Retomar alertas”. Entrar na reunião já tinha botão no cartão do próximo evento.
 - **Modo foco**: nos Ajustes, o Não perturbe pode ligar sozinho num horário (com início e fim, só em dias úteis se quiser, inclusive atravessando a meia-noite) e durante reuniões com link de chamada. Quando o silêncio acaba, um aviso mostra quantos alertas foram segurados e os primeiros títulos. Os títulos ficam só na memória.
 - **Busca global também acha repositórios**: o atalho de busca agora inclui os repositórios do GitHub e do GitLab que a aba Repositórios já guardou (por nome ou descrição), sem fazer nenhuma requisição.

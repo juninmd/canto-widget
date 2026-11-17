@@ -1101,5 +1101,6 @@
   "settings.sync.failing": "Sync error ({n} failures in a row): {error}",
   "settings.sync.noneYet": "No sync yet in this session",
   "strip.pauseAlerts": "Pause alerts 1 h",
-  "strip.resumeAlerts": "Resume alerts"
+  "strip.resumeAlerts": "Resume alerts",
+  "strip.completeTask": "Complete"
 }

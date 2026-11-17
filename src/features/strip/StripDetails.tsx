@@ -1,4 +1,7 @@
-import { api, type StripConfig, type StripItem, type StripSnapshot } from "../../lib/api";
+import { useState } from "react";
+import { emit } from "@tauri-apps/api/event";
+import { TASKS_CHANGED_EVENT } from "../alerts/alertEvents";
+import { api, todayLocal, type StripConfig, type StripItem, type StripSnapshot } from "../../lib/api";
 import { t } from "../../i18n";
 import { useDoNotDisturb } from "../alerts/doNotDisturb";
 import StripCard from "./StripCard";
@@ -16,6 +19,28 @@ type Props = {
 
 /** Two columns of cards in the user's order; a click opens that item's tab in the widget. */
 export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, now }: Props) {
+  const [completing, setCompleting] = useState(false);
+  // The id just completed: the card hides its button until a snapshot brings a different first task.
+  const [doneId, setDoneId] = useState<string | null>(null);
+  const next = snap.next_task && snap.next_task.id !== doneId ? snap.next_task : null;
+  async function complete() {
+    if (!next || completing) return;
+    setCompleting(true);
+    try {
+      await api.taskComplete(next.id);
+      setDoneId(next.id);
+      // Rust only knows what the Tarefas tab last pushed, and that tab may not be on screen: read the day again here
+      // so the card offers the real next task instead of going blank.
+      const open = (await api.tasksForDay(todayLocal())).filter((t) => !t.done);
+      const first = open[0];
+      await api.badgeSetTasks(open.length, first ? { id: first.id, title: first.title } : null);
+      await emit(TASKS_CHANGED_EVENT);
+    } catch {
+      /* a locked vault or a task already gone: the next snapshot shows the truth */
+    } finally {
+      setCompleting(false);
+    }
+  }
   const one = cfg.columns === 1;
   const dnd = useDoNotDisturb();
   const view = cfg.charts ? snap : { ...snap, history: null };
@@ -32,7 +57,18 @@ export default function StripDetails({ cfg, snap, onOpen, onCustomize, onHide, n
               wide={!one && WIDE.has(item)}
               onOpen={() => onOpen(item)}
               action={
-                item === "event" && snap.event?.meet ? (
+                item === "tasks" && next ? (
+                  <button
+                    type="button"
+                    data-nav
+                    disabled={completing}
+                    title={next.title}
+                    onClick={() => void complete()}
+                    className="canto-hit shrink-0 self-center rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-on-accent disabled:opacity-40"
+                  >
+                    {t("strip.completeTask")}
+                  </button>
+                ) : item === "event" && snap.event?.meet ? (
                   <button
                     type="button"
                     data-nav

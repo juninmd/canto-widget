@@ -36,6 +36,7 @@ export type StripConfig = {
   /** Columns of cards in the details. */
   columns: 1 | 2;
 };
+export type NextTask = { id: string; title: string };
 export type StripSnapshot = {
   cpu: number;
   memory: number;
@@ -52,6 +53,8 @@ export type StripSnapshot = {
   reviews: number;
   battery: [number, boolean] | null;
   tasks: number;
+  /** First open task, offered as "Concluir" on the Tarefas card; absent in older backends and mocks. */
+  next_task?: NextTask | null;
   notices: number;
 };
 export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean; mini: boolean; sidebar: boolean };

@@ -281,6 +281,7 @@ export const app: Record<keyof typeof source, string> = {
   "strip.noMarket": "Open Market to load the quotes",
   "strip.customize": "Customize",
   "strip.hide": "Hide",
+  "strip.completeTask": "Complete",
   "strip.pauseAlerts": "Pause alerts 1 h",
   "strip.resumeAlerts": "Resume alerts",
   "settings.strip.items": "Items",

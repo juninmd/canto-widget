@@ -281,6 +281,7 @@ export const app: Record<keyof typeof source, string> = {
   "strip.noMarket": "Abre Mercado para cargar las cotizaciones",
   "strip.customize": "Personalizar",
   "strip.hide": "Ocultar",
+  "strip.completeTask": "Completar",
   "strip.pauseAlerts": "Pausar alertas 1 h",
   "strip.resumeAlerts": "Reanudar alertas",
   "settings.strip.items": "Elementos",

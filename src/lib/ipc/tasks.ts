@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import type { NextTask } from "./window";
 
 /** `dia` of `semanal`: 0 = Sunday ... 6 = Saturday. */
 export type Repeat = { tipo: "diaria" } | { tipo: "dias_uteis" } | { tipo: "semanal"; dia: number };
@@ -59,5 +60,5 @@ export const tasksApi = {
   reminderLeadSet: (minutes: number) => invoke<void>("reminder_lead_set", { minutes }),
   languageSet: (lang: string) => invoke<void>("language_set", { lang }),
   /** Feeds the taskbar badge: Rust can't compute "today" reliably itself (see AGENTS.md), so the UI pushes it. */
-  badgeSetTasks: (count: number) => invoke<void>("badge_set_tasks", { count }),
+  badgeSetTasks: (count: number, next: NextTask | null = null) => invoke<void>("badge_set_tasks", { count, next }),
 };

@@ -276,6 +276,7 @@ export const app = {
   "strip.noMarket": "Abra o Mercado para carregar as cotações",
   "strip.customize": "Personalizar",
   "strip.hide": "Ocultar",
+  "strip.completeTask": "Concluir",
   "strip.pauseAlerts": "Pausar alertas 1 h",
   "strip.resumeAlerts": "Retomar alertas",
   "settings.strip.items": "Itens",

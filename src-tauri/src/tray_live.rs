@@ -20,9 +20,24 @@ const TICK: Duration = Duration::from_secs(90);
 #[cfg(desktop)]
 pub struct JoinMenuItem(pub MenuItem<tauri::Wry>);
 
+/// The task the mini-dashboard offers to complete; the title is as sensitive as the Tarefas tab, so it lives only in
+/// memory and is dropped on lock.
+#[derive(Clone, Debug, PartialEq, serde::Serialize, serde::Deserialize)]
+pub struct NextTask {
+    pub id: String,
+    pub title: String,
+}
+
+/// With no open task left (or no id) there is nothing to offer.
+fn keep_next(count: u32, next: Option<NextTask>) -> Option<NextTask> {
+    next.filter(|t| count > 0 && !t.id.is_empty())
+}
+
+/// `next` is optional so an older caller that only counts keeps working.
 #[tauri::command]
-pub fn badge_set_tasks(state: State<'_, AppState>, count: u32) {
+pub fn badge_set_tasks(state: State<'_, AppState>, count: u32, next: Option<NextTask>) {
     *state.badge_tasks.lock_safe() = count;
+    *state.badge_next_task.lock_safe() = keep_next(count, next);
 }
 
 /// Opens the cached next meeting's Meet link; used by both the tray item and the join shortcut.
@@ -89,4 +104,21 @@ fn update_menu(app: &AppHandle, meeting: Option<&AgendaItem>) {
     };
     let _ = item.0.set_text(text);
     let _ = item.0.set_enabled(enabled);
+}
+
+#[cfg(test)]
+mod next_task_tests {
+    use super::*;
+
+    fn task(id: &str) -> Option<NextTask> {
+        Some(NextTask { id: id.into(), title: "Revisar o PR".into() })
+    }
+
+    #[test]
+    fn the_offer_needs_an_open_task_and_an_id() {
+        assert_eq!(keep_next(2, task("t1")), task("t1"));
+        assert_eq!(keep_next(0, task("t1")), None, "nothing is open, so nothing to complete");
+        assert_eq!(keep_next(2, task("")), None);
+        assert_eq!(keep_next(2, None), None);
+    }
 }
