@@ -100,9 +100,9 @@ pub fn silenced(dnd: Option<&DoNotDisturb>, now_ms: i64) -> bool {
     dnd.is_some_and(|d| d.state_at(now_ms).active)
 }
 
-/// The gate every OS notification and alert pop-up goes through.
+/// The gate every OS notification and alert pop-up goes through: the manual period, the schedule or a running meeting.
 pub fn quiet(app: &AppHandle) -> bool {
-    silenced(app.try_state::<DoNotDisturb>().as_deref(), now_ms())
+    silenced(app.try_state::<DoNotDisturb>().as_deref(), now_ms()) || crate::focus_mode::rule_active(app)
 }
 
 #[cfg(desktop)]
@@ -166,6 +166,7 @@ pub fn dnd_clear(app: AppHandle) -> Result<DndState> {
 pub fn watch(app: AppHandle) {
     crate::resilient::supervise("do-not-disturb", move || {
         let mut last = current(&app);
+        let mut was_quiet = quiet(&app);
         loop {
             std::thread::sleep(TICK);
             let now = current(&app);
@@ -173,6 +174,12 @@ pub fn watch(app: AppHandle) {
                 changed(&app, now);
                 last = now;
             }
+            // Silence of any kind ending (manual, schedule or meeting) hands over what it held back.
+            let is_quiet = quiet(&app);
+            if was_quiet && !is_quiet {
+                crate::focus_mode::announce_end(&app);
+            }
+            was_quiet = is_quiet;
         }
     });
 }
