@@ -98,6 +98,10 @@ export type NotesPage = { total: number; items: Note[] };
 export type VaultStatus = { exists: boolean; unlocked: boolean };
 /** Do not disturb; `untilMs: null` while active means until turned off. */
 export type DndState = { active: boolean; untilMs: number | null };
+/** Focus mode: a daily window and/or running meetings turn do-not-disturb on by themselves. Minutes count from local midnight. */
+export type FocusConfig = { schedule: boolean; start_min: number; end_min: number; weekdays_only: boolean; in_meeting: boolean; offset_min: number };
+/** An alert the silence held back; `at` is Unix ms. */
+export type FocusHeld = { title: string; at: number };
 export type PasswordChanged = { biometricDisabled: boolean; pending: boolean };
 export type BiometricStatus = { available: boolean; enabled: boolean; name: string };
 export type UnlockEntry = { at: number; method: "password" | "windows_hello" | "touch_id" };
@@ -934,6 +938,12 @@ export const api = {
   /** `untilMs: null` keeps it on until turned off; the UI computes the end (local timezone). */
   dndSet: (untilMs: number | null) => invoke<DndState>("dnd_set", { untilMs }),
   dndClear: () => invoke<DndState>("dnd_clear"),
+  focusGet: () => invoke<FocusConfig>("focus_get"),
+  focusSet: (config: FocusConfig) => invoke<FocusConfig>("focus_set", { config }),
+  /** Rust can't trust its timezone: the UI says how far from UTC the local clock is (minutes east). */
+  focusOffset: (offsetMin: number) => invoke<FocusConfig>("focus_offset", { offsetMin }),
+  /** What the silence held back since the last call; asking empties the list. */
+  focusSummary: () => invoke<FocusHeld[]>("focus_summary"),
 
   updateCheck: () => invoke<UpdateInfo>("update_check"),
   /** Verifies the signature, installs and restarts the app; only resolves if something fails first. */

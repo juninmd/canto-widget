@@ -1092,5 +1092,13 @@
   "capture.partial": "task created, but the time/priority was not saved ({error}). Press Enter to retry.",
   "settings.sync.last": "Last sync: {when}",
   "settings.sync.failing": "Sync error ({n} failures in a row): {error}",
-  "settings.sync.noneYet": "No sync yet in this session"
+  "settings.sync.noneYet": "No sync yet in this session",
+  "settings.focusRules.title": "Focus mode",
+  "settings.focusRules.hint": "turns do not disturb on by itself, at the chosen hours or during meetings, and shows what it silenced when it ends",
+  "settings.focusRules.schedule": "Turn on by schedule",
+  "settings.focusRules.from": "from",
+  "settings.focusRules.to": "to",
+  "settings.focusRules.weekdays": "weekdays only",
+  "settings.focusRules.meeting": "Silence during meetings with a call link",
+  "focus.summary": "Focus ended: {n} alert(s) held back — {titles}"
 }
