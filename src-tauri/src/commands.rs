@@ -36,15 +36,19 @@ pub fn vault_create(state: State<'_, AppState>, password: String) -> Result<()> 
 
 #[tauri::command(async)]
 pub fn vault_unlock(state: State<'_, AppState>, password: String) -> Result<()> {
-    state.unlock(&zeroize::Zeroizing::new(password))?;
-    crate::unlock_log::record(&state.dir, "password", now_ms());
-    Ok(())
+    state.unlock_attempt(&zeroize::Zeroizing::new(password), "password", now_ms())
 }
 
 /// Read here, not through `state` at rest: the log survives across sessions without needing the vault open.
 #[tauri::command]
 pub fn unlock_history(state: State<'_, AppState>) -> Vec<crate::unlock_log::UnlockEntry> {
     crate::unlock_log::history(&state.dir)
+}
+
+/// For the lock screen: "N failed attempts since the last access".
+#[tauri::command]
+pub fn unlock_failed_count(state: State<'_, AppState>) -> usize {
+    crate::unlock_log::failed_since_last_success(&state.dir)
 }
 
 #[tauri::command]
@@ -119,7 +123,7 @@ fn pr_url(raw: Option<String>) -> Result<Option<String>> {
     if !(clean.starts_with("https://") || clean.starts_with("http://")) {
         return Err(AppError::Config("link precisa começar com http(s)://".into()));
     }
-    Ok(Some(clean.to_string()))
+    Ok(Some(crate::web_url::parse_web_url(clean)?.into()))
 }
 
 /// `url: None` clears the link, matching the "unset by omission" shape the frontend already uses for schedule.
@@ -202,6 +206,11 @@ mod tests {
         );
         assert_eq!(pr_url(Some("   ".into())).unwrap(), None);
         assert_eq!(pr_url(None).unwrap(), None);
+    }
+
+    #[test]
+    fn pr_url_rejects_a_disguised_host() {
+        assert!(matches!(pr_url(Some("https://github.com@evil.example/x".into())), Err(AppError::Config(_))));
     }
 
     #[test]

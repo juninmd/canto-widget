@@ -148,8 +148,8 @@ pub fn export_now(dir: &Path) -> Result<()> {
     let Some(folder) = folder(dir) else { return Ok(()) };
     let _guard = EXPORT_LOCK.lock_safe();
     let dest = target(&folder);
-    backup::export(dir, &dest)?;
-    let bytes = std::fs::read(&dest)?;
+    // The hash is of the bytes this machine wrote, never of a read-back: the sync client may have swapped the file already.
+    let bytes = backup::export(dir, &dest)?;
     let mut prefs = load(dir);
     prefs.ultimo_hash = Some(hash(&bytes));
     store::write_json_atomic(&path(dir), &prefs)
@@ -191,7 +191,8 @@ pub fn poll_and_merge(state: &AppState) -> Result<Option<ImportSummary>> {
     if state.sync.failed_hash.lock_safe().as_deref() == Some(h.as_str()) {
         return Ok(None); // already known not to open; the error stays on the status
     }
-    let result = backup::import(state, &target(&folder));
+    let result = // The very bytes that were hashed are the ones merged: no second read for the file to change under.
+    backup::import_bytes(state, &bytes, true);
     match &result {
         Ok(_) => {
             *state.sync.failed_hash.lock_safe() = None;

@@ -5,41 +5,52 @@ use rand::{rngs::SysRng, TryRng};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::error::{AppError, Result};
+use crate::store::KdfParams;
 
 pub const SALT_LEN: usize = 16;
 pub const NONCE_LEN: usize = 12;
-/// Argon2id: 19 MiB, 2 passes, 1 lane (the "interactive" profile RFC 9106 recommends).
-const KDF_MEM_KIB: u32 = 19 * 1024;
-const KDF_TIME: u32 = 2;
-const KDF_LANES: u32 = 1;
-
 #[derive(Zeroize, ZeroizeOnDrop)]
-pub struct VaultKey([u8; 32]);
+pub struct VaultKey {
+    bytes: [u8; 32],
+    /// What derived `bytes`; `seal` writes it into the envelope so a vault keeps its own cost across saves.
+    #[zeroize(skip)]
+    kdf: KdfParams,
+}
 
 impl VaultKey {
-    /// Fixed cost by design: changing these parameters invalidates existing vaults.
+    /// New vaults: the default profile (19 MiB, 2 passes, 1 lane).
     pub fn derive(password: &str, salt: &[u8]) -> Result<Self> {
+        Self::derive_with(password, salt, &KdfParams::default())
+    }
+
+    /// The envelope comes from disk, a backup or a synced folder, so its parameters are validated before any
+    /// memory is allocated: a hostile file must not be able to ask for gigabytes at unlock.
+    pub fn derive_with(password: &str, salt: &[u8], kdf: &KdfParams) -> Result<Self> {
         if salt.len() != SALT_LEN {
             return Err(AppError::Crypto("salt com tamanho inválido".into()));
         }
-        let params =
-            Params::new(KDF_MEM_KIB, KDF_TIME, KDF_LANES, Some(32)).map_err(|e| AppError::Crypto(e.to_string()))?;
+        kdf.validate()?;
+        let params = Params::new(kdf.m_kib, kdf.t, kdf.p, Some(32)).map_err(|e| AppError::Crypto(e.to_string()))?;
         let argon = Argon2::new(Algorithm::Argon2id, Version::V0x13, params);
         let mut out = [0u8; 32];
         argon.hash_password_into(password.as_bytes(), salt, &mut out).map_err(|e| AppError::Crypto(e.to_string()))?;
-        let key = VaultKey(out);
+        let key = VaultKey { bytes: out, kdf: kdf.clone() };
         out.zeroize();
         Ok(key)
     }
 
+    pub fn kdf(&self) -> &KdfParams {
+        &self.kdf
+    }
+
     /// Key already derived by another path (e.g. a Windows Hello signature).
     pub(crate) fn from_bytes(bytes: [u8; 32]) -> Self {
-        VaultKey(bytes)
+        VaultKey { bytes, kdf: KdfParams::default() }
     }
 
     /// The `zeroize` feature wipes the cipher's key schedule on drop; the temporary key copy is wiped here.
     fn cipher(&self) -> Aes256Gcm {
-        let mut key = Key::<Aes256Gcm>::from(self.0);
+        let mut key = Key::<Aes256Gcm>::from(self.bytes);
         let cipher = Aes256Gcm::new(&key);
         key.zeroize();
         cipher
@@ -121,7 +132,7 @@ mod tests {
         assert_ne!(a, b);
         let ka = VaultKey::derive("mesma-senha", &a).unwrap();
         let kb = VaultKey::derive("mesma-senha", &b).unwrap();
-        assert_ne!(ka.0, kb.0);
+        assert_ne!(ka.bytes, kb.bytes);
     }
 
     #[test]

@@ -72,6 +72,8 @@ pub struct AppState {
     pub drive_lock: Mutex<()>,
     /// Auto-lock baseline; background polls (clipboard, agenda) deliberately don't touch this.
     last_active: Mutex<i64>,
+    /// Pause after wrong passwords; lives in memory, so a restart clears it.
+    throttle: Mutex<crate::unlock_throttle::Throttle>,
 }
 
 impl AppState {
@@ -95,6 +97,7 @@ impl AppState {
             clip_lock: Mutex::new(()),
             drive_lock: Mutex::new(()),
             last_active: Mutex::new(now_ms()),
+            throttle: Default::default(),
         }
     }
 
@@ -144,7 +147,7 @@ impl AppState {
     pub fn unlock(&self, password: &str) -> Result<()> {
         let blob: SealedBlob = store::read_json(&store::vault_path(&self.dir))?.ok_or(AppError::NotFound)?;
         let salt = blob.salt_bytes()?;
-        let key = VaultKey::derive(password, &salt)?;
+        let key = blob.derive_key(password)?;
         let plain = blob.open(&key, VAULT_AAD)?;
         let data: VaultData = serde_json::from_slice(&plain)?;
         crate::password::finish_interrupted(&self.dir, &salt)?;
@@ -155,6 +158,28 @@ impl AppState {
         // Best-effort: whatever showed up in a synced folder merges in right away.
         let _ = crate::sync::poll_and_merge(self); // the outcome lands in `self.sync` (status)
         Ok(())
+    }
+
+    /// The interactive unlock: honours the pause after wrong passwords (without deriving anything while it
+    /// lasts) and keeps the access log, so a refused password shows up next to the successful unlocks.
+    pub fn unlock_attempt(&self, password: &str, method: &str, now: i64) -> Result<()> {
+        let wait = self.throttle.lock_safe().remaining_secs(now);
+        if wait > 0 {
+            return Err(AppError::Config(format!("aguarde {wait} s para tentar de novo")));
+        }
+        match self.unlock(password) {
+            Ok(()) => {
+                self.throttle.lock_safe().succeeded();
+                crate::unlock_log::record(&self.dir, method, now);
+                Ok(())
+            }
+            Err(AppError::WrongPassword) => {
+                self.throttle.lock_safe().failed(now);
+                crate::unlock_log::record_failure(&self.dir, method, now);
+                Err(AppError::WrongPassword)
+            }
+            Err(e) => Err(e),
+        }
     }
 
     /// Copy of the session password, to encrypt it with biometrics. Never leaves the process.
@@ -280,7 +305,7 @@ impl AppState {
         test_hooks::delay_before_derive();
         #[cfg(test)]
         self.derives.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
-        let key = VaultKey::derive(&password, &blob.salt_bytes()?)?;
+        let key = blob.derive_key(&password)?;
         let plain = blob.open(&key, VAULT_AAD).map_err(|e| match e {
             AppError::WrongPassword => AppError::Config("o backup foi criado com outra senha mestra".into()),
             other => other,

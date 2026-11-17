@@ -26,6 +26,18 @@ pub fn backup_export(app: tauri::AppHandle, state: State<'_, AppState>) -> Resul
     export_to(&app, &state, chosen).map(Some)
 }
 
+/// The saved copies in the app folder, newest first; needs no password (names only).
+#[tauri::command]
+pub fn backup_list(state: State<'_, AppState>) -> Vec<backup::BackupCopy> {
+    backup::list(&state.dir)
+}
+
+/// One click: the vault goes back to that copy, and the state it replaces is kept as a new copy in the list.
+#[tauri::command(async)]
+pub fn backup_restore(state: State<'_, AppState>, name: String) -> Result<ImportSummary> {
+    backup::restore(&state, &name)
+}
+
 #[cfg(desktop)]
 fn export_to(_app: &tauri::AppHandle, state: &AppState, chosen: FilePath) -> Result<String> {
     let destination = picked::path(chosen)?;

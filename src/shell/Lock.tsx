@@ -13,6 +13,7 @@ export default function Lock({ exists, onOpen }: Props) {
   const [busy, setBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [bio, setBio] = useState<BiometricStatus | null>(null);
+  const [failed, setFailed] = useState(0);
   const passwordField = useRef<HTMLInputElement>(null);
   const confirmField = useRef<HTMLInputElement>(null);
 
@@ -30,6 +31,12 @@ export default function Lock({ exists, onOpen }: Props) {
       .biometricStatus()
       .then((s) => setBio(s?.available && s.enabled ? s : null))
       .catch(() => setBio(null));
+  }, [exists]);
+
+  // Refused attempts since the last access: the owner's only sign that someone tried while they were away.
+  useEffect(() => {
+    if (!exists) return;
+    api.unlockFailedCount().then((n) => setFailed(n ?? 0)).catch(() => setFailed(0));
   }, [exists]);
 
   async function withBiometrics() {
@@ -67,6 +74,7 @@ export default function Lock({ exists, onOpen }: Props) {
       onOpen(!exists);
     } catch (e) {
       retry(passwordField.current, errText(e), "password");
+      if (exists) void api.unlockFailedCount().then((n) => setFailed(n ?? 0)).catch(() => {});
     } finally {
       setBusy(false);
     }
@@ -87,6 +95,11 @@ export default function Lock({ exists, onOpen }: Props) {
             : t("lock.hint.create")}
         </p>
       </div>
+      {exists && failed > 0 && (
+        <p role="status" className="text-xs text-warn">
+          {t("lock.failedAttempts", { n: failed })}
+        </p>
+      )}
       <input
         ref={passwordField}
         autoFocus

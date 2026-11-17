@@ -40,12 +40,32 @@ impl Default for KdfParams {
     }
 }
 
+impl KdfParams {
+    /// The file is untrusted input: bounds keep a crafted envelope from demanding gigabytes of RAM or hours of CPU.
+    pub fn validate(&self) -> Result<()> {
+        let ok = self.alg == "argon2id"
+            && (8 * 1024..=256 * 1024).contains(&self.m_kib)
+            && (1..=10).contains(&self.t)
+            && (1..=4).contains(&self.p);
+        if ok {
+            Ok(())
+        } else {
+            Err(AppError::Format("parâmetros de derivação inválidos".into()))
+        }
+    }
+}
+
 impl SealedBlob {
+    /// Key for this envelope, derived with the parameters it was sealed with.
+    pub fn derive_key(&self, password: &str) -> Result<VaultKey> {
+        VaultKey::derive_with(password, &self.salt_bytes()?, &self.kdf)
+    }
+
     pub fn seal(key: &VaultKey, salt: &[u8], plaintext: &[u8], aad: &[u8], at: i64) -> Result<Self> {
         let (nonce, ciphertext) = key.encrypt(plaintext, aad)?;
         Ok(Self {
             version: FORMAT_VERSION,
-            kdf: KdfParams::default(),
+            kdf: key.kdf().clone(),
             salt: B64.encode(salt),
             nonce: B64.encode(nonce),
             ciphertext: B64.encode(ciphertext),
@@ -214,6 +234,49 @@ pub(crate) mod tests {
         let d = std::env::temp_dir().join(format!("canto-store-{name}-{}", std::process::id()));
         let _ = std::fs::remove_dir_all(&d);
         d
+    }
+
+    fn cheap(m_kib: u32, t: u32) -> KdfParams {
+        KdfParams { alg: "argon2id".into(), m_kib, t, p: 1 }
+    }
+
+    #[test]
+    fn a_blob_sealed_with_other_kdf_params_opens_only_with_them() {
+        let salt = new_salt();
+        let kdf = cheap(32 * 1024, 3);
+        let key = VaultKey::derive_with("senha", &salt, &kdf).unwrap();
+        let blob = SealedBlob::seal(&key, &salt, b"x", VAULT_AAD, 1).unwrap();
+        assert_eq!((blob.kdf.m_kib, blob.kdf.t), (32 * 1024, 3), "seal must record the params really used");
+        assert_eq!(blob.open(&blob.derive_key("senha").unwrap(), VAULT_AAD).unwrap().as_slice(), b"x");
+        let default_key = VaultKey::derive("senha", &salt).unwrap();
+        assert!(matches!(blob.open(&default_key, VAULT_AAD), Err(AppError::WrongPassword)));
+    }
+
+    #[test]
+    fn hostile_kdf_params_are_refused_before_deriving() {
+        let salt = new_salt();
+        for bad in [
+            cheap(4_000_000, 2),
+            cheap(1024, 2),
+            cheap(19 * 1024, 0),
+            cheap(19 * 1024, 11),
+            KdfParams { p: 0, ..cheap(19 * 1024, 2) },
+            KdfParams { p: 5, ..cheap(19 * 1024, 2) },
+            KdfParams { alg: "argon2d".into(), ..cheap(19 * 1024, 2) },
+        ] {
+            let started = std::time::Instant::now();
+            assert!(matches!(VaultKey::derive_with("senha", &salt, &bad), Err(AppError::Format(_))), "{bad:?}");
+            assert!(started.elapsed().as_millis() < 50, "refusal must not run the KDF");
+        }
+    }
+
+    #[test]
+    fn the_default_profile_round_trips() {
+        let salt = new_salt();
+        let key = VaultKey::derive("senha", &salt).unwrap();
+        let blob = SealedBlob::seal(&key, &salt, b"x", VAULT_AAD, 1).unwrap();
+        assert_eq!(blob.derive_key("senha").unwrap().kdf().m_kib, 19 * 1024);
+        assert!(blob.open(&blob.derive_key("senha").unwrap(), VAULT_AAD).is_ok());
     }
 
     #[test]

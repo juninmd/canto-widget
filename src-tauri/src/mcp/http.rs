@@ -9,7 +9,7 @@ use std::time::Duration;
 use serde_json::{json, Value};
 use tauri::{AppHandle, Manager};
 
-use super::{rpc, tools::AppBackend, McpState};
+use super::{agents, rpc, tools::AppBackend, McpState};
 
 const MAX_HEAD: usize = 16 * 1024;
 const MAX_BODY: usize = 256 * 1024;
@@ -75,9 +75,10 @@ pub fn bearer(req: &Request) -> Option<&str> {
 pub fn handle(
     req: &Request,
     port: u16,
-    token_hash: &str,
+    creds: &[agents::Cred],
     perms: &super::Perms,
     backend: &dyn rpc::Backend,
+    log: &dyn Fn(agents::CallEntry),
 ) -> Response {
     if !host_ok(req.header("host"), port) {
         return plain(403, "host not allowed");
@@ -87,13 +88,24 @@ pub fn handle(
         return plain(403, "origin not allowed");
     }
     let supplied = bearer(req).map(super::hash_token).unwrap_or_default();
-    if token_hash.is_empty() || !same(&supplied, token_hash) {
+    let Some(cred) = agents::identify(creds, &supplied) else {
         return Response {
             status: 401,
             body: json!({ "error": "invalid or missing token" }).to_string(),
             extra: vec![("WWW-Authenticate", "Bearer")],
         };
-    }
+    };
+    // A read-only agent is stripped of the write switches before anything is listed or called.
+    let perms = &perms.for_cred(cred);
+    let dispatch = |m: &Value| {
+        let reply = rpc::dispatch(m, perms, backend);
+        if let (Some(r), Some("tools/call")) = (&reply, m.get("method").and_then(Value::as_str)) {
+            let tool = m["params"]["name"].as_str().unwrap_or_default();
+            let write = rpc::TOOLS.iter().any(|t| t.name == tool && t.write);
+            log(agents::entry(cred, tool, agents::outcome_of(r), write));
+        }
+        reply
+    };
     if req.path != PATH {
         return plain(404, "not found");
     }
@@ -109,8 +121,8 @@ pub fn handle(
         };
     };
     let replies: Vec<Value> = match &msg {
-        Value::Array(list) => list.iter().filter_map(|m| rpc::dispatch(m, perms, backend)).collect(),
-        one => rpc::dispatch(one, perms, backend).into_iter().collect(),
+        Value::Array(list) => list.iter().filter_map(dispatch).collect(),
+        one => dispatch(one).into_iter().collect(),
     };
     match (&msg, replies.len()) {
         (_, 0) => Response { status: 202, body: String::new(), extra: vec![] },
@@ -184,8 +196,8 @@ fn serve(app: &AppHandle, mut stream: TcpStream) {
     let state = app.state::<McpState>();
     let res = match read_request(&mut stream) {
         Ok(req) => {
-            let (port, hash, perms) = state.snapshot();
-            handle(&req, port, &hash, &perms, &AppBackend(app.clone()))
+            let (port, creds, perms) = state.snapshot();
+            handle(&req, port, &creds, &perms, &AppBackend(app.clone()), &|e| state.log_call(e))
         }
         Err(res) => res,
     };
@@ -249,8 +261,25 @@ mod tests {
         Request { method: method.into(), path: path.into(), headers: h, body: body.as_bytes().to_vec() }
     }
 
+    fn creds(read_only: bool) -> Vec<agents::Cred> {
+        vec![
+            agents::Cred {
+                id: "default".into(),
+                name: "default".into(),
+                token_hash: crate::mcp::hash_token(TOKEN),
+                read_only,
+            },
+            agents::Cred {
+                id: "ro".into(),
+                name: "Agente leitor".into(),
+                token_hash: crate::mcp::hash_token("canto_leitor"),
+                read_only: true,
+            },
+        ]
+    }
+
     fn run(r: &Request) -> Response {
-        handle(r, 47615, &crate::mcp::hash_token(TOKEN), &Perms::default(), &Fake)
+        handle(r, 47615, &creds(false), &Perms::default(), &Fake, &|_| {})
     }
 
     const AUTH: (&str, &str) = ("Authorization", "Bearer canto_secret");
@@ -267,7 +296,13 @@ mod tests {
     #[test]
     fn no_token_configured_refuses_everything() {
         let r = req("POST", "/mcp", &[("Authorization", "Bearer ")], PING);
-        assert_eq!(handle(&r, 47615, "", &Perms::default(), &Fake).status, 401);
+        let none = [agents::Cred {
+            id: "default".into(),
+            name: "default".into(),
+            token_hash: String::new(),
+            read_only: false,
+        }];
+        assert_eq!(handle(&r, 47615, &none, &Perms::default(), &Fake, &|_| {}).status, 401);
     }
 
     #[test]
@@ -290,6 +325,83 @@ mod tests {
             202
         );
         assert_eq!(run(&req("POST", "/mcp", &[AUTH], "{oops")).status, 400);
+    }
+
+    const READER: (&str, &str) = ("Authorization", "Bearer canto_leitor");
+
+    fn call_body(tool: &str) -> String {
+        json!({"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":tool,"arguments":{}}}).to_string()
+    }
+
+    /// Backend that notes which tools actually ran: a refused call must never reach it.
+    struct Counting(std::cell::RefCell<Vec<String>>);
+    impl rpc::Backend for Counting {
+        fn call(&self, name: &str, _: &Value) -> Result<Value, String> {
+            self.0.borrow_mut().push(name.to_string());
+            Ok(json!({}))
+        }
+    }
+
+    fn call_as(
+        header: (&str, &str),
+        read_only_default: bool,
+        tool: &str,
+    ) -> (Value, Vec<String>, Vec<agents::CallEntry>) {
+        let perms = Perms { tasks_write: true, ..Perms::default() };
+        let backend = Counting(Default::default());
+        let log = std::cell::RefCell::new(Vec::new());
+        let res = handle(
+            &req("POST", "/mcp", &[header], &call_body(tool)),
+            47615,
+            &creds(read_only_default),
+            &perms,
+            &backend,
+            &|e| log.borrow_mut().push(e),
+        );
+        (serde_json::from_str(&res.body).unwrap(), backend.0.into_inner(), log.into_inner())
+    }
+
+    #[test]
+    fn a_read_only_agent_cannot_write_even_with_the_write_switch_on() {
+        let (reply, ran, log) = call_as(READER, false, "create_task");
+        assert_eq!(reply["result"]["isError"], true);
+        assert!(ran.is_empty(), "the write reached the backend: {ran:?}");
+        assert_eq!(
+            (log[0].agent.as_str(), log[0].tool.as_str(), log[0].outcome, log[0].write),
+            ("Agente leitor", "create_task", "blocked", true)
+        );
+        let (_, ran, _) = call_as(READER, false, "list_tasks");
+        assert_eq!(ran, ["list_tasks"], "reads keep working");
+    }
+
+    #[test]
+    fn the_shared_token_can_be_made_read_only_too() {
+        let (_, ran, _) = call_as(AUTH, true, "create_task");
+        assert!(ran.is_empty());
+        let (_, ran, log) = call_as(AUTH, false, "create_task");
+        assert_eq!(ran, ["create_task"]);
+        assert_eq!((log[0].agent.as_str(), log[0].outcome), ("default", "ok"));
+    }
+
+    #[test]
+    fn a_read_only_agent_does_not_even_list_the_write_tools() {
+        let perms = Perms { tasks_write: true, ..Perms::default() };
+        let body = json!({"jsonrpc":"2.0","id":1,"method":"tools/list"}).to_string();
+        let r = |h| handle(&req("POST", "/mcp", &[h], &body), 47615, &creds(false), &perms, &Fake, &|_| {});
+        assert!(r(AUTH).body.contains("create_task"));
+        assert!(!r(READER).body.contains("create_task"));
+    }
+
+    #[test]
+    fn only_tool_calls_are_logged_and_without_arguments() {
+        let (_, _, log) = call_as(AUTH, false, "list_tasks");
+        assert_eq!(log.len(), 1);
+        assert!(!format!("{:?}", log[0]).contains("arguments"));
+        let log = std::cell::RefCell::new(Vec::new());
+        handle(&req("POST", "/mcp", &[AUTH], PING), 47615, &creds(false), &Perms::default(), &Fake, &|e| {
+            log.borrow_mut().push(e)
+        });
+        assert!(log.borrow().is_empty());
     }
 
     #[test]

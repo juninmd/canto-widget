@@ -5,11 +5,13 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 let biometrics: unknown = null;
 let wrongPassword = false;
 let biometricFails = false;
+let failedCount = 0;
 const calls: string[] = [];
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string) => {
     calls.push(cmd);
     if (cmd === "vault_unlock" && wrongPassword) return Promise.reject("senha incorreta");
+    if (cmd === "unlock_failed_count") return Promise.resolve(failedCount);
     if (cmd === "biometric_unlock" && biometricFails) return Promise.reject("cancelado pelo usuário");
     return Promise.resolve(cmd === "biometric_status" ? biometrics : null);
   },
@@ -22,6 +24,7 @@ afterEach(() => {
   biometrics = null;
   wrongPassword = false;
   biometricFails = false;
+  failedCount = 0;
   calls.length = 0;
 });
 
@@ -100,4 +103,16 @@ test("biometrics available but not enabled doesn't offer the button", async () =
     render(<Lock exists onOpen={() => {}} />);
   });
   expect(screen.queryByRole("button", { name: /Windows Hello/ })).toBeNull();
+});
+
+test("the lock screen reports refused attempts since the last access, by text", async () => {
+  failedCount = 4;
+  render(<Lock exists onOpen={() => {}} />);
+  expect((await screen.findByRole("status")).textContent).toBe("4 tentativas falhas desde o último acesso");
+});
+
+test("with no refused attempts the lock screen says nothing", async () => {
+  render(<Lock exists onOpen={() => {}} />);
+  await act(async () => {});
+  expect(screen.queryByRole("status")).toBeNull();
 });

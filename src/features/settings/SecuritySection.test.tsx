@@ -62,6 +62,20 @@ test("the unlock history shows the most recent entry first, with its method tran
   expect(items[1].textContent).toContain("senha");
 });
 
+test("refused attempts are labelled by text, not only by color", async () => {
+  responses.autolock_get = () => Promise.resolve(15);
+  responses.unlock_history = () =>
+    Promise.resolve([
+      { at: new Date("2026-09-18T10:00:00Z").getTime(), method: "password", ok: true },
+      { at: new Date("2026-09-20T10:00:00Z").getTime(), method: "password", ok: false },
+    ]);
+  await mount();
+  fireEvent.click(screen.getByText("últimos desbloqueios"));
+  const items = screen.getAllByRole("listitem");
+  expect(items[0].textContent).toContain("senha — tentativa recusada");
+  expect(items[1].textContent).not.toContain("recusada");
+});
+
 test("with no history yet, the section shows no expandable list", async () => {
   responses.autolock_get = () => Promise.resolve(15);
   await mount();

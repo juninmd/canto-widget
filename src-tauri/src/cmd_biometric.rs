@@ -91,7 +91,11 @@ pub fn biometric_enable(app: tauri::AppHandle, state: State<'_, AppState>) -> Re
 #[cfg(not(target_os = "macos"))]
 #[tauri::command(async)]
 pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
-    let password = without_always_on_top(&app, || biometric::open(&state.dir, &VAULT))?;
+    let password = without_always_on_top(&app, || biometric::open(&state.dir, &VAULT)).inspect_err(|e| {
+        if crate::unlock_log::is_refused_verification(e) {
+            crate::unlock_log::record_failure(&state.dir, "windows_hello", now_ms());
+        }
+    })?;
     match state.unlock(&password) {
         Ok(()) => {
             crate::unlock_log::record(&state.dir, "windows_hello", now_ms());

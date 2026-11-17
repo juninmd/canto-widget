@@ -171,10 +171,7 @@ impl Person {
             nickname: values(&self.nicknames).into_iter().next().unwrap_or_default(),
             birthday: birthday(&self.birthdays),
             addresses: capped(self.addresses.iter().map(|a| clean(&a.formatted))),
-            urls: values(&self.urls)
-                .into_iter()
-                .filter(|u| u.starts_with("https://") || u.starts_with("http://"))
-                .collect(),
+            urls: values(&self.urls).into_iter().filter_map(|u| crate::web_url::web_url_or_none(&u)).collect(),
             note: self.biographies.first().map(|b| clip(&b.value, MAX_NOTE)).unwrap_or_default(),
             photo: photo(&self.photos),
             relations,

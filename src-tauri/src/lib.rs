@@ -108,10 +108,12 @@ pub mod trash;
 pub mod tray;
 pub mod tray_live;
 pub mod unlock_log;
+pub mod unlock_throttle;
 #[cfg(desktop)]
 pub mod updater;
 pub mod vault;
 pub mod weather;
+pub mod web_url;
 pub mod wifi_os;
 pub mod window;
 pub mod work_events;
@@ -147,6 +149,7 @@ pub fn run() {
             commands::vault_unlock,
             commands::vault_lock,
             commands::unlock_history,
+            commands::unlock_failed_count,
             commands::vault_touch,
             password::vault_change_password,
             commands::tasks_for_day,
@@ -223,6 +226,8 @@ pub fn run() {
             autolock::autolock_set,
             cmd_backup::backup_export,
             cmd_backup::backup_import,
+            cmd_backup::backup_list,
+            cmd_backup::backup_restore,
             cmd_sync::sync_get,
             cmd_sync::sync_set_folder,
             cmd_sync::sync_clear,
@@ -315,6 +320,12 @@ pub fn run() {
             mcp::mcp_set_port,
             mcp::mcp_token_get,
             mcp::mcp_token_regenerate,
+            mcp::agents::mcp_agent_add,
+            mcp::agents::mcp_agent_set_read_only,
+            mcp::agents::mcp_agent_remove,
+            mcp::agents::mcp_agent_token,
+            mcp::agents::mcp_calls,
+            mcp::agents::mcp_calls_clear,
             weather::cmd::weather_search,
             weather::cmd::weather_set_place,
             weather::cmd::weather_clear,
