@@ -15,6 +15,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **Modo foco**: nos Ajustes, o Não perturbe pode ligar sozinho num horário (com início e fim, só em dias úteis se quiser, inclusive atravessando a meia-noite) e durante reuniões com link de chamada. Quando o silêncio acaba, um aviso mostra quantos alertas foram segurados e os primeiros títulos. Os títulos ficam só na memória.
 - **Busca global também acha repositórios**: o atalho de busca agora inclui os repositórios do GitHub e do GitLab que a aba Repositórios já guardou (por nome ou descrição), sem fazer nenhuma requisição.
 - **GitHub: aprovações, tamanho do diff e “precisa de mim” nas listas**: cada PR mostra, junto do selo de CI, quantas pessoas aprovaram (“✓ 2 aprov.”), se alguém pediu mudanças e as linhas adicionadas e removidas (`+182 −41`). O Canto lê isso no mesmo lote do CI (o `pulls/{n}` já traz o diff; o estado dos reviews custa uma chamada a mais por PR, guardada junto da cabeça do PR). O novo botão **precisa de mim · N** reduz as listas ao que está parado: pedidos de revisão com mais de 48 h e PRs seus com CI falhando, conflito ou mudanças pedidas (rascunhos não contam). Aparece só quando há algo parado; no GitLab vale para revisões atrasadas e conflitos.
 

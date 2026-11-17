@@ -159,6 +159,7 @@ pub const ALERT_WINDOW: &str = "alert";
 /// stays minimized or locked while the pop-up shows.
 pub fn open_alert(app: &tauri::AppHandle, event: AgendaItem) -> tauri::Result<()> {
     if crate::do_not_disturb::quiet(app) {
+        crate::focus_mode::hold(app, &event.title);
         return Ok(());
     }
     crate::notification::send(app, &event);

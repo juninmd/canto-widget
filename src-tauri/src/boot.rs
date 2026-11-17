@@ -31,6 +31,7 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     app.manage(steam::cmd::SteamLock::default());
     app.manage(steam::cmd_more::TopHistory::default());
     app.manage(do_not_disturb::DoNotDisturb::load(&dir));
+    app.manage(focus_mode::FocusMode::load(&dir));
     app.manage(review_alert::ReviewAlerts::load(&dir));
     app.manage(my_pr_alerts::MyPrAlerts::load(&dir));
     app.manage(mentions::state::MentionsUnread::default());
