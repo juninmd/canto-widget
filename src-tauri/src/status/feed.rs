@@ -40,6 +40,16 @@ pub const SOURCES: &[Source] = &[
     Source { id: "datadog", label: "Datadog", url: "https://status.datadoghq.com/history.rss" },
     Source { id: "azion", label: "Azion", url: "https://status.azion.com/history.rss" },
     Source { id: "akamai", label: "Akamai", url: "https://www.akamaistatus.com/history.rss" },
+    Source { id: "circleci", label: "CircleCI", url: "https://status.circleci.com/history.rss" },
+    Source { id: "netlify", label: "Netlify", url: "https://www.netlifystatus.com/history.rss" },
+    Source { id: "atlassian", label: "Atlassian", url: "https://status.atlassian.com/history.rss" },
+    Source { id: "discord", label: "Discord", url: "https://discordstatus.com/history.rss" },
+    Source { id: "figma", label: "Figma", url: "https://status.figma.com/history.rss" },
+    Source { id: "dropbox", label: "Dropbox", url: "https://status.dropbox.com/history.rss" },
+    Source { id: "twilio", label: "Twilio / SendGrid", url: "https://status.twilio.com/history.rss" },
+    Source { id: "render", label: "Render", url: "https://status.render.com/history.rss" },
+    Source { id: "mongodb", label: "MongoDB Atlas", url: "https://status.mongodb.com/history.rss" },
+    Source { id: "zoom", label: "Zoom", url: "https://www.zoomstatus.com/history.rss" },
 ];
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
