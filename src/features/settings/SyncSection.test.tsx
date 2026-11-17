@@ -104,3 +104,21 @@ test("starting 'sincronizar agora' while 'parar' is asking closes the question, 
   expect(screen.queryByText("sim, parar")).toBeNull();
   expect((screen.getByText("parar") as HTMLButtonElement).disabled).toBe(false);
 });
+
+const ok = { lastExportOkAt: Date.now() - 5 * 60_000, lastExportError: null, lastMergeOkAt: null, lastMergeError: null, consecutiveFailures: 0 };
+
+test("a healthy folder shows how long ago it last synced", async () => {
+  responses.sync_get = () => Promise.resolve("D:\\Dropbox\\canto");
+  responses.sync_status = () => Promise.resolve(ok);
+  await open();
+  expect(screen.getByRole("status").textContent).toBe("Última sincronização: há 5 min");
+});
+
+test("an unavailable folder shows the error as text", async () => {
+  responses.sync_get = () => Promise.resolve("D:\\Dropbox\\canto");
+  responses.sync_status = () =>
+    Promise.resolve({ ...ok, lastExportError: "pasta indisponível", consecutiveFailures: 3 });
+  await open();
+  expect(screen.getByRole("status").textContent).toContain("pasta indisponível");
+  expect(screen.getByRole("status").textContent).toContain("3 falhas");
+});
