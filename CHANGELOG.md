@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Servidor MCP mais claro e fácil de configurar**: Ajustes > Servidor MCP agora explica o que é e que só este computador acessa; mostra o endereço com botão copiar e o estado (ligado/desligado); em “Conectar um agente” basta escolher o agente (Claude Code, Codex, OpenCode, Gemini, Cursor, VS Code, Windsurf, mcp-remote), escolher o token (compartilhado ou de um agente) e clicar em **copiar configuração**, com o token escondido na tela; e as permissões ficam agrupadas em dados do dia a dia, dados privados e escrita.
+
 ### Corrigido
 
 - **Backup: as cópias diárias não somem mais com a sincronização, e dá para restaurar com um clique**: a poda contava as cópias diárias e as de “antes de importar” juntas (10 no total), então dez mesclagens vindas da outra máquina apagavam todo o histórico de dias anteriores. Agora cada tipo guarda as suas 10, uma importação automática que não muda nada não gera cópia, e rajadas em até 10 minutos dividem uma só. Em Ajustes > Backup, “cópias automáticas” lista as cópias e o botão **restaurar** volta o cofre àquela cópia (sem mesclar); o estado substituído fica na lista como nova cópia, então dá para desfazer. A sincronização lê o arquivo da pasta uma única vez e registra o hash dos bytes que gravou, sem releitura.
