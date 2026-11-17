@@ -173,3 +173,57 @@ fn the_exported_hash_is_of_the_bytes_written_even_if_the_file_is_swapped_after()
     let merged = poll_and_merge(&a).unwrap();
     assert_eq!(merged.map(|s| s.tasks), Some(2));
 }
+
+#[test]
+fn exporting_to_a_deleted_folder_records_the_error_and_keeps_saving() {
+    let st = machine("pasta-apagada", "1234");
+    let pasta = folder_dir("pasta-apagada");
+    set_folder(&st, pasta.clone()).unwrap();
+    assert!(st.sync.status().last_export_ok_at.is_some());
+    // The export recreates a missing folder, so make it unusable instead: a plain file where the folder was.
+    std::fs::remove_dir_all(&pasta).unwrap();
+    std::fs::write(&pasta, b"x").unwrap();
+
+    with_task(&st, "continua-salvando");
+    let status = st.sync.status();
+    assert!(status.last_export_error.is_some(), "the failed copy must show up in the status");
+    assert!(status.consecutive_failures >= 1);
+    assert!(st.read(|d| d.tasks.iter().any(|t| t.id == "continua-salvando")).unwrap());
+}
+
+#[test]
+fn a_file_from_another_master_password_is_not_derived_twice() {
+    let pasta = folder_dir("outra-senha");
+    let a = machine("senha-a", "1234");
+    set_folder(&a, pasta.clone()).unwrap();
+    let b = machine("senha-b", "9999");
+    // b points at a folder holding a's file: the first poll fails, the second skips the derivation.
+    store::write_json_atomic(&path(&b.dir), &Prefs { pasta: Some(pasta.display().to_string()), ultimo_hash: None })
+        .unwrap();
+    assert!(poll_and_merge(&b).is_err());
+    let derived = b.derives.load(std::sync::atomic::Ordering::SeqCst);
+    assert!(b.sync.status().last_merge_error.is_some());
+    assert_eq!(poll_and_merge(&b).unwrap(), None);
+    assert_eq!(b.derives.load(std::sync::atomic::Ordering::SeqCst), derived, "same file, no new Argon2id run");
+    b.sync.reset_backoff();
+    assert!(poll_and_merge(&b).is_err(), "'sync now' tries the file again");
+}
+
+#[test]
+fn backoff_goes_5_15_30_60_and_resets_after_a_success() {
+    let min = |f| poll_interval(f).as_secs() / 60;
+    assert_eq!([0, 1, 2].map(min), [5, 5, 5]);
+    assert_eq!([3, 4].map(min), [15, 15]);
+    assert_eq!([5, 6].map(min), [30, 30]);
+    assert_eq!([7, 50].map(min), [60, 60]);
+
+    let t = SyncTracker::default();
+    for _ in 0..4 {
+        t.record(true, Some(&AppError::Io("x".into())));
+    }
+    assert_eq!(min(t.status().consecutive_failures), 15);
+    t.record(true, None);
+    assert_eq!(t.status().consecutive_failures, 0);
+    assert_eq!(min(t.status().consecutive_failures), 5);
+    assert!(t.status().last_export_error.is_none());
+}

@@ -149,6 +149,7 @@ export const content: Record<keyof typeof source, string> = {
   "search.groupTasks": "tareas de hoy",
   "search.groupAgenda": "agenda de hoy",
   "search.groupTranscripts": "transcripciones",
+  "search.groupRepos": "repositorios",
   "search.groupNotes": "notas",
   "search.groupClipboard": "portapapeles",
   "search.untitled": "(sin título)",
