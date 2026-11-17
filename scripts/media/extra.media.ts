@@ -18,8 +18,9 @@ test("notes: the editor (waits for the lazy chunk)", async ({ browser }) => {
 
 test("tasks: the weekly report", async ({ browser }) => {
   const page = await fullScene(browser, { now: new Date(2026, 9, 9, 17, 40) });
-  await page.getByRole("button", { name: "resumo do dia" }).click();
-  await page.getByRole("button", { name: "semana" }).click();
+  await page.getByRole("button", { name: "ações da lista" }).click();
+  await page.getByRole("menuitem", { name: "resumo do dia" }).click();
+  await page.getByRole("radio", { name: "semana" }).click();
   await settle(page, 1000);
   await shoot(page, "report-week");
 });
@@ -48,7 +49,7 @@ test("github: connect with a token or from the browser", async ({ browser }) => 
 
 test("tabs: the ones that do not fit wait in a menu", async ({ browser }) => {
   const page = await fullScene(browser);
-  await page.getByRole("button", { name: /^mais/ }).click();
+  await page.getByRole("button", { name: "mais", exact: true }).click();
   await settle(page, 700);
   await shoot(page, "tabs-more");
 });
@@ -63,7 +64,7 @@ test("shortcuts help", async ({ browser }) => {
 test("alert: the snooze menu", async ({ browser }) => {
   const page = await openScene(browser, { path: "/?alert", now: ALERTS_AT, width: 420, height: 380, fixed: { alert_payload: [MEETING] } });
   await settle(page, 900);
-  await page.getByRole("button", { name: "mais opções de adiar" }).click();
+  await page.getByRole("button", { name: "escolher quanto tempo adiar" }).click();
   await settle(page, 700);
   await shoot(page, "alert-snooze");
 });

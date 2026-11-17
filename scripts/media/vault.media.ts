@@ -15,7 +15,8 @@ test("tasks: details panel scrolled into view", async ({ browser }) => {
 
 test("tasks: day summary", async ({ browser }) => {
   const page = await fullScene(browser, { now: new Date(2026, 9, 9, 17, 40) });
-  await page.getByRole("button", { name: "resumo do dia" }).click();
+  await page.getByRole("button", { name: "ações da lista" }).click();
+  await page.getByRole("menuitem", { name: "resumo do dia" }).click();
   await settle(page, 900);
   await shoot(page, "summary");
 });
