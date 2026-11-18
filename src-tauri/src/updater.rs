@@ -55,9 +55,8 @@ fn failed(e: tauri_plugin_updater::Error) -> AppError {
     })
 }
 
-#[tauri::command]
-pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdate>) -> Result<UpdateInfo> {
-    let current = app.package_info().version.to_string();
+/// Asks the release endpoint; returns the newest published version and the update, if it is newer than the running one.
+async fn fetch(app: &tauri::AppHandle) -> Result<(Option<String>, Option<Update>)> {
     let published: Arc<Mutex<Option<String>>> = Arc::default();
     let seen = published.clone();
     let vault = app.clone();
@@ -75,6 +74,13 @@ pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdat
         .await
         .map_err(failed)?;
     let published = published.lock_safe().take();
+    Ok((published, update))
+}
+
+#[tauri::command]
+pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdate>) -> Result<UpdateInfo> {
+    let current = app.package_info().version.to_string();
+    let (published, update) = fetch(&app).await?;
     let info = summarize(
         &current,
         published,
@@ -87,11 +93,18 @@ pub async fn update_check(app: tauri::AppHandle, pending: State<'_, PendingUpdat
 /// Downloads, checks the signature against the embedded public key and installs; then the app restarts.
 #[tauri::command]
 pub async fn update_install(app: tauri::AppHandle, pending: State<'_, PendingUpdate>) -> Result<()> {
-    let update = pending
-        .0
-        .lock_safe()
-        .take()
-        .ok_or_else(|| AppError::Update("nenhuma atualização pendente: verifique de novo".into()))?;
+    // Cloned, not taken: a failed download (network, rate limit) must leave the update available for a retry.
+    let cached = pending.0.lock_safe().clone();
+    let update = match cached {
+        Some(update) => update,
+        // The last check was lost (another check found nothing, or failed): look again instead of giving up.
+        None => {
+            let (_, found) = fetch(&app).await?;
+            let found = found.ok_or_else(|| AppError::Update("o Canto já está na versão mais recente".into()))?;
+            *pending.0.lock_safe() = Some(found.clone());
+            found
+        }
+    };
     let (mut downloaded, emitter) = (0u64, app.clone());
     update
         .download_and_install(
