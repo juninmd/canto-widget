@@ -106,7 +106,7 @@ export default function AgentsTab({ onError }: { onError: (m: string) => void })
       {views.length > 0 && (
         <>
           <div className="flex gap-2">
-            <SearchField value={query} onChange={setQuery} label={t("agents.find.label")} placeholder={t("agents.find.placeholder")} />
+            <SearchField className="flex-1" value={query} onChange={setQuery} label={t("agents.find.label")} placeholder={t("agents.find.placeholder")} />
             <ViewSwitch value={view} options={VIEWS} onChange={setView} />
           </div>
           <FilterChips

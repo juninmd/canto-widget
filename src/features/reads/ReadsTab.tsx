@@ -136,7 +136,7 @@ export default function ReadsTab({ onError }: { onError: (message: string) => vo
       {view.items.length > 0 && (
         <>
           <div className="flex gap-2">
-            <SearchField value={query} onChange={setQuery} label={t("reads.find.label")} placeholder={t("reads.find.placeholder")} />
+            <SearchField className="flex-1" value={query} onChange={setQuery} label={t("reads.find.label")} placeholder={t("reads.find.placeholder")} />
             <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
           </div>
           <FilterChips

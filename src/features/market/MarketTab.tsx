@@ -119,7 +119,7 @@ export default function MarketTab() {
         ))}
       </div>
       <div className="flex shrink-0 gap-2">
-        <SearchField value={query} onChange={setQuery} label={t("market.find.label")} placeholder={t("market.find.placeholder")} />
+        <SearchField className="flex-1" value={query} onChange={setQuery} label={t("market.find.label")} placeholder={t("market.find.placeholder")} />
         <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
       </div>
       <ResultsMeta shown={shown.length} total={inGroup.length} filtering={needle !== ""} onClear={() => setQuery("")} />

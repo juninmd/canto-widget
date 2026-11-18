@@ -18,7 +18,7 @@ type Props = {
 export default function SearchField({ value, onChange, label, placeholder, shortcut = true, className = "", onArrowDown }: Props) {
   const ref = useRef<HTMLInputElement>(null);
   return (
-    <div className={`relative min-w-0 flex-1 ${className}`}>
+    <div className={`relative min-w-0 ${className}`}>
       <span aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-faint">
         <SearchIcon />
       </span>

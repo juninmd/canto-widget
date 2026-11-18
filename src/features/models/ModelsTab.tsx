@@ -161,7 +161,7 @@ export default function ModelsTab() {
       {tab === "rank" && (
         <>
           <div className="flex gap-2">
-            <SearchField value={query} onChange={setQuery} label={t("models.find.label")} placeholder={t("models.find.placeholder")} />
+            <SearchField className="flex-1" value={query} onChange={setQuery} label={t("models.find.label")} placeholder={t("models.find.placeholder")} />
             <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
           </div>
           <ResultsMeta shown={rows.length} total={ranked.length} filtering={needle !== ""} onClear={() => setQuery("")} />
