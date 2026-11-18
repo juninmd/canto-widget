@@ -65,5 +65,5 @@ export function driveColumns(now: Date, onActivate: (file: DriveFile) => void): 
 
 /** Files as a sortable table. */
 export function GDriveTable({ files, now, onActivate }: Props) {
-  return <DataTable label={t("gdrive.search")} columns={driveColumns(now, onActivate)} rows={files} rowKey={(f) => f.id} />;
+  return <DataTable label={t("gdrive.myDrive")} columns={driveColumns(now, onActivate)} rows={files} rowKey={(f) => f.id} />;
 }

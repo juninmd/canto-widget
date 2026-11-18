@@ -55,4 +55,9 @@ export const uiBrowse: Record<keyof typeof source, string> = {
   "gdrive.col.modified": "modificado",
   "gdrive.col.size": "tamaño",
   "gdrive.col.you": "tú",
+  "contacts.col.name": "nombre",
+  "contacts.col.email": "correo",
+  "contacts.col.phone": "teléfono",
+  "contacts.col.org": "empresa",
+  "contacts.col.birthday": "cumpleaños",
 };

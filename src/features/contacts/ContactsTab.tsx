@@ -16,9 +16,13 @@ import ErrorBanner from "../../components/ErrorBanner";
 import GoogleGate from "../google/GoogleGate";
 import { SearchIcon } from "../../components/Icons";
 import Skeleton from "../../components/Skeleton";
+import ViewSwitch from "../../components/ViewSwitch";
+import { useViewPref } from "../../lib/useViewPref";
+import { ContactGrid, ContactTable } from "./ContactViews";
 
 type Props = { onNotice: (message: string) => void };
 
+const VIEWS = ["list", "grid", "table"] as const;
 const FILTERS: ContactFilter[] = ["all", "starred", "email", "phone", "birthday"];
 const UPCOMING_DAYS = 30;
 const UPCOMING_MAX = 8;
@@ -33,6 +37,7 @@ export default function ContactsTab({ onNotice }: Props) {
   const [filter, setFilter] = useState<ContactFilter>("all");
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState("");
+  const [layout, setLayout] = useViewPref("contacts", VIEWS);
   const [flash, setFlash] = useState("");
   const { bump, isLatest } = useLatestRequest();
 
@@ -70,6 +75,8 @@ export default function ContactsTab({ onNotice }: Props) {
     [items],
   );
   const groups = useMemo(() => groupByLetter(filterContacts(items, filter, search)), [items, filter, search]);
+  const flat = useMemo(() => groups.flatMap((g) => g.items), [groups]);
+  const openContact = flat.find((c) => c.id === open);
   const today = useMemo(() => new Date(), [view]);
   const birthdays = useMemo(() => birthdaysToday(items, today), [items, today]);
   const upcoming = useMemo(() => upcomingBirthdays(items, today, UPCOMING_DAYS).slice(0, UPCOMING_MAX), [items, today]);
@@ -133,7 +140,8 @@ export default function ContactsTab({ onNotice }: Props) {
       </section>
       <ContactBirthdays people={birthdays} photos={photos} today={today} onOpen={openLink} onShow={show} />
       <ContactUpcoming people={upcoming} photos={photos} onShow={show} />
-      <label className="canto-field flex items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
+      <div className="flex gap-2">
+      <label className="canto-field flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
         <span aria-hidden="true" className="text-faint [&>svg]:size-3.5"><SearchIcon /></span>
         <input
           type="search"
@@ -146,6 +154,8 @@ export default function ContactsTab({ onNotice }: Props) {
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />
       </label>
+      <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
+      </div>
       <div className="flex flex-wrap gap-1.5">
         {FILTERS.map((id) => (
           <button
@@ -159,9 +169,22 @@ export default function ContactsTab({ onNotice }: Props) {
           </button>
         ))}
       </div>
-      {shown > 0 && <ContactLetters letters={groups.map((g) => g.letter)} onJump={jump} />}
+      {shown > 0 && layout === "list" && <ContactLetters letters={groups.map((g) => g.letter)} onJump={jump} />}
       {shown === 0 ? (
         <p className="wx-glass p-3 text-xs text-muted">{items.length === 0 ? t("contacts.empty") : t("contacts.noMatch")}</p>
+      ) : layout !== "list" ? (
+        <>
+          {layout === "grid" ? (
+            <ContactGrid contacts={flat} photos={photos} open={open} onToggle={(id) => setOpen(open === id ? "" : id)} />
+          ) : (
+            <ContactTable contacts={flat} onToggle={(id) => setOpen(open === id ? "" : id)} />
+          )}
+          {openContact && (
+            <section aria-label={openContact.name} className="wx-glass shrink-0">
+              <ContactDetails contact={openContact} onCopy={(v) => void copy(v)} onCopyCard={() => copyCard(openContact)} onOpen={openLink} />
+            </section>
+          )}
+        </>
       ) : (
         groups.map((group) => (
           <section

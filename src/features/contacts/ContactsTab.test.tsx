@@ -172,3 +172,16 @@ test("a slower, older load does not replace a newer refresh", async () => {
   await new Promise((r) => setTimeout(r, 0));
   expect(document.querySelector("[data-contacts-total]")?.textContent).toBe("9");
 });
+
+test("the grid and the table list the filtered contacts and open the details of the one picked", async () => {
+  render(<ContactsTab onNotice={() => {}} />);
+  await screen.findAllByText("Marina Lopes");
+  fireEvent.change(screen.getByLabelText("buscar contato"), { target: { value: "ana" } });
+  fireEvent.click(screen.getByRole("button", { name: "grade" }));
+  expect(document.querySelectorAll("[data-contact]")).toHaveLength(1);
+  fireEvent.click(screen.getByRole("button", { name: "tabela" }));
+  expect(screen.getByRole("table").querySelectorAll("tbody tr")).toHaveLength(1);
+  fireEvent.change(screen.getByLabelText("buscar contato"), { target: { value: "" } });
+  fireEvent.click(document.querySelector("[data-contact=\"c1\"] button, button[data-contact=\"c1\"]")!);
+  expect(screen.getByRole("region", { name: "Marina Lopes" }).textContent).toContain("marina@exemplo.com");
+});

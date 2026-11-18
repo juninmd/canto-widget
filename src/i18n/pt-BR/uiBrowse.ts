@@ -54,4 +54,9 @@ export const uiBrowse = {
   "gdrive.col.modified": "modificado",
   "gdrive.col.size": "tamanho",
   "gdrive.col.you": "você",
+  "contacts.col.name": "nome",
+  "contacts.col.email": "e-mail",
+  "contacts.col.phone": "telefone",
+  "contacts.col.org": "empresa",
+  "contacts.col.birthday": "aniversário",
 } as const;
