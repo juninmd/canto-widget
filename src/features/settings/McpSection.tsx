@@ -1,37 +1,18 @@
 import { useEffect, useState } from "react";
 import { api, type McpPerms, type McpView } from "../../lib/api";
 import { useSectionError } from "./useSectionError";
-import { t } from "../../i18n";
+import { t, type MessageKey } from "../../i18n";
 import { SettingsSection } from "./SettingsSection";
 import ConfirmButton from "../../components/ConfirmButton";
-import { snippets } from "./mcpSnippets";
+import McpConnect from "./McpConnect";
+import { BTN, CopyButton } from "./McpCopy";
 import McpAgents from "./McpAgents";
 
-const READS: (keyof McpPerms)[] = [
-  "notifications", "tasks", "agenda", "prs", "mentions", "repos", "system", "weather", "agents", "models", "status", "market", "steam", "health",
-  "notes", "clipboard", "gmail", "contacts",
+const GROUPS: { title: MessageKey; keys: (keyof McpPerms)[] }[] = [
+  { title: "settings.mcp.groupData", keys: ["notifications", "tasks", "agenda", "prs", "mentions", "repos", "system", "weather", "agents", "models", "status", "market", "steam", "health"] },
+  { title: "settings.mcp.groupPrivate", keys: ["notes", "clipboard", "gmail", "contacts"] },
+  { title: "settings.mcp.groupWrite", keys: ["tasks_write", "notes_write"] },
 ];
-const WRITES: (keyof McpPerms)[] = ["tasks_write", "notes_write"];
-const BTN = "canto-hit min-h-[24px] rounded-md border border-line px-2 text-xs text-muted hover:text-fg";
-
-/** Copy button that says "copied" for a moment; a blocked clipboard just leaves the text selectable. */
-function CopyButton({ text, label }: { text: string; label?: string }) {
-  const [done, setDone] = useState(false);
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setDone(true);
-      setTimeout(() => setDone(false), 1500);
-    } catch {
-      /* the text is on screen: the user can select it */
-    }
-  }
-  return (
-    <button type="button" onClick={() => void copy()} className={BTN} aria-label={label}>
-      {done ? t("settings.mcp.copied") : t("settings.mcp.copy")}
-    </button>
-  );
-}
 
 /** Local MCP server: on/off, port, token, one switch per resource and ready-made config for each agent. */
 export default function McpSection({ onError }: { onError: (m: string) => void }) {
@@ -97,19 +78,37 @@ export default function McpSection({ onError }: { onError: (m: string) => void }
 
   return (
     <SettingsSection title={t("settings.mcp.title")} error={error}>
-      <p className="text-[11px] text-faint">{t("settings.mcp.intro")}</p>
-      <label className="flex min-h-[24px] items-center gap-2 text-xs text-muted">
-        <input type="checkbox" className="canto-box" checked={view?.enabled ?? false} disabled={!view || busy} onChange={(e) => void toggle(e.target.checked)} />
-        {t("settings.mcp.enable")}
-      </label>
-      {view && (
-        <p className="break-all text-[11px] text-faint">
-          {view.running ? t("settings.mcp.running", { url: view.endpoint }) : t("settings.mcp.stopped")}
-          {view.error ? ` · ${view.error}` : ""}
-        </p>
+      <div className="flex flex-col gap-1 rounded-lg border border-line bg-black/5 p-2.5">
+        <p className="text-xs font-semibold text-fg">{t("settings.mcp.whatTitle")}</p>
+        <p className="text-[11px] text-muted">{t("settings.mcp.intro")}</p>
+        <p className="text-[11px] text-faint">🔒 {t("settings.mcp.safe")}</p>
+      </div>
+      {!view?.enabled && (
+        <ol className="flex flex-col gap-0.5 pl-4 text-[11px] text-muted [list-style:decimal]">
+          <li>{t("settings.mcp.step1")}</li>
+          <li>{t("settings.mcp.step2")}</li>
+          <li>{t("settings.mcp.step3")}</li>
+        </ol>
       )}
+      <div className="flex min-h-[24px] items-center gap-2">
+        <label className="flex items-center gap-2 text-xs text-fg">
+          <input type="checkbox" className="canto-box" checked={view?.enabled ?? false} disabled={!view || busy} onChange={(e) => void toggle(e.target.checked)} />
+          {t("settings.mcp.enable")}
+        </label>
+        {view && (
+          <span className={`ml-auto rounded-full px-2 py-0.5 text-[10px] ${view.running ? "bg-green-500/15 text-green-500" : "bg-black/10 text-faint"}`}>
+            ● {view.running ? t("settings.mcp.on") : t("settings.mcp.stopped")}
+          </span>
+        )}
+      </div>
+      {view?.error && <p className="break-all text-[11px] text-red-400">{view.error}</p>}
       {view?.enabled && (
         <>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted">{t("settings.mcp.endpoint")}</span>
+            <code className="min-w-0 flex-1 break-all rounded-md bg-black/10 px-1.5 py-1 text-[11px] text-fg">{view.endpoint}</code>
+            <CopyButton text={view.endpoint} label={`${t("settings.mcp.copy")} ${t("settings.mcp.endpoint")}`} />
+          </div>
           <label className="flex items-center gap-2 text-xs text-muted">
             {t("settings.mcp.port")}
             <input
@@ -123,6 +122,8 @@ export default function McpSection({ onError }: { onError: (m: string) => void }
               className="w-20 rounded-md border border-line bg-transparent px-1.5 py-0.5 text-xs text-fg"
             />
           </label>
+
+          {token && <McpConnect view={view} token={token} />}
 
           <h4 className="text-xs font-semibold text-fg">{t("settings.mcp.token")}</h4>
           <div className="flex flex-wrap items-center gap-2">
@@ -140,27 +141,14 @@ export default function McpSection({ onError }: { onError: (m: string) => void }
           <p className="text-[11px] text-faint">{t("settings.mcp.tokenHint")}</p>
 
           <h4 className="text-xs font-semibold text-fg">{t("settings.mcp.perms")}</h4>
-          {READS.map(perm)}
-          {WRITES.map(perm)}
           <p className="text-[11px] text-faint">{t("settings.mcp.permsHint")}</p>
+          {GROUPS.map((g) => (
+            <fieldset key={g.title} className="flex flex-col gap-0.5 rounded-lg border border-line px-2.5 py-1.5">
+              <legend className="px-1 text-[11px] font-medium text-fg">{t(g.title)}</legend>
+              <div className="grid grid-cols-1 gap-x-3 sm:grid-cols-2">{g.keys.map(perm)}</div>
+            </fieldset>
+          ))}
           <McpAgents view={view} busy={busy} run={(job) => void run(job)} />
-
-          {token && (
-            <>
-              <h4 className="text-xs font-semibold text-fg">{t("settings.mcp.agents")}</h4>
-              <p className="text-[11px] text-faint">{t("settings.mcp.agentsHint")}</p>
-              {snippets(view.endpoint, token).map((s) => (
-                <details key={s.id} className="rounded-md border border-line px-2 py-1">
-                  <summary className="cursor-pointer text-xs text-fg">{s.name}</summary>
-                  {s.file && <p className="mt-1 text-[11px] text-faint">{t("settings.mcp.agentFile", { file: s.file })}</p>}
-                  <pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all rounded-md bg-black/10 p-1.5 text-[11px] text-fg">{s.text.replace(token, "•".repeat(12))}</pre>
-                  <div className="mt-1">
-                    <CopyButton text={s.text} label={`${t("settings.mcp.copy")} ${s.name}`} />
-                  </div>
-                </details>
-              ))}
-            </>
-          )}
         </>
       )}
     </SettingsSection>
