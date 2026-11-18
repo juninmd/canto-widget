@@ -7,6 +7,8 @@ pub mod autostart;
 pub mod background;
 pub mod backup;
 pub mod badge;
+#[cfg(desktop)]
+pub mod bar_agenda;
 pub mod biometric;
 pub mod blocking;
 pub mod boot;
@@ -362,6 +364,12 @@ pub fn run() {
             dev::cmd::dev_cron_list,
             #[cfg(desktop)]
             dev::cmd::dev_cron_change,
+            #[cfg(desktop)]
+            bar_agenda::bar_agenda_get,
+            #[cfg(desktop)]
+            bar_agenda::bar_agenda_set,
+            #[cfg(desktop)]
+            bar_agenda::bar_agenda_text,
             #[cfg(desktop)]
             strip::cmd::strip_config_get,
             #[cfg(desktop)]

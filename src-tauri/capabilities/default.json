@@ -7,7 +7,8 @@
     "main",
     "alert",
     "capture",
-    "strip"
+    "strip",
+    "bar"
   ],
   "permissions": [
     "core:default",

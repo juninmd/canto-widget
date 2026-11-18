@@ -7,6 +7,7 @@ export type StripItem =
 export const STRIP_ITEMS: readonly StripItem[] = [
   "clock", "cpu", "memory", "gpu", "temp", "disk", "network", "battery", "tasks", "weather", "event", "reviews", "notices", "health", "market",
 ];
+export type BarAgendaConfig = { enabled: boolean; count: number };
 export type StripConfig = {
   enabled: boolean;
   edge: "top" | "bottom";
@@ -79,6 +80,9 @@ export const windowApi = {
   stripDrag: (grab: number, commit: boolean) => invoke<void>("strip_drag", { grab, commit }),
   stripFocus: (on: boolean) => invoke<void>("strip_focus", { on }),
   stripMonitors: () => invoke<string[]>("strip_monitors"),
+  barAgendaGet: () => invoke<BarAgendaConfig>("bar_agenda_get"),
+  barAgendaSet: (config: BarAgendaConfig) => invoke<BarAgendaConfig>("bar_agenda_set", { config }),
+  barAgendaText: () => invoke<string | null>("bar_agenda_text"),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
 };

@@ -217,6 +217,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.tabs.title": "Visible tabs",
   "settings.tabs.hint": "Settings is always visible. Alt+1, Alt+2… follow the order of the visible tabs.",
 
+  "settings.barAgenda.title": "Agenda in the system bar",
+  "settings.barAgenda.label": "show the next event in the system bar",
+  "settings.barAgenda.count": "events in the tray tooltip",
+  "settings.barAgenda.hint": "Shows your next appointment, like “Daily 10:30 · in 12 min”. On macOS it sits in the menu bar; on Linux, beside the tray icon (GNOME and KDE); on Windows, in a strip over the taskbar (bottom taskbar only). Hovering the tray icon lists the next events on all of them. It disappears while the vault is locked.",
   "settings.strip.title": "Mini dashboard",
   "settings.strip.enable": "show the mini dashboard on the screen edge",
   "settings.strip.hint": "An always-visible pill with the numbers that matter. Hover for details and click to pin; it hides while a full-screen app is in front. The tray menu switches it on and off too.",
