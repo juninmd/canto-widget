@@ -97,7 +97,8 @@ fn alert_monitor(win: &WebviewWindow) -> tauri::Result<Option<tauri::Monitor>> {
 /// The tallest the pop-up can be and still end above the Dock: the work area minus the corner margin and the gap.
 pub fn fit_height(height: f64, work_height: f64, gap: f64) -> f64 {
     let room = work_height - MARGIN - gap;
-    if room >= ALERT_HEIGHT.0 {
+    // Never below the minimum card nor from a bad measurement (NaN, negative): then the height stays as asked.
+    if room.is_finite() && room >= ALERT_HEIGHT.0 {
         height.min(room)
     } else {
         height
@@ -108,6 +109,9 @@ pub fn fit_height(height: f64, work_height: f64, gap: f64) -> f64 {
 fn alert_room(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
     let Some(monitor) = alert_monitor(win)? else { return Ok(None) };
     let scale = monitor.scale_factor();
+    if !(scale.is_finite() && scale > 0.0) {
+        return Ok(None);
+    }
     let area = monitor.work_area();
     let (origin, bounds) = (area.position.to_logical::<f64>(scale), area.size.to_logical::<f64>(scale));
     let (fp, fs) = (monitor.position().to_logical::<f64>(scale), monitor.size().to_logical::<f64>(scale));
@@ -368,6 +372,8 @@ mod tests {
         assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN + 80.0), 388.0);
         // A screen too small for the minimum leaves the height alone rather than collapsing the card.
         assert_eq!(super::fit_height(300.0, 100.0, super::MARGIN), 300.0);
+        assert_eq!(super::fit_height(300.0, -50.0, super::MARGIN), 300.0);
+        assert_eq!(super::fit_height(300.0, f64::NAN, super::MARGIN), 300.0);
     }
 
     #[test]
