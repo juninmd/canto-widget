@@ -6,6 +6,7 @@ pub mod cmd_lists;
 pub mod cmd_pr;
 pub mod detail;
 pub mod failures;
+pub mod profile;
 pub mod query;
 pub mod teams;
 pub mod thread;
