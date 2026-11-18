@@ -91,6 +91,7 @@
   "alert.prep.create": "회의록 만들기",
   "alert.prep.created": "생성된 메모: {title}",
   "alert.prep.open": "메모 탭을 엽니다",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "시간",
   "alert.prep.note.guests": "손님",
   "alert.prep.note.agenda": "의제",

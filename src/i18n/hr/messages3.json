@@ -91,6 +91,7 @@
   "alert.prep.create": "stvoriti bilješku sa sastanka",
   "alert.prep.created": "bilješka stvorena: {title}",
   "alert.prep.open": "otvorite karticu Bilješke",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Vrijeme",
   "alert.prep.note.guests": "Gosti",
   "alert.prep.note.agenda": "Dnevni red",

@@ -7,6 +7,7 @@ const calls: string[] = [];
 const args: Record<string, unknown>[] = [];
 let watched: string[] = [];
 let vaultLocked = false;
+let transcripts: unknown[] = [];
 let notesPage: { total: number; items: unknown[] } = { total: 0, items: [] };
 
 mock.module("@tauri-apps/api/core", () => ({
@@ -16,6 +17,8 @@ mock.module("@tauri-apps/api/core", () => ({
     if (cmd === "status_alerts_get") return Promise.resolve(watched);
     if (cmd === "status_alerts_set") return Promise.resolve((a as { ids: string[] }).ids);
     if (cmd === "notes_search") return vaultLocked ? Promise.reject("cofre trancado") : Promise.resolve(notesPage);
+    if (cmd === "transcripts_list") return Promise.resolve(transcripts);
+    if (cmd === "guest_photos") return Promise.resolve({ photos: { "ana@ex.com": "data:image/png;base64,AAAA" }, needs_consent: false });
     if (cmd === "note_save") return Promise.resolve({ id: "n-new", ...(a as object) });
     return Promise.resolve(null);
   },
@@ -153,6 +156,29 @@ test("the meeting alert brings who organized, the agenda and the attached notes"
   });
   expect(args[calls.indexOf("open_link")]).toEqual({ url: "https://docs.google.com/document/d/abc" });
   expect(document.activeElement).toBe(screen.getByRole("button", { name: "entrar no Meet" }));
+});
+
+test("the meeting alert shows the organizer's photo and name", async () => {
+  const organized: AgendaItem = {
+    ...event,
+    organizer: "Ana Souza",
+    attendees: [{ name: "Ana Souza", email: "ana@ex.com", response: "accepted", organizer: true, optional: false, me: false }],
+  };
+  await show([organized]);
+  const box = document.querySelector("[data-organizer]") as HTMLElement;
+  expect(box.textContent).toContain("Ana Souza");
+  expect(box.querySelector("img")?.getAttribute("src")).toBe("data:image/png;base64,AAAA");
+});
+
+test("a recent transcript of the meeting is shown, an old one is not", async () => {
+  transcripts = [{ name: "Daily.md", modified_at: Date.now() - 2 * 86400_000, size: 10, preview: "Ana decidiu adiar o deploy" }];
+  await show([event]);
+  expect(document.querySelector("[data-transcript]")?.textContent).toContain("Ana decidiu adiar o deploy");
+  cleanup();
+  transcripts = [{ name: "Daily.md", modified_at: Date.now() - 90 * 86400_000, size: 10, preview: "muito antiga" }];
+  await show([event]);
+  expect(document.querySelector("[data-transcript]")).toBeNull();
+  transcripts = [];
 });
 
 test("dismissing one alert closes only that id, not the others waiting", async () => {

@@ -91,6 +91,7 @@
   "alert.prep.create": "toplantı notu oluştur",
   "alert.prep.created": "not oluşturuldu: {title}",
   "alert.prep.open": "Notlar sekmesini aç",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Zaman",
   "alert.prep.note.guests": "Misafirler",
   "alert.prep.note.agenda": "Gündem",

@@ -91,6 +91,7 @@
   "alert.prep.create": "создать заметку о встрече",
   "alert.prep.created": "заметка создана: {title}",
   "alert.prep.open": "откройте вкладку «Заметки»",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Время",
   "alert.prep.note.guests": "Гости",
   "alert.prep.note.agenda": "Повестка дня",

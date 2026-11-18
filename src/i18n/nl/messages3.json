@@ -91,6 +91,7 @@
   "alert.prep.create": "vergadernotitie maken",
   "alert.prep.created": "notitie gemaakt: {title}",
   "alert.prep.open": "open het tabblad Notities",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Tijd",
   "alert.prep.note.guests": "Gasten",
   "alert.prep.note.agenda": "Agenda",

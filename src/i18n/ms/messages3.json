@@ -91,6 +91,7 @@
   "alert.prep.create": "buat nota mesyuarat",
   "alert.prep.created": "nota dibuat: {title}",
   "alert.prep.open": "buka tab Nota",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Masa",
   "alert.prep.note.guests": "tetamu",
   "alert.prep.note.agenda": "Agenda",

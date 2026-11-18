@@ -91,6 +91,7 @@
   "alert.prep.create": "creați o notă de întâlnire",
   "alert.prep.created": "notă creată: {title}",
   "alert.prep.open": "deschide fila Note",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Timpul",
   "alert.prep.note.guests": "musafiri",
   "alert.prep.note.agenda": "Agenda",

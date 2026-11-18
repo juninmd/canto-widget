@@ -91,6 +91,7 @@
   "alert.prep.create": "สร้างบันทึกการประชุม",
   "alert.prep.created": "บันทึกที่สร้าง: {title}",
   "alert.prep.open": "เปิดแท็บบันทึกย่อ",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "เวลา",
   "alert.prep.note.guests": "แขก",
   "alert.prep.note.agenda": "วาระการประชุม",

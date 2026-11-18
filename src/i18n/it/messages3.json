@@ -91,6 +91,7 @@
   "alert.prep.create": "creare una nota sulla riunione",
   "alert.prep.created": "nota creata: {title}",
   "alert.prep.open": "aprire la scheda Note",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Tempo",
   "alert.prep.note.guests": "Ospiti",
   "alert.prep.note.agenda": "ordine del giorno",

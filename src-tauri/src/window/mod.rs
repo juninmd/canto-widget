@@ -94,6 +94,35 @@ fn alert_monitor(win: &WebviewWindow) -> tauri::Result<Option<tauri::Monitor>> {
     Ok(main.or(win.current_monitor()?).or(win.primary_monitor()?))
 }
 
+/// The tallest the pop-up can be and still end above the Dock: the work area minus the corner margin and the gap.
+pub fn fit_height(height: f64, work_height: f64, gap: f64) -> f64 {
+    let room = work_height - MARGIN - gap;
+    // Never below the minimum card nor from a bad measurement (NaN, negative): then the height stays as asked.
+    if room.is_finite() && room >= ALERT_HEIGHT.0 {
+        height.min(room)
+    } else {
+        height
+    }
+}
+
+/// Logical work-area height of the monitor the pop-up will use, with the bottom gap that goes with it.
+fn alert_room(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
+    let Some(monitor) = alert_monitor(win)? else { return Ok(None) };
+    let scale = monitor.scale_factor();
+    if !(scale.is_finite() && scale > 0.0) {
+        return Ok(None);
+    }
+    let area = monitor.work_area();
+    let (origin, bounds) = (area.position.to_logical::<f64>(scale), area.size.to_logical::<f64>(scale));
+    let (fp, fs) = (monitor.position().to_logical::<f64>(scale), monitor.size().to_logical::<f64>(scale));
+    let gap = bottom_gap(
+        (origin.x, origin.y, bounds.width, bounds.height),
+        (fp.x, fp.y, fs.width, fs.height),
+        cfg!(target_os = "macos"),
+    );
+    Ok(Some((bounds.height, gap)))
+}
+
 /// Where the window sits when anchored to the chosen monitor's corner, in logical pixels.
 pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
     anchored_position_sized(win, None)
@@ -274,7 +303,11 @@ pub fn clamp_alert_height(height: f64) -> f64 {
 /// The window hugs the card so the rest of the corner stays clickable; it grows upward from the same corner.
 pub fn resize_alert(app: &tauri::AppHandle, height: f64) -> tauri::Result<()> {
     if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
-        let height = clamp_alert_height(height);
+        let mut height = clamp_alert_height(height);
+        // A tall card grows upward from the bottom of the work area and stops below its top edge, never under the Dock.
+        if let Ok(Some((work_height, gap))) = alert_room(&win) {
+            height = fit_height(height, work_height, gap);
+        }
         win.set_size(LogicalSize::new(ALERT_WIDTH, height))?;
         anchor_bottom_right_sized(&win, Some((ALERT_WIDTH, height)))?;
     }
@@ -329,6 +362,18 @@ mod tests {
             body.contains("anchor_bottom_right_sized(&win, Some("),
             "macOS applies set_size late: outer_size is stale"
         );
+    }
+
+    #[test]
+    fn a_tall_alert_is_capped_to_the_room_above_the_dock() {
+        assert_eq!(super::fit_height(640.0, 875.0, super::MARGIN), 640.0);
+        assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN), 468.0);
+        // `gap` already holds the bottom margin; the top margin is the other one. An autohidden Dock shrinks the room too.
+        assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN + 80.0), 388.0);
+        // A screen too small for the minimum leaves the height alone rather than collapsing the card.
+        assert_eq!(super::fit_height(300.0, 100.0, super::MARGIN), 300.0);
+        assert_eq!(super::fit_height(300.0, -50.0, super::MARGIN), 300.0);
+        assert_eq!(super::fit_height(300.0, f64::NAN, super::MARGIN), 300.0);
     }
 
     #[test]

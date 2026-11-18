@@ -171,6 +171,7 @@ export const tasks = {
   "alert.prep.create": "criar nota da reunião",
   "alert.prep.created": "nota criada: {title}",
   "alert.prep.open": "abrir a aba Notas",
+  "alert.transcript": "transcrição recente",
   "alert.prep.note.when": "Horário",
   "alert.prep.note.guests": "Convidados",
   "alert.prep.note.agenda": "Pauta",

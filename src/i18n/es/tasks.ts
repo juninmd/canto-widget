@@ -173,6 +173,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "alert.prep.create": "crear nota de reunión",
   "alert.prep.created": "nota creada: {title}",
   "alert.prep.open": "abrir la pestaña Notas",
+  "alert.transcript": "transcripción reciente",
   "alert.prep.note.when": "Hora",
   "alert.prep.note.guests": "Invitados",
   "alert.prep.note.agenda": "Agenda",

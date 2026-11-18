@@ -91,6 +91,7 @@
   "alert.prep.create": "मीटिंग नोट बनाएं",
   "alert.prep.created": "नोट बनाया गया: {title}",
   "alert.prep.open": "नोट्स टैब खोलें",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "समय",
   "alert.prep.note.guests": "मेहमान",
   "alert.prep.note.agenda": "एजेंडा",

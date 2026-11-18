@@ -6,22 +6,47 @@ import { canvasDpr } from "../../lib/canvasDpr";
 
 type P = { x: number; y: number; v: number; r: number; a: number; s: number };
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
-const COUNT: Record<FxScene, number> = { rings: 0, ticks: 16, sparks: 34, bugs: 40, branches: 3, bubbles: 18, rays: 30, pulse: 0 };
+const COUNT: Record<FxScene, number> = { calendar: 0, ticks: 16, sparks: 34, bugs: 40, branches: 3, bubbles: 18, rays: 30, pulse: 0 };
 
 type Ctx = CanvasRenderingContext2D;
 type Frame = { ctx: Ctx; w: number; h: number; t: number; p: P[]; rgb: string; hot: boolean };
 
 const draw: Record<FxScene, (f: Frame) => void> = {
-  // Rings leave the icon like a ping; an imminent meeting or a critical outage pings faster and thicker.
-  rings({ ctx, w, t, rgb, hot, h }) {
-    const period = hot ? 38 : 90;
-    for (let i = 0; i < 3; i++) {
-      const k = ((t + i * (period / 3)) % period) / period;
-      ctx.strokeStyle = `rgba(${rgb},${(1 - k) * (hot ? 0.55 : 0.3)})`;
-      ctx.lineWidth = hot ? 2.5 : 1.5;
+  // A month page: a header strip, a grid of days and one cell, today's, that fills and fades; closer to the start it beats faster.
+  calendar({ ctx, w, h, t, rgb, hot }) {
+    const cell = 15;
+    const gap = 5;
+    const cols = 7;
+    const rows = 4;
+    const gridW = cols * (cell + gap) - gap;
+    const gridH = rows * (cell + gap) - gap;
+    const x0 = w - gridW - 18;
+    const y0 = Math.max(12, (h - gridH) / 2 + 6);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = `rgba(${rgb},0.22)`;
+    ctx.beginPath();
+    ctx.roundRect(x0 - 8, y0 - 22, gridW + 16, gridH + 30, 8);
+    ctx.stroke();
+    ctx.fillStyle = `rgba(${rgb},0.14)`;
+    ctx.beginPath();
+    ctx.roundRect(x0 - 8, y0 - 22, gridW + 16, 12, [8, 8, 0, 0]);
+    ctx.fill();
+    const beat = hot ? 40 : 90;
+    const k = (t % beat) / beat;
+    const today = (3 + Math.floor(t / beat)) % (cols * rows);
+    for (let i = 0; i < cols * rows; i++) {
+      const x = x0 + (i % cols) * (cell + gap);
+      const y = y0 + Math.floor(i / cols) * (cell + gap);
+      ctx.strokeStyle = `rgba(${rgb},0.16)`;
       ctx.beginPath();
-      ctx.arc(30, h * 0.5, 10 + k * Math.max(w, h) * 0.75, 0, 7);
+      ctx.roundRect(x, y, cell, cell, 3);
       ctx.stroke();
+      if (i === today) {
+        ctx.fillStyle = `rgba(${rgb},${(1 - k) * (hot ? 0.6 : 0.4) + 0.12})`;
+        ctx.beginPath();
+        ctx.roundRect(x - 1, y - 1, cell + 2, cell + 2, 4);
+        ctx.fill();
+      }
     }
   },
   ticks({ ctx, w, h, p, t }) {

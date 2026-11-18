@@ -22,7 +22,7 @@ async function show(e: AgendaItem) {
 
 test("each kind of alert gets its own animated backdrop", async () => {
   const cases: [AgendaItem, string][] = [
-    [item("e1"), "rings"],
+    [item("e1"), "calendar"],
     [item("task:1"), "ticks"],
     [item("mention:1"), "bubbles"],
     [item("model:m"), "sparks"],

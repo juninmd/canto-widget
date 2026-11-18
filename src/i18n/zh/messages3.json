@@ -91,6 +91,7 @@
   "alert.prep.create": "创建会议记录",
   "alert.prep.created": "创建的注释：{title}",
   "alert.prep.open": "打开注释选项卡",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "时间",
   "alert.prep.note.guests": "嘉宾",
   "alert.prep.note.agenda": "议程",

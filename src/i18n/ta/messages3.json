@@ -91,6 +91,7 @@
   "alert.prep.create": "சந்திப்பு குறிப்பை உருவாக்கவும்",
   "alert.prep.created": "குறிப்பு உருவாக்கப்பட்டது: {title}",
   "alert.prep.open": "குறிப்புகள் தாவலைத் திறக்கவும்",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "நேரம்",
   "alert.prep.note.guests": "விருந்தினர்கள்",
   "alert.prep.note.agenda": "நிகழ்ச்சி நிரல்",

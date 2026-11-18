@@ -91,6 +91,7 @@
   "alert.prep.create": "membuat catatan rapat",
   "alert.prep.created": "catatan dibuat: {title}",
   "alert.prep.open": "buka tab Catatan",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Waktu",
   "alert.prep.note.guests": "Tamu",
   "alert.prep.note.agenda": "Agenda",

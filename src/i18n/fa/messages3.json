@@ -91,6 +91,7 @@
   "alert.prep.create": "ایجاد یادداشت جلسه",
   "alert.prep.created": "یادداشت ایجاد شد: {title}",
   "alert.prep.open": "تب Notes را باز کنید",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "زمان",
   "alert.prep.note.guests": "مهمانان",
   "alert.prep.note.agenda": "دستور کار",

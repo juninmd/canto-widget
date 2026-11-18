@@ -91,6 +91,7 @@
   "alert.prep.create": "tạo ghi chú cuộc họp",
   "alert.prep.created": "ghi chú đã được tạo: {title}",
   "alert.prep.open": "mở tab Ghi chú",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "thời gian",
   "alert.prep.note.guests": "Khách",
   "alert.prep.note.agenda": "chương trình nghị sự",

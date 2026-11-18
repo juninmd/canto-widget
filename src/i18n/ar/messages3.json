@@ -91,6 +91,7 @@
   "alert.prep.create": "إنشاء مذكرة الاجتماع",
   "alert.prep.created": "تم إنشاء الملاحظة: {title}",
   "alert.prep.open": "افتح علامة التبويب \"الملاحظات\".",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "الوقت",
   "alert.prep.note.guests": "الضيوف",
   "alert.prep.note.agenda": "جدول الأعمال",

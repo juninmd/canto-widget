@@ -91,6 +91,7 @@
   "alert.prep.create": "izveidot sapulces piezīmi",
   "alert.prep.created": "piezīme izveidota: {title}",
   "alert.prep.open": "atveriet cilni Piezīmes",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Laiks",
   "alert.prep.note.guests": "Viesi",
   "alert.prep.note.agenda": "Darba kārtība",
