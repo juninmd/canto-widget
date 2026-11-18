@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { api, errText, type MarketGroup, type MarketView } from "../../lib/api";
-import { marketState, visibleQuotes, type MarketSort } from "./market";
+import { api, errText, type MarketGroup, type MarketQuote, type MarketView } from "../../lib/api";
+import { formatPrice, marketState, quoteLabel, visibleQuotes, type MarketSort } from "./market";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
 import { fetchedClock } from "../weather/weather";
 import { t } from "../../i18n";
@@ -10,6 +10,22 @@ import MarketRow from "./MarketRow";
 import Skeleton from "../../components/Skeleton";
 import EmptyRetry from "../../components/EmptyRetry";
 import { PulseIcon } from "../../components/Icons";
+import SearchField from "../../components/SearchField";
+import ViewSwitch from "../../components/ViewSwitch";
+import ResultsMeta from "../../components/ResultsMeta";
+import DataTable, { type Column } from "../../components/DataTable";
+import MarketDelta from "./MarketDelta";
+import { useViewPref } from "../../lib/useViewPref";
+import { fold, foldIncludes } from "../../lib/fold";
+
+const VIEWS = ["list", "table"] as const;
+
+const COLUMNS: Column<MarketQuote>[] = [
+  { key: "asset", label: t("market.col.asset"), render: (q) => <span className="font-medium text-fg">{quoteLabel(q.symbol)}</span>, sort: (q) => quoteLabel(q.symbol) },
+  { key: "price", label: t("market.col.price"), align: "right", render: (q) => formatPrice(q, q.price), sort: (q) => q.price },
+  { key: "change", label: t("market.col.change"), align: "right", render: (q) => <MarketDelta change={q.change} />, sort: (q) => q.change },
+  { key: "group", label: t("market.col.group"), render: (q) => t(`protos.market.group.${q.group}`), sort: (q) => q.group },
+];
 
 const GROUPS: (MarketGroup | "all")[] = ["all", "fx", "index", "crypto"];
 const SORTS: MarketSort[] = ["default", "gainers", "losers"];
@@ -22,6 +38,8 @@ export default function MarketTab() {
   const [picked, setPicked] = useState("");
   const [group, setGroup] = useState<MarketGroup | "all">("all");
   const [sort, setSort] = useState<MarketSort>("default");
+  const [query, setQuery] = useState("");
+  const [layout, setLayout] = useViewPref("market", VIEWS);
 
   const load = useCallback(async (force: boolean) => {
     setLoading(true);
@@ -48,7 +66,9 @@ export default function MarketTab() {
     return <Skeleton label={t("protos.market.loading")} rows={4} />;
   }
 
-  const shown = visibleQuotes(view.quotes, group, sort);
+  const needle = fold(query.trim());
+  const inGroup = visibleQuotes(view.quotes, group, sort);
+  const shown = needle ? inGroup.filter((quote) => foldIncludes(quote.symbol, needle) || foldIncludes(quoteLabel(quote.symbol), needle)) : inGroup;
   const hero = shown.find((quote) => quote.symbol === picked) ?? shown[0] ?? view.quotes[0];
   const ups = view.quotes.filter((quote) => quote.change >= 0).length;
   const downs = view.quotes.length - ups;
@@ -98,6 +118,11 @@ export default function MarketTab() {
           </button>
         ))}
       </div>
+      <div className="flex shrink-0 gap-2">
+        <SearchField value={query} onChange={setQuery} label={t("market.find.label")} placeholder={t("market.find.placeholder")} />
+        <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
+      </div>
+      <ResultsMeta shown={shown.length} total={inGroup.length} filtering={needle !== ""} onClear={() => setQuery("")} />
       <MarketHero key={hero.symbol} quote={hero} />
       <div className="flex shrink-0 items-center justify-between px-0.5 text-[11px] text-faint">
         <h3>{t("protos.market.watching")}</h3>
@@ -110,11 +135,19 @@ export default function MarketTab() {
           {t(`protos.market.sort.${sort}`)} ⇅
         </button>
       </div>
-      <ul className="shrink-0 overflow-hidden rounded-[14px] border border-edge bg-ink">
-        {shown.map((quote, index) => (
-          <MarketRow key={quote.symbol} quote={quote} index={index} picked={quote.symbol === hero.symbol} onPick={() => setPicked(quote.symbol)} />
-        ))}
-      </ul>
+      {shown.length === 0 ? (
+        <p className="shrink-0 text-xs text-faint">{t("browse.noResults")}</p>
+      ) : layout === "table" ? (
+        <div className="shrink-0">
+          <DataTable label={t("protos.market.watching")} columns={COLUMNS} rows={shown} rowKey={(quote) => quote.symbol} onRow={(quote) => setPicked(quote.symbol)} />
+        </div>
+      ) : (
+        <ul className="shrink-0 overflow-hidden rounded-[14px] border border-edge bg-ink">
+          {shown.map((quote, index) => (
+            <MarketRow key={quote.symbol} quote={quote} index={index} picked={quote.symbol === hero.symbol} onPick={() => setPicked(quote.symbol)} />
+          ))}
+        </ul>
+      )}
       <p className="mt-auto pb-1 text-center text-[10px] text-faint">
         {t("protos.market.source")}
         {view.fetched_at > 0 && ` · ${t("weather.updated", { time: fetchedClock(view.fetched_at) })}`}

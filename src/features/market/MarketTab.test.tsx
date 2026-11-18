@@ -140,3 +140,16 @@ test("an answer with no quotes and no error says so with a retry instead of an e
   await screen.findByText("Abertura");
   expect(calls.map((c) => c.args.force)).toEqual([false, true]);
 });
+
+test("the search narrows the watchlist by name or ticker and the table view keeps picking the spotlight", async () => {
+  render(<MarketTab />);
+  await screen.findByText("Abertura");
+  fireEvent.change(screen.getByRole("searchbox", { name: "buscar ativos" }), { target: { value: "bitc" } });
+  expect(document.querySelectorAll("[data-market-quote]")).toHaveLength(1);
+  expect(screen.getByText("1 de 4")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "limpar filtros" }));
+  fireEvent.click(screen.getByRole("button", { name: "tabela" }));
+  expect(document.querySelectorAll("[data-market-quote]")).toHaveLength(0);
+  fireEvent.click(screen.getByText("Ibovespa"));
+  expect(hero()).toBe("IBOV");
+});

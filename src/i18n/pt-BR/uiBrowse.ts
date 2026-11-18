@@ -34,4 +34,10 @@ export const uiBrowse = {
   "reads.state.unread": "não lido",
   "reads.state.read": "lido",
   "reads.filter.source": "feed",
+  "market.find.label": "buscar ativos",
+  "market.find.placeholder": "buscar ativo ou código",
+  "market.col.asset": "ativo",
+  "market.col.price": "preço",
+  "market.col.change": "variação",
+  "market.col.group": "tipo",
 } as const;

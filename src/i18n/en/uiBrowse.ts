@@ -35,4 +35,10 @@ export const uiBrowse: Record<keyof typeof source, string> = {
   "reads.state.unread": "unread",
   "reads.state.read": "read",
   "reads.filter.source": "feed",
+  "market.find.label": "search assets",
+  "market.find.placeholder": "search an asset or ticker",
+  "market.col.asset": "asset",
+  "market.col.price": "price",
+  "market.col.change": "change",
+  "market.col.group": "type",
 };
