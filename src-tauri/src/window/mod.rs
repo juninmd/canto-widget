@@ -16,6 +16,12 @@ mod alert_queue;
 const MARGIN: f64 = 16.0;
 
 pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
+    anchor_bottom_right_sized(win, None)
+}
+
+/// `size` is the logical size the window is about to have: a `set_size` just before is applied asynchronously on
+/// macOS, so `outer_size` may still report the old (shorter) height and leave the taller pop-up under the Dock.
+pub fn anchor_bottom_right_sized(win: &WebviewWindow, size: Option<(f64, f64)>) -> tauri::Result<()> {
     #[cfg(not(target_os = "macos"))]
     {
         let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
@@ -23,7 +29,10 @@ pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
         };
         let scale = monitor.scale_factor();
         let win_scale = win.scale_factor().unwrap_or(scale);
-        let size = win.outer_size()?.to_logical::<f64>(win_scale);
+        let size = match size {
+            Some((width, height)) => tauri::LogicalSize::new(width, height),
+            None => win.outer_size()?.to_logical::<f64>(win_scale),
+        };
         let area = monitor.work_area();
         let rect = (
             f64::from(area.position.x),
@@ -37,7 +46,7 @@ pub fn anchor_bottom_right(win: &WebviewWindow) -> tauri::Result<()> {
     }
     #[cfg(target_os = "macos")]
     {
-        if let Some((x, y)) = anchored_position(win)? {
+        if let Some((x, y)) = anchored_position_sized(win, size)? {
             win.set_position(tauri::LogicalPosition::new(x, y))?;
         }
         Ok(())
@@ -87,12 +96,19 @@ fn alert_monitor(win: &WebviewWindow) -> tauri::Result<Option<tauri::Monitor>> {
 
 /// Where the window sits when anchored to the chosen monitor's corner, in logical pixels.
 pub fn anchored_position(win: &WebviewWindow) -> tauri::Result<Option<(f64, f64)>> {
+    anchored_position_sized(win, None)
+}
+
+pub fn anchored_position_sized(win: &WebviewWindow, size: Option<(f64, f64)>) -> tauri::Result<Option<(f64, f64)>> {
     let Some(monitor) = alert_monitor(win)? else {
         return Ok(None);
     };
     let scale = monitor.scale_factor();
     let win_scale = win.scale_factor().unwrap_or(scale);
-    let size = win.outer_size()?.to_logical::<f64>(win_scale);
+    let size = match size {
+        Some((width, height)) => tauri::LogicalSize::new(width, height),
+        None => win.outer_size()?.to_logical::<f64>(win_scale),
+    };
     let area = monitor.work_area();
     let origin = area.position.to_logical::<f64>(scale);
     let bounds = area.size.to_logical::<f64>(scale);
@@ -258,8 +274,9 @@ pub fn clamp_alert_height(height: f64) -> f64 {
 /// The window hugs the card so the rest of the corner stays clickable; it grows upward from the same corner.
 pub fn resize_alert(app: &tauri::AppHandle, height: f64) -> tauri::Result<()> {
     if let Some(win) = app.get_webview_window(ALERT_WINDOW) {
-        win.set_size(LogicalSize::new(ALERT_WIDTH, clamp_alert_height(height)))?;
-        anchor_bottom_right(&win)?;
+        let height = clamp_alert_height(height);
+        win.set_size(LogicalSize::new(ALERT_WIDTH, height))?;
+        anchor_bottom_right_sized(&win, Some((ALERT_WIDTH, height)))?;
     }
     Ok(())
 }
@@ -302,6 +319,16 @@ mod tests {
         assert_eq!(super::bottom_gap(dock_bottom, full, true), super::MARGIN);
         let dock_right = (0.0, 25.0, 1380.0, 875.0);
         assert_eq!(super::bottom_gap(dock_right, full, true), super::MARGIN);
+    }
+
+    #[test]
+    fn resizing_the_alert_anchors_with_the_new_height_not_the_stale_outer_size() {
+        let src = include_str!("mod.rs");
+        let body = &src[src.find("pub fn resize_alert(").unwrap()..src.find("fn hide_alert_window(").unwrap()];
+        assert!(
+            body.contains("anchor_bottom_right_sized(&win, Some("),
+            "macOS applies set_size late: outer_size is stale"
+        );
     }
 
     #[test]
