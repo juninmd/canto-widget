@@ -121,3 +121,32 @@ test("a read-only token shows what to change and keeps the text", async () => {
   expect(within(panel).getByRole("alert").textContent).toContain("permissão de escrita");
   expect((within(panel).getByLabelText("comentário") as HTMLTextAreaElement).value).toBe("Oi");
 });
+
+test("the author and each reviewer open their profile card, and a second click closes it", async () => {
+  responses.github_profile = (args) =>
+    Promise.resolve({ login: String(args.login), name: `Nome de ${String(args.login)}`, bio: "", company: "Acme", location: "", public_repos: 3, followers: 1, since: 2020, url: `https://github.com/${String(args.login)}` });
+  const panel = await mount();
+  await act(async () => {
+    fireEvent.click(within(panel).getByRole("button", { name: "ver perfil de @ana" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  const card = within(panel).getByRole("region", { name: "perfil de @ana" });
+  expect(card.textContent).toContain("Nome de ana");
+  expect(card.querySelector("a")?.getAttribute("href")).toBe("https://github.com/ana");
+  await act(async () => {
+    fireEvent.click(within(panel).getByRole("button", { name: "ver perfil de @bia" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  expect(within(panel).queryByRole("region", { name: "perfil de @ana" })).toBeNull();
+  expect(within(panel).getByRole("region", { name: "perfil de @bia" })).toBeTruthy();
+  fireEvent.click(within(panel).getByRole("button", { name: "ver perfil de @bia" }));
+  expect(within(panel).queryByRole("region", { name: "perfil de @bia" })).toBeNull();
+});
+
+test("a bot is shown as plain text: it has no profile to open", async () => {
+  responses.github_pr_detail = () => Promise.resolve({ ...detail, reviewers: [{ login: "copilot[bot]", state: "approved" }] });
+  render(<PrPeek item={item} login="voce" onClose={() => {}} />);
+  for (let i = 0; i < 4; i++) await act(async () => {});
+  expect(screen.queryByRole("button", { name: /ver perfil de @copilot/ })).toBeNull();
+  expect(screen.getByText("@copilot[bot] · aprovou")).toBeTruthy();
+});

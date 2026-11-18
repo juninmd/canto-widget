@@ -125,13 +125,15 @@ test("espiar shows the PR details, and approving asks for a confirmation first",
       { login: "caio", state: "pending" },
     ],
   };
-  await mockTauri(page, { fixed: { ...fixed, github_pr_detail: detail, github_pr_review: null } });
+  await mockTauri(page, { fixed: { ...fixed, github_pr_detail: detail, github_pr_review: null, github_profile: { login: "bia", name: "Bia Lima", bio: "Revisa tudo que mexe em rotas.", company: "Acme", location: "Recife", public_repos: 21, followers: 54, since: 2018, url: "https://github.com/bia" } } });
   await page.goto("/");
   await goTab(page, "GitHub");
   await page.getByRole("button", { name: "espiar Corrige o cálculo de rotas com paradas" }).click();
   const panel = page.getByRole("region", { name: "detalhes do PR" });
   await expect(panel.getByText("fix/rotas → main")).toBeVisible();
   await expect(panel.getByText("@bia · aprovou")).toBeVisible();
+  await panel.getByRole("button", { name: "ver perfil de @bia" }).click();
+  await expect(panel.getByRole("region", { name: "perfil de @bia" }).getByText("Acme · Recife")).toBeVisible();
   await panel.getByRole("button", { name: "aprovar" }).click();
   await expect(panel.getByRole("button", { name: "confirmar aprovação" })).toBeVisible();
   if (process.env.SHOT) await panel.scrollIntoViewIfNeeded(), await page.screenshot({ path: process.env.SHOT });
