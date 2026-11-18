@@ -33,9 +33,8 @@ jobs:
           java-version: 17
       - run: bun install --frozen-lockfile
       - name: Build APK
-        env:
-          NDK_HOME: ${{ env.ANDROID_NDK_LATEST_HOME }}
         run: |
+          export NDK_HOME="$ANDROID_NDK_LATEST_HOME"
           bin="$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
           export CC_aarch64_linux_android="$bin/aarch64-linux-android24-clang"
           export AR_aarch64_linux_android="$bin/llvm-ar"
