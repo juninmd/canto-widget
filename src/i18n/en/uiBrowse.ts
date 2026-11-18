@@ -60,4 +60,6 @@ export const uiBrowse: Record<keyof typeof source, string> = {
   "contacts.col.phone": "phone",
   "contacts.col.org": "company",
   "contacts.col.birthday": "birthday",
+  "status.find.label": "search services",
+  "status.find.placeholder": "search a service",
 };

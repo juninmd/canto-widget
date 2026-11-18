@@ -59,4 +59,6 @@ export const uiBrowse = {
   "contacts.col.phone": "telefone",
   "contacts.col.org": "empresa",
   "contacts.col.birthday": "aniversário",
+  "status.find.label": "buscar serviços",
+  "status.find.placeholder": "buscar serviço",
 } as const;
