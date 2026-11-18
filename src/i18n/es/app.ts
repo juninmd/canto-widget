@@ -188,6 +188,7 @@ export const app: Record<keyof typeof source, string> = {
 
   "settings.security.title": "Seguridad",
   "settings.security.autolock": "bloquear automáticamente después de",
+  "settings.security.autolockNever": "nunca (solo bloquear manualmente)",
   "settings.security.autolockOption": "{min} min sin uso",
   "settings.security.biometric": "desbloquear con {name}",
   "settings.security.biometricOn": "{name} activado para desbloquear la bóveda",
