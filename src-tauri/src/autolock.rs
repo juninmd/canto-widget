@@ -8,8 +8,9 @@ use crate::store;
 use crate::vault::AppState;
 
 pub const DEFAULT_MINUTES: i64 = 15;
-/// The UI only ever offers these: no "never", so the vault key always leaves RAM eventually.
-pub const OPTIONS: [i64; 4] = [5, 15, 30, 60];
+/// 0 means "never lock by itself": an explicit choice, the vault then only locks manually.
+pub const NEVER: i64 = 0;
+pub const OPTIONS: [i64; 5] = [NEVER, 5, 15, 30, 60];
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 struct Prefs {
@@ -78,7 +79,8 @@ mod tests {
     #[test]
     fn only_the_offered_options_are_accepted() {
         assert!(valid(5) && valid(60));
-        assert!(!valid(0), "0 would mean auto-lock never fires");
+        assert!(valid(NEVER), "0 is the explicit 'never' choice");
+        assert!(!valid(-5));
         assert!(!valid(15 * 60), "an hour typo shouldn't quietly become a day");
     }
 }

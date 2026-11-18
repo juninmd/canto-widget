@@ -48,6 +48,15 @@ test("changing the timeout saves the new value in minutes", async () => {
   expect(calls.find((c) => c.cmd === "autolock_set")?.args).toEqual({ minutes: 60 });
 });
 
+test("the 'never' option saves 0 minutes", async () => {
+  responses.autolock_get = () => Promise.resolve(15);
+  await mount();
+  await act(async () => {
+    fireEvent.change(screen.getByLabelText(/trancar sozinho após/), { target: { value: "0" } });
+  });
+  expect(calls.find((c) => c.cmd === "autolock_set")?.args).toEqual({ minutes: 0 });
+});
+
 test("the unlock history shows the most recent entry first, with its method translated to pt-BR", async () => {
   responses.autolock_get = () => Promise.resolve(15);
   responses.unlock_history = () =>

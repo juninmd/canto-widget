@@ -80,7 +80,7 @@ export default function SecuritySection({ onError }: { onError: (m: string) => v
           >
             {AUTOLOCK_OPTIONS.map((m) => (
               <option key={m} value={m}>
-                {t("settings.security.autolockOption", { min: m })}
+                {m === 0 ? t("settings.security.autolockNever") : t("settings.security.autolockOption", { min: m })}
               </option>
             ))}
           </select>
