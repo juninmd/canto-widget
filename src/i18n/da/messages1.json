@@ -156,6 +156,7 @@
   "settings.myPrAlerts.ownHint": "On GitLab approvals are not shown (only requested changes), merge state and conflicts come from the MR itself, and a failed pipeline becomes the CI alert.",
   "settings.security.title": "Sikkerhed",
   "settings.security.autolock": "låses automatisk efter",
+  "settings.security.autolockNever": "never (only lock manually)",
   "settings.security.autolockOption": "{min} min tomgang",
   "settings.security.biometric": "lås op med {name}",
   "settings.security.biometricOn": "{name} aktiveret for at låse boksen op",

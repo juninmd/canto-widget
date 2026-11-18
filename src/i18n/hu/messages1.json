@@ -156,6 +156,7 @@
   "settings.myPrAlerts.ownHint": "On GitLab approvals are not shown (only requested changes), merge state and conflicts come from the MR itself, and a failed pipeline becomes the CI alert.",
   "settings.security.title": "Biztonság",
   "settings.security.autolock": "után automatikusan záródik",
+  "settings.security.autolockNever": "never (only lock manually)",
   "settings.security.autolockOption": "{min} perc üresjárat",
   "settings.security.biometric": "feloldás a következővel: {name}",
   "settings.security.biometricOn": "{name} engedélyezve van a trezor feloldásához",

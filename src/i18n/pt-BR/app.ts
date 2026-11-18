@@ -183,6 +183,7 @@ export const app = {
 
   "settings.security.title": "Segurança",
   "settings.security.autolock": "trancar sozinho após",
+  "settings.security.autolockNever": "nunca (só trancar manualmente)",
   "settings.security.autolockOption": "{min} min sem uso",
   "settings.security.biometric": "destrancar com {name}",
   "settings.security.biometricOn": "{name} ativado para destrancar o cofre",

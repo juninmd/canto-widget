@@ -32,7 +32,11 @@ fn watch_idle(app: AppHandle) {
         let Some(state) = app.try_state::<AppState>() else {
             continue;
         };
-        let limit_ms = autolock::minutes(&state.dir) * 60_000;
+        let minutes = autolock::minutes(&state.dir);
+        if minutes == autolock::NEVER {
+            continue;
+        }
+        let limit_ms = minutes * 60_000;
         if state.lock_if_idle(limit_ms) {
             let _ = tauri::Emitter::emit(&app, AUTO_LOCK_EVENT, limit_ms / 60_000);
         }

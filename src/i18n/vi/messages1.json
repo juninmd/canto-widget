@@ -156,6 +156,7 @@
   "settings.myPrAlerts.ownHint": "On GitLab approvals are not shown (only requested changes), merge state and conflicts come from the MR itself, and a failed pipeline becomes the CI alert.",
   "settings.security.title": "Bảo mật",
   "settings.security.autolock": "tự động khóa sau",
+  "settings.security.autolockNever": "never (only lock manually)",
   "settings.security.autolockOption": "{min} phút không hoạt động",
   "settings.security.biometric": "mở khóa bằng {name}",
   "settings.security.biometricOn": "{name} được bật để mở khóa kho tiền",

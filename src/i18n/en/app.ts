@@ -188,6 +188,7 @@ export const app: Record<keyof typeof source, string> = {
 
   "settings.security.title": "Security",
   "settings.security.autolock": "lock automatically after",
+  "settings.security.autolockNever": "never (only lock manually)",
   "settings.security.autolockOption": "{min} min idle",
   "settings.security.biometric": "unlock with {name}",
   "settings.security.biometricOn": "{name} enabled to unlock the vault",

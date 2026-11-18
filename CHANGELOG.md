@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Trancar sozinho pode ser desligado**: em Ajustes > Segurança, “trancar sozinho após” ganhou a opção **nunca (só trancar manualmente)**. Quem escolhe isso mantém o cofre aberto até trancar pelo botão ou pela bandeja; o padrão continua 15 min sem uso.
 - **Servidor MCP mais claro e fácil de configurar**: Ajustes > Servidor MCP agora explica o que é e que só este computador acessa; mostra o endereço com botão copiar e o estado (ligado/desligado); em “Conectar um agente” basta escolher o agente (Claude Code, Codex, OpenCode, Gemini, Cursor, VS Code, Windsurf, mcp-remote), escolher o token (compartilhado ou de um agente) e clicar em **copiar configuração**, com o token escondido na tela; e as permissões ficam agrupadas em dados do dia a dia, dados privados e escrita.
 
 ### Corrigido
