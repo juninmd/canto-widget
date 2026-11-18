@@ -3,7 +3,9 @@ import { api, type ChecksStatus, type ForgeItem } from "../../lib/api";
 import type { Forge } from "./forge";
 import type { ReviewInfo } from "./forgeChecks";
 import { daysSince, timeAgo } from "../../lib/time";
-import { overdue, waitHours, waitLabel } from "./reviewRadar";
+import { loadWatched, toggleWatch } from "./ciWatch";
+import { checkKey } from "./forgeChecks";
+import { overdue, waitHours, waitLabel, type SnoozeKind } from "./reviewRadar";
 import { t } from "../../i18n";
 import { CiPill, Pill } from "./ForgePills";
 import { IssueIcon, PullIcon } from "../../components/Icons";
@@ -11,7 +13,7 @@ import { IssueIcon, PullIcon } from "../../components/Icons";
 const STALE_DAYS = 7;
 const ACTION = "canto-hit rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active";
 
-type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; onSnooze?: () => void };
+type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; onSnooze?: (kind: SnoozeKind) => void };
 
 /** One PR/MR/issue. The secondary actions appear on hover or focus-within; they stay in the tab order while hidden. */
 export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onPeek, onSnooze }: Props) {
@@ -21,6 +23,8 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
   // Review requests already show "aguardando"; elsewhere a PR/MR nobody touched for a week is flagged.
   const idle = !waiting && item.is_pr ? daysSince(item.updated_at) : null;
   const badge = ci ?? (checks !== "loading" ? checks : null);
+  const [watching, setWatching] = useState(() => checkKey(item.repo, item.number) in loadWatched());
+  const canWatch = item.is_pr && forge === "github" && (ci === "running" || watching);
   const canCheck = item.is_pr && !ci && checks === null;
 
   async function loadChecks() {
@@ -96,17 +100,35 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
           ↗
         </span>
       </button>
-      {(onSnooze || canCheck || onPeek) && (
-        <div className="absolute right-7 top-1.5 flex items-center gap-0.5 rounded-lg border border-edge bg-panel p-0.5 opacity-0 shadow-raised transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none">
+      {(onSnooze || canCheck || onPeek || canWatch) && (
+        <div className="absolute right-7 top-1.5 flex items-center gap-0.5 whitespace-nowrap rounded-lg border border-edge bg-panel p-0.5 opacity-0 shadow-raised transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none">
           {onPeek && (
             <button type="button" onClick={onPeek} aria-label={t("forge.peek.openOf", { title: item.title })} className={ACTION}>
               {t("forge.peek.open")}
             </button>
           )}
-          {onSnooze && (
-            <button type="button" onClick={onSnooze} aria-label={t("forge.snoozeOf", { title: item.title })} className={ACTION}>
-              {t("forge.snooze")}
+          {canWatch && (
+            <button
+              type="button"
+              aria-pressed={watching}
+              onClick={() => setWatching(toggleWatch(item.repo, item.number, item.title))}
+              aria-label={t(watching ? "forge.watch.offOf" : "forge.watch.onOf", { title: item.title })}
+              className={ACTION}
+            >
+              {t(watching ? "forge.watch.off" : "forge.watch.on")}
             </button>
+          )}
+          {onSnooze && (
+            <>
+              <button type="button" onClick={() => onSnooze("h4")} aria-label={t("forge.snoozeOf", { title: item.title })} className={ACTION}>
+                {t("forge.snooze")}
+              </button>
+              {(["h1", "tomorrow", "week"] as const).map((kind) => (
+                <button key={kind} type="button" onClick={() => onSnooze(kind)} aria-label={t(`forge.snoozeOf.${kind}`, { title: item.title })} className={ACTION}>
+                  {t(`forge.snooze.${kind}`)}
+                </button>
+              ))}
+            </>
           )}
           {canCheck && (
             <button type="button" onClick={() => void loadChecks()} className={ACTION}>

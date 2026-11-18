@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import type { ForgeItem } from "../../lib/api";
-import { activeSnoozes, oldestFirst, overdue, SLA_HOURS, snoozeUntil, waitHours, waitLabel } from "./reviewRadar";
+import { activeSnoozes, snoozeDelay, oldestFirst, overdue, SLA_HOURS, snoozeUntil, waitHours, waitLabel } from "./reviewRadar";
 
 const NOW = new Date("2026-09-18T12:00:00Z");
 const at = (hoursAgo: number) => new Date(NOW.getTime() - hoursAgo * 3_600_000).toISOString();
@@ -41,4 +41,20 @@ test("snoozing merges into stored snoozes instead of overwriting them", () => {
   snoozeUntil("a", NOW.getTime());
   snoozeUntil("b", NOW.getTime());
   expect(Object.keys(activeSnoozes(localStorage.getItem("canto.reviewSnooze"), NOW.getTime())).sort()).toEqual(["a", "b"]);
+});
+
+test("snooze lengths: 1 h, 4 h, a week, and tomorrow means the next 8:00 local time", () => {
+  expect(snoozeDelay("h1")).toBe(3_600_000);
+  expect(snoozeDelay("h4")).toBe(4 * 3_600_000);
+  expect(snoozeDelay("week")).toBe(7 * 24 * 3_600_000);
+  const night = new Date(2026, 10, 16, 23, 30).getTime();
+  expect(new Date(night + snoozeDelay("tomorrow", night)).getTime()).toBe(new Date(2026, 10, 17, 8, 0).getTime());
+  const early = new Date(2026, 10, 16, 6, 0).getTime();
+  expect(new Date(early + snoozeDelay("tomorrow", early)).getTime()).toBe(new Date(2026, 10, 17, 8, 0).getTime());
+});
+
+test("snoozeUntil takes the chosen length", () => {
+  localStorage.clear();
+  const map = snoozeUntil("a", NOW.getTime(), "week");
+  expect(map.a).toBe(NOW.getTime() + 7 * 24 * 3_600_000);
 });

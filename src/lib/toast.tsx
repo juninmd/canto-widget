@@ -21,6 +21,11 @@ export function useToast(): (a: Toast) => void {
   return notify;
 }
 
+/** For tabs that also mount without a provider (tests, previews): no provider, no toast. */
+export function useOptionalToast(): ((a: Toast) => void) | null {
+  return useContext(ToastContext);
+}
+
 export function ToastProvider({ children, durationMs = INFO_DURATION_MS }: { children: ReactNode; durationMs?: number }) {
   const [toasts, setToasts] = useState<ActiveToast[]>([]);
   const nextId = useRef(1);

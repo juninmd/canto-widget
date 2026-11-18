@@ -1169,5 +1169,17 @@
   "settings.mcp.tryAsking": "Then ask it: “what's on my agenda today?”",
   "settings.mcp.groupData": "Everyday data",
   "settings.mcp.groupPrivate": "Private data (off by default)",
-  "settings.mcp.groupWrite": "Can change things (off by default)"
+  "settings.mcp.groupWrite": "Can change things (off by default)",
+  "forge.snooze.h1": "1 h",
+  "forge.snooze.tomorrow": "tomorrow",
+  "forge.snooze.week": "1 wk",
+  "forge.watch.on": "notify on CI",
+  "forge.watch.off": "notifying ✓",
+  "forge.watch.onOf": "notify me when the CI of {title} ends",
+  "forge.watch.offOf": "stop notifying about the CI of {title}",
+  "forge.watch.passed": "CI passed: {title}",
+  "forge.watch.failed": "CI failed: {title}",
+  "forge.snoozeOf.h1": "snooze {title} for 1 hour",
+  "forge.snoozeOf.tomorrow": "snooze {title} until tomorrow",
+  "forge.snoozeOf.week": "snooze {title} for 1 week"
 }

@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { api, errText, type GithubStatus } from "../../lib/api";
 import { applyChecks, applyConflicts, applyReviews, prsToCheck, type CiMap, type ConflictMap, type ReviewMap } from "./forgeChecks";
 import { t } from "../../i18n";
+import { useOptionalToast } from "../../lib/toast";
+import { takeSettled } from "./ciWatch";
 import { useForgeLists } from "./useForgeLists";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
 import { patchForgeCache, readForgeCache } from "./forgeCache";
@@ -21,6 +23,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
   const [ci, setCi] = useState<CiMap>({});
   const [conflicts, setConflicts] = useState<ConflictMap>({});
   const [reviews, setReviews] = useState<ReviewMap>({});
+  const notify = useOptionalToast();
   const known = useRef(ci);
   known.current = ci;
 
@@ -64,6 +67,7 @@ export default function GithubTab({ onError }: { onError: (m: string) => void })
         setCi((m) => applyChecks(m, got));
         setConflicts((m) => applyConflicts(m, got));
         setReviews((m) => applyReviews(m, got));
+        for (const d of takeSettled(got)) notify?.({ message: t(d.ok ? "forge.watch.passed" : "forge.watch.failed", { title: d.title }), type: d.ok ? "info" : "erro" });
       })
       .catch(() => {});
     return () => {
