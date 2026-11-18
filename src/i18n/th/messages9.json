@@ -1187,5 +1187,9 @@
   "forge.person.factsNoYear": "{repos} repositories · {followers} followers",
   "forge.person.open": "open on GitHub ↗",
   "forge.peek.by": "by",
-  "forge.peek.profileOf": "show the profile of @{login}"
+  "forge.peek.profileOf": "show the profile of @{login}",
+  "settings.barAgenda.title": "Agenda in the system bar",
+  "settings.barAgenda.label": "show the next event in the system bar",
+  "settings.barAgenda.count": "events in the tray tooltip",
+  "settings.barAgenda.hint": "Shows your next appointment, like “Daily 10:30 · in 12 min”. On macOS it sits in the menu bar; on Linux, beside the tray icon (GNOME and KDE); on Windows, in a strip over the taskbar (bottom taskbar only). Hovering the tray icon lists the next events on all of them. It disappears while the vault is locked."
 }

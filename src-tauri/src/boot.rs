@@ -49,6 +49,7 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
         app.manage(window::state::WindowState::load(&dir));
         app.manage(sysmon::SystemMonitor::default());
         app.manage(strip::StripState::load(&dir));
+        app.manage(bar_agenda::BarAgenda::load(&dir));
         app.manage(sysmon::alert::SystemAlerts::load(&dir));
         global_shortcuts::register(app.handle())?;
         tray::build(app.handle())?;
@@ -78,6 +79,8 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     window::sidebar::watch(app.handle().clone());
     #[cfg(desktop)]
     strip::watch(app.handle().clone());
+    #[cfg(desktop)]
+    bar_agenda::watch(app.handle().clone());
     review_alert::watch(app.handle().clone());
     my_pr_alerts::watch(app.handle().clone());
     mentions::alerts::watch(app.handle().clone());

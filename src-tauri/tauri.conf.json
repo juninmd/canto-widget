@@ -70,6 +70,25 @@
         "dragDropEnabled": false
       },
       {
+        "label": "bar",
+        "create": false,
+        "title": "Canto",
+        "url": "index.html?bar",
+        "width": 280,
+        "height": 28,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false,
+        "focus": false,
+        "focusable": false,
+        "center": false,
+        "dragDropEnabled": false
+      },
+      {
         "label": "capture",
         "create": false,
         "title": "Canto",

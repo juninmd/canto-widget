@@ -21,6 +21,7 @@ import FocusRulesSection from "../alerts/FocusRulesSection";
 import DigestSection from "./DigestSection";
 import MyPrAlertsSection from "../forge/MyPrAlertsSection";
 import ReviewAlertsSection from "../forge/ReviewAlertsSection";
+import BarAgendaSection from "./BarAgendaSection";
 import FullscreenHoldSection from "./FullscreenHoldSection";
 import AutostartSection from "./AutostartSection";
 import ShortcutsSection from "./ShortcutsSection";
@@ -73,6 +74,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     mcp: <McpSection onError={onError} />,
     window: <WindowSection onError={onError} />,
     strip: <StripSection onError={onError} />,
+    barAgenda: <BarAgendaSection onError={onError} />,
     autostart: <AutostartSection onError={onError} />,
     shortcuts: <ShortcutsSection onOpen={onShowShortcuts} />,
     update: <UpdateSection />,

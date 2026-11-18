@@ -212,6 +212,10 @@ export const app = {
   "settings.tabs.title": "Abas visíveis",
   "settings.tabs.hint": "Ajustes fica sempre visível. Alt+1, Alt+2… seguem a ordem das abas visíveis.",
 
+  "settings.barAgenda.title": "Agenda na barra do sistema",
+  "settings.barAgenda.label": "mostrar o próximo evento na barra do sistema",
+  "settings.barAgenda.count": "eventos na dica da bandeja",
+  "settings.barAgenda.hint": "Mostra o próximo compromisso, como “Daily 10:30 · em 12 min”. No macOS fica na barra de menus; no Linux, ao lado do ícone da bandeja (GNOME e KDE); no Windows, numa faixa sobre a barra de tarefas (só com a barra embaixo). Em todos, passar o mouse no ícone da bandeja lista os próximos eventos. Some com o cofre trancado.",
   "settings.strip.title": "Mini-dashboard",
   "settings.strip.enable": "mostrar o mini-dashboard na borda da tela",
   "settings.strip.hint": "Uma pílula sempre visível com os números que importam. Passe o mouse para ver os detalhes e clique para fixar; ela some quando um app está em tela cheia. Também liga e desliga pelo menu da bandeja.",

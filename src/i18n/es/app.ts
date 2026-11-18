@@ -217,6 +217,10 @@ export const app: Record<keyof typeof source, string> = {
   "settings.tabs.title": "Pestañas visibles",
   "settings.tabs.hint": "Ajustes siempre está visible. Alt+1, Alt+2… siguen el orden de las pestañas visibles.",
 
+  "settings.barAgenda.title": "Agenda en la barra del sistema",
+  "settings.barAgenda.label": "mostrar el próximo evento en la barra del sistema",
+  "settings.barAgenda.count": "eventos en el aviso de la bandeja",
+  "settings.barAgenda.hint": "Muestra tu próximo compromiso, como “Daily 10:30 · en 12 min”. En macOS va en la barra de menús; en Linux, junto al icono de la bandeja (GNOME y KDE); en Windows, en una franja sobre la barra de tareas (solo con la barra abajo). En todos, pasar el ratón por el icono de la bandeja lista los próximos eventos. Se oculta con la bóveda bloqueada.",
   "settings.strip.title": "Mini panel",
   "settings.strip.enable": "mostrar el mini panel en el borde de la pantalla",
   "settings.strip.hint": "Una píldora siempre visible con los números que importan. Pasa el ratón para ver los detalles y haz clic para fijarla; se oculta con una app a pantalla completa. También se activa y desactiva desde el menú de la bandeja.",
