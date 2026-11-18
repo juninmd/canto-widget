@@ -113,7 +113,16 @@ pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Re
 #[cfg(target_os = "macos")]
 #[tauri::command(async)]
 pub fn biometric_unlock(app: tauri::AppHandle, state: State<'_, AppState>) -> Result<()> {
-    let password = without_always_on_top(&app, crate::hello_mac::open)?;
+    let password = match without_always_on_top(&app, crate::hello_mac::open) {
+        Ok(p) => p,
+        // Without the Keychain entitlement the stored item can never open: drop the Touch ID marker so the
+        // lock screen stops offering it and falls back to the master password.
+        Err(AppError::Config(m)) => {
+            let _ = biometric::disable(&state.dir);
+            return Err(AppError::Config(m));
+        }
+        Err(e) => return Err(e),
+    };
     match state.unlock(&password) {
         Ok(()) => {
             crate::unlock_log::record(&state.dir, "touch_id", now_ms());
