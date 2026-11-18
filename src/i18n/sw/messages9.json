@@ -1214,5 +1214,16 @@
   "agents.col.tool": "install with",
   "browse.noFilter": "all",
   "agents.filter.installed": "installed ones",
-  "agents.filter.missing": "not installed ones"
+  "agents.filter.missing": "not installed ones",
+  "reads.find.label": "search readings",
+  "reads.find.placeholder": "search title, feed or summary",
+  "reads.filter.unread": "unread",
+  "reads.filter.read": "read",
+  "reads.col.title": "title",
+  "reads.col.source": "feed",
+  "reads.col.date": "date",
+  "reads.col.state": "status",
+  "reads.state.unread": "unread",
+  "reads.state.read": "read",
+  "reads.filter.source": "feed"
 }
