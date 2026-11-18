@@ -20,6 +20,9 @@ import { useTaskBulk } from "./useTaskBulk";
 import { keepIfSame } from "../../lib/sameData";
 import { ChecklistIcon } from "../../components/Icons";
 import TaskDoneHeader from "./TaskDoneHeader";
+import SearchField from "../../components/SearchField";
+import ResultsMeta from "../../components/ResultsMeta";
+import { fold, foldIncludes } from "../../lib/fold";
 
 type Props = { today: string; version?: number; agenda?: AgendaItem[]; onError: (m: string) => void };
 
@@ -48,6 +51,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const [details, setDetails] = useState("");
   const [summary, setSummary] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<Priority | "">("");
+  const [query, setQuery] = useState("");
   // Finished tasks fold away by default: they are history, and the count in the header says how many there are.
   const [doneOpen, setDoneOpen] = useState(false);
 
@@ -108,7 +112,11 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
   const doneIds = tasks.filter((task) => task.done).map((task) => task.id);
   const done = doneIds.length;
   const bulk = useTaskBulk(today, doneIds, reload, onError);
-  const visible = priorityFilter ? tasks.filter((task) => task.priority === priorityFilter) : tasks;
+  const needle = fold(query.trim());
+  const matchesQuery = (task: Task) =>
+    !needle || foldIncludes(task.title, needle) || (task.subtasks ?? []).some((sub) => foldIncludes(sub.title, needle)) || (task.context ? foldIncludes(task.context.name, needle) : false);
+  const visible = tasks.filter((task) => (!priorityFilter || task.priority === priorityFilter) && matchesQuery(task));
+  const filtering = priorityFilter !== "" || needle !== "";
   const openRows = visible.filter((task) => !task.done);
   const doneRows = visible.filter((task) => task.done);
   const shown = doneOpen ? [...openRows, ...doneRows] : openRows;
@@ -196,7 +204,11 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
     <div className="flex h-full flex-col gap-2">
       <TaskAddForm today={today} reload={reload} onError={onError} />
 
-      {now && !priorityFilter && <TaskNow task={now} />}
+      {tasks.length > 0 && (
+        <SearchField value={query} onChange={setQuery} label={t("tasks.find.label")} placeholder={t("tasks.find.placeholder")} />
+      )}
+
+      {now && !filtering && <TaskNow task={now} />}
 
       <TaskListHeader
         done={done}
@@ -206,6 +218,16 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
         onSummary={() => setSummary(true)}
         onCarryOver={() => void bulk.carryOver()}
         onClearDone={() => void bulk.clearDone()}
+      />
+
+      <ResultsMeta
+        shown={visible.length}
+        total={tasks.length}
+        filtering={filtering}
+        onClear={() => {
+          setQuery("");
+          setPriorityFilter("");
+        }}
       />
 
       <ul ref={listRef} className={`flex-1 space-y-0.5 overflow-y-auto pr-1 ${reorder.dragging ? "cursor-grabbing select-none" : ""}`}>
@@ -229,7 +251,7 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           </EmptyState>
         )}
         {tasks.length > 0 && visible.length === 0 && (
-          <EmptyState icon={<ChecklistIcon />}>{t("tasks.emptyPriority")}</EmptyState>
+          <EmptyState icon={<ChecklistIcon />}>{needle ? t("browse.noResultsFor", { query: query.trim() }) : t("tasks.emptyPriority")}</EmptyState>
         )}
       </ul>
       <GoogleTasksSection today={today} onError={onError} />
