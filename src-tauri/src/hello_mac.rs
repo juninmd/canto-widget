@@ -1,4 +1,4 @@
-//! Touch ID via a Keychain item gated by biometry: no signing needed, the OS prompts on read.
+//! Touch ID via a Keychain item gated by biometry. Needs the `keychain-access-groups` entitlement (Apple signing); without it `available()` is false and the app keeps the master password.
 //!
 //! This differs from `hello.rs` (Windows Hello) on purpose. Windows Hello's API is a
 //! challenge-signing primitive (`NCryptSignHash`), which is why `biometric.rs` derives an AES key
@@ -25,14 +25,33 @@ fn options() -> PasswordOptions {
     PasswordOptions::new_generic_password(SERVICE, ACCOUNT)
 }
 
-fn failure(e: impl std::fmt::Display) -> AppError {
+/// `errSecMissingEntitlement`: a biometry-gated item lives in the data-protection keychain, which the OS only
+/// opens to apps carrying the `keychain-access-groups` entitlement (needs an Apple Developer ID + profile). The
+/// ad-hoc signed build ("-") never has it, so the Keychain refuses with this code.
+const ERR_MISSING_ENTITLEMENT: i32 = -34018;
+
+fn failure(e: security_framework::base::Error) -> AppError {
+    if e.code() == ERR_MISSING_ENTITLEMENT {
+        return AppError::Config(format!(
+            "{NAME} indisponível nesta versão do app (falta a permissão do Keychain, exige assinatura Apple); use a senha mestra"
+        ));
+    }
     AppError::Crypto(format!("{NAME}: {e}"))
 }
 
-/// No cheap, non-prompting hardware check without `LocalAuthentication`: optimistic here, and
-/// `enable_verified` below is where an actual absence of Touch ID surfaces, as a clear error.
+/// Whether the Keychain accepts a biometry-gated item here. Writing one never prompts, so a throwaway probe
+/// item tells apart a build without the entitlement (the button is hidden, master password stays) from a
+/// working one. Probed once: the signature cannot change while the app runs.
 pub fn available() -> bool {
-    true
+    static OK: std::sync::OnceLock<bool> = std::sync::OnceLock::new();
+    *OK.get_or_init(|| {
+        const PROBE: &str = "sonda-touch-id";
+        let mut opts = PasswordOptions::new_generic_password(SERVICE, PROBE);
+        opts.set_access_control_options(AccessControlOptions::BIOMETRY_CURRENT_SET);
+        let res = passwords::set_generic_password_options(b"x", opts);
+        let _ = passwords::delete_generic_password(SERVICE, PROBE);
+        !matches!(res, Err(e) if e.code() == ERR_MISSING_ENTITLEMENT)
+    })
 }
 
 /// Stores the password, then reopens right away: proves the prompt really unlocks it before the
@@ -48,7 +67,7 @@ pub fn enable_verified(password: &str) -> Result<()> {
             delete();
             Err(match other {
                 Err(e) => e,
-                Ok(_) => failure("devolveu outra senha"),
+                Ok(_) => AppError::Crypto(format!("{NAME}: devolveu outra senha")),
             })
         }
     }
