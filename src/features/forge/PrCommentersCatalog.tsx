@@ -5,6 +5,7 @@ import { t } from "../../i18n";
 import Avatar from "../agenda/Avatar";
 import { PullIcon } from "../../components/Icons";
 import Skeleton from "../../components/Skeleton";
+import PersonCard from "./PersonCard";
 import { filterCommenters, type CommenterGroup, type EnrichedComment } from "./prCommenters";
 
 const PAGE_SIZE = 18;
@@ -13,9 +14,11 @@ const PR_PAGE_SIZE = 10;
 type Props = {
   commenters: CommenterGroup[];
   loading?: boolean;
+  /** GitHub only: GitLab's token has no profile lookup wired. */
+  profiles?: boolean;
 };
 
-export default function PrCommentersCatalog({ commenters, loading }: Props) {
+export default function PrCommentersCatalog({ commenters, loading, profiles }: Props) {
   const [query, setQuery] = useState("");
   const [hideBots, setHideBots] = useState(false);
   const [selectedLogin, setSelectedLogin] = useState<string | null>(null);
@@ -136,6 +139,7 @@ export default function PrCommentersCatalog({ commenters, loading }: Props) {
           </div>
 
           <div className="mt-1 space-y-2">
+            {selected && profiles && !selected.isBot && <PersonCard login={selected.login} />}
             {selected && (
               <div className="flex items-center justify-between text-[11px] text-muted">
                 <span>{t("forge.commenters.filterBy", { login: selected.login })}</span>

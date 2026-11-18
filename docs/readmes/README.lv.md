@@ -368,6 +368,7 @@ Un **Sekojiet sistēmai**, kas kopā ar operētājsistēmu pārslēdzas starp ga
 | ![GitHub tab: each PR shows its approvals, "mudanças pedidas" and the size of its diff next to the CI badge, and the "precisa de mim" button keeps only overdue reviews and my stalled PRs](../prints/app/155-forge-aprovacoes-precisa-de-mim.png) |
 | ![GitHub: espiar PR](../prints/app/156-forge-espiar-pr.png) |
 | ![GitHub: avisar CI e adiar](../prints/app/157-forge-avisar-ci-adiar.png) |
+| ![GitHub: perfil](../prints/app/158-forge-perfil-pessoa.png) |
 
 | Parole mainīta, viens fails gaida | Dienas kopsavilkums |
 |---|---|
