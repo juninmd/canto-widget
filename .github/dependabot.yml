@@ -7,6 +7,8 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+    cooldown:
+      default-days: 7
   - package-ecosystem: cargo
     directory: /src-tauri
     schedule:
@@ -14,6 +16,8 @@ updates:
     groups:
       rust-minor:
         update-types: [minor, patch]
+    cooldown:
+      default-days: 7
   - package-ecosystem: bun
     directory: /
     schedule:
@@ -21,3 +25,5 @@ updates:
     groups:
       js-minor:
         update-types: [minor, patch]
+    cooldown:
+      default-days: 7
