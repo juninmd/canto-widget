@@ -8,7 +8,7 @@ on:
     paths: [.github/workflows/android-apk.yml]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   apk:
@@ -43,3 +43,12 @@ jobs:
         with:
           name: canto-android-apk
           path: src-tauri/gen/android/app/build/outputs/apk/**/*.apk
+      - name: Publish pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          apk="$(find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' | head -n1)"
+          cp "$apk" canto-android.apk
+          gh release delete android-latest --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
+          gh release create android-latest canto-android.apk --prerelease --target "$GITHUB_SHA" \
+            --title "Canto Android (debug APK)" --notes "APK debug arm64 gerado pelo workflow android-apk." --repo "$GITHUB_REPOSITORY"
