@@ -235,6 +235,8 @@ export const integrations = {
   "forge.person.facts": "{repos} repositórios · {followers} seguidores · no GitHub desde {year}",
   "forge.person.factsNoYear": "{repos} repositórios · {followers} seguidores",
   "forge.person.open": "abrir no GitHub ↗",
+  "forge.peek.by": "por",
+  "forge.peek.profileOf": "ver perfil de @{login}",
   "forge.snoozedShow": "{n} adiados",
   "forge.snoozedHide": "ocultar adiados",
   "forge.hideDrafts": "ocultar rascunhos",

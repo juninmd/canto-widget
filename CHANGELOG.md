@@ -24,6 +24,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Adicionado
 
+- **GitHub: perfil também no “espiar”**: no painel do PR, o autor e cada revisor viram botões que abrem o cartão do perfil público (nome, empresa, cidade, bio, repositórios, seguidores) com o link para o GitHub. Bots não têm perfil para abrir.
 - **GitHub: perfil de quem comentou**: na aba Comentários, ao escolher uma pessoa aparece o cartão do perfil público dela (nome, empresa, cidade, bio, repositórios, seguidores e desde quando está no GitHub). Só leitura, só o perfil público, e bots não são consultados. GitLab não muda.
 - **GitHub: “avisar CI” e adiar por mais tempo**: num PR com CI rodando, o botão “avisar CI” (ao passar o mouse) faz o Canto mostrar um aviso quando o CI terminar, passando ou falhando, enquanto a aba GitHub estiver atualizando. Nas revisões pedidas, além de “adiar 4 h”, dá para adiar por 1 h, até amanhã às 8h ou por 1 semana.
 - **GitHub: “espiar” um PR, aprovar e comentar sem sair do widget**: o botão que aparece ao passar o mouse abre, sob as listas, a descrição, as branches, os jobs do CI e quem revisou. Dali dá para comentar e aprovar (com confirmação antes de enviar; seu próprio PR não mostra “aprovar”). É a única escrita do app no GitHub e só acontece quando você clica: precisa de um token com permissão de escrita em *Pull requests* (e *Issues*, para comentar); sem ela o Canto continua só leitura e avisa o que mudar. GitLab segue só leitura.

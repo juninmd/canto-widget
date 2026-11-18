@@ -3,6 +3,7 @@ import { api, errText, type ForgeItem, type PrDetail, type PrReviewer } from "..
 import { t } from "../../i18n";
 import Skeleton from "../../components/Skeleton";
 import { CiPill } from "./ForgePills";
+import PersonCard from "./PersonCard";
 
 type Props = { item: ForgeItem; login: string; onClose: () => void };
 type Sent = "approve" | "comment";
@@ -23,6 +24,15 @@ export default function PrPeek({ item, login, onClose }: Props) {
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState<Sent | null>(null);
   const [failed, setFailed] = useState("");
+  const [who, setWho] = useState<string | null>(null);
+  const person = (login: string, label: string) =>
+    login.endsWith("[bot]") ? (
+      <span>{label}</span>
+    ) : (
+      <button type="button" aria-pressed={who === login} aria-label={t("forge.peek.profileOf", { login })} onClick={() => setWho(who === login ? null : login)} className="canto-hit rounded-md hover:text-fg hover:underline">
+        {label}
+      </button>
+    );
 
   useEffect(() => {
     let live = true;
@@ -64,6 +74,7 @@ export default function PrPeek({ item, login, onClose }: Props) {
             {item.reference}
             {detail && ` · ${t("forge.peek.branches", { head: detail.head_branch, base: detail.base_branch })} · ${t("forge.peek.files", { n: detail.changed_files })}`}
           </p>
+          {item.author && <p className="m-0 text-[11px] text-muted">{t("forge.peek.by")} {person(item.author, `@${item.author}`)}</p>}
         </div>
         <button type="button" onClick={onClose} aria-label={t("forge.peek.close")} title={t("forge.peek.close")} className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:text-fg">
           ✕
@@ -91,10 +102,11 @@ export default function PrPeek({ item, login, onClose }: Props) {
             {detail.reviewers.length === 0 && <li className="text-faint">{t("forge.peek.noReviewers")}</li>}
             {detail.reviewers.map((r) => (
               <li key={r.login} className={STATE[r.state].tone}>
-                @{r.login} · {t(STATE[r.state].label)}
+                {person(r.login, `@${r.login} · ${t(STATE[r.state].label)}`)}
               </li>
             ))}
           </ul>
+          {who && <PersonCard login={who} />}
           <div className="flex gap-1.5">
             <textarea
               value={text}

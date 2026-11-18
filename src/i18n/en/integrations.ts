@@ -237,6 +237,8 @@ export const integrations: Record<keyof typeof source, string> = {
   "forge.person.facts": "{repos} repositories · {followers} followers · on GitHub since {year}",
   "forge.person.factsNoYear": "{repos} repositories · {followers} followers",
   "forge.person.open": "open on GitHub ↗",
+  "forge.peek.by": "by",
+  "forge.peek.profileOf": "show the profile of @{login}",
   "forge.snoozedShow": "{n} snoozed",
   "forge.snoozedHide": "hide snoozed",
   "forge.hideDrafts": "hide drafts",
