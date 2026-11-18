@@ -91,6 +91,7 @@
   "alert.prep.create": "会議メモを作成する",
   "alert.prep.created": "作成されたメモ: {title}",
   "alert.prep.open": "「メモ」タブを開く",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "時間",
   "alert.prep.note.guests": "ゲスト",
   "alert.prep.note.agenda": "議題",

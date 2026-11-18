@@ -91,6 +91,7 @@
   "alert.prep.create": "utwórz notatkę ze spotkania",
   "alert.prep.created": "utworzono notatkę: {title}",
   "alert.prep.open": "otwórz zakładkę Notatki",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Czas",
   "alert.prep.note.guests": "Goście",
   "alert.prep.note.agenda": "Porządek obrad",

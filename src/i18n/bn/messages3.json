@@ -91,6 +91,7 @@
   "alert.prep.create": "মিটিং নোট তৈরি করুন",
   "alert.prep.created": "নোট তৈরি করা হয়েছে: {title}",
   "alert.prep.open": "নোট ট্যাব খুলুন",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "সময়",
   "alert.prep.note.guests": "অতিথিরা",
   "alert.prep.note.agenda": "এজেন্ডা",

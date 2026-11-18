@@ -91,6 +91,7 @@
   "alert.prep.create": "vytvořit poznámku ze schůzky",
   "alert.prep.created": "poznámka vytvořena: {title}",
   "alert.prep.open": "otevřete kartu Poznámky",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Čas",
   "alert.prep.note.guests": "Hosté",
   "alert.prep.note.agenda": "Agenda",

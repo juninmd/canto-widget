@@ -91,6 +91,7 @@
   "alert.prep.create": "koosoleku märkme loomine",
   "alert.prep.created": "märge loodud: {title}",
   "alert.prep.open": "avage vahekaart Märkmed",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Aeg",
   "alert.prep.note.guests": "Külalised",
   "alert.prep.note.agenda": "Päevakord",

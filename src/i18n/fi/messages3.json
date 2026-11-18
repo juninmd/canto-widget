@@ -91,6 +91,7 @@
   "alert.prep.create": "luo kokousmuistiinpano",
   "alert.prep.created": "muistiinpano luotu: {title}",
   "alert.prep.open": "avaa Muistiinpanot-välilehti",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Aika",
   "alert.prep.note.guests": "Vieraita",
   "alert.prep.note.agenda": "Agenda",

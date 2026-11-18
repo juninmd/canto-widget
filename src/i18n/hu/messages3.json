@@ -91,6 +91,7 @@
   "alert.prep.create": "találkozójegyzet létrehozása",
   "alert.prep.created": "jegyzet létrehozva: {title}",
   "alert.prep.open": "nyissa meg a Jegyzetek lapot",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Idő",
   "alert.prep.note.guests": "Vendégek",
   "alert.prep.note.agenda": "Napirend",

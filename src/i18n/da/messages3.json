@@ -91,6 +91,7 @@
   "alert.prep.create": "oprette mødenotat",
   "alert.prep.created": "note oprettet: {title}",
   "alert.prep.open": "åbne fanen Noter",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Tid",
   "alert.prep.note.guests": "Gæster",
   "alert.prep.note.agenda": "Dagsorden",

@@ -91,6 +91,7 @@
   "alert.prep.create": "skapa mötesanteckning",
   "alert.prep.created": "anteckning skapad: {title}",
   "alert.prep.open": "öppna fliken Anteckningar",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Tid",
   "alert.prep.note.guests": "Gäster",
   "alert.prep.note.agenda": "Agenda",

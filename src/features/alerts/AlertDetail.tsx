@@ -9,6 +9,8 @@ import AlertGuests from "./AlertGuests";
 import AlertJobs from "./AlertJobs";
 import AlertPrep from "./AlertPrep";
 import Avatar from "../agenda/Avatar";
+import { useGuestPhotos } from "../agenda/useGuestPhotos";
+import AlertTranscript from "./AlertTranscript";
 import { CalendarIcon, CheckIcon, ClockIcon, PullIcon, PulseIcon } from "../../components/Icons";
 import { TONE } from "./AlertStrip";
 import WeatherIcon from "../weather/WeatherIcon";
@@ -92,6 +94,21 @@ function Badge({ event, kind, tone }: { event: AgendaItem; kind: string; tone: (
       className={`row-span-2 grid size-9 place-items-center self-start rounded-xl border [&_svg]:size-[18px] ${tone.card} ${tone.text}`}
     >
       {KIND_ICON[kind]}
+    </span>
+  );
+}
+
+/** Who organized the meeting: directory photo when Rust finds one, initials otherwise, and the name. */
+function Organizer({ event }: { event: AgendaItem }) {
+  const email = (event.attendees ?? []).find((g) => g.organizer)?.email ?? "";
+  const { photos } = useGuestPhotos(true, email ? [email] : []);
+  return (
+    <span data-organizer className="flex min-w-0 items-center gap-1.5">
+      <Avatar name={event.organizer ?? ""} email={email} size="md" photo={photos[email]} />
+      <span className="truncate">
+        <span className="text-faint">{t("agenda.guest.organizer")} · </span>
+        <b className="font-semibold text-fg">{event.organizer}</b>
+      </span>
     </span>
   );
 }
@@ -213,6 +230,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             <Chip tone={tone.text}>{hour(event)}</Chip>
             {kind === "meeting" && soon && <Chip>{soon}</Chip>}
             {event.meet && <Chip>Meet</Chip>}
+            {kind === "meeting" && event.organizer && <Organizer event={event} />}
           </>
         )}
       </div>
@@ -222,6 +240,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             {event.description && <Description text={event.description} />}
             {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
             {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
+            {kind === "meeting" && <AlertTranscript event={event} />}
             {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}
             {kind === "pr" && <AlertJobs jobs={event.attachments ?? []} />}
           </Box>

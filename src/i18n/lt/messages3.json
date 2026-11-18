@@ -91,6 +91,7 @@
   "alert.prep.create": "sukurti susitikimo užrašą",
   "alert.prep.created": "sukurta pastaba: {title}",
   "alert.prep.open": "atidarykite skirtuką Pastabos",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Laikas",
   "alert.prep.note.guests": "Svečiai",
   "alert.prep.note.agenda": "Dienotvarkė",

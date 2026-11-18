@@ -91,6 +91,7 @@
   "alert.prep.create": "Besprechungsnotiz erstellen",
   "alert.prep.created": "Notiz erstellt: {title}",
   "alert.prep.open": "Öffnen Sie die Registerkarte „Notizen“.",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Zeit",
   "alert.prep.note.guests": "Gäste",
   "alert.prep.note.agenda": "Tagesordnung",

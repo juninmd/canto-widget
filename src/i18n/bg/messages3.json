@@ -91,6 +91,7 @@
   "alert.prep.create": "създаване на бележка за срещата",
   "alert.prep.created": "създадена бележка: {title}",
   "alert.prep.open": "отворете раздела Бележки",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "време",
   "alert.prep.note.guests": "гости",
   "alert.prep.note.agenda": "Дневен ред",

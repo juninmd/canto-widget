@@ -91,6 +91,7 @@
   "alert.prep.create": "δημιουργία σημείωσης συνάντησης",
   "alert.prep.created": "η σημείωση δημιουργήθηκε: {title}",
   "alert.prep.open": "ανοίξτε την καρτέλα Σημειώσεις",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Χρόνος",
   "alert.prep.note.guests": "Καλεσμένοι",
   "alert.prep.note.agenda": "Ατζέντα",

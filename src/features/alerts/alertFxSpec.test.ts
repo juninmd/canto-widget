@@ -15,7 +15,7 @@ test("every alert family has its own scene and a way to arrive", () => {
     status: alertFx(item("status:gh", { tag: "minor" }), NOW).scene,
     weather: alertFx(item("weather:rain"), NOW).scene,
   };
-  expect(scenes).toEqual({ meeting: "rings", task: "ticks", mention: "bubbles", model: "sparks", digest: "rays", status: "pulse", weather: "weather" });
+  expect(scenes).toEqual({ meeting: "calendar", task: "ticks", mention: "bubbles", model: "sparks", digest: "rays", status: "pulse", weather: "weather" });
   expect(alertFx(item("task:1"), NOW).enter).toBe("wx-enter-drop");
 });
 

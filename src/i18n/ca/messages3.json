@@ -91,6 +91,7 @@
   "alert.prep.create": "crear una nota de reunió",
   "alert.prep.created": "nota creada: {title}",
   "alert.prep.open": "obriu la pestanya Notes",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Temps",
   "alert.prep.note.guests": "Convidats",
   "alert.prep.note.agenda": "Agenda",

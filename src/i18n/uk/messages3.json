@@ -91,6 +91,7 @@
   "alert.prep.create": "створити нотатку зустрічі",
   "alert.prep.created": "нотатка створена: {title}",
   "alert.prep.open": "відкрити вкладку Примітки",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "час",
   "alert.prep.note.guests": "Гості",
   "alert.prep.note.agenda": "Порядок денний",

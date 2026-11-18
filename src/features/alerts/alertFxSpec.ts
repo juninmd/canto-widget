@@ -3,8 +3,8 @@ import { minutesUntil } from "../agenda/agenda";
 import { kindOf, toneOf, type Tone } from "./alerts";
 import { weatherEnter, weatherSky } from "../weather/weatherFx";
 
-/** The animated backdrop of each alert family: expanding rings, floating ticks, sparkles, glitches, branches, bubbles, sun rays, a heartbeat. */
-export type FxScene = "rings" | "ticks" | "sparks" | "bugs" | "branches" | "bubbles" | "rays" | "pulse";
+/** The animated backdrop of each alert family: a calendar page, floating ticks, sparkles, glitches, branches, bubbles, sun rays, a heartbeat. */
+export type FxScene = "calendar" | "ticks" | "sparks" | "bugs" | "branches" | "bubbles" | "rays" | "pulse";
 
 export type AlertFxSpec = { scene: FxScene | "weather"; enter: string; sky: string; tone: Tone; intense: boolean };
 
@@ -29,8 +29,8 @@ export function alertFx(e: AgendaItem, now = new Date()): AlertFxSpec {
   const spec = (scene: FxScene, enter: string, sky: string, intense = danger): AlertFxSpec => ({ scene, enter: `wx-enter-${enter}`, sky, tone, intense });
   switch (kind) {
     case "meeting":
-      // The closer the start, the faster the rings.
-      return spec("rings", "rise", "#1e3a5f", minutesUntil(e, now) <= 2);
+      // The closer the start, the faster today's cell beats.
+      return spec("calendar", "rise", "#1e3a5f", minutesUntil(e, now) <= 2);
     case "task":
       return spec("ticks", "drop", "#14532d");
     case "pr": {

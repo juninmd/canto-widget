@@ -73,7 +73,7 @@ test("the weather sky stops drawing while the widget is in the tray", async () =
 });
 
 test("the alert backdrop stops drawing while the pop-up is hidden", async () => {
-  await pauseAndResume("the alert backdrop", <AlertFx scene="rings" tone="warn" intense={false} />);
+  await pauseAndResume("the alert backdrop", <AlertFx scene="calendar" tone="warn" intense={false} />);
 });
 
 test("the weather alert sky stops drawing while the pop-up is hidden", async () => {

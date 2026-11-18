@@ -91,6 +91,7 @@
   "alert.prep.create": "креирајте белешку са састанка",
   "alert.prep.created": "белешка креирана: {title}",
   "alert.prep.open": "отворите картицу Белешке",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Време",
   "alert.prep.note.guests": "Гости",
   "alert.prep.note.agenda": "Агенда",

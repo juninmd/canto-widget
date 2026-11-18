@@ -91,6 +91,7 @@
   "alert.prep.create": "ustvari zapisek za sestanek",
   "alert.prep.created": "opomba ustvarjena: {title}",
   "alert.prep.open": "odprite zavihek Opombe",
+  "alert.transcript": "recent transcript",
   "alert.prep.note.when": "Čas",
   "alert.prep.note.guests": "gostje",
   "alert.prep.note.agenda": "Dnevni red",
