@@ -40,4 +40,12 @@ export const uiBrowse = {
   "market.col.price": "preço",
   "market.col.change": "variação",
   "market.col.group": "tipo",
+  "models.find.label": "buscar modelos",
+  "models.find.placeholder": "buscar modelo ou criador",
+  "models.col.rank": "#",
+  "models.col.model": "modelo",
+  "models.col.creator": "criador",
+  "models.col.score": "índice",
+  "models.col.price": "$ / 1M",
+  "models.col.speed": "tok/s",
 } as const;

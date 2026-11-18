@@ -41,4 +41,12 @@ export const uiBrowse: Record<keyof typeof source, string> = {
   "market.col.price": "price",
   "market.col.change": "change",
   "market.col.group": "type",
+  "models.find.label": "search models",
+  "models.find.placeholder": "search a model or creator",
+  "models.col.rank": "#",
+  "models.col.model": "model",
+  "models.col.creator": "creator",
+  "models.col.score": "index",
+  "models.col.price": "$ / 1M",
+  "models.col.speed": "tok/s",
 };

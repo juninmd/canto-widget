@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFlip } from "../../lib/useFlip";
-import { api, errText, type ModelsView } from "../../lib/api";
+import { api, errText, type ModelRow, type ModelsView } from "../../lib/api";
 import { SORTS, availableFilters, withSheet, filterModels, sortModels, type ModelFilter, type ModelSort } from "./models";
 import { loadPicked, savePicked, togglePick } from "./compareMetrics";
 import { timeAgo } from "../../lib/time";
@@ -11,6 +11,23 @@ import ModelsCompare from "./ModelsCompare";
 import ModelsTray from "./ModelsTray";
 import Skeleton from "../../components/Skeleton";
 import SubTabs from "../../components/SubTabs";
+import SearchField from "../../components/SearchField";
+import ViewSwitch from "../../components/ViewSwitch";
+import ResultsMeta from "../../components/ResultsMeta";
+import DataTable, { type Column } from "../../components/DataTable";
+import { useViewPref } from "../../lib/useViewPref";
+import { fold, foldIncludes } from "../../lib/fold";
+
+const VIEWS = ["list", "table"] as const;
+type Row = ModelRow;
+const COLUMNS: Column<Row>[] = [
+  { key: "rank", label: t("models.col.rank"), align: "right", render: (m) => m.rank, sort: (m) => m.rank },
+  { key: "name", label: t("models.col.model"), render: (m) => <span className="font-medium text-fg">{m.name}</span>, sort: (m) => m.name },
+  { key: "creator", label: t("models.col.creator"), render: (m) => m.creator, sort: (m) => m.creator },
+  { key: "score", label: t("models.col.score"), align: "right", render: (m) => m.score.toLocaleString(LOCALE, { minimumFractionDigits: 1, maximumFractionDigits: 1 }), sort: (m) => m.score },
+  { key: "price", label: t("models.col.price"), align: "right", render: (m) => (m.price === null ? "—" : m.price.toLocaleString(LOCALE, { minimumFractionDigits: 2, maximumFractionDigits: 2 })), sort: (m) => m.price ?? Infinity },
+  { key: "speed", label: t("models.col.speed"), align: "right", render: (m) => (m.speed === null ? "—" : Math.round(m.speed)), sort: (m) => m.speed ?? -1 },
+];
 
 const SITE = "https://artificialanalysis.ai/";
 const LINK = "canto-hit min-h-[24px] rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
@@ -26,6 +43,8 @@ export default function ModelsTab() {
   const [tab, setTab] = useState<View>("rank");
   const [filters, setFilters] = useState<ModelFilter[]>([]);
   const [open, setOpen] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [layout, setLayout] = useViewPref("models", VIEWS);
   const [picked, setPickedState] = useState<string[]>(loadPicked);
   const list = useRef<HTMLOListElement>(null);
   // Re-sorting glides each model to its new rank instead of reshuffling the list in one frame.
@@ -56,7 +75,9 @@ export default function ModelsTab() {
   // Toggling a sheet or the loading flag re-renders the tab; the ranking and the compare set only change with their inputs.
   const all = view?.models;
   const offered = useMemo(() => (all ? availableFilters(all) : []), [all]);
-  const rows = useMemo(() => (all ? sortModels(filterModels(all, filters.filter((f) => offered.includes(f))), sort) : []), [all, filters, offered, sort]);
+  const ranked = useMemo(() => (all ? sortModels(filterModels(all, filters.filter((f) => offered.includes(f))), sort) : []), [all, filters, offered, sort]);
+  const needle = fold(query.trim());
+  const rows = useMemo(() => (needle ? ranked.filter((m) => foldIncludes(m.name, needle) || foldIncludes(m.creator, needle)) : ranked), [ranked, needle]);
   const marked = useMemo(() => (all ? picked.filter((id) => all.some((m) => m.id === id)) : []), [all, picked]);
   const max = useMemo(() => Math.max(0, ...(all ?? []).map((m) => m.score)), [all]);
 
@@ -137,6 +158,15 @@ export default function ModelsTab() {
           </button>
         </div>
       )}
+      {tab === "rank" && (
+        <>
+          <div className="flex gap-2">
+            <SearchField value={query} onChange={setQuery} label={t("models.find.label")} placeholder={t("models.find.placeholder")} />
+            <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
+          </div>
+          <ResultsMeta shown={rows.length} total={ranked.length} filtering={needle !== ""} onClear={() => setQuery("")} />
+        </>
+      )}
       {tab === "rank" && offered.length > 0 && (
         <div role="group" aria-label={t("models.filterLabel")} className="flex flex-wrap items-center gap-1.5 text-[11px]">
           <span className="text-faint">{t("models.filterLabel")}</span>
@@ -170,7 +200,9 @@ export default function ModelsTab() {
         {tab === "compare" ? (
           <ModelsCompare rows={view.models} picked={marked} onChange={setPicked} />
         ) : rows.length === 0 ? (
-          <p className="text-xs text-faint">{t("models.empty")}</p>
+          <p className="text-xs text-faint">{needle ? t("browse.noResultsFor", { query: query.trim() }) : t("models.empty")}</p>
+        ) : layout === "table" ? (
+          <DataTable label={t("models.view.rank")} columns={COLUMNS} rows={rows} rowKey={(m) => m.id} />
         ) : (
           <ol ref={list} className="flex flex-col gap-2">
             {rows.map((r, i) => (
