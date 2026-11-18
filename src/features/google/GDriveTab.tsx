@@ -11,11 +11,15 @@ import GDriveMore from "./GDriveMore";
 import GoogleGate from "./GoogleGate";
 import { SearchIcon } from "../../components/Icons";
 import Skeleton from "../../components/Skeleton";
+import ViewSwitch from "../../components/ViewSwitch";
+import { useViewPref } from "../../lib/useViewPref";
+import { GDriveGrid, GDriveTable } from "./GDriveViews";
 
 type Props = { onNotice: (message: string) => void };
 
 const FILTERS: DriveFilter[] = ["all", "recent", "starred", "shared", "mine"];
 const KINDS: DriveKind[] = ["", "doc", "sheet", "slide", "pdf"];
+const VIEWS = ["list", "grid", "table"] as const;
 const CREATE = ["doc", "sheet", "slide"] as const;
 const DRIVE = "https://drive.google.com/drive/my-drive";
 const CHIP =
@@ -30,6 +34,7 @@ export default function GDriveTab({ onNotice }: Props) {
   const [kind, setKind] = useState<DriveKind>("");
   const [search, setSearch] = useState("");
   const [path, setPath] = useState<Crumb[]>([]);
+  const [layout, setLayout] = useViewPref("gdrive", VIEWS);
   const [quota, setQuota] = useState<DriveQuota | null>(null);
   const [failure, setFailure] = useState("");
   const folder = path.at(-1)?.id ?? "";
@@ -52,6 +57,7 @@ export default function GDriveTab({ onNotice }: Props) {
     setFilter(id);
   };
   const enter = (file: DriveFile) => setPath((at) => [...at, { id: file.id, name: file.name }]);
+  const activate = (file: DriveFile) => (file.kind === "folder" ? enter(file) : open(file.link));
   const copy = async (file: DriveFile) => {
     try {
       await navigator.clipboard.writeText(file.link);
@@ -114,7 +120,8 @@ export default function GDriveTab({ onNotice }: Props) {
           ))}
         </div>
       </section>
-      <label className="canto-field flex items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
+      <div className="flex gap-2">
+      <label className="canto-field flex min-w-0 flex-1 items-center gap-2 rounded-lg border border-edge bg-ink px-2.5 text-xs">
         <span aria-hidden="true" className="text-faint [&>svg]:size-3.5"><SearchIcon /></span>
         <input
           type="search"
@@ -127,6 +134,8 @@ export default function GDriveTab({ onNotice }: Props) {
           className="min-w-0 flex-1 bg-transparent py-1.5 text-fg outline-none placeholder:text-faint"
         />
       </label>
+      <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
+      </div>
       <div className="flex flex-wrap gap-1.5">
         {FILTERS.map((id) => (
           <button key={id} type="button" aria-pressed={filter === id && !folder} onClick={() => choose(id)} className={CHIP}>
@@ -185,6 +194,10 @@ export default function GDriveTab({ onNotice }: Props) {
           <span aria-hidden="true" className="canto-float inline-block text-base">🗂️</span>
           {t("gdrive.empty")}
         </p>
+      ) : layout === "grid" ? (
+        <GDriveGrid key={`${folder}|${kind}|${search}|${filter}`} files={files} now={now} onActivate={activate} />
+      ) : layout === "table" ? (
+        <GDriveTable key={`${folder}|${kind}|${search}|${filter}`} files={files} now={now} onActivate={activate} />
       ) : browsing ? (
         <section key={`${folder}|${kind}|${search}`} aria-label={path.at(-1)?.name ?? t("gdrive.myDrive")} className="wx-glass shrink-0">
           <ul className="divide-y divide-edge">

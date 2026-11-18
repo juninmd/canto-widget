@@ -49,4 +49,10 @@ export const uiBrowse: Record<keyof typeof source, string> = {
   "models.col.score": "índice",
   "models.col.price": "$ / 1M",
   "models.col.speed": "tok/s",
+  "gdrive.col.name": "nombre",
+  "gdrive.col.type": "tipo",
+  "gdrive.col.who": "editado por",
+  "gdrive.col.modified": "modificado",
+  "gdrive.col.size": "tamaño",
+  "gdrive.col.you": "tú",
 };

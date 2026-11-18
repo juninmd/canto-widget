@@ -48,4 +48,10 @@ export const uiBrowse = {
   "models.col.score": "índice",
   "models.col.price": "$ / 1M",
   "models.col.speed": "tok/s",
+  "gdrive.col.name": "nome",
+  "gdrive.col.type": "tipo",
+  "gdrive.col.who": "editado por",
+  "gdrive.col.modified": "modificado",
+  "gdrive.col.size": "tamanho",
+  "gdrive.col.you": "você",
 } as const;
