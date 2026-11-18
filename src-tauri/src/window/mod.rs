@@ -363,9 +363,9 @@ mod tests {
     #[test]
     fn a_tall_alert_is_capped_to_the_room_above_the_dock() {
         assert_eq!(super::fit_height(640.0, 875.0, super::MARGIN), 640.0);
-        assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN), 484.0);
-        // Autohidden Dock: the extra gap shrinks the room too.
-        assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN + 80.0), 404.0);
+        assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN), 468.0);
+        // `gap` already holds the bottom margin; the top margin is the other one. An autohidden Dock shrinks the room too.
+        assert_eq!(super::fit_height(640.0, 500.0, super::MARGIN + 80.0), 388.0);
         // A screen too small for the minimum leaves the height alone rather than collapsing the card.
         assert_eq!(super::fit_height(300.0, 100.0, super::MARGIN), 300.0);
     }
