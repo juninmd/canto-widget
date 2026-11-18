@@ -163,7 +163,7 @@ test("the grid and the table show the same files, and a folder still opens in pl
   render(<GDriveTab onNotice={() => {}} />);
   await screen.findByText("PASTA");
   fireEvent.click(screen.getByRole("button", { name: "grade" }));
-  expect(document.querySelectorAll("[data-drive-file]")).toHaveLength(3);
+  for (const id of ["f1", "1", "2"]) expect(document.querySelector(`[data-drive-file="${id}"]`)).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "tabela" }));
   const table = screen.getByRole("table");
   expect(table.textContent).toContain("Roadmap Q4 2026");
