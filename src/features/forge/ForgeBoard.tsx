@@ -165,7 +165,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
             </>
           ) : (
             <div className="flex-1 overflow-y-auto pr-1">
-              <PrCommentersCatalog commenters={commenters.commenters} loading={commenters.loading} />
+              <PrCommentersCatalog commenters={commenters.commenters} loading={commenters.loading} profiles={forge === "github"} />
             </div>
           )}
         </>

@@ -65,7 +65,8 @@ test("GitHub: summary tiles filter the board, the sort sits in a menu, and row a
   await expect(bar).toHaveCSS("opacity", "0");
   await snooze.focus();
   await expect(bar).toHaveCSS("opacity", "1");
-  await page.getByText("Fuso horário no resumo diário").hover();
+  // The bar now holds more buttons and covers the right of the title: hover its left edge.
+  await page.getByText("Fuso horário no resumo diário").hover({ position: { x: 4, y: 4 } });
   await expect(bar).toHaveCSS("opacity", "1");
 
   if (process.env.SHOT) {
