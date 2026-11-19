@@ -203,5 +203,11 @@ export const tasks = {
   "alert.kind.model": "modelo novo",
   "alert.kind.task": "lembrete de tarefa",
   "alert.kind.meeting": "reunião começando",
+  "alert.kind.invite": "novo convite",
+  "alert.outcome.invite": "convite respondido",
+  "alert.invite.accept": "aceitar",
+  "alert.invite.decline": "recusar",
+  "alert.invited": "convite para você",
+  "alert.invitedBy": "convite de {name}",
   "alert.strip": "avisos pendentes",
 } as const;

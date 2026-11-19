@@ -46,7 +46,7 @@ no Meet, o Gemini salva um Google Doc no Drive do organizador e o anexa ao event
 documentos (anexos cujo título cita Gemini ou transcrição) das reuniões dos últimos 14 dias, e a aba **agenda**
 os mostra nos detalhes do evento; clicar abre o documento no navegador. Mostrar o texto dentro do widget exigiria o escopo `drive.readonly`, que o Google classifica como
 restrito e que obrigaria uma auditoria de segurança paga para um app público; por isso o Canto fica só com
-`calendar.events.readonly`. Para pesquisar o texto no Canto, exporte o documento (`.txt` ou `.md`) para a
+`calendar.events`. Para pesquisar o texto no Canto, exporte o documento (`.txt` ou `.md`) para a
 pasta da aba **reuniões**.
 
 ## GitHub (opcional)

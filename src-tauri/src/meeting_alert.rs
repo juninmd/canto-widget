@@ -43,6 +43,13 @@ impl Alerted {
     }
 }
 
+impl Alerted {
+    /// Silences an event that left the agenda (declined) before the next refresh drops it from the cache.
+    pub fn mark(&self, id: &str) {
+        self.0.lock_safe().insert(id.to_string());
+    }
+}
+
 pub fn start_ms(e: &AgendaItem) -> Option<i64> {
     if e.all_day {
         return None;

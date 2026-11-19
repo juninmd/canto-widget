@@ -205,5 +205,11 @@ export const tasks: Record<keyof typeof source, string> = {
   "alert.kind.model": "modelo nuevo",
   "alert.kind.task": "recordatorio de tarea",
   "alert.kind.meeting": "reunión por empezar",
+  "alert.kind.invite": "nueva invitación",
+  "alert.outcome.invite": "invitación respondida",
+  "alert.invite.accept": "aceptar",
+  "alert.invite.decline": "rechazar",
+  "alert.invited": "te invitaron",
+  "alert.invitedBy": "invitación de {name}",
   "alert.strip": "avisos pendientes",
 };

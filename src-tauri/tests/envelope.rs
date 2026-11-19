@@ -37,7 +37,7 @@ fn authorization_url_uses_pkce_s256_and_minimum_scope() {
     assert!(url.contains("code_challenge_method=S256"));
     assert!(url.contains(&format!("code_challenge={}", pkce.challenge)));
     assert!(url.contains(&format!("state={}", pkce.state)));
-    assert!(url.contains("scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events.readonly"));
+    assert!(url.contains("scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fcalendar.events"));
     // minimum identity to show the account, nothing beyond that
     assert!(url.contains("openid") && url.contains("email"));
     assert!(url.contains("redirect_uri=http%3A%2F%2F127.0.0.1%3A5731"));
@@ -47,7 +47,7 @@ fn authorization_url_uses_pkce_s256_and_minimum_scope() {
 }
 
 #[test]
-fn google_login_reads_drive_metadata_only_and_the_calendar_read_only() {
+fn google_login_reads_drive_metadata_only_and_the_calendar_events_only() {
     // The Drive tab lists files and opens them in the browser: their contents are never in reach.
     let url = authorize_url("id", "http://127.0.0.1:1", &Pkce::new());
     assert!(url.contains("auth%2Fdrive.metadata.readonly"), "{url}");
@@ -55,5 +55,7 @@ fn google_login_reads_drive_metadata_only_and_the_calendar_read_only() {
     assert!(url.contains("auth%2Fgmail.modify") && url.contains("auth%2Ftasks"), "{url}");
     // The address book is read-only: the editing scope would let a bug rewrite the user's contacts.
     assert!(url.contains("auth%2Fcontacts.readonly") && !url.contains("auth%2Fcontacts+"), "{url}");
-    assert!(!url.contains("calendar+") && !url.contains("calendar&"), "agenda must be read-only: {url}");
+    // Answering invites needs event write access, but never the whole-calendar scope (settings, sharing, deletion).
+    assert!(url.contains("auth%2Fcalendar.events+") && !url.contains("auth%2Fcalendar+"), "{url}");
+    assert!(!url.contains("calendar.events.readonly"), "{url}");
 }

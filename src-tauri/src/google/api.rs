@@ -28,8 +28,8 @@ pub fn refusal(service: &str, status: u16, body: &str) -> AppError {
     {
         return AppError::Config(
             crate::lang::tr(
-                "reconecte o Google em Ajustes para liberar Gmail, Tarefas, Drive e Contatos",
-                "reconnect Google in Settings to allow Gmail, Tasks, Drive and Contacts",
+                "reconecte o Google em Ajustes para liberar Gmail, Tarefas, Drive, Contatos e as respostas da Agenda",
+                "reconnect Google in Settings to allow Gmail, Tasks, Drive, Contacts and Calendar replies",
             )
             .into(),
         );

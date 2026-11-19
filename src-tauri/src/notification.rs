@@ -19,6 +19,8 @@ pub const DIGEST_PREFIX: &str = "digest:";
 pub const WEATHER_PREFIX: &str = "weather:";
 /// Same prefix as `SYSTEM_PREFIX` in the UI's `alerts.ts`: memory, disk, CPU or battery need attention.
 pub const SYSTEM_PREFIX: &str = "system:";
+/// Same prefix as `INVITE_PREFIX` in the UI's `alerts.ts`: someone invited the user to an event.
+pub const INVITE_PREFIX: &str = "invite:";
 
 pub fn content(event: &AgendaItem) -> (&'static str, String) {
     if event.id.starts_with(TASK_PREFIX) {
@@ -38,6 +40,10 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
     }
     if event.id.starts_with(SYSTEM_PREFIX) {
         return (crate::lang::tr("Sistema", "System"), format!("{}: {}", event.title, event.description));
+    }
+    if event.id.starts_with(INVITE_PREFIX) {
+        let who = if event.organizer.is_empty() { String::new() } else { format!(" · {}", event.organizer) };
+        return (crate::lang::tr("Novo convite", "New invite"), format!("{}{who}", event.title));
     }
     if event.id.starts_with(DIGEST_PREFIX) {
         let lines = event.description.lines().collect::<Vec<_>>().join(" · ");

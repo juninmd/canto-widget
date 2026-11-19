@@ -14,6 +14,7 @@ pub mod blocking;
 pub mod boot;
 pub mod calendar;
 pub mod calendar_event;
+pub mod calendar_rsvp;
 #[cfg(desktop)]
 pub mod capture;
 pub mod checks_cache;
@@ -57,6 +58,7 @@ pub mod health;
 pub mod hello;
 #[cfg(target_os = "macos")]
 pub mod hello_mac;
+pub mod invites;
 pub mod keep_import;
 pub mod lang;
 pub mod market;
@@ -435,6 +437,7 @@ pub fn run() {
             focus_mode::focus_offset,
             focus_mode::focus_summary,
             guest_photos::guest_photos,
+            calendar_rsvp::agenda_respond,
             contacts::photos::contact_photos,
             tray_live::badge_set_tasks,
         ])

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { AgendaItem, Task } from "../../lib/api";
+import type { AgendaItem, RsvpAnswer, Task } from "../../lib/api";
 import { duration } from "./agendaFree";
 import { fitInGap, minuteOf, railEntries, type RailEntry } from "./railEntries";
 import { dayBlocks, hhmm, unscheduled } from "../tasks/dayPlan";
@@ -17,6 +17,9 @@ type Props = {
   onToggle: (id: string) => void;
   onSchedule: (task: Task, time: string) => void;
   onOpen: (url: string) => void;
+  onRespond?: (id: string, answer: RsvpAnswer) => void;
+  /** Id of the event whose answer is on its way. */
+  answering?: string | null;
 };
 
 const DOT = "absolute left-[1px] top-3 h-3 w-3 rounded-full border-2 bg-panel";
@@ -32,7 +35,7 @@ function Row({ tone, dot, children }: { tone?: string; dot?: string; children: R
 }
 
 /** Reuniões, tarefas com horário e janelas livres numa linha só; o que já passou fica recolhido. */
-export default function AgendaRail({ items, tasks, now, live = true, clashes, open, onToggle, onSchedule, onOpen }: Props) {
+export default function AgendaRail({ items, tasks, now, live = true, clashes, open, onToggle, onSchedule, onOpen, onRespond, answering }: Props) {
   const { past, upcoming } = railEntries(items, tasks, now);
   const [showPast, setShowPast] = useState<boolean | null>(null);
   // Nothing left to look at: the finished meetings are the whole answer, so they start open.
@@ -47,7 +50,7 @@ export default function AgendaRail({ items, tasks, now, live = true, clashes, op
       const live = e.start <= at && at < e.end;
       return (
         <Row key={e.id} tone={`${ended ? "opacity-60" : ""} ${clashes.has(e.id) ? "before:bg-danger" : ""}`} dot={live ? "border-accent bg-accent" : "border-sky-400"}>
-          <AgendaCard event={e.item} conflicts={clashes.get(e.id)} open={open === e.id} onToggle={() => onToggle(e.id)} onOpen={onOpen} />
+          <AgendaCard event={e.item} conflicts={clashes.get(e.id)} open={open === e.id} onToggle={() => onToggle(e.id)} onOpen={onOpen} onRespond={onRespond} answering={answering === e.item.id} />
         </Row>
       );
     }

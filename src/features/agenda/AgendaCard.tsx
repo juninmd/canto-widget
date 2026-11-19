@@ -1,15 +1,25 @@
 import { useId } from "react";
-import type { AgendaItem } from "../../lib/api";
+import type { AgendaItem, RsvpAnswer } from "../../lib/api";
 import { hour, people, status } from "./agenda";
 import { t } from "../../i18n";
 import AgendaGuests from "./AgendaGuests";
 import Avatar from "./Avatar";
+import RsvpActions from "./RsvpActions";
 import RsvpBadge, { ConflictBadge } from "./RsvpBadge";
 import { useGuestPhotos } from "./useGuestPhotos";
 
-type Props = { event: AgendaItem; conflicts?: string[]; open: boolean; onToggle: () => void; onOpen: (url: string) => void };
+type Props = {
+  event: AgendaItem;
+  conflicts?: string[];
+  open: boolean;
+  onToggle: () => void;
+  onOpen: (url: string) => void;
+  /** Absent where answering is not offered (the card then only shows the answer). */
+  onRespond?: (id: string, answer: RsvpAnswer) => void;
+  answering?: boolean;
+};
 
-export default function AgendaCard({ event: e, conflicts = [], open, onToggle, onOpen }: Props) {
+export default function AgendaCard({ event: e, conflicts = [], open, onToggle, onOpen, onRespond, answering }: Props) {
   const { label, now } = status(e);
   const detailsId = useId();
   const attachments = e.attachments ?? [];
@@ -44,6 +54,11 @@ export default function AgendaCard({ event: e, conflicts = [], open, onToggle, o
         )}
         {e.location && <span className="block truncate text-[11px] text-faint">{e.location}</span>}
       </button>
+
+      {/* An unanswered invite shows its buttons without opening the card; an answered one only when open. */}
+      {onRespond && e.response && (open || e.response === "needsAction") && (
+        <RsvpActions current={e.response} busy={answering} onAnswer={(a) => onRespond(e.id, a)} />
+      )}
 
       {open && (
         <div id={detailsId} className="mt-2 space-y-1.5 border-t border-edge pt-2 text-[11px] text-muted">

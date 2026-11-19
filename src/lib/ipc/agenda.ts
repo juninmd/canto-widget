@@ -25,6 +25,8 @@ export type AgendaItem = {
   sender?: Sender | null;
 };
 export type Rsvp = "accepted" | "declined" | "tentative" | "needsAction";
+/** What the user can answer an invite with; "needsAction" is only Google's name for not having answered. */
+export type RsvpAnswer = Exclude<Rsvp, "needsAction">;
 export type Guest = { name: string; email: string; response: Rsvp | ""; organizer: boolean; optional: boolean; me: boolean };
 export type Attachment = { title: string; url: string; mime: string };
 export type GuestPhotos = { photos: Record<string, string>; needs_consent: boolean };
@@ -39,4 +41,5 @@ export const agendaApi = {
     invoke<AgendaItem[]>("agenda_today", { timeMin, timeMax }),
   geminiDocs: (timeMin: string, timeMax: string) => invoke<GeminiDoc[]>("gemini_docs", { timeMin, timeMax }),
   guestPhotos: (emails: string[]) => invoke<GuestPhotos>("guest_photos", { emails }),
+  agendaRespond: (eventId: string, answer: RsvpAnswer) => invoke<void>("agenda_respond", { eventId, answer }),
 };

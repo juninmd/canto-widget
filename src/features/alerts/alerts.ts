@@ -16,8 +16,10 @@ export const DIGEST_PREFIX = "digest:";
 export const WEATHER_PREFIX = "weather:";
 /** Same prefix as `SYSTEM_PREFIX` in `notification.rs`: memory, disk, CPU or battery need attention. */
 export const SYSTEM_PREFIX = "system:";
+/** Same prefix as `INVITE_PREFIX` in `notification.rs`: someone invited the user to an event. */
+export const INVITE_PREFIX = "invite:";
 
-export type AlertKind = "status" | "model" | "pr" | "mention" | "digest" | "weather" | "system" | "task" | "meeting";
+export type AlertKind = "status" | "model" | "pr" | "mention" | "digest" | "weather" | "system" | "invite" | "task" | "meeting";
 export type Tone = "danger" | "warn" | "accent" | "muted";
 
 export function kindOf(e: AgendaItem): AlertKind {
@@ -28,6 +30,7 @@ export function kindOf(e: AgendaItem): AlertKind {
   if (e.id.startsWith(DIGEST_PREFIX)) return "digest";
   if (e.id.startsWith(WEATHER_PREFIX)) return "weather";
   if (e.id.startsWith(SYSTEM_PREFIX)) return "system";
+  if (e.id.startsWith(INVITE_PREFIX)) return "invite";
   return e.id.startsWith(TASK_PREFIX) ? "task" : "meeting";
 }
 

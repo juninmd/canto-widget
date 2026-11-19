@@ -9,6 +9,7 @@ import ModeSwitcher from "./ModeSwitcher";
 
 const ICON: Record<AlertKind, () => React.JSX.Element> = {
   meeting: ClockIcon,
+  invite: ClockIcon,
   pr: PullIcon,
   task: ChecklistIcon,
   status: () => <BellIcon on={false} />,

@@ -1,7 +1,7 @@
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 import { emit } from "@tauri-apps/api/event";
-import { api, type AgendaItem, type AlertOutcome } from "../../lib/api";
-import { kindOf, STATUS_PREFIX, SYSTEM_PREFIX, WEATHER_PREFIX } from "./alerts";
+import { api, errText, type AgendaItem, type AlertOutcome, type RsvpAnswer } from "../../lib/api";
+import { INVITE_PREFIX, kindOf, STATUS_PREFIX, SYSTEM_PREFIX, WEATHER_PREFIX } from "./alerts";
 import { TASK_PREFIX } from "./reminders";
 import { t } from "../../i18n";
 import SnoozeButton from "./SnoozeButton";
@@ -34,6 +34,19 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
   primary,
 ) {
   const kind = kindOf(event);
+  const [answering, setAnswering] = useState(false);
+  const [failed, setFailed] = useState("");
+  const answer = (a: RsvpAnswer) => {
+    setAnswering(true);
+    setFailed("");
+    api.agendaRespond(event.id.slice(INVITE_PREFIX.length), a).then(
+      () => onDismiss("done"),
+      (e) => {
+        setFailed(errText(e));
+        setAnswering(false);
+      },
+    );
+  };
   const open = (url: string) => () => void api.openLink(url);
   const snooze = (minutes: number) => void api.alertSnooze(event.id, minutes).then(onHide, () => onDismiss());
   const mute = async () => {
@@ -149,18 +162,35 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           {t("alert.openModels")}
         </button>
       )}
-      {kind === "meeting" && event.link && (
+      {kind === "invite" && (
+        <>
+          <button ref={primary} type="button" disabled={answering} onClick={() => answer("accepted")} className={`${PRIMARY} disabled:opacity-60`}>
+            <CheckIcon />
+            {t("alert.invite.accept")}
+          </button>
+          <button type="button" disabled={answering} onClick={() => answer("declined")} className={`${SECONDARY} disabled:opacity-60`}>
+            <CrossIcon />
+            {t("alert.invite.decline")}
+          </button>
+          {failed && (
+            <span role="alert" title={failed} className="min-w-0 truncate text-[11px] text-danger">
+              {failed}
+            </span>
+          )}
+        </>
+      )}
+      {(kind === "meeting" || kind === "invite") && event.link && (
         <button
-          ref={event.meet ? undefined : primary}
+          ref={event.meet || kind === "invite" ? undefined : primary}
           type="button"
           onClick={open(event.link)}
           aria-label={t("alert.openCalendar")}
           title={t("alert.openCalendar")}
-          className={event.meet ? SECONDARY : PRIMARY}
+          className={event.meet || kind === "invite" ? SECONDARY : PRIMARY}
         >
           <CalendarIcon />
           {/* With a Meet button beside it the label gives way on narrow pop-ups so every action fits one line. */}
-          <span className={event.meet ? "hidden @[480px]:inline" : undefined}>{t("alert.openCalendar")}</span>
+          <span className={event.meet || kind === "invite" ? "hidden @[480px]:inline" : undefined}>{t("alert.openCalendar")}</span>
         </button>
       )}
       {(kind === "status" || kind === "weather" || kind === "system") && (

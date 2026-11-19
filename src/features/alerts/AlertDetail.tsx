@@ -36,6 +36,7 @@ function Chip({ children, tone }: { children: ReactNode; tone?: string }) {
 const KIND_ICON: Record<string, ReactNode> = {
   pr: <PullIcon />,
   meeting: <CalendarIcon />,
+  invite: <CalendarIcon />,
   task: <CheckIcon />,
   status: <PulseIcon size={18} />,
   digest: <ClockIcon />,
@@ -225,12 +226,12 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
             {event.start && <Chip>{timeAgo(event.start)}</Chip>}
           </>
         )}
-        {(kind === "meeting" || kind === "task") && (
+        {(kind === "meeting" || kind === "invite" || kind === "task") && (
           <>
             <Chip tone={tone.text}>{hour(event)}</Chip>
             {kind === "meeting" && soon && <Chip>{soon}</Chip>}
             {event.meet && <Chip>Meet</Chip>}
-            {kind === "meeting" && event.organizer && <Organizer event={event} />}
+            {(kind === "meeting" || kind === "invite") && event.organizer && <Organizer event={event} />}
           </>
         )}
       </div>
@@ -239,14 +240,14 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
           <Box label={kind === "status" ? t("alert.nowSituation") : t("alert.details")}>
             {event.description && <Description text={event.description} />}
             {event.location && <p className="mt-1 break-words text-xs text-muted">{event.location}</p>}
-            {kind === "meeting" && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
+            {(kind === "meeting" || kind === "invite") && people(event) && <p className="mt-1 text-xs text-muted">{people(event)}</p>}
             {kind === "meeting" && <AlertTranscript event={event} />}
             {kind === "meeting" && <AlertPrep event={event} onOpenNotes={onOpenNotes} />}
             {kind === "pr" && <AlertJobs jobs={event.attachments ?? []} />}
           </Box>
         </div>
       )}
-      {kind === "meeting" && (attendees.length > 0 || (event.attachments ?? []).length > 0) && (
+      {(kind === "meeting" || kind === "invite") && (attendees.length > 0 || (event.attachments ?? []).length > 0) && (
         <div className="col-start-2">
           <Box
             label={t("alert.guests")}
