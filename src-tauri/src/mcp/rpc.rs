@@ -193,6 +193,48 @@ pub const TOOLS: &[Tool] = &[
         write: true,
         schema: r#"{"type":"object","properties":{"title":{"type":"string"},"body":{"type":"string"},"tags":{"type":"array","items":{"type":"string"}}},"required":["title"]}"#,
     },
+    Tool {
+        name: "get_briefing",
+        description: "The day in one call: today's tasks, upcoming agenda, alerts so far and the weather. Only the parts whose permission is on.",
+        perm: "tasks",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "search_all",
+        description: "One text search across tasks, notes (if allowed) and the agenda. Accent-insensitive.",
+        perm: "tasks",
+        write: false,
+        schema: r#"{"type":"object","properties":{"query":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":50}},"required":["query"]}"#,
+    },
+    Tool {
+        name: "get_task",
+        description: "One task by id, with subtasks.",
+        perm: "tasks",
+        write: false,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"}},"required":["id"]}"#,
+    },
+    Tool {
+        name: "update_task",
+        description: "Edits a task: title, day, reminder time (HH:MM, empty clears), priority, or `done:false` to reopen. Never deletes.",
+        perm: "tasks_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"},"title":{"type":"string"},"day":{"type":"string","description":"YYYY-MM-DD"},"time":{"type":"string","description":"HH:MM, empty to clear"},"done":{"type":"boolean"}},"required":["id"]}"#,
+    },
+    Tool {
+        name: "set_reminder",
+        description: "Creates a task with a reminder that rings at `time` on `day` (default today), like any Canto task reminder.",
+        perm: "tasks_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"title":{"type":"string"},"time":{"type":"string","description":"HH:MM"},"day":{"type":"string","description":"YYYY-MM-DD, defaults to today"}},"required":["title","time"]}"#,
+    },
+    Tool {
+        name: "notify",
+        description: "Shows an OS notification from Canto, e.g. when a long agent task ends or needs the user.",
+        perm: "notify_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"title":{"type":"string"},"body":{"type":"string"}},"required":["title"]}"#,
+    },
 ];
 
 pub fn tool_list(perms: &Perms) -> Value {
@@ -234,6 +276,18 @@ fn tool_result(text: String, is_error: bool) -> Value {
     json!({ "content": [{ "type": "text", "text": text }], "isError": is_error })
 }
 
+/// A successful result also travels as `structuredContent` (an object, so a bare list is wrapped in `items`),
+/// so agents that read it skip re-parsing the text. Left out when the text was cut: it would be incomplete.
+fn ok_result(value: Value) -> Value {
+    let text = serde_json::to_string_pretty(&value).unwrap_or_default();
+    let whole = text.len() <= MAX_OUTPUT;
+    let mut out = tool_result(cap(text), false);
+    if whole {
+        out["structuredContent"] = if value.is_object() { value } else { json!({ "items": value }) };
+    }
+    out
+}
+
 fn call(params: &Value, perms: &Perms, backend: &dyn Backend) -> Result<Value, (i64, String)> {
     let name = params.get("name").and_then(Value::as_str).unwrap_or_default();
     let tool = TOOLS.iter().find(|t| t.name == name).ok_or((-32602, format!("unknown tool: {name}")))?;
@@ -243,7 +297,7 @@ fn call(params: &Value, perms: &Perms, backend: &dyn Backend) -> Result<Value, (
     }
     let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
     Ok(match backend.call(name, &args) {
-        Ok(value) => tool_result(cap(serde_json::to_string_pretty(&value).unwrap_or_default()), false),
+        Ok(value) => ok_result(value),
         Err(message) => tool_result(message, true),
     })
 }
@@ -355,6 +409,17 @@ mod tests {
     }
 
     #[test]
+    fn results_carry_structured_content_with_lists_wrapped() {
+        let r = send(
+            &Perms::default(),
+            json!({"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"list_tasks"}}),
+        )
+        .unwrap();
+        assert_eq!(r["result"]["structuredContent"]["tool"], "list_tasks");
+        assert_eq!(ok_result(json!([1, 2]))["structuredContent"]["items"], json!([1, 2]));
+    }
+
+    #[test]
     fn long_output_is_cut_on_a_char_boundary() {
         let big = "é".repeat(MAX_OUTPUT);
         let out = cap(big);
@@ -375,6 +440,7 @@ mod tests {
             notes: true,
             tasks_write: true,
             notes_write: true,
+            notify_write: true,
             ..Perms::default()
         };
         for t in TOOLS {

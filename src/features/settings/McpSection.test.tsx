@@ -5,7 +5,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 const calls: { cmd: string; args: unknown }[] = [];
 const perms = {
   notifications: true, tasks: true, notes: false, agenda: true, prs: true, system: true, weather: true, agents: true, models: true, status: true,
-  market: true, mentions: true, repos: true, steam: true, health: true, clipboard: false, gmail: false, contacts: false, tasks_write: false, notes_write: false,
+  market: true, mentions: true, repos: true, steam: true, health: true, clipboard: false, gmail: false, contacts: false, tasks_write: false, notes_write: false, notify_write: false,
 };
 let enabled = false;
 

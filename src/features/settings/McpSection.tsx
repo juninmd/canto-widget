@@ -11,7 +11,7 @@ import McpAgents from "./McpAgents";
 const GROUPS: { title: MessageKey; keys: (keyof McpPerms)[] }[] = [
   { title: "settings.mcp.groupData", keys: ["notifications", "tasks", "agenda", "prs", "mentions", "repos", "system", "weather", "agents", "models", "status", "market", "steam", "health"] },
   { title: "settings.mcp.groupPrivate", keys: ["notes", "clipboard", "gmail", "contacts"] },
-  { title: "settings.mcp.groupWrite", keys: ["tasks_write", "notes_write"] },
+  { title: "settings.mcp.groupWrite", keys: ["tasks_write", "notes_write", "notify_write"] },
 ];
 
 /** Local MCP server: on/off, port, token, one switch per resource and ready-made config for each agent. */
