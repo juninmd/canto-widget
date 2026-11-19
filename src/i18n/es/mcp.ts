@@ -38,6 +38,7 @@ export const mcp = {
   "settings.mcp.perm.tasks_write": "crear y completar tareas",
   "settings.mcp.perm.notes_write": "crear notas y añadir texto",
   "settings.mcp.perm.notify_write": "mostrar notificaciones del sistema",
+  "settings.mcp.perm.actions_write": "ejecutar chequeos de salud y copiar texto al portapapeles",
   "settings.mcp.agents": "Conectar un agente",
   "settings.mcp.agentsHint": "Elige el agente, copia y pega. La configuración ya lleva tu token y se guarda en el archivo del agente: trátala como una contraseña.",
   "settings.mcp.agentFile": "en {file}",

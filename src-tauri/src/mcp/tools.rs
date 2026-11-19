@@ -47,6 +47,10 @@ fn limit(args: &Value, default: usize, max: usize) -> usize {
     args.get("limit").and_then(Value::as_u64).map_or(default, |n| (n as usize).clamp(1, max))
 }
 
+fn offset(args: &Value) -> usize {
+    args.get("offset").and_then(Value::as_u64).map_or(0, |n| n as usize)
+}
+
 fn snippet(body: &str) -> String {
     let flat: String = body.split_whitespace().collect::<Vec<_>>().join(" ");
     flat.chars().take(200).collect()
@@ -74,7 +78,7 @@ pub fn list_tasks(d: &VaultData, args: &Value) -> Value {
         list.retain(|t| !t.done);
     }
     list.sort_by_key(|t| (t.day.clone(), t.done, t.order.unwrap_or(t.created_at), t.created_at));
-    Value::Array(list.into_iter().take(limit(args, 50, 200)).map(task_json).collect())
+    Value::Array(list.into_iter().skip(offset(args)).take(limit(args, 50, 200)).map(task_json).collect())
 }
 
 pub fn list_notes(d: &VaultData, args: &Value) -> Value {
@@ -83,6 +87,7 @@ pub fn list_notes(d: &VaultData, args: &Value) -> Value {
     list.sort_by_key(|n| std::cmp::Reverse((n.pinned, n.updated_at)));
     Value::Array(
         list.into_iter()
+            .skip(offset(args))
             .take(limit(args, 30, 100))
             .map(|n| json!({ "id": n.id, "title": n.title, "tags": n.tags, "pinned": n.pinned, "updated_at": n.updated_at, "snippet": snippet(&n.body) }))
             .collect(),
@@ -150,6 +155,11 @@ pub fn append_to_note_in(d: &mut VaultData, id: &str, extra: &str) -> Result<Val
     note.body = body;
     note.updated_at = crate::model::next_version(note.updated_at, now_ms());
     Ok(json!({ "id": note.id, "title": note.title }))
+}
+
+/// Events whose start (RFC3339 or YYYY-MM-DD) falls on `day`; every event when `day` is empty.
+pub fn agenda_for(items: Vec<crate::calendar::AgendaItem>, day: &str, n: usize) -> Vec<crate::calendar::AgendaItem> {
+    items.into_iter().filter(|e| day.is_empty() || e.start.starts_with(day)).take(n).collect()
 }
 
 fn time_ok(t: &str) -> bool {
@@ -345,8 +355,11 @@ impl Backend for AppBackend {
                     return Err(locked());
                 }
                 let log = self.0.state::<AlertLog>().list();
+                let tag = text(args, "tag");
                 Ok(Value::Array(
                     log.iter()
+                        .filter(|r| tag.is_empty() || r.item.tag == tag)
+                        .take(limit(args, 100, 200))
                         .map(|r| json!({ "title": r.item.title, "tag": r.item.tag, "start": r.item.start, "link": r.item.link, "outcome": r.outcome, "at_ms": r.at }))
                         .collect(),
                 ))
@@ -362,10 +375,12 @@ impl Backend for AppBackend {
                 if !state.is_unlocked() {
                     return Err(locked());
                 }
+                let day = text(args, "day");
+                if !day.is_empty() && !day_ok(day) {
+                    return Err("day must be YYYY-MM-DD".into());
+                }
                 Ok(Value::Array(
-                    self.0
-                        .state::<Upcoming>()
-                        .items()
+                    agenda_for(self.0.state::<Upcoming>().items(), day, limit(args, 100, 100))
                         .iter()
                         .map(|e| json!({ "title": e.title, "start": e.start, "end": e.end, "all_day": e.all_day, "location": e.location, "meet": e.meet, "link": e.link, "guests": e.guests, "response": e.response }))
                         .collect(),
@@ -486,6 +501,21 @@ mod tests {
         append_to_note_in(&mut d, &note, "mais uma linha").unwrap();
         assert!(d.notes[0].body.starts_with("pauta longa") && d.notes[0].body.ends_with("\nmais uma linha"));
         assert!(append_to_note_in(&mut d, &note, "  ").is_err() && append_to_note_in(&mut d, "x", "a").is_err());
+    }
+
+    #[test]
+    fn pages_skip_with_offset_and_the_agenda_filters_by_day() {
+        let mut d = vault();
+        create_task_in(&mut d, "third", "2026-11-16").unwrap();
+        let all = list_tasks(&d, &json!({ "include_done": true }));
+        let page = list_tasks(&d, &json!({ "include_done": true, "offset": 1, "limit": 1 }));
+        assert_eq!(page.as_array().unwrap().len(), 1);
+        assert_eq!(page[0], all[1]);
+        let ev = |s: &str| crate::calendar::AgendaItem { start: s.into(), ..Default::default() };
+        let items = vec![ev("2026-11-16T09:00:00-03:00"), ev("2026-11-17"), ev("2026-11-16")];
+        assert_eq!(agenda_for(items.clone(), "2026-11-16", 10).len(), 2);
+        assert_eq!(agenda_for(items.clone(), "", 2).len(), 2);
+        assert_eq!(agenda_for(items, "2026-12-01", 10).len(), 0);
     }
 
     #[test]

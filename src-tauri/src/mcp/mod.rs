@@ -55,6 +55,7 @@ pub struct Perms {
     pub tasks_write: bool,
     pub notes_write: bool,
     pub notify_write: bool,
+    pub actions_write: bool,
 }
 
 impl Default for Perms {
@@ -81,6 +82,7 @@ impl Default for Perms {
             tasks_write: false,
             notes_write: false,
             notify_write: false,
+            actions_write: false,
         }
     }
 }
@@ -109,6 +111,7 @@ impl Perms {
             "tasks_write" => self.tasks_write,
             "notes_write" => self.notes_write,
             "notify_write" => self.notify_write,
+            "actions_write" => self.actions_write,
             _ => false,
         }
     }
@@ -365,7 +368,13 @@ mod tests {
     fn a_fresh_install_is_off_read_only_and_keeps_notes_private() {
         let c = Config::default();
         assert!(!c.enabled && c.token_hash.is_empty());
-        assert!(!c.perms.tasks_write && !c.perms.notes_write && !c.perms.notify_write && !c.perms.notes);
+        assert!(
+            !c.perms.tasks_write
+                && !c.perms.notes_write
+                && !c.perms.notify_write
+                && !c.perms.actions_write
+                && !c.perms.notes
+        );
         assert!(!c.perms.clipboard && !c.perms.gmail && !c.perms.contacts);
         assert!(c.perms.tasks && c.perms.notifications);
         assert!(!c.perms.allows("unknown"));

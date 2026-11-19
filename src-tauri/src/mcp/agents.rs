@@ -55,7 +55,7 @@ pub struct CallEntry {
 impl Perms {
     /// The same switches with every write turned off.
     pub fn read_only(&self) -> Perms {
-        Perms { tasks_write: false, notes_write: false, ..self.clone() }
+        Perms { tasks_write: false, notes_write: false, notify_write: false, actions_write: false, ..self.clone() }
     }
 
     /// What this holder may do: a read-only one never writes, whatever the switches say.
@@ -243,11 +243,12 @@ mod tests {
 
     #[test]
     fn a_read_only_holder_never_gets_writes_whatever_the_switches_say() {
-        let perms = Perms { tasks_write: true, notes_write: true, ..Perms::default() };
+        let perms =
+            Perms { tasks_write: true, notes_write: true, notify_write: true, actions_write: true, ..Perms::default() };
         let ro = perms.for_cred(&cred("a", "x", true));
-        assert!(!ro.tasks_write && !ro.notes_write && ro.tasks);
+        assert!(!ro.tasks_write && !ro.notes_write && !ro.notify_write && !ro.actions_write && ro.tasks);
         let rw = perms.for_cred(&cred("a", "x", false));
-        assert!(rw.tasks_write && rw.notes_write);
+        assert!(rw.tasks_write && rw.notes_write && rw.notify_write && rw.actions_write);
     }
 
     #[test]

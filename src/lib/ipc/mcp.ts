@@ -4,7 +4,7 @@ export type McpPerms = {
   notifications: boolean; tasks: boolean; notes: boolean; agenda: boolean; prs: boolean; system: boolean; weather: boolean;
   agents: boolean; models: boolean; status: boolean; market: boolean; mentions: boolean; repos: boolean; steam: boolean;
   health: boolean; clipboard: boolean; gmail: boolean; contacts: boolean;
-  tasks_write: boolean; notes_write: boolean; notify_write: boolean;
+  tasks_write: boolean; notes_write: boolean; notify_write: boolean; actions_write: boolean;
 };
 export type McpAgent = { id: string; name: string; read_only: boolean };
 export type McpCall = { at: number; agent: string; tool: string; outcome: "ok" | "blocked" | "error"; write: boolean };

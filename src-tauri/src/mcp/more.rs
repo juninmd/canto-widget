@@ -103,6 +103,32 @@ pub fn call(app: &AppHandle, name: &str, args: &Value) -> Option<Result<Value, S
             .map_err(|e| e.to_string())
             .and_then(json_of)
             .map(|v| filter_contacts(v, text(args, "query"), limit(args, 20, 100))),
+        "get_pull_request" => {
+            let number = args.get("number").and_then(Value::as_u64).unwrap_or(0);
+            block(crate::github::cmd_pr::github_pr_detail(app.clone(), text(args, "repo").into(), number))
+                .map_err(|e| e.to_string())
+                .and_then(json_of)
+        }
+        "get_contact" => block(crate::google::cmd::contacts_list(app.clone()))
+            .map_err(|e| e.to_string())
+            .and_then(json_of)
+            .and_then(|v| find_contact(&v, text(args, "id"), text(args, "name"))),
+        "run_health_check" => {
+            crate::health::cmd::health_check_now(app.clone(), state, app.state(), text(args, "id").into())
+                .map_err(|e| e.to_string())
+                .and_then(json_of)
+        }
+        "copy_to_clipboard" => {
+            use tauri_plugin_clipboard_manager::ClipboardExt;
+            let t = text(args, "text");
+            if t.is_empty() || t.chars().count() > 100_000 {
+                return Some(Err("text must have 1 to 100000 characters".into()));
+            }
+            app.clipboard()
+                .write_text(t.to_string())
+                .map(|_| json!({ "copied_chars": t.chars().count() }))
+                .map_err(|e| e.to_string())
+        }
         _ => return None,
     })
 }
@@ -115,6 +141,25 @@ fn filter_contacts(mut value: Value, query: &str, n: usize) -> Value {
         }
     }
     trim(value, "items", n)
+}
+
+/// A contact by id, or by name ignoring case and accents.
+pub fn find_contact(value: &Value, id: &str, name: &str) -> Result<Value, String> {
+    if id.is_empty() && name.trim().is_empty() {
+        return Err("give an id or a name".into());
+    }
+    let wanted = crate::text_fold::fold(name.trim());
+    value
+        .get("items")
+        .and_then(Value::as_array)
+        .and_then(|items| {
+            items.iter().find(|c| {
+                (!id.is_empty() && c["id"] == id)
+                    || (id.is_empty() && crate::text_fold::fold(c["name"].as_str().unwrap_or_default()) == wanted)
+            })
+        })
+        .cloned()
+        .ok_or_else(|| "contact not found".to_string())
 }
 
 #[cfg(test)]
@@ -136,6 +181,14 @@ mod tests {
         let found = filter_contacts(v.clone(), "jose", 10);
         assert_eq!(found["items"].as_array().unwrap().len(), 2);
         assert_eq!(filter_contacts(v, "", 1)["items"].as_array().unwrap().len(), 1);
+    }
+
+    #[test]
+    fn a_contact_is_found_by_id_or_by_name_without_accents() {
+        let v = json!({ "items": [{ "id": "a", "name": "José Silva" }, { "id": "b", "name": "Ana" }] });
+        assert_eq!(find_contact(&v, "b", "").unwrap()["name"], "Ana");
+        assert_eq!(find_contact(&v, "", " jose silva ").unwrap()["id"], "a");
+        assert!(find_contact(&v, "zz", "").is_err() && find_contact(&v, "", "").is_err());
     }
 
     #[test]
