@@ -41,6 +41,7 @@ pub fn set_text(text: Option<&str>) {
     });
     let id = THREAD.load(Ordering::Relaxed);
     if id != 0 {
+        // A refused post is harmless: the loop re-reads the text on its own timer within a few seconds.
         // SAFETY: posts a plain message to our own message-loop thread.
         unsafe {
             let _ = PostThreadMessageW(id, WM_REFRESH, WPARAM(0), LPARAM(0));
@@ -51,6 +52,9 @@ pub fn set_text(text: Option<&str>) {
 fn run() {
     // SAFETY: a classic Win32 message loop owned by this thread; every handle is created and used here only.
     unsafe {
+        // Peeking creates this thread's message queue, so a post that races the start cannot be refused.
+        let mut first = MSG::default();
+        let _ = PeekMessageW(&mut first, None, WM_USER, WM_USER, PM_NOREMOVE);
         THREAD.store(GetCurrentThreadId(), Ordering::Relaxed);
         let Ok(module) = GetModuleHandleW(None) else { return };
         let inst = HINSTANCE(module.0);
@@ -72,6 +76,10 @@ fn run() {
                 let _ = TranslateMessage(&msg);
                 DispatchMessageW(&msg);
             }
+        }
+        // WM_QUIT ended the loop: take the child down with it.
+        if !own.0.is_null() {
+            let _ = DestroyWindow(own);
         }
     }
 }
