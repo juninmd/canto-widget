@@ -37,6 +37,8 @@ export const mcp = {
   "settings.mcp.perm.contacts": "read Google contacts",
   "settings.mcp.perm.tasks_write": "create and complete tasks",
   "settings.mcp.perm.notes_write": "create notes and append text",
+  "settings.mcp.perm.notify_write": "show system notifications",
+  "settings.mcp.perm.actions_write": "run health checks and copy text to the clipboard",
   "settings.mcp.agents": "Connect an agent",
   "settings.mcp.agentsHint": "Pick your agent, copy and paste. The config already carries your token and is saved in the agent's file: treat it like a password.",
   "settings.mcp.agentFile": "in {file}",

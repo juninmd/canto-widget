@@ -27,24 +27,24 @@ const NONE: &str = r#"{"type":"object","properties":{}}"#;
 pub const TOOLS: &[Tool] = &[
     Tool {
         name: "list_notifications",
-        description: "Alerts Canto showed today (meetings, PRs, reminders, system) and what became of each one. Memory only: empty after Canto restarts.",
+        description: "Alerts Canto showed today (meetings, PRs, reminders, system) and what became of each one. Memory only: empty after Canto restarts. Filter with `tag`.",
         perm: "notifications",
         write: false,
-        schema: NONE,
+        schema: r#"{"type":"object","properties":{"tag":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":200}}}"#,
     },
     Tool {
         name: "list_tasks",
         description: "Tasks from the Canto vault. Open ones by default; pass `day` (YYYY-MM-DD) to see a single day.",
         perm: "tasks",
         write: false,
-        schema: r#"{"type":"object","properties":{"day":{"type":"string","description":"YYYY-MM-DD"},"include_done":{"type":"boolean"},"limit":{"type":"integer","minimum":1,"maximum":200}}}"#,
+        schema: r#"{"type":"object","properties":{"day":{"type":"string","description":"YYYY-MM-DD"},"include_done":{"type":"boolean"},"limit":{"type":"integer","minimum":1,"maximum":200},"offset":{"type":"integer","minimum":0}}}"#,
     },
     Tool {
         name: "list_notes",
         description: "Notes from the Canto vault with a short snippet. Use get_note for the full text.",
         perm: "notes",
         write: false,
-        schema: r##"{"type":"object","properties":{"query":{"type":"string","description":"text to search, or #tag"},"limit":{"type":"integer","minimum":1,"maximum":100}}}"##,
+        schema: r##"{"type":"object","properties":{"query":{"type":"string","description":"text to search, or #tag"},"limit":{"type":"integer","minimum":1,"maximum":100},"offset":{"type":"integer","minimum":0}}}"##,
     },
     Tool {
         name: "get_note",
@@ -55,10 +55,10 @@ pub const TOOLS: &[Tool] = &[
     },
     Tool {
         name: "list_agenda",
-        description: "Upcoming Google Calendar events as last read by Canto (needs Google connected). Meeting links included.",
+        description: "Upcoming Google Calendar events as last read by Canto (needs Google connected). Meeting links included. Pass `day` (YYYY-MM-DD) for a single day.",
         perm: "agenda",
         write: false,
-        schema: NONE,
+        schema: r#"{"type":"object","properties":{"day":{"type":"string","description":"YYYY-MM-DD"},"limit":{"type":"integer","minimum":1,"maximum":100}}}"#,
     },
     Tool {
         name: "list_pull_requests",
@@ -193,7 +193,102 @@ pub const TOOLS: &[Tool] = &[
         write: true,
         schema: r#"{"type":"object","properties":{"title":{"type":"string"},"body":{"type":"string"},"tags":{"type":"array","items":{"type":"string"}}},"required":["title"]}"#,
     },
+    Tool {
+        name: "get_briefing",
+        description: "The day in one call: today's tasks, upcoming agenda, alerts so far and the weather. Only the parts whose permission is on.",
+        perm: "tasks",
+        write: false,
+        schema: NONE,
+    },
+    Tool {
+        name: "search_all",
+        description: "One text search across tasks, notes (if allowed) and the agenda. Accent-insensitive.",
+        perm: "tasks",
+        write: false,
+        schema: r#"{"type":"object","properties":{"query":{"type":"string"},"limit":{"type":"integer","minimum":1,"maximum":50}},"required":["query"]}"#,
+    },
+    Tool {
+        name: "get_task",
+        description: "One task by id, with subtasks.",
+        perm: "tasks",
+        write: false,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"}},"required":["id"]}"#,
+    },
+    Tool {
+        name: "update_task",
+        description: "Edits a task: title, day, reminder time (HH:MM, empty clears), priority, or `done:false` to reopen. Never deletes.",
+        perm: "tasks_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"},"title":{"type":"string"},"day":{"type":"string","description":"YYYY-MM-DD"},"time":{"type":"string","description":"HH:MM, empty to clear"},"done":{"type":"boolean"}},"required":["id"]}"#,
+    },
+    Tool {
+        name: "set_reminder",
+        description: "Creates a task with a reminder that rings at `time` on `day` (default today), like any Canto task reminder.",
+        perm: "tasks_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"title":{"type":"string"},"time":{"type":"string","description":"HH:MM"},"day":{"type":"string","description":"YYYY-MM-DD, defaults to today"}},"required":["title","time"]}"#,
+    },
+    Tool {
+        name: "notify",
+        description: "Shows an OS notification from Canto, e.g. when a long agent task ends or needs the user.",
+        perm: "notify_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"title":{"type":"string"},"body":{"type":"string"}},"required":["title"]}"#,
+    },
+    Tool {
+        name: "get_pull_request",
+        description: "One pull request in detail: description, reviewers, CI checks and comments. `repo` is owner/name.",
+        perm: "prs",
+        write: false,
+        schema: r#"{"type":"object","properties":{"repo":{"type":"string","description":"owner/name"},"number":{"type":"integer","minimum":1}},"required":["repo","number"]}"#,
+    },
+    Tool {
+        name: "get_contact",
+        description: "One Google contact by id or exact name.",
+        perm: "contacts",
+        write: false,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"},"name":{"type":"string"}}}"#,
+    },
+    Tool {
+        name: "run_health_check",
+        description: "Runs one monitored endpoint's check now (an HTTP/TCP/DNS probe) and returns the endpoints with the new reading.",
+        perm: "actions_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"id":{"type":"string"}},"required":["id"]}"#,
+    },
+    Tool {
+        name: "copy_to_clipboard",
+        description: "Puts text on the clipboard so the user can paste it. Never reads it back.",
+        perm: "actions_write",
+        write: true,
+        schema: r#"{"type":"object","properties":{"text":{"type":"string"}},"required":["text"]}"#,
+    },
 ];
+
+/// Ready-made prompts (MCP `prompts`): plain instructions that point at the tools above. They carry no data.
+pub const PROMPTS: &[(&str, &str, &str)] = &[
+    (
+        "daily_plan",
+        "Plan the day from Canto",
+        "Call get_briefing, then propose an order for today's tasks around the agenda. Keep it short and do not change anything.",
+    ),
+    (
+        "standup",
+        "Standup from Canto",
+        "Use list_tasks (include_done, today and yesterday) and list_pull_requests to write a yesterday/today/blockers standup. Do not change anything.",
+    ),
+];
+
+fn prompts_list() -> Value {
+    json!({ "prompts": PROMPTS.iter().map(|(n, d, _)| json!({ "name": n, "description": d })).collect::<Vec<_>>() })
+}
+
+fn prompt_get(params: &Value) -> Result<Value, (i64, String)> {
+    let name = params.get("name").and_then(Value::as_str).unwrap_or_default();
+    let (_, desc, text) =
+        PROMPTS.iter().find(|(n, _, _)| *n == name).ok_or((-32602, format!("unknown prompt: {name}")))?;
+    Ok(json!({ "description": desc, "messages": [{ "role": "user", "content": { "type": "text", "text": text } }] }))
+}
 
 pub fn tool_list(perms: &Perms) -> Value {
     let list: Vec<Value> = TOOLS
@@ -234,6 +329,18 @@ fn tool_result(text: String, is_error: bool) -> Value {
     json!({ "content": [{ "type": "text", "text": text }], "isError": is_error })
 }
 
+/// A successful result also travels as `structuredContent` (an object, so a bare list is wrapped in `items`),
+/// so agents that read it skip re-parsing the text. Left out when the text was cut: it would be incomplete.
+fn ok_result(value: Value) -> Value {
+    let text = serde_json::to_string_pretty(&value).unwrap_or_default();
+    let whole = text.len() <= MAX_OUTPUT;
+    let mut out = tool_result(cap(text), false);
+    if whole {
+        out["structuredContent"] = if value.is_object() { value } else { json!({ "items": value }) };
+    }
+    out
+}
+
 fn call(params: &Value, perms: &Perms, backend: &dyn Backend) -> Result<Value, (i64, String)> {
     let name = params.get("name").and_then(Value::as_str).unwrap_or_default();
     let tool = TOOLS.iter().find(|t| t.name == name).ok_or((-32602, format!("unknown tool: {name}")))?;
@@ -243,7 +350,7 @@ fn call(params: &Value, perms: &Perms, backend: &dyn Backend) -> Result<Value, (
     }
     let args = params.get("arguments").cloned().unwrap_or_else(|| json!({}));
     Ok(match backend.call(name, &args) {
-        Ok(value) => tool_result(cap(serde_json::to_string_pretty(&value).unwrap_or_default()), false),
+        Ok(value) => ok_result(value),
         Err(message) => tool_result(message, true),
     })
 }
@@ -264,7 +371,7 @@ pub fn dispatch(msg: &Value, perms: &Perms, backend: &dyn Backend) -> Option<Val
                 id,
                 json!({
                     "protocolVersion": version,
-                    "capabilities": { "tools": { "listChanged": false } },
+                    "capabilities": { "tools": { "listChanged": false }, "prompts": { "listChanged": false } },
                     "serverInfo": { "name": "canto", "version": env!("CARGO_PKG_VERSION") },
                     "instructions": "Canto is a personal desktop widget. Its data is private: read only what the user asked for and never repeat it elsewhere.",
                 }),
@@ -272,6 +379,11 @@ pub fn dispatch(msg: &Value, perms: &Perms, backend: &dyn Backend) -> Option<Val
         }
         "ping" => ok(id, json!({})),
         "tools/list" => ok(id, tool_list(perms)),
+        "prompts/list" => ok(id, prompts_list()),
+        "prompts/get" => match prompt_get(&params) {
+            Ok(result) => ok(id, result),
+            Err((code, message)) => error(id, code, &message),
+        },
         "tools/call" => match call(&params, perms, backend) {
             Ok(result) => ok(id, result),
             Err((code, message)) => error(id, code, &message),
@@ -355,6 +467,28 @@ mod tests {
     }
 
     #[test]
+    fn results_carry_structured_content_with_lists_wrapped() {
+        let r = send(
+            &Perms::default(),
+            json!({"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"list_tasks"}}),
+        )
+        .unwrap();
+        assert_eq!(r["result"]["structuredContent"]["tool"], "list_tasks");
+        assert_eq!(ok_result(json!([1, 2]))["structuredContent"]["items"], json!([1, 2]));
+    }
+
+    #[test]
+    fn prompts_are_listed_and_fetched_by_name() {
+        let p = Perms::default();
+        let r = send(&p, json!({"jsonrpc":"2.0","id":8,"method":"prompts/list"})).unwrap();
+        assert!(r["result"]["prompts"].as_array().unwrap().iter().any(|x| x["name"] == "daily_plan"));
+        let r = send(&p, json!({"jsonrpc":"2.0","id":9,"method":"prompts/get","params":{"name":"standup"}})).unwrap();
+        assert!(r["result"]["messages"][0]["content"]["text"].as_str().unwrap().contains("list_tasks"));
+        let r = send(&p, json!({"jsonrpc":"2.0","id":10,"method":"prompts/get","params":{"name":"x"}})).unwrap();
+        assert_eq!(r["error"]["code"], -32602);
+    }
+
+    #[test]
     fn long_output_is_cut_on_a_char_boundary() {
         let big = "é".repeat(MAX_OUTPUT);
         let out = cap(big);
@@ -375,6 +509,8 @@ mod tests {
             notes: true,
             tasks_write: true,
             notes_write: true,
+            notify_write: true,
+            actions_write: true,
             ..Perms::default()
         };
         for t in TOOLS {

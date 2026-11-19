@@ -47,6 +47,10 @@ fn limit(args: &Value, default: usize, max: usize) -> usize {
     args.get("limit").and_then(Value::as_u64).map_or(default, |n| (n as usize).clamp(1, max))
 }
 
+fn offset(args: &Value) -> usize {
+    args.get("offset").and_then(Value::as_u64).map_or(0, |n| n as usize)
+}
+
 fn snippet(body: &str) -> String {
     let flat: String = body.split_whitespace().collect::<Vec<_>>().join(" ");
     flat.chars().take(200).collect()
@@ -74,7 +78,7 @@ pub fn list_tasks(d: &VaultData, args: &Value) -> Value {
         list.retain(|t| !t.done);
     }
     list.sort_by_key(|t| (t.day.clone(), t.done, t.order.unwrap_or(t.created_at), t.created_at));
-    Value::Array(list.into_iter().take(limit(args, 50, 200)).map(task_json).collect())
+    Value::Array(list.into_iter().skip(offset(args)).take(limit(args, 50, 200)).map(task_json).collect())
 }
 
 pub fn list_notes(d: &VaultData, args: &Value) -> Value {
@@ -83,6 +87,7 @@ pub fn list_notes(d: &VaultData, args: &Value) -> Value {
     list.sort_by_key(|n| std::cmp::Reverse((n.pinned, n.updated_at)));
     Value::Array(
         list.into_iter()
+            .skip(offset(args))
             .take(limit(args, 30, 100))
             .map(|n| json!({ "id": n.id, "title": n.title, "tags": n.tags, "pinned": n.pinned, "updated_at": n.updated_at, "snippet": snippet(&n.body) }))
             .collect(),
@@ -152,9 +157,145 @@ pub fn append_to_note_in(d: &mut VaultData, id: &str, extra: &str) -> Result<Val
     Ok(json!({ "id": note.id, "title": note.title }))
 }
 
+/// Events whose start (RFC3339 or YYYY-MM-DD) falls on `day`; every event when `day` is empty.
+pub fn agenda_for(items: Vec<crate::calendar::AgendaItem>, day: &str, n: usize) -> Vec<crate::calendar::AgendaItem> {
+    items.into_iter().filter(|e| day.is_empty() || e.start.starts_with(day)).take(n).collect()
+}
+
+fn time_ok(t: &str) -> bool {
+    chrono::NaiveTime::parse_from_str(t, "%H:%M").is_ok()
+}
+
+pub fn get_task_in(d: &VaultData, id: &str) -> Result<Value, String> {
+    d.tasks.iter().find(|t| t.id == id).map(task_json).ok_or_else(|| "task not found".to_string())
+}
+
+/// Edits only the fields present in `args`; an invalid one rejects the whole call, so nothing is half applied.
+pub fn update_task_in(d: &mut VaultData, args: &Value) -> Result<Value, String> {
+    let id = text(args, "id");
+    let task = d.tasks.iter_mut().find(|t| t.id == id).ok_or("task not found")?;
+    let mut next = task.clone();
+    if let Some(title) = args.get("title").and_then(Value::as_str) {
+        let title = title.trim();
+        if title.is_empty() || title.chars().count() > 300 {
+            return Err("title must have 1 to 300 characters".into());
+        }
+        next.title = title.into();
+    }
+    if let Some(day) = args.get("day").and_then(Value::as_str) {
+        if !day_ok(day) {
+            return Err("day must be YYYY-MM-DD".into());
+        }
+        next.day = day.into();
+    }
+    if let Some(time) = args.get("time").and_then(Value::as_str) {
+        if time.is_empty() {
+            next.reminder_time = None;
+        } else if time_ok(time) {
+            next.reminder_time = Some(time.into());
+        } else {
+            return Err("time must be HH:MM".into());
+        }
+    }
+    if let Some(done) = args.get("done").and_then(Value::as_bool) {
+        next.done = done;
+    }
+    if next != *task {
+        next.updated_at = crate::model::next_version(task.updated_at, now_ms());
+        *task = next;
+    }
+    Ok(task_json(task))
+}
+
+pub fn set_reminder_in(d: &mut VaultData, title: &str, time: &str, day: &str) -> Result<Task, String> {
+    if !time_ok(time) {
+        return Err("time must be HH:MM".into());
+    }
+    let mut task = create_task_in(d, title, day)?;
+    let stored = d.tasks.last_mut().ok_or("task not created")?;
+    stored.reminder_time = Some(time.into());
+    task.reminder_time = Some(time.into());
+    Ok(task)
+}
+
+/// Tasks and (when allowed) notes that mention `query`; the agenda is searched by the backend.
+pub fn search_vault(d: &VaultData, query: &str, notes: bool, n: usize) -> Value {
+    let needle = fold(query.trim());
+    if needle.is_empty() {
+        return json!({ "tasks": [], "notes": [] });
+    }
+    let tasks: Vec<Value> =
+        d.tasks.iter().filter(|t| fold(&t.title).contains(&needle)).take(n).map(task_json).collect();
+    let notes: Vec<Value> = if notes {
+        d.notes
+            .iter()
+            .filter(|x| note_matches(x, &needle))
+            .take(n)
+            .map(|x| json!({ "id": x.id, "title": x.title, "snippet": snippet(&x.body) }))
+            .collect()
+    } else {
+        vec![]
+    };
+    json!({ "tasks": tasks, "notes": notes })
+}
+
 impl AppBackend {
     fn state(&self) -> tauri::State<'_, AppState> {
         self.0.state::<AppState>()
+    }
+
+    fn perms(&self) -> super::Perms {
+        self.0.state::<super::McpState>().snapshot().2
+    }
+
+    fn agenda(&self) -> Vec<crate::calendar::AgendaItem> {
+        self.0.state::<Upcoming>().items()
+    }
+
+    fn briefing(&self) -> Result<Value, String> {
+        let perms = self.perms();
+        let today = chrono::Local::now().format("%Y-%m-%d").to_string();
+        let mut out = json!({ "date": today });
+        out["tasks_today"] = read(&self.state(), |d| {
+            Value::Array(d.tasks.iter().filter(|t| t.day == today && !t.done).map(task_json).collect())
+        })?;
+        if perms.agenda {
+            let events: Vec<Value> = self
+                .agenda()
+                .iter()
+                .filter(|e| e.start.starts_with(&today))
+                .map(|e| json!({ "title": e.title, "start": e.start, "meet": e.meet, "link": e.link }))
+                .collect();
+            out["agenda_today"] = Value::Array(events);
+        }
+        if perms.notifications {
+            out["alerts_today"] = json!(self.0.state::<AlertLog>().list().len());
+        }
+        if perms.weather {
+            if let Ok(w) = self.weather() {
+                out["weather"] = json!({ "place": w["place"], "now": w["now"], "rain_from": w["rain_from"] });
+            }
+        }
+        Ok(out)
+    }
+
+    fn search_all(&self, args: &Value) -> Result<Value, String> {
+        let perms = self.perms();
+        let (query, n) = (text(args, "query"), limit(args, 20, 50));
+        let mut out = read(&self.state(), |d| search_vault(d, query, perms.notes, n))?;
+        let needle = fold(query.trim());
+        let events: Vec<Value> = if perms.agenda && !needle.is_empty() {
+            self.agenda()
+                .iter()
+                .filter(|e| fold(&format!("{} {}", e.title, e.location)).contains(&needle))
+                .take(n)
+                .map(|e| json!({ "title": e.title, "start": e.start, "link": e.link }))
+                .collect()
+        } else {
+            vec![]
+        };
+        out["agenda"] = Value::Array(events);
+        Ok(out)
     }
 
     fn pull_requests(&self, args: &Value) -> Result<Value, String> {
@@ -214,8 +355,11 @@ impl Backend for AppBackend {
                     return Err(locked());
                 }
                 let log = self.0.state::<AlertLog>().list();
+                let tag = text(args, "tag");
                 Ok(Value::Array(
                     log.iter()
+                        .filter(|r| tag.is_empty() || r.item.tag == tag)
+                        .take(limit(args, 100, 200))
                         .map(|r| json!({ "title": r.item.title, "tag": r.item.tag, "start": r.item.start, "link": r.item.link, "outcome": r.outcome, "at_ms": r.at }))
                         .collect(),
                 ))
@@ -231,10 +375,12 @@ impl Backend for AppBackend {
                 if !state.is_unlocked() {
                     return Err(locked());
                 }
+                let day = text(args, "day");
+                if !day.is_empty() && !day_ok(day) {
+                    return Err("day must be YYYY-MM-DD".into());
+                }
                 Ok(Value::Array(
-                    self.0
-                        .state::<Upcoming>()
-                        .items()
+                    agenda_for(self.0.state::<Upcoming>().items(), day, limit(args, 100, 100))
                         .iter()
                         .map(|e| json!({ "title": e.title, "start": e.start, "end": e.end, "all_day": e.all_day, "location": e.location, "meet": e.meet, "link": e.link, "guests": e.guests, "response": e.response }))
                         .collect(),
@@ -278,6 +424,33 @@ impl Backend for AppBackend {
             "append_to_note" => {
                 let (id, extra) = (text(args, "id").to_string(), text(args, "text").to_string());
                 write(&state, |d| append_to_note_in(d, &id, &extra))?
+            }
+            "get_briefing" => self.briefing(),
+            "search_all" => self.search_all(args),
+            "get_task" => {
+                let id = text(args, "id");
+                read(&state, |d| get_task_in(d, id))?
+            }
+            "update_task" => write(&state, |d| update_task_in(d, args))?,
+            "set_reminder" => {
+                let day = match text(args, "day") {
+                    "" => chrono::Local::now().format("%Y-%m-%d").to_string(),
+                    d => d.to_string(),
+                };
+                let (title, time) = (text(args, "title").to_string(), text(args, "time").to_string());
+                write(&state, |d| set_reminder_in(d, &title, &time, &day))?.map(|t| task_json(&t))
+            }
+            "notify" => {
+                if !state.is_unlocked() {
+                    return Err(locked());
+                }
+                let title: String = text(args, "title").trim().chars().take(100).collect();
+                if title.is_empty() {
+                    return Err("title is empty".into());
+                }
+                let body: String = text(args, "body").chars().take(300).collect();
+                crate::notification::notify_os(&self.0, &title, &body);
+                Ok(json!({ "shown": true }))
             }
             _ => super::more::call(&self.0, name, args).unwrap_or_else(|| Err(format!("unknown tool: {name}"))),
         }
@@ -331,6 +504,21 @@ mod tests {
     }
 
     #[test]
+    fn pages_skip_with_offset_and_the_agenda_filters_by_day() {
+        let mut d = vault();
+        create_task_in(&mut d, "third", "2026-11-16").unwrap();
+        let all = list_tasks(&d, &json!({ "include_done": true }));
+        let page = list_tasks(&d, &json!({ "include_done": true, "offset": 1, "limit": 1 }));
+        assert_eq!(page.as_array().unwrap().len(), 1);
+        assert_eq!(page[0], all[1]);
+        let ev = |s: &str| crate::calendar::AgendaItem { start: s.into(), ..Default::default() };
+        let items = vec![ev("2026-11-16T09:00:00-03:00"), ev("2026-11-17"), ev("2026-11-16")];
+        assert_eq!(agenda_for(items.clone(), "2026-11-16", 10).len(), 2);
+        assert_eq!(agenda_for(items.clone(), "", 2).len(), 2);
+        assert_eq!(agenda_for(items, "2026-12-01", 10).len(), 0);
+    }
+
+    #[test]
     fn writes_are_validated() {
         let mut d = VaultData::default();
         assert!(create_task_in(&mut d, "  ", "2026-11-16").is_err());
@@ -339,5 +527,37 @@ mod tests {
         assert!(create_note_in(&mut d, "", " ", vec![]).is_err());
         assert!(create_note_in(&mut d, &"t".repeat(301), "", vec![]).is_err());
         assert!(d.tasks.is_empty() && d.notes.is_empty());
+    }
+
+    #[test]
+    fn update_task_edits_only_given_fields_reopens_and_rejects_bad_input() {
+        let mut d = vault();
+        let id = d.tasks[1].id.clone();
+        let r =
+            update_task_in(&mut d, &json!({ "id": id, "done": false, "time": "09:30", "title": " novo " })).unwrap();
+        assert_eq!(
+            (r["done"].clone(), r["time"].clone(), r["title"].clone()),
+            (json!(false), json!("09:30"), json!("novo"))
+        );
+        assert_eq!(d.tasks[1].day, "2026-11-15");
+        assert!(update_task_in(&mut d, &json!({ "id": id, "day": "amanha" })).is_err());
+        assert!(update_task_in(&mut d, &json!({ "id": id, "time": "25:99" })).is_err());
+        assert_eq!(d.tasks[1].reminder_time.as_deref(), Some("09:30"));
+        update_task_in(&mut d, &json!({ "id": id, "time": "" })).unwrap();
+        assert!(d.tasks[1].reminder_time.is_none());
+        assert!(update_task_in(&mut d, &json!({ "id": "nope" })).is_err());
+    }
+
+    #[test]
+    fn reminders_need_a_valid_time_and_search_respects_the_notes_switch() {
+        let mut d = vault();
+        assert!(set_reminder_in(&mut d, "ligar", "9h", "2026-11-16").is_err());
+        let t = set_reminder_in(&mut d, "ligar", "09:00", "2026-11-16").unwrap();
+        assert_eq!(d.tasks.last().unwrap().reminder_time.as_deref(), Some("09:00"));
+        assert_eq!(get_task_in(&d, &t.id).unwrap()["time"], "09:00");
+        assert_eq!(search_vault(&d, "REPORT", true, 5)["tasks"].as_array().unwrap().len(), 1);
+        assert_eq!(search_vault(&d, "reuniao", true, 5)["notes"].as_array().unwrap().len(), 1);
+        assert_eq!(search_vault(&d, "reuniao", false, 5)["notes"].as_array().unwrap().len(), 0);
+        assert!(search_vault(&d, " ", true, 5)["tasks"].as_array().unwrap().is_empty());
     }
 }

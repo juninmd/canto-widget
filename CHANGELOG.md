@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Mais ferramentas no servidor MCP**: `get_briefing` (o dia em uma chamada), `search_all` (busca em tarefas, notas e agenda), `get_task`, `update_task` (editar e reabrir), `set_reminder` e `notify` (notificação do sistema, com permissão própria em Ajustes > Servidor MCP). As respostas agora também vão como `structuredContent`. Também: `get_pull_request` (CI, reviews e comentários), `get_contact`, `run_health_check` e `copy_to_clipboard` (permissão própria), prompts prontos (`daily_plan`, `standup`) e filtros novos (`day` na agenda, `tag` nos alertas, `offset` nas listas).
+
 ### Alterado
 
 - **Trancar sozinho pode ser desligado**: em Ajustes > Segurança, “trancar sozinho após” ganhou a opção **nunca (só trancar manualmente)**. Quem escolhe isso mantém o cofre aberto até trancar pelo botão ou pela bandeja; o padrão continua 15 min sem uso.
