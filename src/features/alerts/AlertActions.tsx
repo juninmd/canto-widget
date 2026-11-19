@@ -54,147 +54,152 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
   };
 
   return (
-    <div className="flex flex-nowrap items-center gap-1.5">
-      {kind === "task" && (
-        <button
-          ref={primary}
-          type="button"
-          onClick={() =>
-            void api
-              .taskComplete(event.id.slice(TASK_PREFIX.length))
-              .then(onCompleted)
-              .finally(() => onDismiss("done"))
-          }
-          className={PRIMARY}
-        >
-          <CheckIcon />
-          {t("alert.completeTask")}
-        </button>
-      )}
-      {(kind === "pr" || kind === "mention") && event.link && (
-        <button
-          ref={primary}
-          type="button"
-          onClick={() => {
-            open(event.link)();
-            onDismiss("done");
-          }}
-          className={PRIMARY}
-        >
-          {kind === "pr" ? <PullIcon /> : <LinkIcon />}
-          {t(kind === "pr" ? "alert.openPr" : "alert.openMention")}
-        </button>
-      )}
-      {kind === "meeting" && event.meet && (
-        <button
-          ref={primary}
-          type="button"
-          onClick={() => {
-            void api.openLink(event.meet);
-            onDismiss("done");
-          }}
-          className={PRIMARY}
-        >
-          <VideoIcon />
-          {t("alert.joinMeet")}
-        </button>
-      )}
-      {kind === "status" && event.link && (
-        <button ref={primary} type="button" onClick={open(event.link)} className={PRIMARY}>
-          <LinkIcon />
-          {t("alert.openStatus")}
-        </button>
-      )}
-      {kind === "weather" && (
-        <button
-          ref={primary}
-          type="button"
-          onClick={() => {
-            void emit(OPEN_TAB_EVENT, "weather");
-            void api.mainShow();
-            onDismiss("done");
-          }}
-          className={`${PRIMARY} ${event.tag === "severe" ? "!bg-danger !shadow-danger/30 !text-white" : ""}`}
-        >
-          <ForecastIcon />
-          {t("alert.openForecast")}
-        </button>
-      )}
-      {kind === "system" && (
-        <button
-          ref={primary}
-          type="button"
-          onClick={() => {
-            void emit(OPEN_TAB_EVENT, "system");
-            void api.mainShow();
-            onDismiss("done");
-          }}
-          className={`${PRIMARY} ${event.tag === "severe" ? "!bg-danger !shadow-danger/30 !text-white" : ""}`}
-        >
-          <PulseIcon size={14} />
-          {t("alert.openSystem")}
-        </button>
-      )}
-      {kind === "model" && onOpenModels && (
-        <button
-          ref={primary}
-          type="button"
-          onClick={() => {
-            onOpenModels();
-            onDismiss("done");
-          }}
-          className={PRIMARY}
-        >
-          <LinkIcon />
-          {t("alert.openModels")}
-        </button>
-      )}
-      {kind === "meeting" && event.link && (
-        <button
-          ref={event.meet ? undefined : primary}
-          type="button"
-          onClick={open(event.link)}
-          className={event.meet ? SECONDARY : PRIMARY}
-        >
-          <CalendarIcon />
-          {t("alert.openCalendar")}
-        </button>
-      )}
-      {(kind === "status" || kind === "weather" || kind === "system") && (
-        <button
-          type="button"
-          onClick={() => void mute()}
-          title={kind === "weather" ? t("alert.weatherMuteTitle") : kind === "system" ? t("alert.systemMuteTitle") : undefined}
-          className={SECONDARY}
-        >
-          <BellOffIcon />
-          {t("alert.silence")}
-        </button>
-      )}
-      {(kind === "meeting" || kind === "task") && <SnoozeButton onSnooze={snooze} />}
-      {onCloseAll && (
-        <button
-          type="button"
-          onClick={onCloseAll}
-          aria-label={t("alert.closeAll")}
-          className="ml-auto inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line/60 bg-edge/60 pl-2.5 pr-1.5 text-[12px] font-medium text-muted transition hover:-translate-y-px hover:border-danger/50 hover:bg-danger/15 hover:text-danger active:translate-y-0 active:scale-[.97]"
-        >
-          <CrossIcon />
-          {t("alert.closeAll")}
-          {count ? <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-line/60 px-1.5 font-mono text-[11px] text-fg">{count}</span> : null}
-        </button>
-      )}
-      {!hideClose && (
-        <button
-          type="button"
-          onClick={() => onDismiss()}
-          title="Esc"
-          className={`${onCloseAll ? "" : "ml-auto "}inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] text-muted hover:bg-edge hover:text-fg`}
-        >
-          <CrossIcon />
-          {t("alert.close")}
-        </button>
-      )}
+    <div className="flex flex-col gap-1.5">
+      {/* Every "open" button shares one line; snooze, mute and close go below. */}
+      <div className="flex flex-nowrap items-center gap-1.5">
+        {kind === "task" && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() =>
+              void api
+                .taskComplete(event.id.slice(TASK_PREFIX.length))
+                .then(onCompleted)
+                .finally(() => onDismiss("done"))
+            }
+            className={PRIMARY}
+          >
+            <CheckIcon />
+            {t("alert.completeTask")}
+          </button>
+        )}
+        {(kind === "pr" || kind === "mention") && event.link && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() => {
+              open(event.link)();
+              onDismiss("done");
+            }}
+            className={PRIMARY}
+          >
+            {kind === "pr" ? <PullIcon /> : <LinkIcon />}
+            {t(kind === "pr" ? "alert.openPr" : "alert.openMention")}
+          </button>
+        )}
+        {kind === "meeting" && event.meet && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() => {
+              void api.openLink(event.meet);
+              onDismiss("done");
+            }}
+            className={PRIMARY}
+          >
+            <VideoIcon />
+            {t("alert.joinMeet")}
+          </button>
+        )}
+        {kind === "status" && event.link && (
+          <button ref={primary} type="button" onClick={open(event.link)} className={PRIMARY}>
+            <LinkIcon />
+            {t("alert.openStatus")}
+          </button>
+        )}
+        {kind === "weather" && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() => {
+              void emit(OPEN_TAB_EVENT, "weather");
+              void api.mainShow();
+              onDismiss("done");
+            }}
+            className={`${PRIMARY} ${event.tag === "severe" ? "!bg-danger !shadow-danger/30 !text-white" : ""}`}
+          >
+            <ForecastIcon />
+            {t("alert.openForecast")}
+          </button>
+        )}
+        {kind === "system" && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() => {
+              void emit(OPEN_TAB_EVENT, "system");
+              void api.mainShow();
+              onDismiss("done");
+            }}
+            className={`${PRIMARY} ${event.tag === "severe" ? "!bg-danger !shadow-danger/30 !text-white" : ""}`}
+          >
+            <PulseIcon size={14} />
+            {t("alert.openSystem")}
+          </button>
+        )}
+        {kind === "model" && onOpenModels && (
+          <button
+            ref={primary}
+            type="button"
+            onClick={() => {
+              onOpenModels();
+              onDismiss("done");
+            }}
+            className={PRIMARY}
+          >
+            <LinkIcon />
+            {t("alert.openModels")}
+          </button>
+        )}
+        {kind === "meeting" && event.link && (
+          <button
+            ref={event.meet ? undefined : primary}
+            type="button"
+            onClick={open(event.link)}
+            className={event.meet ? SECONDARY : PRIMARY}
+          >
+            <CalendarIcon />
+            {t("alert.openCalendar")}
+          </button>
+        )}
+      </div>
+      <div className="flex flex-nowrap items-center gap-1.5">
+        {(kind === "status" || kind === "weather" || kind === "system") && (
+          <button
+            type="button"
+            onClick={() => void mute()}
+            title={kind === "weather" ? t("alert.weatherMuteTitle") : kind === "system" ? t("alert.systemMuteTitle") : undefined}
+            className={SECONDARY}
+          >
+            <BellOffIcon />
+            {t("alert.silence")}
+          </button>
+        )}
+        {(kind === "meeting" || kind === "task") && <SnoozeButton onSnooze={snooze} />}
+        {onCloseAll && (
+          <button
+            type="button"
+            onClick={onCloseAll}
+            aria-label={t("alert.closeAll")}
+            className="ml-auto inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line/60 bg-edge/60 pl-2.5 pr-1.5 text-[12px] font-medium text-muted transition hover:-translate-y-px hover:border-danger/50 hover:bg-danger/15 hover:text-danger active:translate-y-0 active:scale-[.97]"
+          >
+            <CrossIcon />
+            {t("alert.closeAll")}
+            {count ? <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-line/60 px-1.5 font-mono text-[11px] text-fg">{count}</span> : null}
+          </button>
+        )}
+        {!hideClose && (
+          <button
+            type="button"
+            onClick={() => onDismiss()}
+            title="Esc"
+            className={`${onCloseAll ? "" : "ml-auto "}inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-[13px] text-muted hover:bg-edge hover:text-fg`}
+          >
+            <CrossIcon />
+            {t("alert.close")}
+          </button>
+        )}
+      </div>
     </div>
   );
 });
