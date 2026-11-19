@@ -82,7 +82,6 @@ export const windowApi = {
   stripMonitors: () => invoke<string[]>("strip_monitors"),
   barAgendaGet: () => invoke<BarAgendaConfig>("bar_agenda_get"),
   barAgendaSet: (config: BarAgendaConfig) => invoke<BarAgendaConfig>("bar_agenda_set", { config }),
-  barAgendaText: () => invoke<string | null>("bar_agenda_text"),
   fullscreenHoldGet: () => invoke<boolean>("fullscreen_hold_get"),
   fullscreenHoldSet: (enabled: boolean) => invoke<boolean>("fullscreen_hold_set", { enabled }),
 };

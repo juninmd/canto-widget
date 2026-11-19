@@ -369,8 +369,6 @@ pub fn run() {
             #[cfg(desktop)]
             bar_agenda::bar_agenda_set,
             #[cfg(desktop)]
-            bar_agenda::bar_agenda_text,
-            #[cfg(desktop)]
             strip::cmd::strip_config_get,
             #[cfg(desktop)]
             strip::cmd::strip_config_set,

@@ -1,13 +1,15 @@
 //! The next events in the OS bar, off by default: macOS shows the first one as text in the menu bar, Linux as the
-//! label beside the tray icon (AppIndicator: GNOME, KDE), and every system lists them in the tray tooltip. Windows 11
-//! cannot write on the taskbar, so a small pill over it carries the text (`float.rs`). Reads the agenda the meeting
-//! watcher already fetched, so it sends no request of its own.
+//! label beside the tray icon (AppIndicator: GNOME, KDE), and every system lists them in the tray tooltip. Windows has
+//! no tray title: a child window of the taskbar carries the text (`taskbar.rs`), and the tray icon shows the minutes
+//! when there is no horizontal taskbar to sit on. Reads the agenda the meeting watcher already fetched.
 #![cfg(desktop)]
-#[cfg(any(windows, test))]
-pub mod float;
+pub mod icon;
+#[cfg(windows)]
+pub mod taskbar;
 pub mod text;
 
 use std::path::{Path, PathBuf};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Mutex;
 use std::time::Duration;
 
@@ -21,7 +23,6 @@ const FILE: &str = "barra_agenda.json";
 /// The agenda cache moves every 3 minutes, but "em 12 min" has to count down.
 const TICK: Duration = Duration::from_secs(15);
 const TRAY: &str = "canto-tray";
-pub const EVENT: &str = "bar-agenda";
 const MAX_COUNT: u8 = 3;
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -55,13 +56,15 @@ pub struct BarAgenda {
     cfg: Mutex<BarConfig>,
     /// What the bar says now; `None` when nothing is shown.
     shown: Mutex<Option<String>>,
+    /// Whether the tray icon is the countdown one now.
+    counting: AtomicBool,
 }
 
 impl BarAgenda {
     pub fn load(dir: &Path) -> Self {
         let path = dir.join(FILE);
         let cfg: BarConfig = crate::store::read_json(&path).ok().flatten().unwrap_or_default();
-        Self { path, cfg: Mutex::new(cfg.sanitized()), shown: Mutex::new(None) }
+        Self { path, cfg: Mutex::new(cfg.sanitized()), shown: Mutex::new(None), counting: AtomicBool::new(false) }
     }
 
     fn cfg(&self) -> BarConfig {
@@ -88,18 +91,44 @@ pub fn refresh(app: &AppHandle, force: bool) {
         Vec::new()
     };
     let headline = text::headline(&lines);
+    #[cfg(windows)]
+    taskbar::set_text(headline.as_deref());
+    // No taskbar widget to show it: the tray icon itself counts the minutes.
+    let counting = cfg!(windows) && headline.is_some() && unavailable();
     // The title is the sensitive part, so it is held in memory only and cleared with the lock like the agenda cache.
-    if !force && *state.shown.lock_safe() == headline {
+    if !force && *state.shown.lock_safe() == headline && state.counting.load(Ordering::Relaxed) == counting {
         return;
     }
     *state.shown.lock_safe() = headline.clone();
+    state.counting.store(counting, Ordering::Relaxed);
     if let Some(tray) = app.tray_by_id(TRAY) {
         // Only macOS and Linux draw a tray title; elsewhere this is a no-op.
         let _ = tray.set_title(headline.as_deref());
         let _ = tray.set_tooltip(Some(text::tooltip(&lines)));
+        let _ = tray.set_icon(icon_for(app, counting.then(|| lines.first()).flatten()));
     }
-    #[cfg(windows)]
-    float::sync(app, headline.as_deref());
+}
+
+#[cfg(windows)]
+fn unavailable() -> bool {
+    taskbar::unavailable()
+}
+
+#[cfg(not(windows))]
+fn unavailable() -> bool {
+    false
+}
+
+fn icon_for(app: &AppHandle, line: Option<&text::Line>) -> Option<tauri::image::Image<'static>> {
+    match line {
+        Some(l) => {
+            let (rgba, w, h) = icon::countdown(l.in_min);
+            Some(tauri::image::Image::new_owned(rgba, w, h))
+        }
+        None => {
+            app.default_window_icon().map(|i| tauri::image::Image::new_owned(i.rgba().to_vec(), i.width(), i.height()))
+        }
+    }
 }
 
 pub fn watch(app: AppHandle) {
@@ -119,12 +148,6 @@ pub fn bar_agenda_set(app: AppHandle, state: State<'_, BarAgenda>, config: BarCo
     let saved = state.set(config)?;
     refresh(&app, true);
     Ok(saved)
-}
-
-/// For the pill's page, which may open after the last event was sent.
-#[tauri::command]
-pub fn bar_agenda_text(state: State<'_, BarAgenda>) -> Option<String> {
-    state.shown.lock_safe().clone()
 }
 
 #[cfg(test)]
