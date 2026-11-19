@@ -11,7 +11,7 @@ export function sortKeys(v: unknown): unknown {
 }
 
 export function jsonDepth(v: unknown): number {
-  return v && typeof v === "object" ? 1 + Math.max(0, ...Object.values(v).map(jsonDepth)) : 0;
+  return v && typeof v === "object" ? 1 + Object.values(v).reduce<number>((deepest, x) => Math.max(deepest, jsonDepth(x)), 0) : 0;
 }
 
 /** `abas[0].id` into the value it points at, or undefined. */
@@ -40,7 +40,10 @@ const enc = new TextEncoder();
 const hex = (b: ArrayBuffer) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
 
 export function toBase64(bytes: Uint8Array, urlSafe = false): string {
-  const s = btoa(String.fromCharCode(...bytes));
+  // Spreading a big array into fromCharCode overflows the call stack, so go in chunks.
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  const s = btoa(bin);
   return urlSafe ? s.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "") : s;
 }
 

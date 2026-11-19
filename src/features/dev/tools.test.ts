@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { decodeJwt, decodeText, digests, encodeText, expiry, formatJson, jsonPath, lineDiff, parseInstant, parseUrl, randomSecret, signJwt, span, testRegex, verifyJwt } from "./tools";
+import { decodeJwt, decodeText, digests, encodeText, expiry, formatJson, jsonDepth, jsonPath, lineDiff, parseInstant, parseUrl, randomSecret, signJwt, span, testRegex, verifyJwt } from "./tools";
 
 test("JSON formats, minifies and sorts keys, and reports the parse error", () => {
   const r = (m: "format" | "minify" | "sort") => formatJson('{"b":1,"a":{"d":[1,2],"c":0}}', m) as { ok: true; value: { out: string; value: unknown } };
@@ -93,4 +93,10 @@ test("the line diff marks what left and what came", () => {
   ]);
   expect(lineDiff("x".repeat(1), "x")?.every((l) => l.op === " ")).toBe(true);
   expect(lineDiff("\n".repeat(3000), "\n".repeat(3000))).toBeNull();
+});
+
+test("Base64 and JSON depth survive inputs too big to spread as call arguments", () => {
+  const big = "ação ✓".repeat(400_000);
+  expect(encodeText(big)).toBe(Buffer.from(big).toString("base64"));
+  expect(jsonDepth(Array.from({ length: 1_000_000 }, () => 0))).toBe(1);
 });
