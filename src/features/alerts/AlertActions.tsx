@@ -24,9 +24,9 @@ type Props = {
 };
 
 const PRIMARY =
-  "inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-semibold text-on-accent shadow-md shadow-accent/30 transition hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[.97]";
+  "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg bg-accent px-3 text-[13px] font-semibold text-on-accent shadow-md shadow-accent/30 transition hover:-translate-y-px hover:brightness-110 active:translate-y-0 active:scale-[.97]";
 const SECONDARY =
-  "inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg border border-line/60 bg-edge px-3 text-[13px] text-fg transition hover:-translate-y-px hover:brightness-125 active:translate-y-0 active:scale-[.97]";
+  "inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-lg border border-line/60 bg-edge px-3 text-[13px] text-fg transition hover:-translate-y-px hover:brightness-125 active:translate-y-0 active:scale-[.97]";
 
 /** Buttons change with the kind of alert: only calendar events and tasks can be snoozed, only services muted. */
 const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
@@ -54,7 +54,7 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-1.5">
+    <div className="flex flex-nowrap items-center gap-1.5">
       {kind === "task" && (
         <button
           ref={primary}
@@ -177,11 +177,11 @@ const AlertActions = forwardRef<HTMLButtonElement, Props>(function AlertActions(
           type="button"
           onClick={onCloseAll}
           aria-label={t("alert.closeAll")}
-          className="ml-auto flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg px-2 text-[13px] text-muted transition hover:bg-edge hover:text-fg"
+          className="ml-auto inline-flex h-8 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line/60 bg-edge/60 pl-2.5 pr-1.5 text-[12px] font-medium text-muted transition hover:-translate-y-px hover:border-danger/50 hover:bg-danger/15 hover:text-danger active:translate-y-0 active:scale-[.97]"
         >
           <CrossIcon />
           {t("alert.closeAll")}
-          {count ? <span className="font-mono text-[11px] text-faint">{count}</span> : null}
+          {count ? <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-line/60 px-1.5 font-mono text-[11px] text-fg">{count}</span> : null}
         </button>
       )}
       {!hideClose && (
