@@ -13,13 +13,20 @@ export function useToday(now: () => Date = () => new Date()): string {
   const clock = useRef(now);
   clock.current = now;
   useEffect(() => {
-    const t = setInterval(() => {
-      setDay((current) => {
-        const today = todayLocal(clock.current());
-        return today === current ? current : today;
-      });
-    }, TICK_MS);
-    return () => clearInterval(t);
+    const sync = () => setDay((current) => {
+      const today = todayLocal(clock.current());
+      return today === current ? current : today;
+    });
+    const t = setInterval(sync, TICK_MS);
+    // A widget shown again after a night asleep or hidden must not wait up to a tick to leave yesterday.
+    const onVisible = () => {
+      if (!document.hidden) sync();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
   return day;
 }

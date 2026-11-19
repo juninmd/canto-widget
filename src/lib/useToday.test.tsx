@@ -38,3 +38,22 @@ test("does not re-render needlessly within the same day", () => {
   });
   expect(getByTestId("dia").textContent).toBe("2026-09-09");
 });
+
+test("leaves yesterday as soon as the window is shown again, without waiting for a tick", () => {
+  moment = new Date(2026, 8, 9, 23, 0, 0);
+  jest.useFakeTimers();
+  const { getByTestId } = render(<Probe />);
+
+  moment = new Date(2026, 8, 10, 7, 0, 0);
+  act(() => {
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  expect(getByTestId("dia").textContent).toBe("2026-09-10");
+});
+
+test("stops ticking and listening after unmount", () => {
+  jest.useFakeTimers();
+  const { unmount } = render(<Probe />);
+  unmount();
+  expect(jest.getTimerCount()).toBe(0);
+});
