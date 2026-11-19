@@ -1254,5 +1254,18 @@
   "contacts.col.org": "company",
   "contacts.col.birthday": "birthday",
   "status.find.label": "search services",
-  "status.find.placeholder": "search a service"
+  "status.find.placeholder": "search a service",
+  "agenda.respond": "reply to the invite",
+  "agenda.respond.accepted": "Accept",
+  "agenda.respond.tentative": "Maybe",
+  "agenda.respond.declined": "Decline",
+  "agenda.responded.accepted": "Invite accepted",
+  "agenda.responded.tentative": "Replied: maybe",
+  "agenda.responded.declined": "Invite declined",
+  "alert.kind.invite": "new invite",
+  "alert.invite.accept": "accept",
+  "alert.invite.decline": "decline",
+  "alert.invited": "invited you",
+  "alert.invitedBy": "invite from {name}",
+  "alert.outcome.invite": "invite answered"
 }

@@ -31,6 +31,8 @@ export function summary(e: AgendaItem): string {
       return t("alert.digestSummary");
     case "weather":
       return e.description ?? "";
+    case "invite":
+      return e.organizer ? t("alert.invitedBy", { name: e.organizer }) : t("alert.invited");
     case "task":
       return t("alert.taskReminder");
     default:

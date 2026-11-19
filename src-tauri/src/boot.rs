@@ -65,6 +65,7 @@ pub fn setup(app: &mut tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     sysmon::alert::watch(app.handle().clone());
     mcp::start_if_enabled(app.handle());
     meeting_alert::watch(app.handle().clone());
+    invites::watch(app.handle().clone());
     task_reminder::watch(app.handle().clone());
     context_reminder::watch(app.handle().clone());
     steam::alert::watch(app.handle().clone());

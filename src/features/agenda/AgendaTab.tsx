@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { api, errText, todayLocal, type Task } from "../../lib/api";
+import { api, errText, todayLocal, type RsvpAnswer, type Task } from "../../lib/api";
 import { t } from "../../i18n";
 import AgendaDayBar from "./AgendaDayBar";
 import AgendaHero from "./AgendaHero";
@@ -103,6 +103,19 @@ export default function AgendaTab({
       .catch((e) => onError(errText(e)))
       .finally(() => booking.current.delete(task.id));
   }
+  const [answering, setAnswering] = useState<string | null>(null);
+  function respond(id: string, answer: RsvpAnswer) {
+    if (answering) return;
+    setAnswering(id);
+    api
+      .agendaRespond(id, answer)
+      .then(() => {
+        refresh();
+        onBooked?.(t(`agenda.responded.${answer}`));
+      })
+      .catch((e) => onError(errText(e)))
+      .finally(() => setAnswering(null));
+  }
   const openLink = (url: string) => void api.openLink(url).catch((e) => onError(errText(e)));
 
   const refresh = () => {
@@ -158,7 +171,7 @@ export default function AgendaTab({
                   ))}
                 </ul>
               )}
-              <AgendaRail items={items} tasks={tasks} now={at} live={isToday} clashes={clashes} open={open} onToggle={(id) => setOpen(open === id ? null : id)} onSchedule={schedule} onOpen={openLink} />
+              <AgendaRail items={items} tasks={tasks} now={at} live={isToday} clashes={clashes} open={open} onToggle={(id) => setOpen(open === id ? null : id)} onSchedule={schedule} onOpen={openLink} onRespond={respond} answering={answering} />
             </>
           )}
           {!hasDay && loading && !error && <Skeleton label={t("agenda.loading")} />}

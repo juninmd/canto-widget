@@ -20,7 +20,7 @@ receives no user data.
 
 | Scope | Classification | Justification |
 |---|---|---|
-| `calendar.events.readonly` | Sensitive | Shows the user's upcoming events in the agenda and rings an alert before meetings. Read-only; no event is created or changed. |
+| `calendar.events` | Sensitive | Shows the user's upcoming events in the agenda, rings an alert before meetings and alerts on new invites. Writes only one thing: the user's own answer (accept, maybe, decline) to an invite, when they press the button. No event is created, moved or deleted, and the whole-calendar `calendar` scope is not requested. |
 | `directory.readonly` | Sensitive | Fetches profile photos of meeting guests from the user's Workspace directory, to show them next to each event. |
 | `gmail.modify` | Restricted | The Gmail tab shows the unread count and the important messages (sender, subject, snippet) and lets the user mark as read, archive or trash a message with one click. These actions need modify; `gmail.readonly` cannot perform them. Canto does not send mail, does not permanently delete, and does not read message bodies or attachments. |
 | `tasks` | Sensitive | Lists the user's Google Tasks, and creates and completes tasks when the user captures or finishes one in the widget. |
