@@ -12,6 +12,9 @@ import Spinner from "../../components/Spinner";
 import StatusCard from "./StatusCard";
 import StatusOverview from "./StatusOverview";
 import StatusToolbar from "./StatusToolbar";
+import SearchField from "../../components/SearchField";
+import ResultsMeta from "../../components/ResultsMeta";
+import { fold, foldIncludes } from "../../lib/fold";
 
 /** Incident history from services the team depends on: read-only, no account needed. */
 export default function StatusServices({ toolbar }: { toolbar?: HTMLElement | null }) {
@@ -21,6 +24,7 @@ export default function StatusServices({ toolbar }: { toolbar?: HTMLElement | nu
   const [fetchedAt, setFetchedAt] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
   const [filter, setFilter] = useState<StatusFilter>("all");
+  const [query, setQuery] = useState("");
   const [watched, setWatchedState] = useState<string[]>([]);
   // Fast consecutive toggles must build on each other, not on the list captured at render.
   const watchedRef = useRef<string[]>([]);
@@ -67,7 +71,9 @@ export default function StatusServices({ toolbar }: { toolbar?: HTMLElement | nu
   const sorted = results ? bySeverity(results, now) : [];
   const counts = results ? countLevels(results, now) : null;
   const bad = results?.filter((r) => isTroubled(r, now)).length ?? 0;
-  const shown = sorted.filter((r) => matchesFilter(filter, level(r, now)));
+  const needle = fold(query.trim());
+  const byLevel = sorted.filter((r) => matchesFilter(filter, level(r, now)));
+  const shown = needle ? byLevel.filter((r) => foldIncludes(r.label, needle) || foldIncludes(r.id, needle)) : byLevel;
 
   return (
     <div className="flex h-full flex-col gap-2">
@@ -99,7 +105,9 @@ export default function StatusServices({ toolbar }: { toolbar?: HTMLElement | nu
         ) : (
           <>
             <StatusOverview counts={counts} bad={bad} ok={results.length - bad} filter={filter} onFilter={setFilter} />
-            {shown.length === 0 && <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{t("uiStatus.filter.empty")}</p>}
+            <SearchField value={query} onChange={setQuery} label={t("status.find.label")} placeholder={t("status.find.placeholder")} />
+            <ResultsMeta shown={shown.length} total={byLevel.length} filtering={needle !== ""} onClear={() => setQuery("")} />
+            {shown.length === 0 && <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{needle ? t("browse.noResultsFor", { query: query.trim() }) : t("uiStatus.filter.empty")}</p>}
             {shown.map((r) => (
               <StatusCard
                 key={r.id}

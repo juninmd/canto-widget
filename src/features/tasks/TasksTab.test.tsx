@@ -607,3 +607,36 @@ test("the now card offers to start the first open task and groups the rest", asy
   expect(screen.getByText("pendentes · 1")).toBeDefined();
   expect(screen.getByText("concluídas · 1")).toBeDefined();
 });
+
+test("the search box narrows the day by title or subtask, says how many remain and clears with Esc", async () => {
+  extraTasks = [
+    { ...baseTask, id: "t2", title: "ligar pro banco", created_at: 2, updated_at: 2 },
+    { ...baseTask, id: "t3", title: "revisar PR", subtasks: [{ id: "s1", title: "abrir o Figma", done: false }], created_at: 3, updated_at: 3 },
+  ];
+  render(
+    <ToastProvider>
+      <TasksTab today="2026-09-09" onError={() => {}} />
+    </ToastProvider>,
+  );
+  await act(async () => {
+    await Promise.resolve();
+  });
+  const box = screen.getByRole("searchbox", { name: "buscar tarefas" }) as HTMLInputElement;
+  await act(async () => {
+    fireEvent.change(box, { target: { value: "FIGMA" } });
+  });
+  expect(screen.getAllByText("revisar PR").length).toBeGreaterThan(0);
+  expect(screen.queryByText("ligar pro banco")).toBeNull();
+  expect(screen.getByText("1 de 3")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.change(box, { target: { value: "zzz" } });
+  });
+  expect(screen.getByText("nada encontrado para “zzz”")).toBeTruthy();
+
+  await act(async () => {
+    fireEvent.keyDown(box, { key: "Escape" });
+  });
+  expect(box.value).toBe("");
+  expect(screen.getByText("ligar pro banco")).toBeTruthy();
+});

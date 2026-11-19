@@ -221,3 +221,15 @@ test("the comparison table labels each value by its model column and metric row"
   const row = [...document.querySelectorAll("tbody th[scope=row]")].map((th) => th.textContent);
   expect(row).toContain("Inteligência");
 });
+
+test("the search narrows the ranking by model or creator and the table lists the same rows", async () => {
+  await show();
+  fireEvent.change(screen.getByRole("searchbox", { name: "buscar modelos" }), { target: { value: "lumen" } });
+  expect(names()).toEqual(["a"]);
+  expect(screen.getByText("1 de 4")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "tabela" }));
+  expect(names()).toEqual([]);
+  expect(screen.getByRole("table").textContent).toContain("Lumen Labs");
+  fireEvent.click(screen.getByRole("button", { name: "limpar filtros" }));
+  expect(screen.getByRole("table").querySelectorAll("tbody tr")).toHaveLength(4);
+});

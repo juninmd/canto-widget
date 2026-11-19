@@ -182,3 +182,21 @@ test("a double click on marcar como lido sends a single request", async () => {
   await act(async () => pendingMark?.({ ...view, items: view.items.map((a) => ({ ...a, unread: false })) }));
   expect(screen.getByText("0 não lidos de 1")).toBeTruthy();
 });
+
+test("search and the unread filter narrow the cards, and the table lists the same articles", async () => {
+  view = {
+    feeds: [{ url: "https://blog.exemplo.test/feed", label: "Blog Exemplo", error: null }],
+    items: [article("a1", "Como o cache do Cargo funciona"), article("a2", "Notas sobre escrita curta", false)],
+    fetched_at: Date.now(),
+  };
+  await show();
+  fireEvent.change(screen.getByRole("searchbox", { name: "buscar leituras" }), { target: { value: "cargo" } });
+  expect(document.querySelectorAll("[data-read]")).toHaveLength(1);
+  expect(screen.getByText("1 de 2")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "limpar filtros" }));
+  fireEvent.click(screen.getByRole("button", { name: /^lidos/ }));
+  expect(screen.queryByText("Como o cache do Cargo funciona")).toBeNull();
+  expect(screen.getByText("Notas sobre escrita curta")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "tabela" }));
+  expect(screen.getByRole("table", { name: "Leituras" }).textContent).toContain("Notas sobre escrita curta");
+});

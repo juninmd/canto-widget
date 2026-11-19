@@ -249,3 +249,25 @@ export const VideoIcon = () => (
     <path d="m15.5 10.5 6-3.5v10l-6-3.5" />
   </svg>
 );
+
+export const ListIcon = () => (
+  <svg {...base}>
+    <path d="M9 6h12M9 12h12M9 18h12M3 6h2M3 12h2M3 18h2" />
+  </svg>
+);
+
+export const GridIcon = () => (
+  <svg {...base}>
+    <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" />
+    <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" />
+    <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" />
+    <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" />
+  </svg>
+);
+
+export const TableIcon = () => (
+  <svg {...base}>
+    <rect x="3" y="4" width="18" height="16" rx="2" />
+    <path d="M3 10h18M3 15h18M9 4v16" />
+  </svg>
+);

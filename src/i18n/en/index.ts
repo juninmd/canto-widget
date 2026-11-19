@@ -20,5 +20,6 @@ import { dev } from "./dev";
 import { map } from "./map";
 import { uiModelsActivity } from "./uiModelsActivity";
 import { uiFormats } from "./uiFormats";
+import { uiBrowse } from "./uiBrowse";
 
-export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats, ...mcp };
+export const en = { ...app, ...tasks, ...focus, ...content, ...integrations, ...models, ...health, ...steam, ...agents, ...protos, ...weather, ...system, ...dev, ...map, ...reads, ...uiModelsActivity, ...uiForgeStatus, ...uiClipAgenda, ...uiTasksNotes, ...google, ...uiFormats, ...uiBrowse, ...mcp };

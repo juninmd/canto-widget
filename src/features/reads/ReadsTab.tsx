@@ -1,10 +1,56 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api, errText, type ReadArticle, type ReadsView } from "../../lib/api";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
 import { t } from "../../i18n";
 import ErrorBanner from "../../components/ErrorBanner";
 import ReadCard from "./ReadCard";
 import Skeleton from "../../components/Skeleton";
+import SearchField from "../../components/SearchField";
+import FilterChips from "../../components/FilterChips";
+import ViewSwitch from "../../components/ViewSwitch";
+import ResultsMeta from "../../components/ResultsMeta";
+import DataTable, { type Column } from "../../components/DataTable";
+import { useViewPref } from "../../lib/useViewPref";
+import { fold, foldIncludes } from "../../lib/fold";
+import { LOCALE } from "../../i18n";
+
+const VIEWS = ["list", "table"] as const;
+type Seen = "unread" | "read";
+
+const columns = (mark: (a: ReadArticle) => void, onError: (m: string) => void): Column<ReadArticle>[] => [
+  {
+    key: "title",
+    label: t("reads.col.title"),
+    render: (a) => (
+      <button
+        type="button"
+        title={t("reads.openTitle", { title: a.title })}
+        onClick={() => void api.openLink(a.url).catch((e) => onError(String(e)))}
+        className={`canto-hit max-w-full truncate text-left hover:underline ${a.unread ? "font-medium text-fg" : "text-muted"}`}
+      >
+        {a.title}
+      </button>
+    ),
+    sort: (a) => a.title,
+  },
+  { key: "source", label: t("reads.col.source"), render: (a) => a.source, sort: (a) => a.source },
+  {
+    key: "date",
+    label: t("reads.col.date"),
+    render: (a) => (a.published_at ? new Date(a.published_at).toLocaleDateString(LOCALE, { day: "2-digit", month: "short" }) : "—"),
+    sort: (a) => a.published_at,
+  },
+  {
+    key: "state",
+    label: t("reads.col.state"),
+    render: (a) => (
+      <button type="button" onClick={() => mark(a)} title={a.unread ? t("reads.markRead") : t("reads.markUnread")} className="canto-hit underline-offset-2 hover:underline">
+        {a.unread ? t("reads.state.unread") : t("reads.state.read")}
+      </button>
+    ),
+    sort: (a) => Number(a.unread),
+  },
+];
 
 const LINK = "canto-hit min-h-[24px] shrink-0 rounded-md px-1.5 hover:bg-hover hover:text-fg active:bg-active";
 
@@ -13,6 +59,10 @@ export default function ReadsTab({ onError }: { onError: (message: string) => vo
   const [view, setView] = useState<ReadsView | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [query, setQuery] = useState("");
+  const [seen, setSeen] = useState<Seen | null>(null);
+  const [source, setSource] = useState<string | null>(null);
+  const [layout, setLayout] = useViewPref("reads", VIEWS);
 
   const load = useCallback(async (force: boolean) => {
     setLoading(true);
@@ -45,6 +95,18 @@ export default function ReadsTab({ onError }: { onError: (message: string) => vo
     }
   }
 
+  const items = view?.items;
+  const sources = useMemo(() => [...new Set((items ?? []).map((a) => a.source).filter(Boolean))], [items]);
+  const visible = useMemo(() => {
+    const needle = fold(query.trim());
+    return (items ?? []).filter(
+      (a) =>
+        (seen === null || a.unread === (seen === "unread")) &&
+        (source === null || a.source === source) &&
+        (!needle || foldIncludes(a.title, needle) || foldIncludes(a.source, needle) || foldIncludes(a.summary, needle)),
+    );
+  }, [items, query, seen, source]);
+
   if (view === null) {
     return error ? <ErrorBanner message={error} onRetry={() => void load(false)} /> : <Skeleton label={t("reads.loading")} rows={4} />;
   }
@@ -71,11 +133,48 @@ export default function ReadsTab({ onError }: { onError: (message: string) => vo
         </p>
       )}
       {view.feeds.length > 0 && <FeedList view={view} onChanged={setView} onError={onError} />}
+      {view.items.length > 0 && (
+        <>
+          <div className="flex gap-2">
+            <SearchField className="flex-1" value={query} onChange={setQuery} label={t("reads.find.label")} placeholder={t("reads.find.placeholder")} />
+            <ViewSwitch value={layout} options={VIEWS} onChange={setLayout} />
+          </div>
+          <FilterChips
+            allLabel={t("browse.noFilter")}
+            allCount={view.items.length}
+            chips={[
+              { key: "unread", label: t("reads.filter.unread"), count: unread },
+              { key: "read", label: t("reads.filter.read"), count: view.items.length - unread },
+            ]}
+            value={seen}
+            onChange={setSeen}
+          />
+          {sources.length > 1 && (
+            <FilterChips label={t("reads.filter.source")} caption={t("reads.filter.source")} chips={sources.map((name) => ({ key: name, label: name }))} value={source} onChange={setSource} />
+          )}
+          <ResultsMeta
+            shown={visible.length}
+            total={view.items.length}
+            filtering={query.trim() !== "" || seen !== null || source !== null}
+            onClear={() => {
+              setQuery("");
+              setSeen(null);
+              setSource(null);
+            }}
+          />
+        </>
+      )}
       {view.items.length === 0 ? (
         <p className="text-xs text-faint">{view.feeds.length === 0 ? t("reads.empty") : t("reads.emptyItems")}</p>
+      ) : visible.length === 0 ? (
+        <p className="text-xs text-faint">{t("browse.noResults")}</p>
+      ) : layout === "table" ? (
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <DataTable label={t("reads.tab")} columns={columns(mark, onError)} rows={visible} rowKey={(a) => a.id} />
+        </div>
       ) : (
         <ul className="flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto pr-1">
-          {view.items.map((article, i) => (
+          {visible.map((article, i) => (
             <ReadCard key={article.id} article={article} index={i} onMark={mark} onError={onError} />
           ))}
         </ul>

@@ -11,6 +11,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Alterado
 
+- **Busca, filtros e visões em mais abas**: Tarefas ganham busca (título, subtarefas e contexto); Agentes, Leituras, Mercado, Modelos e Status API ganham busca com contador “n de total” e “limpar filtros”; Agentes e Leituras filtram por instalado e por lido/feed; Agentes, Leituras, Mercado e Modelos têm visão em tabela com cabeçalho ordenável; Drive e Contatos ganham grade e tabela. A visão escolhida fica salva por aba, `/` foca a busca e Esc limpa.
 - **Trancar sozinho pode ser desligado**: em Ajustes > Segurança, “trancar sozinho após” ganhou a opção **nunca (só trancar manualmente)**. Quem escolhe isso mantém o cofre aberto até trancar pelo botão ou pela bandeja; o padrão continua 15 min sem uso.
 - **Servidor MCP mais claro e fácil de configurar**: Ajustes > Servidor MCP agora explica o que é e que só este computador acessa; mostra o endereço com botão copiar e o estado (ligado/desligado); em “Conectar um agente” basta escolher o agente (Claude Code, Codex, OpenCode, Gemini, Cursor, VS Code, Windsurf, mcp-remote), escolher o token (compartilhado ou de um agente) e clicar em **copiar configuração**, com o token escondido na tela; e as permissões ficam agrupadas em dados do dia a dia, dados privados e escrita.
 

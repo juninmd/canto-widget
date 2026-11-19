@@ -287,3 +287,12 @@ test("a failed first load stops the skeleton and keeps the retry in reach", asyn
   expect(screen.queryByText("buscando o status dos serviços")).toBeNull();
   expect(screen.getByText("tentar de novo")).toBeTruthy();
 });
+
+test("the search box narrows the services by name and says how many remain", async () => {
+  render(<StatusTab />);
+  await screen.findByText("Claude");
+  fireEvent.change(screen.getByRole("searchbox", { name: "buscar serviços" }), { target: { value: "mag" } });
+  expect(screen.queryByText("AWS")).toBeNull();
+  expect(screen.getByText("Magalu Cloud")).toBeTruthy();
+  expect(screen.getByText(/^1 de \d+$/)).toBeTruthy();
+});

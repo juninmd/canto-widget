@@ -155,3 +155,19 @@ test("an agent without a GitHub repo shows the site host and no release", async 
   expect(agents()).toEqual(["antigravity"]);
   expect(screen.getByText("antigravity.google")).toBeTruthy();
 });
+
+test("search and the installed filter narrow the list; the table view lists the same agents", async () => {
+  views = FIXTURES();
+  await show();
+  fireEvent.change(screen.getByRole("searchbox", { name: "buscar agentes" }), { target: { value: "aid" } });
+  expect(agents()).toEqual(["aider"]);
+  expect(screen.getByText("1 de 2")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "limpar filtros" }));
+  expect(agents()).toEqual(["codex", "aider"]);
+  fireEvent.click(screen.getByRole("button", { name: /^instalados/ }));
+  expect(agents()).toEqual(["codex"]);
+  fireEvent.click(screen.getByRole("button", { name: "tabela" }));
+  const table = screen.getByRole("table", { name: "Agentes" });
+  expect(table.textContent).toContain("Codex CLI");
+  expect(table.textContent).not.toContain("Aider");
+});

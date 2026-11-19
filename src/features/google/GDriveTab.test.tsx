@@ -158,3 +158,16 @@ test("a long file name keeps its full text on hover, and the open button says wh
   expect(open).toBeTruthy();
   expect(screen.getByLabelText("entrar na pasta Projetos").getAttribute("title")).toBe("Projetos");
 });
+
+test("the grid and the table show the same files, and a folder still opens in place", async () => {
+  render(<GDriveTab onNotice={() => {}} />);
+  await screen.findByText("PASTA");
+  fireEvent.click(screen.getByRole("button", { name: "grade" }));
+  for (const id of ["f1", "1", "2"]) expect(document.querySelector(`[data-drive-file="${id}"]`)).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "tabela" }));
+  const table = screen.getByRole("table");
+  expect(table.textContent).toContain("Roadmap Q4 2026");
+  fireEvent.click(screen.getByRole("button", { name: /Projetos/ }));
+  expect(await screen.findByText("Orçamento 2027")).toBeTruthy();
+  expect(calls.at(-1)).toEqual(list("all", "", "", "f1"));
+});
