@@ -292,6 +292,10 @@ Và **Theo dõi hệ thống**, hệ thống chuyển đổi giữa ánh sáng v
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs từ người khác | Bên thứ ba PR xuất hiện dưới dạng cảnh báo |
+|---|---|
+| ![GitHub với ô "từ người khác" được chọn và PR được người khác mở, hiển thị bảng CI, tài liệu tham khảo và tác giả của nó](../prints/app/164-github-terceiros.png) | ![Cửa sổ bật lên cho yêu cầu kéo do người khác mở, nêu tên tác giả và đề nghị mở PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

@@ -146,6 +146,7 @@
   "forge.section.assigned": "Minule määratud",
   "forge.section.myPrs": "{pr} Avasin",
   "forge.section.myIssues": "Probleemid, mille avasin",
+  "forge.section.othersPrs": "PRs teistelt inimestelt",
   "forge.kind.all": "kõik",
   "forge.kind.issues": "probleeme",
   "forge.sort.updated": "uuendatud",

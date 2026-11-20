@@ -100,6 +100,7 @@
   "alert.kind.pr": "vedä pyyntö",
   "alert.pr.ci": "CI epäonnistui",
   "alert.pr.stalled": "ei arvostelua",
+  "alert.pr.others": "joltain muulta",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

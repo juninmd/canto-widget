@@ -146,6 +146,7 @@
   "forge.section.assigned": "المخصصة لي",
   "forge.section.myPrs": "{pr} فتحت",
   "forge.section.myIssues": "القضايا التي فتحتها",
+  "forge.section.othersPrs": "PRs من أشخاص آخرين",
   "forge.kind.all": "الكل",
   "forge.kind.issues": "القضايا",
   "forge.sort.updated": "محدث",

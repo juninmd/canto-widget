@@ -19,7 +19,7 @@ export type ForgeItem = {
  * `fetched_at` (ms) is when the data left the forge; `limited_until` (ms) is set when the rate limit forced a cached copy.
  */
 export type ForgeList = { total: number; items: ForgeItem[]; fetched_at?: number; limited_until?: number | null };
-export type ForgeSection = "review_requested" | "assigned" | "my_prs" | "my_issues";
+export type ForgeSection = "review_requested" | "others_prs" | "assigned" | "my_prs" | "my_issues";
 export type ForgeKind = "all" | "pr" | "issue";
 export type ForgeSort = "updated" | "created" | "comments";
 export type ForgeOrder = "desc" | "asc";

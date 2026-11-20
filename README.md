@@ -143,8 +143,10 @@ sensitive.
 
 **Review requested from me**, assigned to me, PRs and issues I opened, with a PR or issue icon and who opened
 it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and each PR carries a small
-**CI badge** (passed, failed, running or no CI) from its head commit's checks. When someone **requests your
-review**, an OS notification tells you (on by default, switch it off in Settings). Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
+**CI badge** (passed, failed, running or no CI) from its head commit's checks. A **PRs from other people** section
+lists the PRs someone else opened in your repositories — even the ones nobody asked you to review — and a new one
+rings a pop-up and an OS notification (on by default, with its switch in Settings). When someone **requests your
+review**, an OS notification tells you too. Filter by text, `repo:` or `label:`, PRs only or issues only, sort by update, creation or comments, and
 scroll with **show more**. Switch to the **Comments** view to see a **Commenters catalog** grid of everyone who commented on your PRs (avatars, human vs bot badges, comment counts, search, bot filter, progressive pagination) and their comments. Also supports **GitLab.com and self-hosted GitLab**, with a 5-minute cache that
 respects the rate limit. Sign in with a read-only personal token or from the browser (device flow).
 
@@ -452,7 +454,11 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 
 | GitHub: the numbers are filters | Status API: services by severity |
 |---|---|
-| ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](docs/prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](docs/prints/app/111-status-servicos.png) |
+| ![GitHub with five toggle tiles, a compact sort button and CI and waiting-time pills](docs/prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](docs/prints/app/111-status-servicos.png) |
+
+| GitHub: PRs opened by other people | A third-party PR arrives as an alert |
+|---|---|
+| ![GitHub with the "de terceiros" tile selected and a PR opened by another person, showing its CI pill, reference and author](docs/prints/app/164-github-terceiros.png) | ![Pop-up for a pull request opened by someone else, naming the author and offering to open the PR](docs/prints/app/165-aviso-pr-terceiro.png) |
 
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|

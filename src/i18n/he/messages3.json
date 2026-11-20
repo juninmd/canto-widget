@@ -100,6 +100,7 @@
   "alert.kind.pr": "בקשה למשוך",
   "alert.pr.ci": "CI נכשל",
   "alert.pr.stalled": "אין ביקורת",
+  "alert.pr.others": "ממישהו אחר",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

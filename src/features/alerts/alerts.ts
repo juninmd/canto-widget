@@ -46,11 +46,12 @@ const PR_TONE: Record<string, Tone> = {
   reply: "accent",
   assigned: "accent",
   updates: "accent",
+  others: "warn",
 };
 
 /** The one-line name of an own-work alert: its tag, or "sem revisão" for the first kind that had none. */
 export function prLabel(tag: string | undefined): string {
-  const known = ["ci", "stalled", "approved", "changes", "ready", "conflict", "comment", "reply", "assigned", "updates"];
+  const known = ["ci", "stalled", "approved", "changes", "ready", "conflict", "comment", "reply", "assigned", "updates", "others"];
   return t(`alert.pr.${known.includes(tag ?? "") ? tag : "stalled"}` as MessageKey);
 }
 

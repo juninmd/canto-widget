@@ -10,6 +10,7 @@
   "forge.refresh": "リフレッシュする",
   "forge.summary.label": "概要",
   "forge.summary.reviews": "レビュー",
+  "forge.summary.others": "他人から",
   "forge.summary.mine": "私の{pr}",
   "forge.summary.failing": "CI が失敗しました",
   "forge.summary.issues": "私の問題",

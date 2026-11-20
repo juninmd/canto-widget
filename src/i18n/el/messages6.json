@@ -10,6 +10,7 @@
   "forge.refresh": "ανανέωση",
   "forge.summary.label": "περίληψη",
   "forge.summary.reviews": "κριτικές",
+  "forge.summary.others": "από άλλους",
   "forge.summary.mine": "{pr} μου",
   "forge.summary.failing": "CI απέτυχε",
   "forge.summary.issues": "τα θέματα μου",

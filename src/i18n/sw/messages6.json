@@ -10,6 +10,7 @@
   "forge.refresh": "furahisha",
   "forge.summary.label": "muhtasari",
   "forge.summary.reviews": "hakiki",
+  "forge.summary.others": "kutoka kwa wengine",
   "forge.summary.mine": "{pr} yangu",
   "forge.summary.failing": "CI imeshindwa",
   "forge.summary.issues": "masuala yangu",

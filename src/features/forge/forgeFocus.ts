@@ -3,10 +3,11 @@ import { failingItems } from "./forgeTotals";
 import type { CiMap } from "./forgeChecks";
 
 /** A summary tile pressed as a filter: it narrows the board to one group, or to the PRs whose CI failed. */
-export type SummaryFocus = "reviews" | "mine" | "failing" | "issues";
+export type SummaryFocus = "reviews" | "others" | "mine" | "failing" | "issues";
 
 const SECTION: Record<SummaryFocus, ForgeSection> = {
   reviews: "review_requested",
+  others: "others_prs",
   mine: "my_prs",
   failing: "my_prs",
   issues: "my_issues",

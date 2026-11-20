@@ -100,6 +100,7 @@
   "alert.kind.pr": "ดึงคำขอ",
   "alert.pr.ci": "ซีไอไอล้มเหลว",
   "alert.pr.stalled": "ไม่มีการทบทวน",
+  "alert.pr.others": "จากคนอื่น",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

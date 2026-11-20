@@ -100,6 +100,7 @@
   "alert.kind.pr": "cerere de tragere",
   "alert.pr.ci": "CI a eșuat",
   "alert.pr.stalled": "nici o recenzie",
+  "alert.pr.others": "de la altcineva",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

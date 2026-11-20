@@ -14,6 +14,7 @@ export type MyPrAlerts = {
   merge_state: boolean;
   comments: boolean;
   assigned: boolean;
+  others_prs: boolean;
   replies: boolean;
   team_mentions: boolean;
 };

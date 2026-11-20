@@ -146,6 +146,7 @@
   "forge.section.assigned": "Bana atandı",
   "forge.section.myPrs": "{pr} Açtım",
   "forge.section.myIssues": "Açtığım konular",
+  "forge.section.othersPrs": "PRs diğer insanlardan",
   "forge.kind.all": "hepsi",
   "forge.kind.issues": "sorunlar",
   "forge.sort.updated": "güncellendi",

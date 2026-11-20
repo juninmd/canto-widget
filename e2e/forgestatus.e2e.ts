@@ -1,6 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { goTab, mockTauri } from "./mock";
 
+// Docs screenshots are taken at 2x so the README shows crisp text; layout assertions don't care.
+test.use({ deviceScaleFactor: 2 });
+
 const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString();
 const empty = { total: 0, items: [] };
 const item = (n: number, title: string, extra = {}) => ({
@@ -25,6 +28,10 @@ const github = {
       total: 3,
       items: [item(1, "Exportar relatórios em CSV", { created_at: hoursAgo(5) }), item(2, "Fuso horário no resumo diário", { created_at: hoursAgo(60) })],
     },
+    others_prs: {
+      total: 1,
+      items: [item(29, "Adiciona agent-qa às ferramentas", { repo: "ana/awesome-tools", reference: "ana/awesome-tools#29", author: "pranshu", url: "https://github.com/ana/awesome-tools/pull/29", created_at: hoursAgo(280) })],
+    },
     assigned: empty,
     my_prs: { total: 2, items: [item(3, "Extrair o cliente de status", { conflict: true }), item(4, "Guia de contribuição")] },
     my_issues: { total: 1, items: [item(5, "Filtro de data ignora o fuso", { is_pr: false, url: "https://github.com/acme/atlas/issues/5" })] },
@@ -34,6 +41,7 @@ const github = {
     { repo: "acme/atlas", number: 2, status: "running" },
     { repo: "acme/atlas", number: 3, status: "failure", conflict: true },
     { repo: "acme/atlas", number: 4, status: "success" },
+    { repo: "ana/awesome-tools", number: 29, status: "success" },
   ],
 };
 
@@ -43,14 +51,21 @@ test("GitHub: summary tiles filter the board, the sort sits in a menu, and row a
   await goTab(page, "GitHub");
 
   const strip = page.getByRole("group", { name: "resumo" });
-  await expect(page.getByRole("region")).toHaveCount(4);
+  await expect(page.getByRole("region")).toHaveCount(5);
   await strip.getByRole("button", { name: /CI falhou/ }).click();
   await expect(strip.getByRole("button", { name: /CI falhou/ })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("region")).toHaveCount(1);
   await expect(page.getByText("Extrair o cliente de status")).toBeVisible();
   await expect(page.getByText("Guia de contribuição")).toHaveCount(0);
   await strip.getByRole("button", { name: /CI falhou/ }).click();
-  await expect(page.getByRole("region")).toHaveCount(4);
+  await expect(page.getByRole("region")).toHaveCount(5);
+
+  await strip.getByRole("button", { name: /de terceiros/ }).click();
+  await expect(page.getByRole("region")).toHaveCount(1);
+  await expect(page.getByRole("region", { name: "PRs de terceiros" })).toContainText("Adiciona agent-qa às ferramentas");
+  await expect(page.getByText("@pranshu")).toBeVisible();
+  await strip.getByRole("button", { name: /de terceiros/ }).click();
+  await expect(page.getByRole("region")).toHaveCount(5);
 
   await page.getByRole("button", { name: "ordenar por: atualização" }).click();
   await expect(page.getByRole("menuitemradio", { name: "atualização" })).toBeFocused();
@@ -71,8 +86,14 @@ test("GitHub: summary tiles filter the board, the sort sits in a menu, and row a
 
   if (process.env.SHOT) {
     await page.setViewportSize({ width: 420, height: 720 });
-    await page.getByText("Exportar relatórios em CSV").hover();
-    await page.screenshot({ path: `${process.env.SHOT}/110-github-tiles.png` });
+    const csv = page.getByText("Exportar relatórios em CSV");
+    // Center the row: the sticky section heading covers the top of the list; blur so the earlier focus ring closes.
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
+    await csv.evaluate((el) => el.scrollIntoView({ block: "center" }));
+    await csv.hover({ position: { x: 4, y: 4 } });
+    await page.screenshot({ path: `${process.env.SHOT}/110-github-tiles.png`, animations: "disabled" });
+    await strip.getByRole("button", { name: /de terceiros/ }).click();
+    await page.screenshot({ path: `${process.env.SHOT}/164-github-terceiros.png`, animations: "disabled" });
   }
 });
 

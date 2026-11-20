@@ -10,6 +10,7 @@
   "forge.refresh": "osveži",
   "forge.summary.label": "povzetek",
   "forge.summary.reviews": "ocene",
+  "forge.summary.others": "od drugih",
   "forge.summary.mine": "moj {pr}",
   "forge.summary.failing": "CI ni uspel",
   "forge.summary.issues": "moje težave",

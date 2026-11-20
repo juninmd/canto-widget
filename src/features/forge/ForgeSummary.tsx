@@ -13,6 +13,10 @@ export default function ForgeSummary({ forge, lists, ci, focus, onFocus }: Props
   const pr = forge === "gitlab" ? "MRs" : "PRs";
   const tiles: { key: SummaryFocus; label: string; n: number; hot: string }[] = [
     { key: "reviews", label: t("forge.summary.reviews"), n: s.reviews, hot: s.reviews > 0 ? "text-accent-text" : "" },
+    // GitLab has no third-party PRs list, so the tile only exists for GitHub.
+    ...(forge === "github"
+      ? [{ key: "others" as const, label: t("forge.summary.others"), n: s.others, hot: s.others > 0 ? "text-warn" : "" }]
+      : []),
     { key: "mine", label: t("forge.summary.mine", { pr }), n: s.mine, hot: "" },
     ...(s.failing === null ? [] : [{ key: "failing" as const, label: t("forge.summary.failing"), n: s.failing, hot: s.failing > 0 ? "text-danger" : "" }]),
     { key: "issues", label: t("forge.summary.issues"), n: s.issues, hot: "" },

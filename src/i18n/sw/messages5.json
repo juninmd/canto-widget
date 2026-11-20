@@ -146,6 +146,7 @@
   "forge.section.assigned": "Imekabidhiwa kwangu",
   "forge.section.myPrs": "{pr} Nilifungua",
   "forge.section.myIssues": "Masuala niliyofungua",
+  "forge.section.othersPrs": "PRs kutoka kwa watu wengine",
   "forge.kind.all": "zote",
   "forge.kind.issues": "masuala",
   "forge.sort.updated": "imesasishwa",

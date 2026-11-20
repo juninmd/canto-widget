@@ -146,6 +146,7 @@
   "forge.section.assigned": "มอบหมายให้ฉัน",
   "forge.section.myPrs": "{pr} ฉันเปิดแล้ว",
   "forge.section.myIssues": "ปัญหาที่ฉันเปิด",
+  "forge.section.othersPrs": "PRs จากคนอื่นๆ",
   "forge.kind.all": "ทั้งหมด",
   "forge.kind.issues": "ปัญหา",
   "forge.sort.updated": "ปรับปรุงแล้ว",

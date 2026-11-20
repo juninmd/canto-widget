@@ -50,7 +50,7 @@ test("connecting sends the instance address and token to Rust, then lists", asyn
     connected = true;
     return Promise.resolve("ana");
   };
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
   await mount();
   fireEvent.change(screen.getByLabelText("Endereço do GitLab"), { target: { value: "https://gitlab.acme.io" } });
   fireEvent.change(screen.getByLabelText("Token de acesso pessoal"), { target: { value: "glpat-abc" } });
@@ -78,7 +78,7 @@ test("a rejected token stays on the form with the reason", async () => {
 
 test("ver CI asks the vault for the MR's pipeline status by project and iid", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
   responses.gitlab_mr_checks = () => Promise.resolve("failure");
   await mount();
   await act(async () => {
@@ -90,7 +90,7 @@ test("ver CI asks the vault for the MR's pipeline status by project and iid", as
 
 test("GitLab doesn't offer sorting by comments, which its API can't do", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.com" });
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   await mount();
   fireEvent.click(screen.getByRole("button", { name: "ordenar por: atualização" }));
   const options = screen.getAllByRole("menuitemradio").map((o) => o.textContent?.replace("✓", ""));
@@ -101,7 +101,7 @@ test("GitLab doesn't offer sorting by comments, which its API can't do", async (
 test("shows the summary strip without a CI tile", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "bia", base_url: "https://gitlab.acme.io" });
   responses.gitlab_lists = () =>
-    Promise.resolve({ review_requested: { total: 2, items: [mr] }, assigned: empty, my_prs: empty, my_issues: empty });
+    Promise.resolve({ review_requested: { total: 2, items: [mr] }, others_prs: empty, assigned: empty, my_prs: empty, my_issues: empty });
   await mount();
   expect(screen.getByText("revisões")).toBeDefined();
   expect(screen.queryByText("CI falhou")).toBeNull();
@@ -113,7 +113,7 @@ test("a failed status check is an alert with a retry; the lists cached for GitLa
   for (let i = 0; i < 5; i++) await act(async () => {});
   expect(screen.getByRole("alert").textContent).toContain("instância fora do ar");
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: { total: 1, items: [mr] }, review_requested: empty, my_issues: empty });
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "tentar de novo" }));
   });
@@ -130,7 +130,7 @@ test("a failed status check is an alert with a retry; the lists cached for GitLa
 
 test("the GitLab mentions subtab lists the pending to-dos with their author and text", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   responses.gitlab_mentions = () =>
     Promise.resolve({
       rows: [
@@ -169,7 +169,7 @@ test("the GitLab mentions subtab lists the pending to-dos with their author and 
 
 test("'incluir concluídas' asks Rust for the done to-dos too and tags them", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   const row = (id: string, done: boolean) => ({
     id: `gitlab:${id}`,
     title: done ? "Já resolvido" : "Pendente",
@@ -205,7 +205,7 @@ test("an MR the list says has conflicts is flagged right away, with no extra req
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
   const clean = { ...mr, number: 13, reference: "acme/api!13", url: "https://gitlab.acme.io/acme/api/-/merge_requests/13" };
   responses.gitlab_lists = () =>
-    Promise.resolve({ assigned: empty, my_prs: { total: 2, items: [{ ...mr, conflict: true }, clean] }, review_requested: empty, my_issues: empty });
+    Promise.resolve({ others_prs: empty, assigned: empty, my_prs: { total: 2, items: [{ ...mr, conflict: true }, clean] }, review_requested: empty, my_issues: empty });
   await mount();
   const flagged = screen.getAllByText(/conflito/);
   expect(flagged).toHaveLength(1);

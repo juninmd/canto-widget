@@ -10,6 +10,7 @@
   "forge.refresh": "รีเฟรช",
   "forge.summary.label": "สรุป",
   "forge.summary.reviews": "ความคิดเห็น",
+  "forge.summary.others": "จากผู้อื่น",
   "forge.summary.mine": "{pr} ของฉัน",
   "forge.summary.failing": "ซีไอไอล้มเหลว",
   "forge.summary.issues": "ปัญหาของฉัน",

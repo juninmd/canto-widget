@@ -146,6 +146,7 @@
   "forge.section.assigned": "Hozzám rendelve",
   "forge.section.myPrs": "{pr} Megnyitottam",
   "forge.section.myIssues": "Megnyitott problémák",
+  "forge.section.othersPrs": "PRs másoktól",
   "forge.kind.all": "minden",
   "forge.kind.issues": "kérdéseket",
   "forge.sort.updated": "frissítve",

@@ -100,6 +100,7 @@
   "alert.kind.pr": "拉取请求",
   "alert.pr.ci": "持续集成失败",
   "alert.pr.stalled": "没有评论",
+  "alert.pr.others": "从别人那里",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

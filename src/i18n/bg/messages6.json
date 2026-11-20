@@ -10,6 +10,7 @@
   "forge.refresh": "опресняване",
   "forge.summary.label": "резюме",
   "forge.summary.reviews": "прегледи",
+  "forge.summary.others": "от другите",
   "forge.summary.mine": "моят {pr}",
   "forge.summary.failing": "CI не успя",
   "forge.summary.issues": "моите проблеми",

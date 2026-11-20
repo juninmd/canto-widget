@@ -292,6 +292,10 @@ acțiune după nume: accesați o filă, o nouă sarcină sau o notă, alăturaț
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs de la alte persoane | O terță parte PR sosește ca alertă |
+|---|---|
+| ![GitHub cu țiglă „de la alte persoane” selectată și un PR deschis de o altă persoană, arătând pilula CI, referința și autorul acesteia](../prints/app/164-github-terceiros.png) | ![O fereastră pop-up pentru o cerere de extragere deschisă de altcineva, care denumește autorul și se oferă să deschidă PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

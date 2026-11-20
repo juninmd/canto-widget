@@ -8,15 +8,17 @@ const item = (number: number): ForgeItem => ({
 });
 const lists: ForgeLists = {
   review_requested: { total: 3, items: [] },
+  others_prs: { total: 2, items: [] },
   assigned: { total: 0, items: [] },
   my_prs: { total: 9, items: [item(1), item(2), item(3)] },
   my_issues: { total: 5, items: [] },
 };
-const sections = (["review_requested", "assigned", "my_prs", "my_issues"] as const).map((key) => ({ key }));
+const sections = (["review_requested", "others_prs", "assigned", "my_prs", "my_issues"] as const).map((key) => ({ key }));
 
 test("no tile pressed keeps every section; a tile keeps only its own", () => {
-  expect(focusSections(sections, null)).toHaveLength(4);
+  expect(focusSections(sections, null)).toHaveLength(5);
   expect(focusSections(sections, "reviews").map((s) => s.key)).toEqual(["review_requested"]);
+  expect(focusSections(sections, "others").map((s) => s.key)).toEqual(["others_prs"]);
   expect(focusSections(sections, "mine").map((s) => s.key)).toEqual(["my_prs"]);
   expect(focusSections(sections, "failing").map((s) => s.key)).toEqual(["my_prs"]);
   expect(focusSections(sections, "issues").map((s) => s.key)).toEqual(["my_issues"]);

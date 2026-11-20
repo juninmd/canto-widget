@@ -1,6 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import { calls, mockTauri } from "./mock";
 
+// Docs screenshots are taken at 2x so the README shows crisp text; the assertions don't care.
+test.use({ deviceScaleFactor: 2 });
+
 /** Fictitious alerts only (public repository): an outage, a meeting about to start and a model launch. */
 export function fakeAlerts(now = Date.now()) {
   const base = { end: "", all_day: false, location: "", meet: "", link: "" };
@@ -217,6 +220,33 @@ test("an assigned PR says why, where and when in one line, and who opened it", a
   await expect(alert.locator("[data-sender]")).toContainText("dependabot[bot]");
   await expect(alert.getByText("detalhes")).toHaveCount(0);
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+});
+
+test("a pull request opened by someone else names the author and opens from the pop-up", async ({ page }) => {
+  const thirdParty = {
+    id: "pr:others:ana/awesome-tools#29",
+    title: "Adiciona agent-qa às ferramentas",
+    start: new Date(Date.now() - 6 * 60_000).toISOString(),
+    end: "",
+    all_day: false,
+    location: "",
+    meet: "",
+    link: "https://github.com/ana/awesome-tools/pull/29",
+    organizer: "ana/awesome-tools#29",
+    description: "@pranshu abriu este PR em ana/awesome-tools.",
+    tag: "others",
+    sender: { name: "Pranshu Chittora", login: "pranshu", avatar: "" },
+  };
+  await mockTauri(page, { fixed: { alert_payload: [thirdParty] } });
+  await ring(page);
+
+  const alert = page.getByRole("alertdialog");
+  await expect(alert.locator("[data-reason]")).toHaveText("de terceiro");
+  await expect(alert.locator("[data-sender]")).toContainText("@pranshu");
+  await expect(alert.getByRole("button", { name: "abrir PR" })).toBeVisible();
+  if (process.env.SHOT) await alert.screenshot({ path: process.env.SHOT, animations: "disabled" });
+  await alert.getByRole("button", { name: "abrir PR" }).click();
+  expect((await calls(page)).find((c) => c.cmd === "open_link")?.args).toEqual({ url: thirdParty.link });
 });
 
 test("the morning summary lists what is waiting and only offers to close", async ({ page }) => {

@@ -146,6 +146,7 @@
   "forge.section.assigned": "Aan mij toegewezen",
   "forge.section.myPrs": "{pr} Ik opende",
   "forge.section.myIssues": "Problemen die ik heb geopend",
+  "forge.section.othersPrs": "PRs van andere mensen",
   "forge.kind.all": "allemaal",
   "forge.kind.issues": "problemen",
   "forge.sort.updated": "bijgewerkt",

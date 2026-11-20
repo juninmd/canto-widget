@@ -55,7 +55,7 @@ export async function mockTauri(page: Page, opts: MockOptions = {}) {
       autostart_status: false,
       review_alerts_get: false,
       fullscreen_hold_get: false,
-      my_pr_alerts_get: { ci: false, stalled: false, stalled_hours: 48, mentions: false },
+      my_pr_alerts_get: { ci: false, stalled: false, stalled_hours: 48, mentions: false, others_prs: true },
       models_get: o.models ?? { alerts: false, models: [], total: 0, fetched_at: 0, next_fetch_at: 0, throttled: false, error: null },
       market_get: { quotes: [], fetched_at: 0, error: null },
       steam_status: o.steam ?? { configured: false, steamid: "", has_key: false, name: "", region: "br", watching: false },

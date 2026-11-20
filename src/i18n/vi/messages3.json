@@ -100,6 +100,7 @@
   "alert.kind.pr": "kéo yêu cầu",
   "alert.pr.ci": "CI không thành công",
   "alert.pr.stalled": "không có đánh giá",
+  "alert.pr.others": "từ người khác",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

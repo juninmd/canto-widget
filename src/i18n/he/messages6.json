@@ -10,6 +10,7 @@
   "forge.refresh": "לרענן",
   "forge.summary.label": "סיכום",
   "forge.summary.reviews": "ביקורות",
+  "forge.summary.others": "מאחרים",
   "forge.summary.mine": "{pr} שלי",
   "forge.summary.failing": "CI נכשל",
   "forge.summary.issues": "הבעיות שלי",

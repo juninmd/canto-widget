@@ -10,6 +10,7 @@
   "forge.refresh": "ताज़ा करें",
   "forge.summary.label": "सारांश",
   "forge.summary.reviews": "समीक्षाएँ",
+  "forge.summary.others": "दूसरों से",
   "forge.summary.mine": "मेरा {pr}",
   "forge.summary.failing": "सीआई विफल",
   "forge.summary.issues": "मेरे मुद्दे",

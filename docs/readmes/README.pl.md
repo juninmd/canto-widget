@@ -292,6 +292,10 @@ Oraz **Śledź system**, który przełącza się między jasnymi i ciemnymi elem
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs od innych osób | Jako alert pojawia się PR strony trzeciej |
+|---|---|
+| ![GitHub z wybranym kafelkiem „od innych osób” i PR otwartym przez inną osobę, przedstawiającym pigułkę CI, odnośnik i autora](../prints/app/164-github-terceiros.png) | ![Wyskakujące okienko z żądaniem ściągnięcia otwartego przez inną osobę, zawierające nazwisko autora i propozycję otwarcia PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

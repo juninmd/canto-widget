@@ -100,6 +100,7 @@
   "alert.kind.pr": "заявка за изтегляне",
   "alert.pr.ci": "CI не успя",
   "alert.pr.stalled": "няма преглед",
+  "alert.pr.others": "от някой друг",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

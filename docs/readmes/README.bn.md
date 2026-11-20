@@ -291,6 +291,10 @@ OneDrive, Syncthing...), সিস্টেম এবং **আপডেট** ব
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs অন্য লোকেদের থেকে | একটি তৃতীয় পক্ষের PR একটি সতর্কতা হিসাবে আসে৷ |
+|---|---|
+| ![GitHub নির্বাচিত "অন্যান্য ব্যক্তিদের থেকে" টাইল সহ এবং একটি PR অন্য একজনের দ্বারা খোলা, এর CI পিল, রেফারেন্স এবং লেখক দেখাচ্ছে](../prints/app/164-github-terceiros.png) | ![লেখকের নামকরণ এবং PR খোলার প্রস্তাব দিয়ে অন্য কারো দ্বারা খোলা একটি পুল অনুরোধের জন্য পপ-আপ](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

@@ -29,7 +29,7 @@ const pr = {
 
 async function mount(status: "running" | "success" | "failure") {
   responses.github_status = () => Promise.resolve({ connected: true, login: "voce", source: "pat", device_flow: true });
-  responses.github_lists = () => Promise.resolve({ assigned: empty, review_requested: empty, my_issues: empty, my_prs: { total: 1, items: [pr] } });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, review_requested: empty, my_issues: empty, my_prs: { total: 1, items: [pr] } });
   responses.github_prs_checks = () => Promise.resolve([{ repo: pr.repo, number: pr.number, status }]);
   render(
     <ToastProvider>

@@ -10,6 +10,7 @@
   "forge.refresh": "تحديث",
   "forge.summary.label": "ملخص",
   "forge.summary.reviews": "المراجعات",
+  "forge.summary.others": "من الآخرين",
   "forge.summary.mine": "بلدي {pr}",
   "forge.summary.failing": "فشل سي آي",
   "forge.summary.issues": "مشاكلي",

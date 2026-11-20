@@ -100,6 +100,7 @@
   "alert.kind.pr": "pull anmodning",
   "alert.pr.ci": "CI mislykkedes",
   "alert.pr.stalled": "ingen anmeldelse",
+  "alert.pr.others": "fra en anden",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

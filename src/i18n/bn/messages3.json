@@ -100,6 +100,7 @@
   "alert.kind.pr": "অনুরোধ টান",
   "alert.pr.ci": "সিআই ব্যর্থ হয়েছে",
   "alert.pr.stalled": "কোন পর্যালোচনা",
+  "alert.pr.others": "অন্য কারো কাছ থেকে",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

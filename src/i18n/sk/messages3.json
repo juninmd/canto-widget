@@ -100,6 +100,7 @@
   "alert.kind.pr": "vytiahnuť žiadosť",
   "alert.pr.ci": "CI zlyhalo",
   "alert.pr.stalled": "žiadna recenzia",
+  "alert.pr.others": "od niekoho iného",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

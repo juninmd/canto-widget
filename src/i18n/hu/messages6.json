@@ -10,6 +10,7 @@
   "forge.refresh": "frissíteni",
   "forge.summary.label": "összefoglaló",
   "forge.summary.reviews": "vélemények",
+  "forge.summary.others": "másoktól",
   "forge.summary.mine": "az én {pr}",
   "forge.summary.failing": "A CI nem sikerült",
   "forge.summary.issues": "az én problémáim",

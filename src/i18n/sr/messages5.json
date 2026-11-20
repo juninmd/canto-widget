@@ -146,6 +146,7 @@
   "forge.section.assigned": "Додељено мени",
   "forge.section.myPrs": "{pr} Отворио сам",
   "forge.section.myIssues": "Питања која сам отворио",
+  "forge.section.othersPrs": "PRs од других људи",
   "forge.kind.all": "све",
   "forge.kind.issues": "питања",
   "forge.sort.updated": "ажурирано",

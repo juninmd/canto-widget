@@ -10,6 +10,7 @@
   "forge.refresh": "aggiornare",
   "forge.summary.label": "riepilogo",
   "forge.summary.reviews": "recensioni",
+  "forge.summary.others": "da altri",
   "forge.summary.mine": "il mio {pr}",
   "forge.summary.failing": "CI non è riuscito",
   "forge.summary.issues": "i miei problemi",

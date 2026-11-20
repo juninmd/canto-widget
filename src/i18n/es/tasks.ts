@@ -182,6 +182,7 @@ export const tasks: Record<keyof typeof source, string> = {
   "alert.kind.pr": "pull request",
   "alert.pr.ci": "CI fallido",
   "alert.pr.stalled": "sin revisión",
+  "alert.pr.others": "de otra persona",
   "alert.pr.approved": "aprobado",
   "alert.pr.changes": "cambios solicitados",
   "alert.pr.ready": "listo para fusionar",

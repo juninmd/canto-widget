@@ -146,6 +146,7 @@
   "forge.section.assigned": "Ditugaskan kepada saya",
   "forge.section.myPrs": "{pr} Saya membuka",
   "forge.section.myIssues": "Masalah yang saya buka",
+  "forge.section.othersPrs": "PRs dari orang lain",
   "forge.kind.all": "semuanya",
   "forge.kind.issues": "masalah",
   "forge.sort.updated": "diperbarui",

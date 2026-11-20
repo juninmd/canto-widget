@@ -146,6 +146,7 @@
   "forge.section.assigned": "Paskirta man",
   "forge.section.myPrs": "{pr} Atidariau",
   "forge.section.myIssues": "Problemos, kurias atidariau",
+  "forge.section.othersPrs": "PRs iš kitų žmonių",
   "forge.kind.all": "visi",
   "forge.kind.issues": "klausimus",
   "forge.sort.updated": "atnaujinta",

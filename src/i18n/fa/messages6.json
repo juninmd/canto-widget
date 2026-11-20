@@ -10,6 +10,7 @@
   "forge.refresh": "تازه کردن",
   "forge.summary.label": "خلاصه",
   "forge.summary.reviews": "بررسی ها",
+  "forge.summary.others": "از دیگران",
   "forge.summary.mine": "{pr} من",
   "forge.summary.failing": "CI ناموفق بود",
   "forge.summary.issues": "مسائل من",

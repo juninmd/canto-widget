@@ -292,6 +292,10 @@ A **Follow system**, který spolu s OS přepíná mezi světlem a tmou. Všechny
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs od ostatních lidí | Jako upozornění dorazí PR třetí strany |
+|---|---|
+| ![GitHub s vybranou dlaždicí „od jiných lidí“ a PR otevřenou jinou osobou, zobrazující její pilulku CI, odkaz a autora](../prints/app/164-github-terceiros.png) | ![Vyskakovací okno pro žádost o stažení, které otevřel někdo jiný, pojmenoval autora a nabídl otevření souboru PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

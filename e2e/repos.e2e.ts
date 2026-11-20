@@ -50,7 +50,7 @@ const calendar = { days, total: days.reduce((n, d) => n + d.count, 0), fetched_a
 
 const fixed = {
   github_status: { connected: true, login: "voce", source: "pat", device_flow: true },
-  github_lists: { assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
+  github_lists: { others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
   github_repos_page: repos,
   repos_cached: [],
   github_readme: { text: "# Atlas\n\nMapas e rotas para a frota.", truncated: false, fetched_at: now, limited_until: null },

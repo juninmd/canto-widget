@@ -100,6 +100,7 @@
   "alert.kind.pr": "プルリクエスト",
   "alert.pr.ci": "CI が失敗しました",
   "alert.pr.stalled": "レビューはありません",
+  "alert.pr.others": "他の人から",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

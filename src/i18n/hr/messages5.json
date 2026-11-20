@@ -146,6 +146,7 @@
   "forge.section.assigned": "Dodijeljen meni",
   "forge.section.myPrs": "{pr} Otvorio sam",
   "forge.section.myIssues": "Problemi koje sam otvorio",
+  "forge.section.othersPrs": "PRs od drugih ljudi",
   "forge.kind.all": "sve",
   "forge.kind.issues": "pitanja",
   "forge.sort.updated": "ažuriran",

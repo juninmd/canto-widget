@@ -8,11 +8,11 @@ const item = (number: number): ForgeItem => ({
 });
 const list = (total: number, items: ForgeItem[] = []) => ({ total, items });
 const lists: ForgeLists = {
-  review_requested: list(3), assigned: list(0), my_prs: list(2, [item(1), item(2)]), my_issues: list(5),
+  review_requested: list(3), others_prs: list(1), assigned: list(0), my_prs: list(2, [item(1), item(2)]), my_issues: list(5),
 };
 
 test("counts come from the section totals", () => {
-  expect(summarize(lists)).toEqual({ reviews: 3, mine: 2, issues: 5, failing: null });
+  expect(summarize(lists)).toEqual({ reviews: 3, others: 1, mine: 2, issues: 5, failing: null });
 });
 
 test("counts my PRs whose CI failed when badges exist", () => {

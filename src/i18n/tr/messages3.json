@@ -100,6 +100,7 @@
   "alert.kind.pr": "çekme isteği",
   "alert.pr.ci": "CI başarısız oldu",
   "alert.pr.stalled": "inceleme yok",
+  "alert.pr.others": "başkasından",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

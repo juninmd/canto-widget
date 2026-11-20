@@ -21,7 +21,7 @@ const pr = (n: number, title: string, extra: Record<string, unknown> = {}) => ({
 const empty = { total: 0, items: [], fetched_at: now };
 const lists = {
   review_requested: { total: 1, items: [pr(41, "Corrige o cálculo de rotas com paradas", { comments: 5 })], fetched_at: now },
-  assigned: empty,
+  others_prs: empty, assigned: empty,
   my_prs: {
     total: 3,
     items: [pr(52, "Cache de relatórios por período", { author: "voce", comments: 2 }), pr(57, "Rascunho: painel da frota", { author: "voce", draft: true }), pr(60, "Atualiza dependências do mapa", { author: "voce" })],
@@ -65,7 +65,7 @@ test("pinning a repository keeps it one click away through the pinned filter", a
   await mockTauri(page, {
     fixed: {
       ...fixed,
-      github_lists: { assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
+      github_lists: { others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
       github_repos_page: {
         page: 1, has_next: false, revalidated: false, fetched_at: now, limited_until: null,
         repos: [repo("voce/dotfiles", "", "Configurações de shell"), repo("acme/atlas", "acme", "Mapas e rotas para a frota"), repo("acme/relatorios", "acme", "Relatórios por período")],

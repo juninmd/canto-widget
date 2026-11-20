@@ -10,6 +10,7 @@ const config = {
   merge_state: true,
   comments: true,
   assigned: true,
+  others_prs: true,
   replies: false,
   team_mentions: false,
 };
@@ -29,6 +30,7 @@ test("settings list every own-work alert as a switch", async ({ page }) => {
     "avisar quando um PR/MR meu ficar pronto para merge ou tiver conflito",
     "avisar quando um PR/MR meu receber comentário novo",
     "avisar quando algo for atribuído a mim",
+    "avisar quando alguém abrir um PR num repositório meu",
     "avisar quando responderem em uma conversa em que comentei (GitHub)",
     "incluir menções aos meus times (GitHub)",
   ]) {

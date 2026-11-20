@@ -19,6 +19,7 @@ const pr = (number: number, extra: Partial<ForgeItem> = {}): ForgeItem => ({
 const list = (items: ForgeItem[]): ForgeList => ({ total: items.length, items });
 const lists = (p: Partial<ForgeLists>): ForgeLists => ({
   review_requested: list([]),
+  others_prs: list([]),
   assigned: list([]),
   my_prs: list([]),
   my_issues: list([]),

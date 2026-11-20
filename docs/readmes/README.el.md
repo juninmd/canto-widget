@@ -292,6 +292,10 @@ OneDrive, Syncthing...), ξεκινήστε με το σύστημα και τη
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs από άλλα άτομα | Ένα τρίτο μέρος PR φτάνει ως ειδοποίηση |
+|---|---|
+| ![GitHub με επιλεγμένο το πλακίδιο "από άλλα άτομα" και ένα PR που άνοιξε άλλο άτομο, εμφανίζοντας το χάπι CI, την αναφορά και τον συγγραφέα του](../prints/app/164-github-terceiros.png) | ![Αναδυόμενο παράθυρο για ένα αίτημα έλξης που άνοιξε κάποιος άλλος, ονομάζοντας τον συγγραφέα και προσφέροντάς σας να ανοίξετε το PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

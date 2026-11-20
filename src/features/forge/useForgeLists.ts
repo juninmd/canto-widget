@@ -4,7 +4,7 @@ import { appendPage, NO_FILTER, type Forge } from "./forge";
 import { patchForgeCache, readForgeCache } from "./forgeCache";
 import { useLatestRequest } from "../../lib/useLatestRequest";
 
-const FIRST_PAGES: Record<ForgeSection, number> = { review_requested: 1, assigned: 1, my_prs: 1, my_issues: 1 };
+const FIRST_PAGES: Record<ForgeSection, number> = { review_requested: 1, others_prs: 1, assigned: 1, my_prs: 1, my_issues: 1 };
 
 export type ForgeSource = {
   lists: (filter: ForgeFilter, force: boolean) => Promise<ForgeLists>;

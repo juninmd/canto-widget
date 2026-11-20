@@ -292,6 +292,10 @@ OneDrive, Syncthing...), கணினி மற்றும் **புதுப
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs மற்றவர்களிடமிருந்து | மூன்றாம் தரப்பு PR எச்சரிக்கையாக வருகிறது |
+|---|---|
+| ![GitHub "மற்றவர்களிடமிருந்து" ஓடு தேர்ந்தெடுக்கப்பட்டது மற்றும் ஒரு PR மற்றொரு நபரால் திறக்கப்பட்டது, அதன் CI மாத்திரை, குறிப்பு மற்றும் ஆசிரியரைக் காட்டுகிறது](../prints/app/164-github-terceiros.png) | ![வேறொருவரால் திறக்கப்பட்ட இழுத்தல் கோரிக்கைக்கான பாப்-அப், ஆசிரியரின் பெயரைக் குறிப்பிட்டு PR ஐத் திறக்கும்](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

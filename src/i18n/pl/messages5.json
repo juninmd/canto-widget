@@ -146,6 +146,7 @@
   "forge.section.assigned": "Przypisane mi",
   "forge.section.myPrs": "{pr} Otworzyłem",
   "forge.section.myIssues": "Problemy, które otworzyłem",
+  "forge.section.othersPrs": "PRs od innych osób",
   "forge.kind.all": "wszystko",
   "forge.kind.issues": "problemy",
   "forge.sort.updated": "zaktualizowany",

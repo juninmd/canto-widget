@@ -100,6 +100,7 @@
   "alert.kind.pr": "izvilkt pieprasījumu",
   "alert.pr.ci": "CI neizdevās",
   "alert.pr.stalled": "nav apskatu",
+  "alert.pr.others": "no kāda cita",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

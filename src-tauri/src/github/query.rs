@@ -8,6 +8,8 @@ fn qualifiers(section: Section) -> (Option<&'static str>, Option<&'static str>) 
         Section::Assigned => (Some("assignee:@me"), Some("assignee:@me")),
         Section::MyPrs => (None, Some("author:@me")),
         Section::MyIssues => (Some("author:@me"), None),
+        // A PR someone else opened in one of the user's repositories: nobody has to request a review for it to show up.
+        Section::OthersPrs => (None, Some("user:@me -author:@me")),
         Section::Mentioned => (Some("mentions:@me -author:@me"), Some("mentions:@me -author:@me")),
         // Someone else's PR the user commented on, or any issue (own ones included: no other alert covers them).
         Section::Participating => (Some("commenter:@me"), Some("commenter:@me -author:@me")),
@@ -110,6 +112,15 @@ mod tests {
         assert_eq!(q[3], "is:open is:pr archived:false team:acme/ops -author:@me");
         assert_eq!(team_queries(&teams, &filter("csv", Kind::Pr)).len(), 2);
         assert!(team_queries(&[], &ForgeFilter::default()).is_empty());
+    }
+
+    #[test]
+    fn third_party_prs_are_prs_in_my_repositories_that_i_did_not_open() {
+        assert_eq!(
+            queries(Section::OthersPrs, &ForgeFilter::default()),
+            vec!["is:open is:pr archived:false user:@me -author:@me"]
+        );
+        assert!(queries(Section::OthersPrs, &filter("", Kind::Issue)).is_empty(), "it is a PR-only section");
     }
 
     #[test]

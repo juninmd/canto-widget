@@ -180,6 +180,7 @@ export const tasks = {
   "alert.kind.pr": "pull request",
   "alert.pr.ci": "CI falhou",
   "alert.pr.stalled": "sem revisão",
+  "alert.pr.others": "de terceiro",
   "alert.pr.approved": "aprovado",
   "alert.pr.changes": "mudanças pedidas",
   "alert.pr.ready": "pronto para merge",

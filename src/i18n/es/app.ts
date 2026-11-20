@@ -181,6 +181,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.myPrAlerts.mergeState": "avisarme cuando uno de mis PR/MR esté listo para fusionar o tenga un conflicto",
   "settings.myPrAlerts.comments": "avisarme cuando uno de mis PR/MR reciba un comentario nuevo",
   "settings.myPrAlerts.assigned": "avisarme cuando me asignen algo",
+  "settings.myPrAlerts.othersPrs": "avisarme cuando alguien abra un PR en un repositorio mío",
   "settings.myPrAlerts.replies": "avisarme cuando alguien responda en un hilo donde comenté (GitHub)",
   "settings.myPrAlerts.teamMentions": "incluir las menciones a mis equipos (GitHub)",
   "settings.myPrAlerts.teamMentionsHint": "Necesita el permiso read:org en el token. En GitLab, la mención a un grupo ya llega como mención.",

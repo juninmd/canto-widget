@@ -10,6 +10,7 @@
   "forge.refresh": "yenileme",
   "forge.summary.label": "özet",
   "forge.summary.reviews": "yorumlar",
+  "forge.summary.others": "diğerlerinden",
   "forge.summary.mine": "benim {pr}",
   "forge.summary.failing": "CI başarısız oldu",
   "forge.summary.issues": "sorunlarım",

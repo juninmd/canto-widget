@@ -146,6 +146,7 @@
   "forge.section.assigned": "Назначено мне",
   "forge.section.myPrs": "{pr} Я открыл",
   "forge.section.myIssues": "Проблемы, которые я открыл",
+  "forge.section.othersPrs": "PRs от других людей",
   "forge.kind.all": "все",
   "forge.kind.issues": "проблемы",
   "forge.sort.updated": "обновлено",

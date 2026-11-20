@@ -9,7 +9,7 @@ import { useForgeLists, type ForgeSource } from "./useForgeLists";
 afterEach(() => clearForgeCache());
 
 const list = (total: number): ForgeList => ({ total, items: [] }) as unknown as ForgeList;
-const lists = (): ForgeLists => ({ review_requested: list(5), assigned: list(5), my_prs: list(5), my_issues: list(5) }) as ForgeLists;
+const lists = (): ForgeLists => ({ review_requested: list(5), others_prs: list(5), assigned: list(5), my_prs: list(5), my_issues: list(5) }) as ForgeLists;
 
 function deferredSource() {
   const pending: { section: ForgeSection; resolve: (l: ForgeList) => void }[] = [];

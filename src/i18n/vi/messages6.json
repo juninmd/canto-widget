@@ -10,6 +10,7 @@
   "forge.refresh": "làm mới",
   "forge.summary.label": "tóm tắt",
   "forge.summary.reviews": "đánh giá",
+  "forge.summary.others": "từ người khác",
   "forge.summary.mine": "{pr} của tôi",
   "forge.summary.failing": "CI không thành công",
   "forge.summary.issues": "vấn đề của tôi",

@@ -10,6 +10,7 @@
   "forge.refresh": "päivitä",
   "forge.summary.label": "yhteenveto",
   "forge.summary.reviews": "arvosteluja",
+  "forge.summary.others": "muilta",
   "forge.summary.mine": "minun {pr}",
   "forge.summary.failing": "CI epäonnistui",
   "forge.summary.issues": "minun ongelmani",

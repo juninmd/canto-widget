@@ -146,6 +146,7 @@
   "forge.section.assigned": "나에게 할당됨",
   "forge.section.myPrs": "{pr} 열었어요",
   "forge.section.myIssues": "내가 열었던 이슈",
+  "forge.section.othersPrs": "다른 사람의 PRs",
   "forge.kind.all": "모두",
   "forge.kind.issues": "문제",
   "forge.sort.updated": "업데이트됨",
