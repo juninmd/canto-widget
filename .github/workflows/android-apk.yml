@@ -7,6 +7,10 @@ on:
     branches: [claude/project-thread-vufw4p]
     paths: [.github/workflows/android-apk.yml]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
   contents: write
 
