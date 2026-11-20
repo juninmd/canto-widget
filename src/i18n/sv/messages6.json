@@ -10,6 +10,7 @@
   "forge.refresh": "uppdatera",
   "forge.summary.label": "sammanfattning",
   "forge.summary.reviews": "recensioner",
+  "forge.summary.others": "från andra",
   "forge.summary.mine": "min {pr}",
   "forge.summary.failing": "CI misslyckades",
   "forge.summary.issues": "mina problem",

@@ -2,7 +2,7 @@ import type { ChecksStatus, ForgeLists, ForgeSection, PrChecks, PrRef } from "..
 
 /** Same bound as `MAX_PRS` in `github_checks.rs`: each uncached PR costs four GitHub calls. */
 export const MAX_CHECKED = 20;
-const ORDER: ForgeSection[] = ["review_requested", "assigned", "my_prs"];
+const ORDER: ForgeSection[] = ["review_requested", "others_prs", "assigned", "my_prs"];
 
 export type CiMap = Record<string, ChecksStatus>;
 /** GitHub's search has no merge state: the CI batch brings it, keyed like `CiMap`. */

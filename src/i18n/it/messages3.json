@@ -100,6 +100,7 @@
   "alert.kind.pr": "richiesta pull",
   "alert.pr.ci": "CI non è riuscito",
   "alert.pr.stalled": "nessuna recensione",
+  "alert.pr.others": "da qualcun altro",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

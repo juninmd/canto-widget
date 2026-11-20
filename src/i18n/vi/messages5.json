@@ -146,6 +146,7 @@
   "forge.section.assigned": "Đã giao cho tôi",
   "forge.section.myPrs": "{pr} Tôi đã mở",
   "forge.section.myIssues": "Các vấn đề tôi đã mở",
+  "forge.section.othersPrs": "PRs từ người khác",
   "forge.kind.all": "tất cả",
   "forge.kind.issues": "vấn đề",
   "forge.sort.updated": "đã cập nhật",

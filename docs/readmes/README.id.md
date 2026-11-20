@@ -292,6 +292,10 @@ Dan **Ikuti sistem**, yang beralih antara terang dan gelap seiring dengan OS. Se
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs dari orang lain | PR pihak ketiga datang sebagai peringatan |
+|---|---|
+| ![GitHub dengan ubin "dari orang lain" dipilih dan PR dibuka oleh orang lain, menunjukkan pil CI, referensi, dan penulisnya](../prints/app/164-github-terceiros.png) | ![Pop-up untuk permintaan tarik yang dibuka oleh orang lain, menyebutkan nama pembuatnya dan menawarkan untuk membuka PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

@@ -10,6 +10,7 @@
   "forge.refresh": "atsvaidzināt",
   "forge.summary.label": "kopsavilkums",
   "forge.summary.reviews": "atsauksmes",
+  "forge.summary.others": "no citiem",
   "forge.summary.mine": "mans {pr}",
   "forge.summary.failing": "CI neizdevās",
   "forge.summary.issues": "manas problēmas",

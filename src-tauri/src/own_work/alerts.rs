@@ -1,6 +1,7 @@
 //! One background reader for everything that happens to the user's own work on GitHub and GitLab, besides the
-//! mentions: verdicts, merge state, comments, assignments, replies, review requests and broken pipelines. Polls the
-//! same cached lists the tabs use, only with the vault open; the first reading of each only seeds.
+//! mentions: verdicts, merge state, comments, assignments, replies, review requests, PRs opened by other people in
+//! the user's repositories and broken pipelines. Polls the same cached lists the tabs use, only with the vault open;
+//! the first reading of each only seeds.
 use std::time::{Duration, Instant};
 
 use tauri::{AppHandle, Manager};

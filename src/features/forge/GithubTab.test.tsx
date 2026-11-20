@@ -57,7 +57,7 @@ test("saving the token sends it to Rust and starts listing", async () => {
     connected = true;
     return Promise.resolve("octocat");
   };
-  responses.github_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   await mount();
   fireEvent.change(screen.getByPlaceholderText("github_pat_..."), { target: { value: "github_pat_abc" } });
   await act(async () => {
@@ -68,12 +68,12 @@ test("saving the token sends it to Rust and starts listing", async () => {
   expect(screen.getByText("@octocat")).toBeTruthy();
 });
 
-test("connected shows all four lists with totals and opens the item in the browser", async () => {
+test("connected shows all five lists with totals and opens the item in the browser", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "app", device_flow: true });
   responses.github_lists = () =>
-    Promise.resolve({ assigned: empty, my_prs: empty, review_requested: { total: 3, items: [item] }, my_issues: empty });
+    Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: { total: 3, items: [item] }, my_issues: empty });
   await mount();
-  for (const t of ["Revisão pedida a mim", "Atribuídos a mim", "PRs que eu abri", "Issues que eu abri"]) {
+  for (const t of ["Revisão pedida a mim", "PRs de terceiros", "Atribuídos a mim", "PRs que eu abri", "Issues que eu abri"]) {
     expect(screen.getByRole("region", { name: t })).toBeTruthy();
   }
   const region = screen.getByRole("region", { name: "Revisão pedida a mim" });
@@ -99,7 +99,7 @@ test("the card names who opened it only when it isn't me, and marks PR vs issue"
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: false });
   const theirs = { ...item, url: "https://github.com/octo/canto/issues/7", number: 7, is_pr: false, draft: false, author: "hubot" };
   responses.github_lists = () =>
-    Promise.resolve({ assigned: { total: 2, items: [item, theirs] }, my_prs: empty, review_requested: empty, my_issues: empty });
+    Promise.resolve({ others_prs: empty, assigned: { total: 2, items: [item, theirs] }, my_prs: empty, review_requested: empty, my_issues: empty });
   await mount();
   expect(screen.getByText("@hubot")).toBeTruthy();
   expect(screen.getAllByText("@octocat")).toHaveLength(1);
@@ -108,7 +108,7 @@ test("the card names who opened it only when it isn't me, and marks PR vs issue"
 });
 
 const connected = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: false });
-const lists = (over = {}) => ({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty, ...over });
+const lists = (over = {}) => ({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty, ...over });
 
 test("while GitHub answers, the tab shows a busy skeleton instead of a blank area", async () => {
   responses.github_status = connected;
@@ -372,7 +372,7 @@ test("a review request can also be snoozed for 1 h, until tomorrow or a week", a
 test("the summary strip counts reviews owed and my PRs whose CI failed", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "app", device_flow: true });
   responses.github_lists = () =>
-    Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: { total: 3, items: [] }, my_issues: empty });
+    Promise.resolve({ others_prs: empty, assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: { total: 3, items: [] }, my_issues: empty });
   responses.github_prs_checks = () => Promise.resolve([{ repo: item.repo, number: item.number, status: "failure" }]);
   await mount();
   const strip = screen.getByRole("group", { name: "resumo" });
@@ -399,7 +399,7 @@ const reply = (rows: unknown[], extra: Record<string, unknown> = {}) => ({ rows,
 
 async function openMentions(rows: unknown[]) {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: true });
-  responses.github_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   responses.github_mentions = () => Promise.resolve(reply(rows));
   await mount();
   await act(async () => {
@@ -410,7 +410,7 @@ async function openMentions(rows: unknown[]) {
 
 test("the mentions subtab is fetched only when opened, and shows who wrote what with their photo", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: true });
-  responses.github_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   await mount();
   expect(calls.some((c) => c.cmd === "github_mentions")).toBe(false);
   expect(screen.getByRole("tab", { name: "PRs e issues" }).getAttribute("aria-selected")).toBe("true");
@@ -455,7 +455,7 @@ test("a mention whose comment was not found still lists, saying so, and an empty
 
 test("a failed mentions lookup is an alert with a retry, and going back to the lists keeps them", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: true });
-  responses.github_lists = () => Promise.resolve({ assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: empty, my_issues: empty });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: empty, my_issues: empty });
   responses.github_mentions = () => Promise.reject("github: limite de requisições");
   await mount();
   await act(async () => {
@@ -535,7 +535,7 @@ test("a person can be muted from a row, 'marcar todas' reads everything unread, 
 
 test("the subtab shows the unread count the badge already knows, and says when the rate limit holds the list back", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: true });
-  responses.github_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   responses.mentions_unread = () => Promise.resolve(3);
   responses.github_mentions = () => Promise.resolve(reply([mention], { limited_until: Date.now() + 600_000, unread: 1 }));
   await mount();

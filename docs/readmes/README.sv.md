@@ -292,6 +292,10 @@ Och **Följ system**, som växlar mellan ljust och mörkt tillsammans med operat
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs från andra personer | En tredje part PR anländer som en varning |
+|---|---|
+| ![GitHub med rutan "från andra personer" vald och en PR öppnad av en annan person, som visar dess CI-piller, referens och författare](../prints/app/164-github-terceiros.png) | ![Popup-fönster för en pull-begäran som öppnats av någon annan, namnger författaren och erbjuder sig att öppna PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

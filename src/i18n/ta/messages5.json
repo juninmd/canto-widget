@@ -146,6 +146,7 @@
   "forge.section.assigned": "எனக்கு ஒதுக்கப்பட்டது",
   "forge.section.myPrs": "{pr} நான் திறந்தேன்",
   "forge.section.myIssues": "நான் திறந்த சிக்கல்கள்",
+  "forge.section.othersPrs": "பிறரிடமிருந்து PRs",
   "forge.kind.all": "அனைத்து",
   "forge.kind.issues": "பிரச்சினைகள்",
   "forge.sort.updated": "புதுப்பிக்கப்பட்டது",

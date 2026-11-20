@@ -34,7 +34,7 @@ impl Forge for Github {
     }
 }
 
-/// Four sections cost up to six searches of the 30 per minute: served from the cache unless `force`.
+/// Five sections cost up to six searches of the 30 per minute: served from the cache unless `force`.
 #[tauri::command]
 pub async fn github_lists(
     app: tauri::AppHandle,

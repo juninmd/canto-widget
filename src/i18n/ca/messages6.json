@@ -10,6 +10,7 @@
   "forge.refresh": "refrescar",
   "forge.summary.label": "resum",
   "forge.summary.reviews": "comentaris",
+  "forge.summary.others": "dels altres",
   "forge.summary.mine": "el meu {pr}",
   "forge.summary.failing": "CI ha fallat",
   "forge.summary.issues": "els meus problemes",

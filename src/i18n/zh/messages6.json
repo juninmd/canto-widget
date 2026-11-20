@@ -10,6 +10,7 @@
   "forge.refresh": "刷新",
   "forge.summary.label": "总结",
   "forge.summary.reviews": "评论",
+  "forge.summary.others": "来自别人的",
   "forge.summary.mine": "我的{pr}",
   "forge.summary.failing": "持续集成失败",
   "forge.summary.issues": "我的问题",

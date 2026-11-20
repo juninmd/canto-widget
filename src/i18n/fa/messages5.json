@@ -146,6 +146,7 @@
   "forge.section.assigned": "به من اختصاص داده است",
   "forge.section.myPrs": "{pr} باز کردم",
   "forge.section.myIssues": "مسائلی که باز کردم",
+  "forge.section.othersPrs": "PRs از افراد دیگر",
   "forge.kind.all": "همه",
   "forge.kind.issues": "مسائل",
   "forge.sort.updated": "به روز شد",

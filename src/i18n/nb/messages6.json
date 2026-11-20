@@ -10,6 +10,7 @@
   "forge.refresh": "oppdater",
   "forge.summary.label": "sammendrag",
   "forge.summary.reviews": "anmeldelser",
+  "forge.summary.others": "fra andre",
   "forge.summary.mine": "min {pr}",
   "forge.summary.failing": "CI mislyktes",
   "forge.summary.issues": "mine problemer",

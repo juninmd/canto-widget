@@ -292,6 +292,10 @@ Og **Følg system**, som skifter mellem lys og mørk sammen med OS. Alle passere
 |---|---|
 | ![GitHub with four toggle tiles, a compact sort button and CI and waiting-time pills](../prints/app/110-github-tiles.png) | ![Status API services sorted by severity, with a summary bar, filter chips and a state pill](../prints/app/111-status-servicos.png) |
 
+| GitHub: PRs fra andre mennesker | En tredjepart PR ankommer som en alarm |
+|---|---|
+| ![GitHub med "fra andre personer"-flisen valgt og en PR åbnet af en anden person, der viser dens CI-pille, reference og forfatter](../prints/app/164-github-terceiros.png) | ![Pop-up for en pull-anmodning åbnet af en anden, navngiver forfatteren og tilbyder at åbne PR](../prints/app/165-aviso-pr-terceiro.png) |
+
 | Status API: my endpoints | AI models: sort chips | Activity: the focus goal |
 |---|---|---|
 | ![My endpoints worst first, with state pills, a plus-address button and the add form](../prints/app/112-status-endpoints.png) | ![AI models with Intelligence, Price and Speed chips and a rank block](../prints/app/106-modelos-chips.png) | ![Activity with the focus goal card and a pill with the minutes left](../prints/app/107-atividade-meta.png) |

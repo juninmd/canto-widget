@@ -181,6 +181,7 @@ export const app: Record<keyof typeof source, string> = {
   "settings.myPrAlerts.mergeState": "tell me when one of my PRs/MRs becomes ready to merge or gets a conflict",
   "settings.myPrAlerts.comments": "tell me when one of my PRs/MRs gets a new comment",
   "settings.myPrAlerts.assigned": "tell me when something is assigned to me",
+  "settings.myPrAlerts.othersPrs": "tell me when someone opens a PR in one of my repositories",
   "settings.myPrAlerts.replies": "tell me when someone replies in a thread I commented on (GitHub)",
   "settings.myPrAlerts.teamMentions": "include mentions of my teams (GitHub)",
   "settings.myPrAlerts.teamMentionsHint": "Needs the read:org scope on the token. On GitLab a group mention already arrives as a mention.",

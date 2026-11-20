@@ -100,6 +100,7 @@
   "alert.kind.pr": "vytáhnout žádost",
   "alert.pr.ci": "CI se nezdařilo",
   "alert.pr.stalled": "žádná recenze",
+  "alert.pr.others": "od někoho jiného",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

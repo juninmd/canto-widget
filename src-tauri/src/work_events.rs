@@ -99,6 +99,31 @@ pub fn reply_events(found: &[(&ForgeItem, Said)], en: bool) -> Vec<AgendaItem> {
         .collect()
 }
 
+/// PRs someone else opened in the user's repositories. Who opened it rides as the sender, so the card shows a face.
+pub fn others_pr_events(fresh: &[&ForgeItem], en: bool) -> Vec<AgendaItem> {
+    if fresh.len() > MAX_EACH {
+        let title = if en {
+            format!("{} pull requests from other people", fresh.len())
+        } else {
+            format!("{} PRs de terceiros aguardando", fresh.len())
+        };
+        return vec![summary("others", title, fresh.iter().map(|i| format!("{} {}", i.reference, i.title)).collect())];
+    }
+    fresh
+        .iter()
+        .map(|i| {
+            let description = match (i.author.as_str(), en) {
+                ("", true) => format!("Someone opened this pull request in {}.", i.repo),
+                ("", false) => format!("Alguém abriu este PR em {}.", i.repo),
+                (a, true) => format!("@{a} opened this pull request in {}.", i.repo),
+                (a, false) => format!("@{a} abriu este PR em {}.", i.repo),
+            };
+            let sender = (!i.author.is_empty()).then(|| Sender { login: i.author.clone(), ..Default::default() });
+            AgendaItem { description, sender, start: i.created_at.clone(), ..base(i, "others") }
+        })
+        .collect()
+}
+
 /// A failed pipeline on the user's MR, from the to-do GitLab raises for it.
 pub fn pipeline_events(fresh: &[&Mention], en: bool) -> Vec<AgendaItem> {
     let ci = |m: &Mention| AgendaItem {

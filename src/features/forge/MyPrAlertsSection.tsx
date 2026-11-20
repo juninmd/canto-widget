@@ -37,6 +37,7 @@ export default function MyPrAlertsSection({ onError }: { onError: (m: string) =>
     ["merge_state", "settings.myPrAlerts.mergeState"],
     ["comments", "settings.myPrAlerts.comments"],
     ["assigned", "settings.myPrAlerts.assigned"],
+    ["others_prs", "settings.myPrAlerts.othersPrs"],
     ["replies", "settings.myPrAlerts.replies"],
   ] as const;
   return (

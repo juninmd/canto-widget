@@ -34,7 +34,7 @@ const agenda = [
 
 
 const lists = {
-  assigned: { total: 1, items: [forge(120, "Migra o job de relatórios para a fila nova", { is_pr: false })], fetched_at: now },
+  others_prs: { total: 0, items: [] }, assigned: { total: 1, items: [forge(120, "Migra o job de relatórios para a fila nova", { is_pr: false })], fetched_at: now },
   my_prs: { total: 2, items: [forge(128, "Corrige o parser de CSV com aspas", { author: "voce" }), forge(131, "Cache de relatórios por período", { draft: true, author: "voce" })], fetched_at: now },
   review_requested: { total: 2, items: [forge(133, "Adiciona exportação em PDF", { created_at: new Date(now - 60 * 3_600_000).toISOString() }), forge(134, "Ajusta o tema escuro do painel")], fetched_at: now },
   my_issues: { total: 0, items: [], fetched_at: now },

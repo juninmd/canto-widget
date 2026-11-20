@@ -54,15 +54,15 @@ impl Forge for FakeAccount {
 fn assert_shared_orchestration<F: Forge>(cred: F::Credential, calls: &AtomicU32) {
     let cache = ForgeCache::default();
     let lists = list_all::<F>(&cache, &cred, &ForgeFilter::default(), false).unwrap();
-    assert_eq!(calls.load(Ordering::SeqCst), 4, "collect() should fetch all four sections");
+    assert_eq!(calls.load(Ordering::SeqCst), 5, "collect() should fetch all five sections");
     assert_eq!(lists.assigned.items.len(), 1);
 
     list_all::<F>(&cache, &cred, &ForgeFilter::default(), false).unwrap();
-    assert_eq!(calls.load(Ordering::SeqCst), 4, "a call within the TTL should be served from the cache");
+    assert_eq!(calls.load(Ordering::SeqCst), 5, "a call within the TTL should be served from the cache");
 
     let total = review_requested::<F>(&cache, &cred).unwrap();
     assert_eq!(total, 1, "review_requested should reuse list_all's cached review_requested page");
-    assert_eq!(calls.load(Ordering::SeqCst), 4);
+    assert_eq!(calls.load(Ordering::SeqCst), 5);
 }
 
 #[test]

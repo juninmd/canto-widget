@@ -146,6 +146,7 @@
   "forge.section.assigned": "मुझे सौंपा गया",
   "forge.section.myPrs": "{pr} मैंने खोला",
   "forge.section.myIssues": "मेरे द्वारा खोले गए मुद्दे",
+  "forge.section.othersPrs": "PRs अन्य लोगों से",
   "forge.kind.all": "सब",
   "forge.kind.issues": "मुद्दे",
   "forge.sort.updated": "अद्यतन किया गया",

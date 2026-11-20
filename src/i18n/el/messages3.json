@@ -100,6 +100,7 @@
   "alert.kind.pr": "αίτημα έλξης",
   "alert.pr.ci": "CI απέτυχε",
   "alert.pr.stalled": "καμία κριτική",
+  "alert.pr.others": "από κάποιον άλλον",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

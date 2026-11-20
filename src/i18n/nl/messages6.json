@@ -10,6 +10,7 @@
   "forge.refresh": "vernieuwen",
   "forge.summary.label": "samenvatting",
   "forge.summary.reviews": "beoordelingen",
+  "forge.summary.others": "van anderen",
   "forge.summary.mine": "mijn {pr}",
   "forge.summary.failing": "CI is mislukt",
   "forge.summary.issues": "mijn problemen",

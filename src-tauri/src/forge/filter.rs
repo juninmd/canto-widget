@@ -39,6 +39,8 @@ pub enum Section {
     Assigned,
     MyPrs,
     MyIssues,
+    /// PRs someone else opened in one of the user's repositories (GitHub); the tab lists them and the watcher rings.
+    OthersPrs,
     /// Threads where someone @-mentioned the user; the alert watcher and the mentions subtab ask for it, never the lists.
     Mentioned,
     /// Open threads where the user commented (GitHub); only the reply watcher asks for it.
@@ -76,7 +78,8 @@ impl Window {
     }
 }
 
-pub const SECTIONS: [Section; 4] = [Section::ReviewRequested, Section::Assigned, Section::MyPrs, Section::MyIssues];
+pub const SECTIONS: [Section; 5] =
+    [Section::ReviewRequested, Section::Assigned, Section::MyPrs, Section::MyIssues, Section::OthersPrs];
 
 #[derive(Debug, Clone, Default, Deserialize)]
 pub struct ForgeFilter {

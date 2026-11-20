@@ -3,15 +3,19 @@ import { t } from "../../i18n";
 
 export type Forge = "github" | "gitlab";
 
-/** GitLab calls PRs "merge requests"; the sections are the same. */
+/** GitLab calls PRs "merge requests"; the sections are the same, except the third-party PRs list, which is GitHub-only. */
 export function sections(forge: Forge): { key: ForgeSection; title: string; kinds: ForgeKind[] }[] {
   const pr = forge === "gitlab" ? "MRs" : "PRs";
-  return [
+  const all: { key: ForgeSection; title: string; kinds: ForgeKind[] }[] = [
     { key: "review_requested", title: t("forge.section.reviewRequested"), kinds: ["pr"] },
+    ...(forge === "github"
+      ? [{ key: "others_prs" as const, title: t("forge.section.othersPrs"), kinds: ["pr" as const] }]
+      : []),
     { key: "assigned", title: t("forge.section.assigned"), kinds: ["pr", "issue"] },
     { key: "my_prs", title: t("forge.section.myPrs", { pr }), kinds: ["pr"] },
     { key: "my_issues", title: t("forge.section.myIssues"), kinds: ["issue"] },
   ];
+  return all;
 }
 
 export const NO_FILTER: ForgeFilter = { text: "", kind: "all", sort: "updated", order: "desc" };

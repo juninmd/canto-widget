@@ -100,6 +100,7 @@
   "alert.kind.pr": "pull kérés",
   "alert.pr.ci": "A CI nem sikerült",
   "alert.pr.stalled": "nincs felülvizsgálat",
+  "alert.pr.others": "valaki mástól",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

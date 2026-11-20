@@ -100,6 +100,7 @@
   "alert.kind.pr": "tõmba taotlus",
   "alert.pr.ci": "CI ebaõnnestus",
   "alert.pr.stalled": "arvustust pole",
+  "alert.pr.others": "kelleltki teiselt",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

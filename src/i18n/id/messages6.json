@@ -10,6 +10,7 @@
   "forge.refresh": "menyegarkan",
   "forge.summary.label": "ringkasan",
   "forge.summary.reviews": "ulasan",
+  "forge.summary.others": "dari orang lain",
   "forge.summary.mine": "{pr} saya",
   "forge.summary.failing": "CI gagal",
   "forge.summary.issues": "masalah saya",

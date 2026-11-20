@@ -29,7 +29,7 @@ test("the mentions subtab shows who mentioned me, a preview of the text and the 
   await mockTauri(page, {
     fixed: {
       github_status: { connected: true, login: "voce", source: "pat", device_flow: true },
-      github_lists: { assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
+      github_lists: { others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty },
       github_mentions: { rows: mentions, fetched_at: 0, limited_until: null, unread: 2 },
       mentions_unread: 2,
     },

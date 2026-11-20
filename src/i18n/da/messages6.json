@@ -10,6 +10,7 @@
   "forge.refresh": "genopfriske",
   "forge.summary.label": "resumé",
   "forge.summary.reviews": "anmeldelser",
+  "forge.summary.others": "fra andre",
   "forge.summary.mine": "min {pr}",
   "forge.summary.failing": "CI mislykkedes",
   "forge.summary.issues": "mine problemer",

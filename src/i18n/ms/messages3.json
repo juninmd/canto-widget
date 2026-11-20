@@ -100,6 +100,7 @@
   "alert.kind.pr": "permintaan tarik",
   "alert.pr.ci": "CI gagal",
   "alert.pr.stalled": "tiada ulasan",
+  "alert.pr.others": "daripada orang lain",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

@@ -146,6 +146,7 @@
   "forge.section.assigned": "Μου ανατέθηκε",
   "forge.section.myPrs": "{pr} Άνοιξα",
   "forge.section.myIssues": "Θέματα που άνοιξα",
+  "forge.section.othersPrs": "PRs από άλλα άτομα",
   "forge.kind.all": "όλα",
   "forge.kind.issues": "ζητήματα",
   "forge.sort.updated": "ενημερώθηκε",

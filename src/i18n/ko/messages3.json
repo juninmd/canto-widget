@@ -100,6 +100,7 @@
   "alert.kind.pr": "풀 리퀘스트",
   "alert.pr.ci": "CI 실패",
   "alert.pr.stalled": "리뷰 없음",
+  "alert.pr.others": "다른 사람에게서",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

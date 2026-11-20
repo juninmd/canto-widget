@@ -31,8 +31,9 @@ pub fn requests(section: Section, username: &str, p: u32, f: &ForgeFilter) -> Re
         Section::Assigned => (Some(vec![("scope", "assigned_to_me")]), Some(vec![("scope", "assigned_to_me")])),
         Section::MyPrs => (None, Some(vec![("scope", "created_by_me")])),
         Section::MyIssues => (Some(vec![("scope", "created_by_me")]), None),
-        // GitLab has no mention filter on these lists: the to-do list answers it (`gitlab::mentions`).
-        Section::Mentioned | Section::Participating | Section::TeamMentioned => (None, None),
+        // GitLab has no mention filter on these lists: the to-do list answers it (`gitlab::mentions`). It also has
+        // no "PRs from others in my projects" list of its own: that section is GitHub-only.
+        Section::Mentioned | Section::Participating | Section::TeamMentioned | Section::OthersPrs => (None, None),
     };
     let text = f.text();
     let mut out = Vec::new();

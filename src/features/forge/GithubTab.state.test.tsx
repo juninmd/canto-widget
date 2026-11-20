@@ -20,7 +20,7 @@ const item = {
   repo: "octo/canto", number: 42, reference: "octo/canto#42", title: "Revisar o cofre", url: "https://github.com/octo/canto/pull/42",
   created_at: new Date().toISOString(), updated_at: new Date().toISOString(), comments: 0, is_pr: true, draft: false, author: "octocat",
 };
-const lists = { assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: empty, my_issues: empty };
+const lists = { others_prs: empty, assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: empty, my_issues: empty };
 const connected = { connected: true, login: "octocat", source: "pat", device_flow: true };
 const settle = async () => {
   for (let i = 0; i < 5; i++) await act(async () => {});

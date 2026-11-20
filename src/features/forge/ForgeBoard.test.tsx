@@ -35,6 +35,7 @@ const issue = (n: number, title: string) => pr(n, title, { is_pr: false, url: `h
 
 const board = {
   review_requested: { total: 9, items: [pr(1, "Revisar o cofre")] },
+  others_prs: { total: 1, items: [pr(10, "PR de terceiros")] },
   assigned: { total: 1, items: [issue(2, "Atribuída a mim")] },
   my_prs: { total: 4, items: [pr(3, "Meu PR verde"), pr(4, "Meu PR vermelho")] },
   my_issues: { total: 2, items: [issue(5, "Minha issue")] },
@@ -43,6 +44,7 @@ const checks = [
   { repo: "acme/atlas", number: 1, status: "running" },
   { repo: "acme/atlas", number: 3, status: "success" },
   { repo: "acme/atlas", number: 4, status: "failure" },
+  { repo: "acme/atlas", number: 10, status: "success" },
 ];
 
 const empty = { total: 0, items: [] };
@@ -75,8 +77,14 @@ test("the summary tiles are toggles that keep their numbers and narrow the board
   await mountGithub();
   const strip = screen.getByRole("group", { name: "resumo" });
   const tiles = within(strip).getAllByRole("button");
-  expect(tiles.map((b) => b.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "false"]);
-  expect(regions()).toHaveLength(4);
+  expect(tiles.map((b) => b.getAttribute("aria-pressed"))).toEqual(["false", "false", "false", "false", "false"]);
+  expect(regions()).toHaveLength(5);
+
+  await press(/de terceiros/);
+  expect(regions()).toEqual(["PRs de terceiros"]);
+  expect(strip.textContent).toContain("1de terceiros");
+  await press(/de terceiros/);
+  expect(regions()).toHaveLength(5);
 
   await press(/revisões/);
   expect(tile(/revisões/).getAttribute("aria-pressed")).toBe("true");
@@ -93,7 +101,7 @@ test("the summary tiles are toggles that keep their numbers and narrow the board
 
   await press(/minhas issues/);
   expect(tile(/minhas issues/).getAttribute("aria-pressed")).toBe("false");
-  expect(regions()).toHaveLength(4);
+  expect(regions()).toHaveLength(5);
 });
 
 test("pressing a tile filters in place, without asking GitHub again", async () => {
@@ -132,7 +140,7 @@ test("a tile works with the kind chips: a group the chip hides leaves an explain
 test("the CI pill says passou, rodando or falhou in its own color", async () => {
   await mountGithub();
   const failed = screen.getByRole("img", { name: "✗ CI falhou" });
-  const passed = screen.getByRole("img", { name: "✓ CI passou" });
+  const passed = screen.getAllByRole("img", { name: "✓ CI passou" })[0];
   const running = screen.getByRole("img", { name: "● CI rodando" });
   expect(failed.className).toContain("text-danger");
   expect(passed.className).toContain("text-ok");
@@ -170,7 +178,7 @@ test("row actions appear on hover or focus but stay in the tab order, snooze inc
 
 test("ver CI sits in the hover actions and its answer stays on the row", async () => {
   responses.github_pr_checks = () => Promise.resolve("failure");
-  await mountGithub({ ...board, review_requested: empty, assigned: empty, my_issues: empty, my_prs: { total: 1, items: [pr(9, "Sem lote")] } }, []);
+  await mountGithub({ ...board, review_requested: empty, others_prs: empty, assigned: empty, my_issues: empty, my_prs: { total: 1, items: [pr(9, "Sem lote")] } }, []);
   const btn = screen.getByText("ver CI");
   expect(btn.parentElement?.className).toContain("opacity-0");
   await act(async () => {
@@ -211,7 +219,7 @@ test("GitLab keeps three toggle tiles (no CI) and narrows the same way", async (
 });
 
 test("ocultar rascunhos hides draft PRs in place, remembers the choice and keeps the counts", async () => {
-  const lists = { ...board, review_requested: empty, assigned: empty, my_issues: empty, my_prs: { total: 2, items: [pr(3, "Pronto"), pr(4, "Ainda rascunho", { draft: true })] } };
+  const lists = { ...board, review_requested: empty, others_prs: empty, assigned: empty, my_issues: empty, my_prs: { total: 2, items: [pr(3, "Pronto"), pr(4, "Ainda rascunho", { draft: true })] } };
   await mountGithub(lists, []);
   expect(screen.getByText("Ainda rascunho")).toBeTruthy();
   const toggle = screen.getByRole("button", { name: "ocultar rascunhos" });
@@ -227,7 +235,7 @@ test("ocultar rascunhos hides draft PRs in place, remembers the choice and keeps
 });
 
 test("a PR that got new comments since the last look shows a badge that clears once it is opened", async () => {
-  const lists = (comments: number) => ({ ...board, review_requested: empty, assigned: empty, my_issues: empty, my_prs: { total: 1, items: [pr(3, "Com conversa", { comments })] } });
+  const lists = (comments: number) => ({ ...board, review_requested: empty, others_prs: empty, assigned: empty, my_issues: empty, my_prs: { total: 1, items: [pr(3, "Com conversa", { comments })] } });
   await mountGithub(lists(2), []);
   expect(screen.queryByText(/^\+\d+ comentários$/)).toBeNull();
   cleanup();
@@ -245,7 +253,7 @@ test("the CI batch also brings approvals, changes requested and the diff size on
     { repo: "acme/atlas", number: 3, status: "success", conflict: false, additions: 120, deletions: 34, approvals: 2, changes_requested: false },
     { repo: "acme/atlas", number: 4, status: "success", conflict: false, additions: 5, deletions: 1, approvals: 1, changes_requested: true },
   ];
-  await mountGithub({ ...board, review_requested: empty, assigned: empty, my_issues: empty }, batch);
+  await mountGithub({ ...board, review_requested: empty, others_prs: empty, assigned: empty, my_issues: empty }, batch);
   const green = screen.getByText("Meu PR verde").closest("button") as HTMLElement;
   expect(within(green).getByText("✓ 2 aprov.")).toBeTruthy();
   expect(green.textContent).toContain("+120");
@@ -263,12 +271,13 @@ test("precisa de mim narrows the board to overdue reviews and my stalled PRs, an
     assigned: { total: 1, items: [issue(2, "Atribuída a mim")] },
   };
   await mountGithub(lists, checks);
-  const chip = screen.getByRole("button", { name: "precisa de mim · 2" });
+  const chip = screen.getByRole("button", { name: "precisa de mim · 3" });
   expect(chip.getAttribute("aria-pressed")).toBe("false");
   fireEvent.click(chip);
   expect(chip.getAttribute("aria-pressed")).toBe("true");
   expect(screen.getByText("Pedido antigo")).toBeTruthy();
   expect(screen.getByText("Meu PR vermelho")).toBeTruthy();
+  expect(screen.getByText("PR de terceiros")).toBeTruthy();
   expect(screen.queryByText("Pedido novo")).toBeNull();
   expect(screen.queryByText("Meu PR verde")).toBeNull();
   expect(screen.queryByText("Atribuída a mim")).toBeNull();
@@ -277,7 +286,10 @@ test("precisa de mim narrows the board to overdue reviews and my stalled PRs, an
 });
 
 test("without anything stuck there is no precisa de mim button", async () => {
-  await mountGithub({ ...board, my_prs: { total: 1, items: [pr(3, "Meu PR verde")] } }, [{ repo: "acme/atlas", number: 3, status: "success" }]);
+  await mountGithub(
+    { ...board, others_prs: empty, my_prs: { total: 1, items: [pr(3, "Meu PR verde")] } },
+    [{ repo: "acme/atlas", number: 3, status: "success" }],
+  );
   expect(screen.queryByRole("button", { name: /precisa de mim/ })).toBeNull();
 });
 

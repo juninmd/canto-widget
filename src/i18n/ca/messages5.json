@@ -146,6 +146,7 @@
   "forge.section.assigned": "A mi m'ha assignat",
   "forge.section.myPrs": "{pr} Vaig obrir",
   "forge.section.myIssues": "Problemes que vaig obrir",
+  "forge.section.othersPrs": "PRs d'altres persones",
   "forge.kind.all": "tots",
   "forge.kind.issues": "qüestions",
   "forge.sort.updated": "actualitzat",

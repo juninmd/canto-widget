@@ -10,6 +10,7 @@
   "forge.refresh": "রিফ্রেশ",
   "forge.summary.label": "সারাংশ",
   "forge.summary.reviews": "পর্যালোচনা",
+  "forge.summary.others": "অন্যদের থেকে",
   "forge.summary.mine": "আমার {pr}",
   "forge.summary.failing": "সিআই ব্যর্থ হয়েছে",
   "forge.summary.issues": "আমার সমস্যা",

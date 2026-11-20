@@ -146,6 +146,7 @@
   "forge.section.assigned": "分配给我",
   "forge.section.myPrs": "{pr} 我打开了",
   "forge.section.myIssues": "我打开的问题",
+  "forge.section.othersPrs": "其他人的 PRs",
   "forge.kind.all": "全部",
   "forge.kind.issues": "问题",
   "forge.sort.updated": "已更新",

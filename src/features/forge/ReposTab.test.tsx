@@ -45,7 +45,7 @@ const page = (repos: unknown[], extra = {}) => ({ page: 1, repos, has_next: fals
 
 function connect() {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "pat", device_flow: true });
-  responses.github_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.github_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
 }
 
 async function settle(n = 5) {
@@ -243,7 +243,7 @@ test("an error is shown; retry walks the pages again asking Rust to skip its cac
 
 test("GitLab lists its projects through gitlab_repos_page, subgroups nested and the README by project id", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "ana", base_url: "https://gitlab.acme.io" });
-  responses.gitlab_lists = () => Promise.resolve({ assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
+  responses.gitlab_lists = () => Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: empty, my_issues: empty });
   responses.gitlab_repos_page = () =>
     Promise.resolve(page([repo("acme/infra/deploy", "acme/infra", { id: "7", url: "https://gitlab.acme.io/acme/infra/deploy", default_branch: "trunk" })]));
   responses.gitlab_readme = () => Promise.resolve({ text: "", truncated: false, fetched_at: 1, limited_until: null });

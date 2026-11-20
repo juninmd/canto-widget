@@ -100,6 +100,7 @@
   "alert.kind.pr": "traukti prašymą",
   "alert.pr.ci": "CI nepavyko",
   "alert.pr.stalled": "jokios peržiūros",
+  "alert.pr.others": "nuo kažkieno kito",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

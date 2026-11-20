@@ -146,6 +146,7 @@
   "forge.section.assigned": "Възложено на мен",
   "forge.section.myPrs": "{pr} Отворих",
   "forge.section.myIssues": "Проблеми, които отворих",
+  "forge.section.othersPrs": "PRs от други хора",
   "forge.kind.all": "всички",
   "forge.kind.issues": "въпроси",
   "forge.sort.updated": "актуализиран",

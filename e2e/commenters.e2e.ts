@@ -22,7 +22,7 @@ test("render and capture commenters catalog", async ({ page }) => {
     fixed: {
       github_status: { connected: true, login: "dev-exemplo", source: "pat", device_flow: false },
       github_lists: {
-        assigned: empty,
+        others_prs: empty, assigned: empty,
         my_prs: { total: 1, items: [item] },
         review_requested: empty,
         my_issues: empty,
@@ -94,7 +94,7 @@ test("picking a commenter shows their GitHub profile", async ({ page }) => {
   await mockTauri(page, {
     fixed: {
       github_status: { connected: true, login: "voce", source: "pat", device_flow: false },
-      github_lists: { assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: empty, my_issues: empty },
+      github_lists: { others_prs: empty, assigned: empty, my_prs: { total: 1, items: [item] }, review_requested: empty, my_issues: empty },
       github_pr_comments: [
         { id: 1, author: "ana", author_type: "User", avatar_url: "", body: "Pode seguir, as rotas ficaram claras.", created_at: "2026-09-15T10:26:50Z", url: "https://github.com/acme/atlas/pull/7#issuecomment-1" },
       ],

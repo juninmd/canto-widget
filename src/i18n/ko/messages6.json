@@ -10,6 +10,7 @@
   "forge.refresh": "새로 고침",
   "forge.summary.label": "요약",
   "forge.summary.reviews": "리뷰",
+  "forge.summary.others": "다른 사람들로부터",
   "forge.summary.mine": "내 {pr}",
   "forge.summary.failing": "CI 실패",
   "forge.summary.issues": "내 문제",

@@ -100,6 +100,7 @@
   "alert.kind.pr": "अनुरोध खींचें",
   "alert.pr.ci": "सीआई विफल",
   "alert.pr.stalled": "कोई समीक्षा नहीं",
+  "alert.pr.others": "किसी और से",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

@@ -146,6 +146,7 @@
   "forge.section.assigned": "Pridelené mne",
   "forge.section.myPrs": "{pr} Otvoril som",
   "forge.section.myIssues": "Problémy, ktoré som otvoril",
+  "forge.section.othersPrs": "PRs od iných ľudí",
   "forge.kind.all": "všetky",
   "forge.kind.issues": "problémy",
   "forge.sort.updated": "aktualizované",

@@ -31,7 +31,7 @@ export const GITHUB: ForgeLists = {
     ],
     9,
   ),
-  assigned: list([item("acme/atlas", 470, "Filtro de data ignora o fuso do usuário", 8, { is_pr: false, url: "https://github.com/acme/atlas/issues/470", comments: 3 })]),
+  others_prs: empty, assigned: list([item("acme/atlas", 470, "Filtro de data ignora o fuso do usuário", 8, { is_pr: false, url: "https://github.com/acme/atlas/issues/470", comments: 3 })]),
   my_prs: list([
     item("acme/atlas", 479, "fix: backoff exponencial no webhook de cobrança", 2, { author: "eu-demo", comments: 1 }),
     item("acme/portal", 151, "feat: página de preços em inglês", 26, { author: "eu-demo", draft: true }),
@@ -52,7 +52,7 @@ export const GITLAB: ForgeLists = {
     mr(58, "Adicionar filtro por status na fila", 4, { author: "carla.modelo", comments: 2 }),
     mr(42, "Corrigir paginação da lista de pedidos", 29, { author: "bruno.teste" }),
   ]),
-  assigned: list([
+  others_prs: empty, assigned: list([
     { ...item("platform/infra", 51, "Atualizar dependências de segurança", 12, { is_pr: false }), reference: "platform/infra#51", url: "https://gitlab.example.com/platform/infra/-/issues/51" },
   ]),
   my_prs: list([mr(61, "Cache das consultas de estoque", 6, { author: "eu.demo" })]),

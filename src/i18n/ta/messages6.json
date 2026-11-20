@@ -10,6 +10,7 @@
   "forge.refresh": "புதுப்பிக்க",
   "forge.summary.label": "சுருக்கம்",
   "forge.summary.reviews": "விமர்சனங்கள்",
+  "forge.summary.others": "மற்றவர்களிடமிருந்து",
   "forge.summary.mine": "என் {pr}",
   "forge.summary.failing": "CI தோல்வியடைந்தது",
   "forge.summary.issues": "என் பிரச்சினைகள்",

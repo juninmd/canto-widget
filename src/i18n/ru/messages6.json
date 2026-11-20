@@ -10,6 +10,7 @@
   "forge.refresh": "обновить",
   "forge.summary.label": "резюме",
   "forge.summary.reviews": "обзоры",
+  "forge.summary.others": "от других",
   "forge.summary.mine": "мой {pr}",
   "forge.summary.failing": "CI не удалось",
   "forge.summary.issues": "мои проблемы",

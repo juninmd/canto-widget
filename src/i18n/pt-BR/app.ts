@@ -176,6 +176,7 @@ export const app = {
   "settings.myPrAlerts.mergeState": "avisar quando um PR/MR meu ficar pronto para merge ou tiver conflito",
   "settings.myPrAlerts.comments": "avisar quando um PR/MR meu receber comentário novo",
   "settings.myPrAlerts.assigned": "avisar quando algo for atribuído a mim",
+  "settings.myPrAlerts.othersPrs": "avisar quando alguém abrir um PR num repositório meu",
   "settings.myPrAlerts.replies": "avisar quando responderem em uma conversa em que comentei (GitHub)",
   "settings.myPrAlerts.teamMentions": "incluir menções aos meus times (GitHub)",
   "settings.myPrAlerts.teamMentionsHint": "Precisa do escopo read:org no token. No GitLab, a menção a um grupo já vem como menção.",

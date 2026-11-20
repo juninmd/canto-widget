@@ -63,13 +63,15 @@ pub fn content(event: &AgendaItem) -> (&'static str, String) {
             "conflict" => tr("Conflito no PR", "PR conflict"),
             "comment" => tr("Novo comentário", "New comment"),
             "assigned" => tr("Atribuído a você", "Assigned to you"),
+            "others" => tr("PR de terceiro", "Pull request from someone else"),
             "reply" => tr("Resposta na conversa", "Reply in a thread"),
             "updates" => tr("Novidades nos seus PRs", "Updates on your PRs"),
             _ => tr("PR sem revisão", "PR without a review"),
         };
         let head = format!("{} {}", event.organizer, event.title).trim().to_string();
         // What someone said is the point of these; for CI and "no review" the title already tells it.
-        let says = matches!(event.tag.as_str(), "approved" | "changes" | "ready" | "comment" | "reply" | "updates");
+        let says =
+            matches!(event.tag.as_str(), "approved" | "changes" | "ready" | "comment" | "reply" | "updates" | "others");
         let detail = event.description.split_whitespace().collect::<Vec<_>>().join(" ");
         let body = if says && !detail.is_empty() {
             format!("{head}\n{}", detail.chars().take(140).collect::<String>()).trim().to_string()
@@ -193,5 +195,9 @@ mod tests {
             "an assignment says it in the title"
         );
         assert_eq!(content(&pr("updates", "a\nb")).0, "Novidades nos seus PRs");
+        assert_eq!(
+            content(&pr("others", "@pranshu abriu este PR em acme/atlas.")),
+            ("PR de terceiro", "acme/atlas#12 Corrige o parser\n@pranshu abriu este PR em acme/atlas.".into())
+        );
     }
 }

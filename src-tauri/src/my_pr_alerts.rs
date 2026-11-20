@@ -49,6 +49,9 @@ pub struct Config {
     /// Issues, PRs and MRs someone assigned to the user.
     #[serde(default = "on")]
     pub assigned: bool,
+    /// PRs someone else opened in one of the user's repositories (GitHub).
+    #[serde(default = "on")]
+    pub others_prs: bool,
     /// Replies in threads the user commented on (GitHub); off by default, it is the noisiest.
     #[serde(default)]
     pub replies: bool,
@@ -76,6 +79,7 @@ impl Default for Config {
             merge_state: true,
             comments: true,
             assigned: true,
+            others_prs: true,
             replies: false,
             team_mentions: false,
         }

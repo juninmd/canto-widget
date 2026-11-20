@@ -146,6 +146,7 @@
   "forge.section.assigned": "Piešķirts man",
   "forge.section.myPrs": "{pr} Es atvēru",
   "forge.section.myIssues": "Problēmas, kuras es atvēru",
+  "forge.section.othersPrs": "PRs no citām personām",
   "forge.kind.all": "visi",
   "forge.kind.issues": "jautājumiem",
   "forge.sort.updated": "atjaunināts",

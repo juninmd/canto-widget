@@ -46,7 +46,7 @@ test("a GitHub PR with a merge conflict carries the badge once the CI batch answ
         device_flow: false,
       },
       github_lists: {
-        assigned: empty,
+        others_prs: empty, assigned: empty,
         my_prs: {
           total: 2,
           items: items.map((i) => ({ ...i, conflict: false })),
@@ -96,7 +96,7 @@ test("a GitLab MR the list marks as conflicting shows the badge straight away", 
         base_url: "https://gitlab.acme.io",
       },
       gitlab_lists: {
-        assigned: empty,
+        others_prs: empty, assigned: empty,
         my_prs: { total: 2, items },
         review_requested: empty,
         my_issues: empty,

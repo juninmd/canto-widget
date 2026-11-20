@@ -10,6 +10,7 @@
   "forge.refresh": "reîmprospăta",
   "forge.summary.label": "rezumat",
   "forge.summary.reviews": "recenzii",
+  "forge.summary.others": "de la alții",
   "forge.summary.mine": "{pr} meu",
   "forge.summary.failing": "CI a eșuat",
   "forge.summary.issues": "problemele mele",

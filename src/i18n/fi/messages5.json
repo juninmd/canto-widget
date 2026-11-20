@@ -146,6 +146,7 @@
   "forge.section.assigned": "Minulle määrätty",
   "forge.section.myPrs": "{pr} Avasin",
   "forge.section.myIssues": "Asiat, jotka avasin",
+  "forge.section.othersPrs": "PRs muilta ihmisiltä",
   "forge.kind.all": "kaikki",
   "forge.kind.issues": "ongelmia",
   "forge.sort.updated": "päivitetty",

@@ -100,6 +100,7 @@
   "alert.kind.pr": "trek verzoek",
   "alert.pr.ci": "CI is mislukt",
   "alert.pr.stalled": "geen beoordeling",
+  "alert.pr.others": "van iemand anders",
   "alert.pr.approved": "approved",
   "alert.pr.changes": "changes requested",
   "alert.pr.ready": "ready to merge",

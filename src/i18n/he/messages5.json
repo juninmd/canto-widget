@@ -146,6 +146,7 @@
   "forge.section.assigned": "הוקצה לי",
   "forge.section.myPrs": "{pr} פתחתי",
   "forge.section.myIssues": "נושאים שפתחתי",
+  "forge.section.othersPrs": "PRs מאנשים אחרים",
   "forge.kind.all": "הכל",
   "forge.kind.issues": "נושאים",
   "forge.sort.updated": "מעודכן",

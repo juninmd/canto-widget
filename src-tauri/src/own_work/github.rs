@@ -1,5 +1,6 @@
 //! GitHub side of the own-work watcher: review verdicts, merge state and comments on the user's PRs, what was
-//! assigned to them and replies in threads they took part in. The first reading of each only seeds.
+//! assigned to them, replies in threads they took part in and PRs someone else opened in their repositories. The first
+//! reading of each only seeds.
 use std::collections::{HashMap, HashSet};
 
 use tauri::{AppHandle, Manager};
@@ -28,6 +29,7 @@ pub struct Seen {
     login: String,
     prs: Option<HashMap<String, PrState>>,
     assigned: Option<HashSet<String>>,
+    others: Option<HashSet<String>>,
     replies: Option<HashMap<String, String>>,
     avatars: HashMap<String, String>,
 }
@@ -65,6 +67,11 @@ pub fn run(app: &AppHandle, state: &AppState, cfg: &Config, seen: &mut Seen) {
         assigned(app, state, &cred, &login, seen);
     } else {
         seen.assigned = None;
+    }
+    if cfg.others_prs {
+        others_prs(app, state, &cred, seen);
+    } else {
+        seen.others = None;
     }
     if cfg.replies {
         replies(app, state, &cred, &login, seen);
@@ -137,6 +144,23 @@ fn assigned(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, login: 
     }
     ring(app, events, &mut seen.avatars);
     seen.assigned = Some(next);
+}
+
+/// PRs opened by other people in the user's repositories. Nobody requested a review, so nothing else in the app
+/// would tell the user they are waiting; a draft is no news yet.
+fn others_prs(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, seen: &mut Seen) {
+    let Ok(list) = forge::list_page::<Github>(&state.forges, cred, Section::OthersPrs, 1, &recent(Kind::Pr), false)
+    else {
+        return;
+    };
+    let (fresh, next) = review_alert::advance(seen.others.as_ref(), &list);
+    let ready: Vec<&ForgeItem> = fresh.into_iter().filter(|i| !i.draft).collect();
+    let mut events = work_events::others_pr_events(&ready, crate::lang::english());
+    for s in events.iter_mut().filter_map(|e| e.sender.as_mut()).filter(|s| s.avatar.is_empty()) {
+        s.avatar = format!("https://avatars.githubusercontent.com/{}?s=64", s.login);
+    }
+    ring(app, events, &mut seen.avatars);
+    seen.others = Some(next);
 }
 
 fn replies(app: &AppHandle, state: &AppState, cred: &Zeroizing<String>, login: &str, seen: &mut Seen) {

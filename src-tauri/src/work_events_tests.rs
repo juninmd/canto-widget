@@ -66,6 +66,24 @@ fn a_reply_carries_who_wrote_and_what() {
     assert_eq!(reply_events(&many, false)[0].title, "4 respostas nas suas conversas");
 }
 
+#[test]
+fn a_third_party_pr_names_who_opened_it_and_where_and_a_burst_is_one_summary() {
+    let pr = thread(11, "pranshu", true);
+    let [e] = &others_pr_events(&[&pr], false)[..] else { panic!("one alert") };
+    assert_eq!((e.id.as_str(), e.tag.as_str(), e.organizer.as_str()), ("pr:others:o/r#11", "others", "o/r#11"));
+    assert_eq!(e.description, "@pranshu abriu este PR em o/r.");
+    assert_eq!(e.sender.as_ref().map(|s| s.login.as_str()), Some("pranshu"));
+    let [en] = &others_pr_events(&[&pr], true)[..] else { panic!("one alert") };
+    assert_eq!(en.description, "@pranshu opened this pull request in o/r.");
+    let [anon] = &others_pr_events(&[&thread(12, "", true)], false)[..] else { panic!("one alert") };
+    assert_eq!((anon.description.as_str(), anon.sender.as_ref()), ("Alguém abriu este PR em o/r.", None));
+
+    let many: Vec<ForgeItem> = (1..=4).map(|n| thread(n, "ana", true)).collect();
+    let refs: Vec<&ForgeItem> = many.iter().collect();
+    assert_eq!(others_pr_events(&refs, false)[0].title, "4 PRs de terceiros aguardando");
+    assert_eq!(others_pr_events(&refs, true)[0].title, "4 pull requests from other people");
+}
+
 fn todo(id: u64) -> Mention {
     Mention {
         action: "build_failed".into(),

@@ -146,6 +146,7 @@
   "forge.section.assigned": "Tildelt meg",
   "forge.section.myPrs": "{pr} jeg åpnet",
   "forge.section.myIssues": "Utgaver jeg åpnet",
+  "forge.section.othersPrs": "PRs fra andre mennesker",
   "forge.kind.all": "alle",
   "forge.kind.issues": "problemer",
   "forge.sort.updated": "oppdatert",

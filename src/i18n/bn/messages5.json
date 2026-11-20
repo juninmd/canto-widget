@@ -146,6 +146,7 @@
   "forge.section.assigned": "আমাকে বরাদ্দ করা হয়েছে",
   "forge.section.myPrs": "{pr} আমি খুলেছি",
   "forge.section.myIssues": "আমি খোলা সমস্যা",
+  "forge.section.othersPrs": "PRs অন্য লোকেদের থেকে",
   "forge.kind.all": "সব",
   "forge.kind.issues": "সমস্যা",
   "forge.sort.updated": "আপডেট করা হয়েছে",

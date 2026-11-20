@@ -40,14 +40,21 @@ test("drafts, issues and the other sections never ask for attention", () => {
   expect(needsAttention("my_prs", item(3, { draft: true, conflict: true }), NOW)).toBe(false);
   expect(needsAttention("my_prs", item(3, { is_pr: false, conflict: true }), NOW)).toBe(false);
   expect(needsAttention("assigned", item(3, { conflict: true }), NOW)).toBe(false);
+  expect(needsAttention("others_prs", item(3, { draft: true }), NOW)).toBe(false);
 });
 
-test("the count adds both sections", () => {
+test("someone else's PR asks for attention as soon as it exists", () => {
+  expect(needsAttention("others_prs", item(6), NOW)).toBe(true);
+  expect(needsAttention("others_prs", item(6, { draft: true }), NOW)).toBe(false);
+});
+
+test("the count adds the three sections", () => {
   const lists: ForgeLists = {
     review_requested: list([item(1, { created_at: hoursAgo(72) }), item(2)]),
+    others_prs: list([item(6)]),
     assigned: list([item(3, { conflict: true })]),
     my_prs: list([item(4, { conflict: true }), item(5)]),
     my_issues: list([]),
   };
-  expect(attentionCount(lists, NOW)).toBe(2);
+  expect(attentionCount(lists, NOW)).toBe(3);
 });

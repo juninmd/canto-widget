@@ -1,7 +1,7 @@
 import type { ForgeItem, ForgeLists } from "../../lib/api";
 import { checkKey, type CiMap } from "./forgeChecks";
 
-export type ForgeSummary = { reviews: number; mine: number; issues: number; failing: number | null };
+export type ForgeSummary = { reviews: number; others: number; mine: number; issues: number; failing: number | null };
 
 /** My PRs whose CI badge says it failed; none where there are no badges. */
 export function failingItems(lists: ForgeLists, ci?: CiMap): ForgeItem[] {
@@ -11,5 +11,11 @@ export function failingItems(lists: ForgeLists, ci?: CiMap): ForgeItem[] {
 /** Headline counts above the sections; `failing` is null where CI badges don't exist (GitLab). */
 export function summarize(lists: ForgeLists, ci?: CiMap): ForgeSummary {
   const failing = ci ? failingItems(lists, ci).length : null;
-  return { reviews: lists.review_requested.total, mine: lists.my_prs.total, issues: lists.my_issues.total, failing };
+  return {
+    reviews: lists.review_requested.total,
+    others: lists.others_prs.total,
+    mine: lists.my_prs.total,
+    issues: lists.my_issues.total,
+    failing,
+  };
 }

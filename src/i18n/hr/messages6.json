@@ -10,6 +10,7 @@
   "forge.refresh": "osvježiti",
   "forge.summary.label": "sažetak",
   "forge.summary.reviews": "recenzije",
+  "forge.summary.others": "od drugih",
   "forge.summary.mine": "moj {pr}",
   "forge.summary.failing": "CI nije uspio",
   "forge.summary.issues": "moji problemi",

@@ -10,6 +10,7 @@
   "forge.refresh": "osvěžit",
   "forge.summary.label": "shrnutí",
   "forge.summary.reviews": "recenze",
+  "forge.summary.others": "od ostatních",
   "forge.summary.mine": "můj {pr}",
   "forge.summary.failing": "CI se nezdařilo",
   "forge.summary.issues": "moje problémy",

@@ -10,6 +10,7 @@
   "forge.refresh": "atnaujinti",
   "forge.summary.label": "santrauka",
   "forge.summary.reviews": "apžvalgos",
+  "forge.summary.others": "iš kitų",
   "forge.summary.mine": "mano {pr}",
   "forge.summary.failing": "CI nepavyko",
   "forge.summary.issues": "mano klausimai",

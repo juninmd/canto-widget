@@ -146,6 +146,7 @@
   "forge.section.assigned": "私に割り当てられました",
   "forge.section.myPrs": "{pr} 開きました",
   "forge.section.myIssues": "私が開いた問題",
+  "forge.section.othersPrs": "他の人からの PRs",
   "forge.kind.all": "すべて",
   "forge.kind.issues": "問題",
   "forge.sort.updated": "更新されました",

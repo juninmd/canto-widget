@@ -146,6 +146,7 @@
   "forge.section.assigned": "Mi-a fost atribuit",
   "forge.section.myPrs": "{pr} am deschis",
   "forge.section.myIssues": "Probleme pe care le-am deschis",
+  "forge.section.othersPrs": "PRs de la alte persoane",
   "forge.kind.all": "toate",
   "forge.kind.issues": "probleme",
   "forge.sort.updated": "actualizat",

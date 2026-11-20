@@ -10,6 +10,7 @@
   "forge.refresh": "auffrischen",
   "forge.summary.label": "Zusammenfassung",
   "forge.summary.reviews": "Bewertungen",
+  "forge.summary.others": "von anderen",
   "forge.summary.mine": "mein {pr}",
   "forge.summary.failing": "CI ist fehlgeschlagen",
   "forge.summary.issues": "meine Probleme",

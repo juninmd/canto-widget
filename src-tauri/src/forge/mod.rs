@@ -88,6 +88,8 @@ pub struct ForgeLists {
     pub my_prs: ForgeList,
     pub review_requested: ForgeList,
     pub my_issues: ForgeList,
+    /// GitHub only; GitLab answers an empty list.
+    pub others_prs: ForgeList,
 }
 
 impl ForgeLists {
@@ -97,6 +99,7 @@ impl ForgeLists {
             my_prs: section(Section::MyPrs)?,
             review_requested: section(Section::ReviewRequested)?,
             my_issues: section(Section::MyIssues)?,
+            others_prs: section(Section::OthersPrs)?,
         })
     }
 }
@@ -122,7 +125,7 @@ pub trait Forge {
     fn fetch_activity(cred: &Self::Credential, activity: Activity, w: &Window) -> Result<(ForgeList, Option<Quota>)>;
 }
 
-/// The four sections of a tab, each served from the cache unless `force`.
+/// The five sections of a tab, each served from the cache unless `force`.
 pub fn list_all<F: Forge>(
     cache: &ForgeCache,
     cred: &F::Credential,

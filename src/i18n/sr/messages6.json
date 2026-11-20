@@ -10,6 +10,7 @@
   "forge.refresh": "освежити",
   "forge.summary.label": "резиме",
   "forge.summary.reviews": "рецензије",
+  "forge.summary.others": "од других",
   "forge.summary.mine": "мој {pr}",
   "forge.summary.failing": "ЦИ није успео",
   "forge.summary.issues": "моја питања",

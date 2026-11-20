@@ -10,6 +10,7 @@
   "forge.refresh": "actualiser",
   "forge.summary.label": "résumé",
   "forge.summary.reviews": "avis",
+  "forge.summary.others": "des autres",
   "forge.summary.mine": "mon {pr}",
   "forge.summary.failing": "Échec du CI",
   "forge.summary.issues": "mes problèmes",
