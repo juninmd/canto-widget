@@ -1,6 +1,11 @@
+---
+title: Segurança e dados
+---
+{% include nav.html %}
+
 # Segurança e dados
 
-[← voltar ao README](readmes/README.pt-BR.md)
+[← início](./)
 
 ## Modelo de segurança
 

@@ -1,6 +1,11 @@
+---
+title: Guia de uso
+---
+{% include nav.html %}
+
 # Guia de uso
 
-[← voltar ao README](readmes/README.pt-BR.md)
+[← início](./)
 
 Na primeira vez que o cofre é criado, uma tela de boas-vindas mostra os atalhos essenciais (mostrar/esconder,
 trocar de aba, busca global, nova tarefa, trancar, ajuda). Aparece só uma vez — destrancar o cofre depois
@@ -114,7 +119,7 @@ nunca mostra de novo.
 - **Tamanho da interface**, em **Ajustes → Tamanho da interface**: **compacta**, **padrão** ou **confortável** —
   escala texto e espaçamento juntos, como um zoom do widget inteiro. A janela pode ser redimensionada pelas
   bordas se o conteúdo não couber na densidade escolhida.
-- **Atalhos** — `Alt+1`…`Alt+7` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca na aba
+- **Atalhos** — `Alt+1`…`Alt+9` trocam de aba, `F11` entra e sai da tela cheia, `N` cria tarefa ou card, `/` busca na aba
   atual, `Ctrl+K` abre a busca global, `Ctrl+Shift+P` abre a paleta de comandos, `Alt+L` tranca e `?` mostra a lista. Teclas soltas não valem dentro de campos de texto.
 - **Busca global** (`Ctrl+K`) busca ao mesmo tempo nas tarefas de hoje, nas notas e no clipboard; escolher um resultado
   troca de aba e já leva o texto buscado para o campo de busca daquela aba. Tarefas de outros dias ficam de fora: hoje
@@ -174,7 +179,7 @@ Atalho global escondendo e trazendo o widget de volta:
 ## Segurança
 
 - **Auto-trava** — em **Ajustes → Segurança**, escolha destrancar por 5, 15 (padrão), 30 ou 60 min sem uso;
-  passado esse tempo o cofre tranca sozinho e a chave sai da memória. Não há opção de desligar a auto-trava.
+  passado esse tempo o cofre tranca sozinho e a chave sai da memória. Também dá para escolher **nunca (só trancar manualmente)**.
 - **Destravar com Windows Hello** (quando o computador tem o suporte), em **Ajustes → Segurança**. A senha
   mestra continua sendo o único jeito de abrir um backup em outra máquina.
 - **Destravar com Touch ID no macOS** — mesmo lugar, mesma ideia: a senha mestra fica guardada no Chaveiro do

@@ -1,6 +1,11 @@
+---
+title: Integrações
+---
+{% include nav.html %}
+
 # Integrações
 
-[← voltar ao README](readmes/README.pt-BR.md)
+[← início](./)
 
 ## Agenda do Google (opcional)
 

@@ -828,6 +828,7 @@ Found a flaw? [SECURITY.md](SECURITY.md).
 
 | Document | What's in it |
 |---|---|
+| 🌐 [Documentation site](https://juninmd.github.io/canto-widget/) | the same guides as a site: [install](docs/instalacao.md), [every tab](docs/abas.md), [settings](docs/ajustes.md), [shortcuts](docs/atalhos.md) and [FAQ](docs/faq.md) (Portuguese) |
 | 📖 [User guide](docs/uso.md) | tabs, recurring tasks, shortcuts, skins, accessibility, window, updates and start with the system |
 | 📱 [Mobile](docs/mobile.md) | the Android and iOS apps: what is the same, what is left out, how to build |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda and GitHub (personal token or device flow) |
