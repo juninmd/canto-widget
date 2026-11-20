@@ -98,13 +98,13 @@ Join the next meeting with `Ctrl+Alt+M` (`Ctrl+Cmd+M` on macOS). If registration
 
 Today's events come from Google Calendar (read-only). One minute before, the widget jumps onto the screen with
 **join Meet**, plays a sound and sends a system notification, whichever tab you're on or even if it's hidden.
-Each card shows a badge with your answer (accepted, maybe, declined, awaiting). An unanswered invite shows **Accept**, **Maybe** and **Decline** buttons right on the card (the others have them in the details); your answer goes to Google Calendar and the organizer is told, like Google's own buttons. A new invite also rings a **new invite** pop-up with accept and decline. Answering needs the `calendar.events` scope: if you connected before, reconnect Google in Settings once. The answer applies to that occurrence, not to a whole series. Click the event to see who organized
+Each card shows a badge with your answer (accepted, maybe, declined, awaiting). Click the event to see who organized
 it, the agenda, every guest with an initials avatar and their answer, and attachments, like Gemini's notes.
 The top line tells you the **next free slot** of at least 15 minutes (declined invites and all-day events don't
 count), and events that overlap get a **conflict** badge naming the other event. The **Today** view leads with the meeting in progress (time left, join button, clash warning) or the next one, then **the day in one line** (meetings, tasks and free time across the working hours, with meeting time, free time and conflicts counted) and one timeline where meetings, tasks with a time and the free gaps are rows of their own: a gap offers to fit an untimed task, and what is already over folds away.
 
 </td>
-<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"><img src="docs/prints/app/162-agenda-responder-convite.png" alt="An unanswered invite on the agenda with Accept, Maybe and Decline buttons"><img src="docs/prints/app/163-alerta-novo-convite.png" alt="New invite pop-up with the organizer, details, guest list and accept, decline and open in Calendar buttons"></td>
+<td width="36%"><img src="docs/prints/app/22-agenda-detalhes-evento.png" alt="Event details with your answer badge, organizer avatar, guest list with answers and Gemini notes"></td>
 </tr>
 <tr>
 <td><img src="docs/prints/app/02-notas.png" alt="Note cards with tags and a pinned note"></td>
@@ -828,7 +828,6 @@ Found a flaw? [SECURITY.md](SECURITY.md).
 
 | Document | What's in it |
 |---|---|
-| 🌐 [Documentation site](https://juninmd.github.io/canto-widget/) | the same guides as a site: [install](docs/instalacao.md), [every tab](docs/abas.md), [settings](docs/ajustes.md), [shortcuts](docs/atalhos.md) and [FAQ](docs/faq.md) (Portuguese) |
 | 📖 [User guide](docs/uso.md) | tabs, recurring tasks, shortcuts, skins, accessibility, window, updates and start with the system |
 | 📱 [Mobile](docs/mobile.md) | the Android and iOS apps: what is the same, what is left out, how to build |
 | 🔌 [Integrations](docs/integracoes.md) | Google agenda and GitHub (personal token or device flow) |
