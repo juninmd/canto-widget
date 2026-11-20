@@ -1,3 +1,8 @@
+---
+title: Canto no celular
+---
+{% include nav.html %}
+
 # Canto no celular (Android e iOS)
 
 O app de celular é o mesmo código do desktop: o mesmo Rust (cofre cifrado, GitHub, Google, Steam…) e a mesma UI
