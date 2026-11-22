@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, mock, test } from "bun:test";
 import { act } from "react";
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
@@ -179,12 +179,10 @@ test("ticking a task folds it into the done group and focus moves to the next ro
   await act(async () => {
     fireEvent.click(check);
   });
-  await act(async () => {
-    await new Promise((r) => setTimeout(r, 5));
-  });
-  expect(screen.queryByText("primeira")).toBeNull();
+  // A fixed 5 ms sleep raced the fold on a loaded CI runner; wait for the outcome instead.
+  await waitFor(() => expect(document.activeElement?.getAttribute("aria-label")).toBe("segunda"));
+  expect(screen.queryByText("primeira") === null).toBe(true);
   expect(screen.getByRole("button", { name: "concluídas · 1" })).toBeTruthy();
-  expect(document.activeElement?.getAttribute("aria-label")).toBe("segunda");
 });
 
 test("row actions are reachable by keyboard even while hidden until hover", async () => {

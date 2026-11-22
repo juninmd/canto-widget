@@ -1,6 +1,6 @@
-import { afterEach, expect, mock, test } from "bun:test";
-import { act } from "react";
+import { afterEach, beforeEach, expect, jest, mock, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
+import { advance } from "../../test-clock";
 
 const many = Array.from({ length: 1000 }, (_, n) => ({
   id: `c${n}`,
@@ -34,9 +34,13 @@ mock.module("./clip", () => ({
 const { default: ClipboardTab } = await import("./ClipboardTab");
 const { ToastProvider } = await import("../../lib/toast");
 
-afterEach(cleanup);
+beforeEach(() => jest.useFakeTimers());
+afterEach(() => {
+  cleanup();
+  jest.useRealTimers();
+});
 
-const wait = (ms: number) => act(async () => void (await new Promise((r) => setTimeout(r, ms))));
+const wait = advance;
 
 test("a background poll that brings back the same 1000 clips re-renders none of them", async () => {
   render(
