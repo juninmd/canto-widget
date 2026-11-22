@@ -139,7 +139,15 @@ fn the_list_is_newest_first_and_shows_only_the_two_kinds() {
     let st = state("lista");
     let folder = backups_dir(&st.dir);
     std::fs::create_dir_all(&folder).unwrap();
-    for n in ["2026-11-01.canto", "2026-11-02T5000-import.canto", "estranho.canto", "2026-11-03.canto"] {
+    // A stray "-import" file without the ISO date prefix must be ignored, not panic on a multi-byte char.
+    for n in [
+        "2026-11-01.canto",
+        "2026-11-02T5000-import.canto",
+        "estranho.canto",
+        "2026-11-03.canto",
+        "aaaaaaaaaéT5-import.canto",
+        "minhaT5-import.canto",
+    ] {
         std::fs::write(folder.join(n), b"x").unwrap();
     }
     let got: Vec<(String, &str, Option<i64>)> = list(&st.dir).into_iter().map(|c| (c.name, c.kind, c.at)).collect();
