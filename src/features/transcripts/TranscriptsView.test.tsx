@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, expect, jest, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { advance } from "../../test-clock";
 
 const FULL = "C:/reunioes/2026/times/produto/transcricoes-muito-longas";
 const file = { name: "daily.txt", modified_at: 1_760_000_000_000, size: 40, preview: "falamos do deploy" };
@@ -146,13 +147,19 @@ test("copying again restarts the copied label instead of an older timer cutting 
   Object.defineProperty(navigator, "clipboard", { value: { writeText: () => Promise.resolve() }, configurable: true });
   await mount();
   await openFile();
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "copiar" }));
-  });
-  await act(() => new Promise((r) => setTimeout(r, 1000)));
-  await act(async () => {
-    fireEvent.click(screen.getByRole("button", { name: "copiado" }));
-  });
-  await act(() => new Promise((r) => setTimeout(r, 700)));
-  expect(screen.getByRole("button", { name: "copiado" })).toBeTruthy();
+  // The timers under test start on the clicks, so only the clock from here on is faked.
+  jest.useFakeTimers();
+  try {
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "copiar" }));
+    });
+    await advance(1000);
+    await act(async () => {
+      fireEvent.click(screen.getByRole("button", { name: "copiado" }));
+    });
+    await advance(700);
+    expect(screen.getByRole("button", { name: "copiado" })).toBeTruthy();
+  } finally {
+    jest.useRealTimers();
+  }
 });
