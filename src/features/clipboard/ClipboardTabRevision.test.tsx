@@ -1,6 +1,6 @@
-import { afterEach, expect, mock, test } from "bun:test";
-import { act } from "react";
+import { afterEach, beforeEach, expect, jest, mock, test } from "bun:test";
 import { cleanup, render, screen } from "@testing-library/react";
+import { advance } from "../../test-clock";
 
 const clip = (id: string, preview: string) => ({ id, preview, chars: 5, kept: 5, truncated: false, copied_at: 1, pinned: false });
 let served = [clip("c1", "primeiro")];
@@ -21,9 +21,13 @@ mock.module("@tauri-apps/api/core", () => ({
 const { default: ClipboardTab } = await import("./ClipboardTab");
 const { ToastProvider } = await import("../../lib/toast");
 
-afterEach(cleanup);
+beforeEach(() => jest.useFakeTimers());
+afterEach(() => {
+  cleanup();
+  jest.useRealTimers();
+});
 
-const wait = (ms: number) => act(async () => void (await new Promise((r) => setTimeout(r, ms))));
+const wait = advance;
 
 test("the background tick skips the decrypting list call while the history stamp stands still", async () => {
   render(

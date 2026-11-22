@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, expect, mock, test } from "bun:test";
+import { afterEach, beforeEach, expect, jest, mock, test } from "bun:test";
 import { act } from "react";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { advance } from "../../test-clock";
 
 type Call = { cmd: string; args?: Record<string, unknown> };
 const calls: Call[] = [];
@@ -30,12 +31,11 @@ async function show(wait = 200) {
       <ClipboardTab privacy={false} onError={(m) => errors.push(m)} />
     </ToastProvider>,
   );
-  await act(async () => {
-    await new Promise((r) => setTimeout(r, wait));
-  });
+  await advance(wait);
 }
 
 beforeEach(() => {
+  jest.useFakeTimers();
   calls.length = 0;
   errors.length = 0;
   items = [clip("c1", "primeiro"), clip("c2", "segundo"), clip("c3", "fixado", true)];
@@ -47,7 +47,10 @@ beforeEach(() => {
     // Storage may be unavailable; the tests that need it assert on it separately.
   }
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  jest.useRealTimers();
+});
 
 test("a skeleton shows instead of the empty state until the first list answers", async () => {
   let release: (v: unknown) => void = () => {};
@@ -93,9 +96,7 @@ test("clear asks first, with the count and the pinned items that stay", async ()
 test("the same poll failure is reported once, not every 2.5 seconds", async () => {
   listing = () => Promise.reject("sem acesso");
   await show(150);
-  await act(async () => {
-    await new Promise((r) => setTimeout(r, 5200));
-  });
+  await advance(5200);
   expect(listCalls()).toBeGreaterThan(2);
   expect(errors).toEqual(["sem acesso"]);
 }, 10_000);
@@ -107,7 +108,7 @@ test("the poll stops while the window is hidden and resumes when it is back", as
     expect(listCalls()).toBe(0);
     Object.defineProperty(document, "hidden", { configurable: true, get: () => false });
     await act(async () => void document.dispatchEvent(new Event("visibilitychange")));
-    await act(async () => void (await new Promise((r) => setTimeout(r, 250))));
+    await advance(250);
     expect(listCalls()).toBeGreaterThan(0);
   } finally {
     delete (document as unknown as Record<string, unknown>).hidden;
@@ -132,9 +133,9 @@ test("copying a second item restarts the flash instead of the first timer cuttin
       await Promise.resolve();
     });
   await copy("primeiro");
-  await act(async () => void (await new Promise((r) => setTimeout(r, 800))));
+  await advance(800);
   await copy("segundo");
-  await act(async () => void (await new Promise((r) => setTimeout(r, 600))));
+  await advance(600);
   expect(screen.getAllByRole("status").some((s) => s.textContent === "copiado ✓")).toBe(true);
 });
 
