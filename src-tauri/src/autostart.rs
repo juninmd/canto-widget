@@ -45,12 +45,12 @@ fn set(app: &tauri::AppHandle, enabled: bool) -> Result<()> {
     r.map_err(|e| AppError::Io(e.to_string()))
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn autostart_status(app: tauri::AppHandle) -> Result<bool> {
     app.autolaunch().is_enabled().map_err(|e| AppError::Io(e.to_string()))
 }
 
-#[tauri::command]
+#[tauri::command(async)]
 pub fn autostart_set(app: tauri::AppHandle, enabled: bool) -> Result<()> {
     // Recorded before the change so a failure writing the marker aborts the toggle instead of letting the default revert it on boot.
     if let Some(state) = app.try_state::<AppState>() {
