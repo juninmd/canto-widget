@@ -29,25 +29,32 @@ export function useAgenda(active: boolean): Agenda {
   const [error, setError] = useState("");
   const [fetchedAt, setFetchedAt] = useState<number | null>(null);
   const alerted = useRef(new Set<string>());
+  // Only the latest call may write: an older answer, or one arriving after deactivation, is dropped.
+  const seq = useRef(0);
 
   const reload = useCallback(async () => {
+    const id = ++seq.current;
     setLoading(true);
     try {
       const { timeMin, timeMax } = dayWindow();
-      setItems(await api.agendaToday(timeMin, timeMax));
+      const next = await api.agendaToday(timeMin, timeMax);
+      if (id !== seq.current) return;
+      setItems(next);
       setFetchedAt(Date.now());
       setError("");
     } catch (e) {
       // Stays in the tab: without a Google account, the 5-minute polling can't
       // take over the widget's global error strip.
-      setError(errText(e));
+      if (id === seq.current) setError(errText(e));
     } finally {
-      setLoading(false);
+      if (id === seq.current) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
     if (!active) {
+      seq.current++;
+      setLoading(false);
       setItems([]);
       setError("");
       setFetchedAt(null);
