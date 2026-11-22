@@ -175,13 +175,17 @@ pub fn restore(state: &AppState, name: &str) -> Result<ImportSummary> {
 
 /// `YYYY-MM-DD.canto`
 fn is_daily(name: &str) -> bool {
-    let Some(day) = name.strip_suffix(&format!(".{EXTENSION}")) else { return false };
+    name.strip_suffix(&format!(".{EXTENSION}")).is_some_and(is_iso_day)
+}
+
+/// `YYYY-MM-DD`, ASCII only, so `list` can slice the first 10 bytes of any listed name.
+fn is_iso_day(day: &str) -> bool {
     day.len() == 10
         && day.bytes().enumerate().all(|(i, b)| if i == 4 || i == 7 { b == b'-' } else { b.is_ascii_digit() })
 }
 
 fn is_import(name: &str) -> bool {
-    name.ends_with(&format!("-import.{EXTENSION}")) && import_stamp(name).is_some()
+    name.get(..10).is_some_and(is_iso_day) && name[10..].starts_with('T') && import_stamp(name).is_some()
 }
 
 /// What to delete: the oldest copies beyond each kind's own budget. Names start with the ISO date, so
