@@ -2,13 +2,13 @@
 
 Guide for coding agents working on **Canto**, a Tauri v2 desktop widget (Windows, macOS, Linux) that keeps tasks,
 notes, clipboard history, meeting transcripts, the Google Calendar agenda and GitHub issues/PRs in an encrypted
-local vault. Public repository: treat everything you write, commit or screenshot as public.
+local vault. The repository is public: treat everything you write, commit or screenshot as public.
 
 ## Stack and commands
 
 | Layer | Tech |
 |---|---|
-| Shell | Tauri 2.11, Rust 2021 (MSRV 1.85), `src-tauri/` |
+| Shell | Tauri 2.12 (`src-tauri/Cargo.lock`), Rust 2021 (MSRV 1.85), `src-tauri/` |
 | UI | React 19 + TypeScript 7 + Vite 8 + Tailwind v4, `src/` |
 | Package manager | **bun** (`bun.lock`); never npm/yarn/pnpm |
 | UI tests | `bun test` (happy-dom, preload `src/test-setup.ts`) |
@@ -32,7 +32,7 @@ Ubuntu; e2e smoke tests, `cargo fmt --check` and `cargo audit` on Ubuntu; clippy
 Windows and macOS. Every new first-parent commit on `main` runs `release.yml`, which builds signed installers
 and publishes a release after the checks pass.
 
-## Layout
+## Structure
 
 ```text
 src/                      React UI (one component per file, tests next to it)
@@ -53,7 +53,7 @@ src-tauri/src/            core modules at the root, one folder per feature with 
   password.rs             master password change (re-seals every sealed file)
   biometric.rs, hello.rs  Windows Hello unlock
   routine.rs, snooze.rs, notification.rs   reminders, recurring tasks, snoozing, OS notifications
-  alert_log.rs                    in-memory log of what became of each alert today (never on disk)
+  alert_log.rs            in-memory log of what became of each alert today (never on disk)
   meeting_alert.rs, task_reminder.rs   meeting alerts and task reminders rung from Rust (hidden webviews sleep)
   <feature>/mod.rs        the feature's own API; siblings drop the prefix (`steam/lists.rs` is `crate::steam::lists`)
   activity/               opt-in focused-app log: pure spans (mod), OS probes (os), sampler thread (watch)
@@ -69,6 +69,7 @@ src-tauri/src/            core modules at the root, one folder per feature with 
   sysmon/                 Sistema tab (desktop only): one snapshot of CPU, GPU, memory, disks, network, battery and
                           apps (sysinfo + starship-battery); hints and alert ring opt-in system alerts
 src-tauri/tests/          integration tests (backup, envelope, merge, routine, trash)
+docs/readmes/             translated READMEs (`README.<lang>.md`); the root `README.md` is the English source
 ```
 
 ## Conventions
@@ -82,7 +83,8 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   "auto") and resolved once at startup; Rust gets it via `language_set` for notifications, the tray and the
   errors it returns (`lang::tr`, `AppError::text`), whose English text is the fallback. UI tests run in pt-BR (`src/test-setup.ts`).
 - Comments only for *why*, one line. No narrating comments, no section banners.
-- Files stay under ~200 lines; split by responsibility (see `*_tests.rs` siblings via `#[path]`).
+- Files aim for ~200 lines and are split by responsibility (`*_tests.rs` siblings via `#[path]`). 61 TS/TSX and 67
+  Rust files are above that today: split one when you change it, not as a drive-by.
 - **UI code lives where it is used.** A module only one feature needs goes in `src/features/<name>/`; it moves to
   `src/lib` or `src/components` when a second feature needs it. Folders stay flat, and two modules in a folder never
   differ only by letter case (`scripts/layout.test.ts` pins the three rules).
@@ -95,17 +97,14 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
 - Conventional Commits (`feat:`, `fix:`, `docs:`, `test:`, `chore:`); body explains why.
 - Rust: `Mutex` goes through `resilient::LockExt::lock_safe()` (never `lock().unwrap()`, which poisons after one
   panic) and long-lived background threads through `resilient::supervise`, which restarts them after a panic.
-- Every behavior change ships with a test that fails before and passes after, plus a `CHANGELOG.md` entry under
-  **Não publicado** (and README when user-visible).
+- **Tests and docs ship with behavior.** Every behavior change has a test that fails before and passes after, plus a
+  `CHANGELOG.md` entry under **Não publicado** (and README when user-visible).
 - **Any new or changed UI adds or updates a screenshot in `docs/prints/` and the README** (features table, tour,
   or the "mais telas" section) in the same PR — fictitious data only, per Security rules. A tab hidden by
   default (`DEFAULT_HIDDEN` in `src/shell/tabs.ts`) still needs one; skipping this is a scope gap, not optional.
-- **`README.md` (English) is canonical.** `README.pt-BR.md` plus the other `README.<lang>.md` translations
-  (es, fr, it, ja, zh, de, ru, tr, hi) don't need to change in the same PR — they drift and get refreshed
-  separately. Never edit only a translation and leave `README.md` behind.
-
-## Contracts you must not break
-
+- **`README.md` (English) is canonical.** The translations in `docs/readmes/README.<lang>.md` (42 languages) don't
+  need to change in the same PR — they drift and get refreshed separately. Never edit only a translation and leave
+  `README.md` behind.
 - **IPC**: Rust command name == `invoke` name; args are camelCase on the TS side. Change both sides together.
 - **Synced vault keys are frozen.** `Task.hora`, `repetir`, `serie`, `Repeat.tipo` (`diaria`/`dias_uteis`/`semanal`,
   `dia`) and `Note.fixada` travel between machines via backup/merge; Rust fields use English names with
@@ -132,18 +131,17 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   signed installers in parallel, merges and verifies `latest.json`, and publishes with notes generated from the
   commit (`scripts/release-notes.ts`: a summary line, entries grouped by Conventional Commit type from the merged pull request's commits or the squash body, a download table and the compare link; the updater manifest must carry the identical text, so keep it deterministic). A six-hour
   schedule retries failed or missed runs. Never hand-push a version tag or edit release versions manually.
+- **Security**: the vault key lives only in RAM (`Zeroizing`); tokens never reach the webview. All network calls go
+  through Rust; the CSP allows no remote origin. Validate every value coming from the webview at the command boundary
+  (paths, URLs, times, sizes). Links opened from the UI must be `http(s)://`; GitHub items only keep
+  `https://github.com/` URLs. Never commit `src-tauri/google-oauth.json`, `client_secret_*.json`, `.env`, tokens or
+  vault files. Screenshots in `docs/prints/` use fictitious data only: no real names, e-mails, hosts, IPs, paths with
+  a user name, or real clipboard content.
+- **Definition of done**: `bun run lint`, `bun test`, `bun run build`, `cargo fmt --check`, `cargo clippy ... -D warnings`
+  and `cargo test --locked` are green; changed behavior has a test; docs and CHANGELOG updated; UI changes have a README
+  screenshot; no debug output, commented-out code or TODO without an issue.
 
-## Security rules
-
-- The vault key lives only in RAM (`Zeroizing`); tokens never reach the webview. All network calls go through
-  Rust; the CSP allows no remote origin.
-- Validate every value coming from the webview at the command boundary (paths, URLs, times, sizes).
-- Links opened from the UI must be `http(s)://`; GitHub items only keep `https://github.com/` URLs.
-- Never commit `src-tauri/google-oauth.json`, `client_secret_*.json`, `.env`, tokens or vault files.
-- Screenshots in `docs/prints/` use fictitious data only: no real names, e-mails, hosts, IPs, paths with a user
-  name, or real clipboard content.
-
-## Traps
+## Gotchas
 
 - **Windows Hello is shared with the installed app.** `hello::delete()` / `hello::create()` touch
   the real TPM credential regardless of the app identifier. No test may reach them; tests use
@@ -167,13 +165,6 @@ src-tauri/tests/          integration tests (backup, envelope, merge, routine, t
   list the whole range. `prepare` re-targets a resumed draft to that commit. A workflow change merged while a release
   builds makes that run fail at publish; the next run re-plans, folds and retargets. Do not "fix" a 403 with a PAT that
   has `workflows` scope.
-
-## Definition of done
-
-`bun run lint`, `bun test`, `bun run build`, `cargo fmt --check`, `cargo clippy ... -D warnings` and
-`cargo test --locked` are green;
-changed behavior has a test; docs and CHANGELOG updated; UI changes have a README screenshot; no debug output,
-commented-out code or TODO without an issue.
 
 <!-- base-actions-main-policy -->
 ## GitHub Actions — padrão obrigatório (@main)
