@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Corrigido
+
+- **Data no pop-up de novo convite**: o convite mostrava só a hora; agora mostra o dia da semana, a data e a hora (ex.: "seg., 23/11 · 21:16"). Outros alertas de reunião seguem só com a hora.
+
 ### Adicionado
 
 - **Aba GitHub/GitLab em grade e com "Comece por aqui"**: um seletor **Lista | Grade** troca as linhas por cartões em duas colunas com o trecho da descrição, até 3 labels, CI e barra de diff; a escolha fica salva. Um cartão no topo aponta por onde começar: um PR seu que não consegue avançar (CI falhou ou conflito) ou o pedido de revisão mais antigo acima do prazo. Na linha, o ícone ganha um anel que segue o CI e o conflito, uma faixa vermelha marca o que pede atenção e uma mini barra mostra a proporção de adições e remoções, e a foto real do autor aparece ao lado do @login (baixada pelo Rust, só do domínio de imagens do próprio GitHub ou da instância GitLab). O Rust passa a trazer `labels`, `snippet` e `author_avatar` (descrição de uma linha, até 200 caracteres) de cada item.

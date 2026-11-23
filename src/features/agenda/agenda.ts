@@ -16,6 +16,14 @@ export function hour(item: AgendaItem): string {
     : d.toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
 }
 
+/** Day and hour for an event that is not today (an invite), e.g. "qui., 27/11 · 20:57"; just `hour` when the start is unreadable. */
+export function whenLabel(item: AgendaItem): string {
+  const d = new Date(item.start);
+  if (Number.isNaN(d.getTime())) return hour(item);
+  const day = d.toLocaleDateString(LOCALE, { weekday: "short", day: "2-digit", month: "2-digit" });
+  return `${day} · ${hour(item)}`;
+}
+
 /** Minutes until the event starts (negative if it has already started). */
 export function minutesUntil(item: AgendaItem, now = new Date()): number {
   if (item.all_day) return Number.POSITIVE_INFINITY;
