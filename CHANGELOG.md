@@ -7,7 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
-- **Revisão de datas e contagens nas telas**: o alerta de serviço com problema diz "desde qui., 08/10 · 19:15" quando a queda começou em outro dia (antes só a hora); o aviso "próxima busca" dos Modelos IA e o "dados de ..." da Atividade fazem o mesmo; a nota de reunião passa a registrar o dia; o resumo da aba Status API deixa de contar manutenção e serviços sem leitura como "operacionais" (agora bate com o filtro); "Já passaram: 1" no lugar de "1 já passaram".
+- **Revisão de datas e contagens nas telas**: o alerta de serviço com problema diz "desde qui., 08/10 · 19:15" quando a queda começou em outro dia (antes só a hora); o aviso "próxima busca" dos Modelos IA e o "dados de ..." da Atividade fazem o mesmo; o lembrete de tarefa de outro dia (atrasada) mostra o dia, não só a hora; a nota de reunião passa a registrar o dia; o resumo da aba Status API deixa de contar manutenção e serviços sem leitura como "operacionais" (agora bate com o filtro); "Já passaram: 1" no lugar de "1 já passaram".
 - **Data no pop-up de novo convite**: o convite mostrava só a hora; agora mostra o dia da semana, a data e a hora (ex.: "seg., 23/11 · 21:16"). Outros alertas de reunião seguem só com a hora.
 
 ### Adicionado
