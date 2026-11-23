@@ -115,3 +115,20 @@ fn pr_comments_drop_untrusted_avatars_and_non_github_links() {
     assert!(parsed[0].avatar_url.starts_with("data:image/png;base64,"));
     assert_eq!(parsed[1].avatar_url, "");
 }
+
+#[test]
+fn an_item_carries_its_first_labels_and_a_one_line_description() {
+    let mut v = raw(9, "https://github.com/octo/canto/pull/9", "2026-09-10T10:00:00Z", true);
+    v["labels"] =
+        serde_json::json!([{ "name": "bug" }, { "name": "" }, { "name": "ui" }, { "name": "a" }, { "name": "b" }]);
+    v["body"] = serde_json::json!("Fixes the\n\nfocus   bug.\n");
+    let it = &convert(search_response(1, vec![v])).items[0];
+    assert_eq!(it.labels, ["bug", "ui", "a"], "empty names are skipped and the list is capped");
+    assert_eq!(it.snippet, "Fixes the focus bug.");
+}
+
+#[test]
+fn an_item_without_labels_or_body_has_neither() {
+    let it = &convert(search_response(1, vec![raw(9, "https://github.com/octo/canto/issues/9", "", false)])).items[0];
+    assert!(it.labels.is_empty() && it.snippet.is_empty());
+}

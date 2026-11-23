@@ -27,6 +27,27 @@ pub struct ForgeItem {
     /// A PR/MR that can't merge until its conflicts are resolved. GitLab lists say it; GitHub's search doesn't, so
     /// there it stays false and the CI batch (`github_prs_checks`) fills it in.
     pub conflict: bool,
+    /// Up to `MAX_LABELS` label names, in the forge's order; the UI colors them.
+    pub labels: Vec<String>,
+    /// The start of the description as one line of plain text (see `snippet`); empty when there is none.
+    pub snippet: String,
+}
+
+pub(crate) const MAX_LABELS: usize = 3;
+const SNIPPET_CHARS: usize = 200;
+
+/// The description squeezed to one line and cut at `SNIPPET_CHARS` (with an ellipsis), so lists stay small.
+pub(crate) fn snippet(text: Option<&str>) -> String {
+    let flat = text.unwrap_or_default().split_whitespace().collect::<Vec<_>>().join(" ");
+    if flat.chars().count() <= SNIPPET_CHARS {
+        return flat;
+    }
+    let cut: String = flat.chars().take(SNIPPET_CHARS).collect();
+    format!("{}…", cut.trim_end())
+}
+
+pub(crate) fn first_labels<I: IntoIterator<Item = String>>(names: I) -> Vec<String> {
+    names.into_iter().filter(|n| !n.is_empty()).take(MAX_LABELS).collect()
 }
 
 #[derive(Debug, Clone, Default, Serialize, PartialEq)]
@@ -199,6 +220,8 @@ pub(crate) fn item(number: u64, created: &str, updated: &str, comments: u64) -> 
         draft: false,
         author: "octocat".into(),
         conflict: false,
+        labels: Vec::new(),
+        snippet: String::new(),
     }
 }
 

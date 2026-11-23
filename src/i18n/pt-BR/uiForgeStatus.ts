@@ -1,5 +1,13 @@
 // Textos do refinamento das telas GitHub/GitLab (resumo clicável, ordenação compacta) e Status API.
 export const uiForgeStatus = {
+  "forge.layout.label": "modo de exibição",
+  "forge.layout.list": "Lista",
+  "forge.layout.grid": "Grade",
+  "forge.next.title": "Comece por aqui",
+  "forge.next.mine": "seu PR não consegue avançar",
+  "forge.next.review": "aguardando você há {wait}",
+  "forge.next.open": "Abrir",
+  "forge.next.openOf": "Abrir {title}",
   "uiForge.more": "mais ações",
   "uiForge.sortButton": "ordenar por: {sort}",
   "uiForge.sortMenu": "ordenação",

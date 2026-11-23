@@ -13,6 +13,9 @@ import { t } from "../../i18n";
 import ErrorBanner from "../../components/ErrorBanner";
 import ForgeFilterBar from "./ForgeFilterBar";
 import ForgeHeader from "./ForgeHeader";
+import ForgeNextCard from "./ForgeNextCard";
+import { nextAction } from "./forgeNext";
+import { savedLayout, saveLayout, type ForgeLayout } from "./forgeLayout";
 import ForgeSection from "./ForgeSection";
 import ForgeSummary from "./ForgeSummary";
 import MentionsList from "./MentionsList";
@@ -40,6 +43,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const [hideDrafts, setHideDrafts] = useState(savedHideDrafts);
   const [attention, setAttention] = useState(false);
   const [peeked, setPeeked] = useState<ForgeItem | null>(null);
+  const [layout, setLayout] = useState<ForgeLayout>(savedLayout);
   const focus = effectiveFocus(pressed, ci);
 
   const mentions = useMentions(forge);
@@ -63,6 +67,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
   const signals = { ci, conflicts, reviews };
   const stuck = lists ? attentionCount(lists, new Date(), signals) : 0;
   const attending = attention && stuck > 0;
+  const next = lists ? nextAction(lists, ci, conflicts) : null;
   const base = lists ? focusSections(visibleSections(forge, gh.filter.kind), focus) : [];
   const shown = attending ? base.filter((s) => ATTENTION_SECTIONS.includes(s.key)) : base;
 
@@ -93,6 +98,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
         <MentionsList forge={forge} mentions={mentions} />
       ) : (
         <>
+          {next && <ForgeNextCard next={next} onOpen={() => (forge === "github" ? setPeeked(next.item) : void api.openLink(next.item.url))} />}
           {lists && <ForgeSummary forge={forge} lists={lists} ci={ci} focus={focus} onFocus={setPressed} />}
 
           <div className="flex gap-1 rounded-xl bg-edge/60 p-0.5" role="tablist">
@@ -130,6 +136,22 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                 >
                   {t("forge.hideDrafts")}
                 </button>
+                <div role="group" aria-label={t("forge.layout.label")} className="ml-auto flex gap-0.5 rounded-full bg-edge/60 p-0.5">
+                  {(["list", "grid"] as const).map((l) => (
+                    <button
+                      key={l}
+                      type="button"
+                      aria-pressed={layout === l}
+                      onClick={() => {
+                        saveLayout(l);
+                        setLayout(l);
+                      }}
+                      className={`canto-hit min-h-[22px] rounded-full px-2.5 text-[11px] ${layout === l ? "bg-ink font-semibold text-fg shadow-xs" : "text-muted hover:text-fg"}`}
+                    >
+                      {t(`forge.layout.${l}`)}
+                    </button>
+                  ))}
+                </div>
               </div>
               {fresh?.limitedUntil && (
                 <p role="status" className="text-[11px] text-muted">
@@ -156,6 +178,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                       conflicts={conflicts}
                       reviews={reviews}
                       hideDrafts={hideDrafts}
+                      grid={layout === "grid"}
                       onPeek={forge === "github" ? setPeeked : undefined}
                       needs={attending ? (it) => needsAttention(key, it, new Date(), signals) : undefined}
                     />

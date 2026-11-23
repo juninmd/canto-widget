@@ -146,3 +146,16 @@ fn merged_activity_drops_old_mrs_that_were_only_updated_in_the_window() {
     let (list, _) = mrs_since(&account(base), Activity::Merged, &Window::since("2026-09-18T03:00:00+00:00")).unwrap();
     assert_eq!((list.total, list.items.iter().map(|i| i.number).collect::<Vec<_>>()), (1, vec![1]));
 }
+
+#[test]
+fn an_mr_carries_its_labels_and_description_snippet() {
+    let mut v = serde_json::to_value(serde_json::json!({
+        "iid": 4, "title": "t", "web_url": "https://gitlab.acme.io/g/p/-/merge_requests/4",
+        "references": { "full": "g/p!4" }, "labels": ["ux", "backend"], "description": "  Moves\nthe cache  "
+    }))
+    .unwrap();
+    v["author"] = serde_json::json!({ "username": "ana" });
+    let it = item(BASE, true, serde_json::from_value(v).unwrap()).unwrap();
+    assert_eq!(it.labels, ["ux", "backend"]);
+    assert_eq!(it.snippet, "Moves the cache");
+}

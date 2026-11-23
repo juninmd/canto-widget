@@ -53,6 +53,10 @@ pub(crate) struct RawItem {
     /// `mergeable`, `ci_must_pass`, `requested_changes`...: GitLab 15.6 and later.
     #[serde(default)]
     pub(crate) detailed_merge_status: String,
+    #[serde(default)]
+    labels: Vec<String>,
+    #[serde(default)]
+    description: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -209,6 +213,8 @@ pub(crate) fn item(base: &str, is_mr: bool, b: RawItem) -> Option<ForgeItem> {
         draft: b.draft || b.work_in_progress,
         author: b.author.map(|u| u.username).unwrap_or_default(),
         conflict: is_mr && (b.has_conflicts || b.detailed_merge_status == "conflict"),
+        labels: crate::forge::first_labels(b.labels),
+        snippet: crate::forge::snippet(b.description.as_deref()),
     })
 }
 
