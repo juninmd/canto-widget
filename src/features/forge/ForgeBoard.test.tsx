@@ -315,17 +315,46 @@ test("GitLab rows have no espiar: its read-only token has nothing to write with"
   expect(screen.queryByRole("button", { name: /^espiar/ })).toBeNull();
 });
 
-test("the grid layout shows the description snippet and labels, keeps the choice and goes back to rows", async () => {
+test("the grid is the default; the choice is kept and Lista goes back to rows", async () => {
   const rich = pr(4, "Meu PR vermelho", { snippet: "Troca o cache de checks por uma versão incremental.", labels: ["performance", "forge"] });
   await mountGithub({ ...board, my_prs: { total: 1, items: [rich] } });
-  expect(screen.queryByText(/cache de checks/)).toBeNull();
-  fireEvent.click(screen.getByRole("button", { name: "Grade" }));
   expect(screen.getByText("Troca o cache de checks por uma versão incremental.")).toBeTruthy();
   expect(screen.getByText("performance")).toBeTruthy();
-  expect(localStorage.getItem("canto.forge.layout")).toBe("grid");
   fireEvent.click(screen.getByRole("button", { name: "Lista" }));
   expect(screen.queryByText("performance")).toBeNull();
   expect(localStorage.getItem("canto.forge.layout")).toBe("list");
+  fireEvent.click(screen.getByRole("button", { name: "Grade" }));
+  expect(localStorage.getItem("canto.forge.layout")).toBe("grid");
+});
+
+test("a card's top band spells the state out and the radar counts what needs me", async () => {
+  await mountGithub();
+  const card = within(screen.getByRole("region", { name: "PRs que eu abri" })).getByText("Meu PR vermelho").closest("button") as HTMLElement;
+  expect(within(card).getByRole("img", { name: "✗ CI falhou" })).toBeTruthy();
+  expect(screen.getByRole("img", { name: /\d+ de \d+ pedem você/ })).toBeTruthy();
+});
+
+test("the queue shows one PR at a time and J and K move through it", async () => {
+  await mountGithub();
+  fireEvent.click(screen.getByRole("button", { name: "Fila" }));
+  const q = screen.getByRole("region", { name: "Fila" });
+  expect(within(q).getByText(/^1 de \d+$/)).toBeTruthy();
+  expect(within(q).getByText("Meu PR vermelho")).toBeTruthy();
+  fireEvent.keyDown(document, { key: "j" });
+  expect(within(q).getByText(/^2 de \d+$/)).toBeTruthy();
+  fireEvent.keyDown(document, { key: "k" });
+  expect(within(q).getByText(/^1 de \d+$/)).toBeTruthy();
+});
+
+test("Ctrl+K searches the loaded items and Enter opens the peek", async () => {
+  await mountGithub();
+  fireEvent.keyDown(document, { key: "k", ctrlKey: true });
+  const box = screen.getByRole("dialog", { name: "Buscar PR, MR ou issue" });
+  fireEvent.change(within(box).getByLabelText("Buscar PR, MR ou issue"), { target: { value: "cofre" } });
+  expect(within(box).getByText("Revisar o cofre")).toBeTruthy();
+  expect(within(box).queryByText("Meu PR verde")).toBeNull();
+  fireEvent.keyDown(within(box).getByLabelText("Buscar PR, MR ou issue"), { key: "Enter" });
+  expect(screen.queryByRole("dialog", { name: "Buscar PR, MR ou issue" })).toBeNull();
 });
 
 test("the start-here card names my failing PR and opens its peek", async () => {

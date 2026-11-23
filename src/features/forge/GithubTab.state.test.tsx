@@ -117,6 +117,7 @@ test("disconnecting asks inline first and only the confirmation drops the token"
 test("the filter is the tab's search target, hints at Enter while focused, and rows carry the external-link glyph", async () => {
   responses.github_status = () => Promise.resolve(connected);
   responses.github_lists = () => Promise.resolve(lists);
+  localStorage.setItem("canto.forge.layout", "list");
   const { container } = render(<GithubTab onError={() => {}} />);
   await settle();
   const input = screen.getByLabelText("Filtrar issues e PRs");

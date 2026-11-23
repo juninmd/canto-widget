@@ -9,6 +9,7 @@ import { overdue, waitHours, waitLabel, type SnoozeKind } from "./reviewRadar";
 import { t } from "../../i18n";
 import { CiPill, LabelChip, Pill } from "./ForgePills";
 import { IssueIcon, PullIcon } from "../../components/Icons";
+import { prSize } from "./forgeSize";
 
 const STALE_DAYS = 7;
 // The icon's ring says the PR's state at a glance; the pills below spell it out, so color is never the only signal.
@@ -42,6 +43,18 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
   const canWatch = item.is_pr && forge === "github" && (ci === "running" || watching);
   const canCheck = item.is_pr && !ci && checks === null;
 
+  const band = !item.is_pr
+    ? null
+    : conflict
+      ? { label: `⚠ ${t("forge.item.conflict")}`, cls: "bg-danger/15 text-danger", title: t("forge.item.conflictTitle") }
+      : badge === "failure"
+        ? { label: t("forge.checks.failure"), cls: "bg-danger/15 text-danger", title: undefined }
+        : badge === "running"
+          ? { label: t("forge.checks.running"), cls: "bg-cat-meet/15 text-cat-meet", title: undefined }
+          : badge === "success"
+            ? { label: t("forge.checks.success"), cls: "bg-ok/15 text-ok", title: undefined }
+            : null;
+
   async function loadChecks() {
     setChecks("loading");
     try {
@@ -62,6 +75,11 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
         title={item.url}
         className={`relative flex w-full overflow-hidden rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${grid ? "h-full flex-col gap-1.5" : "gap-2.5"} ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
       >
+        {grid && band && (
+          <span role="img" aria-label={band.label} className={`-mx-2.5 -mt-2.5 mb-0.5 flex items-center gap-1.5 px-2.5 py-1 text-[10.5px] font-semibold ${band.cls}`} title={band.title}>
+            {band.label}
+          </span>
+        )}
         {urgent && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-danger/80" />}
         <span
           className={`${grid ? "" : "mt-0.5"} grid size-5 shrink-0 place-items-center rounded-full ${RING[ring]} ${ring === "none" ? (item.draft ? "text-faint" : "text-accent-text") : ""}`}
@@ -81,7 +99,7 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
             </span>
           )}
           <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-muted">
-            {conflict && (
+            {conflict && !(grid && band) && (
               <Pill tone="bad" title={t("forge.item.conflictTitle")}>
                 ⚠ {t("forge.item.conflict")}
               </Pill>
@@ -91,7 +109,7 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
                 {t("forge.item.news", { n: news })}
               </Pill>
             )}
-            {item.is_pr && badge && <CiPill status={badge} />}
+            {item.is_pr && badge && !(grid && band && !conflict) && <CiPill status={badge} />}
             {item.is_pr && review?.changes && (
               <Pill tone="bad" title={t("forge.item.changesTitle")}>
                 {t("forge.item.changes")}
@@ -108,6 +126,11 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
               <span title={t("forge.item.diffTitle")} className="shrink-0 font-mono text-[10.5px] tabular-nums">
                 <span className="text-ok">+{review.additions}</span> <span className="text-danger">−{review.deletions}</span>
                 <DiffBar add={review.additions} del={review.deletions} />
+              </span>
+            )}
+            {grid && item.is_pr && review && (
+              <span title={t("forge.size.title", { size: prSize(review.additions, review.deletions) })} className="shrink-0 rounded-md border border-edge px-1.5 font-mono text-[10px] font-semibold leading-4 text-muted">
+                {prSize(review.additions, review.deletions)}
               </span>
             )}
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
@@ -137,7 +160,7 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
         )}
       </button>
       {(onSnooze || canCheck || onPeek || canWatch) && (
-        <div className="absolute right-7 top-1.5 flex items-center gap-0.5 whitespace-nowrap rounded-lg border border-edge bg-panel p-0.5 opacity-0 shadow-raised transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none">
+        <div className={`absolute top-1.5 flex items-center gap-0.5 rounded-lg border border-edge bg-panel p-0.5 opacity-0 shadow-raised transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none ${grid ? "inset-x-1.5 flex-wrap justify-end" : "right-7 whitespace-nowrap"}`}>
           {onPeek && (
             <button type="button" onClick={onPeek} aria-label={t("forge.peek.openOf", { title: item.title })} className={ACTION}>
               {t("forge.peek.open")}

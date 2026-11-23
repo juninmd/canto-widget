@@ -566,7 +566,7 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 </tr>
 <tr><th colspan="2">GitHub grid view, with the start of each description and its labels</th></tr>
 <tr>
-<td colspan="2"><img src="docs/prints/app/166-github-grade.png" alt="GitHub tab in grid mode: a start-here card, two columns of PR cards with a description excerpt, labels, CI state and a diff bar"></td>
+<td colspan="2"><img src="docs/prints/app/166-github-grade.png" alt="GitHub tab: start-here card, radar ring with the summary filters, search and a List, Grid or Queue switch, and two columns of PR cards with a state band, description excerpt, labels and size"></td>
 </tr>
 </table>
 

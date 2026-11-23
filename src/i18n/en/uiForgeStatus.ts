@@ -1,6 +1,18 @@
 import type { uiForgeStatus as source } from "../pt-BR/uiForgeStatus";
 
 export const uiForgeStatus: Record<keyof typeof source, string> = {
+  "forge.layout.queue": "Queue",
+  "forge.radar.label": "{n} of {total} need you",
+  "forge.radar.center": "need you",
+  "forge.queue.pos": "{n} of {total}",
+  "forge.queue.prev": "Previous",
+  "forge.queue.next": "Next",
+  "forge.queue.empty": "Queue empty. All caught up.",
+  "forge.size.title": "size by diff: {size}",
+  "forge.search.open": "Search",
+  "forge.search.label": "Search PR, MR or issue",
+  "forge.search.placeholder": "Search by title, repo or number",
+  "forge.search.empty": "Nothing found.",
   "forge.layout.label": "display mode",
   "forge.layout.list": "List",
   "forge.layout.grid": "Grid",
