@@ -45,6 +45,14 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
+test("an invite shows the day of the event, not only the hour", async () => {
+  await show();
+  const { whenLabel } = await import("../agenda/agenda");
+  const label = whenLabel(invite);
+  expect(label).toContain("·");
+  expect(screen.getByText(label)).toBeTruthy();
+});
+
 test("an invite is its own kind, never the 'meeting starting' alert", () => {
   expect(kindOf(invite)).toBe("invite");
   expect(kindOf({ ...invite, id: "e9" })).toBe("meeting");

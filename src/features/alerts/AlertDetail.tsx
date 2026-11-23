@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { api, type AgendaItem } from "../../lib/api";
-import { hour, people, status as agendaStatus, tally } from "../agenda/agenda";
+import { hour, people, whenLabel, status as agendaStatus, tally } from "../agenda/agenda";
 import { kindOf, levelLabel, prLabel, senderName, senderProfile, toneOf } from "./alerts";
 import { block, useLexer, type Render } from "../../lib/markdown";
 import { timeAgo } from "../../lib/time";
@@ -228,7 +228,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         )}
         {(kind === "meeting" || kind === "invite" || kind === "task") && (
           <>
-            <Chip tone={tone.text}>{hour(event)}</Chip>
+            <Chip tone={tone.text}>{kind === "invite" ? whenLabel(event) : hour(event)}</Chip>
             {kind === "meeting" && soon && <Chip>{soon}</Chip>}
             {event.meet && <Chip>Meet</Chip>}
             {(kind === "meeting" || kind === "invite") && event.organizer && <Organizer event={event} />}
