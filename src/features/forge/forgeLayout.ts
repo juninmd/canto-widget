@@ -1,12 +1,13 @@
 const KEY = "canto.forge.layout";
 
-export type ForgeLayout = "list" | "grid";
+export type ForgeLayout = "list" | "grid" | "queue";
 
 export const savedLayout = (): ForgeLayout => {
   try {
-    return localStorage.getItem(KEY) === "grid" ? "grid" : "list";
+    const v = localStorage.getItem(KEY);
+    return v === "list" || v === "queue" ? v : "grid";
   } catch {
-    return "list";
+    return "grid";
   }
 };
 

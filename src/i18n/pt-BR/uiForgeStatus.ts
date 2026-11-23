@@ -1,5 +1,17 @@
 // Textos do refinamento das telas GitHub/GitLab (resumo clicável, ordenação compacta) e Status API.
 export const uiForgeStatus = {
+  "forge.layout.queue": "Fila",
+  "forge.radar.label": "{n} de {total} pedem você",
+  "forge.radar.center": "pedem você",
+  "forge.queue.pos": "{n} de {total}",
+  "forge.queue.prev": "Anterior",
+  "forge.queue.next": "Próximo",
+  "forge.queue.empty": "Fila vazia. Tudo em dia.",
+  "forge.size.title": "tamanho pelo diff: {size}",
+  "forge.search.open": "Buscar",
+  "forge.search.label": "Buscar PR, MR ou issue",
+  "forge.search.placeholder": "Buscar por título, repo ou número",
+  "forge.search.empty": "Nada encontrado.",
   "forge.layout.label": "modo de exibição",
   "forge.layout.list": "Lista",
   "forge.layout.grid": "Grade",
