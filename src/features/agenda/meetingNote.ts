@@ -1,5 +1,5 @@
 import type { AgendaItem, Note } from "../../lib/api";
-import { hour } from "./agenda";
+import { whenLabel } from "./agenda";
 import { fold, foldIncludes } from "../../lib/fold";
 import { LOCALE, t } from "../../i18n";
 
@@ -7,7 +7,7 @@ import { LOCALE, t } from "../../i18n";
 export function meetingNoteDraft(event: AgendaItem): { title: string; body: string; tags: string[] } {
   const day = new Date(event.start).toLocaleDateString(LOCALE, { day: "2-digit", month: "2-digit" });
   const names = (event.attendees ?? []).map((g) => g.name || g.email);
-  const lines = [`**${t("alert.prep.note.when")}:** ${hour(event)}`];
+  const lines = [`**${t("alert.prep.note.when")}:** ${whenLabel(event)}`];
   if (names.length > 0) lines.push("", `## ${t("alert.prep.note.guests")}`, "", ...names.map((n) => `- ${n}`));
   if (event.description) lines.push("", `## ${t("alert.prep.note.agenda")}`, "", event.description);
   lines.push("", `## ${t("alert.prep.note.notes")}`, "");

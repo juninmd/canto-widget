@@ -7,7 +7,7 @@ import { activityText } from "./activitySummary";
 import { mergeApps, mergeFocus, weekSeries, type Day } from "./activityView";
 import { MOD_KEY } from "../../lib/platform";
 import { useToast } from "../../lib/toast";
-import { clockLabel } from "../../lib/clockLabel";
+import { clockOrDay } from "../../lib/clockLabel";
 import { useWindowVisible } from "../../lib/useWindowVisible";
 import { useLatestRequest } from "../../lib/useLatestRequest";
 import { useRefreshEvent } from "../../lib/useRefreshEvent";
@@ -97,7 +97,7 @@ export default function ActivityTab({ today, onError }: { today: string; onError
 
   const banner = loadError && (
     <ErrorBanner
-      message={week && fetchedAt ? t("common.staleFailed", { time: clockLabel(fetchedAt), error: loadError }) : t("common.loadFailed", { error: loadError })}
+      message={week && fetchedAt ? t("common.staleFailed", { time: clockOrDay(fetchedAt), error: loadError }) : t("common.loadFailed", { error: loadError })}
       onRetry={() => void load()}
       busy={busy}
     />

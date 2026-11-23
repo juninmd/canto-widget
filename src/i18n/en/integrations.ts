@@ -86,7 +86,7 @@ export const integrations: Record<keyof typeof source, string> = {
   "agenda.hero.doneBody": "nothing else on the agenda today",
   "agenda.hero.progress": "meeting progress",
   "agenda.rail.label": "day timeline",
-  "agenda.rail.past": "{n} already over",
+  "agenda.rail.past": "Already over: {n}",
   "agenda.rail.free": "free · {duration} ({start}–{end})",
   "agenda.rail.task": "task",
   "agenda.rail.bookIn": "fit {title} at {time}",

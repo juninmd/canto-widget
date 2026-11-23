@@ -4,6 +4,7 @@ import { api, errText, type ModelRow, type ModelsView } from "../../lib/api";
 import { SORTS, availableFilters, withSheet, filterModels, sortModels, type ModelFilter, type ModelSort } from "./models";
 import { loadPicked, savePicked, togglePick } from "./compareMetrics";
 import { timeAgo } from "../../lib/time";
+import { clockOrDay } from "../../lib/clockLabel";
 import { LOCALE, t } from "../../i18n";
 import { BellIcon } from "../../components/Icons";
 import ModelItem from "./ModelItem";
@@ -104,7 +105,7 @@ export default function ModelsTab() {
     );
   }
 
-  const nextAt = new Date(view.next_fetch_at).toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
+  const nextAt = clockOrDay(view.next_fetch_at);
   const bell = view.alerts ? t("models.alertOff") : t("models.alertOn");
   const problem = error || view.error;
 

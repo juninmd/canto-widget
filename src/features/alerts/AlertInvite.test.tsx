@@ -80,3 +80,21 @@ test("a failed answer keeps the invite open and says why", async () => {
   expect(dismissed).toEqual([]);
   expect(screen.getByRole("alert").textContent).toContain("reconecte o Google");
 });
+
+test("an outage that began on another day says which day, not only the hour", async () => {
+  const outage: AgendaItem = { ...invite, id: "status:nimbus", title: "Nimbus CDN", tag: "critical", start: new Date(Date.now() - 20 * 3_600_000).toISOString(), organizer: "" };
+  const { clockOrDay } = await import("../../lib/clockLabel");
+  await act(async () => {
+    render(<Alert events={[outage]} onDismiss={() => {}} />);
+  });
+  expect(screen.getByText(`desde ${clockOrDay(Date.parse(outage.start))}`)).toBeTruthy();
+});
+
+test("a reminder for a task due on another day carries that day, not only the hour", async () => {
+  const task: AgendaItem = { ...invite, id: "task:late", title: "Pagar boleto", organizer: "", start: new Date(Date.now() - 3 * 86_400_000).toISOString() };
+  const { whenLabel } = await import("../agenda/agenda");
+  await act(async () => {
+    render(<Alert events={[task]} onDismiss={() => {}} />);
+  });
+  expect(screen.getByText(whenLabel(task))).toBeTruthy();
+});

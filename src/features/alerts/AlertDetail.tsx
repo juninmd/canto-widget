@@ -4,6 +4,7 @@ import { hour, people, whenLabel, status as agendaStatus, tally } from "../agend
 import { kindOf, levelLabel, prLabel, senderName, senderProfile, toneOf } from "./alerts";
 import { block, useLexer, type Render } from "../../lib/markdown";
 import { timeAgo } from "../../lib/time";
+import { clockOrDay } from "../../lib/clockLabel";
 import { t } from "../../i18n";
 import AlertGuests from "./AlertGuests";
 import AlertJobs from "./AlertJobs";
@@ -157,6 +158,12 @@ function Description({ text }: { text: string }) {
 }
 
 /** What the selected alert says, laid out for a wide, short card: heading, chips, then up to two boxes. */
+/** A reminder for a task due on another day (an overdue one) must say so, or its hour reads as today. */
+const startsToday = (e: AgendaItem) => {
+  const d = new Date(e.start);
+  return Number.isNaN(d.getTime()) || d.toDateString() === new Date().toDateString();
+};
+
 export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem; onOpenNotes?: () => void }) {
   const kind = kindOf(event);
   const tone = TONE[toneOf(event)];
@@ -209,7 +216,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         {kind === "status" && (
           <>
             <Chip tone={tone.text}>{levelLabel(event.tag)}</Chip>
-            {event.start && <Chip>{t("alert.since", { time: hour(event) })}</Chip>}
+            {event.start && <Chip>{t("alert.since", { time: clockOrDay(Date.parse(event.start)) })}</Chip>}
             {event.start && <Chip>{timeAgo(event.start)}</Chip>}
           </>
         )}
@@ -228,7 +235,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         )}
         {(kind === "meeting" || kind === "invite" || kind === "task") && (
           <>
-            <Chip tone={tone.text}>{kind === "invite" ? whenLabel(event) : hour(event)}</Chip>
+            <Chip tone={tone.text}>{kind === "invite" || !startsToday(event) ? whenLabel(event) : hour(event)}</Chip>
             {kind === "meeting" && soon && <Chip>{soon}</Chip>}
             {event.meet && <Chip>Meet</Chip>}
             {(kind === "meeting" || kind === "invite") && event.organizer && <Organizer event={event} />}

@@ -107,7 +107,7 @@ test("the bell turns top-10 alerts on and off", async () => {
 
 test("atualizar asks Rust to force, and a throttled answer says when the next fetch is allowed", async () => {
   await show();
-  view = connected({ throttled: true, next_fetch_at: new Date(2026, 8, 29, 15, 40).getTime() });
+  view = connected({ throttled: true, next_fetch_at: new Date().setHours(15, 40, 0, 0) });
   await act(async () => fireEvent.click(screen.getByRole("button", { name: "atualizar" })));
   expect(calls.filter((c) => c.cmd === "models_get").map((c) => c.args)).toEqual([{ force: false }, { force: true }]);
   expect(screen.getByText(/próxima busca às 15:40/)).toBeTruthy();
