@@ -43,7 +43,7 @@ export default function ClipCard({ item: i, copied, className, privacy, onCopy, 
             {kind === "color" ? (
               <span className={`block font-mono text-xs text-fg ${mask}`}>{i.preview.trim()}</span>
             ) : kind === "code" || kind === "json" ? (
-              <pre className={`overflow-hidden whitespace-pre rounded bg-panel px-2 py-1 font-mono text-[11px] leading-snug text-fg ${mask}`}>
+              <pre className={`overflow-hidden whitespace-pre [mask-image:linear-gradient(to_right,black_calc(100%-20px),transparent)] rounded bg-panel px-2 py-1 font-mono text-[11px] leading-snug text-fg ${mask}`}>
                 {codeLines.slice(0, CODE_LINES).join("\n")}
                 {codeLines.length > CODE_LINES && <span className="block text-faint">…</span>}
               </pre>

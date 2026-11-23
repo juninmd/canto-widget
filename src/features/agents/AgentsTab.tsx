@@ -87,6 +87,7 @@ export default function AgentsTab({ onError }: { onError: (m: string) => void })
         </ul>
         <div
           role="progressbar"
+          aria-label={t("agents.header", { installed: installedCount(views), total: views.length })}
           aria-valuemin={0}
           aria-valuemax={views.length}
           aria-valuenow={installedCount(views)}

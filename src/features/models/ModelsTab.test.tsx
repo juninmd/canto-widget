@@ -5,12 +5,13 @@ import type { ModelRow, ModelsView } from "../../lib/api";
 import { modelRow } from "./modelsTestRow";
 
 let view: ModelsView;
+let failFirst = 0;
 const calls: { cmd: string; args: Record<string, unknown> }[] = [];
 
 mock.module("@tauri-apps/api/core", () => ({
   invoke: (cmd: string, args: Record<string, unknown>) => {
     calls.push({ cmd, args });
-    if (cmd === "models_get") return Promise.resolve(view);
+    if (cmd === "models_get") return failFirst-- > 0 ? Promise.reject("sem rede") : Promise.resolve(view);
     if (cmd === "open_link") return Promise.reject("sem navegador padrão");
     if (cmd === "models_alerts_set") return Promise.resolve(args.enabled);
     return Promise.resolve(null);
@@ -232,4 +233,13 @@ test("the search narrows the ranking by model or creator and the table lists the
   expect(screen.getByRole("table").textContent).toContain("Lumen Labs");
   fireEvent.click(screen.getByRole("button", { name: "limpar filtros" }));
   expect(screen.getByRole("table").querySelectorAll("tbody tr")).toHaveLength(4);
+});
+
+test("a first load that fails shows the shared banner with a retry that loads the list", async () => {
+  failFirst = 1;
+  await show();
+  expect(screen.getByText("sem rede")).toBeTruthy();
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "tentar de novo" })));
+  await act(async () => {});
+  expect(screen.getAllByText("Aurora 4").length > 0).toBe(true);
 });
