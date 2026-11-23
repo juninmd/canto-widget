@@ -146,7 +146,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                         saveLayout(l);
                         setLayout(l);
                       }}
-                      className={`canto-hit min-h-[22px] rounded-full px-2.5 text-[11px] ${layout === l ? "bg-ink font-semibold text-fg shadow-xs" : "text-muted hover:text-fg"}`}
+                      className={`canto-hit min-h-[24px] rounded-full px-2.5 text-[11px] ${layout === l ? "bg-ink font-semibold text-fg shadow-xs" : "text-muted hover:text-fg"}`}
                     >
                       {t(`forge.layout.${l}`)}
                     </button>
