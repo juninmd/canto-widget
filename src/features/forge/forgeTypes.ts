@@ -13,6 +13,11 @@ export type ForgeItem = {
   author: string;
   /** Can't merge until conflicts are resolved; absent on boards cached before it existed. */
   conflict?: boolean;
+  /** Up to three label names and the start of the description as one line; absent on boards cached before they existed. */
+  labels?: string[];
+  snippet?: string;
+  /** The author's picture on the forge's own image host, to trade for a `data:` image; empty or absent otherwise. */
+  author_avatar?: string;
 };
 /**
  * `total` is the forge's count; `items` only carries the pages loaded so far.

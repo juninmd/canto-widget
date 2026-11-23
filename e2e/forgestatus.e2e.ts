@@ -55,7 +55,7 @@ test("GitHub: summary tiles filter the board, the sort sits in a menu, and row a
   await strip.getByRole("button", { name: /CI falhou/ }).click();
   await expect(strip.getByRole("button", { name: /CI falhou/ })).toHaveAttribute("aria-pressed", "true");
   await expect(page.getByRole("region")).toHaveCount(1);
-  await expect(page.getByText("Extrair o cliente de status")).toBeVisible();
+  await expect(page.getByRole("region").getByText("Extrair o cliente de status")).toBeVisible();
   await expect(page.getByText("Guia de contribuição")).toHaveCount(0);
   await strip.getByRole("button", { name: /CI falhou/ }).click();
   await expect(page.getByRole("region")).toHaveCount(5);

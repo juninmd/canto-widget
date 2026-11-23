@@ -7,16 +7,29 @@ import { loadWatched, toggleWatch } from "./ciWatch";
 import { checkKey } from "./forgeChecks";
 import { overdue, waitHours, waitLabel, type SnoozeKind } from "./reviewRadar";
 import { t } from "../../i18n";
-import { CiPill, Pill } from "./ForgePills";
+import { CiPill, LabelChip, Pill } from "./ForgePills";
 import { IssueIcon, PullIcon } from "../../components/Icons";
 
 const STALE_DAYS = 7;
+// The icon's ring says the PR's state at a glance; the pills below spell it out, so color is never the only signal.
+const RING = { bad: "bg-danger/15 text-danger", info: "bg-cat-meet/15 text-cat-meet", ok: "bg-ok/15 text-ok", none: "" };
 const ACTION = "canto-hit rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active";
 
-type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; onSnooze?: (kind: SnoozeKind) => void };
+type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; grid?: boolean; avatar?: string; onSnooze?: (kind: SnoozeKind) => void };
+
+function DiffBar({ add, del }: { add: number; del: number }) {
+  const total = add + del;
+  if (total === 0) return null;
+  return (
+    <span aria-hidden="true" className="ml-1 inline-flex h-1 w-8 overflow-hidden rounded-full bg-edge align-middle">
+      <i className="bg-ok" style={{ width: `${(add / total) * 100}%` }} />
+      <i className="flex-1 bg-danger" />
+    </span>
+  );
+}
 
 /** One PR/MR/issue. The secondary actions appear on hover or focus-within; they stay in the tab order while hidden. */
-export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onPeek, onSnooze }: Props) {
+export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onPeek, onSnooze, grid = false, avatar }: Props) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? waitHours(item) : null;
@@ -24,6 +37,8 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
   const idle = !waiting && item.is_pr ? daysSince(item.updated_at) : null;
   const badge = ci ?? (checks !== "loading" ? checks : null);
   const [watching, setWatching] = useState(() => checkKey(item.repo, item.number) in loadWatched());
+  const ring = !item.is_pr ? "none" : conflict || badge === "failure" ? "bad" : badge === "running" ? "info" : badge === "success" ? "ok" : "none";
+  const urgent = item.is_pr && (conflict || badge === "failure" || (wait !== null && overdue(wait)) || (idle !== null && idle >= STALE_DAYS));
   const canWatch = item.is_pr && forge === "github" && (ci === "running" || watching);
   const canCheck = item.is_pr && !ci && checks === null;
 
@@ -45,13 +60,26 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
           void api.openLink(item.url);
         }}
         title={item.url}
-        className={`flex w-full gap-2.5 rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
+        className={`relative flex w-full overflow-hidden rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${grid ? "h-full flex-col gap-1.5" : "gap-2.5"} ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
       >
-        <span className={`mt-0.5 shrink-0 ${item.draft ? "text-faint" : "text-accent-text"}`} aria-label={kind} role="img">
+        {urgent && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-danger/80" />}
+        <span
+          className={`${grid ? "" : "mt-0.5"} grid size-5 shrink-0 place-items-center rounded-full ${RING[ring]} ${ring === "none" ? (item.draft ? "text-faint" : "text-accent-text") : ""}`}
+          aria-label={kind}
+          role="img"
+        >
           {item.is_pr ? <PullIcon /> : <IssueIcon />}
         </span>
         <span className="min-w-0 flex-1">
           <span className="line-clamp-2 text-sm text-fg">{item.title}</span>
+          {grid && item.snippet && <span className="mt-1 line-clamp-3 block text-[11.5px] leading-snug text-muted">{item.snippet}</span>}
+          {grid && !!item.labels?.length && (
+            <span className="mt-1.5 flex flex-wrap gap-1">
+              {item.labels.map((name) => (
+                <LabelChip key={name} name={name} />
+              ))}
+            </span>
+          )}
           <span className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] text-muted">
             {conflict && (
               <Pill tone="bad" title={t("forge.item.conflictTitle")}>
@@ -79,10 +107,16 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
             {item.is_pr && review && (
               <span title={t("forge.item.diffTitle")} className="shrink-0 font-mono text-[10.5px] tabular-nums">
                 <span className="text-ok">+{review.additions}</span> <span className="text-danger">−{review.deletions}</span>
+                <DiffBar add={review.additions} del={review.deletions} />
               </span>
             )}
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
-            {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
+            {item.author && item.author !== login && (
+              <span className="inline-flex min-w-0 shrink-0 items-center gap-1 text-faint">
+                {avatar && <img src={avatar} alt="" className="size-4 rounded-full" />}
+                <span className="truncate">@{item.author}</span>
+              </span>
+            )}
             {wait !== null && (
               <Pill tone={overdue(wait) ? "bad" : "neutral"} title={overdue(wait) ? t("forge.item.overdueTitle") : undefined}>
                 {t("forge.item.waiting", { wait: waitLabel(wait) })}
@@ -96,9 +130,11 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
             <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>
           </span>
         </span>
-        <span aria-hidden="true" title={t("forge.openExternal")} className="shrink-0 self-start text-[11px] text-faint">
-          ↗
-        </span>
+        {!grid && (
+          <span aria-hidden="true" title={t("forge.openExternal")} className="shrink-0 self-start text-[11px] text-faint">
+            ↗
+          </span>
+        )}
       </button>
       {(onSnooze || canCheck || onPeek || canWatch) && (
         <div className="absolute right-7 top-1.5 flex items-center gap-0.5 whitespace-nowrap rounded-lg border border-edge bg-panel p-0.5 opacity-0 shadow-raised transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none">

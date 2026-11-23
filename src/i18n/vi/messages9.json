@@ -1267,5 +1267,13 @@
   "alert.invite.decline": "decline",
   "alert.invited": "invited you",
   "alert.invitedBy": "invite from {name}",
-  "alert.outcome.invite": "invite answered"
+  "alert.outcome.invite": "invite answered",
+  "forge.layout.label": "display mode",
+  "forge.layout.list": "List",
+  "forge.layout.grid": "Grid",
+  "forge.next.title": "Start here",
+  "forge.next.mine": "your PR cannot move on",
+  "forge.next.review": "waiting for you for {wait}",
+  "forge.next.open": "Open",
+  "forge.next.openOf": "Open {title}"
 }

@@ -1,6 +1,14 @@
 import type { uiForgeStatus as source } from "../pt-BR/uiForgeStatus";
 
 export const uiForgeStatus: Record<keyof typeof source, string> = {
+  "forge.layout.label": "display mode",
+  "forge.layout.list": "List",
+  "forge.layout.grid": "Grid",
+  "forge.next.title": "Start here",
+  "forge.next.mine": "your PR cannot move on",
+  "forge.next.review": "waiting for you for {wait}",
+  "forge.next.open": "Open",
+  "forge.next.openOf": "Open {title}",
   "uiForge.more": "more actions",
   "uiForge.sortButton": "sort by: {sort}",
   "uiForge.sortMenu": "sorting",

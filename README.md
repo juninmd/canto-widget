@@ -142,7 +142,7 @@ sensitive.
 ### 🐙 Your GitHub at a glance
 
 **Review requested from me**, assigned to me, PRs and issues I opened, with a PR or issue icon and who opened
-it. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out, and each PR carries a small
+it. A **start here** card points at your own PR that cannot move on or the oldest review you owe, and a **List / Grid** switch turns the rows into cards with the start of the description and the labels. Drafts, PRs **waiting for your review** and PRs **stalled** for a week stand out (a red edge, and a ring on the icon that follows CI and conflicts), and each PR carries a small
 **CI badge** (passed, failed, running or no CI) from its head commit's checks. A **PRs from other people** section
 lists the PRs someone else opened in your repositories — even the ones nobody asked you to review — and a new one
 rings a pop-up and an OS notification (on by default, with its switch in Settings). When someone **requests your
@@ -563,6 +563,10 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 <tr>
 <td><img src="docs/prints/app/100-github-conflito.png" alt="GitHub tab where the PR with a merge conflict gets a red border and a conflict badge next to its CI"></td>
 <td><img src="docs/prints/app/101-gitlab-conflito.png" alt="GitLab tab where the MR with a merge conflict gets the same red border and conflict badge"></td>
+</tr>
+<tr><th colspan="2">GitHub grid view, with the start of each description and its labels</th></tr>
+<tr>
+<td colspan="2"><img src="docs/prints/app/166-github-grade.png" alt="GitHub tab in grid mode: a start-here card, two columns of PR cards with a description excerpt, labels, CI state and a diff bar"></td>
 </tr>
 </table>
 

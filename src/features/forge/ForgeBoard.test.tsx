@@ -276,7 +276,7 @@ test("precisa de mim narrows the board to overdue reviews and my stalled PRs, an
   fireEvent.click(chip);
   expect(chip.getAttribute("aria-pressed")).toBe("true");
   expect(screen.getByText("Pedido antigo")).toBeTruthy();
-  expect(screen.getByText("Meu PR vermelho")).toBeTruthy();
+  expect(within(screen.getByRole("region", { name: "PRs que eu abri" })).getByText("Meu PR vermelho")).toBeTruthy();
   expect(screen.getByText("PR de terceiros")).toBeTruthy();
   expect(screen.queryByText("Pedido novo")).toBeNull();
   expect(screen.queryByText("Meu PR verde")).toBeNull();
@@ -313,4 +313,44 @@ test("GitLab rows have no espiar: its read-only token has nothing to write with"
   render(<GitlabTab onError={() => {}} />);
   for (let i = 0; i < 6; i++) await act(async () => {});
   expect(screen.queryByRole("button", { name: /^espiar/ })).toBeNull();
+});
+
+test("the grid layout shows the description snippet and labels, keeps the choice and goes back to rows", async () => {
+  const rich = pr(4, "Meu PR vermelho", { snippet: "Troca o cache de checks por uma versão incremental.", labels: ["performance", "forge"] });
+  await mountGithub({ ...board, my_prs: { total: 1, items: [rich] } });
+  expect(screen.queryByText(/cache de checks/)).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Grade" }));
+  expect(screen.getByText("Troca o cache de checks por uma versão incremental.")).toBeTruthy();
+  expect(screen.getByText("performance")).toBeTruthy();
+  expect(localStorage.getItem("canto.forge.layout")).toBe("grid");
+  fireEvent.click(screen.getByRole("button", { name: "Lista" }));
+  expect(screen.queryByText("performance")).toBeNull();
+  expect(localStorage.getItem("canto.forge.layout")).toBe("list");
+});
+
+test("the start-here card names my failing PR and opens its peek", async () => {
+  await mountGithub();
+  const card = screen.getByText("Comece por aqui").parentElement as HTMLElement;
+  expect(within(card).getByText("Meu PR vermelho")).toBeTruthy();
+  expect(within(card).getByText("seu PR não consegue avançar")).toBeTruthy();
+});
+
+test("a failing PR gets the red urgency stripe and its icon ring says why", async () => {
+  await mountGithub();
+  const row = within(screen.getByRole("region", { name: "PRs que eu abri" })).getByText("Meu PR vermelho").closest("li") as HTMLElement;
+  expect(row.querySelector("span.bg-danger\\/80")).toBeTruthy();
+  expect(within(row).getByRole("img", { name: "PR" }).className).toContain("bg-danger/15");
+});
+
+test("the author's real picture replaces nothing but sits beside @login once Rust embeds it", async () => {
+  const url = "https://avatars.githubusercontent.com/u/1?v=4";
+  const photo = "data:image/png;base64,iVBORw0KGgo=";
+  responses.repo_avatars = () => Promise.resolve({ [url]: photo });
+  await mountGithub({ ...board, review_requested: { total: 1, items: [pr(1, "Revisar o cofre", { author_avatar: url })] } });
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 200));
+  });
+  const row = screen.getByText("Revisar o cofre").closest("li") as HTMLElement;
+  expect(within(row).getByText("@ana")).toBeTruthy();
+  expect(row.querySelector(`img[src="${photo}"]`)).toBeTruthy();
 });

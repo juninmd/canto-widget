@@ -136,3 +136,11 @@ fn repo_paths_from_the_webview_only_accept_plain_segments() {
     assert!(!valid_repo_path("octo", 2));
     assert!(!valid_repo_path("octo//x", 20));
 }
+
+#[test]
+fn a_long_description_is_cut_on_a_character_boundary_with_an_ellipsis() {
+    let text = "ação".repeat(100);
+    let s = snippet(Some(&text));
+    assert!(s.ends_with('…') && s.chars().count() == 201, "got {} chars", s.chars().count());
+    assert_eq!(snippet(None), "");
+}

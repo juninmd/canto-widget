@@ -48,3 +48,18 @@ export function CiPill({ status }: { status: ChecksStatus }) {
     </span>
   );
 }
+
+const hueOf = (name: string) => [...name].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+
+/** A label as the forge names it; the hue comes from the name so the same label always looks the same. */
+export function LabelChip({ name }: { name: string }) {
+  const h = hueOf(name);
+  return (
+    <span
+      className="max-w-full truncate rounded-md px-1.5 text-[10px] font-medium leading-4"
+      style={{ backgroundColor: `hsl(${h} 70% 55% / .16)`, color: `color-mix(in srgb, hsl(${h} 70% 55%) 65%, var(--color-fg))` }}
+    >
+      {name}
+    </span>
+  );
+}

@@ -52,6 +52,16 @@ struct RawItem {
     pull_request: Option<serde_json::Value>,
     #[serde(default)]
     user: Option<GithubUser>,
+    #[serde(default)]
+    labels: Vec<RawLabel>,
+    #[serde(default)]
+    body: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct RawLabel {
+    #[serde(default)]
+    name: String,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
@@ -234,8 +244,16 @@ fn item(b: RawItem) -> Option<ForgeItem> {
         comments: b.comments,
         is_pr: b.pull_request.is_some(),
         draft: b.draft.unwrap_or(false),
+        author_avatar: b
+            .user
+            .as_ref()
+            .and_then(|u| u.avatar_url.clone())
+            .filter(|url| crate::repos::avatars::allowed("github", "", url))
+            .unwrap_or_default(),
         author: b.user.map(|u| u.login).unwrap_or_default(),
         conflict: false,
+        labels: crate::forge::first_labels(b.labels.into_iter().map(|l| l.name)),
+        snippet: crate::forge::snippet(b.body.as_deref()),
     })
 }
 

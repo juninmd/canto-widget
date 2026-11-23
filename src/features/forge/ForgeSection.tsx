@@ -6,6 +6,7 @@ import { loadSnoozes, oldestFirst, snoozeUntil } from "./reviewRadar";
 import { t } from "../../i18n";
 import { loadSeen, markSeen, newComments, rememberItems } from "./forgeSeen";
 import ForgeRow from "./ForgeRow";
+import { useRepoAvatars } from "./useRepoAvatars";
 
 type Props = {
   title: string;
@@ -26,9 +27,11 @@ type Props = {
   needs?: (item: ForgeItem) => boolean;
   /** Opens the PR in the peek panel (GitHub only: GitLab's read-only token has nothing to write with). */
   onPeek?: (item: ForgeItem) => void;
+  /** Cards in two columns with the start of the description and the labels, instead of rows. */
+  grid?: boolean;
 };
 
-export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, reviews, hideDrafts, needs, onPeek }: Props) {
+export default function ForgeSection({ title, section, forge, list, login, filtered, loadingMore, onMore, ci, conflicts, reviews, hideDrafts, needs, onPeek, grid }: Props) {
   const rest = list.total - list.items.length;
   const radar = section === "review_requested";
   const [snoozed, setSnoozed] = useState(loadSnoozes);
@@ -40,6 +43,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
   const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
   const kept = needs ? shown.filter(needs) : shown;
   const rows = hideDrafts ? kept.filter((it) => !it.draft) : kept;
+  const photo = useRepoAvatars(forge, rows.map((it) => it.author_avatar ?? "").filter(Boolean));
   const onlyDrafts = rows.length === 0 && shown.length > 0;
   return (
     <section aria-label={title}>
@@ -59,11 +63,13 @@ export default function ForgeSection({ title, section, forge, list, login, filte
       {list.items.length === 0 || onlyDrafts ? (
         <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{filtered || onlyDrafts ? t("forge.emptyFiltered") : t("forge.empty")}</p>
       ) : (
-        <ul className="space-y-1.5">
+        <ul className={grid ? "grid grid-cols-2 gap-1.5 max-[420px]:grid-cols-1" : "space-y-1.5"}>
           {rows.map((it) => (
             <ForgeRow
               key={it.url}
               item={it}
+              grid={grid}
+              avatar={it.author_avatar ? photo(it.author_avatar) : undefined}
               login={login}
               forge={forge}
               waiting={radar}
