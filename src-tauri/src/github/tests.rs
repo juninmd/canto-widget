@@ -132,3 +132,16 @@ fn an_item_without_labels_or_body_has_neither() {
     let it = &convert(search_response(1, vec![raw(9, "https://github.com/octo/canto/issues/9", "", false)])).items[0];
     assert!(it.labels.is_empty() && it.snippet.is_empty());
 }
+
+#[test]
+fn the_author_picture_is_kept_only_from_githubs_own_image_host() {
+    let mut v = raw(9, "https://github.com/octo/canto/pull/9", "", true);
+    v["user"] =
+        serde_json::json!({ "login": "octocat", "avatar_url": "https://avatars.githubusercontent.com/u/1?v=4" });
+    assert_eq!(
+        convert(search_response(1, vec![v.clone()])).items[0].author_avatar,
+        "https://avatars.githubusercontent.com/u/1?v=4"
+    );
+    v["user"]["avatar_url"] = serde_json::json!("https://evil.example/u/1.png");
+    assert_eq!(convert(search_response(1, vec![v])).items[0].author_avatar, "");
+}

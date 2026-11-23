@@ -6,6 +6,7 @@ import { loadSnoozes, oldestFirst, snoozeUntil } from "./reviewRadar";
 import { t } from "../../i18n";
 import { loadSeen, markSeen, newComments, rememberItems } from "./forgeSeen";
 import ForgeRow from "./ForgeRow";
+import { useRepoAvatars } from "./useRepoAvatars";
 
 type Props = {
   title: string;
@@ -42,6 +43,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
   const shown = radar && !showSnoozed ? ordered.filter((i) => !hidden.includes(i)) : ordered;
   const kept = needs ? shown.filter(needs) : shown;
   const rows = hideDrafts ? kept.filter((it) => !it.draft) : kept;
+  const photo = useRepoAvatars(forge, rows.map((it) => it.author_avatar ?? "").filter(Boolean));
   const onlyDrafts = rows.length === 0 && shown.length > 0;
   return (
     <section aria-label={title}>
@@ -67,6 +69,7 @@ export default function ForgeSection({ title, section, forge, list, login, filte
               key={it.url}
               item={it}
               grid={grid}
+              avatar={it.author_avatar ? photo(it.author_avatar) : undefined}
               login={login}
               forge={forge}
               waiting={radar}

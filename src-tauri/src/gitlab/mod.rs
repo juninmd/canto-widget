@@ -211,6 +211,12 @@ pub(crate) fn item(base: &str, is_mr: bool, b: RawItem) -> Option<ForgeItem> {
         comments: b.user_notes_count,
         is_pr: is_mr,
         draft: b.draft || b.work_in_progress,
+        author_avatar: b
+            .author
+            .as_ref()
+            .and_then(|u| u.avatar_url.clone())
+            .filter(|url| crate::repos::avatars::allowed("gitlab", base, url))
+            .unwrap_or_default(),
         author: b.author.map(|u| u.username).unwrap_or_default(),
         conflict: is_mr && (b.has_conflicts || b.detailed_merge_status == "conflict"),
         labels: crate::forge::first_labels(b.labels),

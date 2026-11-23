@@ -31,6 +31,9 @@ pub struct ForgeItem {
     pub labels: Vec<String>,
     /// The start of the description as one line of plain text (see `snippet`); empty when there is none.
     pub snippet: String,
+    /// The author's picture URL when it comes from the forge's own image host (see `repos::avatars::allowed`), else
+    /// empty; the UI trades it for a `data:` image through `repo_avatars`.
+    pub author_avatar: String,
 }
 
 pub(crate) const MAX_LABELS: usize = 3;
@@ -222,6 +225,7 @@ pub(crate) fn item(number: u64, created: &str, updated: &str, comments: u64) -> 
         conflict: false,
         labels: Vec::new(),
         snippet: String::new(),
+        author_avatar: String::new(),
     }
 }
 

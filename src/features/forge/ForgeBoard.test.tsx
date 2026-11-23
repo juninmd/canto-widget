@@ -341,3 +341,16 @@ test("a failing PR gets the red urgency stripe and its icon ring says why", asyn
   expect(row.querySelector("span.bg-danger\\/80")).toBeTruthy();
   expect(within(row).getByRole("img", { name: "PR" }).className).toContain("bg-danger/15");
 });
+
+test("the author's real picture replaces nothing but sits beside @login once Rust embeds it", async () => {
+  const url = "https://avatars.githubusercontent.com/u/1?v=4";
+  const photo = "data:image/png;base64,iVBORw0KGgo=";
+  responses.repo_avatars = () => Promise.resolve({ [url]: photo });
+  await mountGithub({ ...board, review_requested: { total: 1, items: [pr(1, "Revisar o cofre", { author_avatar: url })] } });
+  await act(async () => {
+    await new Promise((r) => setTimeout(r, 200));
+  });
+  const row = screen.getByText("Revisar o cofre").closest("li") as HTMLElement;
+  expect(within(row).getByText("@ana")).toBeTruthy();
+  expect(row.querySelector(`img[src="${photo}"]`)).toBeTruthy();
+});

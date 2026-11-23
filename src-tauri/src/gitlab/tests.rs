@@ -159,3 +159,14 @@ fn an_mr_carries_its_labels_and_description_snippet() {
     assert_eq!(it.labels, ["ux", "backend"]);
     assert_eq!(it.snippet, "Moves the cache");
 }
+
+#[test]
+fn an_mr_author_picture_must_come_from_the_instance_not_gravatar() {
+    let mk = |avatar: &str| {
+        let mut v = serde_json::json!({ "iid": 4, "title": "t", "web_url": "https://gitlab.acme.io/g/p/-/merge_requests/4", "references": { "full": "g/p!4" } });
+        v["author"] = serde_json::json!({ "username": "ana", "avatar_url": avatar });
+        item(BASE, true, serde_json::from_value(v).unwrap()).unwrap().author_avatar
+    };
+    assert_eq!(mk("https://gitlab.acme.io/uploads/a.png"), "https://gitlab.acme.io/uploads/a.png");
+    assert_eq!(mk("https://secure.gravatar.com/avatar/1"), "");
+}

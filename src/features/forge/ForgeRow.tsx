@@ -15,7 +15,7 @@ const STALE_DAYS = 7;
 const RING = { bad: "bg-danger/15 text-danger", info: "bg-cat-meet/15 text-cat-meet", ok: "bg-ok/15 text-ok", none: "" };
 const ACTION = "canto-hit rounded-md px-1.5 text-[11px] text-muted hover:bg-hover hover:text-fg active:bg-active";
 
-type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; grid?: boolean; onSnooze?: (kind: SnoozeKind) => void };
+type Props = { item: ForgeItem; login: string; forge: Forge; waiting: boolean; ci?: ChecksStatus; conflict?: boolean; review?: ReviewInfo; news?: number; onOpen?: () => void; onPeek?: () => void; grid?: boolean; avatar?: string; onSnooze?: (kind: SnoozeKind) => void };
 
 function DiffBar({ add, del }: { add: number; del: number }) {
   const total = add + del;
@@ -29,7 +29,7 @@ function DiffBar({ add, del }: { add: number; del: number }) {
 }
 
 /** One PR/MR/issue. The secondary actions appear on hover or focus-within; they stay in the tab order while hidden. */
-export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onPeek, onSnooze, grid = false }: Props) {
+export default function ForgeRow({ item, login, forge, waiting, ci, conflict, review, news = 0, onOpen, onPeek, onSnooze, grid = false, avatar }: Props) {
   const kind = item.is_pr ? (item.draft ? t("forge.item.draftPr") : t("forge.item.pr")) : t("forge.item.issue");
   const [checks, setChecks] = useState<ChecksStatus | "loading" | null>(null);
   const wait = waiting && item.is_pr ? waitHours(item) : null;
@@ -111,7 +111,12 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
               </span>
             )}
             {item.draft && <span className="shrink-0 text-faint">{t("forge.item.draft")}</span>}
-            {item.author && item.author !== login && <span className="shrink-0 truncate text-faint">@{item.author}</span>}
+            {item.author && item.author !== login && (
+              <span className="inline-flex min-w-0 shrink-0 items-center gap-1 text-faint">
+                {avatar && <img src={avatar} alt="" className="size-4 rounded-full" />}
+                <span className="truncate">@{item.author}</span>
+              </span>
+            )}
             {wait !== null && (
               <Pill tone={overdue(wait) ? "bad" : "neutral"} title={overdue(wait) ? t("forge.item.overdueTitle") : undefined}>
                 {t("forge.item.waiting", { wait: waitLabel(wait) })}
