@@ -81,7 +81,7 @@ test("free gaps are rows of the line, and past meetings fold away", async () => 
   const line = screen.getByRole("list", { name: "linha do dia" });
   expect(line.textContent).toContain("livre · 1 h (10:00–11:00)");
   expect(line.textContent).not.toContain("Daily");
-  fireEvent.click(screen.getByRole("button", { name: /1 já passaram/ }));
+  fireEvent.click(screen.getByRole("button", { name: /Já passaram: 1/ }));
   expect(screen.getByRole("list", { name: "linha do dia" }).textContent).toContain("Daily");
 });
 

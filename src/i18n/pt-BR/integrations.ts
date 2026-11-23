@@ -84,7 +84,7 @@ export const integrations = {
   "agenda.hero.doneBody": "nada mais na agenda hoje",
   "agenda.hero.progress": "andamento da reunião",
   "agenda.rail.label": "linha do dia",
-  "agenda.rail.past": "{n} já passaram",
+  "agenda.rail.past": "Já passaram: {n}",
   "agenda.rail.free": "livre · {duration} ({start}–{end})",
   "agenda.rail.task": "tarefa",
   "agenda.rail.bookIn": "encaixar {title} às {time}",

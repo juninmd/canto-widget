@@ -20,6 +20,7 @@ const item = (repo: string, number: number, title: string, hours: number, o: Par
 });
 
 const list = (items: ForgeItem[], total = items.length): ForgeList => ({ total, items, fetched_at: NOW.getTime() - 120_000 });
+const empty = list([]);
 
 /** Fictitious repositories under "acme"; the oldest request is the one the review radar paints red. */
 export const GITHUB: ForgeLists = {

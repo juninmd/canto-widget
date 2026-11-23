@@ -4,6 +4,7 @@ import { hour, people, whenLabel, status as agendaStatus, tally } from "../agend
 import { kindOf, levelLabel, prLabel, senderName, senderProfile, toneOf } from "./alerts";
 import { block, useLexer, type Render } from "../../lib/markdown";
 import { timeAgo } from "../../lib/time";
+import { clockOrDay } from "../../lib/clockLabel";
 import { t } from "../../i18n";
 import AlertGuests from "./AlertGuests";
 import AlertJobs from "./AlertJobs";
@@ -209,7 +210,7 @@ export default function AlertDetail({ event, onOpenNotes }: { event: AgendaItem;
         {kind === "status" && (
           <>
             <Chip tone={tone.text}>{levelLabel(event.tag)}</Chip>
-            {event.start && <Chip>{t("alert.since", { time: hour(event) })}</Chip>}
+            {event.start && <Chip>{t("alert.since", { time: clockOrDay(Date.parse(event.start)) })}</Chip>}
             {event.start && <Chip>{timeAgo(event.start)}</Chip>}
           </>
         )}

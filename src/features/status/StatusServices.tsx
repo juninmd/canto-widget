@@ -104,7 +104,7 @@ export default function StatusServices({ toolbar }: { toolbar?: HTMLElement | nu
           <EmptyRetry icon={<PulseIcon />} message={t("uiStatus.none")} busy={loading} onRetry={() => void load(true)} />
         ) : (
           <>
-            <StatusOverview counts={counts} bad={bad} ok={results.length - bad} filter={filter} onFilter={setFilter} />
+            <StatusOverview counts={counts} bad={bad} ok={counts.ok} filter={filter} onFilter={setFilter} />
             <SearchField value={query} onChange={setQuery} label={t("status.find.label")} placeholder={t("status.find.placeholder")} />
             <ResultsMeta shown={shown.length} total={byLevel.length} filtering={needle !== ""} onClear={() => setQuery("")} />
             {shown.length === 0 && <p className="rounded-xl border border-dashed border-edge px-3 py-3 text-center text-[11px] text-faint">{needle ? t("browse.noResultsFor", { query: query.trim() }) : t("uiStatus.filter.empty")}</p>}
