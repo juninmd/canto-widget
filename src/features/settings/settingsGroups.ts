@@ -7,12 +7,12 @@ export type SectionId =
   | "reminders" | "digest" | "dnd" | "focusRules" | "fullscreen" | "reviewAlerts" | "myPrAlerts"
   | "activity" | "focus" | "security"
   | "google" | "clipboard" | "backup" | "sync"
-  | "mcp" | "window" | "strip" | "barAgenda" | "autostart" | "shortcuts" | "update";
+  | "mcp" | "window" | "sidebar" | "strip" | "barAgenda" | "autostart" | "shortcuts" | "update";
 
 type Group = { id: GroupId; sections: SectionId[]; sensitive: SectionId[] };
 
 /** Window, tray, global shortcut, focused-app and updater settings; the phone has no such thing (the store updates the app). */
-export const DESKTOP_ONLY_SECTIONS: readonly SectionId[] = ["fullscreen", "activity", "mcp", "window", "strip", "barAgenda", "autostart", "shortcuts", "update", "sync"];
+export const DESKTOP_ONLY_SECTIONS: readonly SectionId[] = ["fullscreen", "activity", "mcp", "window", "sidebar", "strip", "barAgenda", "autostart", "shortcuts", "update", "sync"];
 
 /** What a phone keeps of each group; a group left with nothing goes away. */
 export function forPlatform(groups: Group[], mobile: boolean): Group[] {
@@ -27,7 +27,7 @@ const DESKTOP_GROUPS: Group[] = [
   { id: "notifications", sections: ["reminders", "digest", "dnd", "focusRules", "fullscreen", "reviewAlerts", "myPrAlerts"], sensitive: [] },
   { id: "privacy", sections: ["activity", "focus"], sensitive: ["security"] },
   { id: "data", sections: ["google", "clipboard"], sensitive: ["backup", "sync"] },
-  { id: "app", sections: ["mcp", "window", "strip", "barAgenda", "autostart", "shortcuts", "update"], sensitive: [] },
+  { id: "app", sections: ["mcp", "window", "sidebar", "strip", "barAgenda", "autostart", "shortcuts", "update"], sensitive: [] },
 ];
 
 export const GROUPS = forPlatform(DESKTOP_GROUPS, IS_MOBILE);
@@ -55,6 +55,7 @@ const KEYWORDS: Record<SectionId, string> = {
   mcp: "mcp servidor agente agentes claude code codex opencode cursor gemini copilot windsurf token ia ai integração integration server",
   window: "janela sempre no topo posição window top position",
   strip: "mini-dashboard mini painel pílula barra borda cpu clima evento próximo topo base mini dashboard pill edge weather event top bottom gpu disco rede bateria tarefas mercado relógio endpoints opacidade ordem disk network battery tasks market clock opacity order",
+  sidebar: "barra lateral esconde sozinha auto-hide esquerda direita lado monitor tela sidebar left right edge screen",
   barAgenda: "próxima agenda reunião evento barra de tarefas menu bar bandeja tray taskbar next event meeting calendar linux mac windows",
   autostart: "iniciar início automático ligar computador bandeja startup autostart tray",
   shortcuts: "atalhos teclado tecla shortcuts keyboard keys",

@@ -6,55 +6,66 @@ const EDGE_PX: f64 = 2.0;
 
 #[test]
 fn docked_is_flush_right_and_full_height() {
-    assert_eq!(docked(AREA, 420.0), (1500.0, 0.0, 420.0, 1040.0));
-    assert_eq!(docked(SECOND, 420.0), (2780.0, 40.0, 420.0, 1000.0));
+    assert_eq!(docked(AREA, 420.0, Side::Right), (1500.0, 0.0, 420.0, 1040.0));
+    assert_eq!(docked(SECOND, 420.0, Side::Right), (2780.0, 40.0, 420.0, 1000.0));
 }
 
 #[test]
 fn docked_width_never_exceeds_the_screen() {
-    assert_eq!(docked(AREA, 5000.0), (0.0, 0.0, 1920.0, 1040.0));
+    assert_eq!(docked(AREA, 5000.0, Side::Right), (0.0, 0.0, 1920.0, 1040.0));
 }
 
 #[test]
 fn tucked_leaves_only_the_strip_inside_the_work_area() {
-    assert_eq!(tucked_x(AREA, EDGE_PX), 1918.0);
-    assert_eq!(tucked_x(SECOND, EDGE_PX), 3198.0);
+    assert_eq!(tucked_x(AREA, EDGE_PX, 420.0, Side::Right), 1918.0);
+    assert_eq!(tucked_x(SECOND, EDGE_PX, 420.0, Side::Right), 3198.0);
 }
 
 #[test]
 fn leaving_hides_only_after_the_delay() {
-    let win = docked(AREA, 420.0);
+    let win = docked(AREA, 420.0, Side::Right);
     let away = (100.0, 500.0);
-    assert_eq!(decide(false, away, AREA, win, EDGE_PX, Duration::ZERO), Step::Stay);
-    assert_eq!(decide(false, away, AREA, win, EDGE_PX, LEAVE_DELAY - Duration::from_millis(1)), Step::Stay);
-    assert_eq!(decide(false, away, AREA, win, EDGE_PX, LEAVE_DELAY), Step::Tuck);
+    assert_eq!(decide(false, away, AREA, win, EDGE_PX, Side::Right, Duration::ZERO), Step::Stay);
+    assert_eq!(
+        decide(false, away, AREA, win, EDGE_PX, Side::Right, LEAVE_DELAY - Duration::from_millis(1)),
+        Step::Stay
+    );
+    assert_eq!(decide(false, away, AREA, win, EDGE_PX, Side::Right, LEAVE_DELAY), Step::Tuck);
 }
 
 #[test]
 fn the_mouse_over_the_window_never_hides_it() {
-    let win = docked(AREA, 420.0);
-    assert_eq!(decide(false, (1700.0, 300.0), AREA, win, EDGE_PX, Duration::from_secs(60)), Step::Stay);
+    let win = docked(AREA, 420.0, Side::Right);
+    assert_eq!(decide(false, (1700.0, 300.0), AREA, win, EDGE_PX, Side::Right, Duration::from_secs(60)), Step::Stay);
 }
 
 #[test]
 fn a_dragged_window_counts_where_it_is_now() {
     let dragged = (600.0, 100.0, 420.0, 1040.0);
-    assert_eq!(decide(false, (700.0, 300.0), AREA, dragged, EDGE_PX, Duration::from_secs(60)), Step::Stay);
+    assert_eq!(decide(false, (700.0, 300.0), AREA, dragged, EDGE_PX, Side::Right, Duration::from_secs(60)), Step::Stay);
 }
 
 #[test]
 fn touching_the_right_edge_reveals_it() {
     let win = (1918.0, 0.0, 420.0, 1040.0);
-    assert_eq!(decide(true, (1919.0, 500.0), AREA, win, EDGE_PX, Duration::ZERO), Step::Reveal);
-    assert_eq!(decide(true, (1918.0, 0.0), AREA, win, EDGE_PX, Duration::ZERO), Step::Reveal);
+    assert_eq!(decide(true, (1919.0, 500.0), AREA, win, EDGE_PX, Side::Right, Duration::ZERO), Step::Reveal);
+    assert_eq!(decide(true, (1918.0, 0.0), AREA, win, EDGE_PX, Side::Right, Duration::ZERO), Step::Reveal);
 }
 
 #[test]
 fn the_middle_of_the_screen_or_another_monitor_does_not_reveal_it() {
     let win = (1918.0, 0.0, 420.0, 1040.0);
-    assert_eq!(decide(true, (1000.0, 500.0), AREA, win, EDGE_PX, Duration::ZERO), Step::Stay);
-    assert_eq!(decide(true, (1919.0, 1200.0), AREA, win, EDGE_PX, Duration::ZERO), Step::Stay, "below the work area");
-    assert_eq!(decide(true, (1925.0, 500.0), AREA, win, EDGE_PX, Duration::ZERO), Step::Stay, "next monitor");
+    assert_eq!(decide(true, (1000.0, 500.0), AREA, win, EDGE_PX, Side::Right, Duration::ZERO), Step::Stay);
+    assert_eq!(
+        decide(true, (1919.0, 1200.0), AREA, win, EDGE_PX, Side::Right, Duration::ZERO),
+        Step::Stay,
+        "below the work area"
+    );
+    assert_eq!(
+        decide(true, (1925.0, 500.0), AREA, win, EDGE_PX, Side::Right, Duration::ZERO),
+        Step::Stay,
+        "next monitor"
+    );
 }
 
 #[test]
@@ -87,4 +98,30 @@ fn wayland_detection_respects_x11_override_and_display_vars() {
     assert!(!wayland_session(Some("wayland"), Some("wayland-0"), Some("x11")));
     assert!(!wayland_session(Some("x11"), None, None));
     assert!(!wayland_session(None, Some(""), None));
+}
+
+#[test]
+fn the_left_edge_docks_tucks_and_reveals_mirrored() {
+    assert_eq!(docked(SECOND, 420.0, Side::Left), (1920.0, 40.0, 420.0, 1000.0));
+    assert_eq!(tucked_x(AREA, EDGE_PX, 420.0, Side::Left), -418.0, "only the strip stays inside the work area");
+    assert_eq!(tucked_x(SECOND, EDGE_PX, 420.0, Side::Left), 1502.0);
+    let win = (-418.0, 0.0, 420.0, 1040.0);
+    assert_eq!(decide(true, (1.0, 500.0), AREA, win, EDGE_PX, Side::Left, Duration::ZERO), Step::Reveal);
+    assert_eq!(
+        decide(true, (1919.0, 500.0), AREA, win, EDGE_PX, Side::Left, Duration::ZERO),
+        Step::Stay,
+        "the right edge is not the hot zone"
+    );
+    assert_eq!(
+        decide(true, (-1.0, 500.0), AREA, win, EDGE_PX, Side::Left, Duration::ZERO),
+        Step::Stay,
+        "the monitor on the left"
+    );
+}
+
+#[test]
+fn the_cursor_scale_comes_from_the_screen_under_it_on_macos() {
+    let src = include_str!("sidebar.rs").replace('\r', "");
+    let body = &src[src.find("fn cursor_point(").unwrap()..src.find("fn tick(").unwrap()];
+    assert!(body.contains("monitor_from_point"), "a Retina + external setup would read the cursor at the wrong scale");
 }

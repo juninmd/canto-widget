@@ -13,6 +13,15 @@ pub const DEFAULT_HEIGHT: f64 = 580.0;
 /// Tolerance to recognize the position the app itself anchored, not a drag.
 const SLACK_PX: f64 = 4.0;
 
+/// Edge the sidebar docks to.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Side {
+    Left,
+    #[default]
+    Right,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct WindowConfig {
     /// Top-left corner in logical pixels; `None` = anchored to the monitor's corner.
@@ -31,6 +40,12 @@ pub struct WindowConfig {
     /// Sidebar mode: docked to the right edge of the work area, hidden while the mouse is away (`sidebar.rs`).
     #[serde(default)]
     pub sidebar: bool,
+    /// Which edge the sidebar docks to; old files keep the right edge.
+    #[serde(default)]
+    pub sidebar_side: Side,
+    /// Monitor label (see `strip::place::monitor_label`) the sidebar lives on; `None` or unplugged = the widget's own.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub sidebar_monitor: Option<String>,
 }
 
 fn yes() -> bool {
@@ -39,7 +54,16 @@ fn yes() -> bool {
 
 impl Default for WindowConfig {
     fn default() -> Self {
-        Self { position: None, physical_position: None, size: None, always_on_top: true, mini: false, sidebar: false }
+        Self {
+            position: None,
+            physical_position: None,
+            size: None,
+            always_on_top: true,
+            mini: false,
+            sidebar: false,
+            sidebar_side: Side::Right,
+            sidebar_monitor: None,
+        }
     }
 }
 
@@ -185,7 +209,7 @@ pub fn place(win: &WebviewWindow) -> tauri::Result<()> {
         return crate::window::mode::place_mini(win, crate::window::mode::MINI_DEFAULT);
     }
     if cfg.sidebar {
-        return crate::window::sidebar::place(win, &window_state, cfg.size);
+        return crate::window::sidebar::place(win, &window_state, &cfg);
     }
     crate::window::mode::strip_chrome(win)?;
     crate::window::mode::restore_limits(win)?;
@@ -318,6 +342,16 @@ mod tests {
         let cfg = WindowConfig { sidebar: true, ..WindowConfig::default() };
         let back: WindowConfig = serde_json::from_str(&serde_json::to_string(&cfg).unwrap()).unwrap();
         assert!(back.sidebar);
+    }
+
+    #[test]
+    fn sidebar_side_and_monitor_default_to_right_and_the_widgets_own() {
+        let cfg: WindowConfig = serde_json::from_str(r#"{"sidebar":true}"#).unwrap();
+        assert_eq!((cfg.sidebar_side, cfg.sidebar_monitor), (Side::Right, None));
+        let left = WindowConfig { sidebar_side: Side::Left, sidebar_monitor: Some("DELL".into()), ..cfg };
+        let text = serde_json::to_string(&left).unwrap();
+        assert!(text.contains(r#""sidebar_side":"left""#));
+        assert_eq!(serde_json::from_str::<WindowConfig>(&text).unwrap(), left);
     }
 
     #[test]

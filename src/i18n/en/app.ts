@@ -310,7 +310,13 @@ export const app: Record<keyof typeof source, string> = {
   "settings.window.reset": "back to the corner and original size",
   "settings.window.sidebar": "auto-hiding sidebar",
   "settings.window.sidebarHint":
-    "Docks the window to the right edge of the screen at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch the right edge to bring it back. Mini mode and full screen take priority.",
+    "Docks the window to the screen edge at full height. When the mouse leaves it, it tucks away leaving a thin strip; touch that edge to bring it back. Mini mode and full screen take priority.",
+  "settings.sidebar.title": "Sidebar",
+  "settings.sidebar.side": "screen side",
+  "settings.sidebar.left": "left",
+  "settings.sidebar.right": "right",
+  "settings.sidebar.monitor": "monitor",
+  "settings.sidebar.monitorAuto": "the widget's own",
 
   "shortcuts.title": "Keyboard shortcuts",
   "shortcuts.hint": "Single-letter keys don't work while you're typing in a field.",

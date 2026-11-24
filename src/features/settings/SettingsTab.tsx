@@ -6,6 +6,7 @@ import ClipSection from "../clipboard/ClipSection";
 import GoogleSection from "../google/GoogleSection";
 import McpSection from "./McpSection";
 import WindowSection from "./WindowSection";
+import SidebarSection from "./SidebarSection";
 import StripSection from "./StripSection";
 import SecuritySection from "./SecuritySection";
 import SkinPicker from "./SkinPicker";
@@ -73,6 +74,7 @@ export default function SettingsTab({ onError, hiddenTabs, onHiddenTabs, layout,
     clipboard: <ClipSection onError={onError} />,
     mcp: <McpSection onError={onError} />,
     window: <WindowSection onError={onError} />,
+    sidebar: <SidebarSection onError={onError} />,
     strip: <StripSection onError={onError} />,
     barAgenda: <BarAgendaSection onError={onError} />,
     autostart: <AutostartSection onError={onError} />,

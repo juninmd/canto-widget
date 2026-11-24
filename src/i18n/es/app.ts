@@ -310,7 +310,13 @@ export const app: Record<keyof typeof source, string> = {
   "settings.window.reset": "volver a la esquina y al tamaño original",
   "settings.window.sidebar": "barra lateral que se oculta sola",
   "settings.window.sidebarHint":
-    "Fija la ventana al borde derecho de la pantalla, a toda la altura. Al sacar el ratón se oculta y deja una franja fina; toca el borde derecho para volver. El modo mini y la pantalla completa tienen prioridad.",
+    "Pega la ventana al borde de la pantalla, en altura completa. Al sacar el mouse, se oculta y deja solo una franja fina; toca ese borde para volver. El modo mini y la pantalla completa tienen prioridad.",
+  "settings.sidebar.title": "Barra lateral",
+  "settings.sidebar.side": "lado de la pantalla",
+  "settings.sidebar.left": "izquierda",
+  "settings.sidebar.right": "derecha",
+  "settings.sidebar.monitor": "monitor",
+  "settings.sidebar.monitorAuto": "el mismo del widget",
 
   "shortcuts.title": "Atajos de teclado",
   "shortcuts.hint": "Las teclas de una sola letra no funcionan mientras escribes en un campo.",

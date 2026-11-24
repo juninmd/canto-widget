@@ -4,7 +4,7 @@ import { DESKTOP_ONLY_SECTIONS, forPlatform, GROUPS, parseOpenGroups, sectionMat
 test("every section lives in exactly one group", () => {
   const all = GROUPS.flatMap((g) => [...g.sections, ...g.sensitive]);
   expect(new Set(all).size).toBe(all.length);
-  expect(all.length).toBe(25);
+  expect(all.length).toBe(26);
 });
 
 test("search ignores accents and case and needs every word", () => {
