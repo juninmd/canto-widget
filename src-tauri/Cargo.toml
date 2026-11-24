@@ -92,6 +92,13 @@ security-framework = "3.7"
 objc2-foundation = { version = "0.3", default-features = false, features = ["std", "NSProcessInfo", "NSString", "NSObject"] }
 
 # Thin LTO keeps most of fat LTO's size and speed while optimizing in parallel: the installers built in 7-10 min.
+# Argon2 in an unoptimized build made every unlock in the tests take ~1s; the KDF output is unchanged.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3
+
 [profile.release]
 lto = "thin"
 strip = true
