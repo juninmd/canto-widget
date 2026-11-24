@@ -234,7 +234,7 @@ export default function DevPorts() {
         </div>
       )}
       <ul className="flex flex-col">
-        {list === null && !error ? null : shown.length === 0 ? (
+        {list === null ? null : shown.length === 0 ? (
           <li className="px-2 py-8 text-center text-[12px] text-faint">{t("dev.ports.empty")}</li>
         ) : group ? (
           groupByProject(shown).map(([name, items]) => (

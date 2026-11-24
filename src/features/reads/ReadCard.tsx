@@ -40,7 +40,7 @@ export default function ReadCard({
       data-read={article.id}
       style={{ "--i": Math.min(index, 10) } as CSSProperties}
       className={`wx-rise flex gap-2 rounded-lg border border-edge/60 px-2 py-1.5 transition-[opacity,background-color,border-color] duration-300 motion-reduce:transition-none ${
-        article.unread ? "" : "opacity-60"
+        article.unread ? "" : "opacity-85"
       }`}
     >
       {thumb && <img loading="lazy" decoding="async" src={thumb} alt="" className="canto-img-in h-14 w-20 shrink-0 rounded object-cover" />}

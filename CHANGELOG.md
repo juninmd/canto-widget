@@ -7,6 +7,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ### Corrigido
 
+- **Revisão geral das telas (contraste e estados)**: no tema claro, textos verdes, vermelhos, laranja e os tempos do Mapa passam a ter contraste de 4,5:1 ou mais sobre os fundos coloridos; no tema padrão o vermelho de erro e o texto discreto ficam mais legíveis; a linha do dia da Agenda vira uma lista válida para leitores de tela; a barra de progresso dos Agentes ganha nome; a aba Modelos IA mostra o erro de carregamento com **tentar de novo**, como as outras abas; a aba Dev não diz "Nenhuma porta encontrada" quando a leitura falhou; a prévia de código do Clipboard esmaece a borda cortada; itens lidos em Leituras ficam menos apagados.
 - **Revisão de datas e contagens nas telas**: o alerta de serviço com problema diz "desde qui., 08/10 · 19:15" quando a queda começou em outro dia (antes só a hora); o aviso "próxima busca" dos Modelos IA e o "dados de ..." da Atividade fazem o mesmo; o lembrete de tarefa de outro dia (atrasada) mostra o dia, não só a hora; a nota de reunião passa a registrar o dia; o resumo da aba Status API deixa de contar como "operacionais" os serviços cuja página não pôde ser lida; "Já passaram: 1" no lugar de "1 já passaram".
 - **Data no pop-up de novo convite**: o convite mostrava só a hora; agora mostra o dia da semana, a data e a hora (ex.: "seg., 23/11 · 21:16"). Outros alertas de reunião seguem só com a hora.
 

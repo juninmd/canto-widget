@@ -6,9 +6,9 @@
   --color-traffic-stop: #dc2626;
 }
 :root[data-skin="claro"] {
-  --color-traffic-free: #16a34a;
-  --color-traffic-slow: #ca8a04;
-  --color-traffic-jam: #ea580c;
+  --color-traffic-free: #15803d;
+  --color-traffic-slow: #a16207;
+  --color-traffic-jam: #b4380a;
   --color-traffic-stop: #b91c1c;
 }
 .map-frame {

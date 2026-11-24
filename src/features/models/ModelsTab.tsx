@@ -10,6 +10,7 @@ import { BellIcon } from "../../components/Icons";
 import ModelItem from "./ModelItem";
 import ModelsCompare from "./ModelsCompare";
 import ModelsTray from "./ModelsTray";
+import ErrorBanner from "../../components/ErrorBanner";
 import Skeleton from "../../components/Skeleton";
 import SubTabs from "../../components/SubTabs";
 import SearchField from "../../components/SearchField";
@@ -97,9 +98,7 @@ export default function ModelsTab() {
 
   if (view === null) {
     return error ? (
-      <p role="alert" className="text-xs text-danger">
-        {error}
-      </p>
+      <ErrorBanner message={error} onRetry={() => void load(false)} busy={loading} />
     ) : (
       <Skeleton label={t("models.loading")} rows={4} />
     );

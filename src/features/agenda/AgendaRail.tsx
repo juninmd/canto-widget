@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { AgendaItem, RsvpAnswer, Task } from "../../lib/api";
 import { duration } from "./agendaFree";
 import { fitInGap, minuteOf, railEntries, type RailEntry } from "./railEntries";
@@ -105,7 +105,7 @@ export default function AgendaRail({ items, tasks, now, live = true, clashes, op
       <ol aria-label={t("agenda.rail.label")}>
         {pastOpen && past.map((e) => entry(e, true))}
         {upcoming.map((e, i) => (
-          <span key={`${e.kind}-${e.id}`} className="contents">
+          <Fragment key={`${e.kind}-${e.id}`}>
             {i === lineAt && (
               <li aria-label={t("plan.nowLine")} className="flex h-5 items-center gap-2 text-[10px] font-bold text-danger">
                 <span className="canto-now-dot relative h-0.5 w-3.5 bg-danger" />
@@ -114,7 +114,7 @@ export default function AgendaRail({ items, tasks, now, live = true, clashes, op
               </li>
             )}
             {entry(e, false)}
-          </span>
+          </Fragment>
         ))}
       </ol>
     </div>
