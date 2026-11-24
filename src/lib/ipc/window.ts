@@ -60,7 +60,7 @@ export type StripSnapshot = {
   next_task?: NextTask | null;
   notices: number;
 };
-export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean; mini: boolean; sidebar: boolean };
+export type WindowConfig = { position: [number, number] | null; size: [number, number] | null; always_on_top: boolean; mini: boolean; sidebar: boolean; sidebar_side?: "left" | "right"; sidebar_monitor?: string | null };
 
 export const windowApi = {
   windowConfig: () => invoke<WindowConfig>("window_config"),
@@ -68,6 +68,7 @@ export const windowApi = {
   windowReset: () => invoke<void>("window_reset"),
   windowMiniSet: (enabled: boolean) => invoke<void>("window_mini_set", { enabled }),
   windowSidebarSet: (enabled: boolean) => invoke<void>("window_sidebar_set", { enabled }),
+  windowSidebarTarget: (side: "left" | "right", monitor: string | null) => invoke<void>("window_sidebar_target", { side, monitor }),
   windowMaxSet: (enabled: boolean) => invoke<void>("window_max_set", { enabled }),
   windowMaxGet: () => invoke<boolean>("window_max_get"),
   windowMiniResize: (width: number, height: number) => invoke<void>("window_mini_resize", { width, height }),

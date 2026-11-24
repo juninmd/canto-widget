@@ -305,7 +305,13 @@ export const app = {
   "settings.window.reset": "voltar ao canto e ao tamanho original",
   "settings.window.sidebar": "barra lateral que se esconde sozinha",
   "settings.window.sidebarHint":
-    "Gruda a janela no canto direito da tela, em altura total. Ao tirar o mouse dela, some e deixa só uma faixa fina; encoste o mouse na borda direita para voltar. O modo mini e a tela cheia têm prioridade.",
+    "Gruda a janela na borda da tela, em altura total. Ao tirar o mouse dela, some e deixa só uma faixa fina; encoste o mouse na borda para voltar. O modo mini e a tela cheia têm prioridade.",
+  "settings.sidebar.title": "Barra lateral",
+  "settings.sidebar.side": "lado da tela",
+  "settings.sidebar.left": "esquerda",
+  "settings.sidebar.right": "direita",
+  "settings.sidebar.monitor": "monitor",
+  "settings.sidebar.monitorAuto": "o mesmo do widget",
 
   "shortcuts.title": "Atalhos de teclado",
   "shortcuts.hint": "Letras soltas não valem enquanto você digita num campo.",

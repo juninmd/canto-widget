@@ -1,4 +1,4 @@
-//! Sidebar mode: the widget docks to the right edge of the work area at full height and tucks away (a thin strip
+//! Sidebar mode: the widget docks to the left or right edge (of the chosen monitor) at full height at full height and tucks away (a thin strip
 //! stays on screen) when the mouse leaves it; touching the edge slides it back. It is a flag apart from mini and
 //! fullscreen, which win over it while they are on.
 use std::time::{Duration, Instant};
@@ -6,7 +6,7 @@ use std::time::{Duration, Instant};
 use tauri::{Emitter, Manager, WebviewWindow};
 
 use crate::error::{AppError, Result};
-use crate::window::state::{Area, WindowState};
+use crate::window::state::{Area, Side, WindowConfig, WindowState};
 
 /// How often the cursor is sampled; there is no portable "mouse left the window" event for a borderless window.
 const TICK: Duration = Duration::from_millis(80);
@@ -44,16 +44,23 @@ pub enum Step {
     Stay,
 }
 
-/// Docked rectangle: flush right, full height of the work area (physical on Windows/X11, logical points on macOS).
-pub fn docked(area: Area, width: f64) -> Area {
+/// Docked rectangle: flush with the chosen edge, full height of the work area (physical on Windows/X11, logical
+/// points on macOS).
+pub fn docked(area: Area, width: f64, side: Side) -> Area {
     let (x, y, w, h) = area;
     let width = width.min(w);
-    (x + w - width, y, width, h)
+    match side {
+        Side::Right => (x + w - width, y, width, h),
+        Side::Left => (x, y, width, h),
+    }
 }
 
 /// Left edge of the window while tucked: only `edge` remains inside the work area.
-pub fn tucked_x(area: Area, edge: f64) -> f64 {
-    area.0 + area.2 - edge
+pub fn tucked_x(area: Area, edge: f64, width: f64, side: Side) -> f64 {
+    match side {
+        Side::Right => area.0 + area.2 - edge,
+        Side::Left => area.0 + edge - width.min(area.2),
+    }
 }
 
 pub fn contains(rect: Area, p: (f64, f64)) -> bool {
@@ -62,10 +69,22 @@ pub fn contains(rect: Area, p: (f64, f64)) -> bool {
 
 /// `window` is where the window is right now (it may have been dragged), `outside` how long the mouse has been
 /// away from it.
-pub fn decide(peeking: bool, cursor: (f64, f64), area: Area, window: Area, edge: f64, outside: Duration) -> Step {
+pub fn decide(
+    peeking: bool,
+    cursor: (f64, f64),
+    area: Area,
+    window: Area,
+    edge: f64,
+    side: Side,
+    outside: Duration,
+) -> Step {
     if peeking {
         // The hot zone is the tucked strip itself, over the full height of the work area.
-        let hot = (area.0 + area.2 - edge, area.1, edge, area.3);
+        let hot_x = match side {
+            Side::Right => area.0 + area.2 - edge,
+            Side::Left => area.0,
+        };
+        let hot = (hot_x, area.1, edge, area.3);
         return if contains(hot, cursor) { Step::Reveal } else { Step::Stay };
     }
     if contains(window, cursor) || outside < LEAVE_DELAY {
@@ -75,8 +94,22 @@ pub fn decide(peeking: bool, cursor: (f64, f64), area: Area, window: Area, edge:
     }
 }
 
-fn work_area(win: &WebviewWindow) -> tauri::Result<Option<(Area, f64)>> {
-    let Some(monitor) = win.current_monitor()?.or(win.primary_monitor()?) else {
+/// The chosen monitor, else the one the window is on, else the primary.
+fn target_monitor(win: &WebviewWindow, wanted: Option<&str>) -> tauri::Result<Option<tauri::Monitor>> {
+    let list = win.available_monitors()?;
+    let labels: Vec<String> = list
+        .iter()
+        .enumerate()
+        .map(|(i, m)| crate::strip::place::monitor_label(i, m.name().map(String::as_str)))
+        .collect();
+    if let Some(m) = crate::strip::place::pick(&labels, wanted).and_then(|i| list.into_iter().nth(i)) {
+        return Ok(Some(m));
+    }
+    Ok(win.current_monitor()?.or(win.primary_monitor()?))
+}
+
+fn work_area(win: &WebviewWindow, wanted: Option<&str>) -> tauri::Result<Option<(Area, f64)>> {
+    let Some(monitor) = target_monitor(win, wanted)? else {
         return Ok(None);
     };
     let scale = monitor.scale_factor();
@@ -133,19 +166,19 @@ fn set_window_pos(win: &WebviewWindow, x: f64, y: f64) -> tauri::Result<()> {
     win.set_position(tauri::PhysicalPosition::new(x.round() as i32, y.round() as i32))
 }
 
-/// Docks the window (revealed) on the right edge. Idempotent; used by boot, show and the mode switch.
-pub fn place(win: &WebviewWindow, state: &WindowState, saved: Option<(f64, f64)>) -> tauri::Result<()> {
-    // A tucked window reports the monitor on its right, so the cached area and scale win while it is tucked.
+/// Docks the window (revealed) on the chosen edge and monitor. Idempotent; used by boot, show and the mode switch.
+pub fn place(win: &WebviewWindow, state: &WindowState, cfg: &WindowConfig) -> tauri::Result<()> {
+    // A tucked window reports the monitor beside it, so the cached area and scale win while it is tucked.
     let cached = state.dock_area().filter(|_| state.is_peeking());
     let Some((area, scale)) = (match cached {
         Some(pair) => Some(pair),
-        None => work_area(win)?,
+        None => work_area(win, cfg.sidebar_monitor.as_deref())?,
     }) else {
         return Ok(());
     };
     state.set_dock_area(Some((area, scale)));
     state.set_peeking(false);
-    let rect = docked(area, width_for(saved, scale));
+    let rect = docked(area, width_for(cfg.size, scale), cfg.sidebar_side);
     crate::window::mode::strip_chrome(win)?;
     win.set_resizable(false)?;
     win.set_min_size(None::<tauri::LogicalSize<f64>>)?;
@@ -167,7 +200,9 @@ fn window_rect(win: &WebviewWindow) -> Option<Area> {
 fn cursor_point(app: &tauri::AppHandle, pos: tauri::PhysicalPosition<f64>) -> (f64, f64) {
     #[cfg(target_os = "macos")]
     {
-        let scale = app.primary_monitor().ok().flatten().map_or(1.0, |m| m.scale_factor());
+        // The scale of the screen under the pointer: the primary's is wrong on a Retina + external mix.
+        let under = app.monitor_from_point(pos.x, pos.y).ok().flatten();
+        let scale = under.or_else(|| app.primary_monitor().ok().flatten()).map_or(1.0, |m| m.scale_factor());
         let p = pos.to_logical::<f64>(scale);
         (p.x, p.y)
     }
@@ -196,7 +231,7 @@ fn tick(app: &tauri::AppHandle, outside_since: &mut Option<Instant>) {
     if is_wayland() {
         *outside_since = None;
         if state.is_peeking() {
-            let _ = place(&win, &state, cfg.size);
+            let _ = place(&win, &state, &cfg);
             let _ = win.emit_to(win.label(), crate::window::SHOWN_EVENT, true);
         }
         return;
@@ -204,7 +239,9 @@ fn tick(app: &tauri::AppHandle, outside_since: &mut Option<Instant>) {
     let (Ok(raw_cursor), Some(rect)) = (app.cursor_position(), window_rect(&win)) else {
         return;
     };
-    let Some((area, scale)) = state.dock_area().or_else(|| work_area(&win).ok().flatten()) else {
+    let Some((area, scale)) =
+        state.dock_area().or_else(|| work_area(&win, cfg.sidebar_monitor.as_deref()).ok().flatten())
+    else {
         return;
     };
     let cursor = cursor_point(app, raw_cursor);
@@ -214,15 +251,16 @@ fn tick(app: &tauri::AppHandle, outside_since: &mut Option<Instant>) {
         *outside_since = None;
     }
     let away = *outside_since.get_or_insert_with(Instant::now);
-    match decide(peeking, cursor, area, rect, edge, away.elapsed()) {
+    match decide(peeking, cursor, area, rect, edge, cfg.sidebar_side, away.elapsed()) {
         Step::Reveal => {
             *outside_since = None;
-            let _ = place(&win, &state, cfg.size);
+            let _ = place(&win, &state, &cfg);
             let _ = win.emit_to(win.label(), crate::window::SHOWN_EVENT, true);
         }
         Step::Tuck => {
             state.set_peeking(true);
-            let _ = set_window_pos(&win, tucked_x(area, edge), area.1);
+            let width = width_for(cfg.size, scale);
+            let _ = set_window_pos(&win, tucked_x(area, edge, width, cfg.sidebar_side), area.1);
             let _ = win.emit_to(win.label(), crate::window::SHOWN_EVENT, false);
         }
         Step::Stay => {}
@@ -258,6 +296,30 @@ pub fn set_sidebar(app: &tauri::AppHandle, enabled: bool) -> tauri::Result<()> {
     }
     crate::window::state::place(&win)?;
     app.emit(crate::window::mode::MODE_EVENT, state.cfg().mini)
+}
+
+/// Moves the sidebar to the other edge or monitor; takes effect at once when it is on.
+pub fn set_sidebar_target(app: &tauri::AppHandle, side: Side, monitor: Option<String>) -> tauri::Result<()> {
+    let (Some(win), Some(state)) = (app.get_webview_window("main"), app.try_state::<WindowState>()) else {
+        return Ok(());
+    };
+    let monitor = monitor.filter(|m| !m.is_empty());
+    state.change(|c| {
+        c.sidebar_side = side;
+        c.sidebar_monitor = monitor;
+    });
+    state.set_peeking(false);
+    state.set_dock_area(None);
+    if state.cfg().sidebar && !state.cfg().mini {
+        crate::window::state::place(&win)?;
+        let _ = win.emit_to(win.label(), crate::window::SHOWN_EVENT, true);
+    }
+    Ok(())
+}
+
+#[tauri::command]
+pub fn window_sidebar_target(app: tauri::AppHandle, side: Side, monitor: Option<String>) -> Result<()> {
+    set_sidebar_target(&app, side, monitor).map_err(|e| AppError::Io(e.to_string()))
 }
 
 #[tauri::command]

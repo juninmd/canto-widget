@@ -689,6 +689,10 @@ front. Off by default, desktop-only.
 <img src="docs/prints/app/151-mini-dashboard-ajustes.png" alt="Mini dashboard settings: each item with a switch and up/down arrows, a live preview of the pill, size, icons, names, charts and resting opacity" width="300">
 <img src="docs/prints/app/150-mini-dashboard.png" alt="Mini dashboard: a pill with CPU, battery, open tasks, weather, the next meeting, review requests and notices, and its details open with a Join button" width="340">
 
+**Auto-hiding sidebar** (Settings > App > Sidebar, off by default): docks the window at full height to the left or right edge of the monitor you choose, tucks away leaving a thin strip when the mouse leaves it, and slides back when you touch that edge.
+
+<img src="docs/prints/app/167-barra-lateral-lado-monitor.png" alt="Settings: sidebar switch, screen side (left or right) and monitor" width="300">
+
 **Next event in the system bar** (Settings > App, off by default): shows `Daily 10:30 · in 12 min (+1)` where each OS can hold it. macOS puts it in the menu bar and Linux beside the tray icon (GNOME and KDE through AppIndicator). Windows has no tray text, so Canto adds a small child window to the taskbar itself, left of the notification area; with no horizontal taskbar the tray icon counts the minutes instead. Hovering the tray icon lists the next 1 to 3 events everywhere. It reuses the agenda the meeting watcher already fetched, skips all-day, declined and finished events, and clears while the vault is locked.
 
 <img src="docs/prints/app/159-agenda-na-barra.png" alt="Settings: switch to show the next event in the system bar, and how many events the tray tooltip lists" width="300">
