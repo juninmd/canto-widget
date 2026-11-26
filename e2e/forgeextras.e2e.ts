@@ -155,7 +155,7 @@ test("espiar opens the conversation with inline comments and each one links to G
   await page.getByRole("button", { name: "espiar Corrige o cálculo de rotas com paradas" }).click();
   const panel = page.getByRole("region", { name: "detalhes do PR" });
   await expect(panel.getByRole("button", { name: "abrir no GitHub" })).toBeVisible();
-  await panel.getByRole("button", { name: /^ver conversa/ }).click();
+  await panel.getByRole("button", { name: "ver conversa" }).click();
   await expect(panel.getByText("src/rotas/calcular.ts:58").first()).toBeVisible();
   await expect(panel.getByText("Cobertura: 87%")).toBeVisible();
   await panel.getByRole("button", { name: "ocultar bots" }).click();

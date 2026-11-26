@@ -168,7 +168,7 @@ test("comments are only fetched once the conversation is opened", async () => {
   const panel = await mount();
   expect(calls.some((c) => c.cmd === "github_pr_conversation")).toBe(false);
   await act(async () => {
-    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa (1)" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa" }));
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
   expect(calls.find((c) => c.cmd === "github_pr_conversation")?.args).toEqual({ repo: "acme/atlas", number: 7 });
@@ -182,7 +182,7 @@ test("each comment opens itself in the browser and bots can be hidden", async ()
   responses.github_pr_conversation = () => Promise.resolve(talk);
   const panel = await mount();
   await act(async () => {
-    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa (1)" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa" }));
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
   fireEvent.click(within(panel).getByRole("button", { name: "abrir comentário de @bia no GitHub" }));
@@ -196,7 +196,7 @@ test("a failed conversation says why and the rest of the panel keeps working", a
   responses.github_pr_conversation = () => Promise.reject("o GitHub respondeu 403");
   const panel = await mount();
   await act(async () => {
-    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa (1)" }));
+    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa" }));
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
   expect(within(panel).getByRole("alert").textContent).toBe("o GitHub respondeu 403");
