@@ -150,3 +150,55 @@ test("a bot is shown as plain text: it has no profile to open", async () => {
   expect(screen.queryByRole("button", { name: /ver perfil de @copilot/ })).toBeNull();
   expect(screen.getByText("@copilot[bot] · aprovou")).toBeTruthy();
 });
+
+const talk = [
+  { id: 1, author: "bia", bot: false, body: "e se vier vazio?", created_at: "2026-11-01T10:00:00Z", url: "https://github.com/acme/atlas/pull/7#discussion_r1", path: "src/rotas.ts", line: 12, hunk: "-a\n+b", reply: false },
+  { id: 2, author: "ana", bot: false, body: "coberto no teste", created_at: "2026-11-01T11:00:00Z", url: "https://github.com/acme/atlas/pull/7#discussion_r2", path: "src/rotas.ts", line: 12, hunk: "", reply: true },
+  { id: 3, author: "ci[bot]", bot: true, body: "cobertura 87%", created_at: "2026-11-01T12:00:00Z", url: "https://github.com/acme/atlas/pull/7#issuecomment-3", path: "", line: 0, hunk: "", reply: false },
+];
+
+test("the web button opens the PR in the browser", async () => {
+  const panel = await mount();
+  fireEvent.click(within(panel).getByRole("button", { name: "abrir no GitHub" }));
+  expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: item.url });
+});
+
+test("comments are only fetched once the conversation is opened", async () => {
+  responses.github_pr_conversation = () => Promise.resolve(talk);
+  const panel = await mount();
+  expect(calls.some((c) => c.cmd === "github_pr_conversation")).toBe(false);
+  await act(async () => {
+    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa (1)" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  expect(calls.find((c) => c.cmd === "github_pr_conversation")?.args).toEqual({ repo: "acme/atlas", number: 7 });
+  const list = within(panel).getByRole("list", { name: "comentários do PR" });
+  expect(within(list).getAllByRole("listitem")).toHaveLength(3);
+  expect(list.textContent).toContain("src/rotas.ts:12");
+  expect(within(list).getByLabelText("trecho do diff").textContent).toBe("-a\n+b");
+});
+
+test("each comment opens itself in the browser and bots can be hidden", async () => {
+  responses.github_pr_conversation = () => Promise.resolve(talk);
+  const panel = await mount();
+  await act(async () => {
+    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa (1)" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  fireEvent.click(within(panel).getByRole("button", { name: "abrir comentário de @bia no GitHub" }));
+  expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: talk[0]!.url });
+  fireEvent.click(within(panel).getByRole("button", { name: "ocultar bots" }));
+  expect(within(panel).queryByText("cobertura 87%")).toBeNull();
+  expect(within(panel).getByText("coberto no teste")).toBeTruthy();
+});
+
+test("a failed conversation says why and the rest of the panel keeps working", async () => {
+  responses.github_pr_conversation = () => Promise.reject("o GitHub respondeu 403");
+  const panel = await mount();
+  await act(async () => {
+    fireEvent.click(within(panel).getByRole("button", { name: "ver conversa (1)" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  expect(within(panel).getByRole("alert").textContent).toBe("o GitHub respondeu 403");
+  expect(within(panel).getByRole("button", { name: "aprovar" })).toBeTruthy();
+});

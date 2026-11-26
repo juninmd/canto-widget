@@ -535,6 +535,7 @@ action by name: go to a tab, new task or note, join the next meeting, copy the d
 | ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](docs/prints/app/153-forge-novidades-rascunhos.png) |
 | ![GitHub tab: each PR shows its approvals, "mudanças pedidas" and the size of its diff next to the CI badge, and the "precisa de mim" button keeps only overdue reviews and my stalled PRs](docs/prints/app/155-forge-aprovacoes-precisa-de-mim.png) |
 | ![GitHub tab: "espiar" opens the PR description, its CI jobs and reviewers under the lists, with a comment box and an "aprovar" button that asks for confirmation before writing](docs/prints/app/156-forge-espiar-pr.png) |
+| ![GitHub tab: "espiar" now has "ver conversa": the PR's general and inline comments with the diff excerpt, each one with an arrow that opens it on GitHub, a switch to hide bots and an "abrir no GitHub" arrow in the panel header](docs/prints/app/168-forge-conversa-pr.png) |
 | ![GitHub tab: a PR with a running CI gets "avisar CI" (a toast when it ends), and review requests can be snoozed for 1 h, 4 h, until tomorrow or a week](docs/prints/app/157-forge-avisar-ci-adiar.png) |
 | ![GitHub tab: picking a commenter shows their public profile (name, company, location, bio, repositories and followers)](docs/prints/app/158-forge-perfil-pessoa.png) |
 
