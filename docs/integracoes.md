@@ -95,8 +95,8 @@ Duas formas de conectar:
   <https://github.com/settings/personal-access-tokens/new> com **Issues** e **Pull requests** em *Read-only*
   nos repositórios que quiser ver, e cole na aba. Para o selo de CI, some **Checks** e **Commit statuses** em
   *Read-only*.
-  Para **aprovar e comentar** pelo botão “espiar”, esse token precisa de **Pull requests** (e **Issues**, para comentar)
-  em *Read and write*; é opcional e só é usado quando você clica em “aprovar” ou “comentar”.
+  Para **aprovar, pedir mudanças, comentar e responder** na prévia do PR, esse token precisa de **Pull requests** (e **Issues**, para comentar)
+  em *Read and write*; é opcional e só é usado quando você clica no botão correspondente.
 - **Entrar com o GitHub** (device flow): aparece quando a build traz o Client ID de um GitHub App.
   Crie um GitHub App com permissões *Issues*, *Pull requests*, *Checks* e *Commit statuses* em *Read-only*, marque **Enable Device Flow**
   e exporte `CANTO_GITHUB_CLIENT_ID=<client id>` antes do `bun run tauri build` (na CI, variável de repositório
@@ -115,7 +115,7 @@ cache e controle de limite do GitHub (cabeçalhos `RateLimit-Remaining` e `RateL
 Para conectar, informe o endereço da instância (`https://gitlab.com` ou o da sua empresa; um caminho como
 `https://git.acme.io/gitlab` também vale) e um **token de acesso pessoal** com o escopo **read_api**: em
 *Preferences → Access tokens*, ou pelo link **criar token**, que abre a página já preenchida. O Canto confere o token
-na instância antes de salvar.
+na instância antes de salvar. Para **aprovar, comentar, responder e resolver** discussões na prévia do MR, o token precisa do escopo **api** (opcional; só é usado quando você clica no botão).
 
 - Só `https://`. Endereço com usuário, senha ou parâmetros é recusado.
 - O token só vai para o endereço digitado: o Canto não segue redirecionamentos.

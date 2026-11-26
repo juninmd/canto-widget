@@ -158,7 +158,7 @@ pub(crate) fn review_requested(state: &AppState) -> Option<Result<u64>> {
     Some(forge::review_requested::<Gitlab>(&state.forges, &acc))
 }
 
-fn account(app: &tauri::AppHandle) -> Result<Account> {
+pub(crate) fn account(app: &tauri::AppHandle) -> Result<Account> {
     let state = app.state::<AppState>();
     state.touch();
     let cfg = state.gitlab_config()?.ok_or_else(|| AppError::Gitlab("conecte sua conta do GitLab".into()))?;

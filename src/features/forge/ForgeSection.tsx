@@ -25,7 +25,7 @@ type Props = {
   hideDrafts?: boolean;
   /** Narrows the list to the items that ask for my attention. */
   needs?: (item: ForgeItem) => boolean;
-  /** Opens the PR in the peek panel (GitHub only: GitLab's read-only token has nothing to write with). */
+  /** Opens the PR/MR in the full-window view. */
   onPeek?: (item: ForgeItem) => void;
   /** Cards in two columns with the start of the description and the labels, instead of rows. */
   grid?: boolean;

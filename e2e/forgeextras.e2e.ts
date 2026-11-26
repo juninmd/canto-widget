@@ -110,57 +110,93 @@ test("each PR shows its approvals, change requests and diff size, and precisa de
   if (process.env.SHOT3) await page.screenshot({ path: process.env.SHOT3 });
 });
 
-test("espiar shows the PR details, and approving asks for a confirmation first", async ({ page }) => {
-  const detail = {
-    body: "Recalcula as rotas quando uma parada é removida e evita ciclos.",
-    head_branch: "fix/rotas",
-    base_branch: "main",
-    changed_files: 4,
-    jobs: [
-      { name: "build", state: "success", url: "" },
-      { name: "test-windows", state: "failure", url: "" },
-    ],
-    reviewers: [
-      { login: "bia", state: "approved" },
-      { login: "caio", state: "pending" },
-    ],
-  };
-  await mockTauri(page, { fixed: { ...fixed, github_pr_detail: detail, github_pr_review: null, github_profile: { login: "bia", name: "Bia Lima", bio: "Revisa tudo que mexe em rotas.", company: "Acme", location: "Recife", public_repos: 21, followers: 54, since: 2018, url: "https://github.com/bia" } } });
+const detail = {
+  body: "Recalcula as rotas quando uma parada é removida e evita ciclos.\n\nFecha #37.",
+  head_branch: "fix/rotas",
+  base_branch: "main",
+  changed_files: 3,
+  jobs: [
+    { name: "lint", state: "success", url: "", stage: "", seconds: 42, label: "" },
+    { name: "unit", state: "success", url: "", stage: "", seconds: 190, label: "" },
+    { name: "build", state: "running", url: "", stage: "", seconds: 65, label: "" },
+  ],
+  reviewers: [
+    { login: "bia", state: "approved" },
+    { login: "caio", state: "pending" },
+  ],
+};
+const talk = [
+  { id: 1, author: "bia", bot: false, body: "E se a lista de paradas vier vazia?", created_at: ago(30), url: "https://github.com/acme/atlas/pull/41#discussion_r1", path: "src/rotas/calcular.ts", line: 2, hunk: "-let total = 0;\n+let total = origem.dist(paradas[0]);", reply: false, thread: "1", resolved: false, resolvable: false },
+  { id: 2, author: "ana", bot: false, body: "Coberto no último commit.", created_at: ago(28), url: "https://github.com/acme/atlas/pull/41#discussion_r2", path: "src/rotas/calcular.ts", line: 2, hunk: "", reply: true, thread: "1", resolved: false, resolvable: false },
+  { id: 3, author: "ci[bot]", bot: true, body: "Cobertura: 87%", created_at: ago(5), url: "https://github.com/acme/atlas/pull/41#issuecomment-3", path: "", line: 0, hunk: "", reply: false, thread: "", resolved: false, resolvable: false },
+];
+const changed = [
+  { name: "src/rotas/calcular.ts", status: "modified", additions: 4, deletions: 1, truncated: false, patch: "@@ -1,3 +1,6 @@\n const trechos = ordenar(paradas);\n-let total = 0;\n+let total = origem.dist(paradas[0]);\n+for (const t of trechos) total += t.km;\n+if (circular) total += ultimo.volta;\n return total;" },
+  { name: "test/rotas.spec.ts", status: "added", additions: 3, deletions: 0, truncated: false, patch: "@@ -0,0 +1,3 @@\n+it(\"aceita lista vazia\", () => {\n+  expect(calcular([])).toBe(0);\n+});" },
+];
+const profile = { login: "bia", name: "Bia Lima", bio: "Revisa tudo que mexe em rotas.", company: "Acme", location: "Recife", public_repos: 21, followers: 54, since: 2018, url: "https://github.com/bia" };
+const rich = { ...fixed, github_pr_detail: detail, github_pr_conversation: talk, github_pr_files: changed, github_pr_review: null, github_pr_reply: null, github_profile: profile };
+
+test("clicking a PR opens its view; approving asks for a confirmation first", async ({ page }) => {
+  await mockTauri(page, { fixed: rich });
   await page.goto("/");
   await goTab(page, "GitHub");
-  await page.getByRole("button", { name: "espiar Corrige o cálculo de rotas com paradas" }).click();
-  const panel = page.getByRole("region", { name: "detalhes do PR" });
-  await expect(panel.getByText("fix/rotas → main")).toBeVisible();
-  await expect(panel.getByText("@bia · aprovou")).toBeVisible();
-  await panel.getByRole("button", { name: "ver perfil de @bia" }).click();
-  await expect(panel.getByRole("region", { name: "perfil de @bia" }).getByText("Acme · Recife")).toBeVisible();
-  await panel.getByRole("button", { name: "aprovar" }).click();
-  await expect(panel.getByRole("button", { name: "confirmar aprovação" })).toBeVisible();
-  if (process.env.SHOT) await panel.scrollIntoViewIfNeeded(), await page.screenshot({ path: process.env.SHOT });
-  await panel.getByRole("button", { name: "confirmar aprovação" }).click();
-  await expect(panel.getByRole("status")).toHaveText("aprovação enviada");
+  await page.getByText("acme/atlas#41").click();
+  const view = page.getByRole("dialog", { name: "PR acme/atlas#41" });
+  await expect(view.getByText("fix/rotas → main")).toBeVisible();
+  await expect(view.getByText("Fecha #37.")).toBeVisible();
+  await view.getByRole("tab", { name: /Revisores/ }).click();
+  await view.getByRole("button", { name: "ver perfil de @bia" }).click();
+  await expect(view.getByRole("region", { name: "perfil de @bia" }).getByText("Acme · Recife")).toBeVisible();
+  await view.getByRole("button", { name: "aprovar" }).click();
+  await expect(view.getByRole("button", { name: "confirmar aprovação" })).toBeVisible();
+  if (process.env.SHOT) await page.setViewportSize({ width: 420, height: 860 }), await page.screenshot({ path: process.env.SHOT });
+  await view.getByRole("button", { name: "confirmar aprovação" }).click();
+  await expect(view.getByRole("status")).toHaveText("aprovação enviada");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toHaveCount(0);
 });
 
-test("espiar opens the conversation with inline comments and each one links to GitHub", async ({ page }) => {
-  const detail = { body: "Recalcula as rotas quando uma parada é removida e evita ciclos.", head_branch: "fix/rotas", base_branch: "main", changed_files: 4, jobs: [{ name: "build", state: "success", url: "" }], reviewers: [{ login: "bia", state: "approved" }] };
-  const talk = [
-    { id: 1, author: "bia", bot: false, body: "E se a lista de paradas vier vazia?", created_at: ago(30), url: "https://github.com/acme/atlas/pull/41#discussion_r1", path: "src/rotas/calcular.ts", line: 58, hunk: "-let total = 0;\n+let total = origem.dist(paradas[0]);", reply: false },
-    { id: 2, author: "ana", bot: false, body: "Coberto no último commit.", created_at: ago(28), url: "https://github.com/acme/atlas/pull/41#discussion_r2", path: "src/rotas/calcular.ts", line: 58, hunk: "", reply: true },
-    { id: 3, author: "ci[bot]", bot: true, body: "Cobertura: 87%", created_at: ago(5), url: "https://github.com/acme/atlas/pull/41#issuecomment-3", path: "", line: 0, hunk: "", reply: false },
-  ];
+test("the conversation groups replies, hides bots and the diff shows the thread on its line", async ({ page }) => {
   if (process.env.SHOT) await page.setViewportSize({ width: 420, height: 860 });
-  await mockTauri(page, { fixed: { ...fixed, github_pr_detail: detail, github_pr_conversation: talk } });
+  await mockTauri(page, { fixed: rich });
   await page.goto("/");
   await goTab(page, "GitHub");
-  await page.getByRole("button", { name: "espiar Corrige o cálculo de rotas com paradas" }).click();
-  const panel = page.getByRole("region", { name: "detalhes do PR" });
-  await expect(panel.getByRole("button", { name: "abrir no GitHub" })).toBeVisible();
-  await panel.getByRole("button", { name: "ver conversa" }).click();
-  await expect(panel.getByText("src/rotas/calcular.ts:58").first()).toBeVisible();
-  await expect(panel.getByText("Cobertura: 87%")).toBeVisible();
-  await panel.getByRole("button", { name: "ocultar bots" }).click();
-  await expect(panel.getByText("Cobertura: 87%")).toHaveCount(0);
-  if (process.env.SHOT) await panel.scrollIntoViewIfNeeded(), await page.screenshot({ path: process.env.SHOT });
+  await page.getByText("acme/atlas#41").click();
+  const view = page.getByRole("dialog", { name: "PR acme/atlas#41" });
+  await view.getByRole("tab", { name: /Conversa/ }).click();
+  await expect(view.getByText("src/rotas/calcular.ts:2")).toHaveCount(1);
+  await expect(view.getByText("Coberto no último commit.")).toBeVisible();
+  await expect(view.getByText("Cobertura: 87%")).toBeVisible();
+  await view.getByRole("button", { name: "ocultar bots" }).click();
+  await expect(view.getByText("Cobertura: 87%")).toHaveCount(0);
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+  await view.getByRole("tab", { name: /^Diff/ }).click();
+  await expect(view.getByText("E se a lista de paradas vier vazia?")).toBeVisible();
+  if (process.env.SHOT2) await page.screenshot({ path: process.env.SHOT2 });
+});
+
+test("an MR opens the same view with its pipeline stages and no request-changes", async ({ page }) => {
+  if (process.env.SHOT) await page.setViewportSize({ width: 420, height: 860 });
+  const mr = (n: number, title: string) => ({ ...pr(n, title), url: `https://gitlab.com/acme/atlas/-/merge_requests/${n}`, reference: `acme/atlas!${n}` });
+  const stages = { ...detail, jobs: [
+    { name: "compile", state: "success", url: "", stage: "build", seconds: 71, label: "" },
+    { name: "lint", state: "success", url: "", stage: "test", seconds: 42, label: "" },
+    { name: "unit", state: "failure", url: "", stage: "test", seconds: 198, label: "" },
+    { name: "review-app", state: "none", url: "", stage: "deploy", seconds: 0, label: "manual" },
+  ] };
+  await mockTauri(page, { hiddenTabs: [], knownTabs: ["tasks", "notes", "clipboard", "agenda", "github", "gitlab"], fixed: { ...fixed, gitlab_status: { connected: true, username: "voce", base_url: "https://gitlab.com" }, gitlab_lists: { ...lists, review_requested: { total: 1, items: [mr(41, "Corrige o cálculo de rotas com paradas")], fetched_at: now } }, gitlab_mr_detail: stages, gitlab_mr_conversation: [], gitlab_mr_files: changed, gitlab_mr_review: null } });
+  await page.goto("/");
+  await goTab(page, "GitLab");
+  await page.getByText("acme/atlas!41").click();
+  const view = page.getByRole("dialog", { name: "MR acme/atlas!41" });
+  await view.getByRole("tab", { name: /Pipeline/ }).click();
+  await expect(view.getByRole("region", { name: "estágio test" }).getByText("unit")).toBeVisible();
+  await expect(view.getByText("manual")).toBeVisible();
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+  await view.getByRole("tab", { name: /Revisores/ }).click();
+  await expect(view.getByRole("button", { name: "aprovar" })).toBeVisible();
+  await expect(view.getByRole("button", { name: "pedir mudanças" })).toHaveCount(0);
 });
 
 test("a running CI can be watched and a review request can be snoozed for longer", async ({ page }) => {

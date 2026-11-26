@@ -70,7 +70,8 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
         type="button"
         onClick={() => {
           onOpen?.();
-          void api.openLink(item.url);
+          if (onPeek && item.is_pr) onPeek();
+          else void api.openLink(item.url);
         }}
         title={item.url}
         className={`relative flex w-full overflow-hidden rounded-xl border bg-ink/60 p-2.5 text-left transition-colors hover:bg-ink ${grid ? "h-full flex-col gap-1.5" : "gap-2.5"} ${conflict ? "border-danger/60" : "border-edge hover:border-line"}`}
@@ -153,7 +154,7 @@ export default function ForgeRow({ item, login, forge, waiting, ci, conflict, re
             <span className="ml-auto shrink-0 text-faint">{timeAgo(item.updated_at)}</span>
           </span>
         </span>
-        {!grid && (
+        {!grid && !(onPeek && item.is_pr) && (
           <span aria-hidden="true" title={t("forge.openExternal")} className="shrink-0 self-start text-[11px] text-faint">
             ↗
           </span>

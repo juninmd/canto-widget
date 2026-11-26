@@ -7,6 +7,7 @@ pub mod cmd_pr;
 pub mod conversation;
 pub mod detail;
 pub mod failures;
+pub mod files;
 pub mod profile;
 pub mod query;
 pub mod teams;

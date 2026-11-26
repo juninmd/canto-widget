@@ -293,26 +293,51 @@ test("without anything stuck there is no precisa de mim button", async () => {
   expect(screen.queryByRole("button", { name: /precisa de mim/ })).toBeNull();
 });
 
-test("espiar opens the PR details under the lists on GitHub, and closes again", async () => {
+test("clicking a PR opens its view over the window; espiar does the same and ← closes it", async () => {
   responses.github_pr_detail = () => Promise.resolve({ body: "Detalhes do cofre", head_branch: "fix/cofre", base_branch: "main", changed_files: 2, jobs: [], reviewers: [] });
   await mountGithub();
   await act(async () => {
     fireEvent.click(screen.getByRole("button", { name: "espiar Revisar o cofre" }));
   });
   for (let i = 0; i < 3; i++) await act(async () => {});
-  const panel = screen.getByRole("region", { name: "detalhes do PR" });
-  expect(within(panel).getByText("Detalhes do cofre")).toBeTruthy();
+  const view = screen.getByRole("dialog", { name: "PR acme/atlas#1" });
+  expect(within(view).getByText("Detalhes do cofre")).toBeTruthy();
   expect(calls.find((c) => c.cmd === "github_pr_detail")?.args).toEqual({ repo: "acme/atlas", number: 1 });
-  fireEvent.click(within(panel).getByRole("button", { name: "fechar detalhes" }));
-  expect(screen.queryByRole("region", { name: "detalhes do PR" })).toBeNull();
+  fireEvent.click(within(view).getByRole("button", { name: "voltar à lista" }));
+  expect(screen.queryByRole("dialog")).toBeNull();
+  calls = [];
+  await act(async () => {
+    fireEvent.click(within(screen.getByRole("region", { name: "PRs que eu abri" })).getByText("Meu PR vermelho"));
+  });
+  expect(screen.getByRole("dialog", { name: "PR acme/atlas#4" })).toBeTruthy();
+  expect(calls.some((c) => c.cmd === "open_link")).toBe(false);
 });
 
-test("GitLab rows have no espiar: its read-only token has nothing to write with", async () => {
+test("an issue row still opens the browser; only PRs and MRs get the view", async () => {
+  await mountGithub({ ...board, my_issues: { total: 1, items: [issue(9, "Issue do cofre")] } });
+  await act(async () => {
+    fireEvent.click(screen.getByText("Issue do cofre"));
+  });
+  expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: "https://github.com/acme/atlas/issues/9" });
+  expect(screen.queryByRole("dialog")).toBeNull();
+});
+
+test("GitLab MRs open the same view, read from GitLab and without request-changes", async () => {
   responses.gitlab_status = () => Promise.resolve({ connected: true, username: "voce", base_url: "https://gitlab.com" });
   responses.gitlab_lists = () => Promise.resolve(board);
+  responses.gitlab_mr_detail = () => Promise.resolve({ body: "MR do cofre", head_branch: "fix/cofre", base_branch: "main", changed_files: 1, jobs: [{ name: "lint", state: "success", url: "", stage: "test", seconds: 42, label: "" }], reviewers: [{ login: "bia", state: "approved" }] });
   render(<GitlabTab onError={() => {}} />);
   for (let i = 0; i < 6; i++) await act(async () => {});
-  expect(screen.queryByRole("button", { name: /^espiar/ })).toBeNull();
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "espiar Revisar o cofre" }));
+  });
+  for (let i = 0; i < 3; i++) await act(async () => {});
+  const view = screen.getByRole("dialog", { name: "MR acme/atlas#1" });
+  expect(calls.find((c) => c.cmd === "gitlab_mr_detail")?.args).toEqual({ project: "acme/atlas", iid: 1 });
+  expect(calls.some((c) => c.cmd.startsWith("github_"))).toBe(false);
+  fireEvent.click(within(view).getByRole("tab", { name: /Revisores/ }));
+  expect(within(view).queryByRole("button", { name: "pedir mudanças" })).toBeNull();
+  expect(within(view).getByRole("button", { name: "aprovar" })).toBeTruthy();
 });
 
 test("the grid is the default; the choice is kept and Lista goes back to rows", async () => {
