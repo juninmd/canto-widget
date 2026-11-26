@@ -281,7 +281,7 @@ export const integrations = {
   "forge.peek.approved": "aprovação enviada",
   "forge.peek.commented": "comentário enviado",
   "forge.peek.openWeb": "abrir no GitHub",
-  "forge.peek.convShow": "ver conversa ({n})",
+  "forge.peek.convShow": "ver conversa",
   "forge.peek.convHide": "ocultar conversa",
   "forge.peek.convLabel": "comentários do PR",
   "forge.peek.convLoading": "carregando comentários",

@@ -283,7 +283,7 @@ export const integrations: Record<keyof typeof source, string> = {
   "forge.peek.approved": "aprobación enviada",
   "forge.peek.commented": "comentario enviado",
   "forge.peek.openWeb": "abrir en GitHub",
-  "forge.peek.convShow": "ver conversación ({n})",
+  "forge.peek.convShow": "ver conversación",
   "forge.peek.convHide": "ocultar conversación",
   "forge.peek.convLabel": "comentarios del PR",
   "forge.peek.convLoading": "cargando comentarios",

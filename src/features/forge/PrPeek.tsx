@@ -114,7 +114,7 @@ export default function PrPeek({ item, login, onClose }: Props) {
           </ul>
           {who && <PersonCard login={who} />}
           <button type="button" aria-expanded={talk} onClick={() => setTalk(!talk)} className={BTN}>
-            {t(talk ? "forge.peek.convHide" : "forge.peek.convShow", { n: item.comments })}
+            {t(talk ? "forge.peek.convHide" : "forge.peek.convShow")}
           </button>
           {talk && <PrConversation repo={item.repo} number={item.number} />}
           <div className="flex gap-1.5">
