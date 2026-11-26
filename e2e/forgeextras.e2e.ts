@@ -141,6 +141,28 @@ test("espiar shows the PR details, and approving asks for a confirmation first",
   await expect(panel.getByRole("status")).toHaveText("aprovação enviada");
 });
 
+test("espiar opens the conversation with inline comments and each one links to GitHub", async ({ page }) => {
+  const detail = { body: "Recalcula as rotas quando uma parada é removida e evita ciclos.", head_branch: "fix/rotas", base_branch: "main", changed_files: 4, jobs: [{ name: "build", state: "success", url: "" }], reviewers: [{ login: "bia", state: "approved" }] };
+  const talk = [
+    { id: 1, author: "bia", bot: false, body: "E se a lista de paradas vier vazia?", created_at: ago(30), url: "https://github.com/acme/atlas/pull/41#discussion_r1", path: "src/rotas/calcular.ts", line: 58, hunk: "-let total = 0;\n+let total = origem.dist(paradas[0]);", reply: false },
+    { id: 2, author: "ana", bot: false, body: "Coberto no último commit.", created_at: ago(28), url: "https://github.com/acme/atlas/pull/41#discussion_r2", path: "src/rotas/calcular.ts", line: 58, hunk: "", reply: true },
+    { id: 3, author: "ci[bot]", bot: true, body: "Cobertura: 87%", created_at: ago(5), url: "https://github.com/acme/atlas/pull/41#issuecomment-3", path: "", line: 0, hunk: "", reply: false },
+  ];
+  if (process.env.SHOT) await page.setViewportSize({ width: 420, height: 860 });
+  await mockTauri(page, { fixed: { ...fixed, github_pr_detail: detail, github_pr_conversation: talk } });
+  await page.goto("/");
+  await goTab(page, "GitHub");
+  await page.getByRole("button", { name: "espiar Corrige o cálculo de rotas com paradas" }).click();
+  const panel = page.getByRole("region", { name: "detalhes do PR" });
+  await expect(panel.getByRole("button", { name: "abrir no GitHub" })).toBeVisible();
+  await panel.getByRole("button", { name: /^ver conversa/ }).click();
+  await expect(panel.getByText("src/rotas/calcular.ts:58").first()).toBeVisible();
+  await expect(panel.getByText("Cobertura: 87%")).toBeVisible();
+  await panel.getByRole("button", { name: "ocultar bots" }).click();
+  await expect(panel.getByText("Cobertura: 87%")).toHaveCount(0);
+  if (process.env.SHOT) await panel.scrollIntoViewIfNeeded(), await page.screenshot({ path: process.env.SHOT });
+});
+
 test("a running CI can be watched and a review request can be snoozed for longer", async ({ page }) => {
   await mockTauri(page, { fixed: { ...fixed, github_prs_checks: [{ repo: "acme/atlas", number: 41, status: "running" }] } });
   await page.goto("/");

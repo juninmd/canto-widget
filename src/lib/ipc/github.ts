@@ -55,6 +55,8 @@ export type PrJob = { name: string; state: ChecksStatus; url: string };
 export type PrReviewer = { login: string; state: "approved" | "changes" | "pending" };
 /** One PR for the peek panel; `body` is already cut short by Rust. */
 export type PrDetail = { body: string; head_branch: string; base_branch: string; changed_files: number; jobs: PrJob[]; reviewers: PrReviewer[] };
+/** One comment of a PR for the peek panel: general (`path` empty) or inline on a file; Rust already cut the texts short. */
+export type PrConvEntry = { id: number; author: string; bot: boolean; body: string; created_at: string; url: string; path: string; line: number; hunk: string; reply: boolean };
 export type PrChecks = PrRef & { status: ChecksStatus; conflict?: boolean; additions?: number; deletions?: number; approvals?: number; changes_requested?: boolean };
 export type PrComment = {
   id: number;
@@ -89,6 +91,8 @@ export const githubApi = {
   githubPrChecks: (repo: string, number: number) => invoke<ChecksStatus>("github_pr_checks", { repo, number }),
   /** CI badges for up to 20 PRs, cached in Rust per head sha; PRs that failed to load are left out. */
   githubPrDetail: (repo: string, number: number) => invoke<PrDetail>("github_pr_detail", { repo, number }),
+  /** General and inline comments of one PR, oldest first; read only when the conversation is opened. */
+  githubPrConversation: (repo: string, number: number) => invoke<PrConvEntry[]>("github_pr_conversation", { repo, number }),
   githubPrReview: (repo: string, number: number, action: "approve" | "comment", body?: string) => invoke<void>("github_pr_review", { repo, number, action, body: body ?? null }),
   githubProfile: (login: string) => invoke<GithubProfile>("github_profile", { login }),
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),

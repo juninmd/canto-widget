@@ -2,6 +2,7 @@
 use crate::blocking::run;
 use crate::error::Result;
 use crate::github::cmd_lists::token;
+use crate::github::conversation::{self, ConvEntry};
 use crate::github::detail::{self, PrDetail};
 use crate::github::profile::{self, Profile};
 
@@ -9,6 +10,13 @@ use crate::github::profile::{self, Profile};
 pub async fn github_pr_detail(app: tauri::AppHandle, repo: String, number: u64) -> Result<PrDetail> {
     detail::check_target(&repo, number)?;
     run(move || detail::fetch(&token(&app)?, &repo, number)).await
+}
+
+/// The comments of one PR (general and inline), read only when the user opens the conversation in the peek panel.
+#[tauri::command]
+pub async fn github_pr_conversation(app: tauri::AppHandle, repo: String, number: u64) -> Result<Vec<ConvEntry>> {
+    detail::check_target(&repo, number)?;
+    run(move || conversation::fetch(&token(&app)?, &repo, number)).await
 }
 
 /// A user-triggered write (`approve` or `comment`); validated before the token is even read.

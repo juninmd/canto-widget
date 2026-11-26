@@ -4,6 +4,7 @@ import { t } from "../../i18n";
 import Skeleton from "../../components/Skeleton";
 import { CiPill } from "./ForgePills";
 import PersonCard from "./PersonCard";
+import PrConversation from "./PrConversation";
 
 type Props = { item: ForgeItem; login: string; onClose: () => void };
 type Sent = "approve" | "comment";
@@ -25,6 +26,7 @@ export default function PrPeek({ item, login, onClose }: Props) {
   const [sent, setSent] = useState<Sent | null>(null);
   const [failed, setFailed] = useState("");
   const [who, setWho] = useState<string | null>(null);
+  const [talk, setTalk] = useState(false);
   const person = (login: string, label: string) =>
     login.endsWith("[bot]") ? (
       <span>{label}</span>
@@ -40,6 +42,7 @@ export default function PrPeek({ item, login, onClose }: Props) {
     setError("");
     setSent(null);
     setSure(false);
+    setTalk(false);
     api.githubPrDetail(item.repo, item.number).then(
       (d) => live && setDetail(d),
       (e) => live && setError(errText(e)),
@@ -76,6 +79,9 @@ export default function PrPeek({ item, login, onClose }: Props) {
           </p>
           {item.author && <p className="m-0 text-[11px] text-muted">{t("forge.peek.by")} {person(item.author, `@${item.author}`)}</p>}
         </div>
+        <button type="button" onClick={() => void api.openLink(item.url).catch(() => {})} aria-label={t("forge.peek.openWeb")} title={t("forge.peek.openWeb")} className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:text-fg">
+          ↗
+        </button>
         <button type="button" onClick={onClose} aria-label={t("forge.peek.close")} title={t("forge.peek.close")} className="canto-hit grid size-6 shrink-0 place-items-center rounded-md text-faint hover:text-fg">
           ✕
         </button>
@@ -107,6 +113,10 @@ export default function PrPeek({ item, login, onClose }: Props) {
             ))}
           </ul>
           {who && <PersonCard login={who} />}
+          <button type="button" aria-expanded={talk} onClick={() => setTalk(!talk)} className={BTN}>
+            {t(talk ? "forge.peek.convHide" : "forge.peek.convShow", { n: item.comments })}
+          </button>
+          {talk && <PrConversation repo={item.repo} number={item.number} />}
           <div className="flex gap-1.5">
             <textarea
               value={text}
