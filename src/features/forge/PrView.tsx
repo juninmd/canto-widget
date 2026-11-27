@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { api, type ForgeItem } from "../../lib/api";
 import { t, type MessageKey } from "../../i18n";
 import type { Forge } from "./forge";
@@ -32,12 +32,15 @@ export default function PrView({ forge, item, login, onClose }: Props) {
   const back = useMemo(() => prBackend(forge, item), [forge, item]);
   const [tab, setTab] = useState<PrTab>("overview");
   const [only, setOnly] = useState<string | null>(null);
+  const backBtn = useRef<HTMLButtonElement>(null);
   const key = `${forge}|${item.repo}|${item.number}`;
   const detail = usePrLoad(back.detail, true, key);
   const wantsConv = tab === "conversation" || tab === "diff";
   const conv = usePrLoad(back.conversation, wantsConv, key);
   const files = usePrLoad(back.files, tab === "files" || tab === "diff", key);
 
+  // Keyboard and screen-reader users land inside the view, not on the list it covers.
+  useEffect(() => backBtn.current?.focus(), []);
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape" && !/INPUT|TEXTAREA/.test((e.target as HTMLElement).tagName)) onClose();
@@ -52,10 +55,10 @@ export default function PrView({ forge, item, login, onClose }: Props) {
     k === "conversation" ? conv.data?.length : k === "pipeline" ? d?.jobs.length : k === "files" ? (files.data?.length ?? d?.changed_files) : k === "reviewers" ? d?.reviewers.length : undefined;
 
   return (
-    <div role="dialog" aria-label={t("forge.pr.label", { kind: back.kind, ref: item.reference })} className="fixed inset-0 z-40 flex flex-col bg-panel">
+    <div role="dialog" aria-modal="true" aria-label={t("forge.pr.label", { kind: back.kind, ref: item.reference })} className="fixed inset-0 z-40 flex flex-col bg-panel">
       <header className="shrink-0 space-y-1.5 border-b border-edge px-3 pt-2">
         <div className="flex items-start gap-1.5">
-          <button type="button" onClick={onClose} aria-label={t("forge.pr.back")} title={t("forge.pr.back")} className="canto-hit grid size-7 shrink-0 place-items-center rounded-md text-muted hover:bg-hover hover:text-fg">
+          <button ref={backBtn} type="button" onClick={onClose} aria-label={t("forge.pr.back")} title={t("forge.pr.back")} className="canto-hit grid size-7 shrink-0 place-items-center rounded-md text-muted hover:bg-hover hover:text-fg">
             ←
           </button>
           <div className="min-w-0 flex-1">

@@ -240,11 +240,12 @@ struct Diff {
     diff: String,
 }
 
-/// GitLab sends no counts, so they come from the patch itself.
+/// GitLab sends no counts, so they come from the patch itself. Its diffs carry no `---`/`+++` file header, so a
+/// removed Markdown rule (`----`) or an added `++x` line still counts.
 pub fn count_changes(patch: &str) -> (u64, u64) {
     patch.lines().fold((0, 0), |(a, d), l| match l.as_bytes().first() {
-        Some(b'+') if !l.starts_with("+++") => (a + 1, d),
-        Some(b'-') if !l.starts_with("---") => (a, d + 1),
+        Some(b'+') => (a + 1, d),
+        Some(b'-') => (a, d + 1),
         _ => (a, d),
     })
 }

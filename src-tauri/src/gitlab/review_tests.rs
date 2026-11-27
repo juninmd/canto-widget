@@ -59,6 +59,7 @@ fn discussions_become_threads_without_system_notes_and_carry_their_resolved_stat
 #[test]
 fn counts_come_from_the_patch_and_a_removed_file_keeps_its_old_name() {
     assert_eq!(count_changes("@@ -1,2 +1,2 @@\n a\n-b\n+c\n+d"), (2, 1));
+    assert_eq!(count_changes("@@ -1,2 +1,2 @@\n----\n+++x"), (1, 1));
     let raw: Vec<Diff> = serde_json::from_value(json!([
         { "old_path": "old.ts", "new_path": "", "deleted_file": true, "diff": "@@ -1 +0,0 @@\n-x" },
         { "old_path": "a.ts", "new_path": "b.ts", "renamed_file": true, "diff": "" },

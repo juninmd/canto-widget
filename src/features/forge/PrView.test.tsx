@@ -164,3 +164,18 @@ test("a failed lookup is said plainly", async () => {
   for (let i = 0; i < 4; i++) await act(async () => {});
   expect(screen.getByRole("alert").textContent).toBe("o GitHub respondeu 404");
 });
+
+test("focus lands inside the view, and Escape closes it unless a text field has focus", async () => {
+  let closed = 0;
+  responses.github_pr_detail = () => Promise.resolve(detail);
+  render(<PrView forge="github" item={item} login="voce" onClose={() => closed++} />);
+  for (let i = 0; i < 4; i++) await act(async () => {});
+  expect(document.activeElement).toBe(screen.getByRole("button", { name: "voltar à lista" }));
+  fireEvent.keyDown(document.body, { key: "Escape" });
+  expect(closed).toBe(1);
+  const box = document.createElement("textarea");
+  document.body.append(box);
+  fireEvent.keyDown(box, { key: "Escape" });
+  expect(closed).toBe(1);
+  box.remove();
+});
