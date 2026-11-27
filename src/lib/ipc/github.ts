@@ -51,12 +51,16 @@ export type ChecksStatus = "success" | "failure" | "running" | "none";
 export type PrRef = { repo: string; number: number };
 /** Public card of a person: short texts already cut by Rust; `since` is the year the account was created (0 if unknown). */
 export type GithubProfile = { login: string; name: string; bio: string; company: string; location: string; public_repos: number; followers: number; since: number; url: string };
-export type PrJob = { name: string; state: ChecksStatus; url: string };
+/** `stage` is the GitLab stage (empty on GitHub), `seconds` 0 when unknown, `label` the forge's word for a state the app does not track (manual, skipped). */
+export type PrJob = { name: string; state: ChecksStatus; url: string; stage: string; seconds: number; label: string };
 export type PrReviewer = { login: string; state: "approved" | "changes" | "pending" };
 /** One PR for the peek panel; `body` is already cut short by Rust. */
 export type PrDetail = { body: string; head_branch: string; base_branch: string; changed_files: number; jobs: PrJob[]; reviewers: PrReviewer[] };
 /** One comment of a PR for the peek panel: general (`path` empty) or inline on a file; Rust already cut the texts short. */
-export type PrConvEntry = { id: number; author: string; bot: boolean; body: string; created_at: string; url: string; path: string; line: number; hunk: string; reply: boolean };
+export type PrConvEntry = { id: number; author: string; bot: boolean; body: string; created_at: string; url: string; path: string; line: number; hunk: string; reply: boolean; thread: string; resolved: boolean; resolvable: boolean };
+/** One changed file with its capped unified patch (empty for binaries). */
+export type PrFile = { name: string; status: "added" | "removed" | "renamed" | "modified"; additions: number; deletions: number; patch: string; truncated: boolean };
+export type PrReviewAction = "approve" | "request_changes" | "comment";
 export type PrChecks = PrRef & { status: ChecksStatus; conflict?: boolean; additions?: number; deletions?: number; approvals?: number; changes_requested?: boolean };
 export type PrComment = {
   id: number;
@@ -93,7 +97,17 @@ export const githubApi = {
   githubPrDetail: (repo: string, number: number) => invoke<PrDetail>("github_pr_detail", { repo, number }),
   /** General and inline comments of one PR, oldest first; read only when the conversation is opened. */
   githubPrConversation: (repo: string, number: number) => invoke<PrConvEntry[]>("github_pr_conversation", { repo, number }),
-  githubPrReview: (repo: string, number: number, action: "approve" | "comment", body?: string) => invoke<void>("github_pr_review", { repo, number, action, body: body ?? null }),
+  githubPrReview: (repo: string, number: number, action: PrReviewAction, body?: string) => invoke<void>("github_pr_review", { repo, number, action, body: body ?? null }),
+  githubPrFiles: (repo: string, number: number) => invoke<PrFile[]>("github_pr_files", { repo, number }),
+  /** Reply inside an inline thread; `comment` is the thread's first comment. */
+  githubPrReply: (repo: string, number: number, comment: number, body: string) => invoke<void>("github_pr_reply", { repo, number, comment, body }),
+  gitlabMrDetail: (project: string, iid: number) => invoke<PrDetail>("gitlab_mr_detail", { project, iid }),
+  gitlabMrConversation: (project: string, iid: number) => invoke<PrConvEntry[]>("gitlab_mr_conversation", { project, iid }),
+  gitlabMrFiles: (project: string, iid: number) => invoke<PrFile[]>("gitlab_mr_files", { project, iid }),
+  /** GitLab has no "request changes" in its REST API. */
+  gitlabMrReview: (project: string, iid: number, action: "approve" | "comment", body?: string) => invoke<void>("gitlab_mr_review", { project, iid, action, body: body ?? null }),
+  gitlabMrReply: (project: string, iid: number, discussion: string, body: string) => invoke<void>("gitlab_mr_reply", { project, iid, discussion, body }),
+  gitlabMrResolve: (project: string, iid: number, discussion: string, resolved: boolean) => invoke<void>("gitlab_mr_resolve", { project, iid, discussion, resolved }),
   githubProfile: (login: string) => invoke<GithubProfile>("github_profile", { login }),
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
   /** Fetch comments on a PR to display in the commenters catalog. */

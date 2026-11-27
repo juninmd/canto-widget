@@ -4,6 +4,7 @@ use crate::error::Result;
 use crate::github::cmd_lists::token;
 use crate::github::conversation::{self, ConvEntry};
 use crate::github::detail::{self, PrDetail};
+use crate::github::files::{self, PrFile};
 use crate::github::profile::{self, Profile};
 
 #[tauri::command]
@@ -19,7 +20,27 @@ pub async fn github_pr_conversation(app: tauri::AppHandle, repo: String, number:
     run(move || conversation::fetch(&token(&app)?, &repo, number)).await
 }
 
-/// A user-triggered write (`approve` or `comment`); validated before the token is even read.
+/// The changed files with their patches, read only when the user opens the Arquivos or Diff tab.
+#[tauri::command]
+pub async fn github_pr_files(app: tauri::AppHandle, repo: String, number: u64) -> Result<Vec<PrFile>> {
+    detail::check_target(&repo, number)?;
+    run(move || files::fetch(&token(&app)?, &repo, number)).await
+}
+
+/// A reply inside an inline review thread; `comment` is the thread's first comment.
+#[tauri::command]
+pub async fn github_pr_reply(
+    app: tauri::AppHandle,
+    repo: String,
+    number: u64,
+    comment: u64,
+    body: String,
+) -> Result<()> {
+    let write = detail::plan_reply(&repo, number, comment, &body)?;
+    run(move || detail::send(&token(&app)?, &write)).await
+}
+
+/// A user-triggered write (`approve`, `request_changes` or `comment`); validated before the token is even read.
 #[tauri::command]
 pub async fn github_pr_review(
     app: tauri::AppHandle,

@@ -53,3 +53,19 @@ fn the_diff_keeps_only_its_last_lines_and_a_long_body_is_cut() {
     assert!(got[0].hunk.ends_with("+l19"));
     assert!(got[0].body.chars().count() <= MAX_BODY);
 }
+
+#[test]
+fn an_inline_thread_is_addressed_by_its_first_comment_and_a_general_comment_has_none() {
+    let first = raw(
+        json!({ "id": 10, "html_url": "https://github.com/a/b/pull/1#r10", "body": "?", "created_at": "2026-11-01T10:00:00Z", "path": "a.ts", "line": 3, "diff_hunk": "+x" }),
+    );
+    let reply = raw(
+        json!({ "id": 11, "html_url": "https://github.com/a/b/pull/1#r11", "body": "!", "created_at": "2026-11-01T11:00:00Z", "path": "a.ts", "line": 3, "in_reply_to_id": 10 }),
+    );
+    let general = raw(
+        json!({ "id": 12, "html_url": "https://github.com/a/b/pull/1#c12", "body": "ok", "created_at": "2026-11-01T12:00:00Z" }),
+    );
+    let got = merge(vec![general], vec![first, reply]);
+    assert_eq!(got.iter().map(|c| c.thread.as_str()).collect::<Vec<_>>(), ["10", "10", ""]);
+    assert!(got.iter().all(|c| !c.resolvable && !c.resolved));
+}

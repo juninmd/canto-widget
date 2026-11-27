@@ -65,7 +65,7 @@ fn a_comment_needs_text_and_goes_to_the_conversation() {
 #[test]
 fn unknown_actions_and_oversized_text_are_refused() {
     assert!(plan("merge", "acme/atlas", 7, "").is_err());
-    assert!(plan("request_changes", "acme/atlas", 7, "x").is_err());
+    assert!(plan("merge_now", "acme/atlas", 7, "x").is_err());
     assert!(plan("comment", "acme/atlas", 7, &"a".repeat(MAX_COMMENT + 1)).is_err());
     assert!(plan("comment", "acme/atlas", 7, &"a".repeat(MAX_COMMENT)).is_ok());
 }
@@ -79,4 +79,15 @@ fn a_read_only_token_gets_a_message_that_says_what_to_change() {
     assert!(write_refused(422).unwrap().to_string().contains("próprio PR"));
     assert!(write_refused(500).is_none());
     assert!(write_refused(200).is_none());
+}
+
+#[test]
+fn requesting_changes_needs_the_reason_and_a_reply_needs_its_thread() {
+    let w = plan("request_changes", "acme/atlas", 7, " Falta teste ").unwrap();
+    assert_eq!(w.path, "repos/acme/atlas/pulls/7/reviews");
+    assert_eq!(w.json, json!({ "event": "REQUEST_CHANGES", "body": "Falta teste" }));
+    assert!(plan("request_changes", "acme/atlas", 7, "  ").is_err());
+    let r = plan_reply("acme/atlas", 7, 99, "Feito").unwrap();
+    assert_eq!(r.path, "repos/acme/atlas/pulls/7/comments/99/replies");
+    assert!(plan_reply("acme/atlas", 7, 0, "x").is_err() && plan_reply("acme/atlas", 7, 9, " ").is_err());
 }

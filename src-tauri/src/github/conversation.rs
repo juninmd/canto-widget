@@ -25,6 +25,12 @@ pub struct ConvEntry {
     /// The last lines of the diff around an inline comment; empty for a reply, which shares its thread's.
     pub hunk: String,
     pub reply: bool,
+    /// Who a reply goes to: the id of the thread's first comment (GitHub) or the discussion id (GitLab). Empty for a
+    /// general comment, which has no thread.
+    pub thread: String,
+    pub resolved: bool,
+    /// Only GitLab can resolve from here; GitHub needs a GraphQL thread id this panel does not read.
+    pub resolvable: bool,
 }
 
 #[derive(Deserialize)]
@@ -62,6 +68,7 @@ fn entry(r: Raw) -> Option<ConvEntry> {
         return None;
     }
     let reply = r.in_reply_to_id.is_some();
+    let has_path = r.path.is_some();
     let hunk = if reply { String::new() } else { tail(r.diff_hunk.as_deref().unwrap_or("")) };
     let (author, bot) = match r.user {
         Some(u) => (u.login.clone(), u.kind.as_deref() == Some("Bot") || u.login.ends_with("[bot]")),
@@ -78,10 +85,13 @@ fn entry(r: Raw) -> Option<ConvEntry> {
         line: r.line.or(r.original_line).unwrap_or(0),
         hunk,
         reply,
+        thread: if has_path { r.in_reply_to_id.unwrap_or(r.id).to_string() } else { String::new() },
+        resolved: false,
+        resolvable: false,
     })
 }
 
-fn tail(hunk: &str) -> String {
+pub(crate) fn tail(hunk: &str) -> String {
     let lines: Vec<&str> = hunk.lines().collect();
     lines[lines.len().saturating_sub(MAX_HUNK_LINES)..].iter().map(|l| clip(l, 160)).collect::<Vec<_>>().join("\n")
 }

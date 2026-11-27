@@ -24,7 +24,7 @@ import { checkKey } from "./forgeChecks";
 import ForgeSummary from "./ForgeSummary";
 import MentionsList from "./MentionsList";
 import { savedHideDrafts, saveHideDrafts } from "./forgeDrafts";
-import PrPeek from "./PrPeek";
+import PrView from "./PrView";
 import PrCommentersCatalog from "./PrCommentersCatalog";
 import ReposList, { savedStats } from "./ReposList";
 import Skeleton from "../../components/Skeleton";
@@ -118,7 +118,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
         <MentionsList forge={forge} mentions={mentions} />
       ) : (
         <>
-          {next && <ForgeNextCard next={next} onOpen={() => (forge === "github" ? setPeeked(next.item) : void api.openLink(next.item.url))} />}
+          {next && <ForgeNextCard next={next} onOpen={() => (next.item.is_pr ? setPeeked(next.item) : void api.openLink(next.item.url))} />}
           {lists && <ForgeSummary forge={forge} lists={lists} ci={ci} focus={focus} onFocus={setPressed} need={stuck} />}
 
           <div className="flex gap-1 rounded-xl bg-edge/60 p-0.5" role="tablist">
@@ -186,7 +186,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                 {lists && layout === "queue" && (
                   <ForgeQueue
                     items={queueItems}
-                    onPeek={forge === "github" ? setPeeked : undefined}
+                    onPeek={setPeeked}
                     renderItem={(it) => (
                       <ForgeRow
                         key={it.url}
@@ -198,6 +198,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                         ci={ci?.[checkKey(it.repo, it.number)]}
                         conflict={it.conflict === true || conflicts?.[checkKey(it.repo, it.number)] === true}
                         review={reviews?.[checkKey(it.repo, it.number)]}
+                        onPeek={it.is_pr ? () => setPeeked(it) : undefined}
                       />
                     )}
                   />
@@ -222,12 +223,12 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
                       reviews={reviews}
                       hideDrafts={hideDrafts}
                       grid={layout !== "list"}
-                      onPeek={forge === "github" ? setPeeked : undefined}
+                      onPeek={setPeeked}
                       needs={attending ? (it) => needsAttention(key, it, new Date(), signals) : undefined}
                     />
                   ))}
               </div>
-              {peeked && forge === "github" && <PrPeek item={peeked} login={login} onClose={() => setPeeked(null)} />}
+              {peeked && <PrView forge={forge} item={peeked} login={login} onClose={() => setPeeked(null)} />}
             </>
           ) : (
             <div className="flex-1 overflow-y-auto pr-1">
@@ -242,7 +243,7 @@ export default function ForgeBoard({ forge, login, host, lists: gh, ci, conflict
           onClose={() => setSearching(false)}
           onPick={(it) => {
             setSearching(false);
-            if (forge === "github" && it.is_pr) setPeeked(it);
+            if (it.is_pr) setPeeked(it);
             else void api.openLink(it.url);
           }}
         />

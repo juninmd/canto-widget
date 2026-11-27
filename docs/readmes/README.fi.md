@@ -370,8 +370,10 @@ Ja **Seuraa järjestelmää**, joka vaihtaa vaalean ja pimeän välillä käytt�
 |---|
 | ![GitHub tab: a "+3 comments" badge on a PR that got comments since it was last opened, and the "ocultar rascunhos" toggle hiding draft PRs](../prints/app/153-forge-novidades-rascunhos.png) |
 | ![GitHub tab: each PR shows its approvals, "mudanças pedidas" and the size of its diff next to the CI badge, and the "precisa de mim" button keeps only overdue reviews and my stalled PRs](../prints/app/155-forge-aprovacoes-precisa-de-mim.png) |
-| ![GitHub: espiar PR](../prints/app/156-forge-espiar-pr.png) |
-| ![GitHub tab: "espiar" now has "ver conversa": the PR's general and inline comments with the diff excerpt, each one with an arrow that opens it on GitHub, a switch to hide bots and an "abrir no GitHub" arrow in the panel header](../prints/app/168-forge-conversa-pr.png) |
+| ![GitHub tab: clicking a PR opens it over the whole Canto window, with tabs Geral, Conversa, Pipeline, Arquivos, Diff, Revisores and Comentar; here the Conversa tab groups each thread with its diff excerpt and replies, with filters and a switch to hide bots](../prints/app/169-forge-pr-conversa.png) |
+| ![GitHub tab: the Diff tab shows every changed file with line numbers and the review threads left on their lines](../prints/app/170-forge-pr-diff.png) |
+| ![GitLab tab: a merge request opens the same view; the Pipeline tab lists the jobs of each stage with their time and a link to the log](../prints/app/171-forge-mr-pipeline.png) |
+| ![GitHub tab: the Revisores tab shows who answered and the two verdicts, "aprovar" and "pedir mudanças", each asking for confirmation before writing](../prints/app/172-forge-pr-revisores.png) |
 | ![GitHub: avisar CI e adiar](../prints/app/157-forge-avisar-ci-adiar.png) |
 | ![GitHub: perfil](../prints/app/158-forge-perfil-pessoa.png) |
 

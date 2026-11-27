@@ -114,7 +114,7 @@ test("disconnecting asks inline first and only the confirmation drops the token"
   expect(count("github_disconnect")).toBe(1);
 });
 
-test("the filter is the tab's search target, hints at Enter while focused, and rows carry the external-link glyph", async () => {
+test("the filter is the tab's search target, hints at Enter while focused, and PR rows (which open the view) carry no external-link glyph", async () => {
   responses.github_status = () => Promise.resolve(connected);
   responses.github_lists = () => Promise.resolve(lists);
   localStorage.setItem("canto.forge.layout", "list");
@@ -125,7 +125,7 @@ test("the filter is the tab's search target, hints at Enter while focused, and r
   expect(screen.queryByText("Enter para buscar")).toBeNull();
   fireEvent.focus(input);
   expect(screen.getByText("Enter para buscar")).toBeTruthy();
-  expect(container.querySelector('li [title="abre no navegador"]')?.getAttribute("aria-hidden")).toBe("true");
+  expect(container.querySelector('li [title="abre no navegador"]')).toBeNull();
 });
 
 test("the refresh button shows a spinner and is disabled while the lists load", async () => {

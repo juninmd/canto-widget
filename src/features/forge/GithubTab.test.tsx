@@ -68,7 +68,7 @@ test("saving the token sends it to Rust and starts listing", async () => {
   expect(screen.getByText("@octocat")).toBeTruthy();
 });
 
-test("connected shows all five lists with totals and opens the item in the browser", async () => {
+test("connected shows all five lists with totals; a PR opens its view and the arrow opens the browser", async () => {
   responses.github_status = () => Promise.resolve({ connected: true, login: "octocat", source: "app", device_flow: true });
   responses.github_lists = () =>
     Promise.resolve({ others_prs: empty, assigned: empty, my_prs: empty, review_requested: { total: 3, items: [item] }, my_issues: empty });
@@ -82,6 +82,10 @@ test("connected shows all five lists with totals and opens the item in the brows
   expect(screen.getByText("rascunho")).toBeTruthy();
   await act(async () => {
     fireEvent.click(screen.getByText("Revisar o cofre"));
+  });
+  expect(calls.some((c) => c.cmd === "open_link")).toBe(false);
+  await act(async () => {
+    fireEvent.click(screen.getByRole("button", { name: "abrir no GitHub" }));
   });
   expect(calls.find((c) => c.cmd === "open_link")?.args).toEqual({ url: item.url });
 });

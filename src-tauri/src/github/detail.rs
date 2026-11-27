@@ -20,6 +20,12 @@ pub struct PrJob {
     pub state: ChecksStatus,
     /// Empty when the link isn't on github.com.
     pub url: String,
+    /// GitLab stage of the job; empty on GitHub.
+    pub stage: String,
+    /// Run time in whole seconds; 0 when unknown or still queued.
+    pub seconds: u64,
+    /// The forge's own word for a state this app does not track (`manual`, `skipped`...); empty otherwise.
+    pub label: String,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
@@ -112,6 +118,9 @@ fn jobs(runs: Vec<Run>) -> Vec<PrJob> {
             state: run_status(&r.run),
             url: if r.html_url.starts_with(PREFIX) { r.html_url } else { String::new() },
             name: r.name,
+            stage: String::new(),
+            seconds: 0,
+            label: String::new(),
         })
         .collect()
 }
@@ -153,7 +162,8 @@ pub struct Write {
     pub json: Value,
 }
 
-/// `approve` posts an approving review (the text is optional); `comment` posts a conversation comment (the text is required).
+/// `approve` posts an approving review (the text is optional); `request_changes` posts a blocking review and `comment`
+/// a conversation comment (the text is required for both).
 pub fn plan(action: &str, repo: &str, number: u64, text: &str) -> Result<Write> {
     check_target(repo, number)?;
     let text = text.trim();
@@ -168,12 +178,27 @@ pub fn plan(action: &str, repo: &str, number: u64, text: &str) -> Result<Write> 
             }
             Ok(Write { path: format!("repos/{repo}/pulls/{number}/reviews"), json })
         }
+        "request_changes" if !text.is_empty() => Ok(Write {
+            path: format!("repos/{repo}/pulls/{number}/reviews"),
+            json: json!({ "event": "REQUEST_CHANGES", "body": text }),
+        }),
+        "request_changes" => Err(AppError::Format("diga o que precisa mudar antes de enviar".into())),
         "comment" if !text.is_empty() => {
             Ok(Write { path: format!("repos/{repo}/issues/{number}/comments"), json: json!({ "body": text }) })
         }
         "comment" => Err(AppError::Format("escreva o comentário antes de enviar".into())),
         _ => Err(AppError::Format("ação desconhecida".into())),
     }
+}
+
+/// A reply inside an inline review thread; `comment` is the id of the thread's first comment.
+pub fn plan_reply(repo: &str, number: u64, comment: u64, text: &str) -> Result<Write> {
+    check_target(repo, number)?;
+    let text = text.trim();
+    if comment == 0 || text.is_empty() || text.chars().count() > MAX_COMMENT {
+        return Err(AppError::Format("resposta inválida".into()));
+    }
+    Ok(Write { path: format!("repos/{repo}/pulls/{number}/comments/{comment}/replies"), json: json!({ "body": text }) })
 }
 
 /// What a refused write means to the user; a rate limit is left to the shared handler.
