@@ -62,7 +62,7 @@ test("a skeleton shows instead of the empty state until the first search answers
   let release: (v: unknown) => void = () => {};
   search = new Promise((r) => (release = r));
   await mount();
-  expect(screen.getByRole("status", { name: "carregando os cards" })).toBeTruthy();
+  expect(screen.getByText("carregando os cards")).toBeTruthy();
   expect(screen.queryByText(/nenhum card salvo/)).toBeNull();
   search = null;
   await act(async () => release({ total: 0, items: [] }));

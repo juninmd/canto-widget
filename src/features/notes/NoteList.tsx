@@ -1,4 +1,5 @@
 import { useRef, type ReactNode } from "react";
+import { Button } from "@juninmd/sonido";
 import { useFlip } from "../../lib/useFlip";
 import { t } from "../../i18n";
 import type { Note } from "../../lib/api";
@@ -64,19 +65,7 @@ export default function NoteList({ notes, total, loaded, query, view, card, onMo
         </li>
       )}
       {notes.length === 0 && loaded && (
-        <EmptyState className={span} icon={query ? <SearchIcon /> : <NoteIcon />}>
-          {query ? t("notes.emptySearch") : t("notes.empty")}
-          {query && <span className="mt-1.5 block text-[11px] text-faint/90">{t("uiTasksNotes.emptyHint")}</span>}
-          {query && (
-            <button
-              type="button"
-              onClick={onClearQuery}
-              className="canto-hit mt-2 min-h-[24px] rounded-md bg-edge px-2 text-[11px] text-muted hover:bg-active hover:text-fg active:bg-active"
-            >
-              {t("uiTasksNotes.clearSearch")}
-            </button>
-          )}
-        </EmptyState>
+        <EmptyState className={span} icon={query ? <SearchIcon /> : <NoteIcon />} title={query ? t("notes.emptySearch") : t("notes.empty")} description={query ? t("uiTasksNotes.emptyHint") : undefined} action={query ? <Button variant="secondary" size="sm" onClick={onClearQuery}>{t("uiTasksNotes.clearSearch")}</Button> : undefined} />
       )}
     </ul>
   );

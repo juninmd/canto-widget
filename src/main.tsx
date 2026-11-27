@@ -10,6 +10,7 @@ import { RTL_LANGUAGES } from "./i18n/languages";
 import { loadWindowRoot, windowKind } from "./shell/windowRoot";
 import { subscribeWindowShown, windowShown } from "./lib/windowShown";
 import "./styles.css";
+import "@juninmd/sonido/styles.css";
 
 document.documentElement.lang = LANGUAGE;
 // Styles keyed on this reach the page behind the safe areas, which no component owns.

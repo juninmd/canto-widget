@@ -98,11 +98,11 @@ test("starting 'sincronizar agora' while 'parar' is asking closes the question, 
     fireEvent.click(screen.getByText("sincronizar agora"));
   });
   expect(screen.queryByText("sim, parar")).toBeNull();
-  expect((screen.getByText("parar") as HTMLButtonElement).disabled).toBe(true);
+  expect((screen.getByText("parar").closest("button") as HTMLButtonElement).disabled).toBe(true);
   await act(async () => finish(null));
   expect(cleared).toBe(false);
   expect(screen.queryByText("sim, parar")).toBeNull();
-  expect((screen.getByText("parar") as HTMLButtonElement).disabled).toBe(false);
+  expect((screen.getByText("parar").closest("button") as HTMLButtonElement).disabled).toBe(false);
 });
 
 const ok = { lastExportOkAt: Date.now() - 5 * 60_000, lastExportError: null, lastMergeOkAt: null, lastMergeError: null, consecutiveFailures: 0 };

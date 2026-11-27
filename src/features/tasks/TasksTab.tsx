@@ -245,13 +245,10 @@ export default function TasksTab({ today, version, agenda = [], onError }: Props
           </li>
         )}
         {tasks.length === 0 && loadedFor === today && (
-          <EmptyState icon={<ChecklistIcon />}>
-            {t("tasks.empty")}
-            <span className="mt-1.5 block text-[11px] text-faint/90">{t("tasks.emptyHint")}</span>
-          </EmptyState>
+          <EmptyState icon={<ChecklistIcon />} title={t("tasks.empty")} description={t("tasks.emptyHint")} />
         )}
         {tasks.length > 0 && visible.length === 0 && (
-          <EmptyState icon={<ChecklistIcon />}>{needle ? t("browse.noResultsFor", { query: query.trim() }) : t("tasks.emptyPriority")}</EmptyState>
+          <EmptyState icon={<ChecklistIcon />} title={needle ? t("browse.noResultsFor", { query: query.trim() }) : t("tasks.emptyPriority")} />
         )}
       </ul>
       <GoogleTasksSection today={today} onError={onError} />

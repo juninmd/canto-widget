@@ -1,4 +1,5 @@
 import { t } from "../i18n";
+import { applySonidoTheme } from "./sonido";
 export type SkinId = "padrao" | "hueco-mundo" | "dracula" | "glass" | "aurora" | "claro" | "sistema";
 type SkinReal = Exclude<SkinId, "sistema">;
 
@@ -41,6 +42,7 @@ export function applySkin(skin: SkinId): void {
     setTimeout(() => delete root.dataset.skinFade, SKIN_FADE_MS);
   }
   root.dataset.skin = next;
+  applySonidoTheme(next);
   localStorage.setItem(KEY, skin);
 }
 

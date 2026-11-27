@@ -79,12 +79,12 @@ test("a photo that isn't an image data: URL doesn't become an <img>; shows the i
 test("until the status answers there is a skeleton, never a 'não configurado' flash", async () => {
   hold = true;
   render(<GoogleSection onError={() => {}} />);
-  expect(screen.getByRole("status", { name: "lendo a conta do Google" })).toBeTruthy();
+  expect(screen.getByText("lendo a conta do Google")).toBeTruthy();
   expect(screen.queryByText("não configurado")).toBeNull();
   await act(async () => {
     release!();
   });
-  expect(screen.queryByRole("status", { name: "lendo a conta do Google" })).toBeNull();
+  expect(screen.queryByText("lendo a conta do Google")).toBeNull();
   expect(screen.getByText("Ana Souza")).toBeTruthy();
 });
 

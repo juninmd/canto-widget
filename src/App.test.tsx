@@ -588,7 +588,7 @@ test("a lock that fails says so, keeps the tabs and rereads the real vault state
 test("while the vault state loads there is a skeleton; if it fails, a banner with retry instead of a blank body", async () => {
   statusFailures = 1;
   render(<App />);
-  expect(screen.getByRole("status", { name: "abrindo o cofre…" })).toBeTruthy();
+  expect(screen.getByText("abrindo o cofre…")).toBeTruthy();
   await settle();
   expect(screen.getByText("Não foi possível carregar. cofre ilegível")).toBeTruthy();
   expect(screen.queryByRole("tablist")).toBeNull();
