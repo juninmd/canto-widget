@@ -81,11 +81,11 @@ test("the sort chips pick price (cheapest first) and speed (fastest first) and m
 test("the metric being sorted by is highlighted in each row", async () => {
   await show();
   const row = (id: string) => document.querySelector(`[data-model="${id}"]`)!;
-  expect(screen.getByText("73,2").className).toContain("text-accent-text");
+  expect(screen.getByText("73,2").parentElement!.className).toContain("text-accent-text");
   expect(screen.getByText("143 tok/s").className).not.toContain("text-accent-text");
   await act(async () => fireEvent.click(screen.getByRole("button", { name: "preço" })));
   expect(screen.getByText("$3,44 / 1M tokens").className).toContain("text-accent-text");
-  expect(screen.getByText("73,2").className).not.toContain("text-accent-text");
+  expect(screen.getByText("73,2").parentElement!.className).not.toContain("text-accent-text");
   await act(async () => fireEvent.click(screen.getByRole("button", { name: "velocidade" })));
   expect(row("a").textContent).toContain("143 tok/s");
   expect(screen.getByText("143 tok/s").className).toContain("text-accent-text");

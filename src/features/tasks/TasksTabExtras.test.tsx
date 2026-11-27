@@ -53,11 +53,11 @@ test("a skeleton shows instead of the empty state until the first load answers",
   pending = new Promise((r) => (release = r));
   list = [];
   await mount();
-  expect(screen.getByRole("status", { name: "carregando as tarefas" })).toBeTruthy();
+  expect(screen.getByText("carregando as tarefas")).toBeTruthy();
   expect(screen.queryByText(/nada para hoje/)).toBeNull();
   pending = null;
   await act(async () => release([]));
-  expect(screen.queryByRole("status", { name: "carregando as tarefas" })).toBeNull();
+  expect(screen.queryByText("carregando as tarefas")).toBeNull();
   expect(screen.getByText(/nada para hoje/)).toBeTruthy();
   expect(screen.getByText(/"!alta" a prioridade/)).toBeTruthy();
 });

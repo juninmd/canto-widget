@@ -114,7 +114,8 @@ test("while GitHub answers, the tab shows a busy skeleton instead of a blank are
   responses.github_status = connected;
   responses.github_lists = () => new Promise(() => {});
   await mount();
-  expect(screen.getByRole("status", { name: "carregando issues e PRs" }).getAttribute("aria-busy")).toBe("true");
+  expect(screen.getByRole("status").textContent).toContain("carregando issues e PRs");
+  expect(screen.getByRole("status").getAttribute("aria-busy")).toBe("true");
 });
 
 test("show more fetches the next page of that section only and skips repeats", async () => {

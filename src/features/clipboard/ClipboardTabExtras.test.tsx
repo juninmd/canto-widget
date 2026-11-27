@@ -56,7 +56,7 @@ test("a skeleton shows instead of the empty state until the first list answers",
   let release: (v: unknown) => void = () => {};
   listing = () => new Promise((r) => (release = r));
   await show();
-  expect(screen.getByRole("status", { name: "carregando o histórico" })).toBeTruthy();
+  expect(screen.getAllByRole("status").map((s) => s.textContent).join(" ")).toContain("carregando o histórico");
   expect(screen.queryByText(/copie algo/)).toBeNull();
   listing = null;
   await act(async () => release({ items: [], max_pinned: 100 }));

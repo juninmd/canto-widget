@@ -225,7 +225,7 @@ export default function ClipboardTab({ privacy, initialQuery, querySeq, onError 
                 <Skeleton label={t("clipboard.loading")} />
               </li>
             ) : (
-              <EmptyState icon={filtering ? <SearchIcon /> : <ClipboardIcon />}>{filtering ? t("clipboard.emptySearch") : t("clipboard.empty")}</EmptyState>
+              <EmptyState icon={filtering ? <SearchIcon /> : <ClipboardIcon />} title={filtering ? t("clipboard.emptySearch") : t("clipboard.empty")} />
             )}
           </ul>
         )}

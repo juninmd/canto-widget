@@ -153,9 +153,7 @@ export default function TranscriptsTab({ privacy = false, initialQuery, querySeq
             </li>
           )}
           {noFiles && (
-            <EmptyState icon={query ? <SearchIcon /> : <NoteIcon />}>
-              {query ? t("transcripts.emptySearch") : t("transcripts.empty")}
-            </EmptyState>
+            <EmptyState icon={query ? <SearchIcon /> : <NoteIcon />} title={query ? t("transcripts.emptySearch") : t("transcripts.empty")} />
           )}
         </ul>
         <p role="status" className={reading ? "mt-2 text-[11px] text-faint" : ""}>

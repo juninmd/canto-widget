@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Alterado
+
+- **Componentes do Sonido**: spinner, skeleton, contador animado, botão de confirmação em dois passos, estado vazio e as sub-abas passam a vir do design system @juninmd/sonido, no lugar das cópias locais. A skin escolhida também define o data-theme do Sonido (padrão, Hueco Mundo, Drácula, Glass, Aurora e claro), então as duas camadas andam juntas. Comparações lado a lado em docs/sonido-migration/.
+
 ### Corrigido
 
 - **Revisão geral das telas (contraste e estados)**: no tema claro, textos verdes, vermelhos, laranja e os tempos do Mapa passam a ter contraste de 4,5:1 ou mais sobre os fundos coloridos; no tema padrão o vermelho de erro e o texto discreto ficam mais legíveis; a linha do dia da Agenda vira uma lista válida para leitores de tela; a barra de progresso dos Agentes ganha nome; a aba Modelos IA mostra o erro de carregamento com **tentar de novo**, como as outras abas; a aba Dev não diz "Nenhuma porta encontrada" quando a leitura falhou; a prévia de código do Clipboard esmaece a borda cortada; itens lidos em Leituras ficam menos apagados.

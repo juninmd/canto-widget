@@ -94,7 +94,8 @@ test("attached Gemini notes and the Calendar page open in the browser", async ()
 
 test("the first load shows a busy skeleton, not the empty-agenda message", () => {
   render(<AgendaTab agenda={agenda({ loading: true })} onError={() => {}} />);
-  expect(screen.getByRole("status", { name: "carregando a agenda" })).toBeTruthy();
+  // Sonido's Skeleton announces through a hidden live region (role=status), not through aria-label.
+  expect(screen.getByRole("status").textContent).toContain("carregando a agenda");
   expect(screen.queryByText(/nenhum evento hoje/)).toBeNull();
 });
 

@@ -1,13 +1,22 @@
 import type { ReactNode } from "react";
+import { EmptyState as SonidoEmptyState } from "@juninmd/sonido";
 
-/** A list with nothing in it says so with a mark and one line, instead of a lone grey sentence. */
-export default function EmptyState({ icon, children, className = "" }: { icon: ReactNode; children: ReactNode; className?: string }) {
+type Props = {
+  icon: ReactNode;
+  /** The one line that says what is missing. */
+  title: string;
+  /** Optional second line, e.g. how to make results appear. */
+  description?: ReactNode;
+  /** Optional way out: retry, clear the search, open Settings. */
+  action?: ReactNode;
+  className?: string;
+};
+
+/** A list with nothing in it says so with a mark, one line and a way out, instead of a lone grey sentence. */
+export default function EmptyState({ icon, title, description, action, className = "" }: Props) {
   return (
-    <li className={`flex flex-col items-center gap-2 px-4 py-10 text-center text-xs text-faint ${className}`}>
-      <span aria-hidden="true" className="grid size-10 place-items-center rounded-full bg-edge/60 text-muted [&>svg]:size-5">
-        {icon}
-      </span>
-      <span className="max-w-[24ch]">{children}</span>
+    <li className={className}>
+      <SonidoEmptyState icon={icon} title={title} description={description} action={action} />
     </li>
   );
 }

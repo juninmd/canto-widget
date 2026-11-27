@@ -37,9 +37,10 @@ test("reading the folder shows a skeleton, and a failure never leaves it spinnin
   dir = () => Promise.reject("cofre trancado");
   const globalErrors: string[] = [];
   render(<TranscriptsTab onError={(m) => globalErrors.push(m)} />);
-  expect(screen.getByRole("status", { name: "lendo as transcrições" })).toBeTruthy();
+  // Sonido's Skeleton announces through a hidden live region, so the label is text, not an aria-label.
+  expect(screen.getByText("lendo as transcrições")).toBeTruthy();
   await settle();
-  expect(screen.queryByRole("status", { name: "lendo as transcrições" })).toBeNull();
+  expect(screen.queryByText("lendo as transcrições")).toBeNull();
   expect(globalErrors).toEqual(["cofre trancado"]);
   dir = () => Promise.resolve("C:/nao/existe");
 });

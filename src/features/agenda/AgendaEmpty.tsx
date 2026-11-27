@@ -1,3 +1,4 @@
+import { Button } from "@juninmd/sonido";
 import { t } from "../../i18n";
 import { ClockIcon } from "../../components/Icons";
 import EmptyState from "../../components/EmptyState";
@@ -8,20 +9,17 @@ type Props = { notConnected: boolean; isToday: boolean; onOpenSettings?: () => v
 export default function AgendaEmpty({ notConnected, isToday, onOpenSettings }: Props) {
   return (
     <ul>
-      <EmptyState icon={<ClockIcon />}>
-        {notConnected ? (
-          <>
-            <span className="block">{t("agenda.notConnected")}</span>
-            {onOpenSettings && (
-              <button type="button" onClick={onOpenSettings} className="canto-hit mt-2 min-h-7 rounded-lg bg-accent px-3 text-xs font-semibold text-on-accent">
-                {t("agenda.openSettings")}
-              </button>
-            )}
-          </>
-        ) : (
-          t(isToday ? "agenda.empty" : "agenda.emptyDay")
-        )}
-      </EmptyState>
+      <EmptyState
+        icon={<ClockIcon />}
+        title={notConnected ? t("agenda.notConnected") : t(isToday ? "agenda.empty" : "agenda.emptyDay")}
+        action={
+          notConnected && onOpenSettings ? (
+            <Button size="sm" onClick={onOpenSettings}>
+              {t("agenda.openSettings")}
+            </Button>
+          ) : undefined
+        }
+      />
     </ul>
   );
 }
