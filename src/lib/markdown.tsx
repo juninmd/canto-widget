@@ -43,6 +43,8 @@ export type Render = {
   text: (text: string) => ReactNode;
   /** A link; without one the text stays text, which is what a card that is itself a button wants. */
   link?: (href: string, children: ReactNode, key: string) => ReactNode;
+  /** A picture; without one it is left out, which is what an alert or a note preview wants. */
+  image?: (src: string, alt: string, key: string) => ReactNode;
 };
 
 export function inline(tokens: Token[] | undefined, render: Render, key: string): ReactNode[] {
@@ -63,7 +65,7 @@ export function inline(tokens: Token[] | undefined, render: Render, key: string)
         return <span key={k} className="text-accent-text underline decoration-dotted">{children}</span>;
       }
       case "image":
-        return null;
+        return render.image ? render.image((tok as Tokens.Image).href, (tok as Tokens.Image).text, k) : null;
       case "br":
         return <br key={k} />;
       case "text":

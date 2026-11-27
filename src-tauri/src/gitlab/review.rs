@@ -210,6 +210,7 @@ fn entries(base: &str, project: &str, iid: u64, raw: Vec<Discussion>) -> Vec<Con
                 thread: if d.individual_note { String::new() } else { d.id.clone() },
                 resolved: resolvable && resolved,
                 resolvable,
+                reactions: Vec::new(),
             });
         }
     }

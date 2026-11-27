@@ -1,7 +1,10 @@
 //! Issue and PR/MR lists as the UI shows them, whichever forge they came from.
+pub mod blob;
 pub mod cache;
 pub mod cmd;
 pub mod filter;
+pub mod image;
+pub mod pr_meta;
 
 use serde::Serialize;
 

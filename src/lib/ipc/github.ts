@@ -57,9 +57,27 @@ export type PrReviewer = { login: string; state: "approved" | "changes" | "pendi
 /** One PR for the peek panel; `body` is already cut short by Rust. */
 export type PrDetail = { body: string; head_branch: string; base_branch: string; changed_files: number; jobs: PrJob[]; reviewers: PrReviewer[] };
 /** One comment of a PR for the peek panel: general (`path` empty) or inline on a file; Rust already cut the texts short. */
-export type PrConvEntry = { id: number; author: string; bot: boolean; body: string; created_at: string; url: string; path: string; line: number; hunk: string; reply: boolean; thread: string; resolved: boolean; resolvable: boolean };
+export type PrConvEntry = { id: number; author: string; bot: boolean; body: string; created_at: string; url: string; path: string; line: number; hunk: string; reply: boolean; thread: string; resolved: boolean; resolvable: boolean; reactions?: { emoji: string; count: number }[] };
 /** One changed file with its capped unified patch (empty for binaries). */
 export type PrFile = { name: string; status: "added" | "removed" | "renamed" | "modified"; additions: number; deletions: number; patch: string; truncated: boolean };
+export type PrLabel = { name: string; color: string };
+export type PrReaction = { id: number; emoji: string; user: string };
+/** State, labels and reactions of one PR/MR for the full view; `body` is the whole description. */
+export type PrMeta = {
+  title: string; state: "open" | "closed" | "merged"; draft: boolean; conflict: boolean; author: string; author_avatar: string; created_at: string; body: string;
+  labels: PrLabel[]; assignees: string[]; milestone: string; merge_methods: string[]; reactions: PrReaction[];
+};
+export type PrMergeMethod = "merge" | "squash" | "rebase";
+/** What a user can do to a PR/MR; `target` is `pr`, `comment` (a general one) or `review` (an inline one). */
+export type PrAction =
+  | { kind: "merge"; method: PrMergeMethod; auto?: boolean }
+  | { kind: "close" }
+  | { kind: "reopen" }
+  | { kind: "draft"; on: boolean }
+  | { kind: "label_add"; name: string }
+  | { kind: "label_remove"; name: string }
+  | { kind: "react"; target: "pr" | "comment" | "review"; id?: number; emoji: string }
+  | { kind: "unreact"; target: "pr" | "comment" | "review"; id?: number; reaction: number };
 export type PrReviewAction = "approve" | "request_changes" | "comment";
 export type PrChecks = PrRef & { status: ChecksStatus; conflict?: boolean; additions?: number; deletions?: number; approvals?: number; changes_requested?: boolean };
 export type PrComment = {
@@ -108,6 +126,16 @@ export const githubApi = {
   gitlabMrReview: (project: string, iid: number, action: "approve" | "comment", body?: string) => invoke<void>("gitlab_mr_review", { project, iid, action, body: body ?? null }),
   gitlabMrReply: (project: string, iid: number, discussion: string, body: string) => invoke<void>("gitlab_mr_reply", { project, iid, discussion, body }),
   gitlabMrResolve: (project: string, iid: number, discussion: string, resolved: boolean) => invoke<void>("gitlab_mr_resolve", { project, iid, discussion, resolved }),
+  githubPrMeta: (repo: string, number: number) => invoke<PrMeta>("github_pr_meta", { repo, number }),
+  githubPrAct: (repo: string, number: number, action: PrAction) => invoke<void>("github_pr_act", { repo, number, action }),
+  githubRepoLabels: (repo: string) => invoke<PrLabel[]>("github_repo_labels", { repo }),
+  gitlabMrMeta: (project: string, iid: number) => invoke<PrMeta>("gitlab_mr_meta", { project, iid }),
+  gitlabMrAct: (project: string, iid: number, action: PrAction) => invoke<void>("gitlab_mr_act", { project, iid, action }),
+  gitlabProjectLabels: (project: string) => invoke<PrLabel[]>("gitlab_project_labels", { project }),
+  /** A picture of a description or comment as a `data:` URL (the CSP blocks remote ones); rejects when it can't be fetched. */
+  forgeImage: (forge: "github" | "gitlab", url: string) => invoke<string>("forge_image", { forge, url }),
+  /** A picture of the repository at a branch, as a `data:` URL: the before or after of an image in a diff. */
+  prBlobImage: (forge: "github" | "gitlab", repo: string, path: string, gitRef: string) => invoke<string>("pr_blob_image", { forge, repo, path, gitRef }),
   githubProfile: (login: string) => invoke<GithubProfile>("github_profile", { login }),
   githubPrsChecks: (prs: PrRef[]) => invoke<PrChecks[]>("github_prs_checks", { prs }),
   /** Fetch comments on a PR to display in the commenters catalog. */

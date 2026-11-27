@@ -5,6 +5,10 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 
 ## [Não publicado]
 
+### Adicionado
+
+- **Preview de PR/MR completo**: a tela cheia agora dispensa abrir o GitHub ou o GitLab. Descrição em markdown com imagens, reações com emoji, mesclar (merge, squash, rebase; no GitLab, também ao passar o pipeline), fechar, reabrir, rascunho ⇄ pronto, labels, responsáveis, milestone, avatar e @autor. Conversa e Comentar viraram uma aba, Arquivos e Diff viraram uma aba (árvore ou lista, filtro, imagens com lado a lado, antes, depois e mistura). Abas com ícone seguem o layout horizontal ou vertical do app; na vertical a barra se oculta sozinha e tem alfinete.
+
 ### Alterado
 
 - **Componentes do Sonido**: spinner, skeleton, contador animado, botão de confirmação em dois passos, estado vazio e as sub-abas passam a vir do design system @juninmd/sonido, no lugar das cópias locais. A skin escolhida também define o data-theme do Sonido (padrão, Hueco Mundo, Drácula, Glass, Aurora e claro), então as duas camadas andam juntas. Comparações lado a lado em docs/sonido-migration/.

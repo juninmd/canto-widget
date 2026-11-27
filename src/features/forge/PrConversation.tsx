@@ -5,12 +5,34 @@ import { t } from "../../i18n";
 import Skeleton from "../../components/Skeleton";
 import type { PrBackend } from "./prApi";
 import type { Loaded } from "./usePrLoad";
+import PrCompose from "./PrCompose";
+import PrMarkdown from "./PrMarkdown";
+import PrReactions, { GITHUB_EMOJI, GITLAB_EMOJI } from "./PrReactions";
 import { filterThreads, groupThreads, type Thread, type ThreadFilter } from "./prThreads";
 
 const BTN = "canto-hit min-h-[24px] rounded-md border border-edge px-2 text-[11px] text-muted hover:bg-hover hover:text-fg disabled:opacity-60";
 const FILTERS: ThreadFilter[] = ["all", "open", "resolved"];
 
-function Comment({ c, reply }: { c: PrConvEntry; reply?: boolean }) {
+function Comment({ c, reply, back, onChanged }: { c: PrConvEntry; reply?: boolean; back: PrBackend; onChanged: () => void }) {
+  const [added, setAdded] = useState<string[]>([]);
+  const [failed, setFailed] = useState("");
+  const target = c.path ? "review" : "comment";
+  // GitHub sends counts and Rust cannot tell which are yours, so a pill adds yours; GitLab sends none, so what was
+  // added here is shown until the conversation is read again.
+  const counts = (c.reactions ?? []).map((r) => ({ emoji: r.emoji, count: r.count, mine: false }));
+  const items = back.commentCounts ? counts : added.map((emoji) => ({ emoji, count: 1, mine: true }));
+
+  async function react(emoji: string) {
+    setFailed("");
+    try {
+      await back.act({ kind: "react", target, id: c.id, emoji });
+      setAdded((a) => (a.includes(emoji) ? a : [...a, emoji]));
+      onChanged();
+    } catch (e) {
+      setFailed(errText(e));
+    }
+  }
+
   return (
     <div className={`rounded-lg border border-edge bg-panel/60 p-1.5 ${reply ? "ml-3" : ""}`}>
       <div className="flex items-center gap-1.5 text-[11px] text-muted">
@@ -21,7 +43,17 @@ function Comment({ c, reply }: { c: PrConvEntry; reply?: boolean }) {
           ↗
         </button>
       </div>
-      <p className="m-0 mt-0.5 whitespace-pre-wrap break-words text-xs text-fg">{c.body}</p>
+      <div className="mt-0.5">
+        <PrMarkdown back={back} text={c.body} />
+      </div>
+      <div className="mt-1">
+        <PrReactions items={items} emojis={back.forge === "gitlab" ? GITLAB_EMOJI : GITHUB_EMOJI} onToggle={(e) => void react(e)} />
+      </div>
+      {failed && (
+        <p role="alert" className="m-0 mt-1 text-[11px] text-danger">
+          {failed}
+        </p>
+      )}
     </div>
   );
 }
@@ -70,9 +102,9 @@ function ThreadCard({ th, back, onChanged }: { th: Thread; back: PrBackend; onCh
         </p>
       )}
       {th.root.hunk && <pre aria-label={t("forge.peek.diff")} className="m-0 max-h-24 overflow-auto rounded-md bg-ink p-1 font-mono text-[10px] text-muted">{th.root.hunk}</pre>}
-      <Comment c={th.root} />
+      <Comment c={th.root} back={back} onChanged={onChanged} />
       {th.replies.map((r) => (
-        <Comment key={r.id} c={r} reply />
+        <Comment key={r.id} c={r} reply back={back} onChanged={onChanged} />
       ))}
       {th.id && (
         <div className="flex flex-wrap items-center gap-1.5">
@@ -140,6 +172,7 @@ export default function PrConversation({ back, conv }: { back: PrBackend; conv: 
           <ThreadCard key={th.key} th={th} back={back} onChanged={conv.reload} />
         ))}
       </ul>
+      <PrCompose back={back} onDone={conv.reload} />
     </div>
   );
 }
