@@ -12,7 +12,7 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@juninmd/sonido": "^2.2.1",
+    "@juninmd/sonido": "^2.3.1",
     "@tauri-apps/api": "^2.12.5",
     "@tiptap/core": "^3.34.0",
     "@tiptap/extension-hard-break": "^3.34.0",

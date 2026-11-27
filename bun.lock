@@ -5,7 +5,7 @@
     "": {
       "name": "canto-widget",
       "dependencies": {
-        "@juninmd/sonido": "^2.2.1",
+        "@juninmd/sonido": "^2.3.1",
         "@tauri-apps/api": "^2.12.5",
         "@tiptap/core": "^3.34.0",
         "@tiptap/extension-hard-break": "^3.34.0",
@@ -68,7 +68,7 @@
 
     "@jridgewell/trace-mapping": ["@jridgewell/trace-mapping@0.3.31", "", { "dependencies": { "@jridgewell/resolve-uri": "^3.1.0", "@jridgewell/sourcemap-codec": "^1.4.14" } }, "sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw=="],
 
-    "@juninmd/sonido": ["@juninmd/sonido@2.2.1", "", { "peerDependencies": { "react": ">=18", "react-dom": ">=18" } }, "sha512-e/KIJDPL2MNiRSaor3Ks6TeFNphfROD37Q/QYsZehfKUOfkj/zlxnOw2vOGMchti1NwnQ1fYYXGvted6ncT8yA=="],
+    "@juninmd/sonido": ["@juninmd/sonido@2.3.1", "", { "peerDependencies": { "react": ">=18", "react-dom": ">=18" } }, "sha512-QzHSaN6AuRnJqFcgSQ1vCJAu4RBB6ITnQ23ktEtBc5P87G2HdITatRvBJ4a0wGfNupI+7Dmq5KSKRsPLnPKKSg=="],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.2.6", "", { "dependencies": { "@tybys/wasm-util": "^0.10.3" }, "peerDependencies": { "@emnapi/core": "^1.7.1 || 2.0.0-beta.2", "@emnapi/runtime": "^1.7.1 || 2.0.0-beta.2" } }, "sha512-mRyDmEw9/fCDXCGfL1sbgIw/GUK0PVxRW4YwgPN61F3LQ+fSyoBFarJVzgGyhF6kRzEQZ0FejDqm4WLXSeqQmw=="],
 

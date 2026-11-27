@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Tabs } from "@juninmd/sonido";
+import { SubTabs as SonidoSubTabs } from "@juninmd/sonido";
 
 type Tab<K extends string> = { key: K; label: string; badge?: number; tone?: "hot" | "info"; icon?: ReactNode };
 type Props<K extends string> = {
@@ -15,26 +15,8 @@ type Props<K extends string> = {
 
 /**
  * The small segmented switch under a tab's header (Status API, GitHub, GitLab, Steam).
- * Keyboard, ARIA and the pill look come from Sonido's Tabs; `dense`/`iconsOnly` only adjust layout.
+ * The original look now lives in Sonido's SubTabs; the app only renames `tabs` to `items`.
  */
 export default function SubTabs<K extends string>({ label, tabs, value, onChange, dense = false, iconsOnly = false }: Props<K>) {
-  return (
-    <Tabs
-      label={label}
-      variant="pill"
-      value={value}
-      onChange={onChange}
-      items={tabs.map((s) => ({
-        key: s.key,
-        label: s.label,
-        icon: s.icon,
-        badge: s.badge
-          ? s.tone === "hot"
-            ? <span aria-hidden="true" className="steam-hot-badge">{s.badge}</span>
-            : <span aria-hidden="true">{s.badge}</span>
-          : undefined,
-      }))}
-      className={`${dense ? "canto-subtabs--dense" : ""} ${iconsOnly ? "canto-subtabs--icons" : ""}`.trim() || undefined}
-    />
-  );
+  return <SonidoSubTabs label={label} items={tabs} value={value} onChange={onChange} dense={dense} iconsOnly={iconsOnly} />;
 }

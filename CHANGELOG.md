@@ -8,6 +8,7 @@ versões em [SemVer](https://semver.org/lang/pt-BR/).
 ### Alterado
 
 - **Componentes do Sonido**: spinner, skeleton, contador animado, botão de confirmação em dois passos, estado vazio e as sub-abas passam a vir do design system @juninmd/sonido, no lugar das cópias locais. A skin escolhida também define o data-theme do Sonido (padrão, Hueco Mundo, Drácula, Glass, Aurora e claro), então as duas camadas andam juntas. Comparações lado a lado em docs/sonido-migration/.
+- **Sub-abas e confirmação com o desenho original**: o controle segmentado volta a ter contador laranja de novidade, modo denso e modo só-ícone, e o botão de confirmação volta a ser um chip compacto com a pergunta em uma linha e as duas ações de texto. As duas variações agora vivem no Sonido (`SubTabs` e `ConfirmButton appearance="inline"`), então o app não precisa mais de CSS de ponte.
 
 ### Corrigido
 
