@@ -16,16 +16,7 @@ na revisão da troca.
 A skin do widget (`data-skin`) também define o `data-theme` do Sonido em `src/lib/sonido.ts`, então padrão,
 Hueco Mundo, Drácula, Glass, Aurora e claro pintam as duas camadas com o mesmo token.
 
-## Como as imagens foram geradas
+## Comparações
 
-`preview.html` + `preview.tsx` montam a mesma página com os dois lados. O lado **Antes** importa cópias literais dos
-componentes em `legacy/` (tiradas de `origin/main`, só o caminho do import mudou); o lado **Depois** importa os
-arquivos do app já apoiados no Sonido. Com `bun run dev`:
+As capturas (`antes-depois-padrao.png`, `antes-depois-hueco-mundo.png`, `confirmacao-hueco-mundo.png`, `subtabs-confirm-hueco-mundo.png`, `subtabs-confirm-padrao.png`, `subtabs-confirm-pergunta.png`) foram geradas antes do merge, em Chromium 1180×900 (`deviceScaleFactor: 2`, `fullPage`), com dados fictícios. O harness que montava os dois lados (`preview*` e as cópias em `legacy/`) foi removido depois da revisão; as imagens ficam como registro da troca.
 
-```bash
-# http://localhost:1420/docs/sonido-migration/preview.html
-# http://localhost:1420/docs/sonido-migration/preview.html?skin=hueco-mundo
-```
-
-As capturas (`antes-depois-padrao.png`, `antes-depois-hueco-mundo.png`, `confirmacao-hueco-mundo.png`) foram feitas
-em Chromium 1180×900, `fullPage`, com dados fictícios.
