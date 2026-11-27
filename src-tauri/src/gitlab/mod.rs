@@ -1,5 +1,6 @@
 //! Open issues and merge requests from GitLab.com or a self-hosted instance, via API v4.
 pub mod cmd;
+pub mod manage;
 pub mod query;
 pub mod review;
 pub mod todos;

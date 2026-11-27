@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { api, type ForgeItem } from "../../lib/api";
+import { api, type ForgeItem, type PrMeta } from "../../lib/api";
 import { t, type MessageKey } from "../../i18n";
 import type { Forge } from "./forge";
 import { prBackend } from "./prApi";
@@ -10,63 +10,100 @@ import PrOverview from "./PrOverview";
 import PrConversation from "./PrConversation";
 import PrPipeline from "./PrPipeline";
 import PrFiles from "./PrFiles";
-import PrDiff from "./PrDiff";
 import PrReviewers from "./PrReviewers";
-import PrCompose from "./PrCompose";
+import PrActions from "./PrActions";
+import { PrTabBar, PrTabRail, type PrTabDef } from "./PrTabs";
+import { Avatar } from "./PrOverview";
+import { Pill } from "./ForgePills";
+import { useRepoAvatars } from "./useRepoAvatars";
+import { useTabLayout } from "../../shell/tabLayout";
 
 type Props = { forge: Forge; item: ForgeItem; login: string; onClose: () => void };
-export type PrTab = "overview" | "conversation" | "pipeline" | "files" | "diff" | "reviewers" | "compose";
+export type PrTab = "overview" | "conversation" | "pipeline" | "files" | "reviewers";
 
 const TABS: { key: PrTab; label: MessageKey }[] = [
   { key: "overview", label: "forge.pr.tab.overview" },
   { key: "conversation", label: "forge.pr.tab.conversation" },
   { key: "pipeline", label: "forge.pr.tab.pipeline" },
   { key: "files", label: "forge.pr.tab.files" },
-  { key: "diff", label: "forge.pr.tab.diff" },
   { key: "reviewers", label: "forge.pr.tab.reviewers" },
-  { key: "compose", label: "forge.pr.tab.compose" },
 ];
 
-/** A PR or MR over the whole Canto window: tabs for what to read and for what to do, loaded only when opened. */
+const STATE_TONE = { open: "ok", draft: "neutral", merged: "info", closed: "bad" } as const;
+
+/** What the header says of the PR/MR: open, draft, merged or closed. */
+function stateOf(meta: PrMeta | null): keyof typeof STATE_TONE | null {
+  return !meta ? null : meta.state === "open" && meta.draft ? "draft" : meta.state;
+}
+
+/** A PR or MR over the whole Canto window: everything to read and to do, so the forge's own site isn't needed. */
 export default function PrView({ forge, item, login, onClose }: Props) {
   const back = useMemo(() => prBackend(forge, item), [forge, item]);
   const [tab, setTab] = useState<PrTab>("overview");
-  const [only, setOnly] = useState<string | null>(null);
+  const { layout } = useTabLayout();
   const backBtn = useRef<HTMLButtonElement>(null);
   const key = `${forge}|${item.repo}|${item.number}`;
   const detail = usePrLoad(back.detail, true, key);
-  const wantsConv = tab === "conversation" || tab === "diff";
-  const conv = usePrLoad(back.conversation, wantsConv, key);
-  const files = usePrLoad(back.files, tab === "files" || tab === "diff", key);
+  const meta = usePrLoad(back.meta, true, key);
+  const conv = usePrLoad(back.conversation, tab === "conversation" || tab === "files", key);
+  const files = usePrLoad(back.files, tab === "files", key);
+  const refresh = () => (detail.reload(), meta.reload());
 
   // Keyboard and screen-reader users land inside the view, not on the list it covers.
   useEffect(() => backBtn.current?.focus(), []);
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape" && !/INPUT|TEXTAREA/.test((e.target as HTMLElement).tagName)) onClose();
+      if (e.key === "Escape" && !/INPUT|TEXTAREA|SELECT/.test((e.target as HTMLElement).tagName)) onClose();
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
   const d = detail.data;
+  const m = meta.data;
+  const photo = useRepoAvatars(forge, [m?.author_avatar ?? ""])(m?.author_avatar ?? "");
   const state = d ? (d.jobs.some((j) => j.state === "failure") ? "failure" : d.jobs.some((j) => j.state === "running") ? "running" : d.jobs.length ? "success" : "none") : null;
   const count = (k: PrTab) =>
     k === "conversation" ? conv.data?.length : k === "pipeline" ? d?.jobs.length : k === "files" ? (files.data?.length ?? d?.changed_files) : k === "reviewers" ? d?.reviewers.length : undefined;
+  const tabs: PrTabDef[] = TABS.map((x) => ({ ...x, count: count(x.key) }));
+  const vertical = layout === "vertical";
+  const shown = stateOf(m);
+  const author = m?.author || item.author;
+
+  const panel = (
+    <div role="tabpanel" className="min-h-0 min-w-0 flex-1 space-y-2.5 overflow-y-auto px-3 py-3">
+      {detail.error && (
+        <p role="alert" className="m-0 text-[11px] text-danger">
+          {detail.error}
+        </p>
+      )}
+      {!d && !detail.error && <Skeleton label={t("forge.peek.loading")} rows={3} />}
+      {d && tab === "overview" && <PrOverview back={back} detail={d} meta={m} login={login} onChanged={refresh} />}
+      {d && tab === "conversation" && <PrConversation back={back} conv={conv} />}
+      {d && tab === "pipeline" && <PrPipeline back={back} jobs={d.jobs} />}
+      {d && tab === "files" && <PrFiles back={back} files={files} conv={conv.data} base={d.base_branch} head={d.head_branch} onThreads={() => setTab("conversation")} />}
+      {d && tab === "reviewers" && <PrReviewers back={back} detail={d} item={item} login={login} onDone={detail.reload} />}
+    </div>
+  );
 
   return (
     <div role="dialog" aria-modal="true" aria-label={t("forge.pr.label", { kind: back.kind, ref: item.reference })} className="fixed inset-0 z-40 flex flex-col bg-panel">
-      <header className="shrink-0 space-y-1.5 border-b border-edge px-3 pt-2">
+      <header className="shrink-0 space-y-2 border-b border-edge px-3 pt-2">
         <div className="flex items-start gap-1.5">
           <button ref={backBtn} type="button" onClick={onClose} aria-label={t("forge.pr.back")} title={t("forge.pr.back")} className="canto-hit grid size-7 shrink-0 place-items-center rounded-md text-muted hover:bg-hover hover:text-fg">
             ←
           </button>
           <div className="min-w-0 flex-1">
-            <h2 className="m-0 break-words text-sm font-semibold text-fg">{item.title}</h2>
-            <p className="m-0 flex flex-wrap items-center gap-x-2 text-[11px] text-muted">
+            <h2 className="m-0 break-words text-sm font-semibold text-fg">{m?.title || item.title}</h2>
+            <p className="m-0 mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted">
+              {shown && <Pill tone={STATE_TONE[shown]}>{t(`forge.pr.state.${shown}` as MessageKey)}</Pill>}
               <span className="font-mono">{item.reference}</span>
               {d && <span className="font-mono">{t("forge.peek.branches", { head: d.head_branch, base: d.base_branch })}</span>}
-              {item.author && <span>{t("forge.peek.by")} @{item.author}</span>}
+              {author && (
+                <span className="inline-flex items-center gap-1 font-semibold text-fg">
+                  <Avatar src={photo} name={author} size="size-4" />@{author}
+                </span>
+              )}
               {state && <CiPill status={state} />}
             </p>
           </div>
@@ -74,34 +111,18 @@ export default function PrView({ forge, item, login, onClose }: Props) {
             ↗
           </button>
         </div>
-        <div role="tablist" aria-label={t("forge.pr.tabs")} className="-mb-px flex gap-0.5 overflow-x-auto">
-          {TABS.map(({ key: k, label }) => {
-            const n = count(k);
-            return (
-              <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`canto-hit shrink-0 whitespace-nowrap border-b-2 px-2.5 py-1.5 text-xs ${tab === k ? "border-accent font-semibold text-accent-text" : "border-transparent text-muted hover:text-fg"}`}>
-                {t(label)}
-                {n !== undefined && <span className="ml-1 rounded-full bg-edge px-1.5 text-[10px] tabular-nums text-muted">{n}</span>}
-              </button>
-            );
-          })}
-        </div>
+        {m && <PrActions back={back} meta={m} checks={state ?? "none"} onDone={refresh} />}
+        {!vertical && <PrTabBar tabs={tabs} tab={tab} onChange={setTab} />}
+        {vertical && <div className="pb-2" />}
       </header>
-      <div role="tabpanel" className="min-h-0 flex-1 space-y-2.5 overflow-y-auto px-3 py-3">
-        {detail.error && (
-          <p role="alert" className="m-0 text-[11px] text-danger">
-            {detail.error}
-          </p>
-        )}
-        {!d && !detail.error && <Skeleton label={t("forge.peek.loading")} rows={3} />}
-        {d && tab === "overview" && <PrOverview detail={d} />}
-        {d && tab === "conversation" && <PrConversation back={back} conv={conv} />}
-        {d && tab === "pipeline" && <PrPipeline back={back} jobs={d.jobs} />}
-        {d && tab === "files" && <PrFiles files={files} onPick={(name) => (setOnly(name), setTab("diff"))} conv={conv.data} />}
-        {d && tab === "diff" && <PrDiff files={files} conv={conv.data} only={only} onAll={() => setOnly(null)} onThreads={() => setTab("conversation")} />}
-        {d && tab === "reviewers" && <PrReviewers back={back} detail={d} item={item} login={login} onDone={detail.reload} />}
-        {d && tab === "compose" && <PrCompose back={back} onDone={conv.reload} />}
-      </div>
+      {vertical ? (
+        <div className="flex min-h-0 flex-1">
+          <PrTabRail tabs={tabs} tab={tab} onChange={setTab} />
+          {panel}
+        </div>
+      ) : (
+        panel
+      )}
     </div>
   );
 }
-

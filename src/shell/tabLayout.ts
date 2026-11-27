@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Tab } from "./TabBar";
 
 export type TabLayout = "horizontal" | "vertical" | "dock";
@@ -36,16 +36,29 @@ function write(key: string, value: string) {
   }
 }
 
+/** Other windows of the app that read the layout (the forge view shows tabs the same way) hear a change at once. */
+const CHANGED = "canto:tablayout";
+
 export function useTabLayout() {
   const [layout, setLayoutState] = useState<TabLayout>(() => parseLayout(read(LAYOUT_KEY)));
   const [pinned, setPinnedState] = useState(() => read(PINNED_KEY) === "1");
+  useEffect(() => {
+    const sync = () => {
+      setLayoutState(parseLayout(read(LAYOUT_KEY)));
+      setPinnedState(read(PINNED_KEY) === "1");
+    };
+    window.addEventListener(CHANGED, sync);
+    return () => window.removeEventListener(CHANGED, sync);
+  }, []);
   const setLayout = useCallback((next: TabLayout) => {
     setLayoutState(next);
     write(LAYOUT_KEY, next);
+    window.dispatchEvent(new Event(CHANGED));
   }, []);
   const setPinned = useCallback((next: boolean) => {
     setPinnedState(next);
     write(PINNED_KEY, next ? "1" : "0");
+    window.dispatchEvent(new Event(CHANGED));
   }, []);
   return { layout, setLayout, pinned, setPinned } as const;
 }

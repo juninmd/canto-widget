@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 use crate::error::Result;
+use crate::forge::pr_meta::emoji_of;
 use crate::github::detail::{check_target, clip};
 use crate::github::{client, network, response, API};
 
@@ -31,6 +32,27 @@ pub struct ConvEntry {
     pub resolved: bool,
     /// Only GitLab can resolve from here; GitHub needs a GraphQL thread id this panel does not read.
     pub resolvable: bool,
+    /// How many people reacted with each emoji (GitHub only: GitLab's notes carry none). Counts, not people, so a
+    /// reaction can be added but not taken back from here.
+    pub reactions: Vec<ReactionCount>,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub struct ReactionCount {
+    pub emoji: String,
+    pub count: u64,
+}
+
+/// GitHub's `reactions` rollup: `{"+1": 2, "heart": 1, "total_count": 3, "url": ...}`.
+fn counts(raw: &std::collections::HashMap<String, serde_json::Value>) -> Vec<ReactionCount> {
+    let mut out: Vec<ReactionCount> = raw
+        .iter()
+        .filter_map(|(k, v)| {
+            Some(ReactionCount { emoji: emoji_of(true, k)?.into(), count: v.as_u64().filter(|n| *n > 0)? })
+        })
+        .collect();
+    out.sort_by(|a, b| b.count.cmp(&a.count).then(a.emoji.cmp(&b.emoji)));
+    out
 }
 
 #[derive(Deserialize)]
@@ -61,6 +83,8 @@ struct Raw {
     diff_hunk: Option<String>,
     #[serde(default)]
     in_reply_to_id: Option<u64>,
+    #[serde(default)]
+    reactions: std::collections::HashMap<String, serde_json::Value>,
 }
 
 fn entry(r: Raw) -> Option<ConvEntry> {
@@ -88,6 +112,7 @@ fn entry(r: Raw) -> Option<ConvEntry> {
         thread: if has_path { r.in_reply_to_id.unwrap_or(r.id).to_string() } else { String::new() },
         resolved: false,
         resolvable: false,
+        reactions: counts(&r.reactions),
     })
 }
 

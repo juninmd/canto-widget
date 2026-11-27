@@ -8,6 +8,7 @@ pub mod conversation;
 pub mod detail;
 pub mod failures;
 pub mod files;
+pub mod manage;
 pub mod profile;
 pub mod query;
 pub mod teams;

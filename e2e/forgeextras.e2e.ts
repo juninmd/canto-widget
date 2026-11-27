@@ -134,8 +134,15 @@ const changed = [
   { name: "src/rotas/calcular.ts", status: "modified", additions: 4, deletions: 1, truncated: false, patch: "@@ -1,3 +1,6 @@\n const trechos = ordenar(paradas);\n-let total = 0;\n+let total = origem.dist(paradas[0]);\n+for (const t of trechos) total += t.km;\n+if (circular) total += ultimo.volta;\n return total;" },
   { name: "test/rotas.spec.ts", status: "added", additions: 3, deletions: 0, truncated: false, patch: "@@ -0,0 +1,3 @@\n+it(\"aceita lista vazia\", () => {\n+  expect(calcular([])).toBe(0);\n+});" },
 ];
+const pic = "data:image/svg+xml;utf8," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="560" height="260"><rect width="560" height="260" fill="#14214a"/><rect x="20" y="20" width="520" height="34" rx="8" fill="#1f2c52"/><rect x="20" y="70" width="330" height="170" rx="10" fill="#1d2b5c"/><rect x="366" y="70" width="174" height="80" rx="10" fill="#0f766e"/><rect x="366" y="160" width="174" height="80" rx="10" fill="#6d28d9"/></svg>');
+const meta = {
+  title: "Corrige o cálculo de rotas com paradas removidas", state: "open", draft: false, conflict: false, author: "ana", author_avatar: "", created_at: ago(180),
+  body: "## Resumo\n\nRecalcula as rotas quando uma parada é removida e **evita ciclos**.\n\n- [x] Cobertura de teste\n- [ ] Documentar no README\n\n| Antes | Depois |\n|---|---|\n| 3 s | 0,4 s |\n\n![antes e depois](https://user-images.githubusercontent.com/1/rotas.png)\n\nFecha #37.",
+  labels: [{ name: "bug", color: "d73a4a" }, { name: "rotas", color: "0e8a16" }], assignees: ["ana"], milestone: "v0.82", merge_methods: ["squash", "merge", "rebase"],
+  reactions: [{ id: 1, emoji: "👍", user: "voce" }, { id: 2, emoji: "👍", user: "bia" }, { id: 3, emoji: "🎉", user: "bia" }],
+};
 const profile = { login: "bia", name: "Bia Lima", bio: "Revisa tudo que mexe em rotas.", company: "Acme", location: "Recife", public_repos: 21, followers: 54, since: 2018, url: "https://github.com/bia" };
-const rich = { ...fixed, github_pr_detail: detail, github_pr_conversation: talk, github_pr_files: changed, github_pr_review: null, github_pr_reply: null, github_profile: profile };
+const rich = { ...fixed, github_pr_meta: meta, forge_image: pic, pr_blob_image: pic, github_repo_labels: meta.labels, github_pr_act: null, github_pr_detail: detail, github_pr_conversation: talk, github_pr_files: changed, github_pr_review: null, github_pr_reply: null, github_profile: profile };
 
 test("clicking a PR opens its view; approving asks for a confirmation first", async ({ page }) => {
   await mockTauri(page, { fixed: rich });
@@ -145,6 +152,8 @@ test("clicking a PR opens its view; approving asks for a confirmation first", as
   const view = page.getByRole("dialog", { name: "PR acme/atlas#41" });
   await expect(view.getByText("fix/rotas → main")).toBeVisible();
   await expect(view.getByText("Fecha #37.")).toBeVisible();
+  await expect(view.getByAltText("antes e depois")).toBeVisible();
+  await expect(view.getByRole("button", { name: "mesclar" })).toBeVisible();
   await view.getByRole("tab", { name: /Revisores/ }).click();
   await view.getByRole("button", { name: "ver perfil de @bia" }).click();
   await expect(view.getByRole("region", { name: "perfil de @bia" }).getByText("Acme · Recife")).toBeVisible();
@@ -171,7 +180,8 @@ test("the conversation groups replies, hides bots and the diff shows the thread 
   await view.getByRole("button", { name: "ocultar bots" }).click();
   await expect(view.getByText("Cobertura: 87%")).toHaveCount(0);
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
-  await view.getByRole("tab", { name: /^Diff/ }).click();
+  await view.getByRole("tab", { name: /^Arquivos/ }).click();
+  await view.getByRole("button", { name: /calcular.ts/ }).click();
   await expect(view.getByText("E se a lista de paradas vier vazia?")).toBeVisible();
   if (process.env.SHOT2) await page.screenshot({ path: process.env.SHOT2 });
 });

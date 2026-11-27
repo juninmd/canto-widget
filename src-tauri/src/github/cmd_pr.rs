@@ -1,10 +1,12 @@
 //! The peek panel's commands: one PR's details, and approve or comment from the widget.
 use crate::blocking::run;
 use crate::error::Result;
+use crate::forge::pr_meta::{PrAction, PrLabel, PrMeta};
 use crate::github::cmd_lists::token;
 use crate::github::conversation::{self, ConvEntry};
 use crate::github::detail::{self, PrDetail};
 use crate::github::files::{self, PrFile};
+use crate::github::manage;
 use crate::github::profile::{self, Profile};
 
 #[tauri::command]
@@ -60,4 +62,25 @@ pub async fn github_profile(app: tauri::AppHandle, login: String) -> Result<Prof
         return Err(crate::error::AppError::Github("usuário inválido".into()));
     }
     run(move || profile::fetch(&token(&app)?, &login)).await
+}
+
+/// State, labels, author and reactions of one PR, read when its view opens and again after every action.
+#[tauri::command]
+pub async fn github_pr_meta(app: tauri::AppHandle, repo: String, number: u64) -> Result<PrMeta> {
+    detail::check_target(&repo, number)?;
+    run(move || manage::fetch_meta(&token(&app)?, &repo, number)).await
+}
+
+/// The repository's labels, read only when the label picker opens.
+#[tauri::command]
+pub async fn github_repo_labels(app: tauri::AppHandle, repo: String) -> Result<Vec<PrLabel>> {
+    detail::check_target(&repo, 1)?;
+    run(move || manage::fetch_labels(&token(&app)?, &repo)).await
+}
+
+/// Merge, close, reopen, draft, label or react: planned and validated before the token is even read.
+#[tauri::command]
+pub async fn github_pr_act(app: tauri::AppHandle, repo: String, number: u64, action: PrAction) -> Result<()> {
+    let step = manage::plan(&repo, number, &action)?;
+    run(move || manage::run_step(&token(&app)?, &repo, number, &step)).await
 }
